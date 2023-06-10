@@ -57,6 +57,7 @@ bool World::RayIntersection(Ray& ray) {
 		ivec3 side;
 		vec3 l;
 		vec3 TravelDistance;
+
 		//iterates through the 3 axis
 		for (int axis = 0; axis < 3; axis++) {
 			//Sets where the ray could intersect to
@@ -132,8 +133,7 @@ float World::GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int dire
 	ivec3 FlooredPos(floor(Origin.x), floor(Origin.y), floor(Origin.z));
 	ivec3 Move(0,0,0);
 
-	if ((direction == PX) || (direction == PY) || (direction == PZ)) {
-
+	if (direction % 2 == 0) { //Negative direction has a " + 1". So by taking the modulus, you can find if it is negative or positive. Explaination: PX = 0, NX = 1
 		if (direction == PX) {
 			displacement = 1 - (Origin.x - (float)FlooredPos.x);
 			Move.x = 1;

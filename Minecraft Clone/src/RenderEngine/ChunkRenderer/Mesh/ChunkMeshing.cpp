@@ -29,14 +29,16 @@ void ChunkMeshData::GenerateMesh(Chunk& chunk) {
 
 	GenerateFaceCollection(chunk); //Generates face with their respected textures
 
-	//GenerateFaceLighting(chunk); //Add lighting to those faces
+	GenerateFaceLighting(chunk); //Add lighting to those faces
 
-	SimplifyMesh(chunk);
+	SimplifyMesh(chunk); //Simplifies mesh
 
+	//Clear cache
 	FaceCollectionCache.clear();
 
 }
 
+//Checks if there are anything different between q0 and q1
 bool ChunkMeshData::compareQuads(Quad q0, Quad q1) {
 	if (q0.L_NN != q1.L_NN)
 		return false;
@@ -76,10 +78,11 @@ void ChunkMeshData::GenerateFaceCollection(Chunk& chunk) {
 //Simplifies mesh (Algorithm: Greedy Meshing): Similar to this https://gist.github.com/Vercidium/a3002bd083cce2bc854c9ff8f0118d33
 void ChunkMeshData::SimplifyMesh(Chunk& chunk) {
 	//iterate through the x, y, and z axis
-	for (int axis = 0; axis < 3; axis++) {
 
-		int x[3]{};
-		int q[3]{};
+	int x[3]{};
+	int q[3]{};
+
+	for (int axis = 0; axis < 3; axis++) {
 
 		int Axis0 = (axis + 2) % 3;
 		int Axis1 = (axis + 1) % 3;
@@ -97,11 +100,11 @@ void ChunkMeshData::SimplifyMesh(Chunk& chunk) {
 						if (!compareQuads(GetFace(x[0], x[1], x[2], axis * 2 + facing), NullQuad)) { // Check if quad actually exist first
 							LastQuad = GetFace(x[0], x[1], x[2], axis * 2 + facing); //Load in quad face
 
-							int Axis1W = 0;
-							int Axis0H = 0;
-							int Axis1K = 0;
+							int Axis1W = 1;
+							int Axis0H = 1;
+							int Axis1K = 1;
 
-							for (Axis1W = 1; Axis1W + x[Axis1] < 16; Axis1W++) { //Go as far as it can until it hit a quad that is different
+							for (Axis1W = 1; Axis1W + x[Axis1] <= 16; Axis1W++) { //Go as far as it can until it hit a quad that is different
 								q[Axis0] = x[Axis0];
 								q[Axis1] = x[Axis1] + Axis1W;
 								q[Axis2] = x[Axis2];
@@ -116,46 +119,40 @@ void ChunkMeshData::SimplifyMesh(Chunk& chunk) {
 							
 							//This starts at 1 because we already know that at Axis0H = 0, there's a valid quad
 
-							int LastH = 0;
-							int LastK = 0;
+							for (Axis0H = 1; Axis0H + x[Axis0] < 16; Axis0H++) {
 
-							for (Axis0H = 0; Axis0H + x[Axis0] < 16; Axis0H++) {
-								for (Axis1K = 0; Axis1K < Axis1W; Axis1K++) { //loops through until it finds a break
+								q[Axis0] = x[Axis0] + Axis0H;
+								q[Axis1] = x[Axis1];
+								q[Axis2] = x[Axis2];
+
+								if (!compareQuads(GetFace(q[0], q[1], q[2], axis * 2 + facing), LastQuad)) { //Checks if it can expand in the other direction first
+									Axis1K = Axis1W;
+									break;
+								}
+
+								//This starts at 1 because we already know it can expand in the other direction
+								for (Axis1K = 1; Axis1K < Axis1W; Axis1K++) { //loops through until it finds a break
 
 									q[Axis0] = x[Axis0] + Axis0H;
 									q[Axis1] = x[Axis1] + Axis1K;
 									q[Axis2] = x[Axis2];
-
-									bool IsSame = compareQuads(GetFace(q[0], q[1], q[2], axis * 2 + facing), LastQuad);
 									
-									if (!IsSame) {
+									if (!compareQuads(GetFace(q[0], q[1], q[2], axis * 2 + facing), LastQuad)) {
 										done = true;
 										break;
 									}
-									LastK = Axis1K;
 								}
 								if (done) {
 									break;
 								}
-								LastH = Axis0H;
 							}
 
-							/*getLogger()->LogInfo("Mesh Debug 0",
-
-								"Position: " + to_string(x[0]) + ", " + to_string(x[1]) + ", " + to_string(x[2]) +
-								"\tAxis (h, k): " + to_string(Axis0H) + ", " + to_string(Axis1K)
-
-							);*/
-
-
 							//Set all of the used quads as NullQuads to prevent them from being used again;
-							for (int Axis0H_TMP = 0; Axis0H_TMP < LastH; Axis0H_TMP++) {
-								for (int Axis1K_TMP = 0; Axis1K_TMP < LastK; Axis1K_TMP++) {
-
+							for (int Axis0H_TMP = 0; Axis0H_TMP < Axis0H; Axis0H_TMP++) {
+								for (int Axis1K_TMP = 0; Axis1K_TMP < Axis1K; Axis1K_TMP++) {
 									q[Axis0] = x[Axis0] + Axis0H_TMP;
 									q[Axis1] = x[Axis1] + Axis1K_TMP;
 									q[Axis2] = x[Axis2];
-
 									SetFace(q[0], q[1], q[2], axis * 2 + facing, NullQuad);
 								}
 							}
@@ -166,9 +163,7 @@ void ChunkMeshData::SimplifyMesh(Chunk& chunk) {
 
 							finalq.h = Axis0H;
 							finalq.w = Axis1W;
-							 
 
-								
 							AddFacetoMesh(finalq, x[Axis2], axis, facing);
 
 							LastQuad = NullQuad;
@@ -194,6 +189,9 @@ void ChunkMeshData::AddFacetoMesh(Quad quad, int slice, int axis, int face) {
 	int ParallelAxis = axis;
 	int AxisU = ((axis + 1) % 3);
 	int AxisV = ((axis + 2) % 3);
+
+	//AxisU = (axis + 1 * (axis % 2) + (int)(0.5 * axis + 1) * ((axis + 1) % 2)) % 3;
+	//AxisV = (axis + 2 * (axis % 2) + (int)(-0.5 * axis + 2) * ((axis + 1) % 2)) % 3;
 
 	unsigned int P0[3]{};
 	unsigned int P1[3]{};
