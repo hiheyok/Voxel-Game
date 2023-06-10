@@ -58,7 +58,7 @@ private:
 	std::vector<std::thread> Workers;
 	std::thread LoaderWorker;
 	std::vector<std::deque<ChunkID>> WorkerMeshQueue;
-	std::vector<concurrency::concurrent_queue<Meshing::ChunkMeshData>> WorkerMeshOutput;
+	std::vector<concurrency::concurrent_queue<ChunkMesh>> WorkerMeshOutput;
 	std::vector<bool> WorkerIsWorking;
 	std::vector<bool> WorkerPause;
 

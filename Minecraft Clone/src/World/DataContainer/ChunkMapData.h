@@ -56,22 +56,29 @@ public:
 		int ChunkY = (int)floor((float)y / 16.f);
 		int ChunkZ = (int)floor((float)z / 16.f);
 
+		UsingChunk(getChunkID(ChunkX, ChunkY, ChunkZ));
+
 		int LocalX = x - ChunkX * 16;
 		int LocalY = y - ChunkY * 16;
 		int LocalZ = z - ChunkZ * 16;
 
 		if (CheckChunk(ChunkX, ChunkY, ChunkZ)) {
-			return GetChunk(ChunkX, ChunkY, ChunkZ).GetBlock(LocalX, LocalY, LocalZ);
+			BlockID block = GetChunk(ChunkX, ChunkY, ChunkZ).GetBlock(LocalX, LocalY, LocalZ);
+
+			FinishedChunk(getChunkID(ChunkX, ChunkY, ChunkZ));
+
+			return block;
 		}
-		else {
-			return NULL_BLOCK;
-		}
+
+		return NULL_BLOCK;
 	}
 
 	BlockID GetBlockGlobal(glm::ivec3 pos) {
 		int ChunkX = (int)floor((float)pos.x / 16.f);
 		int ChunkY = (int)floor((float)pos.y / 16.f);
 		int ChunkZ = (int)floor((float)pos.z / 16.f);
+
+		UsingChunk(getChunkID(ChunkX, ChunkY, ChunkZ));
 
 		int LocalX = pos.x - ChunkX * 16;
 		int LocalY = pos.y - ChunkY * 16;
@@ -80,15 +87,15 @@ public:
 		if (CheckChunk(ChunkX, ChunkY, ChunkZ)) {
 			return GetChunk(ChunkX, ChunkY, ChunkZ).GetBlock(LocalX, LocalY, LocalZ);
 		}
-		else {
-			return NULL_BLOCK;
-		}
+		return NULL_BLOCK;
 	}
 
 	bool ChangeBlockGlobal(BlockID block, int x, int y, int z) {
 		int ChunkX = (int)floor((float)x / 16.f);
 		int ChunkY = (int)floor((float)y / 16.f);
 		int ChunkZ = (int)floor((float)z / 16.f);
+
+		UsingChunk(getChunkID(ChunkX, ChunkY, ChunkZ));
 
 		unsigned int LocalX = x - ChunkX * 16;
 		unsigned int LocalY = y - ChunkY * 16;
@@ -97,19 +104,34 @@ public:
 		if (CheckChunk(ChunkX, ChunkY, ChunkZ)) {
 			Data[getChunkID(ChunkX, ChunkY, ChunkZ)].Blocks.ChangeBlock(block, LocalX, LocalY, LocalZ);
 			Data[getChunkID(ChunkX, ChunkY, ChunkZ)].isEmpty = false;
+			FinishedChunk(getChunkID(ChunkX, ChunkY, ChunkZ));
 			return true;
 		}
-		else {
-			return false;
-		}
+
+		FinishedChunk(getChunkID(ChunkX, ChunkY, ChunkZ));
+		return false;
+
+		
 	}
 
 	bool CheckChunk(int x, int y, int z) {
 		return ChunkIDContainer.count(getChunkID(x, y, z));
 	}
-private:
 
-	Concurrency::concurrent_unordered_map<ChunkID, Chunk> Data;
-	Concurrency::concurrent_unordered_set<ChunkID> ChunkIDContainer;
+	void UsingChunk(ChunkID id) {
+		ChunksBeingUsed.insert(id);
+	}
+
+	void FinishedChunk(ChunkID id) {
+		ChunksBeingUsed.erase(id);
+	}
+
+	bool IsChunkInUse(ChunkID id) {
+		ChunksBeingUsed.contains(id);
+	}
+private:
+	std::unordered_set<ChunkID> ChunksBeingUsed;
+	std::unordered_map<ChunkID, Chunk> Data;
+	std::unordered_set<ChunkID> ChunkIDContainer;
 	std::thread MainWorldThread;
 };

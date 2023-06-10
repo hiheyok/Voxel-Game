@@ -78,13 +78,14 @@ void WorldRender::MeshWorker(int id) {
 					main->SetNeighbor((ChunkContainer*)&Neighbors[PZ], PZ);
 				}
 
-				Meshing::ChunkMeshData mesh;
-				mesh.GenerateMesh(ChunkCache[chunk]);
+				ChunkMesh mesh;
+				mesh.chunk = &ChunkCache[chunk];
+				mesh.SmartGreedyMeshing();
 				
 				WorkerMeshOutput[WorkerID].push(mesh);
 				WorkerIsWorking[WorkerID] = false;
 
-				delete main;
+				
 
 				if (WorkerPause[WorkerID])
 					break;
@@ -104,9 +105,10 @@ void WorldRender::Update() {
 			PauseWorker(WorkerID);
 
 			while (!WorkerMeshOutput[WorkerID].empty()) {
-				Meshing::ChunkMeshData mesh;
+				ChunkMesh mesh;
 				if (WorkerMeshOutput[WorkerID].try_pop(mesh)) {
 					Renderer.AddChunkMesh(mesh);
+					//delete mesh.chunk;
 				}
 
 				
