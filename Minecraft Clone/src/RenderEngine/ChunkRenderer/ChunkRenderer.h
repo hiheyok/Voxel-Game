@@ -222,8 +222,8 @@ public:
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_DEPTH_TEST);
 		//	glDepthFunc(GL_ALWAYS);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_FRONT);
+		//glEnable(GL_CULL_FACE);
+		//glCullFace(GL_FRONT);
 
 		glBindVertexArray(VAO);
 		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, IBO);
