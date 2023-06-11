@@ -1,15 +1,16 @@
 #pragma once
 #include "../Chunk/Block/Blocks.h"
+#include <glm/vec3.hpp>
 
 class BlockContainer {
 public:
 	
 	BlockID GetBlock(unsigned int x, unsigned int y, unsigned int z) {
-		return Data[GetDataIndex(x, y, z)];
+		return Data[GetDataIndex(x,y,z)];
 	}
 
 	void ChangeBlock(BlockID ID, unsigned int x, unsigned int y, unsigned int z) {
-		Data[GetDataIndex(x, y, z)] = ID;
+		Data[GetDataIndex(x,y,z)] = ID;
 	}
 
 	void DumpData() {

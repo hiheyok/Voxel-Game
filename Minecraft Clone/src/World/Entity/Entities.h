@@ -21,5 +21,5 @@ inline EntityID RegisterNewEntity() {
 __declspec(selectany) EntityID PLAYER = RegisterNewEntity();
 
 inline void InitializeEntities() {
-	EntityTypeList[PLAYER]->ChangeHitboxSize(6.f,18.f,6.f);
+	EntityTypeList[PLAYER]->ChangeHitboxSize(0.8,1.8,0.8);
 }

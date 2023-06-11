@@ -87,6 +87,9 @@
     <ClCompile Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\World\DataContainer\WorldData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\World\World.h">
@@ -219,6 +222,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\World\DataContainer\WorldData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

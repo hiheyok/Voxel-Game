@@ -43,9 +43,9 @@ void Chunk::Generate(FastNoiseLite* noise) {
 					}
 				}*/
 
-				if ((x == 16) || (z == 16) || (y == 16)) {
+				/*if ((x == 16) || (z == 16) || (y == 16)) {
 					Blocks.ChangeBlock(DIAMOND_BLOCK, x - cx, y - cy, z - cz);
-				}
+				}*/
 
 				if (y < 10) {
 					Blocks.ChangeBlock(WATER, x - cx, y - cy, z - cz);

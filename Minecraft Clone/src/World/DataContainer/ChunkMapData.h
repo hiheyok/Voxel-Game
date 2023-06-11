@@ -16,31 +16,18 @@ public:
 		Data[ID] = chunk;
 		ChunkIDContainer.insert(ID);
 
-		if (CheckChunk(x, y, z - 1)) {
-			GetChunk(x, y, z).SetNeighbor((ChunkContainer*)&GetChunk(x, y, z - 1), NZ);
-			GetChunk(x, y, z - 1).SetNeighbor((ChunkContainer*)&GetChunk(x, y, z), PZ);
-		}
-		if (CheckChunk(x, y, z + 1)) {
-			GetChunk(x, y, z).SetNeighbor((ChunkContainer*)&GetChunk(x, y, z + 1), PZ);
-			GetChunk(x, y, z + 1).SetNeighbor((ChunkContainer*)&GetChunk(x, y, z), NZ);
-		}
-		if (CheckChunk(x, y - 1, z)) {
-			GetChunk(x, y, z).SetNeighbor((ChunkContainer*)&GetChunk(x, y - 1, z), NY);
-			GetChunk(x, y - 1, z).SetNeighbor((ChunkContainer*)&GetChunk(x, y, z), PY);
-		}
-		if (CheckChunk(x, y + 1, z)) {
-			GetChunk(x, y, z).SetNeighbor((ChunkContainer*)&GetChunk(x, y + 1, z), PY);
-			GetChunk(x, y + 1, z).SetNeighbor((ChunkContainer*)&GetChunk(x, y, z), NY);
-		}
-		if (CheckChunk(x - 1, y, z)) {
-			GetChunk(x, y, z).SetNeighbor((ChunkContainer*)&GetChunk(x - 1, y, z), NX);
-			GetChunk(x - 1, y, z).SetNeighbor((ChunkContainer*)&GetChunk(x, y, z), PX);
-		}
-		if (CheckChunk(x + 1, y, z)) {
-			GetChunk(x, y, z).SetNeighbor((ChunkContainer*)&GetChunk(x + 1, y, z), PX);
-			GetChunk(x + 1, y, z).SetNeighbor((ChunkContainer*)&GetChunk(x, y, z), NX);
-		}
+		for (int axis = 0; axis < 3; axis++) {
+			for (int face = 0; face < 2; face++) {
+				int p[3]{ x ,y ,z }; // p[3] is just the position of the neighboring chunk
 
+				p[axis] += (-2 * face) + 1; 
+
+				if (CheckChunk(p[0], p[1], p[2])) {
+					GetChunk(x, y, z).SetNeighbor((ChunkContainer*)&GetChunk(p[0], p[1], p[2]), axis * 2 + face);
+					GetChunk(p[0], p[1], p[2]).SetNeighbor((ChunkContainer*)&GetChunk(x, y, z), axis * 2 - face + 1);
+				}
+			}
+		}
 	}
 
 	Chunk& GetChunk(int x, int y, int z) {
@@ -52,20 +39,16 @@ public:
 	}
 
 	BlockID GetBlockGlobal(int x, int y, int z) {
-		int ChunkX = (int)floor((float)x / 16.f);
-		int ChunkY = (int)floor((float)y / 16.f);
-		int ChunkZ = (int)floor((float)z / 16.f);
 
-		UsingChunk(getChunkID(ChunkX, ChunkY, ChunkZ));
+		//c[3] is the position of the chunk
+		//l[3] is the local position of a block inside a chunk
 
-		int LocalX = x - ChunkX * 16;
-		int LocalY = y - ChunkY * 16;
-		int LocalZ = z - ChunkZ * 16;
+		int c[3]{ (int)floor((float)x / 16.f) ,(int)floor((float)y / 16.f) ,(int)floor((float)z / 16.f) };
 
-		if (CheckChunk(ChunkX, ChunkY, ChunkZ)) {
-			BlockID block = GetChunk(ChunkX, ChunkY, ChunkZ).GetBlock(LocalX, LocalY, LocalZ);
+		int l[3]{ x - c[0] * 16 ,y - c[1] * 16,z - c[2] * 16 };
 
-			FinishedChunk(getChunkID(ChunkX, ChunkY, ChunkZ));
+		if (CheckChunk(c[0], c[1], c[2])) {
+			BlockID block = GetChunk(c[0], c[1], c[2]).GetBlock(l[0], l[1], l[2]);
 
 			return block;
 		}
@@ -73,44 +56,18 @@ public:
 		return NULL_BLOCK;
 	}
 
-	BlockID GetBlockGlobal(glm::ivec3 pos) {
-		int ChunkX = (int)floor((float)pos.x / 16.f);
-		int ChunkY = (int)floor((float)pos.y / 16.f);
-		int ChunkZ = (int)floor((float)pos.z / 16.f);
-
-		UsingChunk(getChunkID(ChunkX, ChunkY, ChunkZ));
-
-		int LocalX = pos.x - ChunkX * 16;
-		int LocalY = pos.y - ChunkY * 16;
-		int LocalZ = pos.z - ChunkZ * 16;
-
-		if (CheckChunk(ChunkX, ChunkY, ChunkZ)) {
-			return GetChunk(ChunkX, ChunkY, ChunkZ).GetBlock(LocalX, LocalY, LocalZ);
-		}
-		return NULL_BLOCK;
-	}
-
 	bool ChangeBlockGlobal(BlockID block, int x, int y, int z) {
-		int ChunkX = (int)floor((float)x / 16.f);
-		int ChunkY = (int)floor((float)y / 16.f);
-		int ChunkZ = (int)floor((float)z / 16.f);
+		int ChunkPos[3]{ (int)floor((float)x / 16.f) ,(int)floor((float)y / 16.f) ,(int)floor((float)z / 16.f) };
 
-		UsingChunk(getChunkID(ChunkX, ChunkY, ChunkZ));
+		int LocalBlockPos[3]{ x - ChunkPos[0] * 16 ,y - ChunkPos[1] * 16,z - ChunkPos[2] * 16 };
 
-		unsigned int LocalX = x - ChunkX * 16;
-		unsigned int LocalY = y - ChunkY * 16;
-		unsigned int LocalZ = z - ChunkZ * 16;
-
-		if (CheckChunk(ChunkX, ChunkY, ChunkZ)) {
-			Data[getChunkID(ChunkX, ChunkY, ChunkZ)].Blocks.ChangeBlock(block, LocalX, LocalY, LocalZ);
-			Data[getChunkID(ChunkX, ChunkY, ChunkZ)].isEmpty = false;
-			FinishedChunk(getChunkID(ChunkX, ChunkY, ChunkZ));
+		if (CheckChunk(ChunkPos[0], ChunkPos[1], ChunkPos[2])) {
+			Data[getChunkID(ChunkPos[0], ChunkPos[1], ChunkPos[2])].Blocks.ChangeBlock(block, LocalBlockPos[0], LocalBlockPos[1], LocalBlockPos[2]);
+			Data[getChunkID(ChunkPos[0], ChunkPos[1], ChunkPos[2])].isEmpty = false;
 			return true;
 		}
 
-		FinishedChunk(getChunkID(ChunkX, ChunkY, ChunkZ));
 		return false;
-
 		
 	}
 
@@ -129,6 +86,11 @@ public:
 	bool IsChunkInUse(ChunkID id) {
 		ChunksBeingUsed.contains(id);
 	}
+
+	Chunk& operator[](ChunkID id) {
+		return Data[id];
+	}
+
 private:
 	std::unordered_set<ChunkID> ChunksBeingUsed;
 	std::unordered_map<ChunkID, Chunk> Data;

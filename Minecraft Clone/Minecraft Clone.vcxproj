@@ -161,6 +161,7 @@
     <ClCompile Include="src\World\Chunk\Block\Block.cpp" />
     <ClCompile Include="src\World\Chunk\Chunk.cpp" />
     <ClCompile Include="src\World\Chunk\ChunkData.cpp" />
+    <ClCompile Include="src\World\DataContainer\WorldData.cpp" />
     <ClCompile Include="src\World\Entity\Entity.cpp" />
     <ClCompile Include="src\World\World.cpp" />
   </ItemGroup>
@@ -209,6 +210,7 @@
     <ClInclude Include="src\World\Entity\Entity.h" />
     <ClInclude Include="src\World\Entity\Hitbox.h" />
     <ClInclude Include="src\World\World.h" />
+    <ClInclude Include="src\World\DataContainer\WorldData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -32,9 +32,11 @@ public:
 		return Neighbors[Side];
 	}
 	
-	void SetPosition(glm::ivec3 Position_) {
-		Position = Position_;
-		chunkID = getChunkID(Position_);
+	void SetPosition(int x, int y, int z) {
+		Position.x = x;
+		Position.y = y;
+		Position.z = z;
+		chunkID = getChunkID(x, y, z);
 	}
 
 	glm::ivec3 Position;

@@ -71,27 +71,27 @@ void LocalWorld::MovePlayer(bool KeyW, bool KeyA, bool KeyS, bool KeyD, bool Key
 
 	vec3 right = normalize(cross(front, glm::vec3(0.0, 1.0, 0.0)));
 
-	float velocity = 20 * delta;
+	float velocity = 20;
 
 	if (KeyW) {
-		Player.Position += front * velocity;
+		Player.Velocity += front * velocity;
 	}
 	if (KeyA) {
-		Player.Position -= right * velocity;
+		Player.Velocity -= right * velocity;
 	}
 	if (KeyS) {
-		Player.Position -= front * velocity;
+		Player.Velocity -= front * velocity;
 	}
 	if (KeyD) {
-		Player.Position += right * velocity;
+		Player.Velocity += right * velocity;
 	}
 
 	if (KeySpace) {
-		Player.Position.y += velocity;
+		Player.Velocity.y += velocity;
 	}
 
 	if (shift) {
-		Player.Position.y += -velocity;
+		Player.Velocity.y += -velocity;
 	}
 
 
@@ -110,20 +110,20 @@ void LocalWorld::MovePlayer(bool KeyW, bool KeyA, bool KeyS, bool KeyD, bool Key
 	//	friction = 1000.0F;
 	//}
 
-	//vec3 time = world->GetTimeTillCollusion(Player);
+	vec3 time = world->GetTimeTillCollusion(Player);
 
-	//if ((time.x != -1.) && (time.x <= delta)) {
-	//	Player.Velocity.x = 0;
-	//}
-	//if ((time.y != -1.) && (time.y <= delta)) {
-	//	Player.Velocity.y = 0;
-	//}
-	//if ((time.z != -1.) && (time.z <= delta)) {
-	//	Player.Velocity.z = 0;
-	//}
+	if ((time.x != -1.) && (time.x <= delta)) {
+		Player.Velocity.x = 0;
+	}
+	if ((time.y != -1.) && (time.y <= delta)) {
+		Player.Velocity.y = 0;
+	}
+	if ((time.z != -1.) && (time.z <= delta)) {
+		Player.Velocity.z = 0;
+	}
 
-	/*Player.Position += Player.Velocity * delta;
-	Player.Velocity = Player.Velocity * powf(1 / 5, delta);*/
+	Player.Position += Player.Velocity * delta;
+	Player.Velocity = Player.Velocity * powf(1 / 5, delta);
 
 
 }

@@ -31,14 +31,6 @@ public:
 
 	concurrency::concurrent_queue<Chunk> ChunksUpdated;
 
-	void PauseWorker(int WorkerID);
-
-	void UnpauseWorker(int WorkerID);
-
-	void PauseLoader();
-
-	void UnpauseLoader();
-
 	bool IsEntityOnGround(Entity entity);
 
 	ChunkMap Chunks;
@@ -47,6 +39,7 @@ public:
 	bool PauseChunksUpdatedWriting = false;
 
 private:
+
 	void WorldThread();
 
 	void LoaderThread();
@@ -55,7 +48,14 @@ private:
 	
 	float GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int direction, int distancetest);
 
-	
+	void PauseWorker(int WorkerID);
+
+	void UnpauseWorker(int WorkerID);
+
+	void PauseLoader();
+
+	void UnpauseLoader();
+
 
 	std::thread MainWorldThread;
 	std::thread Loader;

@@ -9,41 +9,29 @@ using namespace chrono;
 using namespace glm;
 
 void World::SetBlock(BlockID block, int x, int y, int z) {
-	int ChunkX = floor((float)x / 16.f);
-	int ChunkY = floor((float)y / 16.f);
-	int ChunkZ = floor((float)z / 16.f);
 
-	int LocalX = x - ChunkX * 16;
-	int LocalY = y - ChunkY * 16;
-	int LocalZ = z - ChunkZ * 16;
+	int c[3]{ floor((float)x / 16.f) ,floor((float)y / 16.f) ,floor((float)z / 16.f) }; //c[3] is the position of the chunk
 
-	if (!Chunks.CheckChunk(ChunkX, ChunkY, ChunkZ)) {
+	if (!Chunks.CheckChunk(c[0],c[1],c[2])) {
 		Chunk chunk;
-		chunk.SetPosition(ivec3(ChunkX, ChunkY, ChunkZ));
-		Chunks.InsertChunk(chunk, ChunkX, ChunkY, ChunkZ);
+		chunk.SetPosition(c[0], c[1], c[2]);
+		Chunks.InsertChunk(chunk, c[0], c[1], c[2]);
 	}
 
-	Chunks.GetChunk(ChunkX, ChunkY, ChunkZ).Blocks.ChangeBlock(block, LocalX, LocalY, LocalZ);
-	Chunks.GetChunk(ChunkX, ChunkY, ChunkZ).isEmpty = false;
-	ChunksUpdated.push(Chunks.GetChunk(getChunkID(ChunkX, ChunkY, ChunkZ)));
+	Chunks.ChangeBlockGlobal(block, x, y, z);
 
-	if (Chunks.CheckChunk(ChunkX, ChunkY, ChunkZ - 1)) {
-		ChunksUpdated.push(Chunks.GetChunk(getChunkID(ChunkX, ChunkY, ChunkZ - 1)));
-	}
-	if (Chunks.CheckChunk(ChunkX, ChunkY, ChunkZ + 1)) {
-		ChunksUpdated.push(Chunks.GetChunk(getChunkID(ChunkX, ChunkY, ChunkZ + 1)));
-	}
-	if (Chunks.CheckChunk(ChunkX, ChunkY - 1, ChunkZ)) {
-		ChunksUpdated.push(Chunks.GetChunk(getChunkID(ChunkX, ChunkY - 1, ChunkZ)));
-	}
-	if (Chunks.CheckChunk(ChunkX, ChunkY + 1, ChunkZ)) {
-		ChunksUpdated.push(Chunks.GetChunk(getChunkID(ChunkX, ChunkY + 1, ChunkZ)));
-	}
-	if (Chunks.CheckChunk(ChunkX - 1, ChunkY, ChunkZ)) {
-		ChunksUpdated.push(Chunks.GetChunk(getChunkID(ChunkX - 1, ChunkY, ChunkZ)));
-	}
-	if (Chunks.CheckChunk(ChunkX + 1, ChunkY, ChunkZ)) {
-		ChunksUpdated.push(Chunks.GetChunk(getChunkID(ChunkX + 1, ChunkY, ChunkZ)));
+	ChunksUpdated.push(Chunks.GetChunk(getChunkID(c[0], c[1], c[2])));
+
+	for (int axis = 0; axis < 3; axis++) {
+		for (int face = 0; face < 2; face++) {
+			int q[3]{ c[0],c[1],c[2] }; //q is the position of the neighbor
+
+			q[axis] += (-2 * face) + 1;
+
+			if (Chunks.CheckChunk(q[0], q[1], q[2])) {
+				ChunksUpdated.push(Chunks.GetChunk(getChunkID(q[0], q[1], q[2])));
+			}
+		}
 	}
 }
 
@@ -134,40 +122,24 @@ float World::GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int dire
 	ivec3 Move(0,0,0);
 
 	if (direction % 2 == 0) { //Negative direction has a " + 1". So by taking the modulus, you can find if it is negative or positive. Explaination: PX = 0, NX = 1
-		if (direction == PX) {
-			displacement = 1 - (Origin.x - (float)FlooredPos.x);
-			Move.x = 1;
-		}
-		if (direction == PY) {
-			displacement = 1 - (Origin.y - (float)FlooredPos.y);
-			Move.y = 1;
-		}
-		if (direction == PZ) {
-			displacement = 1 - (Origin.z - (float)FlooredPos.z);
-			Move.z = 1;
-		}
+
+		int axis = direction / 2;
+
+		displacement = 1 - (Origin[axis] - (float)FlooredPos[axis]);
+		Move[axis] = 1;
 	}
 	else {
+		int axis = (direction - 1) / 2;
 
-		if (direction == NX) {
-			displacement = Origin.x - (float)FlooredPos.x;
-			Move.x = -1;
-		}
-		if (direction == NY) {
-			displacement = Origin.y - (float)FlooredPos.y;
-			Move.y = -1;
-		}
-		if (direction == NZ) {
-			displacement = Origin.z - (float)FlooredPos.z;
-			Move.z = -1;
-		}
+		displacement = Origin[axis] - (float)FlooredPos[axis];
+		Move[axis] = -1;
 	}
 
 	for (int i = 0; i < distancetest; i++) {
 
 		ivec3 Loc = FlooredPos + Move * i;
 
-		if ((Chunks.GetBlockGlobal(Loc) != AIR) && (Chunks.GetBlockGlobal(Loc) != NULL_BLOCK)) {
+		if ((Chunks.GetBlockGlobal(Loc.x, Loc.y, Loc.z) != AIR) && (Chunks.GetBlockGlobal(Loc.x, Loc.y, Loc.z) != NULL_BLOCK)) {
 			return (float)i + displacement - 1;
 		}
 	}
@@ -186,8 +158,10 @@ dvec3 World::GetTimeTillCollusion(Entity entity) {
 	int iz = floor(Hitbox.size.z) + 1;
 
 	vec3 leasttime(-1.f, -1.f, -1.f);
+	
+	int SearchDistance = 5;
 
-	float LeastDistance = -1.f;
+	float LeastDistance = SearchDistance;
 
 	for (int x = 0; x <= ix; x++) {
 		for (int y = 0; y <= iy; y++) {
@@ -212,19 +186,10 @@ dvec3 World::GetTimeTillCollusion(Entity entity) {
 					if (entity.Velocity[axis] != 0.f) { //First checks if the velocity isn't 0 because if it is 0, it's not moving in that axis so it's not going to collide in that direction
 						int direction = entity.Velocity[axis] < 0 ? axis * 2 + 1 : axis * 2; // The "+1" indicates that the direction is negative 
 
-						float distance;
+						float distance = GetDistanceUntilCollusionSingleDirection(origin, direction, floor(LeastDistance) + 2);
 
-						//Same usage as the bool World::IsEntityOnGround(Entity entity) function. Basicaally adds some optimization
-						if (LeastDistance == -1.f) {
-							LeastDistance = GetDistanceUntilCollusionSingleDirection(origin, direction, 5);
-							distance = LeastDistance;
-						}
-						else {
-							distance = GetDistanceUntilCollusionSingleDirection(origin, direction, floor(LeastDistance) + 1);
-							if (distance < LeastDistance) {
-								LeastDistance = distance;
-							}
-						}
+						if ((distance < LeastDistance) && (distance != -1.f))
+							LeastDistance = distance;
 
 						if (distance != -1.f) { // -1.f means that it cannot find any blocks that could collide in that range (5)
 							float time = abs(distance / entity.Velocity[axis]);// This gets the time it takes for the entity to travel that distance
@@ -375,7 +340,10 @@ void World::ChunkGenerationWorker(int id) {
 
 				if (ChunkWorkerJob[WorkerID].try_pop(chunkid)) {
 					Chunk chunk;
-					chunk.SetPosition(ChunkIDToPOS(chunkid));
+
+					ivec3 Pos = ChunkIDToPOS(chunkid);
+
+					chunk.SetPosition(Pos.x, Pos.y, Pos.z);
 					chunk.Generate(&noise);
 
 					WorkerChunkOutput[WorkerID].push(chunk);
@@ -438,7 +406,9 @@ bool World::IsEntityOnGround(Entity entity) {
 	int ix = floor(Hitbox.size.x) + 1;
 	int iz = floor(Hitbox.size.z) + 1;
 
-	float LeastLength = -1.f;
+	int SearchDistance = 5;
+
+	float LeastLength = SearchDistance;
 
 	float OnGroundError = 0.01f;
 
@@ -454,18 +424,12 @@ bool World::IsEntityOnGround(Entity entity) {
 			float Distance = 0.f;
 
 			//Set the distance to check to the previose least length from collusion to optimize searching
-			if (LeastLength == -1.f) {
-				LeastLength = GetDistanceUntilCollusionSingleDirection(origin, NY, 5);
-				Distance = LeastLength;
-			}
-			else {
-				Distance = GetDistanceUntilCollusionSingleDirection(origin, NY, floor(LeastLength) + 1);
-				if (Distance < LeastLength) {
-					LeastLength = Distance;
-				}
+			Distance = GetDistanceUntilCollusionSingleDirection(origin, NY, floor(LeastLength) + 2);
+
+			if (Distance < LeastLength) {
+				LeastLength = Distance;
 			}
 			
-
 			if ((Distance != -1) && (Distance < OnGroundError)) {
 				return true;
 			}
