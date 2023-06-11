@@ -200,16 +200,16 @@ void LocalWorld::GetBlock() {
 
 	if (world->RayIntersection(ray)) {
 		if (ray.bouncesurface == NX) {
-			HoldingBlock = world->Chunks.GetBlockGlobal((int)floor(ray.EndPoint.x - 1), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z));
+			HoldingBlock = world->GetBlock((int)floor(ray.EndPoint.x - 1), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z));
 		}
 		if (ray.bouncesurface == NY) {
-			HoldingBlock = world->Chunks.GetBlockGlobal((int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y - 1), (int)floor(ray.EndPoint.z));
+			HoldingBlock = world->GetBlock((int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y - 1), (int)floor(ray.EndPoint.z));
 		}
 		if (ray.bouncesurface == NZ) {
-			HoldingBlock = world->Chunks.GetBlockGlobal((int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z - 1));
+			HoldingBlock = world->GetBlock((int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z - 1));
 		}
 		if ((ray.bouncesurface == PX) || (ray.bouncesurface == PY) || (ray.bouncesurface == PZ)) {
-			HoldingBlock = world->Chunks.GetBlockGlobal((int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z));
+			HoldingBlock = world->GetBlock((int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z));
 		}
 
 	}

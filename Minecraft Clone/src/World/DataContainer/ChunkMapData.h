@@ -2,41 +2,32 @@
 
 #include "../Chunk/Chunk.h"
 
-#include <concurrent_unordered_map.h>
-#include <concurrent_unordered_set.h>
 #include <unordered_map>
 #include <unordered_set>
 
 class ChunkMap {
 public:
-	void InsertChunk(Chunk chunk, int x, int y, int z) {
+	void InsertChunk(Chunk chunk) {
 		
-		ChunkID ID = getChunkID(x, y, z);
+		ChunkID ID = getChunkID(chunk.Position);
 		
 		Data[ID] = chunk;
 		ChunkIDContainer.insert(ID);
 
 		for (int axis = 0; axis < 3; axis++) {
 			for (int face = 0; face < 2; face++) {
-				int p[3]{ x ,y ,z }; // p[3] is just the position of the neighboring chunk
+				int p[3]{ chunk.Position.x ,chunk.Position.y ,chunk.Position.z }; // p[3] is just the position of the neighboring chunk
 
 				p[axis] += (-2 * face) + 1; 
 
 				if (CheckChunk(p[0], p[1], p[2])) {
-					GetChunk(x, y, z).SetNeighbor((ChunkContainer*)&GetChunk(p[0], p[1], p[2]), axis * 2 + face);
-					GetChunk(p[0], p[1], p[2]).SetNeighbor((ChunkContainer*)&GetChunk(x, y, z), axis * 2 - face + 1);
+					GetChunk(chunk.Position.x, chunk.Position.y, chunk.Position.z).SetNeighbor((ChunkContainer*)&GetChunk(p[0], p[1], p[2]), axis * 2 + face);
+					GetChunk(p[0], p[1], p[2]).SetNeighbor((ChunkContainer*)&GetChunk(chunk.Position.x, chunk.Position.y, chunk.Position.z), axis * 2 - face + 1);
 				}
 			}
 		}
 	}
 
-	Chunk& GetChunk(int x, int y, int z) {
-		return Data[getChunkID(x, y, z)];
-	}
-
-	Chunk& GetChunk(ChunkID ID) {
-		return Data[ID];
-	}
 
 	BlockID GetBlockGlobal(int x, int y, int z) {
 
@@ -53,10 +44,10 @@ public:
 			return block;
 		}
 
-		return NULL_BLOCK;
+		return NULL_BLOCK; //Returns a null block if block is not inside this collection of chunks
 	}
 
-	bool ChangeBlockGlobal(BlockID block, int x, int y, int z) {
+	bool SetBlockGlobal(BlockID block, int x, int y, int z) {
 		int ChunkPos[3]{ (int)floor((float)x / 16.f) ,(int)floor((float)y / 16.f) ,(int)floor((float)z / 16.f) };
 
 		int LocalBlockPos[3]{ x - ChunkPos[0] * 16 ,y - ChunkPos[1] * 16,z - ChunkPos[2] * 16 };
@@ -71,28 +62,33 @@ public:
 		
 	}
 
-	bool CheckChunk(int x, int y, int z) {
+	bool CheckChunk(int x, int y, int z) { //Checks is a chunk exists
 		return ChunkIDContainer.count(getChunkID(x, y, z));
 	}
 
-	void UsingChunk(ChunkID id) {
-		ChunksBeingUsed.insert(id);
+	bool EraseChunk(int x, int y, int z) {
+		if (CheckChunk(x, y, z)) {
+			Data.erase(getChunkID(x, y, z));
+			return true;
+		}
+		return false;
 	}
 
-	void FinishedChunk(ChunkID id) {
-		ChunksBeingUsed.erase(id);
-	}
-
-	bool IsChunkInUse(ChunkID id) {
-		ChunksBeingUsed.contains(id);
-	}
-
-	Chunk& operator[](ChunkID id) {
+	Chunk& operator[](ChunkID id) { //Returns a chunk with the given id
 		return Data[id];
 	}
 
 private:
-	std::unordered_set<ChunkID> ChunksBeingUsed;
+
+
+	Chunk& GetChunk(int x, int y, int z) {
+		return GetChunk(getChunkID(x, y, z));
+	}
+
+	Chunk& GetChunk(ChunkID ID) {
+		return Data[ID];
+	}
+
 	std::unordered_map<ChunkID, Chunk> Data;
 	std::unordered_set<ChunkID> ChunkIDContainer;
 	std::thread MainWorldThread;

@@ -163,6 +163,7 @@
     <ClCompile Include="src\World\Chunk\ChunkData.cpp" />
     <ClCompile Include="src\World\DataContainer\WorldData.cpp" />
     <ClCompile Include="src\World\Entity\Entity.cpp" />
+    <ClCompile Include="src\World\TerrainGeneration\Generator.cpp" />
     <ClCompile Include="src\World\World.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -203,12 +204,14 @@
     <ClInclude Include="src\World\Chunk\Block\BlockTexture.h" />
     <ClInclude Include="src\World\Chunk\Chunk.h" />
     <ClInclude Include="src\World\Chunk\ChunkData.h" />
+    <ClInclude Include="src\World\CollusionDetection\Intersection.h" />
     <ClInclude Include="src\World\DataContainer\BlockData.h" />
     <ClInclude Include="src\World\DataContainer\ChunkMapData.h" />
     <ClInclude Include="src\World\Entity\Entities.h" />
     <ClInclude Include="src\World\Entity\EntityType.h" />
     <ClInclude Include="src\World\Entity\Entity.h" />
     <ClInclude Include="src\World\Entity\Hitbox.h" />
+    <ClInclude Include="src\World\TerrainGeneration\Generator.h" />
     <ClInclude Include="src\World\World.h" />
     <ClInclude Include="src\World\DataContainer\WorldData.h" />
   </ItemGroup>

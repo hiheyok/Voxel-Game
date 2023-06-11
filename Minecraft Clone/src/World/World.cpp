@@ -8,32 +8,6 @@ using namespace std;
 using namespace chrono;
 using namespace glm;
 
-void World::SetBlock(BlockID block, int x, int y, int z) {
-
-	int c[3]{ floor((float)x / 16.f) ,floor((float)y / 16.f) ,floor((float)z / 16.f) }; //c[3] is the position of the chunk
-
-	if (!Chunks.CheckChunk(c[0],c[1],c[2])) {
-		Chunk chunk;
-		chunk.SetPosition(c[0], c[1], c[2]);
-		Chunks.InsertChunk(chunk, c[0], c[1], c[2]);
-	}
-
-	Chunks.ChangeBlockGlobal(block, x, y, z);
-
-	ChunksUpdated.push(Chunks.GetChunk(getChunkID(c[0], c[1], c[2])));
-
-	for (int axis = 0; axis < 3; axis++) {
-		for (int face = 0; face < 2; face++) {
-			int q[3]{ c[0],c[1],c[2] }; //q is the position of the neighbor
-
-			q[axis] += (-2 * face) + 1;
-
-			if (Chunks.CheckChunk(q[0], q[1], q[2])) {
-				ChunksUpdated.push(Chunks.GetChunk(getChunkID(q[0], q[1], q[2])));
-			}
-		}
-	}
-}
 
 bool World::RayIntersection(Ray& ray) {
 
@@ -95,7 +69,7 @@ bool World::RayIntersection(Ray& ray) {
 		}
 
 		//Test if the ray collides if there is a block
-		if ((Chunks.GetBlockGlobal(floor(t.x), floor(t.y), floor(t.z)) != AIR) && (Chunks.GetBlockGlobal(floor(t.x), floor(t.y), floor(t.z)) != NULL_BLOCK)) {
+		if ((GetBlock(floor(t.x), floor(t.y), floor(t.z)) != AIR) && (GetBlock(floor(t.x), floor(t.y), floor(t.z)) != NULL_BLOCK)) {
 
 			ray.EndPoint = pos;
 
@@ -139,7 +113,7 @@ float World::GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int dire
 
 		ivec3 Loc = FlooredPos + Move * i;
 
-		if ((Chunks.GetBlockGlobal(Loc.x, Loc.y, Loc.z) != AIR) && (Chunks.GetBlockGlobal(Loc.x, Loc.y, Loc.z) != NULL_BLOCK)) {
+		if ((GetBlock(Loc.x, Loc.y, Loc.z) != AIR) && (GetBlock(Loc.x, Loc.y, Loc.z) != NULL_BLOCK)) {
 			return (float)i + displacement - 1;
 		}
 	}
@@ -217,48 +191,20 @@ void World::SetPlayerPos(glm::dvec3 pos) {
 }
 
 void World::Start() {
-
 	stop = false;
 
-	ChunkGenerationWorkers.resize(ChunkWorkerCount);
-	WorkerChunkOutput.resize(ChunkWorkerCount);
-	ChunkWorkerJob.resize(ChunkWorkerCount);
-	WorkerIsWorking.resize(ChunkWorkerCount);
-	WorkerPause.resize(ChunkWorkerCount);
+	WorldGenerator.Start(4);
 
 	MainWorldThread = std::thread(&World::WorldThread, this);
-
-	for (int i = 0; i < ChunkWorkerCount; i++) {
-		ChunkGenerationWorkers[i] = thread(&World::ChunkGenerationWorker, this, i);
-	}
-	Loader = thread(&World::LoaderThread, this);
 }
 
 void World::Stop() {
 	stop = true;
 }
 
-void World::PauseWorker(int WorkerID) {
-	WorkerPause[WorkerID] = true;
-	while (WorkerIsWorking[WorkerID]) {}
-}
-
-void World::UnpauseWorker(int WorkerID) {
-	WorkerPause[WorkerID] = false;
-}
-
-void World::PauseLoader() {
-	LoaderPause = true;
-	while (LoaderIsWorking) {}
-}
-
-void World::UnpauseLoader() {
-	LoaderPause = false;
-}
-
 void World::WorldThread() {
 	while (!stop) {
-		ChunksPerTick = 0;
+		int ChunksPerTick = 0;
 		auto t0 = high_resolution_clock::now();
 		
 		vec3 pos = PlayerPos / 16.f;
@@ -272,129 +218,34 @@ void World::WorldThread() {
 					int offsety =  y;
 					int offsetz = floor(pos.z) + z;
 
-					if (!Chunks.CheckChunk(offsetx, offsety, offsetz) && (!ChunksInQueue.count(getChunkID(offsetx, offsety, offsetz)))) {
-						jobs.push_back(getChunkID(offsetx, offsety, offsetz));
+					if (!CheckChunk(offsetx, offsety, offsetz) && (!ChunksInQueue.count(getChunkID(offsetx, offsety, offsetz)))) {
+						WorldGenerator.Generate(offsetx, offsety, offsetz);
 						ChunksInQueue.insert(getChunkID(offsetx, offsety, offsetz));
 					}
 				}
 			}
 		}
 
-		if (jobs.size() != 0) {
-			PauseLoader();
+		deque<Chunk> GenOutput = WorldGenerator.GetOutput();
 
-			while (jobs.size() != 0) {
-				ChunkJobQueue.push(jobs.back());
-				jobs.pop_back();
-			}
+		while (!GenOutput.empty()) {
 
-			UnpauseLoader();
-		}
+			Chunk chunk = GenOutput.front();
+			GenOutput.pop_front();
 
-		for (int WorkerID = 0; WorkerID < ChunkWorkerCount; WorkerID++) {
+			SetChunk(chunk);
+			ChunksInQueue.erase(chunk.chunkID);
+			ChunksUpdated.push(chunk);
 
-			if (!WorkerChunkOutput[WorkerID].empty()) {
-
-				PauseWorker(WorkerID);
-
-				while (PauseChunksUpdatedWriting) {}
-
-				ChunksUpdatedWriting = true;
-				while (!WorkerChunkOutput[WorkerID].empty()) {
-					Chunk chunk;
-					if (WorkerChunkOutput[WorkerID].try_pop(chunk)) {
-						Chunks.InsertChunk(chunk, chunk.Position.x, chunk.Position.y, chunk.Position.z);
-						ChunksInQueue.erase(chunk.chunkID);
-						ChunksUpdated.push(chunk);
-						
-					}
-
-
-				}
-				ChunksUpdatedWriting = false;
-				UnpauseWorker(WorkerID);
-
-			}
-
-			UnpauseWorker(WorkerID);
+			ChunksPerTick++;
 		}
 
 		timerSleepNotPrecise(1000.f / TPS);
 
 		float MSPT = ((double)(high_resolution_clock::now() - t0).count() / 1000000);
 
-		//getLogger()->LogInfo("World", "MSPT: " + std::to_string(MSPT) + " | Chunks Per Second: " + std::to_string((float)ChunksPerTick / (MSPT / 1000)));
+		getLogger()->LogInfo("World", "MSPT: " + std::to_string(MSPT) + " | Chunks Per Second: " + std::to_string((float)ChunksPerTick / (MSPT / 1000)));
 	}
-}
-
-
-void World::ChunkGenerationWorker(int id) {
-	const int WorkerID = id;
-
-	while (!stop) {
-		if (!WorkerPause[WorkerID]) {
-			while (!ChunkWorkerJob[WorkerID].empty()) {
-				WorkerIsWorking[WorkerID] = true;
-
-				ChunkID chunkid;
-
-				if (ChunkWorkerJob[WorkerID].try_pop(chunkid)) {
-					Chunk chunk;
-
-					ivec3 Pos = ChunkIDToPOS(chunkid);
-
-					chunk.SetPosition(Pos.x, Pos.y, Pos.z);
-					chunk.Generate(&noise);
-
-					WorkerChunkOutput[WorkerID].push(chunk);
-					ChunksPerTick++;
-					WorkerIsWorking[WorkerID] = false;
-				}
-
-				
-				if (WorkerPause[WorkerID])
-					break;
-			}
-		}
-		timerSleepNotPrecise(5);
-	}
-
-
-}
-
-void World::CreateChunk(int x, int y, int z) {
-	if (!ChunksInQueue.count(getChunkID(x, y, z))) {
-		ChunkJobQueue.push(getChunkID(x, y, z));
-		ChunksInQueue.insert(getChunkID(x, y, z));
-	}
-}
-
-void World::LoaderThread() {
-	while (!stop)
-	{
-		if (!LoaderPause) {
-			LoaderIsWorking = true;
-
-			while (!ChunkJobQueue.empty()) {
-				ChunkID job;
-				if (ChunkJobQueue.try_pop(job)) {
-					if ((WorkerSelect % ChunkWorkerCount) == 0)
-						WorkerSelect = 0;
-
-					ChunkWorkerJob[WorkerSelect].push(job);
-
-					WorkerSelect++;
-				}
-
-				if (LoaderPause)
-					break;
-			}
-
-			LoaderIsWorking = false;
-
-		}
-		timerSleepNotPrecise(5);
-	} 
 }
 
 bool World::IsEntityOnGround(Entity entity) {
