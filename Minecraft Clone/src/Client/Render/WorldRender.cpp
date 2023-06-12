@@ -1,125 +1,95 @@
 #include "WorldRender.h"
 #include "../../Utils/Clock.h"
 
-
+using namespace std;
 using namespace glm;
 
 void WorldRender::Render() {
 	Renderer.draw();
 }
 
-void WorldRender::LoadChunk(Chunk chunk) {
-	if (!chunk.isEmpty) {
-		ChunkLoadingCache.push_back(chunk);
+void WorldRender::LoadChunkToRenderer(ChunkID chunk) {
+	if (!world->GetChunk(chunk).isEmpty) {
+		SchedulerLock.lock();
+		TaskList.push_back(chunk);
+		SchedulerLock.unlock();
+		
 	}
 	
 }
 
-ChunkID WorldRender::GenChunkID(int x, int y, int z) {
-	long long unsigned int sx = (((1u << 1) - 1u) & (x >> 31));
-	long long unsigned int sy = (((1u << 1) - 1u) & (y >> 31));
-	long long unsigned int sz = (((1u << 1) - 1u) & (z >> 31));
-	long long unsigned int ax = (long long unsigned int)abs(x);
-	long long unsigned int ay = (long long unsigned int)abs(y);
-	long long unsigned int az = (long long unsigned int)abs(z);
 
-	return 0LLU | ax << 0 | ay << 16 | az << 32 | sx << 61 | sy << 62 | sz << 63;
-}
+void WorldRender::Worker(int id) {
 
-void WorldRender::PauseWorker(int WorkerID) {
-	WorkerPause[WorkerID] = true;
-	while (WorkerIsWorking[WorkerID]) {}
-}
+	const int WorkerID = id;
 
-void WorldRender::UnpauseWorker(int WorkerID) {
-	WorkerPause[WorkerID] = false;
-}
+	deque<ChunkID> Jobs;
 
-void WorldRender::MeshWorker(int id) {
-
-	int WorkerID = id;
+	deque<ChunkMesh> FinishedJobs;
 
 	while (!stop) {
+		//Fetches all of the tasks and put it in "Jobs"
 
-		if (!WorkerPause[WorkerID]) {
-			while (WorkerMeshQueue[WorkerID].size() != 0) {
-
-				WorkerIsWorking[WorkerID] = true;
-
-				ChunkID chunk = WorkerMeshQueue[WorkerID].back();
-				WorkerMeshQueue[WorkerID].pop_back();
-
-				Chunk* main = new Chunk;
-				*main = ChunkCache[chunk];
-
-				Chunk Neighbors[6]{};
-				if (ChunkCache.count(GenChunkID(main->Position.x - 1, main->Position.y, main->Position.z))) {
-					Neighbors[NX] = ChunkCache[GenChunkID(main->Position.x - 1, main->Position.y, main->Position.z)];
-					main->SetNeighbor((ChunkContainer*)&Neighbors[NX], NX);
-				}
-				if (ChunkCache.count(GenChunkID(main->Position.x + 1, main->Position.y, main->Position.z))) {
-					Neighbors[PX] = ChunkCache[GenChunkID(main->Position.x + 1, main->Position.y, main->Position.z)];
-					main->SetNeighbor((ChunkContainer*)&Neighbors[PX], PX);
-				}
-				if (ChunkCache.count(GenChunkID(main->Position.x, main->Position.y - 1, main->Position.z))) {
-					Neighbors[NY] = ChunkCache[GenChunkID(main->Position.x, main->Position.y - 1, main->Position.z)];
-					main->SetNeighbor((ChunkContainer*)&Neighbors[NY], NY);
-				}
-				if (ChunkCache.count(GenChunkID(main->Position.x, main->Position.y + 1, main->Position.z))) {
-					Neighbors[PY] = ChunkCache[GenChunkID(main->Position.x, main->Position.y + 1, main->Position.z)];
-					main->SetNeighbor((ChunkContainer*)&Neighbors[PY], PY);
-				}
-				if (ChunkCache.count(GenChunkID(main->Position.x, main->Position.y, main->Position.z - 1))) {
-					Neighbors[NZ] = ChunkCache[GenChunkID(main->Position.x, main->Position.y, main->Position.z - 1)];
-					main->SetNeighbor((ChunkContainer*)&Neighbors[NZ], NZ);
-				}
-				if (ChunkCache.count(GenChunkID(main->Position.x, main->Position.y, main->Position.z + 1))) {
-					Neighbors[PZ] = ChunkCache[GenChunkID(main->Position.x, main->Position.y, main->Position.z + 1)];
-					main->SetNeighbor((ChunkContainer*)&Neighbors[PZ], PZ);
-				}
-
-				ChunkMesh mesh;
-				mesh.chunk = &ChunkCache[chunk];
-				mesh.SmartGreedyMeshing();
-				
-				WorkerMeshOutput[WorkerID].push(mesh);
-				WorkerIsWorking[WorkerID] = false;
-
-				
-
-				if (WorkerPause[WorkerID])
-					break;
-			}
-		}
+		WorkerLocks[WorkerID].lock();
+		Jobs.insert(Jobs.end(), WorkerTask[WorkerID].begin(), WorkerTask[WorkerID].end());
 		
+		WorkerTask[WorkerID].clear();
+		WorkerLocks[WorkerID].unlock();
+		
+		while (!Jobs.empty()) {
+			ChunkID task = Jobs.front(); //fetches task
+			Jobs.pop_front();
+			ivec3 pos = ChunkIDToPOS(task);
+
+			//Generates the chunks
+			ChunkMesh NewMesh;
+			NewMesh.chunk = &world->GetChunk(pos.x, pos.y, pos.z);
+			NewMesh.SmartGreedyMeshing();
+			FinishedJobs.push_back(NewMesh);
+		}
+
+		WorkerLocks[WorkerID].lock();
+		WorkerOutput[WorkerID].insert(WorkerOutput[WorkerID].end(), FinishedJobs.begin(), FinishedJobs.end());
+		FinishedJobs.clear();
+		WorkerLocks[WorkerID].unlock();
+
 		timerSleepNotPrecise(5);
 	}
 }
 
 void WorldRender::Update() {
 
-	for (int WorkerID = 0; WorkerID < MeshWorkerCount; WorkerID++) {
+	for (int WorkerID = 0; WorkerID < WorkerCount; WorkerID++) {
 		
-		if (!WorkerMeshOutput[WorkerID].empty()) {
+		WorkerLocks[WorkerID].lock();
 
-			PauseWorker(WorkerID);
-
-			while (!WorkerMeshOutput[WorkerID].empty()) {
-				ChunkMesh mesh;
-				if (WorkerMeshOutput[WorkerID].try_pop(mesh)) {
-					Renderer.AddChunkMesh(mesh);
-					//delete mesh.chunk;
-				}
-
-				
+		while (!WorkerOutput[WorkerID].empty()) {
+			if (WorkerOutput[WorkerID].front().vertices.size() != 0) {
+				Renderer.AddChunkMesh(WorkerOutput[WorkerID].front());
 			}
-
-			UnpauseWorker(WorkerID);
-			
+			WorkerOutput[WorkerID].pop_front();
 		}
 
-		UnpauseWorker(WorkerID);
+		WorkerLocks[WorkerID].unlock();
 	}
+
+	std::unordered_set<ChunkID> ChunksToUpdate;
+
+	world->ChunkUpdateLock.lock();
+	for (ChunkID task : world->ChunksUpdated) {
+		ChunksToUpdate.insert(task);
+	}
+	world->ChunksUpdated.clear();
+	world->ChunkUpdateLock.unlock();
+
+	for (ChunkID chunkid : ChunksToUpdate) {
+		
+		LoadChunkToRenderer(chunkid);
+		world->ChunksUpdated.erase(chunkid);
+	}
+
+	
+
 	
 	Renderer.UpdateData();
 	Renderer.GenCallDrawCommands();
@@ -130,75 +100,75 @@ void WorldRender::Stop() {
 	stop = true;
 }
 
-void WorldRender::Start(GLFWwindow* window_) {
+void WorldRender::Start(GLFWwindow* window_,World* world_, int ThreadCount) {
 	stop = false;
 
 	window = window_;
+	world = world_;
+	WorkerCount = ThreadCount;
 
 	Renderer.init(window, player.getCamera());
 	Renderer.ReloadAssets();
 
-	Workers.resize(MeshWorkerCount);
-	WorkerMeshQueue.resize(MeshWorkerCount);
-	WorkerMeshOutput.resize(MeshWorkerCount);
-	WorkerIsWorking.resize(MeshWorkerCount);
-	WorkerPause.resize(MeshWorkerCount);
+	WorkerCount = ThreadCount;
 
-	for (int i = 0; i < MeshWorkerCount; i++) {
-		Workers[i] = std::thread(&WorldRender::MeshWorker, this, i);
+	Workers.resize(ThreadCount);
+	WorkerTask.resize(ThreadCount);
+	WorkerOutput.resize(ThreadCount);
+	WorkerLocks.resize(ThreadCount);
+
+	for (int i = 0; i < ThreadCount; i++) {
+		Workers[i] = std::thread(&WorldRender::Worker, this, i);
 	}
-	LoaderWorker = std::thread(&WorldRender::LoaderThread, this, 1);
+	Scheduler = std::thread(&WorldRender::TaskScheduler, this);
 }
 
-void WorldRender::LoaderThread(int id) {
+void WorldRender::TaskScheduler() {
 	
+	int WorkerSelection = 0;
+
+	std::deque<std::deque<ChunkID>> DistributedTasks;
+
+	DistributedTasks.resize(WorkerCount);
+
+	std::deque<ChunkID> InternalTaskList;
+
 	while (!stop) {
-		if (!LoaderPause) {
-			LoaderIsWorking = true;
 
-			int loops = 0;
+		//Fetch tasks
 
-			mut.lock();
-			while (ChunkLoadingCache.size() != 0) {
+		SchedulerLock.lock();
+		InternalTaskList.insert(InternalTaskList.end(), TaskList.begin(), TaskList.end());
+		TaskList.clear();
+		SchedulerLock.unlock();
 
-				Chunk ChunkToLoad = ChunkLoadingCache.back();
-				ChunkLoadingCache.pop_back(); //change
+		//Interally distributes the jobs
 
-				ChunkCache[ChunkToLoad.chunkID] = ChunkToLoad;
+		while (!InternalTaskList.empty()) {
 
-				if ((WorkerSelect % MeshWorkerCount) == 0)
-					WorkerSelect = 0;
+			ChunkID task = InternalTaskList.front();
+			InternalTaskList.pop_front();
 
-				WorkerMeshQueue[WorkerSelect].push_back(ChunkToLoad.chunkID);
-				WorkerSelect++;
+			DistributedTasks[WorkerSelection].push_back(task);
 
-				
+			WorkerSelection++;
 
-				loops++;
-
-				if (loops == 200) {
-					loops = 0;
-					break;
-				}
-
-				if (LoaderPause)
-					break;
-			}
-
-			mut.unlock();
-
-			LoaderIsWorking = false;
+			if (WorkerSelection % WorkerCount == 0)
+				WorkerSelection = 0;
 		}
-		timerSleepNotPrecise(5);
+
+		//Distributes the tasks
+
+		for (int i = 0; i < WorkerCount; i++) {
+			WorkerLocks[i].lock();
+			WorkerTask[i].insert(WorkerTask[i].end(), DistributedTasks[i].begin(), DistributedTasks[i].end());
+			WorkerLocks[i].unlock();
+
+			DistributedTasks[i].clear();
+		}
+
 	}
+
+	timerSleepNotPrecise(5);
 	
-}
-
-void WorldRender::PauseLoader() {
-	LoaderPause = true;
-	while (LoaderIsWorking) {}
-}
-
-void WorldRender::UnpauseLoader() {
-	LoaderPause = false;
 }

@@ -7,11 +7,9 @@
 #include <concurrent_queue.h>
 #include <thread>
 #include <mutex>
+#include "../../World/World.h"
 class WorldRender {
 public:
-	void Render();
-
-	void LoadChunk(Chunk chunk);
 
 	void SetRotation(glm::dvec2 rotation) {
 		player.SetRotation(rotation);
@@ -21,52 +19,41 @@ public:
 		player.SetPosition(position);
 	}
 
-	void Start(GLFWwindow* window_);
+	void Render();
+
+	void LoadChunkToRenderer(ChunkID chunk);
+	
+	void Start(GLFWwindow* window_, World* world_, int ThreadCount);
 
 	void Stop();
 
-	void PauseWorker(int WorkerID);
-
-	void UnpauseWorker(int WorkerID);
-
 	void Update();
-
-	void PauseLoader();
-
-	void UnpauseLoader();
 
 private:
 
-	void MeshWorker(int id);
+	void Worker(int id);
 
-	void LoaderThread(int id);
-
-	ChunkID GenChunkID(int x, int y, int z);
+	void TaskScheduler();
 
 	PlayerPOV player;
 	ChunkRenderer Renderer;
 	GLFWwindow* window;
+	World* world;
+
+	int WorkerCount = NULL;
 
 	bool stop = false;
 
-	int MeshWorkerCount = 1;
+	std::deque<ChunkID> TaskList; //All tasks will go in here and they will be distributed to all the workers
 
-	int WorkersWriting = 0;
+	std::deque<std::thread> Workers;
+	std::deque<std::deque<ChunkID>> WorkerTask;
+	std::deque<std::deque<ChunkMesh>> WorkerOutput;
+	std::deque<std::mutex> WorkerLocks;
 
-	int WorkerSelect = 0;
-
-	std::vector<std::thread> Workers;
-	std::thread LoaderWorker;
-	std::vector<std::deque<ChunkID>> WorkerMeshQueue;
-	std::vector<concurrency::concurrent_queue<ChunkMesh>> WorkerMeshOutput;
-	std::vector<bool> WorkerIsWorking;
-	std::vector<bool> WorkerPause;
-
-	bool LoaderPause = false;
-	bool LoaderIsWorking = false;
-
-	std::mutex mut;
-
-	concurrency::concurrent_unordered_map<ChunkID, Chunk> ChunkCache;
-	std::deque<Chunk> ChunkLoadingCache;
+	std::thread Scheduler;
+	std::mutex SchedulerLock;
+	
+	//Debugging stuff
+	int count = 0;
 };

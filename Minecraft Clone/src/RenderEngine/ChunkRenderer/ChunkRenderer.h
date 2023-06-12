@@ -288,7 +288,7 @@ public:
 
 	//Settings
 
-	int RenderDistance = 8;
+	int RenderDistance = 64;
 
 private:
 

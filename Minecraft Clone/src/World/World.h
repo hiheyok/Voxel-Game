@@ -25,7 +25,7 @@ public:
 
 	glm::dvec3 GetTimeTillCollusion(Entity entity);
 
-	concurrency::concurrent_queue<Chunk> ChunksUpdated;
+	
 
 	bool IsEntityOnGround(Entity entity);
 
@@ -46,7 +46,7 @@ private:
 
 	const float TPS = 20.f;
 
-	const int horizontaltickingdistance = 8;
+	const int horizontaltickingdistance = 64;
 	const int vertialtickingdistance = 4;
 
 	Generator WorldGenerator;

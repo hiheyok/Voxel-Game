@@ -1,6 +1,7 @@
 #include "Generator.h"
 #include "../Chunk/ChunkID.h"
 #include "../../Utils/Clock.h"
+
 using namespace std;
 using namespace glm;
 
@@ -47,11 +48,9 @@ void Generator::Worker(int id) {
 		//Fetches all of the tasks and put it in "Jobs"
 
 		WorkerLocks[WorkerID].lock();
-		Jobs = WorkerTask[WorkerID];
+		Jobs.insert(Jobs.end(), WorkerTask[WorkerID].begin(), WorkerTask[WorkerID].end());
 		WorkerTask[WorkerID].clear();
 		WorkerLocks[WorkerID].unlock();
-
-		
 
 		//Generates the chunks
 		while (!Jobs.empty()) {
@@ -59,18 +58,18 @@ void Generator::Worker(int id) {
 			Jobs.pop_front();
 			//Generate
 			ivec3 pos = ChunkIDToPOS(task);
-
+			
 			Chunk NewChunk;
 			NewChunk.SetPosition(pos.x, pos.y, pos.z);
 			NewChunk.Generate(&noise);
 			FinishedJobs.push_back(NewChunk);
 		}
 
+
+
 		WorkerLocks[WorkerID].lock();
-		while (!FinishedJobs.empty()) {
-			WorkerOutput[WorkerID].push_back(FinishedJobs.front());
-			FinishedJobs.pop_front();
-		}
+		WorkerOutput[WorkerID].insert(WorkerOutput[WorkerID].end(), FinishedJobs.begin(), FinishedJobs.end());
+		FinishedJobs.clear();
 		WorkerLocks[WorkerID].unlock();
 
 		timerSleepNotPrecise(5);
@@ -118,11 +117,12 @@ void Generator::TaskScheduler() {
 
 		for (int i = 0; i < WorkerCount; i++) {
 			WorkerLocks[i].lock();
-			WorkerTask[i] = DistributedTasks[i];
+			WorkerTask[i].insert(WorkerTask[i].end(),DistributedTasks[i].begin(), DistributedTasks[i].end());
 			WorkerLocks[i].unlock();
-
 			DistributedTasks[i].clear();
 		}
+
+		
 
 		//Manages worker output
 
@@ -130,20 +130,20 @@ void Generator::TaskScheduler() {
 		//Fetches worker output
 		for (int i = 0; i < WorkerCount; i++) {
 			WorkerLocks[i].lock();
-			ChunkOutputs[i] = WorkerOutput[i];
-			WorkerLocks[i].unlock();
-
+			ChunkOutputs[i].insert(ChunkOutputs[i].end(), WorkerOutput[i].begin(), WorkerOutput[i].end());
 			WorkerOutput[i].clear();
+			WorkerLocks[i].unlock();
 		}
 
 		//Output the chunks so it can be used
 
 		SchedulerLock.lock();
 		for (int i = 0; i < WorkerCount; i++) {
-			while (!ChunkOutputs[i].empty()) {
-				Output.push_back(ChunkOutputs[i].front());
-				ChunkOutputs[i].pop_front();
-			}
+			Output.insert(Output.end(), ChunkOutputs[i].begin(), ChunkOutputs[i].end());
+			
+			//count += ChunkOutputs[i].size();
+
+			ChunkOutputs[i].clear();
 		}
 		SchedulerLock.unlock();
 		
@@ -153,5 +153,7 @@ void Generator::TaskScheduler() {
 }
 
 void Generator::Generate(int x, int y, int z) {
+	SchedulerLock.lock();
 	TaskList.push_back(getChunkID(x, y, z));
+	SchedulerLock.unlock();
 }

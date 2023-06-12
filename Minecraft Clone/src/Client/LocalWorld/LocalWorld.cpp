@@ -2,6 +2,8 @@
 
 #include <glm/geometric.hpp>
 
+#include <glm/gtx/common.hpp>
+
 using namespace std;
 using namespace glm;
 
@@ -140,24 +142,13 @@ void LocalWorld::PlaceBlock() {
 
 	if (world->RayIntersection(ray)) {
 
-		if (ray.bouncesurface == PX) {
-			world->SetBlock(HoldingBlock, (int)floor(ray.EndPoint.x) - 1, (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z));
-		}
-		if (ray.bouncesurface == NX) {
-			world->SetBlock(HoldingBlock, (int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z));
-		}
-		if (ray.bouncesurface == PY) {
-			world->SetBlock(HoldingBlock, (int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y) - 1, (int)floor(ray.EndPoint.z));
-		}
-		if (ray.bouncesurface == NY) {
-			world->SetBlock(HoldingBlock, (int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z));
-		}
-		if (ray.bouncesurface == PZ) {
-			world->SetBlock(HoldingBlock, (int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z) - 1);
-		}
-		if (ray.bouncesurface == NZ) {
-			world->SetBlock(HoldingBlock, (int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z));
-		}
+		int BounceSurface = ray.bouncesurface;
+
+		ivec3 PlacePos = floor(ray.EndPoint);
+
+		PlacePos[floor(BounceSurface / 2)] -= -(BounceSurface - floor(BounceSurface / 2) * 2) + 1;
+
+		world->SetBlock(HoldingBlock, PlacePos.x, PlacePos.y, PlacePos.z);
 	}
 }
 

@@ -2,6 +2,8 @@
 
 #include "../Chunk/Chunk.h"
 
+#include <concurrent_unordered_map.h>
+
 #include <unordered_map>
 #include <unordered_set>
 
@@ -10,7 +12,7 @@ public:
 	void InsertChunk(Chunk chunk) {
 		
 		ChunkID ID = getChunkID(chunk.Position);
-		
+
 		Data[ID] = chunk;
 		ChunkIDContainer.insert(ID);
 
@@ -68,7 +70,7 @@ public:
 
 	bool EraseChunk(int x, int y, int z) {
 		if (CheckChunk(x, y, z)) {
-			Data.erase(getChunkID(x, y, z));
+			Data.unsafe_erase(getChunkID(x, y, z));
 			return true;
 		}
 		return false;
@@ -78,8 +80,12 @@ public:
 		return Data[id];
 	}
 
-private:
+	Chunk GetCopyOfChunk(int x, int y, int z) {
+		Chunk copy = Data[getChunkID(x, y, z)];
+		return copy;
+	}
 
+private:
 
 	Chunk& GetChunk(int x, int y, int z) {
 		return GetChunk(getChunkID(x, y, z));
@@ -89,7 +95,6 @@ private:
 		return Data[ID];
 	}
 
-	std::unordered_map<ChunkID, Chunk> Data;
-	std::unordered_set<ChunkID> ChunkIDContainer;
-	std::thread MainWorldThread;
+	std::unordered_set<ChunkID> ChunkIDContainer; //Contains all of the chunks this has
+	Concurrency::concurrent_unordered_map<ChunkID, Chunk> Data; //Contains all of the actual chunk data
 };

@@ -41,4 +41,7 @@ private:
 	bool stop = false;
 
 	FastNoiseLite noise;
+
+	//debugging stuff
+	int count = 0;
 };

@@ -25,7 +25,7 @@ void Client::run() {
 
 	getLogger()->LogInfo("World", "Generating World");
 
-	TerrainRender.Start(getWindow());
+	TerrainRender.Start(getWindow(), &MainWorld, 4);
 
 	MainLocalWorld.SetWorld(&MainWorld);
 
@@ -79,20 +79,6 @@ void Client::Update() {
 	TerrainRender.SetPosition(MainLocalWorld.GetPlayerPosition());
 	TerrainRender.SetRotation(MainLocalWorld.GetPlayerRotation());
 
-	TerrainRender.PauseLoader();
-	while (!MainWorld.ChunksUpdated.empty()) {
-		Chunk updatingchunk;
-
-		if (MainWorld.ChunksUpdated.try_pop(updatingchunk)) {
-			if (!updatingchunk.isEmpty) {
-				TerrainRender.LoadChunk(updatingchunk);
-			}
-		}
-		
-	}
-	TerrainRender.UnpauseLoader();
-
-	MainWorld.ChunksUpdated.clear();
 	TerrainRender.Update();
 
 }

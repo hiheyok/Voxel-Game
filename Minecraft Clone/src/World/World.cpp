@@ -235,7 +235,6 @@ void World::WorldThread() {
 
 			SetChunk(chunk);
 			ChunksInQueue.erase(chunk.chunkID);
-			ChunksUpdated.push(chunk);
 
 			ChunksPerTick++;
 		}
@@ -244,7 +243,7 @@ void World::WorldThread() {
 
 		float MSPT = ((double)(high_resolution_clock::now() - t0).count() / 1000000);
 
-		getLogger()->LogInfo("World", "MSPT: " + std::to_string(MSPT) + " | Chunks Per Second: " + std::to_string((float)ChunksPerTick / (MSPT / 1000)));
+		//getLogger()->LogInfo("World", "MSPT: " + std::to_string(MSPT) + " | Chunks Per Second: " + std::to_string((float)ChunksPerTick / (MSPT / 1000)));
 	}
 }
 
