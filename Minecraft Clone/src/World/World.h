@@ -25,8 +25,6 @@ public:
 
 	glm::dvec3 GetTimeTillCollusion(Entity entity);
 
-	
-
 	bool IsEntityOnGround(Entity entity);
 
 private:
@@ -46,7 +44,7 @@ private:
 
 	const float TPS = 20.f;
 
-	const int horizontaltickingdistance = 64;
+	const int horizontaltickingdistance = 32;
 	const int vertialtickingdistance = 4;
 
 	Generator WorldGenerator;

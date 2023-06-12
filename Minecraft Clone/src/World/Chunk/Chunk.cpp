@@ -27,6 +27,7 @@ void Chunk::Generate(FastNoiseLite* noise) {
 				if ((a == y || a + 1 == y || a + 2 == y || a + 3 == y || a + 4 == y) && a > 10) {
 					if (TREE_MAP >= (TREE_RAND_VAL - TREE_RAND_VAL_RANGE) && TREE_MAP <= (TREE_RAND_VAL + TREE_RAND_VAL_RANGE)) {
 						Blocks.ChangeBlock(OAK_LOG,x - cx, y - cy, z - cz);
+						isEmpty = false;
 
 					}
 				}
@@ -49,19 +50,23 @@ void Chunk::Generate(FastNoiseLite* noise) {
 
 				if (y < 10) {
 					Blocks.ChangeBlock(WATER, x - cx, y - cy, z - cz);
+					isEmpty = false;
 				}
 
 				if (a > y) {
 					if (y < 12) {
 						Blocks.ChangeBlock(SAND, x - cx, y - cy, z - cz);
+						isEmpty = false;
 					}
 					else {
 
 						if (a >= y) {
 							Blocks.ChangeBlock(GRASS, x - cx, y - cy, z - cz);
+							isEmpty = false;
 						}
 						if (a - 1 > y) {
 							Blocks.ChangeBlock(DIRT, x - cx, y - cy, z - cz);
+							isEmpty = false;
 						}
 
 						//std::cout << a << "\n";
@@ -77,5 +82,5 @@ void Chunk::Generate(FastNoiseLite* noise) {
 
 		}
 	}
-	isEmpty = false;
+	
 }

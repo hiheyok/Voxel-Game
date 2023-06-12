@@ -3,6 +3,7 @@
 #include "../Chunk/Chunk.h"
 
 #include <concurrent_unordered_map.h>
+#include <concurrent_unordered_set.h>
 
 #include <unordered_map>
 #include <unordered_set>
@@ -95,6 +96,6 @@ private:
 		return Data[ID];
 	}
 
-	std::unordered_set<ChunkID> ChunkIDContainer; //Contains all of the chunks this has
+	Concurrency::concurrent_unordered_set<ChunkID> ChunkIDContainer; //Contains all of the chunks this has
 	Concurrency::concurrent_unordered_map<ChunkID, Chunk> Data; //Contains all of the actual chunk data
 };

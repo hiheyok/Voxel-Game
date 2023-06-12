@@ -25,7 +25,7 @@ void Client::run() {
 
 	getLogger()->LogInfo("World", "Generating World");
 
-	TerrainRender.Start(getWindow(), &MainWorld, 4);
+	TerrainRender.Start(getWindow(), &MainWorld, 6);
 
 	MainLocalWorld.SetWorld(&MainWorld);
 

@@ -167,8 +167,10 @@ void WorldRender::TaskScheduler() {
 			DistributedTasks[i].clear();
 		}
 
+		timerSleepNotPrecise(5);
+
 	}
 
-	timerSleepNotPrecise(5);
+	
 	
 }

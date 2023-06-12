@@ -73,7 +73,7 @@ void LocalWorld::MovePlayer(bool KeyW, bool KeyA, bool KeyS, bool KeyD, bool Key
 
 	vec3 right = normalize(cross(front, glm::vec3(0.0, 1.0, 0.0)));
 
-	float velocity = 20;
+	float velocity = 250;
 
 	if (KeyW) {
 		Player.Velocity += front * velocity;
