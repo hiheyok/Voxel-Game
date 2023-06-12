@@ -193,7 +193,7 @@ void World::SetPlayerPos(glm::dvec3 pos) {
 void World::Start() {
 	stop = false;
 
-	WorldGenerator.Start(6);
+	WorldGenerator.Start(2);
 
 	MainWorldThread = std::thread(&World::WorldThread, this);
 }
@@ -243,7 +243,7 @@ void World::WorldThread() {
 
 		float MSPT = ((double)(high_resolution_clock::now() - t0).count() / 1000000);
 
-		//getLogger()->LogInfo("World", "MSPT: " + std::to_string(MSPT) + " | Chunks Per Second: " + std::to_string((float)ChunksPerTick / (MSPT / 1000)));
+		getLogger()->LogInfo("World", "MSPT: " + std::to_string(MSPT) + " | Chunks Per Second: " + std::to_string((float)ChunksPerTick / (MSPT / 1000)));
 	}
 }
 
