@@ -19,7 +19,12 @@ inline EntityID RegisterNewEntity() {
 }
 
 __declspec(selectany) EntityID PLAYER = RegisterNewEntity();
+__declspec(selectany) EntityID HUMAN = RegisterNewEntity();
 
 inline void InitializeEntities() {
-	EntityTypeList[PLAYER]->ChangeHitboxSize(0.8,1.8,0.8);
+	EntityTypeList[PLAYER]->ChangeHitboxSize(0.8f, 1.8f, 0.8f);
+	EntityTypeList[PLAYER]->RenderModel.AddRectangle(0.8f, 1.8f, 0.8f);
+
+	EntityTypeList[HUMAN]->ChangeHitboxSize(0.8f, 1.8f, 0.8f);
+	EntityTypeList[HUMAN]->RenderModel.AddRectangle(0.8f, 1.8f, 0.8f);
 }

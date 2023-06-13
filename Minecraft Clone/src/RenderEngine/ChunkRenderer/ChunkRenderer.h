@@ -113,11 +113,11 @@ public:
 
 
 
-	void _AddChunk(ChunkMesh data) {
+	void _AddChunk(Meshing::ChunkMeshData data) {
 
-		unsigned long long int ChunkID = getChunkID(data.chunk->Position);
+		unsigned long long int ChunkID = getChunkID(data.Position);
 
-		size_t MeshSizeSolid = data.vertices.size() * sizeof(unsigned int);
+		size_t MeshSizeSolid = data.SolidVertices.size() * sizeof(unsigned int);
 
 		if (MeshSizeSolid == 0) {
 			MeshList[ChunkID] = true;
@@ -125,15 +125,15 @@ public:
 		}
 
 		ChunkRenderDataBufferAddress renderdata;
-		renderdata.x = data.chunk->Position.x;
-		renderdata.y = data.chunk->Position.y;
-		renderdata.z = data.chunk->Position.z;
+		renderdata.x = data.Position.x;
+		renderdata.y = data.Position.y;
+		renderdata.z = data.Position.z;
 
 		if (ChunkRenderListSolid.size() == 0) {
 			renderdata.offset = 0;
 			renderdata.size = MeshSizeSolid;
 			GPUMemoryUsage += MeshSizeSolid;
-			insertData(VBO, GL_ARRAY_BUFFER, renderdata.offset, &data.vertices);
+			insertData(VBO, GL_ARRAY_BUFFER, renderdata.offset, &data.SolidVertices);
 			ChunkRenderListSolid.insert(ChunkRenderListSolid.begin(), renderdata);
 			MeshList[ChunkID] = true;
 			ChunkRenderListSolidOffsetLookup[ChunkID] = 0;
@@ -144,7 +144,7 @@ public:
 				renderdata.offset = ChunkRenderListSolid.back().offset + ChunkRenderListSolid.back().size;
 				renderdata.size = MeshSizeSolid;
 				GPUMemoryUsage += MeshSizeSolid;
-				insertData(VBO, GL_ARRAY_BUFFER, renderdata.offset, &data.vertices);
+				insertData(VBO, GL_ARRAY_BUFFER, renderdata.offset, &data.SolidVertices);
 				ChunkRenderListSolid.emplace_back(renderdata);
 				MeshList[ChunkID] = true;
 				ChunkRenderListSolidOffsetLookup[ChunkID] = renderdata.offset;
@@ -157,7 +157,7 @@ public:
 						renderdata.offset = ChunkRenderListSolid[i].offset + ChunkRenderListSolid[i].size;
 						renderdata.size = MeshSizeSolid;
 						GPUMemoryUsage += MeshSizeSolid;
-						insertData(VBO, GL_ARRAY_BUFFER, renderdata.offset, &data.vertices);
+						insertData(VBO, GL_ARRAY_BUFFER, renderdata.offset, &data.SolidVertices);
 						ChunkRenderListSolid.insert(ChunkRenderListSolid.begin() + i + 1, renderdata);
 						MeshList[ChunkID] = true;
 						ChunkRenderListSolidOffsetLookup[ChunkID] = renderdata.offset;
@@ -181,20 +181,24 @@ public:
 		fr.CalculateFrustum(camera);
 
 		int SolidIndex = 1;
-		for (int i = 0; i < ChunkRenderListSolid.size(); i++) {
-			ChunkRenderDataBufferAddress data = ChunkRenderListSolid[(ChunkRenderListSolid.size() - 1) - i];
+		int ListSize = (int)ChunkRenderListSolid.size();
 
-			if (FindDistanceNoSqrt(data.x, data.y, data.z, Pos.x, Pos.y, Pos.z) < pow(RenderDistance, 2)) {//if (!(data.x + -Pos.x > RenderDistance || data.y + -Pos.y > RenderDistance || data.z + -Pos.z > RenderDistance || data.x + -Pos.x < -RenderDistance || data.y + -Pos.y < -RenderDistance || data.z + -Pos.z < -RenderDistance)) {//if (FindDistance(data.second.x, data.second.y, data.second.z, (int)x12 / CHUNK_SIZE, (int)y12 / CHUNK_SIZE, (int)z12 / CHUNK_SIZE) <= renderDistance) {
-				if (fr.SphereInFrustum((float)data.x * 16, (float)data.y * 16, (float)data.z * 16, (float)32)) {
+		int RenderRange = RenderDistance * RenderDistance;
+
+		for (int i = 0; i < ListSize; i++) {
+			ChunkRenderDataBufferAddress* data = &ChunkRenderListSolid[(ListSize - 1) - i];
+
+			if (FindDistanceNoSqrt(data->x, data->y, data->z, Pos.x, Pos.y, Pos.z) < RenderRange) {//if (!(data.x + -Pos.x > RenderDistance || data.y + -Pos.y > RenderDistance || data.z + -Pos.z > RenderDistance || data.x + -Pos.x < -RenderDistance || data.y + -Pos.y < -RenderDistance || data.z + -Pos.z < -RenderDistance)) {//if (FindDistance(data.second.x, data.second.y, data.second.z, (int)x12 / CHUNK_SIZE, (int)y12 / CHUNK_SIZE, (int)z12 / CHUNK_SIZE) <= renderDistance) {
+				if (fr.SphereInFrustum((float)data->x * 16, (float)data->y * 16, (float)data->z * 16, (float)32)) {
 					DrawArraysIndirectCommand cmd;
-					cmd.count = (unsigned int)data.size / (sizeof(unsigned int) * 2);
+					cmd.count = (unsigned int)data->size / (sizeof(unsigned int) * 2);
 					cmd.instanceCount = 1;
-					cmd.first = (unsigned int)data.offset / (sizeof(unsigned int) * 2);
+					cmd.first = (unsigned int)data->offset / (sizeof(unsigned int) * 2);
 					cmd.baseInstance = SolidIndex;
 					DrawArraysIndirectCommandListSolid.push_back(cmd);
-					SolidChunkShaderPos.emplace_back(data.x);
-					SolidChunkShaderPos.emplace_back(data.y);
-					SolidChunkShaderPos.emplace_back(data.z);
+					SolidChunkShaderPos.emplace_back(data->x);
+					SolidChunkShaderPos.emplace_back(data->y);
+					SolidChunkShaderPos.emplace_back(data->z);
 					SolidIndex++;
 				}
 			}
@@ -267,10 +271,10 @@ public:
 		SolidShader->setVec3("camPos", camera->Position);
 	}
 
-	void AddChunkMesh(ChunkMesh& chunk) {
+	void AddChunkMesh(Meshing::ChunkMeshData& chunk) {
 		
-		if (MeshList.count(getChunkID(chunk.chunk->Position))) {
-			_DeleteChunk(getChunkID(chunk.chunk->Position));
+		if (MeshList.count(getChunkID(chunk.Position))) {
+			_DeleteChunk(getChunkID(chunk.Position));
 			_AddChunk(chunk);
 		}
 		else {
@@ -288,7 +292,7 @@ public:
 
 	//Settings
 
-	int RenderDistance = 32;
+	int RenderDistance = 16;
 
 private:
 

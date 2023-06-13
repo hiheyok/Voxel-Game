@@ -37,6 +37,6 @@ private:
 
 	BlockID HoldingBlock = AIR;
 	Entity Player;
-	World* world;
+	World* world = nullptr;
 };
 

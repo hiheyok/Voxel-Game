@@ -18,7 +18,6 @@ bool World::RayIntersection(Ray& ray) {
 
 		ivec3 side;
 		vec3 l;
-		vec3 TravelDistance;
 
 		//iterates through the 3 axis
 		for (int axis = 0; axis < 3; axis++) {
@@ -41,18 +40,16 @@ bool World::RayIntersection(Ray& ray) {
 				//(floor(pos[axis]) + side[axis]) - pos[axis]) is the distance delta is the velocity of the vector 
 				//Calculates the time it takes to get to that point for each axis
 			}
-			TravelDistance[axis] = powf((floor(pos[axis]) + side[axis]) - pos[axis], 2) + powf(l[axis] * delta[(axis + 1) % 3], 2) + powf(l[axis] * delta[(axis + 2) % 3], 2);
-			//Using that time, it calculates the total distance the vector will travel within that time for each axis
 		}
 
 		float li = 0;
 
 		//Test which axis gives the lowest time 
-		if (TravelDistance.x > TravelDistance.y) {
-			li = TravelDistance.y > TravelDistance.z ? l.z : l.y;
+		if (l.x > l.y) {
+			li = l.y > l.z ? l.z : l.y;
 		}
 		else {
-			li = TravelDistance.x > TravelDistance.z ? l.z : l.x;
+			li = l.x > l.z ? l.z : l.x;
 		}
 
 		//Multiply the least time by the vector delta to get the next position
@@ -69,7 +66,7 @@ bool World::RayIntersection(Ray& ray) {
 		}
 
 		//Test if the ray collides if there is a block
-		if ((GetBlock(floor(t.x), floor(t.y), floor(t.z)) != AIR) && (GetBlock(floor(t.x), floor(t.y), floor(t.z)) != NULL_BLOCK)) {
+		if ((GetBlock((int)floor(t.x), (int)floor(t.y), (int)floor(t.z)) != AIR) && (GetBlock((int)floor(t.x), (int)floor(t.y), (int)floor(t.z)) != NULL_BLOCK)) {
 
 			ray.EndPoint = pos;
 
@@ -127,15 +124,15 @@ dvec3 World::GetTimeTillCollusion(Entity entity) {
 	vec3 HitboxStart = entity.Position - (Hitbox.size / 2.f);
 	vec3 HitboxEnd = entity.Position + (Hitbox.size / 2.f);
 
-	int ix = floor(Hitbox.size.x) + 1;
-	int iy = floor(Hitbox.size.y) + 1;
-	int iz = floor(Hitbox.size.z) + 1;
+	int ix = (int)floor(Hitbox.size.x) + 1;
+	int iy = (int)floor(Hitbox.size.y) + 1;
+	int iz = (int)floor(Hitbox.size.z) + 1;
 
 	vec3 leasttime(-1.f, -1.f, -1.f);
 	
 	int SearchDistance = 5;
 
-	float LeastDistance = SearchDistance;
+	float LeastDistance = (float)SearchDistance;
 
 	for (int x = 0; x <= ix; x++) {
 		for (int y = 0; y <= iy; y++) {
@@ -160,7 +157,7 @@ dvec3 World::GetTimeTillCollusion(Entity entity) {
 					if (entity.Velocity[axis] != 0.f) { //First checks if the velocity isn't 0 because if it is 0, it's not moving in that axis so it's not going to collide in that direction
 						int direction = entity.Velocity[axis] < 0 ? axis * 2 + 1 : axis * 2; // The "+1" indicates that the direction is negative 
 
-						float distance = GetDistanceUntilCollusionSingleDirection(origin, direction, floor(LeastDistance) + 2);
+						float distance = GetDistanceUntilCollusionSingleDirection(origin, direction, (int)floor(LeastDistance) + 2);
 
 						if ((distance < LeastDistance) && (distance != -1.f))
 							LeastDistance = distance;
@@ -193,7 +190,7 @@ void World::SetPlayerPos(glm::dvec3 pos) {
 void World::Start() {
 	stop = false;
 
-	WorldGenerator.Start(2);
+	WorldGenerator.Start(4);
 
 	MainWorldThread = std::thread(&World::WorldThread, this);
 }
@@ -214,9 +211,9 @@ void World::WorldThread() {
 		for (int x = -horizontaltickingdistance; x <= horizontaltickingdistance; x++) {
 			for (int y = -0; y <= 8; y++) {
 				for (int z = -horizontaltickingdistance; z <= horizontaltickingdistance; z++) {
-					int offsetx = floor(pos.x) + x;
-					int offsety =  y;
-					int offsetz = floor(pos.z) + z;
+					int offsetx = (int)floor(pos.x) + x;
+					int offsety = y;
+					int offsetz = (int)floor(pos.z) + z;
 
 					if (!CheckChunk(offsetx, offsety, offsetz) && (!ChunksInQueue.count(getChunkID(offsetx, offsety, offsetz)))) {
 						WorldGenerator.Generate(offsetx, offsety, offsetz);
@@ -239,9 +236,9 @@ void World::WorldThread() {
 			ChunksPerTick++;
 		}
 
-		timerSleepNotPrecise(1000.f / TPS);
+		timerSleepNotPrecise((int)(1000.f / (float)TPS));
 
-		float MSPT = ((double)(high_resolution_clock::now() - t0).count() / 1000000);
+		float MSPT = (float)((double)(high_resolution_clock::now() - t0).count() / 1000000.0);
 
 		getLogger()->LogInfo("World", "MSPT: " + std::to_string(MSPT) + " | Chunks Per Second: " + std::to_string((float)ChunksPerTick / (MSPT / 1000)));
 	}
@@ -253,12 +250,12 @@ bool World::IsEntityOnGround(Entity entity) {
 	vec3 HitboxStart = entity.Position - (Hitbox.size / 2.f);
 	vec3 HitboxEnd = entity.Position + (Hitbox.size / 2.f);
 
-	int ix = floor(Hitbox.size.x) + 1;
-	int iz = floor(Hitbox.size.z) + 1;
+	int ix = (int)floor(Hitbox.size.x) + 1;
+	int iz = (int)floor(Hitbox.size.z) + 1;
 
 	int SearchDistance = 5;
 
-	float LeastLength = SearchDistance;
+	float LeastLength = (float)SearchDistance;
 
 	float OnGroundError = 0.01f;
 
@@ -274,7 +271,7 @@ bool World::IsEntityOnGround(Entity entity) {
 			float Distance = 0.f;
 
 			//Set the distance to check to the previose least length from collusion to optimize searching
-			Distance = GetDistanceUntilCollusionSingleDirection(origin, NY, floor(LeastLength) + 2);
+			Distance = GetDistanceUntilCollusionSingleDirection(origin, NY, (int)floor(LeastLength) + 2);
 
 			if (Distance < LeastLength) {
 				LeastLength = Distance;

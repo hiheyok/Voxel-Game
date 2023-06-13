@@ -17,7 +17,7 @@ void ChunkMeshData::GenerateMesh(Chunk& chunk) {
 
 	NullQuad.Texture = 9999;
 
-	FaceCollectionCache.resize(4096 * 6);
+	FaceCollectionCache = new Quad[4096*6]{};
 
 	for (int i = 0; i < 4096 * 6; i++) {
 		FaceCollectionCache[i] = NullQuad;
@@ -34,7 +34,7 @@ void ChunkMeshData::GenerateMesh(Chunk& chunk) {
 	SimplifyMesh(chunk); //Simplifies mesh
 
 	//Clear cache
-	FaceCollectionCache.clear();
+	delete[] FaceCollectionCache;
 
 }
 
@@ -82,7 +82,7 @@ void ChunkMeshData::SimplifyMesh(Chunk& chunk) {
 	int x[3]{};
 	int q[3]{};
 
-	for (int axis = 2; axis < 3; axis++) {
+	for (int axis = 0; axis < 3; axis++) {
 
 		int Axis0 = (axis + 2) % 3;
 		int Axis1 = (axis + 1) % 3;
@@ -216,7 +216,7 @@ void ChunkMeshData::AddFacetoMesh(Quad quad, int slice, int axis, int face) {
 
 	int tex = quad.Texture;
 
-	if (face == 0) {
+	if (face == 1) {
 		SolidVertices.push_back(0u | P0[ParallelAxis] | P1[AxisU] | P0[AxisV] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | 0 | (tex << textureBitOffset));
 		SolidVertices.push_back(0u | P0[ParallelAxis] | P1[AxisU] | P1[AxisV] | (PP << blockShadingBitOffset));
@@ -424,14 +424,14 @@ Quad ChunkMeshData::GetFace(int x, int y, int z, int side) {
 	if (x >= 16 || y >= 16 || z >= 16 || x < 0 || y < 0 || z < 0) {
 		return NullQuad;
 	}
-	return FaceCollectionCache.data()[(x * 256 + y * 16 + z) * 6 + side];
+	return FaceCollectionCache[(x * 256 + y * 16 + z) * 6 + side];
 }
 
 void ChunkMeshData::SetFace(int x, int y, int z, int side, Quad quad) {
 	if (x >= 16 || y >= 16 || z >= 16 || x < 0 || y < 0 || z < 0) {
 		return;
 	}
-	FaceCollectionCache.data()[(x * 256 + y * 16 + z) * 6 + side] = quad;
+	FaceCollectionCache[(x * 256 + y * 16 + z) * 6 + side] = quad;
 }
 
 int ChunkMeshData::GetTexture(Chunk& chunk, int x, int y, int z, int side) {

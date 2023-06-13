@@ -71,7 +71,7 @@ namespace Meshing
 		int GetTexture(Chunk& chunk, int x, int y, int z, int side);
 
 		//Face data
-		std::vector<Quad> FaceCollectionCache;
+		Quad* FaceCollectionCache;
 
 		//Add faces to the mesh
 		void AddFacetoMesh(Quad quad, int slice, int axis, int face);

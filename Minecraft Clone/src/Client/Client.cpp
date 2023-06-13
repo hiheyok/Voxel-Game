@@ -66,7 +66,7 @@ void Client::Update() {
 
 	UpdateKeyPressSet();
 
-	MainLocalWorld.UpdateIO(GetKeyboardDump(), TestForKeyInputs(GLFW_KEY_LEFT_SHIFT), (float)cursormovementx, (float)cursormovementy, PressedLeft, PressedMiddle, PressedRight, Frametime);
+	MainLocalWorld.UpdateIO(GetKeyboardDump(), TestForKeyInputs(GLFW_KEY_LEFT_SHIFT), (float)cursormovementx, (float)cursormovementy, PressedLeft, PressedMiddle, PressedRight, (float)Frametime);
 	PressedLeft = false;
 	PressedMiddle = false;
 	PressedRight = false;

@@ -177,6 +177,7 @@
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\BakedChunkMesh.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshing.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\Mesher.h" />
+    <ClInclude Include="src\RenderEngine\EntityRenderer\EntityRenderer.h" />
     <ClInclude Include="src\RenderEngine\Frustum\frustum.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Buffers\Buffer.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Framebuffer\Framebuffer.h" />
@@ -204,10 +205,10 @@
     <ClInclude Include="src\World\Chunk\Block\BlockTexture.h" />
     <ClInclude Include="src\World\Chunk\Chunk.h" />
     <ClInclude Include="src\World\Chunk\ChunkData.h" />
-    <ClInclude Include="src\World\CollusionDetection\Intersection.h" />
     <ClInclude Include="src\World\DataContainer\BlockData.h" />
     <ClInclude Include="src\World\DataContainer\ChunkMapData.h" />
     <ClInclude Include="src\World\Entity\Entities.h" />
+    <ClInclude Include="src\World\Entity\EntityModel.h" />
     <ClInclude Include="src\World\Entity\EntityType.h" />
     <ClInclude Include="src\World\Entity\Entity.h" />
     <ClInclude Include="src\World\Entity\Hitbox.h" />

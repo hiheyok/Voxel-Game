@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Hitbox.h"
-
+#include "EntityModel.h"
 typedef unsigned short EntityID;
 
 class EntityType {
@@ -23,10 +23,12 @@ public:
 		return Hitbox;
 	}
 
-	EntityID ID;
+	EntityID ID = NULL;
+
+	EntityModel RenderModel;
 
 private:
-
+	
 	AABB Hitbox;
 };
 

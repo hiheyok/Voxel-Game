@@ -48,7 +48,7 @@ private:
 
 	std::deque<std::thread> Workers;
 	std::deque<std::deque<ChunkID>> WorkerTask;
-	std::deque<std::deque<ChunkMesh>> WorkerOutput;
+	std::deque<std::deque<Meshing::ChunkMeshData>> WorkerOutput;
 	std::deque<std::mutex> WorkerLocks;
 
 	std::thread Scheduler;

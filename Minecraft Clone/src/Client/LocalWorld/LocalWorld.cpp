@@ -54,10 +54,10 @@ void LocalWorld::RotatePlayer(float cursorx, float cursory) {
 	Player.Rotation.x += cursorx * CamSensitivity;
 	Player.Rotation.y -= cursory * CamSensitivity;
 
-	if (Player.Rotation.y > 89.9999)
-		Player.Rotation.y = 89.9999;
-	if (Player.Rotation.y < -89.9999)
-		Player.Rotation.y = -89.9999;
+	if (Player.Rotation.y > 89.9999f)
+		Player.Rotation.y = 89.9999f;
+	if (Player.Rotation.y < -89.9999f)
+		Player.Rotation.y = -89.9999f;
 
 }
 
@@ -73,7 +73,7 @@ void LocalWorld::MovePlayer(bool KeyW, bool KeyA, bool KeyS, bool KeyD, bool Key
 
 	vec3 right = normalize(cross(front, glm::vec3(0.0, 1.0, 0.0)));
 
-	float velocity = 250;
+	float velocity = 50;
 
 	if (KeyW) {
 		Player.Velocity += front * velocity;
@@ -146,7 +146,7 @@ void LocalWorld::PlaceBlock() {
 
 		ivec3 PlacePos = floor(ray.EndPoint);
 
-		PlacePos[floor(BounceSurface / 2)] -= -(BounceSurface - floor(BounceSurface / 2) * 2) + 1;
+		PlacePos[floor(BounceSurface / 2)] -= -(BounceSurface - (int)floor(BounceSurface / 2) * 2) + 1;
 
 		world->SetBlock(HoldingBlock, PlacePos.x, PlacePos.y, PlacePos.z);
 	}

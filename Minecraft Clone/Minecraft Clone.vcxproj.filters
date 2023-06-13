@@ -230,10 +230,13 @@
     <ClInclude Include="src\World\DataContainer\WorldData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\CollusionDetection\Intersection.h">
+    <ClInclude Include="src\World\TerrainGeneration\Generator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\TerrainGeneration\Generator.h">
+    <ClInclude Include="src\World\Entity\EntityModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\EntityRenderer\EntityRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

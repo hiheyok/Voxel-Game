@@ -33,7 +33,6 @@ private:
 	
 	float GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int direction, int distancetest);
 
-
 	std::thread MainWorldThread;
 
 	std::thread Loader;
@@ -44,7 +43,7 @@ private:
 
 	const float TPS = 20.f;
 
-	const int horizontaltickingdistance = 32;
+	const int horizontaltickingdistance = 16;
 	const int vertialtickingdistance = 4;
 
 	Generator WorldGenerator;
