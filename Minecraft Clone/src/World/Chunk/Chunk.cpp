@@ -84,3 +84,83 @@ void Chunk::Generate(FastNoiseLite* noise) {
 	}
 	
 }
+
+void Chunk::GenerateV2(FastNoiseLite* noise) {
+
+	noise->SetFrequency(0.009f);
+
+	int cx = Position.x * 16;
+	int cz = Position.z * 16;
+	int cy = Position.y * 16;
+
+	float heightBias = 50;
+	float noiseOffset = 0.3;
+
+	for (int x = 0; x < 16; x++) {
+		for (int z = 0; z < 16; z++) {
+			for (int y = 0; y < 16; y++) {
+
+				float gx = (float)(x + cx);
+				float gy = (float)(y + cy);
+				float gz = (float)(z + cz);
+
+				float n = getNoise3D(x, y, z, 4, noise);
+
+				//getLogger()->LogInfo("Generator" , "Noise: " + std::to_string(n));
+
+				n = n * exp(-gy / heightBias);
+
+				n = n + noiseOffset;
+
+				if (n > 0.5f) {
+					Blocks.ChangeBlock(STONE, (uint32_t)x, (uint32_t)y, (uint32_t)z);
+					isEmpty = false;
+				}
+
+
+			}
+		}
+	}
+
+	
+}
+
+float Chunk::getNoise3D(int x, int y, int z, int samples, FastNoiseLite* noise) {
+	int cx = Position.x * 16;
+	int cz = Position.z * 16;
+	int cy = Position.y * 16;
+
+	float gx = (float)(x + cx);
+	float gy = (float)(y + cy);
+	float gz = (float)(z + cz);
+
+	float out = 0.0f;
+
+	for (int i = 0; i < samples; i++) {
+		float n = (noise->GetNoise(gx * powf(2, i), gy * powf(2, i), gz * powf(2, i)) + 1) * 0.5f;
+		out += n * powf(0.5f, i);
+	}
+
+	out = out * ((-0.5f) / (powf(0.5, samples) - 1));
+
+	return out;
+
+}
+float Chunk::getNoise2D(int x, int z, int samples, FastNoiseLite* noise) {
+	int cx = Position.x * 16;
+	int cz = Position.z * 16;
+
+	float gx = (float)(x + cx);
+	float gz = (float)(z + cz);
+
+	float out = 0.0f;
+
+	for (int i = 0; i < samples; i++) {
+		float n = (noise->GetNoise(gx * powf(2, i), gz * powf(2, i)) + 1) * 0.5f;
+		out += n * powf(0.5f, i);
+	}
+
+	out = out * ((-0.5f) / (powf(0.5, samples) - 1));
+
+	return out;
+}

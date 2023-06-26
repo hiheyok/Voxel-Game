@@ -112,7 +112,7 @@ void LocalWorld::MovePlayer(bool KeyW, bool KeyA, bool KeyS, bool KeyD, bool Key
 	//	friction = 1000.0F;
 	//}
 
-	vec3 time = world->GetTimeTillCollusion(Player);
+	/*vec3 time = world->GetTimeTillCollusion(Player);
 
 	if ((time.x != -1.) && (time.x <= delta)) {
 		Player.Velocity.x = 0;
@@ -122,7 +122,7 @@ void LocalWorld::MovePlayer(bool KeyW, bool KeyA, bool KeyS, bool KeyD, bool Key
 	}
 	if ((time.z != -1.) && (time.z <= delta)) {
 		Player.Velocity.z = 0;
-	}
+	}*/
 
 	Player.Position += Player.Velocity * delta;
 	Player.Velocity = Player.Velocity * powf(1 / 5, delta);
@@ -146,7 +146,7 @@ void LocalWorld::PlaceBlock() {
 
 		ivec3 PlacePos = floor(ray.EndPoint);
 
-		PlacePos[floor(BounceSurface / 2)] -= -(BounceSurface - (int)floor(BounceSurface / 2) * 2) + 1;
+		PlacePos[(int)floor(BounceSurface / 2)] -= -(BounceSurface - (int)floor(BounceSurface / 2) * 2) + 1;
 
 		world->SetBlock(HoldingBlock, PlacePos.x, PlacePos.y, PlacePos.z);
 	}

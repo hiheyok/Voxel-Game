@@ -27,7 +27,7 @@ void WorldRender::Worker(int id) {
 
 	deque<ChunkID> Jobs;
 
-	deque<ChunkMeshData> FinishedJobs;
+	deque<ChunkMesh> FinishedJobs;
 
 	while (!stop) {
 		//Fetches all of the tasks and put it in "Jobs"
@@ -44,8 +44,9 @@ void WorldRender::Worker(int id) {
 			ivec3 pos = ChunkIDToPOS(task);
 
 			//Generates the chunks
-			ChunkMeshData NewMesh;
-			NewMesh.GenerateMesh(world->GetChunk(pos.x, pos.y, pos.z));
+			ChunkMesh NewMesh;
+			NewMesh.chunk = &world->GetChunk(pos.x, pos.y, pos.z);
+			NewMesh.SmartGreedyMeshing();
 			FinishedJobs.push_back(NewMesh);
 		}
 
@@ -65,8 +66,8 @@ void WorldRender::Update() {
 		WorkerLocks[WorkerID].lock();
 
 		while (!WorkerOutput[WorkerID].empty()) {
-			if (WorkerOutput[WorkerID].front().SolidVertices.size() != 0) {
-				Renderer.AddChunkMesh(WorkerOutput[WorkerID].front());
+			if (WorkerOutput[WorkerID].front().vertices.size() != 0) {
+				Renderer.AddChunkMesh(WorkerOutput[(uint64_t)WorkerID].front());
 			}
 			WorkerOutput[WorkerID].pop_front();
 		}

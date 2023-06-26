@@ -43,8 +43,8 @@ private:
 
 	const float TPS = 20.f;
 
-	const int horizontaltickingdistance = 16;
-	const int vertialtickingdistance = 4;
+	const int horizontaltickingdistance = 24;
+	const int vertialtickingdistance = 8;
 
 	Generator WorldGenerator;
 

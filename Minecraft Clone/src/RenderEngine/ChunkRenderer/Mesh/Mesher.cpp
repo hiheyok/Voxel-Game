@@ -592,10 +592,10 @@ void ChunkMesh::SGaddSidenz(ivec3 p0, ivec3 p1, bool transparency, int sx, int s
 }
 
 void ChunkMesh::SaddSideny(int x, int y, int z, BlockID block) {
-	int a = lightMvalue_;
-	int b = lightMvalue_;
-	int a1 = lightMvalue_;
-	int b1 = lightMvalue_;
+	uint a = lightMvalue_;
+	uint b = lightMvalue_;
+	uint a1 = lightMvalue_;
+	uint b1 = lightMvalue_;
 	if (!BlockList[chunk->GetBlock(x - 1, y - 1, z)]->block->transparency) {
 		a = lightCvalue_;
 		b = lightCvalue_;
@@ -623,10 +623,10 @@ void ChunkMesh::SaddSideny(int x, int y, int z, BlockID block) {
 	SMesh->add(x, y, z, block, a, b, a1, b1, NY);
 }
 void ChunkMesh::SaddSidepy(int x, int y, int z, BlockID block) {
-	int a = lightMvalue_;
-	int b = lightMvalue_;
-	int a1 = lightMvalue_;
-	int b1 = lightMvalue_;
+	uint a = lightMvalue_;
+	uint b = lightMvalue_;
+	uint a1 = lightMvalue_;
+	uint b1 = lightMvalue_;
 	if (!BlockList[chunk->GetBlock(x - 1, y + 1, z)]->block->transparency) {
 		a = lightCvalue_;
 		b = lightCvalue_;
@@ -654,10 +654,10 @@ void ChunkMesh::SaddSidepy(int x, int y, int z, BlockID block) {
 	SMesh->add(x, y, z, block, a, b, a1, b1, PY);
 }
 void ChunkMesh::SaddSidenx(int x, int y, int z, BlockID block) {
-	int br = lightMvalue_;
-	int bl = lightMvalue_;
-	int tl = lightMvalue_;
-	int tr = lightMvalue_;
+	uint br = lightMvalue_;
+	uint bl = lightMvalue_;
+	uint tl = lightMvalue_;
+	uint tr = lightMvalue_;
 	if (!BlockList[chunk->GetBlock(x - 1, y - 1, z)]->block->transparency) {
 		br = lightCvalue_;
 		bl = lightCvalue_;
@@ -685,10 +685,10 @@ void ChunkMesh::SaddSidenx(int x, int y, int z, BlockID block) {
 	SMesh->add(x, y, z, block, br, bl, tr, tl, NX);
 }
 void ChunkMesh::SaddSidepx(int x, int y, int z, BlockID block) {
-	int br = lightMvalue_;
-	int bl = lightMvalue_;
-	int tl = lightMvalue_;
-	int tr = lightMvalue_;
+	uint br = lightMvalue_;
+	uint bl = lightMvalue_;
+	uint tl = lightMvalue_;
+	uint tr = lightMvalue_;
 	if (!BlockList[chunk->GetBlock(x + 1, y - 1, z)]->block->transparency) {
 		br = lightCvalue_;
 		bl = lightCvalue_;
@@ -716,10 +716,10 @@ void ChunkMesh::SaddSidepx(int x, int y, int z, BlockID block) {
 	SMesh->add(x, y, z, block, br, bl, tr, tl, PX); // (bl,br,tl,tr)
 }
 void ChunkMesh::SaddSidenz(int x, int y, int z, BlockID block) {
-	int br = lightMvalue_;
-	int bl = lightMvalue_;
-	int tl = lightMvalue_;
-	int tr = lightMvalue_;
+	uint br = lightMvalue_;
+	uint bl = lightMvalue_;
+	uint tl = lightMvalue_;
+	uint tr = lightMvalue_;
 	if (!BlockList[chunk->GetBlock(x, y - 1, z - 1)]->block->transparency) {
 		br = lightCvalue_;
 		bl = lightCvalue_;
@@ -747,10 +747,10 @@ void ChunkMesh::SaddSidenz(int x, int y, int z, BlockID block) {
 	SMesh->add(x, y, z, block, br, bl, tl, tr, NZ); // (br,bf,tf,tr)
 }
 void ChunkMesh::SaddSidepz(int x, int y, int z, BlockID block) {
-	int br = lightMvalue_;
-	int bl = lightMvalue_;
-	int tl = lightMvalue_;
-	int tr = lightMvalue_;
+	uint br = lightMvalue_;
+	uint bl = lightMvalue_;
+	uint tl = lightMvalue_;
+	uint tr = lightMvalue_;
 	if (!BlockList[chunk->GetBlock(x, y - 1, z + 1)]->block->transparency) {
 		br = lightCvalue_;
 		bl = lightCvalue_;

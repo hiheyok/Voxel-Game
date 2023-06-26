@@ -69,9 +69,9 @@ public:
 
     GLuint textureID = NULL;
 
-    GLuint width = NULL;
-    GLuint height = NULL;
-    GLuint Format = NULL;
+    int width = NULL;
+    int height = NULL;
+    int Format = NULL;
 private:
     
 };

@@ -190,7 +190,7 @@ void World::SetPlayerPos(glm::dvec3 pos) {
 void World::Start() {
 	stop = false;
 
-	WorldGenerator.Start(4);
+	WorldGenerator.Start(8);
 
 	MainWorldThread = std::thread(&World::WorldThread, this);
 }
