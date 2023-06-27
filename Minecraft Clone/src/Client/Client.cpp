@@ -51,7 +51,7 @@ void Client::GameLoop() {
 		Frametime = (double)(high_resolution_clock::now() - t0).count() / 1000000000.0;
 
 		if ((high_resolution_clock::now() - t2).count() > 250000000) {
-			UpdateWindowName("Voxel Engine | FPS:" + std::to_string(1.0 / Frametime));
+			UpdateWindowName("Voxel Engine | FPS: " + std::to_string(1.0 / Frametime));
 			t2 = high_resolution_clock::now();
 		}
 		

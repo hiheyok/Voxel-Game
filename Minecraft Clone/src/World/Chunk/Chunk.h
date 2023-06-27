@@ -24,6 +24,9 @@ public:
 
 private:
 
-	float getNoise3D(int x, int y, int z, int samples, FastNoiseLite* noise);
-	float getNoise2D(int x, int z, int samples, FastNoiseLite* noise);
+	float getNoise3D(int x, int y, int z, int samples, float frequency, FastNoiseLite* noise);
+	float getNoise2D(int x, int z, int samples,float frequency, FastNoiseLite* noise);
+
+	float continentialNoise(float n);
+	float erosionNoise(float n);
 };

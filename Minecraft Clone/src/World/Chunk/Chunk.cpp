@@ -1,9 +1,35 @@
 #include "Chunk.h"
 
+#include <vector>
+#include <map>
 constexpr auto SEED = 3453454;
 
 double TREE_RAND_VAL = 0.5;
 double TREE_RAND_VAL_RANGE = .01f;
+
+using namespace std;
+
+map<float, float> Continentalness = {
+	{0.f, 0.75f},
+	{0.2f, 0.82f},
+	{0.23f, 0.8f},
+	{0.28f, 0.5f},
+	{0.38f, 0.2f},
+	{0.75f, 0.1f},
+	{1.f, 0.3f},
+};
+
+map<float, float> Erosionness = {
+	{0.f, 0.9f},
+	{0.075f, 0.5f},
+	{0.15f, 0.55f},
+	{0.3f, 0.3f},
+	{0.75f, 0.1f},
+	{0.8f, 0.3f},
+	{0.9f, 0.2f},
+	{1.f, 0.0f},
+};
+
 
 void Chunk::Generate(FastNoiseLite* noise) {
 
@@ -87,7 +113,9 @@ void Chunk::Generate(FastNoiseLite* noise) {
 
 void Chunk::GenerateV2(FastNoiseLite* noise) {
 
-	noise->SetFrequency(0.009f);
+	noise->SetFrequency(0.005f);
+
+	noise->SetNoiseType(noise->NoiseType_OpenSimplex2);
 
 	int cx = Position.x * 16;
 	int cz = Position.z * 16;
@@ -98,23 +126,39 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 
 	for (int x = 0; x < 16; x++) {
 		for (int z = 0; z < 16; z++) {
+
+			float continental = continentialNoise(getNoise2D(x, z, 3,0.3f, noise));
+			float erosion = continentialNoise(getNoise2D(x + 4345, z + 6443, 3, 0.3f, noise));
+
 			for (int y = 0; y < 16; y++) {
 
 				float gx = (float)(x + cx);
 				float gy = (float)(y + cy);
 				float gz = (float)(z + cz);
 
-				float n = getNoise3D(x, y, z, 4, noise);
+				float n =  getNoise3D(x, y, z, 4,1.f, noise);
 
 				//getLogger()->LogInfo("Generator" , "Noise: " + std::to_string(n));
 
-				n = n * exp(-gy / heightBias);
-
 				n = n + noiseOffset;
 
+				n += continental;
+				n += erosion;
+
+				n = n * exp(-gy / heightBias);
+
+				//getLogger()->LogInfo("Chunk Generator", "Continential Noise: " + to_string(continental));
 				if (n > 0.5f) {
-					Blocks.ChangeBlock(STONE, (uint32_t)x, (uint32_t)y, (uint32_t)z);
-					isEmpty = false;
+					if (n < 0.54f) {
+						Blocks.ChangeBlock(DIRT, (uint32_t)x, (uint32_t)y, (uint32_t)z);
+						isEmpty = false;
+					}
+					else {
+						Blocks.ChangeBlock(STONE, (uint32_t)x, (uint32_t)y, (uint32_t)z);
+						isEmpty = false;
+					}
+
+					
 				}
 
 
@@ -125,7 +169,7 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 	
 }
 
-float Chunk::getNoise3D(int x, int y, int z, int samples, FastNoiseLite* noise) {
+float Chunk::getNoise3D(int x, int y, int z, int samples, float frequency, FastNoiseLite* noise) {
 	int cx = Position.x * 16;
 	int cz = Position.z * 16;
 	int cy = Position.y * 16;
@@ -133,6 +177,10 @@ float Chunk::getNoise3D(int x, int y, int z, int samples, FastNoiseLite* noise) 
 	float gx = (float)(x + cx);
 	float gy = (float)(y + cy);
 	float gz = (float)(z + cz);
+
+	gx *= frequency;
+	gy *= frequency;
+	gz *= frequency;
 
 	float out = 0.0f;
 
@@ -146,12 +194,15 @@ float Chunk::getNoise3D(int x, int y, int z, int samples, FastNoiseLite* noise) 
 	return out;
 
 }
-float Chunk::getNoise2D(int x, int z, int samples, FastNoiseLite* noise) {
+float Chunk::getNoise2D(int x, int z, int samples, float frequency, FastNoiseLite* noise) {
 	int cx = Position.x * 16;
 	int cz = Position.z * 16;
 
 	float gx = (float)(x + cx);
 	float gz = (float)(z + cz);
+
+	gx *= frequency;
+	gz *= frequency;
 
 	float out = 0.0f;
 
@@ -161,6 +212,54 @@ float Chunk::getNoise2D(int x, int z, int samples, FastNoiseLite* noise) {
 	}
 
 	out = out * ((-0.5f) / (powf(0.5, samples) - 1));
+
+	return out;
+}
+
+map<float, float>::iterator getItr(std::map<float, float>& map, float bottomBound) {
+	std::map<float, float>::iterator itr = map.begin();
+	
+	while (itr != map.end()) {
+		if (itr->first >= bottomBound) {
+			return --itr;
+		}
+		itr++;
+	}
+}
+
+float Chunk::continentialNoise(float n) {
+	std::map<float, float>::iterator itr = getItr(Continentalness, n);
+
+	float x1 = itr->first;
+	float y1 = itr->second;
+
+	itr++;
+
+	float x2 = itr->first;
+	float y2 = itr->second;
+
+	float m = (y1 - y2) / (x1 - x2);
+
+	float out = m * (n - x1) + y1;
+
+	return out;
+
+}
+
+float Chunk::erosionNoise(float n) {
+	std::map<float, float>::iterator itr = getItr(Continentalness, n);
+
+	float x1 = itr->first;
+	float y1 = itr->second;
+
+	itr++;
+
+	float x2 = itr->first;
+	float y2 = itr->second;
+
+	float m = (y1 - y2) / (x1 - x2);
+
+	float out = m * (n - x1) + y1;
 
 	return out;
 }

@@ -195,7 +195,7 @@ public:
 					cmd.instanceCount = 1;
 					cmd.first = (unsigned int)data->offset / (sizeof(unsigned int) * 2);
 					cmd.baseInstance = SolidIndex;
-					DrawArraysIndirectCommandListSolid.push_back(cmd);
+					DrawArraysIndirectCommandListSolid.emplace_back(cmd);
 					SolidChunkShaderPos.emplace_back(data->x);
 					SolidChunkShaderPos.emplace_back(data->y);
 					SolidChunkShaderPos.emplace_back(data->z);
