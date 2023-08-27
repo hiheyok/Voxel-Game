@@ -29,4 +29,5 @@ private:
 
 	float continentialNoise(float n);
 	float erosionNoise(float n);
+	float peaksandvalley(float n);
 };

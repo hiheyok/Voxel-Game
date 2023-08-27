@@ -18,14 +18,16 @@ void Client::run() {
 
 	DisableCursor();
 
-	MainLocalWorld.SetPlayerPosition(0.,15.0,0.);
-	MainLocalWorld.SetPlayerRotation(0.,-50.);
+	MainLocalWorld.SetPlayerPosition(0.,150.0,0.);
+	MainLocalWorld.SetPlayerRotation(0.,-30.);
+
+	MainWorld.horizontaltickingdistance = 16;
 
 	MainWorld.Start();
 
 	getLogger()->LogInfo("World", "Generating World");
-
-	TerrainRender.Start(getWindow(), &MainWorld, 8);
+	TerrainRender.renderDistance = 16;
+	TerrainRender.Start(getWindow(), &MainWorld, 20);
 
 	MainLocalWorld.SetWorld(&MainWorld);
 
@@ -51,7 +53,10 @@ void Client::GameLoop() {
 		Frametime = (double)(high_resolution_clock::now() - t0).count() / 1000000000.0;
 
 		if ((high_resolution_clock::now() - t2).count() > 250000000) {
-			UpdateWindowName("Voxel Engine | FPS: " + std::to_string(1.0 / Frametime));
+			UpdateWindowName("Voxel Engine | FPS: " + std::to_string(1.0 / Frametime) + 
+				" | Pos: " + std::to_string(MainLocalWorld.GetPlayerPosition().x) + ", " +
+				std::to_string(MainLocalWorld.GetPlayerPosition().y) + ", " +
+				std::to_string(MainLocalWorld.GetPlayerPosition().z) + ", ");
 			t2 = high_resolution_clock::now();
 		}
 		

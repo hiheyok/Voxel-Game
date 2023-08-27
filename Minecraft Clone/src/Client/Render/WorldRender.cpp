@@ -111,7 +111,7 @@ void WorldRender::Start(GLFWwindow* window_,World* world_, int ThreadCount) {
 
 	Renderer.init(window, player.getCamera());
 	Renderer.ReloadAssets();
-
+	Renderer.RenderDistance = renderDistance;
 	WorkerCount = ThreadCount;
 
 	Workers.resize(ThreadCount);

@@ -88,7 +88,7 @@ public:
 		size_t high = ChunkRenderListSolid.size() - 1;
 
 		while (true) {
-			size_t mid = (size_t)((low + high) * 0.5);
+			size_t mid = (size_t)((float)(low + high) * 0.5f);
 			if (offset == ChunkRenderListSolid[mid].offset) {
 				return mid;
 			}
@@ -107,7 +107,7 @@ public:
 			return high;
 		}
 
-		return 0;
+		return 0ULL;
 
 	}
 
@@ -292,7 +292,7 @@ public:
 
 	//Settings
 
-	int RenderDistance = 24;
+	int RenderDistance = 16;
 
 private:
 
@@ -337,5 +337,7 @@ private:
 
 	std::vector<ChunkRenderDataBufferAddress> ChunkRenderListTransparent;
 	std::vector<DrawArraysIndirectCommand> DrawArraysIndirectCommandListTransparent;
+
+
 };
 #endif

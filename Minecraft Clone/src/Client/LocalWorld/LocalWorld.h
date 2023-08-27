@@ -38,5 +38,8 @@ private:
 	BlockID HoldingBlock = AIR;
 	Entity Player;
 	World* world = nullptr;
+
+	bool enableCollusion = true;
+	float speed = 50.f;
 };
 

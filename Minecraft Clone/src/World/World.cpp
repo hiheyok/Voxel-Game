@@ -1,6 +1,7 @@
 #include "World.h"
 
 #include "../Utils/Clock.h"
+#include "../Utils/Math/vectorOperations.h"
 #include <glm/vec3.hpp>
 #include <chrono>
 
@@ -8,81 +9,78 @@ using namespace std;
 using namespace chrono;
 using namespace glm;
 
-
 bool World::RayIntersection(Ray& ray) {
 
-	vec3 delta = ray.Direction;
-	vec3 pos = ray.Origin;
+	//Direction with magnitude
+	vec3 Delta = ray.Direction;
+
+	//Direction to Step
+	ivec3 Direction = Sign(Delta);
+
+	//getLogger()->LogInfo("Ray", std::to_string(Direction.x) + ", " + std::to_string(Direction.y) + ", "+ std::to_string(Direction.z));
+
+	//Location in grid
+	ivec3 BlockPos = ivec3(floor(ray.Origin.x), floor(ray.Origin.y), floor(ray.Origin.z));
+
+	//To keep track of point location
+	vec3 EndPoint = ray.Origin;
+
+	vec3 DeltaDist(
+		abs(1 / Delta[0]), abs(1 / Delta[1]), abs(1 / Delta[2])
+	);
+
+	//Stepping Variable
+	vec3 sideDist(
+		((float)Direction[0] * ((float)BlockPos[0] - EndPoint[0]) + ((float)Direction[0] * 0.5f) + 0.5f)* DeltaDist[0],
+		((float)Direction[1] * ((float)BlockPos[1] - EndPoint[1]) + ((float)Direction[1] * 0.5f) + 0.5f)* DeltaDist[1],
+		((float)Direction[2] * ((float)BlockPos[2] - EndPoint[2]) + ((float)Direction[2] * 0.5f) + 0.5f)* DeltaDist[2]
+	);
+
 	
-	for (int i = 0; i < 100; i++) {
 
-		ivec3 side;
-		vec3 l;
+	//Max Iterations
+	const uint32_t max_iterations = 50;
+	uint32_t iterations = 0;
 
-		//iterates through the 3 axis
-		for (int axis = 0; axis < 3; axis++) {
-			//Sets where the ray could intersect to
-			if ((pos[axis] == floor(pos[axis])) && (delta[axis] < 0)) {
-				side[axis] = -1;
-			}
-			else {
-				side[axis] = delta[axis] >= 0 ? 1 : 0;
-			}
+	bvec3 mask(false, false, false);
 
-			//If delta is 0, it will set the (t) that it will take to insect to some massive value 
-			//If delta is not 0, it will set a (t) that will tell us how long it will take the ray to get there 
-			
-			if (delta[axis] == 0.f) {
-				l[axis] = 9999999999999999999.f;
-			}
-			else {
-				l[axis] = ((floor(pos[axis]) + side[axis]) - pos[axis]) / delta[axis];
-				//(floor(pos[axis]) + side[axis]) - pos[axis]) is the distance delta is the velocity of the vector 
-				//Calculates the time it takes to get to that point for each axis
-			}
-		}
+	while (iterations < max_iterations) {
+		iterations++;
 
-		float li = 0;
+		if ((GetBlock(BlockPos.x, BlockPos.y, BlockPos.z) != AIR) && (GetBlock(BlockPos.x, BlockPos.y, BlockPos.z) != NULL_BLOCK)) {
 
-		//Test which axis gives the lowest time 
-		if (l.x > l.y) {
-			li = l.y > l.z ? l.z : l.y;
-		}
-		else {
-			li = l.x > l.z ? l.z : l.x;
-		}
-
-		//Multiply the least time by the vector delta to get the next position
-		pos = li * delta + pos;
-
-		vec3 t = pos;
-
-		//If delta is below 0 and the position is on a side of a block, it basicaally means that the pos is going down or behind that block, etc
-		//So it subtract 1 block to reflect the position when testing if there's a block there
-
-		for (int axis = 0; axis < 3; axis++) {
-			if ((floor(pos[axis]) == pos[axis]) && (delta[axis] < 0))
-				t[axis] -= 1;
-		}
-
-		//Test if the ray collides if there is a block
-		if ((GetBlock((int)floor(t.x), (int)floor(t.y), (int)floor(t.z)) != AIR) && (GetBlock((int)floor(t.x), (int)floor(t.y), (int)floor(t.z)) != NULL_BLOCK)) {
-
-			ray.EndPoint = pos;
+			ray.EndPoint = (vec3)BlockPos;
 
 			ray.Length = sqrtf(powf(ray.EndPoint.x - ray.Origin.x, 2) + powf(ray.EndPoint.y - ray.Origin.y, 2) + powf(ray.EndPoint.z - ray.Origin.z, 2));
 
-			//Iterates through the axis
 			for (int axis = 0; axis < 3; axis++) {
-				if ((floor(pos[axis]) == pos[axis]) && (delta[axis] != 0)) { //This test which side the ray collided with the block
-					ray.bouncesurface = delta[axis] < 0 ? axis * 2 + 1 : axis * 2; //Set the surface it bounces off. + 1 means that the surface is behind, bottom, etc
+				if (mask[axis]) { 
+					ray.bouncesurface = Delta[axis] < 0 ? axis * 2 + 1 : axis * 2; //Set the surface it bounces off. + 1 means that the surface is behind, bottom, etc
 					return true;
 				}
 			}
 			return false;
 		}
+
+		bvec3 l1 = lessThan(sideDist[0], sideDist[1], sideDist[2], sideDist[1], sideDist[2], sideDist[0]);
+		bvec3 l2 = lessThanEqual(sideDist[0], sideDist[1], sideDist[2], sideDist[2], sideDist[0], sideDist[1]);
+
+		mask[0] = l1[0] && l2[0];
+		mask[1] = l1[1] && l2[1];
+		mask[2] = l1[2] && l2[2];
+
+		sideDist[0] += (float)mask[0] * DeltaDist[0];
+		sideDist[1] += (float)mask[1] * DeltaDist[1];
+		sideDist[2] += (float)mask[2] * DeltaDist[2];
+
+		BlockPos[0] += ((int)mask[0]) * Direction[0];
+		BlockPos[1] += ((int)mask[1]) * Direction[1];
+		BlockPos[2] += ((int)mask[2]) * Direction[2];
+
 	}
+
 	return false;
+	
 }
 
 float World::GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int direction, int distancetest) {
@@ -190,7 +188,7 @@ void World::SetPlayerPos(glm::dvec3 pos) {
 void World::Start() {
 	stop = false;
 
-	WorldGenerator.Start(8);
+	WorldGenerator.Start(16);
 
 	MainWorldThread = std::thread(&World::WorldThread, this);
 }
@@ -257,7 +255,11 @@ bool World::IsEntityOnGround(Entity entity) {
 
 	float LeastLength = (float)SearchDistance;
 
-	float OnGroundError = 0.01f;
+	float OnGroundError = 0.001f;
+
+	if (entity.Velocity.y > 0.f) {
+		return false;
+	}
 
 	for (int x = 0; x <= ix; x++) {
 		for (int z = 0; z <= iz; z++) {

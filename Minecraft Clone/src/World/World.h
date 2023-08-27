@@ -27,6 +27,9 @@ public:
 
 	bool IsEntityOnGround(Entity entity);
 
+	int horizontaltickingdistance = 16;
+	int vertialtickingdistance = 8;
+
 private:
 
 	void WorldThread();
@@ -43,8 +46,7 @@ private:
 
 	const float TPS = 20.f;
 
-	const int horizontaltickingdistance = 24;
-	const int vertialtickingdistance = 8;
+	
 
 	Generator WorldGenerator;
 

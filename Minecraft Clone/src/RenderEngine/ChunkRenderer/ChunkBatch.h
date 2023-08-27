@@ -6,10 +6,10 @@
 #include "../Camera/camera.h"
 #include "../frustum/frustum.h"
 #include "../../Utils/MathHelper.h"
-#include "../../Utils/Math/ChunkID/ChunkID.h"
 #include "../../World/Chunk/Chunk.h"
 #include "../OpenGL/Buffers/Buffer.h"
 #include <unordered_map>
+#include <map>
 
 struct DrawCommandIndirect {
 	unsigned int  count;
@@ -61,4 +61,8 @@ private:
 	std::vector<GLint> ChunkShaderPos;
 	std::vector<DataBufferAddress> RenderList;
 	std::vector<DrawCommandIndirect> DrawCommands;
+
+	std::map<size_t, size_t> InsertSpace; // <Slot Size, Index>
+
+
 };

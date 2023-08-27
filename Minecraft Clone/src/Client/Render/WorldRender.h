@@ -29,6 +29,8 @@ public:
 
 	void Update();
 
+	int renderDistance = 16;
+
 private:
 
 	void Worker(int id);

@@ -30,6 +30,18 @@ map<float, float> Erosionness = {
 	{1.f, 0.0f},
 };
 
+map<float, float> PeaksValley = {
+	{0.f, 0.0f},
+	{0.075f, 0.0f},
+	{0.15f, 0.25f},
+	{0.5f, 0.35f},
+	{0.6f, 0.75f},
+	{0.75f, 0.85f},
+	{0.9f, 0.83f},
+	{1.f, 0.84f},
+};
+
+
 
 void Chunk::Generate(FastNoiseLite* noise) {
 
@@ -128,7 +140,8 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 		for (int z = 0; z < 16; z++) {
 
 			float continental = continentialNoise(getNoise2D(x, z, 3,0.3f, noise));
-			float erosion = continentialNoise(getNoise2D(x + 4345, z + 6443, 3, 0.3f, noise));
+			float erosion = erosionNoise(getNoise2D(x + 4345, z + 6443, 3, 1.f, noise)) / 2.f;
+			float pv = peaksandvalley(getNoise2D(x + 65345, z + 12323, 3, 4.f, noise)) / 8;
 
 			for (int y = 0; y < 16; y++) {
 
@@ -144,6 +157,7 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 
 				n += continental;
 				n += erosion;
+				n += (pv / (heightBias * (n + 0.5))) * gy;
 
 				n = n * exp(-gy / heightBias);
 
@@ -248,6 +262,24 @@ float Chunk::continentialNoise(float n) {
 
 float Chunk::erosionNoise(float n) {
 	std::map<float, float>::iterator itr = getItr(Continentalness, n);
+
+	float x1 = itr->first;
+	float y1 = itr->second;
+
+	itr++;
+
+	float x2 = itr->first;
+	float y2 = itr->second;
+
+	float m = (y1 - y2) / (x1 - x2);
+
+	float out = m * (n - x1) + y1;
+
+	return out;
+}
+
+float Chunk::peaksandvalley(float n) {
+	std::map<float, float>::iterator itr = getItr(PeaksValley, n);
 
 	float x1 = itr->first;
 	float y1 = itr->second;

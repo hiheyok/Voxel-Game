@@ -1,5 +1,7 @@
 #include "ChunkBatch.h"
 
+using namespace glm;
+
 void ChunkDrawBatch::SetupBuffers() {
 	VBO.SetType(GL_ARRAY_BUFFER);
 	IBO.SetType(GL_DRAW_INDIRECT_BUFFER);
@@ -41,7 +43,7 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
 	DrawCommands.clear();
 	ChunkShaderPos.clear();
 
-	ivec3 Position(floor(camera->Position.x / 16), floor(camera->Position.y / 16), floor(camera->Position.z / 16));
+	ivec3 Position(floor(camera->Position.x / 16.f), floor(camera->Position.y / 16.f), floor(camera->Position.z / 16.f));
 
 	int Index = 1;
 
@@ -72,7 +74,7 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int
 	size_t DataSize = Data.size() * sizeof(unsigned int);
 	if (DataSize == 0) { return true; }
 	if (DataSize + MemoryUsage > MaxBufferSize) { 
-		getLogger()->LogDebug("Chunk Renderer", "DrawBatch Out of Memory: " + std::to_string(MemoryUsage));
+		getLogger()->LogDebug("Chunk Renderer", "Draw Batch Out of Memory: " + std::to_string(MemoryUsage));
 		return false; 
 	}
 	DataBufferAddress RenderingData;
@@ -112,7 +114,7 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int
 			return true;
 		}
 	}
-	getLogger()->LogDebug("Chunk Renderer", "DrawBatch Out of Memory: " + std::to_string(MemoryUsage));
+	getLogger()->LogDebug("Chunk Renderer", "Draw Batch Out of Memory: " + std::to_string(MemoryUsage));
 	return false;
 }
 
