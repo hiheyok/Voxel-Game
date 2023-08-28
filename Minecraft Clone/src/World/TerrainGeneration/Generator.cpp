@@ -61,7 +61,7 @@ void Generator::Worker(int id) {
 			
 			Chunk NewChunk;
 			NewChunk.SetPosition(pos.x, pos.y, pos.z);
-			NewChunk.GenerateV2(&noise);
+			NewChunk.Generate(&noise);
 			FinishedJobs.emplace_back(NewChunk);
 		}
 

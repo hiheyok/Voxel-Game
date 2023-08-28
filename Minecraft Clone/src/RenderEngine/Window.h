@@ -8,6 +8,8 @@
 #include <vector>
 #define _CRTDBG_MAP_ALLOC
 
+#define KEY_CTRL 0x01
+
 class Window {
 public:
 	void Start();

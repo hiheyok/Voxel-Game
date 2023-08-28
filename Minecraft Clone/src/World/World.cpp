@@ -31,9 +31,9 @@ bool World::RayIntersection(Ray& ray) {
 
 	//Stepping Variable
 	vec3 sideDist(
-		((float)Direction[0] * ((float)BlockPos[0] - EndPoint[0]) + ((float)Direction[0] * 0.5f) + 0.5f)* DeltaDist[0],
-		((float)Direction[1] * ((float)BlockPos[1] - EndPoint[1]) + ((float)Direction[1] * 0.5f) + 0.5f)* DeltaDist[1],
-		((float)Direction[2] * ((float)BlockPos[2] - EndPoint[2]) + ((float)Direction[2] * 0.5f) + 0.5f)* DeltaDist[2]
+		((float)Direction[0] * ((float)BlockPos[0] - EndPoint[0]) + ((float)Direction[0] * 0.5f) + 0.5f) * DeltaDist[0],
+		((float)Direction[1] * ((float)BlockPos[1] - EndPoint[1]) + ((float)Direction[1] * 0.5f) + 0.5f) * DeltaDist[1],
+		((float)Direction[2] * ((float)BlockPos[2] - EndPoint[2]) + ((float)Direction[2] * 0.5f) + 0.5f) * DeltaDist[2]
 	);
 
 	
@@ -92,13 +92,13 @@ float World::GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int dire
 
 	if (direction % 2 == 0) { //Negative direction has a " + 1". So by taking the modulus, you can find if it is negative or positive. Explaination: PX = 0, NX = 1
 
-		int axis = direction / 2;
+		int axis = (int)((float)direction / 2.f);
 
 		displacement = 1 - (Origin[axis] - (float)FlooredPos[axis]);
 		Move[axis] = 1;
 	}
 	else {
-		int axis = (direction - 1) / 2;
+		int axis = (int)((float)(direction - 1) / 2.f);
 
 		displacement = Origin[axis] - (float)FlooredPos[axis];
 		Move[axis] = -1;

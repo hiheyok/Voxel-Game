@@ -1,7 +1,8 @@
 #ifndef CHUNK_R_H_
 #define CHUNK_R_H_
-#define _CRTDBG_MAP_ALLOC
+
 #include "Mesh/Mesher.h"
+#include "Mesh/ChunkMeshing.h"
 
 #include "../Camera/camera.h"
 #include "../frustum/frustum.h"
@@ -9,7 +10,7 @@
 #include "../OpenGL/Texture/texture.h"
 #include "../../Utils/MathHelper.h"
 #include "../../Utils/MutithreadedData.h"
-#include "Mesh/ChunkMeshing.h"
+
 #include <unordered_map>
 #include <deque>
 #include <queue>
@@ -113,11 +114,11 @@ public:
 
 
 
-	void _AddChunk(ChunkMesh data) {
+	void _AddChunk(Meshing::ChunkMeshData& data) {
 
-		unsigned long long int ChunkID = getChunkID(data.chunk->Position);
+		unsigned long long int ChunkID = getChunkID(data.Position);
 
-		size_t MeshSizeSolid = data.vertices.size() * sizeof(unsigned int);
+		size_t MeshSizeSolid = data.SolidVertices.size() * sizeof(unsigned int);
 
 		if (MeshSizeSolid == 0) {
 			MeshList[ChunkID] = true;
@@ -125,15 +126,15 @@ public:
 		}
 
 		ChunkRenderDataBufferAddress renderdata;
-		renderdata.x = data.chunk->Position.x;
-		renderdata.y = data.chunk->Position.y;
-		renderdata.z = data.chunk->Position.z;
+		renderdata.x = data.Position.x;
+		renderdata.y = data.Position.y;
+		renderdata.z = data.Position.z;
 
 		if (ChunkRenderListSolid.size() == 0) {
 			renderdata.offset = 0;
 			renderdata.size = MeshSizeSolid;
 			GPUMemoryUsage += MeshSizeSolid;
-			insertData(VBO, GL_ARRAY_BUFFER, renderdata.offset, &data.vertices);
+			insertData(VBO, GL_ARRAY_BUFFER, renderdata.offset, &data.SolidVertices);
 			ChunkRenderListSolid.insert(ChunkRenderListSolid.begin(), renderdata);
 			MeshList[ChunkID] = true;
 			ChunkRenderListSolidOffsetLookup[ChunkID] = 0;
@@ -144,7 +145,7 @@ public:
 				renderdata.offset = ChunkRenderListSolid.back().offset + ChunkRenderListSolid.back().size;
 				renderdata.size = MeshSizeSolid;
 				GPUMemoryUsage += MeshSizeSolid;
-				insertData(VBO, GL_ARRAY_BUFFER, renderdata.offset, &data.vertices);
+				insertData(VBO, GL_ARRAY_BUFFER, renderdata.offset, &data.SolidVertices);
 				ChunkRenderListSolid.emplace_back(renderdata);
 				MeshList[ChunkID] = true;
 				ChunkRenderListSolidOffsetLookup[ChunkID] = renderdata.offset;
@@ -157,7 +158,7 @@ public:
 						renderdata.offset = ChunkRenderListSolid[i].offset + ChunkRenderListSolid[i].size;
 						renderdata.size = MeshSizeSolid;
 						GPUMemoryUsage += MeshSizeSolid;
-						insertData(VBO, GL_ARRAY_BUFFER, renderdata.offset, &data.vertices);
+						insertData(VBO, GL_ARRAY_BUFFER, renderdata.offset, &data.SolidVertices);
 						ChunkRenderListSolid.insert(ChunkRenderListSolid.begin() + i + 1, renderdata);
 						MeshList[ChunkID] = true;
 						ChunkRenderListSolidOffsetLookup[ChunkID] = renderdata.offset;
@@ -271,10 +272,10 @@ public:
 		SolidShader->setVec3("camPos", camera->Position);
 	}
 
-	void AddChunkMesh(ChunkMesh& chunk) {
+	void AddChunkMesh(Meshing::ChunkMeshData& chunk) {
 		
-		if (MeshList.count(getChunkID(chunk.chunk->Position))) {
-			_DeleteChunk(getChunkID(chunk.chunk->Position));
+		if (MeshList.count(getChunkID(chunk.Position))) {
+			_DeleteChunk(getChunkID(chunk.Position));
 			_AddChunk(chunk);
 		}
 		else {

@@ -40,17 +40,7 @@ void ChunkMeshData::GenerateMesh(Chunk& chunk) {
 
 //Checks if there are anything different between q0 and q1
 bool ChunkMeshData::compareQuads(Quad q0, Quad q1) {
-	if (q0.L_NN != q1.L_NN)
-		return false;
-	if (q0.L_PN != q1.L_PN)
-		return false;
-	if (q0.L_PP != q1.L_PP)
-		return false;
-	if (q0.L_NP != q1.L_NP)
-		return false;
-	if (q0.Texture != q1.Texture)
-		return false;
-	return true;
+	return (q0.Lighting == q1.Lighting) && (q0.Texture == q1.Texture);
 }
 
 //Loops through all the blocks in the chunk and check if each block side is visible. If a block side is visible, it generates the quad and puts it in the cache
@@ -82,6 +72,8 @@ void ChunkMeshData::SimplifyMesh(Chunk& chunk) {
 	int x[3]{};
 	int q[3]{};
 
+	uint64_t SideVisited[4]{0,0,0,0};
+
 	for (int axis = 0; axis < 3; axis++) {
 
 		int Axis0 = (axis + 2) % 3;
@@ -97,6 +89,7 @@ void ChunkMeshData::SimplifyMesh(Chunk& chunk) {
 			for (x[Axis2] = 0; x[Axis2] < 16; x[Axis2]++) {
 				for (x[Axis1] = 0; x[Axis1] < 16; x[Axis1]++) {
 					for (x[Axis0] = 0; x[Axis0] < 16; x[Axis0]++) {
+
 						if (!compareQuads(GetFace(x[0], x[1], x[2], axis * 2 + facing), NullQuad)) { // Check if quad actually exist first
 							LastQuad = GetFace(x[0], x[1], x[2], axis * 2 + facing); //Load in quad face
 
@@ -119,7 +112,7 @@ void ChunkMeshData::SimplifyMesh(Chunk& chunk) {
 							
 							//This starts at 1 because we already know that at Axis0H = 0, there's a valid quad
 
-							for (Axis0H = 1; Axis0H + x[Axis0] < 16; Axis0H++) {
+							for (Axis0H = 0; Axis0H + x[Axis0] < 16; Axis0H++) {
 
 								q[Axis0] = x[Axis0] + Axis0H;
 								q[Axis1] = x[Axis1];
@@ -154,9 +147,11 @@ void ChunkMeshData::SimplifyMesh(Chunk& chunk) {
 									q[Axis1] = x[Axis1] + Axis1K_TMP;
 									q[Axis2] = x[Axis2];
 									SetFace(q[0], q[1], q[2], axis * 2 + facing, NullQuad);
+									
 								}
 							}
 							Quad finalq = LastQuad;
+
 
 							finalq.y = x[Axis0];
 							finalq.x = x[Axis1];
@@ -183,67 +178,197 @@ const int blockShadingBitOffset = 15;
 const int textureBitOffset = 20;
 
 void ChunkMeshData::AddFacetoMesh(Quad quad, int slice, int axis, int face) {
-
-	unsigned int v[6]{};
-
-	int ParallelAxis = axis;
-	int AxisU = ((axis + 1) % 3);
-	int AxisV = ((axis + 2) % 3);
-
-	// @ axis = 2
-
-//	AxisU = ((axis + 1 * (axis % 2) + (int)(0.5 * axis + 1) * ((axis + 1) % 2)) % 3); // 1
-//	AxisV = ((axis + 2 * (axis % 2) + (int)(-0.5 * axis + 2) * ((axis + 1) % 2)) % 3); // 0
-
-	unsigned int P0[3]{};
-	unsigned int P1[3]{};
-
-	P0[ParallelAxis] = (slice - face + 1) << (ParallelAxis * 5);
-	P0[AxisU] = (quad.x) << (AxisU * 5);
-	P0[AxisV] = (quad.y) << (AxisV * 5);
-
-	P1[ParallelAxis] = (slice - face + 1) << (ParallelAxis * 5);
-	P1[AxisU] = (quad.x + quad.w) << (AxisU * 5);
-	P1[AxisV] = (quad.y + quad.h) << (AxisV * 5);
-
 	int sy = quad.w << 10;
 	int sx = quad.h << 0;
 
-	int NN = quad.L_NN;
-	int NP = quad.L_NP;
-	int PN = quad.L_PN;
-	int PP = quad.L_PP;
-
-	int tex = quad.Texture;
-
-	if (face == 1) {
-		SolidVertices.push_back(0u | P0[ParallelAxis] | P1[AxisU] | P0[AxisV] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | 0 | 0 | (tex << textureBitOffset));
-		SolidVertices.push_back(0u | P0[ParallelAxis] | P1[AxisU] | P1[AxisV] | (PP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | 0 | (tex << textureBitOffset));
-		SolidVertices.push_back(0u | P0[ParallelAxis] | P0[AxisU] | P1[AxisV] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | (tex << textureBitOffset));
-		SolidVertices.push_back(0u | P0[ParallelAxis] | P1[AxisU] | P0[AxisV] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | 0 | 0 | (tex << textureBitOffset));
-		SolidVertices.push_back(0u | P0[ParallelAxis] | P0[AxisU] | P1[AxisV] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | (tex << textureBitOffset));
-		SolidVertices.push_back(0u | P0[ParallelAxis] | P0[AxisU] | P0[AxisV] | (NN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | 0 | sy | (tex << textureBitOffset));
+	if (axis == 0) { //0 = x axis
+		AddFacetoMesh_X(quad, slice, face, sx, sy);
 	}
-	else {
-		SolidVertices.push_back(0u | P0[ParallelAxis] | P1[AxisU] | P0[AxisV] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | 0 | 0 | (tex << textureBitOffset));
-		SolidVertices.push_back(0u | P0[ParallelAxis] | P0[AxisU] | P1[AxisV] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | (tex << textureBitOffset));
-		SolidVertices.push_back(0u | P0[ParallelAxis] | P1[AxisU] | P1[AxisV] | (PP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | 0 | (tex << textureBitOffset));
-		SolidVertices.push_back(0u | P0[ParallelAxis] | P1[AxisU] | P0[AxisV] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | 0 | 0 | (tex << textureBitOffset));
-		SolidVertices.push_back(0u | P0[ParallelAxis] | P0[AxisU] | P0[AxisV] | (NN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | 0 | sy | (tex << textureBitOffset));
-		SolidVertices.push_back(0u | P0[ParallelAxis] | P0[AxisU] | P1[AxisV] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | (tex << textureBitOffset));
-		
+	if (axis == 1) { //1 = y axis
+		AddFacetoMesh_Y(quad, slice, face, sx, sy);
+	}
+	if (axis == 2) { //2 = z axis
+		AddFacetoMesh_Z(quad, slice, face, sx, sy);
+	}
+	
+}
+
+void ChunkMeshData::AddFacetoMesh_X(Quad quad, int slice, int face, int sx, int sy) {
+	unsigned int P0[3]{};
+	unsigned int P1[3]{};
+	
+	int ParallelAxis = 0;
+	int AxisU = 1;
+	int AxisV = 2;
+
+	P0[0] = (slice - face + 1) << (ParallelAxis * 5);
+	P0[1] = (quad.x + quad.w) << (AxisU * 5);
+	P0[2] = (quad.y + quad.h) << (AxisV * 5);
+
+	P1[0] = (slice - face + 1) << (ParallelAxis * 5);
+	P1[1] = (quad.x) << (AxisU * 5);
+	P1[2] = (quad.y) << (AxisV * 5);
+
+	char NN = quad.getLight(L_NN);
+	char NP = quad.getLight(L_NP);
+	char PN = quad.getLight(L_PN);
+	char PP = quad.getLight(L_PP);
+
+	int tex = quad.Texture << textureBitOffset;
+
+	switch (face) {
+	case 1 :
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | sy | tex);
+		break;
+	case 0:
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | sy | tex);
+		break;
+	}
+}
+
+void ChunkMeshData::AddFacetoMesh_Y(Quad quad, int slice, int face, int sx, int sy) {
+	unsigned int P0[3]{};
+	unsigned int P1[3]{};
+
+	int ParallelAxis = 1;
+	int AxisU = 2;
+	int AxisV = 0;
+
+	P0[0] = (slice - face + 1) << (ParallelAxis * 5);
+	P0[1] = (quad.x + quad.w) << (AxisU * 5);
+	P0[2] = (quad.y + quad.h) << (AxisV * 5);
+
+	P1[0] = (slice - face + 1) << (ParallelAxis * 5);
+	P1[1] = (quad.x) << (AxisU * 5);
+	P1[2] = (quad.y) << (AxisV * 5);
+
+	char NN = quad.getLight(L_NN);
+	char NP = quad.getLight(L_NP);
+	char PN = quad.getLight(L_PN);
+	char PP = quad.getLight(L_PP);
+
+	int tex = quad.Texture << textureBitOffset; //x : z
+
+	switch (face) {
+	case 1:
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | sy | tex);
+		break;
+	case 0:
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | sy | tex);
+		break;
+	}
+}
+
+void ChunkMeshData::AddFacetoMesh_Z(Quad quad, int slice, int face, int sx, int sy) { //x : x
+	unsigned int P0[3]{};
+	unsigned int P1[3]{};
+
+	int ParallelAxis = 2;
+	int AxisU = 0;
+	int AxisV = 1;
+
+	P0[0] = (slice - face + 1) << (ParallelAxis * 5);
+	P0[1] = (quad.x + quad.w) << (AxisU * 5);
+	P0[2] = (quad.y + quad.h) << (AxisV * 5);
+
+	P1[0] = (slice - face + 1) << (ParallelAxis * 5);
+	P1[1] = (quad.x) << (AxisU * 5);
+	P1[2] = (quad.y) << (AxisV * 5);
+
+	char NN = quad.getLight(L_NN);
+	char NP = quad.getLight(L_NP);
+	char PN = quad.getLight(L_PN);
+	char PP = quad.getLight(L_PP);
+
+	int tex = quad.Texture << textureBitOffset;
+	/*
+	
+	SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | sy | tex);
+*/
+	switch (face) {
+	case 1:
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | sy | tex);
+		break;
+	case 0:
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | sy | tex);
+		break;
 	}
 }
 
@@ -264,132 +389,132 @@ void ChunkMeshData::GenerateFaceLighting(Chunk& chunk) {
 					Quad NegativeZ = GetFace(x, y, z, NZ);
 
 					if (chunk.GetBlock(x + 1, y + 1, z) != AIR) {
-						PositiveX.L_NP = 10;
-						PositiveX.L_PP = 10;
-						PositiveY.L_PN = 10;
-						PositiveY.L_PP = 10;
+						PositiveX.setLight(L_NP, 10);
+						PositiveX.setLight(L_PP, 10);
+						PositiveY.setLight(L_PN, 10);
+						PositiveY.setLight(L_PP, 10);
 						if (chunk.GetBlock(x + 1, y + 1, z + 1) != AIR) {
-							PositiveX.L_NP = 10;
-							PositiveY.L_PP = 10;
-							PositiveZ.L_PP = 10;
+							PositiveX.setLight(L_NP, 10);
+							PositiveY.setLight(L_PP, 10);
+							PositiveZ.setLight(L_PP, 10);
 						}
 						if (chunk.GetBlock(x + 1, y + 1, z - 1) != AIR) {
-							PositiveX.L_NP = 10;
-							PositiveY.L_PN = 10;
-							NegativeZ.L_PP = 10;
+							PositiveX.setLight(L_NP, 10);
+							PositiveY.setLight(L_PN, 10);
+							NegativeZ.setLight(L_PP, 10);
 						}
 					}
 					if (chunk.GetBlock(x - 1, y + 1, z) != AIR) {
-						NegativeX.L_NP = 10;
-						NegativeX.L_PP = 10;
-						PositiveY.L_NN = 10;
-						PositiveY.L_NP = 10;
+						NegativeX.setLight(L_NP, 10);
+						NegativeX.setLight(L_PP, 10);
+						PositiveY.setLight(L_NN, 10);
+						PositiveY.setLight(L_NP, 10);
 						if (chunk.GetBlock(x - 1, y + 1, z + 1) != AIR) {
-							NegativeX.L_NP = 10;
-							PositiveY.L_NP = 10;
-							PositiveZ.L_NP = 10;
+							NegativeX.setLight(L_NP, 10);
+							PositiveY.setLight(L_NP, 10);
+							PositiveZ.setLight(L_NP, 10);
 						}
 						if (chunk.GetBlock(x - 1, y + 1, z - 1) != AIR) {
-							NegativeX.L_NP = 10;
-							PositiveY.L_NN = 10;
-							NegativeZ.L_NP = 10;
+							NegativeX.setLight(L_NP, 10);
+							PositiveY.setLight(L_NN, 10);
+							NegativeZ.setLight(L_NP, 10);
 						}
 					}
 					if (chunk.GetBlock(x, y + 1, z + 1) != AIR) {
-						PositiveZ.L_NP = 10;
-						PositiveZ.L_PP = 10;
-						PositiveY.L_NP = 10;
-						PositiveY.L_PP = 10;
+						PositiveZ.setLight(L_NP, 10);
+						PositiveZ.setLight(L_PP, 10);
+						PositiveY.setLight(L_NP, 10);
+						PositiveY.setLight(L_PP, 10);
 						if (chunk.GetBlock(x + 1, y + 1, z + 1) != AIR) {
-							PositiveX.L_NP = 10;
-							PositiveY.L_PP = 10;
-							PositiveZ.L_PP = 10;
+							PositiveX.setLight(L_NP, 10);
+							PositiveY.setLight(L_PP, 10);
+							PositiveZ.setLight(L_PP, 10);
 						}
 						if (chunk.GetBlock(x - 1, y + 1, z + 1) != AIR) {
-							NegativeX.L_NP = 10;
-							PositiveY.L_NP = 10;
-							PositiveZ.L_NP = 10;
+							NegativeX.setLight(L_NP, 10);
+							PositiveY.setLight(L_NP, 10);
+							PositiveZ.setLight(L_NP, 10);
 						}
 					}
 					if (chunk.GetBlock(x, y + 1, z - 1) != AIR) {
-						NegativeZ.L_NP = 10;
-						NegativeZ.L_PP = 10;
-						PositiveY.L_NN = 10;
-						PositiveY.L_PN = 10;
+						NegativeZ.setLight(L_NP, 10);
+						NegativeZ.setLight(L_PP, 10);
+						PositiveY.setLight(L_NN, 10);
+						PositiveY.setLight(L_PN, 10);
 						if (chunk.GetBlock(x + 1, y + 1, z - 1) != AIR) {
-							PositiveX.L_NP = 10;
-							PositiveY.L_PN = 10;
-							NegativeZ.L_PP = 10;
+							PositiveX.setLight(L_NP, 10);
+							PositiveY.setLight(L_PN, 10);
+							NegativeZ.setLight(L_PP, 10);
 						}
 						if (chunk.GetBlock(x - 1, y + 1, z - 1) != AIR) {
-							NegativeX.L_NP = 10;
-							PositiveY.L_NN = 10;
-							NegativeZ.L_NP = 10;
+							NegativeX.setLight(L_NP, 10);
+							PositiveY.setLight(L_NN, 10);
+							NegativeZ.setLight(L_NP, 10);
 						}
 					}
 
 					if (chunk.GetBlock(x + 1, y - 1, z) != AIR) {
-						PositiveX.L_NN = 10;
-						PositiveX.L_PN = 10;
-						NegativeY.L_PN = 10;
-						NegativeY.L_PP = 10;
+						PositiveX.setLight(L_NN, 10);
+						PositiveX.setLight(L_PN, 10);
+						NegativeY.setLight(L_PN, 10);
+						NegativeY.setLight(L_PP, 10);
 						if (chunk.GetBlock(x + 1, y - 1, z + 1) != AIR) {
-							PositiveX.L_NN = 10;
-							NegativeY.L_PP = 10;
-							PositiveZ.L_PN = 10;
+							PositiveX.setLight(L_NN, 10);
+							NegativeY.setLight(L_PP, 10);
+							PositiveZ.setLight(L_PN, 10);
 						}
 						if (chunk.GetBlock(x + 1, y - 1, z - 1) != AIR) {
-							PositiveX.L_NN = 10;
-							NegativeY.L_PN = 10;
-							NegativeZ.L_PN = 10;
+							PositiveX.setLight(L_NN, 10);
+							NegativeY.setLight(L_PN, 10);
+							NegativeZ.setLight(L_PN, 10);
 						}
 					}
 					if (chunk.GetBlock(x - 1, y - 1, z) != AIR) {
-						NegativeX.L_NN = 10;
-						NegativeX.L_PN = 10;
-						NegativeY.L_NN = 10;
-						NegativeY.L_NP = 10;
+						NegativeX.setLight(L_NN, 10);
+						NegativeX.setLight(L_PN, 10);
+						NegativeY.setLight(L_NN, 10);
+						NegativeY.setLight(L_NP, 10);
 						if (chunk.GetBlock(x - 1, y - 1, z + 1) != AIR) {
-							NegativeX.L_NN = 10;
-							NegativeY.L_NP = 10;
-							PositiveZ.L_NN = 10;
+							NegativeX.setLight(L_NN, 10);
+							NegativeY.setLight(L_NP, 10);
+							PositiveZ.setLight(L_NN, 10);
 						}
 						if (chunk.GetBlock(x - 1, y - 1, z - 1) != AIR) {
-							NegativeX.L_NN = 10;
-							NegativeY.L_NN = 10;
-							NegativeZ.L_NN = 10;
+							NegativeX.setLight(L_NN, 10);
+							NegativeY.setLight(L_NN, 10);
+							NegativeZ.setLight(L_NN, 10);
 						}
 					}
 					if (chunk.GetBlock(x, y - 1, z + 1) != AIR) {
-						PositiveZ.L_NN = 10;
-						PositiveZ.L_PN = 10;
-						NegativeY.L_NP = 10;
-						NegativeY.L_PP = 10;
+						PositiveZ.setLight(L_NN, 10);
+						PositiveZ.setLight(L_PN, 10);
+						NegativeY.setLight(L_NP, 10);
+						NegativeY.setLight(L_PP, 10);
 						if (chunk.GetBlock(x + 1, y - 1, z + 1) != AIR) {
-							PositiveX.L_NN = 10;
-							NegativeY.L_PP = 10;
-							PositiveZ.L_PN = 10;
+							PositiveX.setLight(L_NN, 10);
+							NegativeY.setLight(L_PP, 10);
+							PositiveZ.setLight(L_PN, 10);
 						}
 						if (chunk.GetBlock(x - 1, y - 1, z + 1) != AIR) {
-							NegativeX.L_NN = 10;
-							NegativeY.L_NP = 10;
-							PositiveZ.L_NN = 10;
+							NegativeX.setLight(L_NN, 10);
+							NegativeY.setLight(L_NP, 10);
+							PositiveZ.setLight(L_NN, 10);
 						}
 					}
 					if (chunk.GetBlock(x, y - 1, z - 1) != AIR) {
-						NegativeZ.L_NN = 10;
-						NegativeZ.L_PN = 10;
-						NegativeY.L_NN = 10;
-						NegativeY.L_PN = 10;
+						NegativeZ.setLight(L_NN, 10);
+						NegativeZ.setLight(L_PN, 10);
+						NegativeY.setLight(L_NN, 10);
+						NegativeY.setLight(L_PN, 10);
 						if (chunk.GetBlock(x - 1, y - 1, z - 1) != AIR) {
-							NegativeX.L_NN = 10;
-							NegativeY.L_NN = 10;
-							NegativeZ.L_NN = 10;
+							NegativeX.setLight(L_NN, 10);
+							NegativeY.setLight(L_NN, 10);
+							NegativeZ.setLight(L_NN, 10);
 						}
 						if (chunk.GetBlock(x + 1, y - 1, z - 1) != AIR) {
-							PositiveX.L_NN = 10;
-							NegativeY.L_PN = 10;
-							NegativeZ.L_PN = 10;
+							PositiveX.setLight(L_NN, 10);
+							NegativeY.setLight(L_PN, 10);
+							NegativeZ.setLight(L_PN, 10);
 						}
 					}
 				}

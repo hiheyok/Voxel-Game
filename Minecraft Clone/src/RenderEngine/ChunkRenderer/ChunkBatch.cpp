@@ -1,6 +1,8 @@
 #include "ChunkBatch.h"
+#include <iterator>
 
 using namespace glm;
+using namespace std;
 
 void ChunkDrawBatch::SetupBuffers() {
 	VBO.SetType(GL_ARRAY_BUFFER);
@@ -26,6 +28,8 @@ void ChunkDrawBatch::SetupBuffers() {
 
 	SSBO.SetMaxSize(MaxBufferSize);
 	SSBO.InitializeData();
+
+	InsertSpace.insert(pair<size_t, size_t>((size_t)MaxBufferSize, 0ULL));
 }
 
 void ChunkDrawBatch::Reset() {
@@ -71,48 +75,52 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
 
 bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int y, int z) {
 	unsigned long long int ChunkID = getChunkID(x, y, z);
+
 	size_t DataSize = Data.size() * sizeof(unsigned int);
-	if (DataSize == 0) { return true; }
-	if (DataSize + MemoryUsage > MaxBufferSize) { 
-		getLogger()->LogDebug("Chunk Renderer", "Draw Batch Out of Memory: " + std::to_string(MemoryUsage));
-		return false; 
-	}
+
 	DataBufferAddress RenderingData;
 	RenderingData.x = x;
 	RenderingData.y = y;
 	RenderingData.z = z;
+	RenderingData.size = DataSize;
 
-	if (RenderList.size() == 0) {
-		RenderingData.offset = 0;
-		RenderingData.size = DataSize;
-		MemoryUsage += DataSize;
-		VBO.InsertSubData(RenderingData.offset, Data.size(), &Data);
-		RenderList.insert(RenderList.begin(), RenderingData);
-		RenderListOffsetLookup[ChunkID] = 0;
-		UpdateCommands = true;
-		return true;
-	}
-	if (RenderList.back().offset + RenderList.back().size + MemoryUsage < MaxBufferSize) {
-		RenderingData.offset = RenderList.back().offset + RenderList.back().size;
-		RenderingData.size = DataSize;
-		MemoryUsage += DataSize;
-		VBO.InsertSubData(RenderingData.offset, Data.size(), &Data);
-		RenderList.emplace_back(RenderingData);
-		RenderListOffsetLookup[ChunkID] = RenderingData.offset;
-		UpdateCommands = true;
-		return true;
-	}
-	for (int i = 0; i < RenderList.size(); i++) {
-		if (RenderList[i].offset + RenderList[i].size + DataSize < RenderList[i + 1].offset) {
-			RenderingData.offset = RenderList[i].offset + RenderList[i].size;
-			RenderingData.size = DataSize;
+	auto it = InsertSpace.end();
+	int iterations = 0;
+	bool stop = false;
+
+	while (true) {
+		if (it->second >= DataSize) {
+			RenderingData.offset = it->first;
 			MemoryUsage += DataSize;
 			VBO.InsertSubData(RenderingData.offset, Data.size(), &Data);
-			RenderList.insert(RenderList.begin() + i + 1, RenderingData);
-			RenderListOffsetLookup[ChunkID] = RenderingData.offset;
+			RenderList.insert(RenderList.begin(), RenderingData);
+			RenderListOffsetLookup[ChunkID] = 0;
 			UpdateCommands = true;
-			return true;
+
+			//Update Insert Map
+			it->second += DataSize;
+			if (it->first - DataSize == 0) { //Delete insert space if data takes entire space
+				InsertSpace.erase(it);
+			}
+			else {
+				size_t offset = it->second;
+				size_t size = it->first;
+
+				InsertSpace.erase(it);
+
+				InsertSpace.insert(pair<size_t, size_t>(size - DataSize, offset + size));
+			}
+			break;
 		}
+
+		iterations++;
+
+		if (iterations >= InsertSpace.size()) {
+			break;
+		}
+
+		it--;
+
 	}
 	getLogger()->LogDebug("Chunk Renderer", "Draw Batch Out of Memory: " + std::to_string(MemoryUsage));
 	return false;
@@ -122,6 +130,24 @@ void ChunkDrawBatch::DeleteChunkVertices(ChunkID ChunkID) {
 	if (RenderListOffsetLookup.count(ChunkID)) {
 		size_t index = GetRenderObjIndex(RenderListOffsetLookup[ChunkID]);
 		MemoryUsage -= RenderList[index].size;
+
+		if (InsertSpace.count(RenderList[index].size + RenderList[index].offset)) {
+			size_t offset = RenderList[index].offset - RenderList[index].size;
+			size_t size = NULL; 
+
+			if (index + 1 > RenderList.size()) {
+				size = MaxBufferSize - RenderList[index].offset;
+			}
+			else {
+				size = RenderList[index + 1].offset - offset;
+			}
+
+			InsertSpace.insert(pair<size_t, size_t>(size, offset));
+		}
+		else {
+			InsertSpace.insert(pair<size_t, size_t>(RenderList[index].size, RenderList[index].offset - RenderList[index].size));
+		}
+
 		RenderList.erase(RenderList.begin() + index);
 		RenderListOffsetLookup.erase(ChunkID);
 	}

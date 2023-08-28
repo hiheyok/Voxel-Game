@@ -62,7 +62,6 @@ private:
 	std::vector<DataBufferAddress> RenderList;
 	std::vector<DrawCommandIndirect> DrawCommands;
 
-	std::map<size_t, size_t> InsertSpace; // <Slot Size, Index>
-
+	std::multimap<size_t, size_t> InsertSpace; // <Slot Size, Index>
 
 };

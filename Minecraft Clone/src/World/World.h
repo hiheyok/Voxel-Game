@@ -46,8 +46,6 @@ private:
 
 	const float TPS = 20.f;
 
-	
-
 	Generator WorldGenerator;
 
 	std::unordered_set<ChunkID> ChunksInQueue;

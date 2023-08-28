@@ -277,6 +277,10 @@ void Window::UpdateKeyPressSet() {
     if (TestForKeyInputs(GLFW_KEY_SPACE))
         KeyPressed.insert(' ');
 
+    if (TestForKeyInputs(GLFW_KEY_LEFT_CONTROL))
+        KeyPressed.insert(KEY_CTRL);
+
+
 }
 
 void Window::onMouseButton(int button, int action) {

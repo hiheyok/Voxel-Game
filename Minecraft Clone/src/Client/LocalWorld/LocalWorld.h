@@ -39,7 +39,8 @@ private:
 	Entity Player;
 	World* world = nullptr;
 
-	bool enableCollusion = true;
+	bool enableCollusion = false;
+	bool sprint = false;
 	float speed = 50.f;
 };
 

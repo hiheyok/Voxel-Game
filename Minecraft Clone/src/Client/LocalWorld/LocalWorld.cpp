@@ -21,6 +21,8 @@ void LocalWorld::UpdateIO(std::unordered_set<char> Keys, bool shift, float curso
 		speed--;
 	}
 
+	sprint = Keys.count(0x01); // ctrl
+
 
 	RotatePlayer(cursorx, cursory);
 
@@ -89,6 +91,10 @@ void LocalWorld::MovePlayer(bool KeyW, bool KeyA, bool KeyS, bool KeyD, bool Key
 
 	float velocity = speed * delta;
 
+	if (sprint) {
+		velocity *= 4.f;
+	}
+
 	if (KeyW) {
 		Player.Velocity += front * velocity;
 	}
@@ -107,9 +113,12 @@ void LocalWorld::MovePlayer(bool KeyW, bool KeyA, bool KeyS, bool KeyD, bool Key
 	}
 
 
-	if (KeySpace && world->IsEntityOnGround(Player)) {
+	if (KeySpace && (world->IsEntityOnGround(Player) && enableCollusion)) {
 		Player.Velocity.y +=  delta * 75000.f;
-		getLogger()->LogInfo("Physics","Jump!");
+	}
+
+	if (KeySpace && (!enableCollusion)) {
+		Player.Velocity.y += velocity;
 	}
 
 

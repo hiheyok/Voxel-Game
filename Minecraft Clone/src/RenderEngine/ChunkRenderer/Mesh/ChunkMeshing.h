@@ -3,16 +3,32 @@
 
 #include "../../../World/Chunk/Chunk.h"
 
+#define L_NN 0x00
+#define L_PN 0x01
+#define L_PP 0x02
+#define L_NP 0x03
+
 namespace Meshing
 {
+
 	struct Quad {
 		//Position in the slice 
-		int x = 0, y = 0;
+		char x = 0, y = 0;
 		//Size
-		int w = 0, h = 0;
+		char w = 0, h = 0;
 
-		//Lighting
-		int L_NN = 15, L_NP = 15, L_PP = 15, L_PN = 15; // Lighting : P = Positive; N = Negative
+		//Lighting; stored as 16 bit to save mem
+		uint16_t Lighting = 0xFFFF;
+		uint16_t Texture = 0;
+		inline char getLight(char Location) {
+			return 0b1111 & (Lighting >> (Location * 4));
+		}
+
+		inline void setLight(char Location, char Val) {
+			Lighting |= Val << (Location * 4);
+		}
+
+		//int L_NN = 15, L_NP = 15, L_PP = 15, L_PN = 15; // Lighting : P = Positive; N = Negative
 
 		/*
 
@@ -24,8 +40,7 @@ namespace Meshing
 			L_NP = Negative X , Positive Y
 		*/
 
-		//Texture layer
-		int Texture = 0;
+		
 	};
 
 	class ChunkMeshData {
@@ -38,7 +53,7 @@ namespace Meshing
 		//Position of the mesh in the world
 		glm::ivec3 Position = glm::ivec3(0,0,0);
 		
-		//Generates the Mesh
+		//Generate the Mesh
 		void GenerateMesh(Chunk& chunk);
 
 		//Allows you to edit the chunk without remeshing the entire chunk
@@ -75,6 +90,11 @@ namespace Meshing
 
 		//Add faces to the mesh
 		void AddFacetoMesh(Quad quad, int slice, int axis, int face);
+
+
+		void AddFacetoMesh_X(Quad quad, int slice, int face, int sx, int sy);
+		void AddFacetoMesh_Y(Quad quad, int slice, int face, int sx, int sy);
+		void AddFacetoMesh_Z(Quad quad, int slice, int face, int sx, int sy);
 
 		//To check if a block had been used in the Greedy Meshing Algorithm
 
