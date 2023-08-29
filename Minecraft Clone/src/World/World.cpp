@@ -36,8 +36,6 @@ bool World::RayIntersection(Ray& ray) {
 		((float)Direction[2] * ((float)BlockPos[2] - EndPoint[2]) + ((float)Direction[2] * 0.5f) + 0.5f) * DeltaDist[2]
 	);
 
-	
-
 	//Max Iterations
 	const uint32_t max_iterations = 50;
 	uint32_t iterations = 0;
@@ -92,13 +90,13 @@ float World::GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int dire
 
 	if (direction % 2 == 0) { //Negative direction has a " + 1". So by taking the modulus, you can find if it is negative or positive. Explaination: PX = 0, NX = 1
 
-		int axis = (int)((float)direction / 2.f);
+		int axis = (int)floor(((float)direction * 0.5f));
 
 		displacement = 1 - (Origin[axis] - (float)FlooredPos[axis]);
 		Move[axis] = 1;
 	}
 	else {
-		int axis = (int)((float)(direction - 1) / 2.f);
+		int axis = (int)floor(((float)(direction - 1) * 0.5f));
 
 		displacement = Origin[axis] - (float)FlooredPos[axis];
 		Move[axis] = -1;
@@ -109,7 +107,7 @@ float World::GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int dire
 		ivec3 Loc = FlooredPos + Move * i;
 
 		if ((GetBlock(Loc.x, Loc.y, Loc.z) != AIR) && (GetBlock(Loc.x, Loc.y, Loc.z) != NULL_BLOCK)) {
-			return (float)i + displacement - 1;
+			return (float)i + displacement - 1.f;
 		}
 	}
 
@@ -126,17 +124,30 @@ dvec3 World::GetTimeTillCollusion(Entity entity) {
 	int iy = (int)floor(Hitbox.size.y) + 1;
 	int iz = (int)floor(Hitbox.size.z) + 1;
 
+	ivec3 i_bound = ivec3(ix, iy, iz);
+
 	vec3 leasttime(-1.f, -1.f, -1.f);
 	
 	int SearchDistance = 5;
 
 	float LeastDistance = (float)SearchDistance;
 
-	for (int x = 0; x <= ix; x++) {
-		for (int y = 0; y <= iy; y++) {
-			for (int z = 0; z <= iz; z++) {
+	for (int axis = 0; axis < 3; axis++) {
 
-				vec3 origin = HitboxStart + vec3(x, y, z);
+		//0 = x; 1 = y; 2 = z
+
+		int u_axis = (axis + 1) % 3;
+		int v_axis = (axis + 2) % 3;
+
+		for (int u = 0; u <= i_bound[u_axis]; u++) {
+			for (int v = 0; v <= i_bound[v_axis]; v++) {
+				ivec3 offset(0,0,0);
+
+				offset[axis] = i_bound[axis] * (entity.Velocity[axis] >= 0);
+				offset[u_axis] = u;
+				offset[v_axis] = v;
+
+				vec3 origin = HitboxStart + (vec3)offset;
 
 				if (origin.x > HitboxEnd.x)
 					origin.x = HitboxEnd.x;
@@ -144,37 +155,34 @@ dvec3 World::GetTimeTillCollusion(Entity entity) {
 					origin.y = HitboxEnd.y;
 				if (origin.z > HitboxEnd.z)
 					origin.z = HitboxEnd.z;
-				
+
 				bool IsPointOnHitboxSurface = (origin.x == HitboxStart.x) || (origin.x == HitboxEnd.x) || (origin.y == HitboxStart.y) || (origin.y == HitboxEnd.y) || (origin.z == HitboxStart.z) || (origin.z == HitboxEnd.z);
 
 				if (!IsPointOnHitboxSurface) //Checks if the origin is on the surface to optimize stuff
 					continue;
 
-				//Iterates through the x, y, and z axis
-				for (int axis = 0; axis < 3; axis++) {
-					if (entity.Velocity[axis] != 0.f) { //First checks if the velocity isn't 0 because if it is 0, it's not moving in that axis so it's not going to collide in that direction
-						int direction = entity.Velocity[axis] < 0 ? axis * 2 + 1 : axis * 2; // The "+1" indicates that the direction is negative 
 
-						float distance = GetDistanceUntilCollusionSingleDirection(origin, direction, (int)floor(LeastDistance) + 2);
+				if (entity.Velocity[axis] != 0.f) { //First checks if the velocity isn't 0 because if it is 0, it's not moving in that axis so it's not going to collide in that direction
+					int direction = axis * 2 + (entity.Velocity[axis] < 0); // The "+1" indicates that the direction is negative 
 
-						if ((distance < LeastDistance) && (distance != -1.f))
-							LeastDistance = distance;
+					float distance = GetDistanceUntilCollusionSingleDirection(origin, direction, (int)floor(LeastDistance) + 2);
 
-						if (distance != -1.f) { // -1.f means that it cannot find any blocks that could collide in that range (5)
-							float time = abs(distance / entity.Velocity[axis]);// This gets the time it takes for the entity to travel that distance
+					if ((distance < LeastDistance) && (distance != -1.f))
+						LeastDistance = distance;
 
-							if (time < leasttime[axis]) {
+					if (distance != -1.f) { // -1.f means that it cannot find any blocks that could collide in that range (5)
+						float time = abs(distance / entity.Velocity[axis]);// This gets the time it takes for the entity to travel that distance
+
+						if (time < leasttime[axis]) {
+							leasttime[axis] = time;
+						}
+						else {
+							if (leasttime[axis] == -1.f) { //leasttime[axis] == -1.f means that a "time" value haven't been inputted yet
 								leasttime[axis] = time;
-							}
-							else {
-								if (leasttime[axis] == -1.f) { //leasttime[axis] == -1.f means that a "time" value haven't been inputted yet
-									leasttime[axis] = time;
-								}
 							}
 						}
 					}
 				}
-
 			}
 		}
 	}

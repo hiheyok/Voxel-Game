@@ -46,6 +46,14 @@ namespace Meshing
 	class ChunkMeshData {
 	public:
 
+		ChunkMeshData() {
+
+		}
+
+		ChunkMeshData(Chunk& chunk) {
+			GenerateMesh(chunk);
+		}
+
 		//Mesh Vertices
 		std::vector<unsigned int> SolidVertices;
 		std::vector<unsigned int> TransparentVertices;

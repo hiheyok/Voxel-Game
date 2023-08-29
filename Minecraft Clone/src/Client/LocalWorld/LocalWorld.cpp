@@ -117,7 +117,7 @@ void LocalWorld::MovePlayer(bool KeyW, bool KeyA, bool KeyS, bool KeyD, bool Key
 		Player.Velocity.y +=  delta * 75000.f;
 	}
 
-	if (KeySpace && (!enableCollusion)) {
+	if (KeySpace) {
 		Player.Velocity.y += velocity;
 	}
 
@@ -125,7 +125,7 @@ void LocalWorld::MovePlayer(bool KeyW, bool KeyA, bool KeyS, bool KeyD, bool Key
 	
 
 	if (enableCollusion) {
-		float gravity = -100.f;
+		float gravity = 0;
 
 		Player.Velocity.y += gravity * delta;
 

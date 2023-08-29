@@ -1,7 +1,6 @@
 #ifndef CHUNK_R_H_
 #define CHUNK_R_H_
 
-#include "Mesh/Mesher.h"
 #include "Mesh/ChunkMeshing.h"
 
 #include "../Camera/camera.h"
@@ -20,6 +19,17 @@ struct DrawArraysIndirectCommand {
 	unsigned int  instanceCount;
 	unsigned int  first;
 	unsigned int  baseInstance;
+
+	DrawArraysIndirectCommand() {
+
+	}
+
+	DrawArraysIndirectCommand(uint32_t _count, uint32_t _instanceCount, uint32_t _first, uint32_t _baseInstance) {
+		count = _count;
+		instanceCount = _instanceCount;
+		first = _first;
+		baseInstance = _baseInstance;
+	}
 };
 
 struct ChunkRenderDataBufferAddress {
@@ -330,15 +340,15 @@ private:
 
 	size_t GPUMemoryUsage = 0;
 
-	size_t GPUBufferSizeSolid = 1000000000;
+	size_t GPUBufferSizeSolid = 5000000000;
 	size_t GPUBufferSizeTransparent = 120000000;
-	size_t GPUSSBOMAXSIZE = 10000000;
+	size_t GPUSSBOMAXSIZE = 50000000;
 
 	GLFWwindow* window = nullptr;
 	Camera* camera = nullptr;
 	CFrustum fr;
 
-	std::unordered_map<ChunkID, ChunkMesh> MeshDataQueue;
+	std::unordered_map<ChunkID, Meshing::ChunkMeshData> MeshDataQueue;
 
 	std::unordered_map<long long int, size_t> ChunkRenderListSolidOffsetLookup;
 	std::unordered_map<long long int, size_t> ChunkRenderListTransparentOffsetCache;

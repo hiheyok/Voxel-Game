@@ -2,8 +2,6 @@
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "Mesh/Mesher.h"
-
 #include "../Camera/camera.h"
 #include "../frustum/frustum.h"
 #include "../OpenGL/shader/shader.h"

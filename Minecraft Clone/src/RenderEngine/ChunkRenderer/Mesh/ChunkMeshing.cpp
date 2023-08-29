@@ -17,7 +17,9 @@ void ChunkMeshData::GenerateMesh(Chunk& chunk) {
 
 	NullQuad.Texture = 9999;
 
-	FaceCollectionCache = new Quad[4096*6]{};
+	Quad cache[4096 * 6]{};
+
+	FaceCollectionCache = cache;
 
 	for (int i = 0; i < 4096 * 6; i++) {
 		FaceCollectionCache[i] = NullQuad;
@@ -32,9 +34,6 @@ void ChunkMeshData::GenerateMesh(Chunk& chunk) {
 	GenerateFaceLighting(chunk); //Add lighting to those faces
 
 	SimplifyMesh(chunk); //Simplifies mesh
-
-	//Clear cache
-	delete[] FaceCollectionCache;
 
 }
 
@@ -385,135 +384,8 @@ void ChunkMeshData::GenerateFaceLighting(Chunk& chunk) {
 					Quad NegativeY = GetFace(x, y, z, NY);
 					Quad NegativeZ = GetFace(x, y, z, NZ);
 
-					if (chunk.GetBlock(x + 1, y + 1, z) != AIR) {
-						PositiveX.setLight(L_NP, 10);
-						PositiveX.setLight(L_PP, 10);
-						PositiveY.setLight(L_PN, 10);
-						PositiveY.setLight(L_PP, 10);
-						if (chunk.GetBlock(x + 1, y + 1, z + 1) != AIR) {
-							PositiveX.setLight(L_NP, 10);
-							PositiveY.setLight(L_PP, 10);
-							PositiveZ.setLight(L_PP, 10);
-						}
-						if (chunk.GetBlock(x + 1, y + 1, z - 1) != AIR) {
-							PositiveX.setLight(L_NP, 10);
-							PositiveY.setLight(L_PN, 10);
-							NegativeZ.setLight(L_PP, 10);
-						}
-					}
-					if (chunk.GetBlock(x - 1, y + 1, z) != AIR) {
-						NegativeX.setLight(L_NP, 10);
-						NegativeX.setLight(L_PP, 10);
-						PositiveY.setLight(L_NN, 10);
-						PositiveY.setLight(L_NP, 10);
-						if (chunk.GetBlock(x - 1, y + 1, z + 1) != AIR) {
-							NegativeX.setLight(L_NP, 10);
-							PositiveY.setLight(L_NP, 10);
-							PositiveZ.setLight(L_NP, 10);
-						}
-						if (chunk.GetBlock(x - 1, y + 1, z - 1) != AIR) {
-							NegativeX.setLight(L_NP, 10);
-							PositiveY.setLight(L_NN, 10);
-							NegativeZ.setLight(L_NP, 10);
-						}
-					}
-					if (chunk.GetBlock(x, y + 1, z + 1) != AIR) {
-						PositiveZ.setLight(L_NP, 10);
-						PositiveZ.setLight(L_PP, 10);
-						PositiveY.setLight(L_NP, 10);
-						PositiveY.setLight(L_PP, 10);
-						if (chunk.GetBlock(x + 1, y + 1, z + 1) != AIR) {
-							PositiveX.setLight(L_NP, 10);
-							PositiveY.setLight(L_PP, 10);
-							PositiveZ.setLight(L_PP, 10);
-						}
-						if (chunk.GetBlock(x - 1, y + 1, z + 1) != AIR) {
-							NegativeX.setLight(L_NP, 10);
-							PositiveY.setLight(L_NP, 10);
-							PositiveZ.setLight(L_NP, 10);
-						}
-					}
-					if (chunk.GetBlock(x, y + 1, z - 1) != AIR) {
-						NegativeZ.setLight(L_NP, 10);
-						NegativeZ.setLight(L_PP, 10);
-						PositiveY.setLight(L_NN, 10);
-						PositiveY.setLight(L_PN, 10);
-						if (chunk.GetBlock(x + 1, y + 1, z - 1) != AIR) {
-							PositiveX.setLight(L_NP, 10);
-							PositiveY.setLight(L_PN, 10);
-							NegativeZ.setLight(L_PP, 10);
-						}
-						if (chunk.GetBlock(x - 1, y + 1, z - 1) != AIR) {
-							NegativeX.setLight(L_NP, 10);
-							PositiveY.setLight(L_NN, 10);
-							NegativeZ.setLight(L_NP, 10);
-						}
-					}
 
-					if (chunk.GetBlock(x + 1, y - 1, z) != AIR) {
-						PositiveX.setLight(L_NN, 10);
-						PositiveX.setLight(L_PN, 10);
-						NegativeY.setLight(L_PN, 10);
-						NegativeY.setLight(L_PP, 10);
-						if (chunk.GetBlock(x + 1, y - 1, z + 1) != AIR) {
-							PositiveX.setLight(L_NN, 10);
-							NegativeY.setLight(L_PP, 10);
-							PositiveZ.setLight(L_PN, 10);
-						}
-						if (chunk.GetBlock(x + 1, y - 1, z - 1) != AIR) {
-							PositiveX.setLight(L_NN, 10);
-							NegativeY.setLight(L_PN, 10);
-							NegativeZ.setLight(L_PN, 10);
-						}
-					}
-					if (chunk.GetBlock(x - 1, y - 1, z) != AIR) {
-						NegativeX.setLight(L_NN, 10);
-						NegativeX.setLight(L_PN, 10);
-						NegativeY.setLight(L_NN, 10);
-						NegativeY.setLight(L_NP, 10);
-						if (chunk.GetBlock(x - 1, y - 1, z + 1) != AIR) {
-							NegativeX.setLight(L_NN, 10);
-							NegativeY.setLight(L_NP, 10);
-							PositiveZ.setLight(L_NN, 10);
-						}
-						if (chunk.GetBlock(x - 1, y - 1, z - 1) != AIR) {
-							NegativeX.setLight(L_NN, 10);
-							NegativeY.setLight(L_NN, 10);
-							NegativeZ.setLight(L_NN, 10);
-						}
-					}
-					if (chunk.GetBlock(x, y - 1, z + 1) != AIR) {
-						PositiveZ.setLight(L_NN, 10);
-						PositiveZ.setLight(L_PN, 10);
-						NegativeY.setLight(L_NP, 10);
-						NegativeY.setLight(L_PP, 10);
-						if (chunk.GetBlock(x + 1, y - 1, z + 1) != AIR) {
-							PositiveX.setLight(L_NN, 10);
-							NegativeY.setLight(L_PP, 10);
-							PositiveZ.setLight(L_PN, 10);
-						}
-						if (chunk.GetBlock(x - 1, y - 1, z + 1) != AIR) {
-							NegativeX.setLight(L_NN, 10);
-							NegativeY.setLight(L_NP, 10);
-							PositiveZ.setLight(L_NN, 10);
-						}
-					}
-					if (chunk.GetBlock(x, y - 1, z - 1) != AIR) {
-						NegativeZ.setLight(L_NN, 10);
-						NegativeZ.setLight(L_PN, 10);
-						NegativeY.setLight(L_NN, 10);
-						NegativeY.setLight(L_PN, 10);
-						if (chunk.GetBlock(x - 1, y - 1, z - 1) != AIR) {
-							NegativeX.setLight(L_NN, 10);
-							NegativeY.setLight(L_NN, 10);
-							NegativeZ.setLight(L_NN, 10);
-						}
-						if (chunk.GetBlock(x + 1, y - 1, z - 1) != AIR) {
-							PositiveX.setLight(L_NN, 10);
-							NegativeY.setLight(L_PN, 10);
-							NegativeZ.setLight(L_PN, 10);
-						}
-					}
+
 				}
 
 			}
