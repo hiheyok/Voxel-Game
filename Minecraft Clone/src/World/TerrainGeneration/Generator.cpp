@@ -34,7 +34,10 @@ void Generator::Start(int ThreadCount) {
 
 void Generator::Stop() {
 	stop = true;
-
+	Scheduler.join();
+	for (int i = 0; i < Workers.size(); i++) {
+		Workers[i].join();
+	}
 }
 
 void Generator::Worker(int id) {
@@ -75,6 +78,8 @@ void Generator::Worker(int id) {
 		timerSleepNotPrecise(5);
 	}
 
+	Jobs.clear();
+	getLogger()->LogInfo("World", "Shutting down world gen worker: " + std::to_string(WorkerID));
 }
 
 void Generator::TaskScheduler() {
@@ -145,6 +150,8 @@ void Generator::TaskScheduler() {
 		timerSleepNotPrecise(5);
 
 	}
+
+	getLogger()->LogInfo("World", "Shutting down world gen scheduler");
 }
 
 void Generator::Generate(int x, int y, int z) {

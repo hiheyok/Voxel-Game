@@ -92,9 +92,9 @@ namespace Meshing
 		void AddFacetoMesh(Quad quad, int slice, int axis, int face);
 
 
-		void AddFacetoMesh_X(Quad quad, int slice, int face, int sx, int sy);
-		void AddFacetoMesh_Y(Quad quad, int slice, int face, int sx, int sy);
-		void AddFacetoMesh_Z(Quad quad, int slice, int face, int sx, int sy);
+		void AddFacetoMesh_X(Quad quad, int slice, int face);
+		void AddFacetoMesh_Y(Quad quad, int slice, int face);
+		void AddFacetoMesh_Z(Quad quad, int slice, int face);
 
 		//To check if a block had been used in the Greedy Meshing Algorithm
 

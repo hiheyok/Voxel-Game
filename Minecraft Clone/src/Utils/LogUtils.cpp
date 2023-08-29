@@ -45,6 +45,7 @@ void LogUtils::MainLogger() {
 			}
 		}
 	}
+	printf("[ 9999999999 ] [ Logging ] [ INFO ]: Shutting down logging thread\n");
 }
 
 void LogUtils::Start() {
@@ -111,6 +112,8 @@ void LogUtils::LogDebug(std::string Subtype, std::string Message) {
 
 void LogUtils::Stop() {
 	stop = true;
+	
+	
 }
 
 LogUtils* getLogger() {

@@ -71,6 +71,16 @@ public:
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 
+	void Cleanup() {
+		glDeleteBuffers(1, &VBO);
+		glDeleteBuffers(1, &IBO);
+		glDeleteBuffers(1, &SSBO);
+
+		glDeleteVertexArrays(1, &VAO);
+
+
+	}
+
 	void _DeleteChunk(long long int ChunkID) {
 		if (ChunkRenderListSolidOffsetLookup.count(ChunkID)) {
 			size_t index = GetRenderSolidList(ChunkRenderListSolidOffsetLookup[ChunkID]);

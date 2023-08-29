@@ -36,6 +36,8 @@ public:
 
 	void LogDebug(std::string Subtype, std::string Message);
 
+	std::thread LoggingThread;
+
 private:
 
 	std::mutex Mutex;
@@ -48,7 +50,7 @@ private:
 
 	std::chrono::high_resolution_clock::time_point InitTime = std::chrono::high_resolution_clock::now();
 
-	std::thread LoggingThread;
+	
 	
 	std::deque<LogData> Logs;
 	std::deque<LogData> LogsCache;

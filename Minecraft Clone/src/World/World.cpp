@@ -195,6 +195,8 @@ void World::Start() {
 
 void World::Stop() {
 	stop = true;
+	MainWorldThread.join();
+	WorldGenerator.Stop();
 }
 
 void World::WorldThread() {
@@ -238,8 +240,11 @@ void World::WorldThread() {
 
 		float MSPT = (float)((double)(high_resolution_clock::now() - t0).count() / 1000000.0);
 
-		getLogger()->LogInfo("World", "MSPT: " + std::to_string(MSPT) + " | Chunks Per Second: " + std::to_string((float)ChunksPerTick / (MSPT / 1000)));
+		//getLogger()->LogInfo("World", "MSPT: " + std::to_string(MSPT) + " | Chunks Per Second: " + std::to_string((float)ChunksPerTick / (MSPT / 1000)));
 	}
+
+	getLogger()->LogInfo("World","Shutting down main world thread");
+
 }
 
 bool World::IsEntityOnGround(Entity entity) {

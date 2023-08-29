@@ -56,6 +56,8 @@ void WorldRender::Worker(int id) {
 
 		timerSleepNotPrecise(5);
 	}
+
+	getLogger()->LogInfo("Mesher", "Shutting down mesh worker: " + std::to_string(WorkerID));
 }
 
 void WorldRender::Update() {
@@ -99,6 +101,12 @@ void WorldRender::Update() {
 
 void WorldRender::Stop() {
 	stop = true;
+	Scheduler.join();
+	for (int i = 0; i < Workers.size(); i++) {
+		Workers[i].join();
+	}
+
+	Renderer.Cleanup();
 }
 
 void WorldRender::Start(GLFWwindow* window_,World* world_, int ThreadCount) {
@@ -172,6 +180,6 @@ void WorldRender::TaskScheduler() {
 
 	}
 
-	
+	getLogger()->LogInfo("Mesher", "Shutting down mesh scheduler");
 	
 }

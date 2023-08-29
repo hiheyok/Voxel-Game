@@ -68,7 +68,6 @@ void ChunkMeshData::GenerateFaceCollection(Chunk& chunk) {
 //Simplifies mesh (Algorithm: Greedy Meshing): Similar to this https://gist.github.com/Vercidium/a3002bd083cce2bc854c9ff8f0118d33
 void ChunkMeshData::SimplifyMesh(Chunk& chunk) {
 	//iterate through the x, y, and z axis
-
 	int x[3]{};
 	int q[3]{};
 
@@ -178,22 +177,20 @@ const int blockShadingBitOffset = 15;
 const int textureBitOffset = 20;
 
 void ChunkMeshData::AddFacetoMesh(Quad quad, int slice, int axis, int face) {
-	int sy = quad.w << 10;
-	int sx = quad.h << 0;
-
+	
 	if (axis == 0) { //0 = x axis
-		AddFacetoMesh_X(quad, slice, face, sx, sy);
+		AddFacetoMesh_X(quad, slice, face);
 	}
 	if (axis == 1) { //1 = y axis
-		AddFacetoMesh_Y(quad, slice, face, sx, sy);
+		AddFacetoMesh_Y(quad, slice, face);
 	}
 	if (axis == 2) { //2 = z axis
-		AddFacetoMesh_Z(quad, slice, face, sx, sy);
+		AddFacetoMesh_Z(quad, slice, face);
 	}
 	
 }
 
-void ChunkMeshData::AddFacetoMesh_X(Quad quad, int slice, int face, int sx, int sy) {
+void ChunkMeshData::AddFacetoMesh_X(Quad quad, int slice, int face) {
 	unsigned int P0[3]{};
 	unsigned int P1[3]{};
 	
@@ -202,53 +199,56 @@ void ChunkMeshData::AddFacetoMesh_X(Quad quad, int slice, int face, int sx, int 
 	int AxisV = 2;
 
 	P0[0] = (slice - face + 1) << (ParallelAxis * 5);
-	P0[1] = (quad.x + quad.w) << (AxisU * 5);
-	P0[2] = (quad.y + quad.h) << (AxisV * 5);
+	P0[1] = (quad.x) << (AxisU * 5);
+	P0[2] = (quad.y) << (AxisV * 5);
 
-	P1[0] = (slice - face + 1) << (ParallelAxis * 5);
-	P1[1] = (quad.x) << (AxisU * 5);
-	P1[2] = (quad.y) << (AxisV * 5);
+	P1[0] = (slice - face + 1) << (ParallelAxis * 5); // x
+	P1[1] = (quad.x + quad.w) << (AxisU * 5); // y
+	P1[2] = (quad.y + quad.h) << (AxisV * 5); // z
 
 	char NN = quad.getLight(L_NN);
 	char NP = quad.getLight(L_NP);
 	char PN = quad.getLight(L_PN);
 	char PP = quad.getLight(L_PP);
 
+	int sy = quad.w << 10;
+	int sx = quad.h << 0;
+
 	int tex = quad.Texture << textureBitOffset;
 
 	switch (face) {
-	case 1 :
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+	case 1:
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | tex);
 		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | 0 | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | sy | tex);
 		break;
 	case 0:
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | 0 | tex);
 		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | 0 | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | sy | tex);
 		break;
 	}
 }
 
-void ChunkMeshData::AddFacetoMesh_Y(Quad quad, int slice, int face, int sx, int sy) {
+void ChunkMeshData::AddFacetoMesh_Y(Quad quad, int slice, int face) {
 	unsigned int P0[3]{};
 	unsigned int P1[3]{};
 
@@ -257,53 +257,60 @@ void ChunkMeshData::AddFacetoMesh_Y(Quad quad, int slice, int face, int sx, int 
 	int AxisV = 0;
 
 	P0[0] = (slice - face + 1) << (ParallelAxis * 5);
-	P0[1] = (quad.x + quad.w) << (AxisU * 5);
-	P0[2] = (quad.y + quad.h) << (AxisV * 5);
+	P0[1] = (quad.y) << (AxisV * 5);
+	P0[2] = (quad.x) << (AxisU * 5);
+	
 
-	P1[0] = (slice - face + 1) << (ParallelAxis * 5);
-	P1[1] = (quad.x) << (AxisU * 5);
-	P1[2] = (quad.y) << (AxisV * 5);
+	P1[0] = (slice - face + 1) << (ParallelAxis * 5); // y
+	P1[1] = (quad.y + quad.h) << (AxisV * 5); // x
+	P1[2] = (quad.x + quad.w) << (AxisU * 5); // z
+	
 
 	char NN = quad.getLight(L_NN);
 	char NP = quad.getLight(L_NP);
 	char PN = quad.getLight(L_PN);
 	char PP = quad.getLight(L_PP);
 
+	int sx = quad.h << 0;
+	int sy = quad.w << 10;
+
 	int tex = quad.Texture << textureBitOffset; //x : z
 
 	switch (face) {
 	case 1:
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | 0 | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | sy | tex);
 		break;
 	case 0:
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | 0 | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
+		
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | sy | tex);
+		
 		break;
 	}
 }
 
-void ChunkMeshData::AddFacetoMesh_Z(Quad quad, int slice, int face, int sx, int sy) { //x : x
+void ChunkMeshData::AddFacetoMesh_Z(Quad quad, int slice, int face) { //x : x
 	unsigned int P0[3]{};
 	unsigned int P1[3]{};
 
@@ -312,61 +319,51 @@ void ChunkMeshData::AddFacetoMesh_Z(Quad quad, int slice, int face, int sx, int 
 	int AxisV = 1;
 
 	P0[0] = (slice - face + 1) << (ParallelAxis * 5);
-	P0[1] = (quad.x + quad.w) << (AxisU * 5);
-	P0[2] = (quad.y + quad.h) << (AxisV * 5);
+	P0[1] = (quad.x) << (AxisU * 5);
+	P0[2] = (quad.y) << (AxisV * 5);
 
-	P1[0] = (slice - face + 1) << (ParallelAxis * 5);
-	P1[1] = (quad.x) << (AxisU * 5);
-	P1[2] = (quad.y) << (AxisV * 5);
+	P1[0] = (slice - face + 1) << (ParallelAxis * 5); // z
+	P1[1] = (quad.x + quad.w) << (AxisU * 5); // x
+	P1[2] = (quad.y + quad.h) << (AxisV * 5); // y
 
 	char NN = quad.getLight(L_NN);
 	char NP = quad.getLight(L_NP);
 	char PN = quad.getLight(L_PN);
 	char PP = quad.getLight(L_PP);
 
+	int sy = quad.h << 10;
+	int sx = quad.w << 0;
+
 	int tex = quad.Texture << textureBitOffset;
-	/*
-	
-	SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | 0 | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | 0 | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | 0 | sy | tex);
-*/
+
 	switch (face) {
 	case 1:
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | 0 | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | sy | tex);
 		break;
 	case 0:
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | 0 | sy | tex);
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | 0 | tex);
 		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | 0 | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | sx | 0 | tex);
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
+		
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | sy | tex);
 		break;
 	}

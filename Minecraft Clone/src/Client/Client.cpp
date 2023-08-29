@@ -33,6 +33,16 @@ void Client::run() {
 
 	getLogger()->LogInfo("Client", "Starting Gameloop");
 	GameLoop();
+	Cleanup();
+}
+
+void Client::Cleanup() {
+	TerrainRender.Stop();
+	MainWorld.Stop();
+	getLogger()->Stop();
+	getLogger()->LoggingThread.join();
+
+	glfwDestroyWindow(getWindow());
 }
 
 void Client::GameLoop() {
@@ -75,6 +85,10 @@ void Client::Update() {
 
 	if (TestForKeyInputs(GLFW_KEY_Z)) {
 		getLogger()->LogInfo("Client", "FPS: " + std::to_string(1.f / (float)Frametime));
+	}
+
+	if (TestForKeyInputs(GLFW_KEY_ESCAPE)) {
+		glfwSetWindowShouldClose(getWindow(), true);
 	}
 
 

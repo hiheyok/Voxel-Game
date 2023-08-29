@@ -11,6 +11,7 @@ private:
 
 	void GameLoop();
 	void Update();
+	void Cleanup();
 
 	double Frametime = 0.5;
 
