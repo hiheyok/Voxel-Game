@@ -322,8 +322,6 @@ private:
 	bool UpdateDrawCommands = false;
 
 	std::vector<glm::vec3> SpreadCache;
-	int SpreadCacheRenderDistance = 0;
-	int SpreadCacheRenderHeight = 0;
 
 	std::deque<int> FIBO;
 	std::vector<int> spread;

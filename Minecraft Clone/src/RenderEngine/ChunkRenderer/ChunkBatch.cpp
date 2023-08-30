@@ -86,7 +86,6 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int
 
 	auto it = InsertSpace.end();
 	int iterations = 0;
-	bool stop = false;
 
 	while (true) {
 		if (it->second >= DataSize) {

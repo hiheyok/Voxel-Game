@@ -35,7 +35,7 @@ void Generator::Start(int ThreadCount) {
 void Generator::Stop() {
 	stop = true;
 	Scheduler.join();
-	for (int i = 0; i < Workers.size(); i++) {
+	for (size_t i = 0; i < Workers.size(); i++) {
 		Workers[i].join();
 	}
 }

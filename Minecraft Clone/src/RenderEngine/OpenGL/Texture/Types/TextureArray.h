@@ -11,7 +11,7 @@ public:
 
 		std::ofstream file;
 		file.open("BlockTexDump.dmp");
-		for (int i = 0; i < ArrayData.size(); i++) {
+		for (size_t i = 0; i < ArrayData.size(); i++) {
 			file << ArrayData.data()[i];
 		}
 		file.close();
@@ -34,7 +34,7 @@ public:
 	bool AddTextureToArray(RawTextureData* Data) {
 		Format = GL_RGBA;
 		if (Data->data) {
-			if (width == (GLuint)Data->width && height == (GLuint)Data->height) {
+			if (width == Data->width && height == Data->height) {
 				if (Data->format == GL_RGB) {
 					for (int index = 0; index < Data->width * Data->height; index++) {
 						ArrayData.push_back(Data->data[(index * 3)]);

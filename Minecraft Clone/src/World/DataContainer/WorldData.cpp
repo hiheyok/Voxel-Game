@@ -17,10 +17,13 @@ bool WorldData::SetBlock(BlockID block, int x, int y, int z) {
 				int p[3]{ c[0] ,c[1] ,c[2]}; // p[3] is just the position of the neighboring chunk
 
 				p[axis] += (-2 * face) + 1;
-
-				if (CheckChunk(p[0], p[1], p[2])) {
-					ChunkUpdate(p[0], p[1], p[2]);
+				if ((abs(p[axis] % 16) == 0) && (abs(p[axis] % 16) == 15) ) {
+					if (CheckChunk(p[0], p[1], p[2])) {
+						ChunkUpdate(p[0], p[1], p[2]);
+					}
 				}
+
+				
 			}
 		}
 

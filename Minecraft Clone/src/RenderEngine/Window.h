@@ -3,7 +3,7 @@
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/vec2.hpp>
-#include "../utils/LogUtils.h"
+#include "../Utils/LogUtils.h"
 #include <unordered_set>
 #include <vector>
 #define _CRTDBG_MAP_ALLOC

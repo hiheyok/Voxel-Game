@@ -145,9 +145,9 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 
 			for (int y = 0; y < 16; y++) {
 
-				float gx = (float)(x + cx);
+				//float gx = (float)(x + cx);
 				float gy = (float)(y + cy);
-				float gz = (float)(z + cz);
+				//float gz = (float)(z + cz);
 
 				float n =  getNoise3D(x, y, z, 4,1.f, noise);
 
@@ -239,6 +239,7 @@ map<float, float>::iterator getItr(std::map<float, float>& map, float bottomBoun
 		}
 		itr++;
 	}
+	return itr;
 }
 
 float Chunk::continentialNoise(float n) {

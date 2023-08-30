@@ -1,6 +1,6 @@
 #pragma once
-#include "../camera/camera.h"
-#define _CRTDBG_MAP_ALLOC
+#include "../Camera/camera.h"
+
 class CFrustum {
 
 public:

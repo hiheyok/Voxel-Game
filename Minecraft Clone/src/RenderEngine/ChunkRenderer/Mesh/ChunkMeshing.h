@@ -70,7 +70,7 @@ namespace Meshing
 	private:
 
 		//Simplifies the Mesh and output it in the vertices array
-		void SimplifyMesh(Chunk& chunk);
+		void SimplifyMesh();
 
 		//Compare quad sizes and position
 		bool compareQuads(Quad q0, Quad q1);

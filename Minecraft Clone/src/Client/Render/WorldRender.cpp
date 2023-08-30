@@ -49,7 +49,7 @@ void WorldRender::Worker(int id) {
 			FinishedJobs.emplace_back(world->GetChunk(pos.x, pos.y, pos.z));
 			auto t1 = std::chrono::high_resolution_clock::now();
 
-			double time = ((double)(t1 - t0).count() / 1000.0);
+		//	double time = ((double)(t1 - t0).count() / 1000.0);
 
 		//	getLogger()->LogInfo("Mesh","Mesh time (microseconds): " + std::to_string(time));
 		}

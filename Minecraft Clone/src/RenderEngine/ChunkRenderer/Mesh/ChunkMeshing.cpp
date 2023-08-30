@@ -10,12 +10,12 @@ using namespace glm;
 void ChunkMeshData::GenerateMesh(Chunk& chunk) {
 	//Initialize
 
-	NullQuad.h = 9999;
-	NullQuad.w = 9999;
-	NullQuad.x = 9999;
-	NullQuad.y = 9999;
+	NullQuad.h = 255;
+	NullQuad.w = 255;
+	NullQuad.x = 255;
+	NullQuad.y = 255;
 
-	NullQuad.Texture = 9999;
+	NullQuad.Texture = 255;
 
 	Quad cache[4096 * 6]{};
 
@@ -33,7 +33,7 @@ void ChunkMeshData::GenerateMesh(Chunk& chunk) {
 
 	GenerateFaceLighting(chunk); //Add lighting to those faces
 
-	SimplifyMesh(chunk); //Simplifies mesh
+	SimplifyMesh(); //Simplifies mesh
 
 }
 
@@ -65,12 +65,10 @@ void ChunkMeshData::GenerateFaceCollection(Chunk& chunk) {
 
 
 //Simplifies mesh (Algorithm: Greedy Meshing): Similar to this https://gist.github.com/Vercidium/a3002bd083cce2bc854c9ff8f0118d33
-void ChunkMeshData::SimplifyMesh(Chunk& chunk) {
+void ChunkMeshData::SimplifyMesh() {
 	//iterate through the x, y, and z axis
 	int x[3]{};
 	int q[3]{};
-
-	uint64_t SideVisited[4]{0,0,0,0};
 
 	for (int axis = 0; axis < 3; axis++) {
 

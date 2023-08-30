@@ -246,7 +246,7 @@ void World::WorldThread() {
 
 		timerSleepNotPrecise((int)(1000.f / (float)TPS));
 
-		float MSPT = (float)((double)(high_resolution_clock::now() - t0).count() / 1000000.0);
+	//	float MSPT = (float)((double)(high_resolution_clock::now() - t0).count() / 1000000.0);
 
 		//getLogger()->LogInfo("World", "MSPT: " + std::to_string(MSPT) + " | Chunks Per Second: " + std::to_string((float)ChunksPerTick / (MSPT / 1000)));
 	}
