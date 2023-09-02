@@ -145,9 +145,7 @@
     <ClCompile Include="src\Client\Render\WorldRender.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\RenderEngine\Camera\camera.cpp" />
-    <ClCompile Include="src\RenderEngine\ChunkRenderer\Mesh\BakedChunkMesh.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshing.cpp" />
-    <ClCompile Include="src\RenderEngine\ChunkRenderer\Mesh\Mesher.cpp" />
     <ClCompile Include="src\RenderEngine\Frustum\frustum.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Buffers\Buffer.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\OpenGL.cpp" />

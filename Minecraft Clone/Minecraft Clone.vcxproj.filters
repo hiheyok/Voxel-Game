@@ -48,12 +48,6 @@
     <ClCompile Include="src\RenderEngine\Camera\camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\ChunkRenderer\Mesh\BakedChunkMesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RenderEngine\ChunkRenderer\Mesh\Mesher.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\RenderEngine\Frustum\frustum.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
