@@ -102,13 +102,13 @@ void ChunkMeshData::SimplifyMesh() {
 								q[Axis2] = x[Axis2];
 
 								bool IsSame = compareQuads(GetFace(q[0], q[1], q[2], axis * 2 + facing), LastQuad);
-								
+
 								if (!IsSame)
 									break;
 							}
 
 							bool done = false;
-							
+
 							//This starts at 1 because we already know that at Axis0H = 0, there's a valid quad
 
 							for (Axis0H = 0; Axis0H + x[Axis0] < 16; Axis0H++) {
@@ -128,7 +128,7 @@ void ChunkMeshData::SimplifyMesh() {
 									q[Axis0] = x[Axis0] + Axis0H;
 									q[Axis1] = x[Axis1] + Axis1K;
 									q[Axis2] = x[Axis2];
-									
+
 									if (!compareQuads(GetFace(q[0], q[1], q[2], axis * 2 + facing), LastQuad)) {
 										done = true;
 										break;
@@ -146,7 +146,7 @@ void ChunkMeshData::SimplifyMesh() {
 									q[Axis1] = x[Axis1] + Axis1K_TMP;
 									q[Axis2] = x[Axis2];
 									SetFace(q[0], q[1], q[2], axis * 2 + facing, NullQuad);
-									
+
 								}
 							}
 							Quad finalq = LastQuad;
@@ -173,7 +173,7 @@ void ChunkMeshData::SimplifyMesh() {
 
 
 void ChunkMeshData::AddFacetoMesh(Quad quad, int slice, int axis, int face) {
-	
+
 	if (axis == 0) { //0 = x axis
 		AddFacetoMesh_X(quad, slice, face);
 		return;
@@ -189,9 +189,9 @@ void ChunkMeshData::AddFacetoMesh(Quad quad, int slice, int axis, int face) {
 }
 
 void ChunkMeshData::AddFacetoMesh_X(Quad quad, int slice, int face) {
-	unsigned int P0[3]{};
-	unsigned int P1[3]{};
-	
+	uint32_t P0[3]{};
+	uint32_t P1[3]{};
+
 	int ParallelAxis = 0;
 	int AxisU = 1;
 	int AxisV = 2;
@@ -216,7 +216,7 @@ void ChunkMeshData::AddFacetoMesh_X(Quad quad, int slice, int face) {
 
 	switch (face) {
 	case 1:
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NP << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | 0 | tex);
 		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
@@ -247,8 +247,8 @@ void ChunkMeshData::AddFacetoMesh_X(Quad quad, int slice, int face) {
 }
 
 void ChunkMeshData::AddFacetoMesh_Y(Quad quad, int slice, int face) {
-	unsigned int P0[3]{};
-	unsigned int P1[3]{};
+	uint32_t P0[3]{};
+	uint32_t P1[3]{};
 
 	int ParallelAxis = 1;
 	int AxisU = 2;
@@ -257,12 +257,12 @@ void ChunkMeshData::AddFacetoMesh_Y(Quad quad, int slice, int face) {
 	P0[0] = (slice - face + 1) << (ParallelAxis * 5);
 	P0[1] = (quad.y) << (AxisV * 5);
 	P0[2] = (quad.x) << (AxisU * 5);
-	
+
 
 	P1[0] = (slice - face + 1) << (ParallelAxis * 5); // y
 	P1[1] = (quad.y + quad.h) << (AxisV * 5); // x
 	P1[2] = (quad.x + quad.w) << (AxisU * 5); // z
-	
+
 
 	char NN = quad.getLight(L_NN);
 	char NP = quad.getLight(L_NP);
@@ -302,14 +302,14 @@ void ChunkMeshData::AddFacetoMesh_Y(Quad quad, int slice, int face) {
 		SolidVertices.push_back(0u | sx | sy | tex);
 		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
-		
+
 		break;
 	}
 }
 
 void ChunkMeshData::AddFacetoMesh_Z(Quad quad, int slice, int face) { //x : x
-	unsigned int P0[3]{};
-	unsigned int P1[3]{};
+	uint32_t P0[3]{};
+	uint32_t P1[3]{};
 
 	int ParallelAxis = 2;
 	int AxisU = 0;
@@ -373,7 +373,7 @@ void ChunkMeshData::GenerateAmbientOcculsion(Chunk& chunk) {
 
 	for (int axis = 0; axis < 3; axis++) {
 		for (int face = 0; face < 2; face++) {
-			int p[3]{0,0,0};
+			int p[3]{ 0,0,0 };
 
 			int axis0 = axis;
 			int axis1 = (axis + 1) % 3; //u
@@ -385,11 +385,10 @@ void ChunkMeshData::GenerateAmbientOcculsion(Chunk& chunk) {
 				for (p[axis1] = -1; p[axis1] < 17; p[axis1]++) {
 					for (p[axis2] = -1; p[axis2] < 17; p[axis2]++) {
 
-						Quad q = GetFace(p[0],p[1],p[2],axis * 2 + face);
+						Quad q = GetFace(p[0], p[1], p[2], axis * 2 + face);
 
-						if (compareQuads(NullQuad, q)) { //Checks if face doesnt exist
+						if (compareQuads(NullQuad, q)) //Checks if face doesnt exist
 							continue;
-						}
 
 						int check[3]{ p[0],p[1],p[2] };
 
@@ -405,40 +404,39 @@ void ChunkMeshData::GenerateAmbientOcculsion(Chunk& chunk) {
 								check[axis1] = u + p[axis1];
 								check[axis2] = v + p[axis2];
 
-								if (chunk.GetBlock(check[0], check[1], check[2]) != AIR) {
-									
-									uint8_t CornerIndex = 0;
+								if (chunk.GetBlock(check[0], check[1], check[2]) == AIR)
+									continue;
 
-									if ((u != 0) && (v != 0)) { //Corners
+								uint8_t CornerIndex = 0;
 
-										CornerIndex |= 0b10 * (u == 1);
-										CornerIndex |= 0b01 * (v == 1);
+								if ((u != 0) && (v != 0)) { //Corners
 
-										q.setLight(CornerIndex, lightlvl);
-										
-										continue;
-									}
+									CornerIndex |= 0b10 * (u == 1);
+									CornerIndex |= 0b01 * (v == 1);
 
-									if (u != 0) {
+									q.setLight(CornerIndex, lightlvl);
 
-										CornerIndex |= 0b10 * (u == 1);
+									continue;
+								}
 
-										q.setLight(CornerIndex, lightlvl);
-										q.setLight(CornerIndex | 0b01, lightlvl);
+								if (u != 0) {
 
-										continue;
-									}
+									CornerIndex |= 0b10 * (u == 1);
 
-									if (v != 0) {
+									q.setLight(CornerIndex, lightlvl);
+									q.setLight(CornerIndex | 0b01, lightlvl);
 
-										CornerIndex |= 0b01 * (v == 1);
+									continue;
+								}
 
-										q.setLight(CornerIndex, lightlvl);
-										q.setLight(CornerIndex | 0b10, lightlvl);
+								if (v != 0) {
 
-										continue;
-									}
+									CornerIndex |= 0b01 * (v == 1);
 
+									q.setLight(CornerIndex, lightlvl);
+									q.setLight(CornerIndex | 0b10, lightlvl);
+
+									continue;
 								}
 							}
 						}
@@ -472,16 +470,14 @@ bool ChunkMeshData::IsFaceVisible(Chunk& chunk, int x, int y, int z, int side) {
 }
 
 Quad ChunkMeshData::GetFace(int x, int y, int z, int side) {
-	if (x >= 16 || y >= 16 || z >= 16 || x < 0 || y < 0 || z < 0) {
+	if (x >= 16 || y >= 16 || z >= 16 || x < 0 || y < 0 || z < 0)
 		return NullQuad;
-	}
 	return FaceCollectionCache[(x * 256 + y * 16 + z) * 6 + side];
 }
 
 void ChunkMeshData::SetFace(int x, int y, int z, int side, Quad quad) {
-	if (x >= 16 || y >= 16 || z >= 16 || x < 0 || y < 0 || z < 0) {
+	if (x >= 16 || y >= 16 || z >= 16 || x < 0 || y < 0 || z < 0)
 		return;
-	}
 	FaceCollectionCache[(x * 256 + y * 16 + z) * 6 + side] = quad;
 }
 
