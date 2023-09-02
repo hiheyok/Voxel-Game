@@ -2,6 +2,7 @@
 #include "../DataContainer/BlockData.h"
 #include <glm/vec3.hpp>
 #include "ChunkID.h"
+#include <atomic>
 
 #define PX 0x00
 #define NX 0x01
@@ -27,6 +28,7 @@ public:
 	}
 
 	BlockID GetBlock(int x, int y, int z);
+	void SetBlock(BlockID block, int x, int y, int z);
 
 	ChunkContainer* GetNeighbor(unsigned int Side) {
 		return Neighbors[Side];
@@ -46,6 +48,8 @@ public:
 	bool isEmpty = true;
 
 	ChunkContainer* Neighbors[6]{nullptr};
+
+private:
 
 	BlockContainer Blocks;
 };

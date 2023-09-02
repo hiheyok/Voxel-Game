@@ -64,7 +64,7 @@ void Chunk::Generate(FastNoiseLite* noise) {
 			for (int y = 0 + cy; y < 16 + cy; y++) {
 				if ((a == y || a + 1 == y || a + 2 == y || a + 3 == y || a + 4 == y) && a > 10) {
 					if (TREE_MAP >= (TREE_RAND_VAL - TREE_RAND_VAL_RANGE) && TREE_MAP <= (TREE_RAND_VAL + TREE_RAND_VAL_RANGE)) {
-						Blocks.ChangeBlock(OAK_LOG,x - cx, y - cy, z - cz);
+						SetBlock(OAK_LOG,x - cx, y - cy, z - cz);
 						isEmpty = false;
 
 					}
@@ -87,23 +87,23 @@ void Chunk::Generate(FastNoiseLite* noise) {
 				}*/
 
 				if (y < 10) {
-					Blocks.ChangeBlock(WATER, x - cx, y - cy, z - cz);
+					SetBlock(WATER, x - cx, y - cy, z - cz);
 					isEmpty = false;
 				}
 
 				if (a > y) {
 					if (y < 12) {
-						Blocks.ChangeBlock(SAND, x - cx, y - cy, z - cz);
+						SetBlock(SAND, x - cx, y - cy, z - cz);
 						isEmpty = false;
 					}
 					else {
 
 						if (a >= y) {
-							Blocks.ChangeBlock(GRASS, x - cx, y - cy, z - cz);
+							SetBlock(GRASS, x - cx, y - cy, z - cz);
 							isEmpty = false;
 						}
 						if (a - 1 > y) {
-							Blocks.ChangeBlock(DIRT, x - cx, y - cy, z - cz);
+							SetBlock(DIRT, x - cx, y - cy, z - cz);
 							isEmpty = false;
 						}
 
@@ -145,13 +145,9 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 
 			for (int y = 0; y < 16; y++) {
 
-				//float gx = (float)(x + cx);
 				float gy = (float)(y + cy);
-				//float gz = (float)(z + cz);
 
 				float n =  getNoise3D(x, y, z, 4,1.f, noise);
-
-				//getLogger()->LogInfo("Generator" , "Noise: " + std::to_string(n));
 
 				n = n + noiseOffset;
 
@@ -164,11 +160,11 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 				//getLogger()->LogInfo("Chunk Generator", "Continential Noise: " + to_string(continental));
 				if (n > 0.5f) {
 					if (n < 0.54f) {
-						Blocks.ChangeBlock(DIRT, (uint32_t)x, (uint32_t)y, (uint32_t)z);
+						SetBlock(DIRT, (uint32_t)x, (uint32_t)y, (uint32_t)z);
 						isEmpty = false;
 					}
 					else {
-						Blocks.ChangeBlock(STONE, (uint32_t)x, (uint32_t)y, (uint32_t)z);
+						SetBlock(STONE, (uint32_t)x, (uint32_t)y, (uint32_t)z);
 						isEmpty = false;
 					}
 

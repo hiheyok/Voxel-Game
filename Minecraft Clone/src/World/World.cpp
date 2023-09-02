@@ -17,8 +17,6 @@ bool World::RayIntersection(Ray& ray) {
 	//Direction to Step
 	ivec3 Direction = Sign(Delta);
 
-	//getLogger()->LogInfo("Ray", std::to_string(Direction.x) + ", " + std::to_string(Direction.y) + ", "+ std::to_string(Direction.z));
-
 	//Location in grid
 	ivec3 BlockPos = ivec3(floor(ray.Origin.x), floor(ray.Origin.y), floor(ray.Origin.z));
 

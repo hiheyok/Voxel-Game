@@ -8,9 +8,11 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include <atomic>
+
 class ChunkMap {
 public:
-	void InsertChunk(Chunk chunk) {
+	void InsertChunk(Chunk& chunk) {
 		
 		ChunkID ID = getChunkID(chunk.Position);
 
@@ -56,7 +58,7 @@ public:
 		int LocalBlockPos[3]{ x - ChunkPos[0] * 16 ,y - ChunkPos[1] * 16,z - ChunkPos[2] * 16 };
 
 		if (CheckChunk(ChunkPos[0], ChunkPos[1], ChunkPos[2])) {
-			Data[getChunkID(ChunkPos[0], ChunkPos[1], ChunkPos[2])].Blocks.ChangeBlock(block, LocalBlockPos[0], LocalBlockPos[1], LocalBlockPos[2]);
+			Data[getChunkID(ChunkPos[0], ChunkPos[1], ChunkPos[2])].SetBlock(block, LocalBlockPos[0], LocalBlockPos[1], LocalBlockPos[2]);
 			Data[getChunkID(ChunkPos[0], ChunkPos[1], ChunkPos[2])].isEmpty = false;
 			return true;
 		}
@@ -79,11 +81,6 @@ public:
 
 	Chunk& operator[](ChunkID id) { //Returns a chunk with the given id
 		return Data[id];
-	}
-
-	Chunk GetCopyOfChunk(int x, int y, int z) {
-		Chunk copy = Data[getChunkID(x, y, z)];
-		return copy;
 	}
 
 private:

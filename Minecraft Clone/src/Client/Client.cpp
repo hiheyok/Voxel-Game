@@ -21,12 +21,12 @@ void Client::run() {
 	MainLocalWorld.SetPlayerPosition(0.,70.0,0.);
 	MainLocalWorld.SetPlayerRotation(0.,-30.);
 
-	MainWorld.horizontaltickingdistance = 16;
+	MainWorld.horizontaltickingdistance = 64;
 
 	MainWorld.Start();
 
 	getLogger()->LogInfo("World", "Generating World");
-	TerrainRender.renderDistance = 16;
+	TerrainRender.renderDistance = 64;
 	TerrainRender.Start(getWindow(), &MainWorld, 16);
 
 	MainLocalWorld.SetWorld(&MainWorld);
