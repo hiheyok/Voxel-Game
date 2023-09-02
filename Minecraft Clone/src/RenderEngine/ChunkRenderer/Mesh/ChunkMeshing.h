@@ -3,10 +3,11 @@
 
 #include "../../../World/Chunk/Chunk.h"
 
-#define L_NN 0x00
-#define L_PN 0x01
-#define L_PP 0x02
-#define L_NP 0x03
+#define L_NN 0b00
+#define L_NP 0b01
+#define L_PN 0b10
+#define L_PP 0b11
+
 
 namespace Meshing
 {
@@ -20,12 +21,13 @@ namespace Meshing
 		//Lighting; stored as 16 bit to save mem
 		uint16_t Lighting = 0xFFFF;
 		uint16_t Texture = 0;
-		inline char getLight(char Location) {
+		inline char getLight(uint8_t Location) {
 			return 0b1111 & (Lighting >> (Location * 4));
 		}
 
-		inline void setLight(char Location, char Val) {
-			Lighting |= Val << (Location * 4);
+		inline void setLight(uint8_t Location, uint8_t Val) {
+			Lighting = Lighting & (~(0b1111 << (Location * 4))); // Clears light value for that location
+			Lighting |= (Val << (Location * 4)); //Inserts light value
 		}
 
 		//int L_NN = 15, L_NP = 15, L_PP = 15, L_PN = 15; // Lighting : P = Positive; N = Negative
@@ -33,9 +35,9 @@ namespace Meshing
 		/*
 
 		Relative to x-axis
-			L_NP = Negative Z , Positive Y
+			L_NP = Negative Y , Positive Z
 		Relative to y-axis
-			L_NP = Negative X , Positive Z
+			L_NP = Negative Z , Positive X
 		Relative to z-axis
 			L_NP = Negative X , Positive Y
 		*/
@@ -78,8 +80,8 @@ namespace Meshing
 		//Generates all the faces and puts them in the cache
 		void GenerateFaceCollection(Chunk& chunk);
 
-		//Generates the lighting for the mesh
-		void GenerateFaceLighting(Chunk& chunk);
+		//Ambient Occulsion
+		void GenerateAmbientOcculsion(Chunk& chunk);
 
 		//Check if the player can see the mesh
 		bool IsFaceVisible(Chunk& chunk, int x, int y, int z, int side);

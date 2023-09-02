@@ -11,15 +11,13 @@ static long long unsigned int getChunkID(int x, int y, int z) {
 
 	return 0LLU | ax << 0 | ay << 16 | az << 32 | sx << 61 | sy << 62 | sz << 63;
 }
-static long long unsigned int getChunkID(glm::ivec3 vec) {
-	long long unsigned int sx = (((1u << 1) - 1u) & (vec.x >> 31));
-	long long unsigned int sy = (((1u << 1) - 1u) & (vec.y >> 31));
-	long long unsigned int sz = (((1u << 1) - 1u) & (vec.z >> 31));
-	long long unsigned int ax = (long long unsigned int)abs(vec.x);
-	long long unsigned int ay = (long long unsigned int)abs(vec.y);
-	long long unsigned int az = (long long unsigned int)abs(vec.z);
 
-	return 0LLU | ax << 0 | ay << 16 | az << 32 | sx << 61 | sy << 62 | sz << 63;
+static long long unsigned int getChunkID(glm::ivec3 vec) {
+	return getChunkID(vec.x,vec.y,vec.z);
+}
+
+static long long unsigned int getChunkID(int* c) {
+	return getChunkID(c[0],c[1],c[2]);
 }
 
 static glm::ivec3 ChunkIDToPOS(long long unsigned int n) {

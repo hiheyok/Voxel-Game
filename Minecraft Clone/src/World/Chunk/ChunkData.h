@@ -17,38 +17,24 @@ class ChunkContainer {
 	
 public:
 	
-	void SetNeighbor(ChunkContainer* Neighbor, unsigned int Side) {
-		Neighbors[Side] = Neighbor;
-	}
+	void SetNeighbor(ChunkContainer* Neighbor, unsigned int Side);
 
-	void ClearNeighbors() {
-		for (int i = 0; i < 6; i++) {
-			Neighbors[i] = nullptr;
-		}
-	}
+	void ClearNeighbors();
 
 	BlockID GetBlock(int x, int y, int z);
+
 	void SetBlock(BlockID block, int x, int y, int z);
 
-	ChunkContainer* GetNeighbor(unsigned int Side) {
-		return Neighbors[Side];
-	}
+	ChunkContainer* GetNeighbor(unsigned int Side);
 	
-	void SetPosition(int x, int y, int z) {
-		Position.x = x;
-		Position.y = y;
-		Position.z = z;
-		chunkID = getChunkID(x, y, z);
-	}
+	void SetPosition(int x, int y, int z);
 
 	glm::ivec3 Position;
-
 	ChunkID chunkID;
 
 	bool isEmpty = true;
 
 	ChunkContainer* Neighbors[6]{nullptr};
-
 private:
 
 	BlockContainer Blocks;

@@ -7,6 +7,9 @@ using namespace Meshing;
 using namespace std;
 using namespace glm;
 
+const int blockShadingBitOffset = 15;
+const int textureBitOffset = 20;
+
 void ChunkMeshData::GenerateMesh(Chunk& chunk) {
 	//Initialize
 
@@ -31,9 +34,9 @@ void ChunkMeshData::GenerateMesh(Chunk& chunk) {
 
 	GenerateFaceCollection(chunk); //Generates face with their respected textures
 
-	GenerateFaceLighting(chunk); //Add lighting to those faces
+	GenerateAmbientOcculsion(chunk); //AO
 
-	SimplifyMesh(); //Simplifies mesh
+	SimplifyMesh(); //Simplifies mesh (Greedy Meshing)
 
 }
 
@@ -48,21 +51,21 @@ void ChunkMeshData::GenerateFaceCollection(Chunk& chunk) {
 	for (int x = 0; x < 16; x++) {
 		for (int y = 0; y < 16; y++) {
 			for (int z = 0; z < 16; z++) {
-				if (chunk.GetBlock(x, y, z) != AIR) {
-					for (int side = 0; side < 6; side++) {
-						if (IsFaceVisible(chunk, x, y, z, side)) {
-							Quad quad;
-							quad.Texture = GetTexture(chunk, x, y, z, side);
-							SetFace(x, y, z, side, quad);
-						}
-					}
+				if (chunk.GetBlock(x, y, z) == AIR)
+					continue;
+
+				for (int side = 0; side < 6; side++) {
+					if (!IsFaceVisible(chunk, x, y, z, side))
+						continue;
+
+					Quad quad;
+					quad.Texture = GetTexture(chunk, x, y, z, side);
+					SetFace(x, y, z, side, quad);
 				}
 			}
 		}
 	}
 }
-
-
 
 //Simplifies mesh (Algorithm: Greedy Meshing): Similar to this https://gist.github.com/Vercidium/a3002bd083cce2bc854c9ff8f0118d33
 void ChunkMeshData::SimplifyMesh() {
@@ -148,7 +151,6 @@ void ChunkMeshData::SimplifyMesh() {
 							}
 							Quad finalq = LastQuad;
 
-
 							finalq.y = x[Axis0];
 							finalq.x = x[Axis1];
 
@@ -167,24 +169,23 @@ void ChunkMeshData::SimplifyMesh() {
 	}
 }
 
-const int xDataBitOffset = 0;
-const int yDataBitOffset = 5;
-const int zDataBitOffset = 10;
-const int blockShadingBitOffset = 15;
-const int textureBitOffset = 20;
+
+
 
 void ChunkMeshData::AddFacetoMesh(Quad quad, int slice, int axis, int face) {
 	
 	if (axis == 0) { //0 = x axis
 		AddFacetoMesh_X(quad, slice, face);
+		return;
 	}
 	if (axis == 1) { //1 = y axis
 		AddFacetoMesh_Y(quad, slice, face);
+		return;
 	}
 	if (axis == 2) { //2 = z axis
 		AddFacetoMesh_Z(quad, slice, face);
+		return;
 	}
-	
 }
 
 void ChunkMeshData::AddFacetoMesh_X(Quad quad, int slice, int face) {
@@ -215,29 +216,29 @@ void ChunkMeshData::AddFacetoMesh_X(Quad quad, int slice, int face) {
 
 	switch (face) {
 	case 1:
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | 0 | tex);
 		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | 0 | tex);
 		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | sy | tex);
 		break;
 	case 0:
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | 0 | tex);
 		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | sy | tex);
 		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
@@ -275,30 +276,29 @@ void ChunkMeshData::AddFacetoMesh_Y(Quad quad, int slice, int face) {
 
 	switch (face) {
 	case 1:
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | 0 | tex);
 		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | 0 | tex);
 		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | sy | tex);
 		break;
 	case 0:
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | 0 | tex);
 		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
-		
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | sy | tex);
 		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
@@ -335,57 +335,116 @@ void ChunkMeshData::AddFacetoMesh_Z(Quad quad, int slice, int face) { //x : x
 
 	switch (face) {
 	case 1:
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | 0 | tex);
 		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
 		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | sy | tex);
 		break;
 	case 0:
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
 		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | 0 | tex);
 		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | 0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | 0 | sy | tex);
-		
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PN << blockShadingBitOffset));
+		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx | sy | tex);
 		break;
 	}
 }
 
-//This generates the lighting by looping through all the blocks in the chunk. If it finds a block that is solid, it will check if there's another block near it that forms a corner, and it makes that spot just a little darker
+//Creates ambient occulsion 
 
-void ChunkMeshData::GenerateFaceLighting(Chunk& chunk) {
-	for (int x = 0 - 1; x < 16 + 1; x++) {
-		for (int y = 0 - 1; y < 16 + 1; y++) {
-			for (int z = 0 - 1; z < 16 + 1; z++) {
+void ChunkMeshData::GenerateAmbientOcculsion(Chunk& chunk) {
 
-				if (chunk.GetBlock(x, y, z) != AIR) {
-					Quad PositiveX = GetFace(x, y, z, PX);
-					Quad PositiveY = GetFace(x, y, z, PY);
-					Quad PositiveZ = GetFace(x, y, z, PZ);
+	uint8_t lightlvl = 13;
 
-					Quad NegativeX = GetFace(x, y, z, NX);
-					Quad NegativeY = GetFace(x, y, z, NY);
-					Quad NegativeZ = GetFace(x, y, z, NZ);
+	for (int axis = 0; axis < 3; axis++) {
+		for (int face = 0; face < 2; face++) {
+			int p[3]{0,0,0};
 
+			int axis0 = axis;
+			int axis1 = (axis + 1) % 3; //u
+			int axis2 = (axis + 2) % 3; //v
 
+			int offset = 1 - (2 * face); // main axis offset
 
+			for (p[axis0] = -1; p[axis0] < 17; p[axis0]++) {
+				for (p[axis1] = -1; p[axis1] < 17; p[axis1]++) {
+					for (p[axis2] = -1; p[axis2] < 17; p[axis2]++) {
+
+						Quad q = GetFace(p[0],p[1],p[2],axis * 2 + face);
+
+						if (compareQuads(NullQuad, q)) { //Checks if face doesnt exist
+							continue;
+						}
+
+						int check[3]{ p[0],p[1],p[2] };
+
+						check[axis0] += offset;
+
+						for (int u = -1; u < 2; u++) {
+
+							for (int v = -1; v < 2; v++) {
+
+								if (v == 0 && u == 0)
+									continue;
+
+								check[axis1] = u + p[axis1];
+								check[axis2] = v + p[axis2];
+
+								if (chunk.GetBlock(check[0], check[1], check[2]) != AIR) {
+									
+									uint8_t CornerIndex = 0;
+
+									if ((u != 0) && (v != 0)) { //Corners
+
+										CornerIndex |= 0b10 * (u == 1);
+										CornerIndex |= 0b01 * (v == 1);
+
+										q.setLight(CornerIndex, lightlvl);
+										
+										continue;
+									}
+
+									if (u != 0) {
+
+										CornerIndex |= 0b10 * (u == 1);
+
+										q.setLight(CornerIndex, lightlvl);
+										q.setLight(CornerIndex | 0b01, lightlvl);
+
+										continue;
+									}
+
+									if (v != 0) {
+
+										CornerIndex |= 0b01 * (v == 1);
+
+										q.setLight(CornerIndex, lightlvl);
+										q.setLight(CornerIndex | 0b10, lightlvl);
+
+										continue;
+									}
+
+								}
+							}
+						}
+						SetFace(p[0], p[1], p[2], axis * 2 + face, q);
+					}
 				}
-
 			}
 		}
 	}

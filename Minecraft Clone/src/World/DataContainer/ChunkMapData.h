@@ -12,9 +12,11 @@
 
 class ChunkMap {
 public:
-	void InsertChunk(Chunk& chunk) {
+	void InsertChunk(Chunk chunk) {
 		
 		ChunkID ID = getChunkID(chunk.Position);
+
+		std::pair<ChunkID, Chunk> insert(ID, chunk);
 
 		Data[ID] = chunk;
 		ChunkIDContainer.insert(ID);
@@ -31,6 +33,8 @@ public:
 				}
 			}
 		}
+
+		ChunksInUse.try_emplace(ID, 0);
 	}
 
 
@@ -46,6 +50,7 @@ public:
 		if (CheckChunk(c[0], c[1], c[2])) {
 			BlockID block = GetChunk(c[0], c[1], c[2]).GetBlock(l[0], l[1], l[2]);
 
+			
 			return block;
 		}
 
@@ -93,6 +98,7 @@ private:
 		return Data[ID];
 	}
 
+	std::unordered_map<ChunkID, std::atomic_uint8_t> ChunksInUse;
 	Concurrency::concurrent_unordered_set<ChunkID> ChunkIDContainer; //Contains all of the chunks this has
 	Concurrency::concurrent_unordered_map<ChunkID, Chunk> Data; //Contains all of the actual chunk data
 };
