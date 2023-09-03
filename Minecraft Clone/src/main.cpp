@@ -7,6 +7,8 @@
 
 int main() {
 	
+	stbi_set_flip_vertically_on_load(true);
+
 	getLogger()->Start();
 
 	Client GameClient;

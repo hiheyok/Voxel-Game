@@ -293,7 +293,7 @@ public:
 	}
 
 	void AddChunkMesh(Meshing::ChunkMeshData& chunk) {
-		
+
 		if (MeshList.count(getChunkID(chunk.Position))) {
 			_DeleteChunk(getChunkID(chunk.Position));
 			_AddChunk(chunk);
@@ -338,7 +338,7 @@ private:
 
 	size_t GPUMemoryUsage = 0;
 
-	size_t GPUBufferSizeSolid = 5000000000;
+	size_t GPUBufferSizeSolid = 1000000000;
 	size_t GPUBufferSizeTransparent = 120000000;
 	size_t GPUSSBOMAXSIZE = 50000000;
 

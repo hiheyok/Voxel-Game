@@ -10,7 +10,7 @@
 
 class RawTextureData {
 public:
-    
+
     void Erase() { stbi_image_free(data); }
     void Load(const char* path) {
         ImagePath = path;
@@ -44,8 +44,8 @@ public:
     int format = NULL;
     unsigned char* data = nullptr;
 private:
-    
-    
+
+
     const char* ImagePath;
 };
 
@@ -73,7 +73,7 @@ public:
     int height = NULL;
     int Format = NULL;
 private:
-    
+
 };
 
 #endif

@@ -13,13 +13,11 @@ bool WorldData::SetBlock(BlockID block, int x, int y, int z) {
 		WorldChunkData.SetBlockGlobal(block, x, y, z);
 		ChunkUpdate(c[0], c[1], c[2]);
 
-		
 		int offx = (abs(b[0] + 1)) % 16;// 0 = back; != 0 = front
 		int offy = (abs(b[1] + 1)) % 16;
 		int offz = (abs(b[2] + 1)) % 16;
 
 		int off[3]{offx, offy, offz};
-
 
 		for (int axis = 0; axis < 3; axis++) {
 

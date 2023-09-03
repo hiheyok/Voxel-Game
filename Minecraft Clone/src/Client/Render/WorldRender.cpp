@@ -86,13 +86,8 @@ void WorldRender::Update() {
 	world->ChunkUpdateLock.unlock();
 
 	for (ChunkID chunkid : ChunksToUpdate) {
-		
 		LoadChunkToRenderer(chunkid);
-		world->ChunksUpdated.erase(chunkid);
 	}
-
-	
-
 	
 	Renderer.UpdateData();
 	Renderer.GenCallDrawCommands();

@@ -31,7 +31,7 @@ public:
 
 	void ChunkUpdate(int x, int y, int z);
 
-	std::unordered_set<ChunkID> ChunksUpdated;
+	concurrency::concurrent_unordered_set<ChunkID> ChunksUpdated;
 
 	std::mutex ChunkUpdateLock;
 

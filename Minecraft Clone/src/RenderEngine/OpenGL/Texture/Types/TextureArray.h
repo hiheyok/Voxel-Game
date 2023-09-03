@@ -7,7 +7,7 @@
 class TextureArray : public Texture {
 public:
 	void UploadToGPU() {
-		
+
 
 		std::ofstream file;
 		file.open("BlockTexDump.dmp");
@@ -58,10 +58,11 @@ public:
 				getLogger()->LogError("Texture Array Loader", "Width or height doesn't match");
 				return false;
 			}
-			
-			
-		}else {
-			getLogger()->LogError("Texture Array Loader","No texture");
+
+
+		}
+		else {
+			getLogger()->LogError("Texture Array Loader", "No texture");
 			return false;
 		}
 		return true;
@@ -82,7 +83,7 @@ public:
 	std::vector<unsigned char> ArrayData;
 
 private:
-	
+
 	int Layers = 0;
-	
+
 };
