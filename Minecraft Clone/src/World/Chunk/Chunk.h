@@ -24,7 +24,15 @@ public:
 	
 	void GenerateV2(FastNoiseLite* noise);
 
+	void UpdateGen();
+
 private:
+
+	//Generate Decor
+	void GenerateDecor(FastNoiseLite* noise);
+
+	//Gen env
+	void GenerateEnvironment(FastNoiseLite* noise);
 
 	float getNoise3D(int x, int y, int z, int samples, float frequency, FastNoiseLite* noise);
 	float getNoise2D(int x, int z, int samples,float frequency, FastNoiseLite* noise);

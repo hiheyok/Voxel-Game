@@ -35,7 +35,7 @@ private:
 
 	void GetBlock();
 
-	BlockID HoldingBlock = GRASS;
+	BlockID HoldingBlock = OAK_PLANK;
 	Entity Player;
 	World* world = nullptr;
 

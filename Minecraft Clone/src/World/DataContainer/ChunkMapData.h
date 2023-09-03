@@ -30,9 +30,12 @@ public:
 				if (CheckChunk(p[0], p[1], p[2])) {
 					GetChunk(chunk.Position.x, chunk.Position.y, chunk.Position.z).SetNeighbor((ChunkContainer*)&GetChunk(p[0], p[1], p[2]), axis * 2 + face);
 					GetChunk(p[0], p[1], p[2]).SetNeighbor((ChunkContainer*)&GetChunk(chunk.Position.x, chunk.Position.y, chunk.Position.z), axis * 2 - face + 1);
+					GetChunk(p[0], p[1], p[2]).UpdateGen();
 				}
 			}
 		}
+
+		Data[ID].UpdateGen();
 
 		ChunksInUse.try_emplace(ID, 0);
 	}

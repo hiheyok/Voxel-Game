@@ -11,6 +11,7 @@
 #include "../../Utils/MutithreadedData.h"
 
 #include <unordered_map>
+#include <unordered_set>
 #include <deque>
 #include <queue>
 
@@ -91,14 +92,14 @@ public:
 
 	}
 
-	void _DeleteChunk(long long int ChunkID) {
-		if (ChunkRenderListSolidOffsetLookup.count(ChunkID)) {
-			size_t index = GetRenderSolidList(ChunkRenderListSolidOffsetLookup[ChunkID]);
+	void _DeleteChunk(ChunkID chunkid) {
+		if (ChunkRenderListSolidOffsetLookup.count(chunkid)) {
+			size_t index = GetRenderSolidList(ChunkRenderListSolidOffsetLookup[chunkid]);
 			GPUMemoryUsage -= ChunkRenderListSolid[index].size;
-			MeshList[ChunkID] = false;
-			MeshList.erase(ChunkID);
+			MeshList.erase(chunkid);
+			MeshList.erase(chunkid);
 			ChunkRenderListSolid.erase(ChunkRenderListSolid.begin() + index);
-			ChunkRenderListSolidOffsetLookup.erase(ChunkID);
+			ChunkRenderListSolidOffsetLookup.erase(chunkid);
 		}
 	}
 
@@ -141,7 +142,7 @@ public:
 		size_t MeshSizeSolid = data.SolidVertices.size() * sizeof(unsigned int);
 
 		if (MeshSizeSolid == 0) {
-			MeshList[ChunkID] = true;
+			MeshList.insert(ChunkID);
 			return;
 		}
 
@@ -156,7 +157,8 @@ public:
 			GPUMemoryUsage += MeshSizeSolid;
 			insertData(VBO, GL_ARRAY_BUFFER, renderdata.offset, &data.SolidVertices);
 			ChunkRenderListSolid.insert(ChunkRenderListSolid.begin(), renderdata);
-			MeshList[ChunkID] = true;
+			ChunkRenderListSolidMap[ChunkID] = renderdata;
+			MeshList.insert(ChunkID);
 			ChunkRenderListSolidOffsetLookup[ChunkID] = 0;
 			UpdateDrawCommands = true;
 		}
@@ -167,7 +169,8 @@ public:
 				GPUMemoryUsage += MeshSizeSolid;
 				insertData(VBO, GL_ARRAY_BUFFER, renderdata.offset, &data.SolidVertices);
 				ChunkRenderListSolid.emplace_back(renderdata);
-				MeshList[ChunkID] = true;
+				ChunkRenderListSolidMap[ChunkID] = renderdata;
+				MeshList.insert(ChunkID);
 				ChunkRenderListSolidOffsetLookup[ChunkID] = renderdata.offset;
 				UpdateDrawCommands = true;
 			}
@@ -180,7 +183,8 @@ public:
 						GPUMemoryUsage += MeshSizeSolid;
 						insertData(VBO, GL_ARRAY_BUFFER, renderdata.offset, &data.SolidVertices);
 						ChunkRenderListSolid.insert(ChunkRenderListSolid.begin() + i + 1, renderdata);
-						MeshList[ChunkID] = true;
+						ChunkRenderListSolidMap[ChunkID] = renderdata;
+						MeshList.insert(ChunkID);
 						ChunkRenderListSolidOffsetLookup[ChunkID] = renderdata.offset;
 						added = true;
 						UpdateDrawCommands = true;
@@ -205,6 +209,66 @@ public:
 		int ListSize = (int)ChunkRenderListSolid.size();
 
 		int RenderRange = RenderDistance * RenderDistance;
+
+
+		//std::deque<glm::ivec3> queue;
+		//std::unordered_set<ChunkID> Used;
+
+		//queue.emplace_back(Pos);
+		//Used.insert(getChunkID(Pos));
+
+		//while (true) {
+		//	if (queue.size() == 0) {
+		//		break;
+		//	}
+
+		//	
+
+		//	glm::ivec3 ChunkPos = queue.front();
+		//	queue.pop_front();
+
+		//	if (FindDistanceNoSqrt(ChunkPos.x, ChunkPos.y, ChunkPos.z, Pos.x, Pos.y, Pos.z) < RenderRange) {//if (!(data.x + -Pos.x > RenderDistance || data.y + -Pos.y > RenderDistance || data.z + -Pos.z > RenderDistance || data.x + -Pos.x < -RenderDistance || data.y + -Pos.y < -RenderDistance || data.z + -Pos.z < -RenderDistance)) {//if (FindDistance(data.second.x, data.second.y, data.second.z, (int)x12 / CHUNK_SIZE, (int)y12 / CHUNK_SIZE, (int)z12 / CHUNK_SIZE) <= renderDistance) {
+		//		if (fr.SphereInFrustum((float)ChunkPos.x * 16, (float)ChunkPos.y * 16, (float)ChunkPos.z * 16, (float)32)) {
+		//			if (ChunkRenderListSolidMap.count(getChunkID(ChunkPos))) {
+
+		//				ChunkRenderDataBufferAddress* data = &ChunkRenderListSolidMap[getChunkID(ChunkPos)];
+
+		//				DrawArraysIndirectCommand cmd;
+		//				cmd.count = (unsigned int)data->size / (sizeof(unsigned int) * 2);
+		//				cmd.instanceCount = 1;
+		//				cmd.first = (unsigned int)data->offset / (sizeof(unsigned int) * 2);
+		//				cmd.baseInstance = SolidIndex;
+		//				DrawArraysIndirectCommandListSolid.emplace_back(cmd);
+		//				SolidChunkShaderPos.emplace_back(data->x);
+		//				SolidChunkShaderPos.emplace_back(data->y);
+		//				SolidChunkShaderPos.emplace_back(data->z);
+		//				SolidIndex++;
+		//			}
+
+		//			for (int axis = 0; axis < 3; axis++) {
+		//				for (int face = 0; face < 2; face++) {
+		//					glm::ivec3 neighbor = ChunkPos;
+
+		//					neighbor[axis] += 1 - (2 * face);
+
+		//					ChunkID neighborID = getChunkID(neighbor);
+
+		//					if (Used.count(neighborID)) {
+		//						continue;
+		//					}
+
+		//					queue.emplace_back(neighbor);
+		//					Used.insert(neighborID);
+
+		//				}
+		//			}
+
+		//			
+
+		//			
+		//		}
+		//	}
+		//}
 
 		for (int i = 0; i < ListSize; i++) {
 			ChunkRenderDataBufferAddress* data = &ChunkRenderListSolid[(ListSize - 1) - i];
@@ -308,7 +372,7 @@ public:
 		SolidShader->bindTextureArray2D(0, BlockTextureArray.textureID, "BlockTexture");
 	}
 
-	std::unordered_map<ChunkID, bool> MeshList;
+	std::unordered_set<ChunkID> MeshList;
 
 
 	//Settings
@@ -338,7 +402,7 @@ private:
 
 	size_t GPUMemoryUsage = 0;
 
-	size_t GPUBufferSizeSolid = 1000000000;
+	size_t GPUBufferSizeSolid = 5000000000;
 	size_t GPUBufferSizeTransparent = 120000000;
 	size_t GPUSSBOMAXSIZE = 50000000;
 
@@ -351,6 +415,8 @@ private:
 	std::unordered_map<long long int, size_t> ChunkRenderListSolidOffsetLookup;
 	std::unordered_map<long long int, size_t> ChunkRenderListTransparentOffsetCache;
 
+
+	std::unordered_map<long long int, ChunkRenderDataBufferAddress> ChunkRenderListSolidMap;
 	std::vector<ChunkRenderDataBufferAddress> ChunkRenderListSolid;
 	std::vector<DrawArraysIndirectCommand> DrawArraysIndirectCommandListSolid;
 

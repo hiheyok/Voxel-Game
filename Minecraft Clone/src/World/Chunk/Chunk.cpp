@@ -69,21 +69,21 @@ void Chunk::Generate(FastNoiseLite* noise) {
 
 					}
 				}
-				/*if (a + 5 == y && a > 10) {
+				if (a + 5 == y && a > 10) {
 					if (TREE_MAP >= (TREE_RAND_VAL - TREE_RAND_VAL_RANGE) && TREE_MAP <= (TREE_RAND_VAL + TREE_RAND_VAL_RANGE)) {
 						for (int tx = -2; tx <= 2; tx++) {
 							for (int ty = -2; ty <= 2; ty++) {
 								for (int tz = -2; tz <= 2; tz++) {
-									addblock(x + tx, y + ty, z + tz, OAK_LEAF);
+									SetBlock(OAK_LEAF,x + tx - cx, y + ty - cy, z + tz - cz);
 								}
 							}
 						}
 
 					}
-				}*/
+				}
 
 				/*if ((x == 16) || (z == 16) || (y == 16)) {
-					Blocks.ChangeBlock(DIAMOND_BLOCK, x - cx, y - cy, z - cz);
+					SetBlock(DIAMOND_BLOCK, x - cx, y - cy, z - cz);
 				}*/
 
 				if (y < 10) {
@@ -160,12 +160,11 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 				//getLogger()->LogInfo("Chunk Generator", "Continential Noise: " + to_string(continental));
 				if (n > 0.5f) {
 					if (n < 0.54f) {
-						SetBlock(DIRT, (uint32_t)x, (uint32_t)y, (uint32_t)z);
-						isEmpty = false;
+						SetBlock(DIRT, x, y, z);
+						SetBlock(GRASS, x, y + 1, z);
 					}
 					else {
-						SetBlock(STONE, (uint32_t)x, (uint32_t)y, (uint32_t)z);
-						isEmpty = false;
+						SetBlock(STONE, x, y, z);
 					}
 
 					
@@ -176,7 +175,124 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 		}
 	}
 
+	GenerateEnvironment(noise);
+	GenerateDecor(noise);
+}
+
+void Chunk::GenerateEnvironment(FastNoiseLite* noise) {
 	
+	int cx = Position.x * 16;
+	int cz = Position.z * 16;
+	int cy = Position.y * 16;
+	
+	for (int x = 0; x < 16; x++) {
+		for (int z = 0; z < 16; z++) {
+			for (int y = 0; y < 16; y++) {
+				if (y + cy < 35) {
+					if ((GetBlock(x, y, z) != DIRT) && (GetBlock(x, y, z) != STONE)) {
+						SetBlock(WATER, x, y, z);
+					}
+				}
+				
+
+
+			}
+		}
+	}
+
+}
+
+void Chunk::GenerateDecor(FastNoiseLite* noise) {
+
+	int cx = Position.x * 16;
+	int cz = Position.z * 16;
+	int cy = Position.y * 16;
+
+	const int tree_height = 3;
+
+	for (int x = 0; x < 16; x++) {
+		for (int z = 0; z < 16; z++) {
+
+			//Global Pos
+			int gx = cx + x;
+			int gz = cz + z;
+
+			float TREE_MAP = (float)((double)(noise->GetNoise((float)gx * 100.f, (float)gz * 100.f, (float)SEED) + 1.f) / 2.f);
+			for (int y = 0; y < 16; y++) {
+				if (GetBlock(x, y - 1, z) == GRASS) {
+
+					if (TREE_MAP <= 0.04) {
+						for (int tx = -2; tx <= 2; tx++) {
+							for (int tz = -2; tz <= 2; tz++) {
+								if ((abs(tx) == 2) && (abs(tz) == 2)) {
+									continue;
+								}
+
+								for (int ty = tree_height; ty <= tree_height + 1; ty++) {
+									SetBlock(OAK_LEAF, x + tx, y + ty, z + tz);
+								}
+
+							}
+						}
+
+						for (int tx = -1; tx <= 1; tx++) {
+							for (int tz = -1; tz <= 1; tz++) {
+								
+
+								for (int ty = tree_height + 2; ty <= tree_height + 3; ty++) {
+
+									if ((abs(tx) == 1) && (abs(tz) == 1) && (ty == tree_height + 3)) {
+										continue;
+									}
+
+									SetBlock(OAK_LEAF, x + tx, y + ty, z + tz);
+								}
+
+							}
+						}
+
+						for (int ty = 0; ty < tree_height + 2; ty++) {
+							SetBlock(OAK_LOG, x, y + ty, z);
+						}
+
+					}
+
+					
+
+
+				}
+
+			}
+		}
+	}
+}
+
+void Chunk::UpdateGen() {
+	for (int axis = 0; axis < 3; axis++) {
+		for (int face = 0; face < 2; face++) {
+			int index = axis * 2 + face;
+
+			if (Neighbors[index] == nullptr) {
+				continue;
+			}
+
+			std::vector<ChunkBlockPlace::SetBlockRelative> blocks = Neighbors[index]->OutsideBlockToPlace[axis * 2 + (!face)];
+
+			//if (blocks.size() != 0) {
+			//	getLogger()->LogInfo("World Gen", std::to_string(blocks.size()));
+			//}
+			
+			
+
+			Neighbors[index]->OutsideBlockToPlace[axis * 2 + (!face)].clear();
+
+			for (const auto& b : blocks) {
+				SetBlock(b.m_block, b.m_x, b.m_y, b.m_z);
+			}
+
+			blocks.clear();
+		}
+	}
 }
 
 float Chunk::getNoise3D(int x, int y, int z, int samples, float frequency, FastNoiseLite* noise) {

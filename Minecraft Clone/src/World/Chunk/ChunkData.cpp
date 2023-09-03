@@ -34,7 +34,43 @@ BlockID ChunkContainer::GetBlock(int x, int y, int z) {
 }
 
 void ChunkContainer::SetBlock(BlockID block, int x, int y, int z) {
-	Blocks.ChangeBlock(block, (uint32_t)x, (uint32_t)y, (uint32_t)z);
+	if (x >= 16 || y >= 16 || z >= 16 || x < 0 || y < 0 || z < 0) {
+		if (x < 0) {
+			OutsideBlockToPlace[NX].emplace_back(block, x + 16, y, z);
+			return;
+		}
+
+		if (x >= 16) {
+			OutsideBlockToPlace[PX].emplace_back(block, x - 16, y, z);
+			return;
+		}
+
+		if (y < 0) {
+			OutsideBlockToPlace[NY].emplace_back(block, x, y + 16, z);
+			return;
+		}
+
+		if (y >= 16) {
+			OutsideBlockToPlace[PY].emplace_back(block, x, y - 16, z);
+			return;
+		}
+
+		if (z < 0) {
+			OutsideBlockToPlace[NZ].emplace_back(block, x, y, z + 16);
+			return;
+		}
+
+		if (z >= 16) {
+			OutsideBlockToPlace[PZ].emplace_back(block, x, y, z - 16);
+			return;
+		}
+	}
+	else {
+		Blocks.ChangeBlock(block, (uint32_t)x, (uint32_t)y, (uint32_t)z);
+		isEmpty = false;
+	}
+
+	
 }
 
 void ChunkContainer::SetPosition(int x, int y, int z) {

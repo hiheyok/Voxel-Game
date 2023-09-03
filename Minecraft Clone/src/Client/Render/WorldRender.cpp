@@ -45,7 +45,11 @@ void WorldRender::Worker(int id) {
 
 			//Generates the meshes
 			auto t0 = std::chrono::high_resolution_clock::now();
-			FinishedJobs.emplace_back(world->GetChunk(pos.x, pos.y, pos.z));
+			ChunkMeshData MeshData(world->GetChunk(pos.x, pos.y, pos.z));
+			if (MeshData.SolidVertices.size() + MeshData.TransparentVertices.size() != 0) {
+				FinishedJobs.emplace_back(MeshData);
+			}
+			
 			auto t1 = std::chrono::high_resolution_clock::now();
 		}
 
@@ -62,13 +66,27 @@ void WorldRender::Worker(int id) {
 
 void WorldRender::Update() {
 
+	//int ChunksPerFrame = 250;
+	//int Count = 0;
+
 	for (int WorkerID = 0; WorkerID < WorkerCount; WorkerID++) {
 		
 		WorkerLocks[WorkerID].lock();
 
+		if (WorkerOutput[WorkerID].size() != 0) {
+			getLogger()->LogInfo("Rendering", "Adding Chunks: " + std::to_string(WorkerOutput[WorkerID].size()));
+		}
+		
+
 		while (!WorkerOutput[WorkerID].empty()) {
+
+			//if (Count > ChunksPerFrame) {
+			//	break;
+			//}
+
 			if (WorkerOutput[WorkerID].front().SolidVertices.size() != 0) {
 				Renderer.AddChunkMesh(WorkerOutput[(uint64_t)WorkerID].front());
+			//	Count++;
 			}
 			WorkerOutput[WorkerID].pop_front();
 		}

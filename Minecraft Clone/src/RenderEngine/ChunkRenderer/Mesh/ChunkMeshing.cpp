@@ -369,7 +369,7 @@ void ChunkMeshData::AddFacetoMesh_Z(Quad quad, int slice, int face) { //x : x
 
 void ChunkMeshData::GenerateAmbientOcculsion(Chunk& chunk) {
 
-	uint8_t lightlvl = 13;
+	uint8_t lightlvl = 11;
 
 	for (int axis = 0; axis < 3; axis++) {
 		for (int face = 0; face < 2; face++) {
