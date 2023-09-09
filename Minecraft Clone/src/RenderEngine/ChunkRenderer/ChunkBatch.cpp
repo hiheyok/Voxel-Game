@@ -5,19 +5,24 @@ using namespace glm;
 using namespace std;
 
 void ChunkDrawBatch::SetupBuffers() {
+	VBO.GenBuffer();
+	IBO.GenBuffer();
+	SSBO.GenBuffer();
+	Array.GenArray();
+
 	VBO.SetType(GL_ARRAY_BUFFER);
 	IBO.SetType(GL_DRAW_INDIRECT_BUFFER);
 	SSBO.SetType(GL_SHADER_STORAGE_BUFFER);
 
 	VBO.SetUsage(GL_STATIC_DRAW);
 	IBO.SetUsage(GL_DYNAMIC_DRAW);
-	SSBO.SetUsage(GL_DYNAMIC_DRAW);
+	SSBO.SetUsage(GL_DYNAMIC_COPY);
 
 	Array.Bind();
 
 	VBO.SetMaxSize(MaxBufferSize);
 	VBO.InitializeData();
-	IBO.SetMaxSize(MaxBufferSize);
+	IBO.SetMaxSize((size_t)(MaxBufferSize / 1000));
 	IBO.InitializeData();
 
 	VBO.Bind();
@@ -26,7 +31,7 @@ void ChunkDrawBatch::SetupBuffers() {
 	VBO.Unbind();
 	Array.Unbind();
 
-	SSBO.SetMaxSize(MaxBufferSize);
+	SSBO.SetMaxSize((size_t)(MaxBufferSize / 1000));
 	SSBO.InitializeData();
 
 	InsertSpace.insert(pair<size_t, size_t>((size_t)MaxBufferSize, 0ULL));
@@ -40,12 +45,28 @@ void ChunkDrawBatch::Reset() {
 	SetupBuffers();
 }
 
+void ChunkDrawBatch::Cleanup() {
+	VBO.Delete();
+	VBO.Delete();
+	IBO.Delete();
+	SSBO.Delete();
+	Array.~VertexArray();
+
+	DrawCommands.clear();
+	RenderList.clear();
+	ChunkShaderPos.clear();
+	RenderListOffsetLookup.clear();
+
+}
+
 void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
 	if (!UpdateCommands)
 		return;
 
 	DrawCommands.clear();
 	ChunkShaderPos.clear();
+
+	Frustum.CalculateFrustum(camera);
 
 	ivec3 Position(floor(camera->Position.x / 16.f), floor(camera->Position.y / 16.f), floor(camera->Position.z / 16.f));
 
@@ -54,7 +75,7 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
 	for (int i = 0; i < RenderList.size(); i++) {
 		DataBufferAddress data = RenderList[(RenderList.size() - 1) - i];
 		if (FindDistanceNoSqrt(data.x, data.y, data.z, Position.x, Position.y, Position.z) < pow(RenderDistance, 2)) {
-			if (Frustum->SphereInFrustum((float)data.x * 16, (float)data.y * 16, (float)data.z * 16, (float)32)) {
+			if (Frustum.SphereInFrustum((float)data.x * 16, (float)data.y * 16, (float)data.z * 16, (float)32)) {
 				DrawCommandIndirect cmd;
 				cmd.count = (unsigned int)data.size / (sizeof(unsigned int) * 2);
 				cmd.instanceCount = 1;
@@ -74,7 +95,7 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
 }
 
 bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int y, int z) {
-	unsigned long long int ChunkID = getChunkID(x, y, z);
+	ChunkID id = getChunkID(x, y, z);
 
 	size_t DataSize = Data.size() * sizeof(unsigned int);
 
@@ -84,71 +105,156 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int
 	RenderingData.z = z;
 	RenderingData.size = DataSize;
 
-	auto it = InsertSpace.end();
-	int iterations = 0;
+	auto it = InsertSpace.begin();
 
-	while (true) {
-		if (it->second >= DataSize) {
-			RenderingData.offset = it->first;
-			MemoryUsage += DataSize;
-			VBO.InsertSubData(RenderingData.offset, Data.size(), &Data);
-			RenderList.insert(RenderList.begin(), RenderingData);
-			RenderListOffsetLookup[ChunkID] = 0;
-			UpdateCommands = true;
+	for (int i = 1; i < InsertSpace.size(); i++) {
+		if (it->first <= DataSize) {
+			it++;
+		}
+		else {
+			break;
+		}
+		
+	}
 
-			//Update Insert Map
-			it->second += DataSize;
-			if (it->first - DataSize == 0) { //Delete insert space if data takes entire space
-				InsertSpace.erase(it);
+	if (it->first >= DataSize) {
+
+		size_t InsertIndex = 0;
+		bool InsertBegin = false;
+			
+		if (RenderList.size() != 0) {
+			if ((RenderList[0].offset >= it->second + DataSize)) {
+				InsertIndex = 0;
+				InsertBegin = true;
 			}
 			else {
-				size_t offset = it->second;
-				size_t size = it->first;
+				InsertIndex = FindClosestRenderObjIndex(it->second);
 
-				InsertSpace.erase(it);
+				if (InsertIndex == 0) {
+					/*if (DataSize) {
 
-				InsertSpace.insert(pair<size_t, size_t>(size - DataSize, offset + size));
+					}*/
+					std::cout << "ERR\n";
+				}
+
 			}
-			break;
 		}
 
-		iterations++;
-
-		if (iterations >= InsertSpace.size()) {
-			break;
+		if ((RenderList.size() == 0) || InsertBegin) {
+			RenderingData.offset = it->second;
+			MemoryUsage += DataSize;
+			VBO.InsertSubData(RenderingData.offset, Data.size() * sizeof(unsigned int), Data.data());
+			RenderList.insert(RenderList.begin() + InsertIndex, RenderingData);
+			RenderListOffsetLookup[id] = RenderingData.offset;
+			UpdateCommands = true;
+		}
+		else {
+			RenderingData.offset = it->second;
+			MemoryUsage += DataSize;
+			VBO.InsertSubData(RenderingData.offset, Data.size() * sizeof(unsigned int), Data.data());
+			RenderList.insert(RenderList.begin() + InsertIndex + 1, RenderingData);
+			RenderListOffsetLookup[id] = RenderingData.offset;
+			UpdateCommands = true;
+			
 		}
 
-		it--;
 
+		//Update Insert Map
+
+		size_t iteratorOffset = it->second;
+		size_t iteratorSize = it->first;
+
+		if ((RenderList.size() != 1) && (!InsertBegin)) {  //Case: If the chunk isn't the first chunk in the list
+			DataBufferAddress& lastChunk = RenderList[InsertIndex];
+			ChunkID lastID = getChunkID(lastChunk.x, lastChunk.y, lastChunk.z);
+
+			InsertSpace.erase(InsertSpaceIterators[lastID]);
+			InsertSpaceIterators.erase(lastID);
+		}
+		else { //First chunk in the list; doesnt delete InsertSpaceIterators cause there is nothing else yet
+			InsertSpace.erase(it);
+		}
+
+		if (iteratorSize - DataSize > 0) {
+			size_t offset = iteratorOffset + DataSize;
+			size_t size = iteratorSize - DataSize;
+
+			std::multimap<size_t, size_t>::iterator nextIterator = InsertSpace.insert(pair<size_t, size_t>(size, offset));
+			InsertSpaceIterators[id] = nextIterator;
+		}
+		return;
 	}
+
 	getLogger()->LogDebug("Chunk Renderer", "Draw Batch Out of Memory: " + std::to_string(MemoryUsage));
 	return false;
 }
 
-void ChunkDrawBatch::DeleteChunkVertices(ChunkID ChunkID) {
-	if (RenderListOffsetLookup.count(ChunkID)) {
-		size_t index = GetRenderObjIndex(RenderListOffsetLookup[ChunkID]);
+void ChunkDrawBatch::DeleteChunkVertices(ChunkID id) {
+	if (RenderListOffsetLookup.count(id)) {
+		size_t index = GetRenderObjIndex(RenderListOffsetLookup[id]);
+
 		MemoryUsage -= RenderList[index].size;
 
-		if (InsertSpace.count(RenderList[index].size + RenderList[index].offset)) {
-			size_t offset = RenderList[index].offset - RenderList[index].size;
-			size_t size = NULL; 
+		if (InsertSpaceIterators.count(id)) { //Checks if there's a gap
+			size_t offset = 0;
+			size_t size = 0;
 
-			if (index + 1 > RenderList.size()) {
-				size = MaxBufferSize - RenderList[index].offset;
-			}
-			else {
-				size = RenderList[index + 1].offset - offset;
-			}
+			if (index == 0) { //case; the chunk being deleted is the first one and there is a gap next to it
+				size = InsertSpaceIterators[id]->first + RenderList[index].size;
 
-			InsertSpace.insert(pair<size_t, size_t>(size, offset));
+				InsertSpace.erase(InsertSpaceIterators[id]);
+				InsertSpaceIterators.erase(id);
+
+				(void)InsertSpace.insert(pair<size_t, size_t>(size, offset));
+			}
+			else { //Case; the chunk being deleted isn't in the first index
+				auto& lastChunk = RenderList[index - 1];
+				ChunkID lastID = getChunkID(lastChunk.x, lastChunk.y, lastChunk.z);
+
+				if (InsertSpaceIterators.count(lastID)) { //Case: There is empty space before and after the chunk being deleted
+					offset = lastChunk.offset + lastChunk.size;
+					size = InsertSpaceIterators[id]->first + RenderList[index].size + InsertSpaceIterators[lastID]->first;
+
+					InsertSpace.erase(InsertSpaceIterators[id]);
+					InsertSpace.erase(InsertSpaceIterators[lastID]);
+					InsertSpaceIterators.erase(id);
+					InsertSpaceIterators.erase(lastID);
+
+					std::multimap<size_t, size_t>::iterator nextIterator = InsertSpace.insert(pair<size_t, size_t>(size, offset));
+
+					InsertSpaceIterators[lastID] = nextIterator;
+				}
+				else { //Case: There is only empty space after
+					offset = RenderList[index].offset;
+					size = InsertSpaceIterators[id]->first + RenderList[index].size;
+
+					InsertSpace.erase(InsertSpaceIterators[id]);
+					InsertSpaceIterators.erase(id);
+
+					std::multimap<size_t, size_t>::iterator nextIterator = InsertSpace.insert(pair<size_t, size_t>(size, offset));
+
+					InsertSpaceIterators[lastID] = nextIterator;
+				}
+
+
+
+				
+
+				
+			}
 		}
-		else {
-			InsertSpace.insert(pair<size_t, size_t>(RenderList[index].size, RenderList[index].offset - RenderList[index].size));
+		else { //Case; if the chunk being deleted is between two chunks with no gap
+			std::multimap<size_t, size_t>::iterator nextIterator = InsertSpace.insert(pair<size_t, size_t>(RenderList[index].size, RenderList[index].offset));
+
+			if (index != 0) {
+				auto& lastChunk = RenderList[index - 1];
+				ChunkID lastID = getChunkID(lastChunk.x, lastChunk.y, lastChunk.z);
+				InsertSpaceIterators[lastID] = nextIterator;
+			}
 		}
 
 		RenderList.erase(RenderList.begin() + index);
-		RenderListOffsetLookup.erase(ChunkID);
+		RenderListOffsetLookup.erase(id);
 	}
 }
 
@@ -177,28 +283,65 @@ void ChunkDrawBatch::Draw() {
 }
 
 size_t ChunkDrawBatch::GetRenderObjIndex(size_t Offset) {
+
+	if (RenderList.size() == 0) {
+		return 0;
+	}
+
 	size_t low = 0;
 	size_t high = RenderList.size() - 1;
 
 	while (true) {
-		size_t mid = (size_t)((low + high) * 0.5);
+		size_t mid = (size_t)((float)(low + high) * 0.5f);
 		if (Offset == RenderList[mid].offset) {
 			return mid;
 		}
-		else if (Offset > RenderList[mid].offset) {
+		if (low == high) {
+			break;
+		}
+		if (Offset > RenderList[mid].offset) {
 			low = mid + 1;
 		}
 		else {
 			high = mid - 1;
 		}
-		if (low == high) {
-			break;
-		}
+		
 	}
 
 	if (Offset == RenderList[high].offset) {
 		return high;
 	}
+	return 0ULL;
 
-	return -1;
+}
+size_t ChunkDrawBatch::FindClosestRenderObjIndex(size_t Offset) {
+
+	if (RenderList.size() == 0) {
+		return 0;
+	}
+
+	size_t low = 0;
+	size_t high = RenderList.size() - 1;
+
+	while (true) {
+		size_t mid = (size_t)((float)(low + high) * 0.5f);
+		if (Offset == RenderList[mid].offset + RenderList[mid].size) {
+			return mid;
+		}
+		if (low == high) {
+			break;
+		}
+		if (Offset > RenderList[mid].offset + RenderList[mid].size) {
+			low = mid + 1;
+		}
+		else {
+			high = mid - 1;
+		}
+		
+	}
+
+	if (Offset == RenderList[high].offset) {
+		return high;
+	}
+	return 0ULL;
 }

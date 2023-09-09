@@ -1,6 +1,7 @@
 #pragma once
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
+#include <iostream>
 
 class Buffer {
 public:
@@ -11,6 +12,7 @@ public:
 		glDeleteBuffers(1, &BufferID);
 	}
 
+	void GenBuffer();
 
 	void SetType(GLenum Type_);
 	void SetMaxSize(size_t MaxSize_);
@@ -48,6 +50,8 @@ public:
 	~VertexArray() {
 		glDeleteVertexArrays(1, &ArrayID);
 	}
+
+	void GenArray();
 
 	void Bind();
 

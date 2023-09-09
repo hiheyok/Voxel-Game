@@ -14,9 +14,9 @@ namespace Meshing
 
 	struct Quad {
 		//Position in the slice 
-		char x = 0, y = 0;
+		uint8_t x = 0, y = 0;
 		//Size
-		char w = 0, h = 0;
+		uint8_t w = 0, h = 0;
 
 		//Lighting; stored as 16 bit to save mem
 		uint16_t Lighting = 0xFFFF;

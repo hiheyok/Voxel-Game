@@ -11,7 +11,7 @@ void Buffer::InsertData(GLsizeiptr Size, const void* Data, GLenum Usage) {
 
 void Buffer::InsertSubData(GLintptr Offset, GLsizeiptr Size, const void* Data) {
 	Bind();
-	glBufferSubData(Type,Offset, Size, Data);
+	glBufferSubData(Type, Offset, Size, Data);
 	Unbind();
 }
 
@@ -61,6 +61,10 @@ void Buffer::UnbindBase(int Index) {
 	glBindBufferBase(Type, Index, 0);
 }
 
+void Buffer::GenBuffer() {
+	glGenBuffers(1, &BufferID);
+}
+
 void VertexArray::Bind() {
 	glBindVertexArray(ArrayID);
 }
@@ -70,11 +74,15 @@ void VertexArray::Unbind() {
 }
 
 void VertexArray::EnableAttriPTR(GLuint Index, GLint Size, GLenum Type, GLboolean normalized, GLsizei Stride, int SubIndex) {
-	glVertexAttribPointer(Index, Size, Type, normalized, sizeof(Type) * Stride, (void*)(SubIndex * sizeof(unsigned int)));
+	glVertexAttribPointer(Index, Size, Type, normalized, sizeof(GL_FLOAT) * Stride, (void*)(SubIndex * sizeof(unsigned int)));
 	glEnableVertexAttribArray(Index);
 }
 
 void VertexArray::ResetArray() {
 	glDeleteVertexArrays(1, &ArrayID);
+	glGenVertexArrays(1, &ArrayID);
+}
+
+void VertexArray::GenArray() {
 	glGenVertexArrays(1, &ArrayID);
 }

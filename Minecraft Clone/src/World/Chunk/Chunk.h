@@ -24,6 +24,8 @@ public:
 	
 	void GenerateV2(FastNoiseLite* noise);
 
+	void GenSuperFlat();
+
 	void UpdateGen();
 
 private:

@@ -4,8 +4,8 @@
 #include "Mesh/ChunkMeshing.h"
 
 #include "../Camera/camera.h"
-#include "../frustum/frustum.h"
-#include "../OpenGL/shader/shader.h"
+#include "../Frustum/frustum.h"
+#include "../OpenGL/Shader/Shader.h"
 #include "../OpenGL/Texture/texture.h"
 #include "../../Utils/MathHelper.h"
 #include "../../Utils/MutithreadedData.h"
@@ -176,8 +176,8 @@ public:
 			}
 			else {
 				bool added = false;
-				for (int i = 0; i < ChunkRenderListSolid.size(); i++) {
-					if (ChunkRenderListSolid[i].offset + ChunkRenderListSolid[i].size + MeshSizeSolid < ChunkRenderListSolid[i + 1].offset) {
+				for (size_t i = 0; i < ChunkRenderListSolid.size(); i++) {
+					if (ChunkRenderListSolid[i].offset + ChunkRenderListSolid[i].size + MeshSizeSolid < ChunkRenderListSolid[i + 1LLU].offset) {
 						renderdata.offset = ChunkRenderListSolid[i].offset + ChunkRenderListSolid[i].size;
 						renderdata.size = MeshSizeSolid;
 						GPUMemoryUsage += MeshSizeSolid;

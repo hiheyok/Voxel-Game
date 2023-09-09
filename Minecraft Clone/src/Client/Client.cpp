@@ -21,12 +21,12 @@ void Client::run() {
 	MainLocalWorld.SetPlayerPosition(0.,70.0,0.);
 	MainLocalWorld.SetPlayerRotation(0.,-30.);
 
-	MainWorld.horizontaltickingdistance = 32;
+	MainWorld.horizontaltickingdistance = 5;
 
 	MainWorld.Start();
 
 	getLogger()->LogInfo("World", "Generating World");
-	TerrainRender.renderDistance = 32;
+	TerrainRender.renderDistance = 5;
 	TerrainRender.Start(getWindow(), &MainWorld, 16);
 
 	MainLocalWorld.SetWorld(&MainWorld);
@@ -66,7 +66,9 @@ void Client::GameLoop() {
 			UpdateWindowName("Voxel Engine | FPS: " + std::to_string(1.0 / Frametime) + 
 				" | Pos: " + std::to_string(MainLocalWorld.GetPlayerPosition().x) + ", " +
 				std::to_string(MainLocalWorld.GetPlayerPosition().y) + ", " +
-				std::to_string(MainLocalWorld.GetPlayerPosition().z) + ", ");
+				std::to_string(MainLocalWorld.GetPlayerPosition().z) + ", VRAM Fragmentation Rate: " 
+				+ std::to_string(TerrainRender.RendererV2.getFragmentationRate()) + 
+				", VRAM Usage " + std::to_string(TerrainRender.RendererV2.getVRAMUsageFull()));
 			t2 = high_resolution_clock::now();
 		}
 		

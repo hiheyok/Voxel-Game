@@ -4,7 +4,7 @@
 
 #include "../../Utils/LogUtils.h"
 #include "../Camera/camera.h"
-#include "../frustum/frustum.h"
+#include "../Frustum/frustum.h"
 #include "../../Utils/MathHelper.h"
 #include "../../World/Chunk/Chunk.h"
 #include "../OpenGL/Buffers/Buffer.h"
@@ -46,22 +46,33 @@ public:
 
 	void Unbind();
 
+	void Cleanup();
+
 	size_t GetRenderObjIndex(size_t offset);
-private:
+
+	size_t FindClosestRenderObjIndex(size_t offset);
+
 	Camera* camera;
-	CFrustum* Frustum;
+
+	std::multimap<size_t, size_t> InsertSpace; // <Slot Size, Index>
+	size_t MemoryUsage = 0;
+private:
+	
+	CFrustum Frustum;
 	Buffer VBO, IBO, SSBO;
 	VertexArray Array;
 	size_t MaxBufferSize = NULL;
-	size_t MemoryUsage = 0;
+	
 
 	bool UpdateCommands = false;
 
 	std::unordered_map<long long int, size_t> RenderListOffsetLookup;
 	std::vector<GLint> ChunkShaderPos;
+
+	std::unordered_map<ChunkID, std::multimap<size_t, size_t>::iterator> InsertSpaceIterators;
 	std::vector<DataBufferAddress> RenderList;
 	std::vector<DrawCommandIndirect> DrawCommands;
 
-	std::multimap<size_t, size_t> InsertSpace; // <Slot Size, Index>
+	
 
 };

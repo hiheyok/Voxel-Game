@@ -20,6 +20,7 @@ static long long unsigned int getChunkID(int* c) {
 	return getChunkID(c[0],c[1],c[2]);
 }
 
+
 static glm::ivec3 ChunkIDToPOS(long long unsigned int n) {
 	int x = ((unsigned int)(((1u << 1) - 1u) & (n >> 61)) << 31) ? -(int)(((1LLU << 16) - 1u) & (n >> 0LLU)) : (int)(((1LLU << 16) - 1u) & (n >> 0LLU));
 	int y = ((unsigned int)(((1u << 1) - 1u) & (n >> 62)) << 31) ? -(int)(((1LLU << 16) - 1u) & (n >> 16LLU)) : (int)(((1LLU << 16) - 1u) & (n >> 16LLU));

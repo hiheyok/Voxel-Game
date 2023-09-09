@@ -41,6 +41,22 @@ map<float, float> PeaksValley = {
 	{1.f, 0.84f},
 };
 
+void Chunk::GenSuperFlat() {
+	int cy = Position.y * 16;
+
+	float heightBias = 50;
+	float noiseOffset = 0.3;
+
+	for (int x = 0; x < 16; x++) {
+		for (int z = 0; z < 16; z++) {
+			for (int y = 0; y < 16; y++) {
+				if (y + cy < 10) {
+					SetBlock(GRASS, x, y, z);
+				}
+			}
+		}
+	}
+}
 
 
 void Chunk::Generate(FastNoiseLite* noise) {
@@ -129,8 +145,8 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 
 	noise->SetNoiseType(noise->NoiseType_OpenSimplex2);
 
-	int cx = Position.x * 16;
-	int cz = Position.z * 16;
+	//int cx = Position.x * 16;
+	//int cz = Position.z * 16;
 	int cy = Position.y * 16;
 
 	float heightBias = 50;
@@ -181,8 +197,8 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 
 void Chunk::GenerateEnvironment(FastNoiseLite* noise) {
 	
-	int cx = Position.x * 16;
-	int cz = Position.z * 16;
+	//int cx = Position.x * 16;
+	//int cz = Position.z * 16;
 	int cy = Position.y * 16;
 	
 	for (int x = 0; x < 16; x++) {
@@ -191,6 +207,17 @@ void Chunk::GenerateEnvironment(FastNoiseLite* noise) {
 				if (y + cy < 35) {
 					if ((GetBlock(x, y, z) != DIRT) && (GetBlock(x, y, z) != STONE)) {
 						SetBlock(WATER, x, y, z);
+						SetBlock(WATER, x, y + 1, z);
+					}
+				} 
+
+				if (y + cy == 35) {
+					if (GetBlock(x, y, z) == GRASS) {
+						SetBlock(SAND, x, y, z);
+					}
+
+					if (GetBlock(x, y + 1, z) == GRASS) {
+						SetBlock(SAND, x, y + 1, z);
 					}
 				}
 				
@@ -272,17 +299,10 @@ void Chunk::UpdateGen() {
 		for (int face = 0; face < 2; face++) {
 			int index = axis * 2 + face;
 
-			if (Neighbors[index] == nullptr) {
+			if (Neighbors[index] == nullptr)
 				continue;
-			}
 
-			std::vector<ChunkBlockPlace::SetBlockRelative> blocks = Neighbors[index]->OutsideBlockToPlace[axis * 2 + (!face)];
-
-			//if (blocks.size() != 0) {
-			//	getLogger()->LogInfo("World Gen", std::to_string(blocks.size()));
-			//}
-			
-			
+			std::vector<SetBlockRelative> blocks = Neighbors[index]->OutsideBlockToPlace[axis * 2 + (!face)];
 
 			Neighbors[index]->OutsideBlockToPlace[axis * 2 + (!face)].clear();
 

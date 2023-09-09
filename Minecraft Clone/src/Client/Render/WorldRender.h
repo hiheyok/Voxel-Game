@@ -8,6 +8,7 @@
 #include <thread>
 #include <mutex>
 #include "../../World/World.h"
+#include "../../RenderEngine/ChunkRenderer/TerrainRenderer.h"
 class WorldRender {
 public:
 
@@ -30,7 +31,7 @@ public:
 	void Update();
 
 	int renderDistance = 16;
-
+	TerrainRenderer RendererV2;
 private:
 
 	void Worker(int id);
@@ -39,6 +40,7 @@ private:
 
 	PlayerPOV player;
 	ChunkRenderer Renderer;
+	
 	GLFWwindow* window;
 	World* world;
 

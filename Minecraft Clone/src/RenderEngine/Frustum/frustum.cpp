@@ -13,8 +13,8 @@
 #include "../Camera/camera.h"
 #include "frustum.h"
 #include <tgmath.h>
-#include <GL/glew.h>
-#include <glfw/glfw3.h>
+#include <gl/glew.h>
+#include <GLFW/glfw3.h>
 
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/type_ptr.hpp>
