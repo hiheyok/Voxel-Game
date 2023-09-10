@@ -6,7 +6,7 @@ using namespace glm;
 
 using namespace Meshing;
 
-#define RENDERV2w true
+#define RENDERV2f true
 
 void WorldRender::Render() {
 #ifndef RENDERV2

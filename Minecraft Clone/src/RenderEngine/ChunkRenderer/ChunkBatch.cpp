@@ -163,7 +163,10 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int
 			RenderList.insert(RenderList.begin() + InsertIndex + 1, RenderingData);
 			RenderListOffsetLookup[id] = RenderingData.offset;
 			UpdateCommands = true;
-			
+		}
+
+		if (InsertIndex == 0) {
+			std::cout << "PAUSE\n";
 		}
 
 		//Update Insert Map

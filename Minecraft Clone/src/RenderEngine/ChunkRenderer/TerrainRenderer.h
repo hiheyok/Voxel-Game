@@ -113,6 +113,10 @@ public:
 			if (ChunkBatches[batchIndex].InsertSpace.size() != 1) {
 				for (int i = 1; i < ChunkBatches[batchIndex].InsertSpace.size(); i++) {
 					it++;
+
+					if (it->first >= MeshDataSize) {
+						break;
+					}
 				}
 			}
 			
@@ -184,7 +188,7 @@ private:
 	void CreateNewBatch() {
 		ChunkBatches.emplace_back();
 		size_t i = ChunkBatches.size() - 1;
-		ChunkBatches[i].SetMaxSize(10000000);
+		ChunkBatches[i].SetMaxSize(1000000000);
 		ChunkBatches[i].SetupBuffers();
 		ChunkBatches[i].camera = camera;
 	}
