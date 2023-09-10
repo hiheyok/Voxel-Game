@@ -133,10 +133,6 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int
 
 				if (InsertIndex == 0 && RenderList.size() != 1) {
 					int _offset = RenderList[1].offset;
-
-					if (_offset  <= DataSize + it->second) {
-						std::cout << "ERR\n";
-					}
 				}
 			}
 		}
@@ -150,23 +146,12 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int
 			UpdateCommands = true;
 		}
 		else {
-			if (InsertIndex + 1 < RenderList.size()) {
-				if (RenderList[InsertIndex + 1].offset == it->second) {
-					std::cout << "ERRRRR\n";
-				}
-			}
-			
-
 			RenderingData.offset = it->second;
 			MemoryUsage += DataSize;
 			VBO.InsertSubData(RenderingData.offset, Data.size() * sizeof(unsigned int), Data.data());
 			RenderList.insert(RenderList.begin() + InsertIndex + 1, RenderingData);
 			RenderListOffsetLookup[id] = RenderingData.offset;
 			UpdateCommands = true;
-		}
-
-		if (InsertIndex == 0) {
-			std::cout << "PAUSE\n";
 		}
 
 		//Update Insert Map
