@@ -62,6 +62,22 @@ public:
 		}
 	}
 
+	void Defrag(int iterations) {
+		for (auto& DrawBatch : ChunkBatches) {
+			DrawBatch.Defrager(iterations);
+		}
+	}
+
+	uint32_t getGapCount() {
+		int n = 0;
+
+		for (auto& DrawBatch : ChunkBatches) {
+			n += DrawBatch.InsertSpace.size();
+		}
+
+		return n;
+	}
+
 	void Update() {
 		int width, height;
 
@@ -108,24 +124,16 @@ public:
 		for (int batchIndex = 0; batchIndex < ChunkBatches.size(); batchIndex++) {
 			size_t MeshDataSize = MeshData.SolidVertices.size();
 
-			auto it = ChunkBatches[batchIndex].InsertSpace.begin();
-
-			if (ChunkBatches[batchIndex].InsertSpace.size() != 1) {
-				for (int i = 1; i < ChunkBatches[batchIndex].InsertSpace.size(); i++) {
-					it++;
-
-					if (it->first >= MeshDataSize) {
-						break;
-					}
-				}
-			}
+			auto it = --ChunkBatches[batchIndex].InsertSpace.end();
 			
-			if (it->first >= MeshDataSize) {
-				ChunkBatches[batchIndex].AddChunkVertices(MeshData.SolidVertices, MeshData.Position.x, MeshData.Position.y, MeshData.Position.z);
+			if (it->first >= MeshDataSize * sizeof(unsigned int)) {
+				ChunkBatches[batchIndex].AddChunkVertices(MeshData.SolidVertices, true, MeshData.Position.x, MeshData.Position.y, MeshData.Position.z);
+				ChunkBatchLookup[id] = batchIndex;
+				return;
 			}
-
-			ChunkBatchLookup[id] = batchIndex;
 		}
+
+		getLogger()->LogInfo("Terrain Renderer", "Unable to add chunk. Buffers are full!");
 	}
 
 	double getFragmentationRate() {
@@ -135,18 +143,18 @@ public:
 
 		for (int batchIndex = 0; batchIndex < n; batchIndex++) {
 
-			auto it = ChunkBatches[batchIndex].InsertSpace.begin();
+			auto& batch = ChunkBatches[batchIndex];
 
-			if (ChunkBatches[batchIndex].InsertSpace.size() != 1) {
-				for (int i = 1; i < ChunkBatches[batchIndex].InsertSpace.size(); i++) {
-					it++;
-				}
+			if (batch.RenderList.size() != 0) {
+				int index = batch.RenderList.size() - 1;
+
+				size_t FullMemoryUse = batch.RenderList[index].size + batch.RenderList[index].offset; //Include gaps
+				size_t MemoryUse = ChunkBatches[batchIndex].MemoryUsage; //Only include vertex data
+
+				fragRate += ((double)MemoryUse / (double)FullMemoryUse) / ((double)n);
 			}
 
-			size_t FullMemoryUse = it->second; //Include gaps
-			size_t MemoryUse = ChunkBatches[batchIndex].MemoryUsage; //Only include vertex data
-
-			fragRate += ((double)MemoryUse / (double)FullMemoryUse) / ((double)n);
+			
 		}
 
 		return 1.0 - fragRate;
@@ -157,15 +165,11 @@ public:
 
 		for (int batchIndex = 0; batchIndex < ChunkBatches.size(); batchIndex++) {
 
-			auto it = ChunkBatches[batchIndex].InsertSpace.begin();
+			int index = ChunkBatches[batchIndex].RenderList.size() - 1;
 
-			if (ChunkBatches[batchIndex].InsertSpace.size() != 1) {
-				for (int i = 1; i < ChunkBatches[batchIndex].InsertSpace.size(); i++) {
-					it++;
-				}
+			if (index != -1) {
+				memUsage += ChunkBatches[batchIndex].RenderList[index].size + ChunkBatches[batchIndex].RenderList[index].offset;
 			}
-
-			memUsage += it->second; //Include gaps
 		}
 
 		return memUsage;
@@ -188,7 +192,7 @@ private:
 	void CreateNewBatch() {
 		ChunkBatches.emplace_back();
 		size_t i = ChunkBatches.size() - 1;
-		ChunkBatches[i].SetMaxSize(1000000000);
+		ChunkBatches[i].SetMaxSize(100000000);
 		ChunkBatches[i].SetupBuffers();
 		ChunkBatches[i].camera = camera;
 	}

@@ -32,6 +32,7 @@ public:
 
 	int renderDistance = 16;
 	TerrainRenderer RendererV2;
+	ChunkRenderer Renderer;
 private:
 
 	void Worker(int id);
@@ -39,7 +40,7 @@ private:
 	void TaskScheduler();
 
 	PlayerPOV player;
-	ChunkRenderer Renderer;
+	
 	
 	GLFWwindow* window;
 	World* world;

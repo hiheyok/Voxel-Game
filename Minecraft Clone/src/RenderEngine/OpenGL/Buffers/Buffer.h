@@ -32,6 +32,8 @@ public:
 
 	void Unbind();
 
+	void getData(uint32_t* ptr, size_t offset, size_t size);
+
 	unsigned int GetID();
 
 	void InsertData(GLsizeiptr Size, const void* Data, GLenum Usage);

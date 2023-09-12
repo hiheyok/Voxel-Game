@@ -34,7 +34,7 @@ public:
 
 	void GenDrawCommands(int RenderDistance);
 
-	bool AddChunkVertices(std::vector<unsigned int> Data, int x, int y, int z);
+	bool AddChunkVertices(std::vector<unsigned int> Data, bool insertBack, int x, int y, int z);
 
 	void DeleteChunkVertices(ChunkID ID);
 
@@ -48,6 +48,8 @@ public:
 
 	void Cleanup();
 
+	void Defrager(int iterations);
+
 	size_t GetRenderObjIndex(size_t offset);
 
 	size_t FindClosestRenderObjIndex(size_t offset);
@@ -56,6 +58,7 @@ public:
 
 	std::multimap<size_t, size_t> InsertSpace; // <Slot Size, Index>
 	size_t MemoryUsage = 0;
+	std::vector<DataBufferAddress> RenderList;
 private:
 	
 	CFrustum Frustum;
@@ -69,8 +72,11 @@ private:
 	std::unordered_map<long long int, size_t> RenderListOffsetLookup;
 	std::vector<GLint> ChunkShaderPos;
 
-	std::unordered_map<ChunkID, std::multimap<size_t, size_t>::iterator> InsertSpaceIterators;
-	std::vector<DataBufferAddress> RenderList;
+	std::unordered_map<ChunkID, std::multimap<size_t, size_t>::iterator> InsertSpaceIteratorsFront;
+	std::unordered_map<ChunkID, std::multimap<size_t, size_t>::iterator> InsertSpaceIteratorsBack;
+
+	std::map<size_t, std::multimap<size_t, size_t>::iterator> GapIteratorsSortedOffset;
+	
 	std::vector<DrawCommandIndirect> DrawCommands;
 
 	

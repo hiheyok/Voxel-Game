@@ -133,7 +133,19 @@ public:
 
 	}
 
+	double getFragmentationRate() {
+		int index = ChunkRenderListSolid.size() - 1;
 
+		if (index == -1) {
+			return 0.0;
+		}
+
+		return 1.0 - ((double)GPUMemoryUsage / (double)(ChunkRenderListSolid[index].offset + ChunkRenderListSolid[index].size));
+	}
+
+	size_t getVRAMUsageFull() {
+		return GPUMemoryUsage ;
+	}
 
 	void _AddChunk(Meshing::ChunkMeshData& data) {
 
@@ -402,7 +414,7 @@ private:
 
 	size_t GPUMemoryUsage = 0;
 
-	size_t GPUBufferSizeSolid = 5000000000;
+	size_t GPUBufferSizeSolid = 1000000000;
 	size_t GPUBufferSizeTransparent = 120000000;
 	size_t GPUSSBOMAXSIZE = 50000000;
 

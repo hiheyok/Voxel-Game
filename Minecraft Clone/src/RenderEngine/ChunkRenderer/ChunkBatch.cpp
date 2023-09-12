@@ -35,7 +35,8 @@ void ChunkDrawBatch::SetupBuffers() {
 	SSBO.SetMaxSize((size_t)(MaxBufferSize / 1000));
 	SSBO.InitializeData();
 
-	InsertSpace.insert(pair<size_t, size_t>((size_t)MaxBufferSize, 0ULL));
+	
+	GapIteratorsSortedOffset[0] = InsertSpace.insert(pair<size_t, size_t>((size_t)MaxBufferSize, 0ULL));
 }
 
 void ChunkDrawBatch::Reset() {
@@ -95,7 +96,7 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
 	IBO.InsertSubData(0, DrawCommands.size() * sizeof(DrawCommandIndirect), DrawCommands.data());
 }
 
-bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int y, int z) {
+bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, bool insertBack, int x, int y, int z) {
 	ChunkID id = getChunkID(x, y, z);
 
 	size_t DataSize = Data.size() * sizeof(unsigned int);
@@ -106,17 +107,26 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int
 	RenderingData.z = z;
 	RenderingData.size = DataSize;
 
-	auto it = InsertSpace.begin();
-
-	for (int i = 1; i < InsertSpace.size(); i++) {
-		if (it->first <= DataSize) {
-			it++;
-		}
-		else {
-			break;
-		}
-		
+	std::multimap<size_t, size_t>::iterator it;
+	if (insertBack) {
+		it = --InsertSpace.end();
 	}
+	else {
+		auto gapIt = GapIteratorsSortedOffset.begin();
+
+		for (int i = 1; i < InsertSpace.size(); i++) {
+			if (gapIt->second->first <= DataSize) {
+				gapIt++;
+			}
+			else {
+				break;
+			}
+		}
+		it = gapIt->second;
+	}
+	
+
+
 
 	if (it->first >= DataSize) {
 
@@ -144,6 +154,7 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int
 			RenderList.insert(RenderList.begin() + InsertIndex, RenderingData);
 			RenderListOffsetLookup[id] = RenderingData.offset;
 			UpdateCommands = true;
+			//std::cout << DataSize << ", " << RenderList[0].size << "\n";
 		}
 		else {
 			RenderingData.offset = it->second;
@@ -160,26 +171,57 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int
 		size_t iteratorSize = it->first;
 
 		std::optional<ChunkID> lastID;
+		std::optional<ChunkID> frontID;
 
-		if ((RenderList.size() != 1) && (!InsertBegin)) {  //Case: If the chunk isn't the first chunk in the list
+		if ((RenderList.size() > 1) && (!InsertBegin)) {  //Case: If the chunk isn't the first chunk in the list
 			DataBufferAddress& lastChunk = RenderList[InsertIndex];
 			lastID = getChunkID(lastChunk.x, lastChunk.y, lastChunk.z);
-		}
-		else { //First chunk in the list; doesnt delete InsertSpaceIterators cause there is nothing else yet
+			GapIteratorsSortedOffset.erase(iteratorOffset);
+			
+			InsertSpaceIteratorsFront.erase(lastID.value());
+
+			if (InsertIndex + 2 != RenderList.size()) {
+				DataBufferAddress& nextChunk = RenderList[InsertIndex + 2];
+				frontID = getChunkID(nextChunk.x, nextChunk.y, nextChunk.z);
+
+				InsertSpaceIteratorsBack.erase(frontID.value());
+			}
+
 			InsertSpace.erase(it);
 		}
+		else { //First chunk in the list; doesnt delete InsertSpaceIteratorsFront cause there is nothing else yet, but attempts to clear InsertSpaceIteratorsBack
 
-		if (iteratorSize != DataSize) {
+
+			if (RenderList.size() > 1) {
+				auto& nextChunk = RenderList[1];
+
+				frontID = getChunkID(nextChunk.x, nextChunk.y, nextChunk.z);
+
+				InsertSpaceIteratorsBack.erase(frontID.value());
+				GapIteratorsSortedOffset.erase(iteratorOffset);
+				InsertSpace.erase(it);
+				std::cout << iteratorSize << "\n";
+			}
+			else {
+				GapIteratorsSortedOffset.erase(iteratorOffset);
+				InsertSpace.erase(it);
+			}
+
+			
+		}
+
+		if (iteratorSize > DataSize) {
 			size_t offset = iteratorOffset + DataSize;
 			size_t size = iteratorSize - DataSize;
 
-			if (lastID.has_value()) {
-				InsertSpace.erase(InsertSpaceIterators[lastID.value()]);
-				InsertSpaceIterators.erase(lastID.value());
+			std::multimap<size_t, size_t>::iterator nextIterator = InsertSpace.insert(pair<size_t, size_t>(size, offset));
+			InsertSpaceIteratorsFront[id] = nextIterator;
+
+			if (frontID.has_value()) {
+				InsertSpaceIteratorsBack[frontID.value()] = nextIterator;
 			}
 
-			std::multimap<size_t, size_t>::iterator nextIterator = InsertSpace.insert(pair<size_t, size_t>(size, offset));
-			InsertSpaceIterators[id] = nextIterator;
+			GapIteratorsSortedOffset[offset] = nextIterator;
 		}
 		return true;
 	}
@@ -197,81 +239,77 @@ void ChunkDrawBatch::DeleteChunkVertices(ChunkID id) {
 		size_t offset = 0;
 		size_t size = 0;
 
-		if (InsertSpaceIterators.count(id)) { //Checks if there's a gap in front of it
-			if (index == 0) { //case; the chunk being deleted is the first one and there is a gap in front of it
-				size = InsertSpaceIterators[id]->first + RenderList[index].size;
+		bool FrontGap = InsertSpaceIteratorsFront.count(id);
+		bool BackGap = InsertSpaceIteratorsBack.count(id);
+		bool FirstChunkInIndex = (index == 0);
 
-				InsertSpace.erase(InsertSpaceIterators[id]);
-				InsertSpaceIterators.erase(id);
+		std::multimap<size_t, size_t>::iterator FrontIt;
+		std::multimap<size_t, size_t>::iterator BackIt;
 
-				(void)InsertSpace.insert(pair<size_t, size_t>(size, offset));
-			}
-			else { //Case; the chunk being deleted isn't in the first index
-				auto& lastChunk = RenderList[index - 1];
-				ChunkID lastID = getChunkID(lastChunk.x, lastChunk.y, lastChunk.z);
-
-				if (InsertSpaceIterators.count(lastID)) { //Case: There is empty space before and after the chunk being deleted
-					offset = InsertSpaceIterators[lastID]->second;
-					size = InsertSpaceIterators[id]->first + RenderList[index].size + InsertSpaceIterators[lastID]->first;
-
-					InsertSpace.erase(InsertSpaceIterators[id]);
-					InsertSpace.erase(InsertSpaceIterators[lastID]);
-					InsertSpaceIterators.erase(id);
-					InsertSpaceIterators.erase(lastID);
-
-					std::multimap<size_t, size_t>::iterator nextIterator = InsertSpace.insert(pair<size_t, size_t>(size, offset));
-
-					InsertSpaceIterators[lastID] = nextIterator;
-				}
-				else { //Case: There is only empty space after
-					offset = RenderList[index].offset;
-					size = InsertSpaceIterators[id]->first + RenderList[index].size;
-
-					InsertSpace.erase(InsertSpaceIterators[id]);
-					InsertSpaceIterators.erase(id);
-
-					std::multimap<size_t, size_t>::iterator nextIterator = InsertSpace.insert(pair<size_t, size_t>(size, offset));
-
-					InsertSpaceIterators[lastID] = nextIterator;
-				}
-			}
+		if (FrontGap) {
+			FrontIt = InsertSpaceIteratorsFront[id];
 		}
-		else { //Case; if the chunk being deleted (might) only have a gap before it
-			bool hasGapBefore = false;
 
-			std::optional<ChunkID> lastID;
+		if (BackGap) {
+			BackIt = InsertSpaceIteratorsBack[id];
+		}
 
-			if (index != 0) {
-				DataBufferAddress& lastChunk = RenderList[index - 1];
-				lastID = getChunkID(lastChunk.x, lastChunk.y, lastChunk.z);
+		auto& RemovalChunk = RenderList[index];
 
-				if (InsertSpaceIterators.count(lastID.value())) {
-					hasGapBefore = true;
-				}
-			}
+		//Manages gap space
+		if (FrontGap) {
+			offset = RemovalChunk.offset;
+			size = RemovalChunk.size + FrontIt->first;
+		}
 
-			if (hasGapBefore) { //Case: There is a gap before the chunk being deleted
-				std::multimap<size_t, size_t>::iterator lastIterator = InsertSpaceIterators[lastID.value()];
-
-				offset = lastIterator->second;
-				size = lastIterator->first + RenderList[index].size;
-
-				InsertSpace.erase(InsertSpaceIterators[lastID.value()]);
-				InsertSpaceIterators.erase(lastID.value());
-
-				std::multimap<size_t, size_t>::iterator nextIterator = InsertSpace.insert(pair<size_t, size_t>(size, offset));
-
-				InsertSpaceIterators[lastID.value()] = nextIterator;
+		if (BackGap) {
+			if (FrontGap) {
+				offset = BackIt->second;
+				size = BackIt->first + RemovalChunk.size + FrontIt->first;
 			}
 			else {
-				std::multimap<size_t, size_t>::iterator nextIterator = InsertSpace.insert(pair<size_t, size_t>(RenderList[index].size, RenderList[index].offset));
-
-				if (lastID.has_value()) {//Case: not first chunk in the index
-					InsertSpaceIterators[lastID.value()] = nextIterator;
-				}
-
-				
+				offset = BackIt->second;
+				size = BackIt->first + RemovalChunk.size;
 			}
+		}
+
+		if (FrontGap && BackGap) {
+			offset = RemovalChunk.offset;
+			size = RemovalChunk.size;
+		}
+		//Erase Iterators
+
+		std::cout << "-\n";
+
+		if (FrontGap) {
+			GapIteratorsSortedOffset.erase(FrontIt->second);
+			InsertSpace.erase(FrontIt);
+			InsertSpaceIteratorsFront.erase(id);
+		}
+
+		if (BackGap) {
+			GapIteratorsSortedOffset.erase(BackIt->second);
+			InsertSpace.erase(BackIt);
+			InsertSpaceIteratorsBack.erase(id);
+		}
+		std::cout << "-\n";
+
+		//Add new iterators
+
+		auto NewIterator = InsertSpace.insert(std::pair<size_t, size_t>(size, offset));
+
+		GapIteratorsSortedOffset[offset] = NewIterator;
+
+		if (index + 1 != RenderList.size()) { //Checks if there is chunk after the new gap
+			auto& FrontChunk = RenderList[index + 1];
+			ChunkID frontID = getChunkID(FrontChunk.x, FrontChunk.y, FrontChunk.z);
+			InsertSpaceIteratorsBack[frontID] = NewIterator;
+		}
+
+		if (index - 1 != -1) {
+			auto& BackChunk = RenderList[index - 1]; //Checks if there is chunk before the new gap
+			ChunkID backID = getChunkID(BackChunk.x, BackChunk.y, BackChunk.z);
+			InsertSpaceIteratorsFront[backID] = NewIterator;
 		}
 
 		RenderList.erase(RenderList.begin() + index);
@@ -325,7 +363,6 @@ size_t ChunkDrawBatch::GetRenderObjIndex(size_t Offset) {
 		else {
 			high = mid - 1;
 		}
-		
 	}
 
 	if (Offset == RenderList[high].offset) {
@@ -363,4 +400,52 @@ size_t ChunkDrawBatch::FindClosestRenderObjIndex(size_t Offset) {
 		return high;
 	}
 	return 0ULL;
+}
+
+void ChunkDrawBatch::Defrager(int iterations) {
+	int i = 0;
+
+	if (GapIteratorsSortedOffset.size() == 1) { //space already fully defragged
+		return;
+	}
+
+	while (i < iterations) {
+		auto it = GapIteratorsSortedOffset.begin();
+
+		if (GapIteratorsSortedOffset.size() == 1) {
+			return;
+		}
+
+		size_t offset = it->first;
+		size_t size = it->second->first;
+
+		int index = GetRenderObjIndex(offset + size);
+
+		auto& data = RenderList[index];
+
+		size_t bufferOffset = data.offset;
+		size_t bufferSize = data.size;
+
+		ChunkID id = getChunkID(data.x, data.y, data.z);
+
+		std::vector<uint32_t> VertexData;
+		VertexData.resize(bufferSize / sizeof(unsigned int));
+		VBO.getData(VertexData.data(), bufferOffset, bufferSize);
+
+		DeleteChunkVertices(id);
+
+		glm::ivec3 pos = ChunkIDToPOS(id);
+		AddChunkVertices(VertexData, false, data.x, data.y, data.z);
+
+		//
+
+		i++;
+
+		if (i > iterations) {
+			return;
+		}
+	}
+
+
+
 }

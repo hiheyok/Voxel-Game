@@ -81,7 +81,7 @@ void WorldRender::Update() {
 		WorkerLocks[WorkerID].lock();
 
 		if (WorkerOutput[WorkerID].size() != 0) {
-			getLogger()->LogInfo("Rendering", "Adding Chunks: " + std::to_string(WorkerOutput[WorkerID].size()));
+		//	getLogger()->LogInfo("Rendering", "Adding Chunks: " + std::to_string(WorkerOutput[WorkerID].size()));
 		}
 		
 
@@ -115,6 +115,7 @@ void WorldRender::Update() {
 	}
 	
 #ifndef RENDERV2
+	//RendererV2.Defrag(10);
 	RendererV2.Update();
 	RendererV2.PrepareRenderer();
 #else

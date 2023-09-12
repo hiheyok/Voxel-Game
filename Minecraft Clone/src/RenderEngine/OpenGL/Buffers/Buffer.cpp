@@ -65,6 +65,14 @@ void Buffer::GenBuffer() {
 	glGenBuffers(1, &BufferID);
 }
 
+void Buffer::getData(uint32_t* ptr, size_t offset, size_t size) {
+	Bind();
+	void* pointer = glMapBuffer(Type, GL_READ_ONLY);
+	memcpy(ptr, (void*)((uint32_t*)pointer + offset), size);
+	glUnmapBuffer(Type);
+	Unbind();
+}
+
 void VertexArray::Bind() {
 	glBindVertexArray(ArrayID);
 }
