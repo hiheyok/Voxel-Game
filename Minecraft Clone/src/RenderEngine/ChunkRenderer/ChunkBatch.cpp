@@ -35,7 +35,6 @@ void ChunkDrawBatch::SetupBuffers() {
 	SSBO.SetMaxSize((size_t)(MaxBufferSize / 1000));
 	SSBO.InitializeData();
 
-	
 	GapIteratorsSortedOffset[0] = InsertSpace.insert(pair<size_t, size_t>((size_t)MaxBufferSize, 0ULL));
 }
 
@@ -414,13 +413,9 @@ void ChunkDrawBatch::Defrager(int iterations) {
 
 		DeleteChunkVertices(id);
 
-		glm::ivec3 pos = ChunkIDToPOS(id);
 		AddChunkVertices(VertexData, false, x, y, z);
 
-		//
-
 		i++;
-
 		if (i > iterations) {
 			return;
 		}

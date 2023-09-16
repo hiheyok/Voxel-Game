@@ -127,7 +127,7 @@ public:
 			auto it = --ChunkBatches[batchIndex].InsertSpace.end();
 			
 			if (it->first >= MeshDataSize * sizeof(unsigned int)) {
-				ChunkBatches[batchIndex].AddChunkVertices(MeshData.SolidVertices, false, MeshData.Position.x, MeshData.Position.y, MeshData.Position.z);
+				ChunkBatches[batchIndex].AddChunkVertices(MeshData.SolidVertices, true, MeshData.Position.x, MeshData.Position.y, MeshData.Position.z);
 				ChunkBatchLookup[id] = batchIndex;
 				return;
 			}

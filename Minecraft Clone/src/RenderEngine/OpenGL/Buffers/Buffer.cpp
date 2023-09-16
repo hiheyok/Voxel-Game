@@ -67,9 +67,7 @@ void Buffer::GenBuffer() {
 
 void Buffer::getData(uint32_t* ptr, size_t offset, size_t size) {
 	Bind();
-	void* pointer = glMapBuffer(Type, GL_READ_ONLY);
-	memcpy(ptr, (void*)((uint32_t*)pointer + offset), size);
-	glUnmapBuffer(Type);
+	glGetBufferSubData(Type, offset, size, static_cast<void*>(ptr));
 	Unbind();
 }
 

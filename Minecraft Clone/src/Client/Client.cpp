@@ -21,12 +21,12 @@ void Client::run() {
 	MainLocalWorld.SetPlayerPosition(0.,70.0,0.);
 	MainLocalWorld.SetPlayerRotation(0.,-30.);
 
-	MainWorld.horizontaltickingdistance = 8;
+	MainWorld.horizontaltickingdistance = 64;
 
 	MainWorld.Start();
 
 	getLogger()->LogInfo("World", "Generating World");
-	TerrainRender.renderDistance = 8;
+	TerrainRender.renderDistance = 64;
 	TerrainRender.Start(getWindow(), &MainWorld, 16);
 
 	MainLocalWorld.SetWorld(&MainWorld);
@@ -71,8 +71,6 @@ void Client::GameLoop() {
 				", VRAM Usage (MB):  " + std::to_string(TerrainRender.RendererV2.getVRAMUsageFull() / 1000000)
 				 + ", Gap Count: " + std::to_string(TerrainRender.RendererV2.getGapCount())
 			);
-
-			TerrainRender.RendererV2.Defrag(10);
 			t2 = high_resolution_clock::now();
 
 		}

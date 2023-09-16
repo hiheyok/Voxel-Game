@@ -115,7 +115,7 @@ void WorldRender::Update() {
 	}
 	
 #ifndef RENDERV2
-	//RendererV2.Defrag(10);
+	RendererV2.Defrag(25);
 	RendererV2.Update();
 	RendererV2.PrepareRenderer();
 #else

@@ -64,8 +64,7 @@ void Generator::Worker(int id) {
 			
 			Chunk NewChunk;
 			NewChunk.SetPosition(pos.x, pos.y, pos.z);
-			NewChunk.Generate(&noise);
-			//NewChunk.GenSuperFlat();
+			NewChunk.GenerateV2(&noise);
 			FinishedJobs.emplace_back(NewChunk);
 		}
 
@@ -127,9 +126,6 @@ void Generator::TaskScheduler() {
 			WorkerLocks[i].unlock();
 			DistributedTasks[i].clear();
 		}
-
-		//Manages worker output
-
 
 		//Fetches worker output
 		for (int i = 0; i < WorkerCount; i++) {
