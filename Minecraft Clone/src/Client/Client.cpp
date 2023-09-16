@@ -72,7 +72,7 @@ void Client::GameLoop() {
 				 + ", Gap Count: " + std::to_string(TerrainRender.RendererV2.getGapCount())
 			);
 
-		//	TerrainRender.RendererV2.Defrag(10);
+			TerrainRender.RendererV2.Defrag(10);
 			t2 = high_resolution_clock::now();
 
 		}

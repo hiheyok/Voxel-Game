@@ -127,7 +127,7 @@ public:
 			auto it = --ChunkBatches[batchIndex].InsertSpace.end();
 			
 			if (it->first >= MeshDataSize * sizeof(unsigned int)) {
-				ChunkBatches[batchIndex].AddChunkVertices(MeshData.SolidVertices, true, MeshData.Position.x, MeshData.Position.y, MeshData.Position.z);
+				ChunkBatches[batchIndex].AddChunkVertices(MeshData.SolidVertices, false, MeshData.Position.x, MeshData.Position.y, MeshData.Position.z);
 				ChunkBatchLookup[id] = batchIndex;
 				return;
 			}
@@ -192,7 +192,7 @@ private:
 	void CreateNewBatch() {
 		ChunkBatches.emplace_back();
 		size_t i = ChunkBatches.size() - 1;
-		ChunkBatches[i].SetMaxSize(100000000);
+		ChunkBatches[i].SetMaxSize(1000000000);
 		ChunkBatches[i].SetupBuffers();
 		ChunkBatches[i].camera = camera;
 	}
