@@ -178,7 +178,6 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, bool inser
 
 			if (frontID.has_value()) {
 				InsertSpaceIteratorsBack[frontID.value()] = nextIterator;
-				std::cout << size << ", " << offset << "\n";
 			}
 			InsertSpaceIteratorsFront[id] = nextIterator;
 
@@ -252,10 +251,6 @@ void ChunkDrawBatch::DeleteChunkVertices(ChunkID id) {
 		}
 
 		//Erase Iterators
-
-		if ((FrontGap) && (BackGap)) {
-			std::cout << FrontIt->first << ", " << FrontIt->second << " | " << BackIt->first << ", " << BackIt->second << "\n";
-		}
 
 		if (FrontGap) {
 			GapIteratorsSortedOffset.erase(FrontIt->second);
@@ -413,10 +408,14 @@ void ChunkDrawBatch::Defrager(int iterations) {
 		VertexData.resize(bufferSize / sizeof(unsigned int));
 		VBO.getData(VertexData.data(), bufferOffset, bufferSize);
 
+		int x = data.x;
+		int y = data.y;
+		int z = data.z;
+
 		DeleteChunkVertices(id);
 
 		glm::ivec3 pos = ChunkIDToPOS(id);
-		AddChunkVertices(VertexData, false, data.x, data.y, data.z);
+		AddChunkVertices(VertexData, false, x, y, z);
 
 		//
 
