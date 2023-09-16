@@ -56,19 +56,23 @@ void Generator::Worker(int id) {
 		WorkerLocks[WorkerID].unlock();
 
 		//Generates the chunks
-		while (!Jobs.empty()) {
+
+		const int NumJobs = Jobs.size();
+
+		for (int i = 0; i < NumJobs; i++) {
 			ChunkID task = Jobs.front(); //fetches task
 			Jobs.pop_front();
 			//Generate
 			ivec3 pos = ChunkIDToPOS(task);
-			
-			Chunk NewChunk;
-			NewChunk.SetPosition(pos.x, pos.y, pos.z);
-			NewChunk.GenerateV2(&noise);
-			FinishedJobs.emplace_back(NewChunk);
+
+			int x = pos.x;
+			int y = pos.y;
+			int z = pos.z;
+
+			TerrainType type = MOUNTAINS;
+
+			FinishedJobs.emplace_back(x, y, z, type, noise);
 		}
-
-
 
 		WorkerLocks[WorkerID].lock();
 		WorkerOutput[WorkerID].insert(WorkerOutput[WorkerID].end(), FinishedJobs.begin(), FinishedJobs.end());

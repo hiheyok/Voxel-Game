@@ -6,15 +6,9 @@ using namespace glm;
 
 using namespace Meshing;
 
-#define RENDERV2f true
-
 void WorldRender::Render() {
-#ifndef RENDERV2
 	RendererV2.RenderSky();
 	RendererV2.Render();
-#else
-	Renderer.draw();
-#endif
 }
 
 void WorldRender::LoadChunkToRenderer(ChunkID chunk) {
@@ -73,27 +67,16 @@ void WorldRender::Worker(int id) {
 
 void WorldRender::Update() {
 
-	//int ChunksPerFrame = 250;
-	//int Count = 0;
-
 	for (int WorkerID = 0; WorkerID < WorkerCount; WorkerID++) {
 		
 		WorkerLocks[WorkerID].lock();
-
-		if (WorkerOutput[WorkerID].size() != 0) {
-		//	getLogger()->LogInfo("Rendering", "Adding Chunks: " + std::to_string(WorkerOutput[WorkerID].size()));
-		}
-		
 
 		while (!WorkerOutput[WorkerID].empty()) {
 
 
 			if (WorkerOutput[WorkerID].front().SolidVertices.size() != 0) {
-#ifndef RENDERV2
 				RendererV2.AddChunk(WorkerOutput[(uint64_t)WorkerID].front());
-#else
-				Renderer.AddChunkMesh(WorkerOutput[(uint64_t)WorkerID].front());
-#endif
+				RendererV2.Defrag(1);
 			}
 			WorkerOutput[WorkerID].pop_front();
 		}
@@ -114,15 +97,9 @@ void WorldRender::Update() {
 		LoadChunkToRenderer(chunkid);
 	}
 	
-#ifndef RENDERV2
 	RendererV2.Defrag(25);
 	RendererV2.Update();
 	RendererV2.PrepareRenderer();
-#else
-	Renderer.UpdateData();
-	Renderer.GenCallDrawCommands();
-#endif
-	
 
 }
 
@@ -133,11 +110,7 @@ void WorldRender::Stop() {
 		Workers[i].join();
 	}
 
-#ifndef RENDERV2
 	RendererV2.Cleanup();
-#else
-	Renderer.Cleanup();
-#endif
 	
 }
 
@@ -148,16 +121,9 @@ void WorldRender::Start(GLFWwindow* window_,World* world_, int ThreadCount) {
 	world = world_;
 	WorkerCount = ThreadCount;
 	
-#ifndef RENDERV2
 	RendererV2.Initialize(window, player.getCamera());
 	RendererV2.LoadAssets();
 	RendererV2.setSettings(renderDistance, 90);
-#else
-	Renderer.init(window, player.getCamera());
-	Renderer.ReloadAssets();
-	Renderer.RenderDistance = renderDistance;
-#endif
-	
 	
 	WorkerCount = ThreadCount;
 

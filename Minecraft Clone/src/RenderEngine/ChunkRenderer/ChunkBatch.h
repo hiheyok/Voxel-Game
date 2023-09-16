@@ -59,6 +59,8 @@ public:
 	std::multimap<size_t, size_t> InsertSpace; // <Slot Size, Index>
 	size_t MemoryUsage = 0;
 	std::vector<DataBufferAddress> RenderList;
+
+	double debugTime = 0.0;
 private:
 	
 	CFrustum Frustum;
@@ -74,8 +76,6 @@ private:
 
 	std::unordered_map<ChunkID, std::multimap<size_t, size_t>::iterator> InsertSpaceIteratorsFront;
 	std::unordered_map<ChunkID, std::multimap<size_t, size_t>::iterator> InsertSpaceIteratorsBack;
-
-	std::map<size_t, std::multimap<size_t, size_t>::iterator> GapIteratorsSortedOffset;
 	
 	std::vector<DrawCommandIndirect> DrawCommands;
 

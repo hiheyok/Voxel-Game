@@ -35,7 +35,7 @@ void ChunkDrawBatch::SetupBuffers() {
 	SSBO.SetMaxSize((size_t)(MaxBufferSize / 1000));
 	SSBO.InitializeData();
 
-	GapIteratorsSortedOffset[0] = InsertSpace.insert(pair<size_t, size_t>((size_t)MaxBufferSize, 0ULL));
+	InsertSpace.insert(pair<size_t, size_t>((size_t)MaxBufferSize, 0ULL));
 }
 
 void ChunkDrawBatch::Reset() {
@@ -107,49 +107,46 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, bool inser
 	RenderingData.size = DataSize;
 
 	std::multimap<size_t, size_t>::iterator it;
-	if (insertBack) {
-		it = --InsertSpace.end();
+
+	if (InsertSpace.size() > 1) {
+		it = --(--InsertSpace.end());
+
+		if (it->first < DataSize) {
+			it++;
+		}
 	}
 	else {
-		auto gapIt = GapIteratorsSortedOffset.begin();
-
-		for (int i = 1; i < InsertSpace.size(); i++) {
-			if (gapIt->second->first <= DataSize) {
-				gapIt++;
-			}
-			else {
-				break;
-			}
-		}
-		it = gapIt->second;
+		it = InsertSpace.begin();
 	}
 
-	if (it->first >= DataSize) {
+	size_t iteratorOffset = it->second;
+	size_t iteratorSize = it->first;
+
+	
+
+	if (iteratorSize >= DataSize) {
 
 		size_t InsertIndex = 0;
 		bool InsertBegin = false;
 			
 		if (RenderList.size() != 0) {
-			if ((RenderList[0].offset >= it->second + DataSize)) {
+			if ((RenderList[0].offset >= iteratorOffset + DataSize)) {
 				InsertIndex = 0;
 				InsertBegin = true;
 			}
 			else {
-				InsertIndex = FindClosestRenderObjIndex(it->second) + 1;
+				InsertIndex = FindClosestRenderObjIndex(iteratorOffset) + 1;
 			}
 		}
 
-		RenderingData.offset = it->second;
 		MemoryUsage += DataSize;
+		RenderingData.offset = iteratorOffset;
 		VBO.InsertSubData(RenderingData.offset, Data.size() * sizeof(unsigned int), Data.data());
 		RenderList.insert(RenderList.begin() + InsertIndex, RenderingData);
 		RenderListOffsetLookup[id] = RenderingData.offset;
 		UpdateCommands = true;
 
 		//Update Insert Map
-
-		size_t iteratorOffset = it->second;
-		size_t iteratorSize = it->first;
 
 		std::optional<ChunkID> lastID;
 		std::optional<ChunkID> frontID;
@@ -166,7 +163,6 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, bool inser
 			InsertSpaceIteratorsBack.erase(frontID.value());
 		}
 
-		GapIteratorsSortedOffset.erase(iteratorOffset);
 		InsertSpace.erase(it);
 
 		if (iteratorSize != DataSize) {
@@ -179,13 +175,11 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, bool inser
 				InsertSpaceIteratorsBack[frontID.value()] = nextIterator;
 			}
 			InsertSpaceIteratorsFront[id] = nextIterator;
-
-			GapIteratorsSortedOffset[offset] = nextIterator;
 		}
 		return true;
 	}
 
-	getLogger()->LogDebug("Chunk Renderer", "Draw Batch Out of Memory: " + std::to_string(MemoryUsage));
+	getLogger()->LogDebug("Chunk Renderer", "Draw Batch Out of Memory: " + std::to_string(MemoryUsage) + " | " + std::to_string(it->first));
 	return false;
 }
 
@@ -236,26 +230,31 @@ void ChunkDrawBatch::DeleteChunkVertices(ChunkID id) {
 		}
 		//Get Front and Back chunks
 
-		std::optional<ChunkID> FrontChunk;
-		std::optional<ChunkID> BackChunk;
+		bool FrontChunkB = false;
+		bool BackChunkB = false;
+
+		ChunkID FrontChunk;
+		ChunkID BackChunk;
 
 		if (RenderList.size() != index + 1) {
 			auto& FrontGapChunk = RenderList[index + 1];
 			FrontChunk = getChunkID(FrontGapChunk.x, FrontGapChunk.y, FrontGapChunk.z);
+			FrontChunkB = true;
 		}
 
 		if (-1 != index - 1) {
 			auto& BackGapChunk = RenderList[index - 1];
 			BackChunk = getChunkID(BackGapChunk.x, BackGapChunk.y, BackGapChunk.z);
+			BackChunkB = true;
 		}
 
 		//Erase Iterators
-
+		
+		
 		if (FrontGap) {
-			GapIteratorsSortedOffset.erase(FrontIt->second);
 
-			if (FrontChunk.has_value()) {
-				InsertSpaceIteratorsBack.erase(FrontChunk.value());
+			if (FrontChunkB) {
+				InsertSpaceIteratorsBack.erase(FrontChunk);
 			}
 
 			InsertSpaceIteratorsFront.erase(id);
@@ -263,32 +262,37 @@ void ChunkDrawBatch::DeleteChunkVertices(ChunkID id) {
 		}
 
 		if (BackGap) {
-			GapIteratorsSortedOffset.erase(BackIt->second);
 
-			if (BackChunk.has_value()) {
-				InsertSpaceIteratorsFront.erase(BackChunk.value());
+			if (BackChunkB) {
+				InsertSpaceIteratorsFront.erase(BackChunk);
 			}
 
 			InsertSpaceIteratorsBack.erase(id);
 			InsertSpace.erase(BackIt);
 		}
 
-		//Add new iterators
+		
 
+		//Add new iterators
+		
 		auto NewIterator = InsertSpace.insert(std::pair<size_t, size_t>(size, offset));
 
-		GapIteratorsSortedOffset[offset] = NewIterator;
-
-		if (FrontChunk.has_value()) {
-			InsertSpaceIteratorsBack[FrontChunk.value()] = NewIterator;
+		if (FrontChunkB) {
+			InsertSpaceIteratorsBack[FrontChunk] = NewIterator;
 		}
 
-		if (BackChunk.has_value()) {
-			InsertSpaceIteratorsFront[BackChunk.value()] = NewIterator;
+		if (BackChunkB) {
+			InsertSpaceIteratorsFront[BackChunk] = NewIterator;
 		}
 
-		RenderList.erase(RenderList.begin() + index);
+		
+		auto t0 = std::chrono::high_resolution_clock::now();
+
+		RenderList.erase(RenderList.begin() + index); //O(n) complexity
 		RenderListOffsetLookup.erase(id);
+
+		auto t1 = std::chrono::high_resolution_clock::now();
+		debugTime += (double)(t1 - t0).count() / 1000.0;
 	}
 }
 
@@ -380,21 +384,36 @@ size_t ChunkDrawBatch::FindClosestRenderObjIndex(size_t Offset) {
 void ChunkDrawBatch::Defrager(int iterations) {
 	int i = 0;
 
-	if (GapIteratorsSortedOffset.size() == 1) { //space already fully defragged
+	if (InsertSpace.size() == 1) { //space already fully defragged
 		return;
 	}
 
 	while (i < iterations) {
-		auto it = GapIteratorsSortedOffset.begin();
-
-		if (GapIteratorsSortedOffset.size() == 1) {
+		
+		if (InsertSpace.size() == 1) {
 			return;
 		}
 
-		size_t offset = it->first;
-		size_t size = it->second->first;
+		std::multimap<size_t, size_t>::iterator it; 
 
-		int index = GetRenderObjIndex(offset + size);
+		std::multimap<size_t, size_t>::iterator it0 = --(--InsertSpace.end());
+		std::multimap<size_t, size_t>::iterator it1 = (--InsertSpace.end());
+
+		if (it0->second > it1->second) {
+			it = it1;
+		}
+		else {
+			it = it0;
+		}
+
+		int RenderListSize = RenderList.size();
+
+		size_t offset = it->second;
+		size_t size = it->first;
+
+		int index = 0;
+
+		index = GetRenderObjIndex(offset + size);
 
 		auto& data = RenderList[index];
 
@@ -402,18 +421,24 @@ void ChunkDrawBatch::Defrager(int iterations) {
 		size_t bufferSize = data.size;
 
 		ChunkID id = getChunkID(data.x, data.y, data.z);
-
+		
 		std::vector<uint32_t> VertexData;
 		VertexData.resize(bufferSize / sizeof(unsigned int));
+		
 		VBO.getData(VertexData.data(), bufferOffset, bufferSize);
 
 		int x = data.x;
 		int y = data.y;
 		int z = data.z;
+		
+		
 
 		DeleteChunkVertices(id);
+		
 
 		AddChunkVertices(VertexData, false, x, y, z);
+
+		
 
 		i++;
 		if (i > iterations) {

@@ -1,15 +1,36 @@
 #pragma once
 
 #include "ChunkData.h"
-
-
-
 #include "../../Utils/FastNoiseLite.h"
+
+enum TerrainType {
+	SUPERFLAT, FASTTERRAIN, MOUNTAINS
+};
 
 
 class Chunk : public ChunkContainer {
 public:
 	
+	Chunk(int x, int y, int z, TerrainType type, FastNoiseLite& noise) {
+		SetPosition(x, y, z);
+
+		switch (type) {
+		case SUPERFLAT:
+			GenSuperFlat();
+			break;
+		case FASTTERRAIN:
+			Generate(&noise);
+			break;
+		case MOUNTAINS:
+			GenerateV2(&noise);
+			break;
+		}
+	}
+
+	Chunk() {
+
+	}
+
 	void GenerateBlankChunk() {
 		for (int x = 0; x < 16; x++) {
 			for (int y = 0; y < 16; y++) {
@@ -42,4 +63,6 @@ private:
 	float continentialNoise(float n);
 	float erosionNoise(float n);
 	float peaksandvalley(float n);
+public:
+	bool operator==(const Chunk& other) const = default;
 };

@@ -73,6 +73,8 @@ void Client::GameLoop() {
 			);
 			t2 = high_resolution_clock::now();
 
+			getLogger()->LogDebug("Renderer","Input Time: " + std::to_string(TerrainRender.RendererV2.getDebugTime()));
+
 		}
 		
 	}

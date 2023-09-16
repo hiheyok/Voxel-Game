@@ -1,6 +1,5 @@
 #pragma once
 #include "PlayerPOV.h"
-#include "../../RenderEngine/ChunkRenderer/ChunkRenderer.h"
 #include "../../RenderEngine/ChunkRenderer/Mesh/ChunkMeshing.h"
 #include <unordered_map>
 #include <concurrent_unordered_map.h>
@@ -32,7 +31,6 @@ public:
 
 	int renderDistance = 16;
 	TerrainRenderer RendererV2;
-	ChunkRenderer Renderer;
 private:
 
 	void Worker(int id);
@@ -40,8 +38,6 @@ private:
 	void TaskScheduler();
 
 	PlayerPOV player;
-	
-	
 	GLFWwindow* window;
 	World* world;
 

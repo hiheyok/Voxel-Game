@@ -41,7 +41,6 @@ bool WorldData::SetBlock(BlockID block, int x, int y, int z) {
 				}
 			}
 			
-			
 		}
 
 		return true;

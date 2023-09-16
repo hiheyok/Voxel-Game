@@ -3,9 +3,9 @@
 #include <GLFW/glfw3.h>
 
 #include "../Camera/camera.h"
-#include "../frustum/frustum.h"
-#include "../OpenGL/shader/shader.h"
-#include "../OpenGL/Texture/texture.h"
+#include "../Frustum/frustum.h"
+#include "../OpenGL/Shader/Shader.h"
+#include "../OpenGL/Texture/Texture.h"
 #include "../../Utils/MathHelper.h"
 #include "../OpenGL/Buffers/Buffer.h"
 #include "Mesh/ChunkMeshing.h"
@@ -127,13 +127,24 @@ public:
 			auto it = --ChunkBatches[batchIndex].InsertSpace.end();
 			
 			if (it->first >= MeshDataSize * sizeof(unsigned int)) {
-				ChunkBatches[batchIndex].AddChunkVertices(MeshData.SolidVertices, true, MeshData.Position.x, MeshData.Position.y, MeshData.Position.z);
+				ChunkBatches[batchIndex].AddChunkVertices(MeshData.SolidVertices, false, MeshData.Position.x, MeshData.Position.y, MeshData.Position.z);
 				ChunkBatchLookup[id] = batchIndex;
 				return;
 			}
 		}
 
 		getLogger()->LogInfo("Terrain Renderer", "Unable to add chunk. Buffers are full!");
+	}
+
+	double getDebugTime() {
+		double t = 0.0;
+
+		for (int batchIndex = 0; batchIndex < ChunkBatches.size(); batchIndex++) {
+
+			t+=ChunkBatches[batchIndex].debugTime;
+		}
+
+		return t;
 	}
 
 	double getFragmentationRate() {
@@ -192,7 +203,7 @@ private:
 	void CreateNewBatch() {
 		ChunkBatches.emplace_back();
 		size_t i = ChunkBatches.size() - 1;
-		ChunkBatches[i].SetMaxSize(1000000000);
+		ChunkBatches[i].SetMaxSize(5000000000);
 		ChunkBatches[i].SetupBuffers();
 		ChunkBatches[i].camera = camera;
 	}

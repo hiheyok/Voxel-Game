@@ -59,7 +59,7 @@ void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, unsigned int id,
 
 
     if (str.str().size() != 0) {
-      //  getLogger()->LogError("OpenGL", str.str());
+        getLogger()->LogError("OpenGL", str.str());
        // std::cout << "OpenGL: " << str.str() << "\n";
     }
 
@@ -96,7 +96,7 @@ void Window::Start() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    window = glfwCreateWindow(sizex, sizey, "1.1.0A (DEV)", NULL, NULL);
+    window = glfwCreateWindow(sizex, sizey, "1.1.1A (DEV)", NULL, NULL);
 
     glfwMakeContextCurrent(window);
 
@@ -124,11 +124,10 @@ void Window::Start() {
         Logger->LogError("OpenGL", "Initialization Failed: GLEW");
         return;
     }
+
     std::stringstream str;
     str << "OpenGL Version: " << glGetString(GL_VERSION);
     Logger->LogInfo("OpenGL", str.str());
-
-    
 
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -139,18 +138,14 @@ void Window::Start() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
     glfwSwapInterval(0);
-
- 
 }
 
 void Window::mouse_callback(double xpos, double ypos) {
-
     cursormovementx = xpos - cursorx;
     cursormovementy = ypos - cursory;
 
     cursorx = (int)xpos;
     cursory = (int)ypos;
-
 }
 
 void Window::UpdateWindowName(std::string name) {
@@ -288,17 +283,14 @@ void Window::onMouseButton(int button, int action) {
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
     {
         PressedRight = true;
-
     }
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
     {
         PressedLeft = true;
-
     }
     if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS)
     {
         PressedMiddle = true;
-
     }
 }
 

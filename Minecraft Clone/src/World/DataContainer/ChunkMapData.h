@@ -19,7 +19,6 @@ public:
 		std::pair<ChunkID, Chunk> insert(ID, chunk);
 
 		Data[ID] = chunk;
-		ChunkIDContainer.insert(ID);
 
 		for (int axis = 0; axis < 3; axis++) {
 			for (int face = 0; face < 2; face++) {
@@ -76,7 +75,7 @@ public:
 	}
 
 	bool CheckChunk(int x, int y, int z) { //Checks is a chunk exists
-		return ChunkIDContainer.count(getChunkID(x, y, z));
+		return Data.count(getChunkID(x, y, z));
 	}
 
 	bool EraseChunk(int x, int y, int z) {
@@ -102,6 +101,5 @@ private:
 	}
 
 	std::unordered_map<ChunkID, std::atomic_uint8_t> ChunksInUse;
-	Concurrency::concurrent_unordered_set<ChunkID> ChunkIDContainer; //Contains all of the chunks this has
 	Concurrency::concurrent_unordered_map<ChunkID, Chunk> Data; //Contains all of the actual chunk data
 };
