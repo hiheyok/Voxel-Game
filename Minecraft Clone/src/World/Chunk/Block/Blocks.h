@@ -47,12 +47,10 @@ __declspec(selectany) BlockID SAND = RegisterNewBlock(false, true, false);
 __declspec(selectany) BlockID OAK_LOG = RegisterNewBlock(false, true, false);
 __declspec(selectany) BlockID OAK_LEAF = RegisterNewBlock(false, true, false);
 __declspec(selectany) BlockID DIAMOND_BLOCK = RegisterNewBlock(false, true, false);
-
 __declspec(selectany) BlockID OAK_PLANK = RegisterNewBlock(false, true, false);
-
 __declspec(selectany) BlockID COBBLESTONE = RegisterNewBlock(false, true, false);
-
 __declspec(selectany) BlockID BRICK = RegisterNewBlock(false, true, false);
+__declspec(selectany) BlockID WHITE_CONCRETE = RegisterNewBlock(false, true, false);
 
 __declspec(selectany) BlockID NULL_BLOCK = RegisterNewBlock(false, false, false);
 
@@ -81,6 +79,8 @@ inline void InitializeBlockTextures() {
 	BlockList[OAK_PLANK]->Texture->SetFacesCustom("assets/textures/array/block/oak_planks.png", FRONT, BACK, LEFT, RIGHT, BOTTOM, TOP);
 	
 	BlockList[BRICK]->Texture->SetFacesCustom("assets/textures/array/block/bricks.png", FRONT, BACK, LEFT, RIGHT, BOTTOM, TOP);
+	BlockList[WHITE_CONCRETE]->Texture->SetFacesCustom("assets/textures/array/block/white_concrete.png", FRONT, BACK, LEFT, RIGHT, BOTTOM, TOP);
+
 
 	BlockTextureArray.UploadToGPU();
 }

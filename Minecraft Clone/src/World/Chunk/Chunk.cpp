@@ -51,7 +51,7 @@ void Chunk::GenSuperFlat() {
 		for (int z = 0; z < 16; z++) {
 			for (int y = 0; y < 16; y++) {
 				if (y + cy < 10) {
-					SetBlock(GRASS, x, y, z);
+					SetBlock(WHITE_CONCRETE, x, y, z);
 				}
 			}
 		}

@@ -40,7 +40,28 @@ bool WorldData::SetBlock(BlockID block, int x, int y, int z) {
 					ChunkUpdate(p[0], p[1], p[2]);
 				}
 			}
-			
+		}
+
+		int p[3]{ c[0] ,c[1] ,c[2] }; // p[3] is just the position of the neighboring chunk
+		bool update = false;
+
+		for (int axis = 0; axis < 3; axis++) {
+
+			if (off[axis] == 0) {
+				p[axis] += 1;
+				update = true;
+			}
+
+			if ((off[axis] == 15) || (off[axis] == 1)) {
+				p[axis] -= 1;
+				update = true;
+			}
+		}
+
+		if (update) {
+			if (CheckChunk(p[0], p[1], p[2])) {
+				ChunkUpdate(p[0], p[1], p[2]);
+			}
 		}
 
 		return true;
