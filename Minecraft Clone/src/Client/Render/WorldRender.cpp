@@ -35,10 +35,13 @@ void WorldRender::Worker(int id) {
 
 		WorkerLocks[WorkerID].lock();
 		Jobs.insert(Jobs.end(), WorkerTask[WorkerID].begin(), WorkerTask[WorkerID].end());
-		
 		WorkerTask[WorkerID].clear();
 		WorkerLocks[WorkerID].unlock();
 		
+		int count = 0;
+
+		int BatchSize = 500;
+
 		while (!Jobs.empty()) {
 			ChunkID task = Jobs.front(); //fetches task
 			Jobs.pop_front();
@@ -50,14 +53,23 @@ void WorldRender::Worker(int id) {
 			FinishedJobs.emplace_back(world->GetChunk(pos.x, pos.y, pos.z));
 			
 			auto t1 = std::chrono::high_resolution_clock::now();
+
+			count++;
+
+			if ((count % BatchSize) == 0) {
+				break;
+			}
 		}
+		
+		if (FinishedJobs.size() != 0) {
+			WorkerLocks[WorkerID].lock();
+			WorkerOutput[WorkerID].insert(WorkerOutput[WorkerID].end(), FinishedJobs.begin(), FinishedJobs.end());
+			FinishedJobs.clear();
+			WorkerLocks[WorkerID].unlock();
+		}
+		
 
-		WorkerLocks[WorkerID].lock();
-		WorkerOutput[WorkerID].insert(WorkerOutput[WorkerID].end(), FinishedJobs.begin(), FinishedJobs.end());
-		FinishedJobs.clear();
-		WorkerLocks[WorkerID].unlock();
-
-		timerSleepNotPrecise(5);
+		timerSleepNotPrecise(3);
 	}
 
 	getLogger()->LogInfo("Mesher", "Shutting down mesh worker: " + std::to_string(WorkerID));
@@ -74,7 +86,6 @@ void WorldRender::Update() {
 
 			RendererV2.AddChunk(WorkerOutput[(uint64_t)WorkerID].front());
 			RendererV2.Defrag(1);
-
 			WorkerOutput[WorkerID].pop_front();
 		}
 

@@ -59,6 +59,9 @@ void Generator::Worker(int id) {
 
 		const int NumJobs = Jobs.size();
 
+		int count = 0;
+		int BatchSize = 500;
+
 		for (int i = 0; i < NumJobs; i++) {
 			ChunkID task = Jobs.front(); //fetches task
 			Jobs.pop_front();
@@ -72,14 +75,21 @@ void Generator::Worker(int id) {
 			TerrainType type = MOUNTAINS;
 
 			FinishedJobs.emplace_back(x, y, z, type, noise);
+
+			count++;
+			if ((count % BatchSize) == 0) {
+				break;
+			}
 		}
 
-		WorkerLocks[WorkerID].lock();
-		WorkerOutput[WorkerID].insert(WorkerOutput[WorkerID].end(), FinishedJobs.begin(), FinishedJobs.end());
-		FinishedJobs.clear();
-		WorkerLocks[WorkerID].unlock();
-
-		timerSleepNotPrecise(5);
+		if (FinishedJobs.size() != 0) {
+			WorkerLocks[WorkerID].lock();
+			WorkerOutput[WorkerID].insert(WorkerOutput[WorkerID].end(), FinishedJobs.begin(), FinishedJobs.end());
+			FinishedJobs.clear();
+			WorkerLocks[WorkerID].unlock();
+		}
+		
+		timerSleepNotPrecise(3);
 	}
 
 	Jobs.clear();

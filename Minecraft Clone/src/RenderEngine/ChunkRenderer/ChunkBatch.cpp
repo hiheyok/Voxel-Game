@@ -1,6 +1,8 @@
 #include "ChunkBatch.h"
 #include <iterator>
 #include <optional>
+#include <stack>
+#include <array>
 
 using namespace glm;
 using namespace std;
@@ -336,27 +338,20 @@ void ChunkDrawBatch::Defrager(int iterations) {
 		size_t offset = it->second;
 		size_t size = it->first;
 
-		if (!RenderList.count(offset + size)) {
-			std::cout << "err\n";
-		}
-
 		auto& data = RenderList[offset + size];
 
 		size_t bufferOffset = data.offset;
 		size_t bufferSize = data.size;
 
 		ChunkID id = getChunkID(data.x, data.y, data.z);
-		
-		std::vector<uint32_t> VertexData;
-		VertexData.resize(bufferSize / sizeof(unsigned int));
+
+		std::vector<uint32_t> VertexData(bufferSize / sizeof(unsigned int));
 		
 		VBO.getData(VertexData.data(), bufferOffset, bufferSize);
 
 		int x = data.x;
 		int y = data.y;
 		int z = data.z;
-		
-		//std::cout << id << "\n";
 
 		DeleteChunkVertices(id);
 		
