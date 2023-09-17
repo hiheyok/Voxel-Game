@@ -121,13 +121,17 @@ public:
 			ChunkBatchLookup.erase(id);
 		}
 
+		if (MeshData.SolidVertices.size() == 0) {
+			return;
+		}
+
 		for (int batchIndex = 0; batchIndex < ChunkBatches.size(); batchIndex++) {
 			size_t MeshDataSize = MeshData.SolidVertices.size();
 
 			auto it = --ChunkBatches[batchIndex].InsertSpace.end();
 			
 			if (it->first >= MeshDataSize * sizeof(unsigned int)) {
-				ChunkBatches[batchIndex].AddChunkVertices(MeshData.SolidVertices, false, MeshData.Position.x, MeshData.Position.y, MeshData.Position.z);
+				ChunkBatches[batchIndex].AddChunkVertices(MeshData.SolidVertices, MeshData.Position.x, MeshData.Position.y, MeshData.Position.z);
 				ChunkBatchLookup[id] = batchIndex;
 				return;
 			}
@@ -159,7 +163,7 @@ public:
 			if (batch.RenderList.size() != 0) {
 				int index = batch.RenderList.size() - 1;
 
-				size_t FullMemoryUse = batch.RenderList[index].size + batch.RenderList[index].offset; //Include gaps
+				size_t FullMemoryUse = (--batch.RenderList.end())->second.size + (--batch.RenderList.end())->second.offset; //Include gaps
 				size_t MemoryUse = ChunkBatches[batchIndex].MemoryUsage; //Only include vertex data
 
 				fragRate += ((double)MemoryUse / (double)FullMemoryUse) / ((double)n);
@@ -176,11 +180,13 @@ public:
 
 		for (int batchIndex = 0; batchIndex < ChunkBatches.size(); batchIndex++) {
 
-			int index = ChunkBatches[batchIndex].RenderList.size() - 1;
-
-			if (index != -1) {
-				memUsage += ChunkBatches[batchIndex].RenderList[index].size + ChunkBatches[batchIndex].RenderList[index].offset;
+			if (ChunkBatches[batchIndex].RenderList.size() == 0) {
+				continue;
 			}
+
+			auto RenderListEnd = --ChunkBatches[batchIndex].RenderList.end();
+
+			memUsage += RenderListEnd->second.size + RenderListEnd->second.offset;
 		}
 
 		return memUsage;

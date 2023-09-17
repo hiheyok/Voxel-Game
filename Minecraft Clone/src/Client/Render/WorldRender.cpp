@@ -46,10 +46,8 @@ void WorldRender::Worker(int id) {
 
 			//Generates the meshes
 			auto t0 = std::chrono::high_resolution_clock::now();
-			ChunkMeshData MeshData(world->GetChunk(pos.x, pos.y, pos.z));
-			if (MeshData.SolidVertices.size() + MeshData.TransparentVertices.size() != 0) {
-				FinishedJobs.emplace_back(MeshData);
-			}
+
+			FinishedJobs.emplace_back(world->GetChunk(pos.x, pos.y, pos.z));
 			
 			auto t1 = std::chrono::high_resolution_clock::now();
 		}
@@ -74,10 +72,9 @@ void WorldRender::Update() {
 		while (!WorkerOutput[WorkerID].empty()) {
 
 
-			if (WorkerOutput[WorkerID].front().SolidVertices.size() != 0) {
-				RendererV2.AddChunk(WorkerOutput[(uint64_t)WorkerID].front());
-				RendererV2.Defrag(1);
-			}
+			RendererV2.AddChunk(WorkerOutput[(uint64_t)WorkerID].front());
+			RendererV2.Defrag(1);
+
 			WorkerOutput[WorkerID].pop_front();
 		}
 

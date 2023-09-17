@@ -9,6 +9,7 @@
 #include "../../World/Chunk/Chunk.h"
 #include "../OpenGL/Buffers/Buffer.h"
 #include <unordered_map>
+#include <list>
 #include <map>
 
 struct DrawCommandIndirect {
@@ -34,7 +35,7 @@ public:
 
 	void GenDrawCommands(int RenderDistance);
 
-	bool AddChunkVertices(std::vector<unsigned int> Data, bool insertBack, int x, int y, int z);
+	bool AddChunkVertices(std::vector<unsigned int> Data, int x, int y, int z);
 
 	void DeleteChunkVertices(ChunkID ID);
 
@@ -50,15 +51,11 @@ public:
 
 	void Defrager(int iterations);
 
-	size_t GetRenderObjIndex(size_t offset);
-
-	size_t FindClosestRenderObjIndex(size_t offset);
-
 	Camera* camera;
 
 	std::multimap<size_t, size_t> InsertSpace; // <Slot Size, Index>
 	size_t MemoryUsage = 0;
-	std::vector<DataBufferAddress> RenderList;
+	std::map<size_t, DataBufferAddress> RenderList; //Offset, Render List
 
 	double debugTime = 0.0;
 private:
@@ -68,10 +65,11 @@ private:
 	VertexArray Array;
 	size_t MaxBufferSize = NULL;
 	
+	int counter = 0;
 
 	bool UpdateCommands = false;
 
-	std::unordered_map<long long int, size_t> RenderListOffsetLookup;
+	std::unordered_map<ChunkID, size_t> RenderListOffsetLookup;
 	std::vector<GLint> ChunkShaderPos;
 
 	std::unordered_map<ChunkID, std::multimap<size_t, size_t>::iterator> InsertSpaceIteratorsFront;
