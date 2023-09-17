@@ -69,7 +69,7 @@ void WorldRender::Worker(int id) {
 		}
 		
 
-		timerSleepNotPrecise(3);
+		timerSleepNotPrecise(1);
 	}
 
 	getLogger()->LogInfo("Mesher", "Shutting down mesh worker: " + std::to_string(WorkerID));
@@ -105,7 +105,7 @@ void WorldRender::Update() {
 		LoadChunkToRenderer(chunkid);
 	}
 	
-	RendererV2.Defrag(25);
+	RendererV2.Defrag(100);
 	RendererV2.Update();
 	RendererV2.PrepareRenderer();
 
@@ -190,7 +190,7 @@ void WorldRender::TaskScheduler() {
 			DistributedTasks[i].clear();
 		}
 
-		timerSleepNotPrecise(5);
+		timerSleepNotPrecise(1);
 
 	}
 

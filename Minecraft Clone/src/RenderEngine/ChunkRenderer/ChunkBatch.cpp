@@ -1,8 +1,6 @@
 #include "ChunkBatch.h"
 #include <iterator>
 #include <optional>
-#include <stack>
-#include <array>
 
 using namespace glm;
 using namespace std;
@@ -68,6 +66,9 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
 
 	DrawCommands.clear();
 	ChunkShaderPos.clear();
+	
+	DrawCommands.reserve(lastRenderSize);
+	ChunkShaderPos.reserve(lastRenderSize * 3);
 
 	Frustum.CalculateFrustum(camera);
 
@@ -77,14 +78,9 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
 
 	for (const auto& data_ : RenderList) {
 		auto& data = data_.second;
-		if (FindDistanceNoSqrt(data.x, data.y, data.z, Position.x, Position.y, Position.z) < pow(RenderDistance, 2)) {
+		if (FindDistanceNoSqrt(data.x, data.y, data.z, Position.x, Position.y, Position.z) < RenderDistance * RenderDistance) {
 			if (Frustum.SphereInFrustum((float)data.x * 16, (float)data.y * 16, (float)data.z * 16, (float)32)) {
-				DrawCommandIndirect cmd;
-				cmd.count = (unsigned int)data.size / (sizeof(unsigned int) * 2);
-				cmd.instanceCount = 1;
-				cmd.first = (unsigned int)data.offset / (sizeof(unsigned int) * 2);
-				cmd.baseInstance = Index;
-				DrawCommands.push_back(cmd);
+				DrawCommands.emplace_back((unsigned int)data.size / (sizeof(unsigned int) * 2), 1, (unsigned int)data.offset / (sizeof(unsigned int) * 2), Index);
 				ChunkShaderPos.emplace_back(data.x);
 				ChunkShaderPos.emplace_back(data.y);
 				ChunkShaderPos.emplace_back(data.z);
@@ -92,6 +88,8 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
 			}
 		}
 	}
+
+	lastRenderSize = DrawCommands.size();
 
 	SSBO.InsertSubData(0, ChunkShaderPos.size() * sizeof(int), ChunkShaderPos.data());
 	IBO.InsertSubData(0, DrawCommands.size() * sizeof(DrawCommandIndirect), DrawCommands.data());
@@ -167,7 +165,6 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int
 			}
 			InsertSpaceIteratorsFront[id] = nextIterator;
 		}
-		counter++;
 
 		return true;
 	}
@@ -317,13 +314,15 @@ void ChunkDrawBatch::Defrager(int iterations) {
 		return;
 	}
 
+	std::multimap<size_t, size_t>::iterator it;
+
 	while (i < iterations) {
 		
 		if (InsertSpace.size() == 1) {
 			return;
 		}
 
-		std::multimap<size_t, size_t>::iterator it; 
+		
 
 		std::multimap<size_t, size_t>::iterator it0 = --(--InsertSpace.end());
 		std::multimap<size_t, size_t>::iterator it1 = (--InsertSpace.end());

@@ -11,12 +11,23 @@
 #include <unordered_map>
 #include <list>
 #include <map>
+#include <stack>
+#include <array>
+
 
 struct DrawCommandIndirect {
 	unsigned int  count;
 	unsigned int  instanceCount;
 	unsigned int  first;
 	unsigned int  baseInstance;
+
+	DrawCommandIndirect() {
+
+	}
+
+	DrawCommandIndirect(uint32_t count_, uint32_t instanceCount_, uint32_t first_, uint32_t baseInstance_) : count(count_), instanceCount(instanceCount_), first(first_), baseInstance(baseInstance_) {
+
+	}
 };
 
 struct DataBufferAddress {
@@ -64,13 +75,13 @@ private:
 	Buffer VBO, IBO, SSBO;
 	VertexArray Array;
 	size_t MaxBufferSize = NULL;
-	
-	int counter = 0;
 
 	bool UpdateCommands = false;
 
 	std::unordered_map<ChunkID, size_t> RenderListOffsetLookup;
 	std::vector<GLint> ChunkShaderPos;
+
+	int lastRenderSize = 0;
 
 	std::unordered_map<ChunkID, std::multimap<size_t, size_t>::iterator> InsertSpaceIteratorsFront;
 	std::unordered_map<ChunkID, std::multimap<size_t, size_t>::iterator> InsertSpaceIteratorsBack;

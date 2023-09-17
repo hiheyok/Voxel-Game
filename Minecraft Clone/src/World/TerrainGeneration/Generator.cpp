@@ -89,7 +89,7 @@ void Generator::Worker(int id) {
 			WorkerLocks[WorkerID].unlock();
 		}
 		
-		timerSleepNotPrecise(3);
+		timerSleepNotPrecise(1);
 	}
 
 	Jobs.clear();
@@ -158,7 +158,7 @@ void Generator::TaskScheduler() {
 		}
 		SchedulerLock.unlock();
 		
-		timerSleepNotPrecise(5);
+		timerSleepNotPrecise(1);
 
 	}
 
