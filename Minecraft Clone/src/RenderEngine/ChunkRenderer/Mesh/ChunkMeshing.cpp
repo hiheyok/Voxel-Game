@@ -237,8 +237,6 @@ void ChunkMeshData::AddFacetoMesh_X(Quad quad, int slice, int face) {
 		sy0 = sy_tmp;
 	}
 
-	
-
 	int tex = quad.Texture << textureBitOffset;
 
 	switch (face) {
@@ -285,11 +283,9 @@ void ChunkMeshData::AddFacetoMesh_Y(Quad quad, int slice, int face) {
 	P0[1] = (quad.y) << (AxisV * 5);
 	P0[2] = (quad.x) << (AxisU * 5);
 
-
 	P1[0] = (slice - face + 1) << (ParallelAxis * 5); // y
 	P1[1] = (quad.y + quad.h) << (AxisV * 5); // x
 	P1[2] = (quad.x + quad.w) << (AxisU * 5); // z
-
 
 	char NN = quad.getLight(L_NN);
 	char NP = quad.getLight(L_NP);
@@ -324,8 +320,6 @@ void ChunkMeshData::AddFacetoMesh_Y(Quad quad, int slice, int face) {
 		sx0 = sx_tmp;
 	}
 
-	
-
 	int tex = quad.Texture << textureBitOffset; //x : z
 
 	switch (face) {
@@ -358,8 +352,6 @@ void ChunkMeshData::AddFacetoMesh_Y(Quad quad, int slice, int face) {
 		SolidVertices.push_back(0u | sx | sy | tex);
 		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx0 | sy | tex);
-		
-
 		break;
 	}
 }
@@ -412,8 +404,6 @@ void ChunkMeshData::AddFacetoMesh_Z(Quad quad, int slice, int face) { //x : x
 
 		face = !face;
 	}
-
-	
 
 	int tex = quad.Texture << textureBitOffset;
 
@@ -498,7 +488,9 @@ void ChunkMeshData::GenerateAmbientOcculsion(Chunk& chunk) {
 									CornerIndex |= 0b10 * (u == 1);
 									CornerIndex |= 0b01 * (v == 1);
 
-									q.setLight(CornerIndex, lightlvl);
+									if (q.getLight(CornerIndex) > 1) {
+										q.setLight(CornerIndex, q.getLight(CornerIndex) - 2);
+									}
 
 									continue;
 								}
@@ -507,8 +499,12 @@ void ChunkMeshData::GenerateAmbientOcculsion(Chunk& chunk) {
 
 									CornerIndex |= 0b10 * (u == 1);
 
-									q.setLight(CornerIndex, lightlvl);
-									q.setLight(CornerIndex | 0b01, lightlvl);
+									if (q.getLight(CornerIndex) > 1) {
+										q.setLight(CornerIndex, q.getLight(CornerIndex) - 2);
+									}
+									if (q.getLight(CornerIndex | 0b01) > 1) {
+										q.setLight(CornerIndex | 0b01, q.getLight(CornerIndex | 0b01) - 2);
+									}
 
 									continue;
 								}
@@ -517,8 +513,14 @@ void ChunkMeshData::GenerateAmbientOcculsion(Chunk& chunk) {
 
 									CornerIndex |= 0b01 * (v == 1);
 
-									q.setLight(CornerIndex, lightlvl);
-									q.setLight(CornerIndex | 0b10, lightlvl);
+									if (q.getLight(CornerIndex) > 1) {
+										q.setLight(CornerIndex, q.getLight(CornerIndex) - 2);
+									}
+									if (q.getLight(CornerIndex | 0b10) > 1) {
+										q.setLight(CornerIndex | 0b10, q.getLight(CornerIndex | 0b10) - 2);
+									}
+									
+									
 
 									continue;
 								}
