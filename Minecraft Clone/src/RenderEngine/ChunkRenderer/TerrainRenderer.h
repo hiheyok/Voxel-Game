@@ -121,6 +121,8 @@ public:
 			ChunkBatchLookup.erase(id);
 		}
 
+		UpdateDrawCommands = true;
+
 		if (MeshData.SolidVertices.size() == 0) {
 			return;
 		}
@@ -213,6 +215,8 @@ private:
 		ChunkBatches[i].SetupBuffers();
 		ChunkBatches[i].camera = camera;
 	}
+
+	bool UpdateDrawCommands = false;
 
 	int m_RenderDistance = 16;
 	float m_FOV = 80.f;

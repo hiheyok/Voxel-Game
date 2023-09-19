@@ -31,6 +31,13 @@ public:
 
 	int renderDistance = 16;
 	TerrainRenderer RendererV2;
+
+	double buildTime = 0.0;
+
+	double buildstage0 = 0.0;
+	double buildstage1 = 0.0;
+	double buildstage2 = 0.0;
+
 private:
 
 	void Worker(int id);

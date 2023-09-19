@@ -31,17 +31,21 @@ void ChunkMeshData::GenerateMesh(Chunk& chunk) {
 	Position = chunk.Position;
 
 	//Generates the unsimplified mesh first
-
+	auto t0 = std::chrono::high_resolution_clock::now();
 	GenerateFaceCollection(chunk); //Generates face with their respected textures
-
+	auto t1 = std::chrono::high_resolution_clock::now();
 	GenerateAmbientOcculsion(chunk); //AO
-
+	auto t2 = std::chrono::high_resolution_clock::now();
 	SimplifyMesh(); //Simplifies mesh (Greedy Meshing)
+	auto t3 = std::chrono::high_resolution_clock::now();
 
+	stage0 = (double)(t1 - t0).count() / 1000000.0;
+	stage1 = (double)(t2 - t1).count() / 1000000.0;
+	stage2 = (double)(t3 - t2).count() / 1000000.0;
 }
 
 //Checks if there are anything different between q0 and q1
-bool ChunkMeshData::compareQuads(Quad q0, Quad q1) {
+inline bool ChunkMeshData::compareQuads(Quad& q0, Quad& q1) {
 	return (q0.Lighting == q1.Lighting) && (q0.Texture == q1.Texture);
 }
 
@@ -146,9 +150,9 @@ void ChunkMeshData::SimplifyMesh() {
 									q[Axis1] = x[Axis1] + Axis1K_TMP;
 									q[Axis2] = x[Axis2];
 									SetFace(q[0], q[1], q[2], axis * 2 + facing, NullQuad);
-
 								}
 							}
+
 							Quad finalq = LastQuad;
 
 							finalq.y = x[Axis0];
@@ -161,6 +165,7 @@ void ChunkMeshData::SimplifyMesh() {
 
 							LastQuad = NullQuad;
 
+							x[Axis0] += Axis0H - 1;
 						}
 					}
 				}
@@ -339,7 +344,6 @@ void ChunkMeshData::AddFacetoMesh_Y(Quad quad, int slice, int face) {
 		
 		break;
 	case 0:
-
 		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
 		SolidVertices.push_back(0u | sx0 | sy0 | tex);
 		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset));
@@ -443,8 +447,6 @@ void ChunkMeshData::AddFacetoMesh_Z(Quad quad, int slice, int face) { //x : x
 
 void ChunkMeshData::GenerateAmbientOcculsion(Chunk& chunk) {
 
-	uint8_t lightlvl = 11;
-
 	for (int axis = 0; axis < 3; axis++) {
 		for (int face = 0; face < 2; face++) {
 			int p[3]{ 0,0,0 };
@@ -459,7 +461,7 @@ void ChunkMeshData::GenerateAmbientOcculsion(Chunk& chunk) {
 				for (p[axis1] = -1; p[axis1] < 17; p[axis1]++) {
 					for (p[axis2] = -1; p[axis2] < 17; p[axis2]++) {
 
-						Quad q = GetFace(p[0], p[1], p[2], axis * 2 + face);
+						Quad& q = GetFace(p[0], p[1], p[2], axis * 2 + face);
 
 						if (compareQuads(NullQuad, q)) //Checks if face doesnt exist
 							continue;
@@ -468,9 +470,9 @@ void ChunkMeshData::GenerateAmbientOcculsion(Chunk& chunk) {
 
 						check[axis0] += offset;
 
-						for (int u = -1; u < 2; u++) {
+						for (int u = -1; u <= 1; u++) {
 
-							for (int v = -1; v < 2; v++) {
+							for (int v = -1; v <= 1; v++) {
 
 								if (v == 0 && u == 0)
 									continue;
@@ -519,14 +521,12 @@ void ChunkMeshData::GenerateAmbientOcculsion(Chunk& chunk) {
 									if (q.getLight(CornerIndex | 0b10) > 1) {
 										q.setLight(CornerIndex | 0b10, q.getLight(CornerIndex | 0b10) - 2);
 									}
-									
-									
 
 									continue;
 								}
 							}
 						}
-						SetFace(p[0], p[1], p[2], axis * 2 + face, q);
+
 					}
 				}
 			}
@@ -555,7 +555,7 @@ bool ChunkMeshData::IsFaceVisible(Chunk& chunk, int x, int y, int z, int side) {
 	}
 }
 
-Quad ChunkMeshData::GetFace(int x, int y, int z, int side) {
+Quad& ChunkMeshData::GetFace(int x, int y, int z, int side) {
 	if (x >= 16 || y >= 16 || z >= 16 || x < 0 || y < 0 || z < 0)
 		return NullQuad;
 	return FaceCollectionCache[(x * 256 + y * 16 + z) * 6 + side];

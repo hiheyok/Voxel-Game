@@ -54,6 +54,10 @@ void WorldRender::Worker(int id) {
 			
 			auto t1 = std::chrono::high_resolution_clock::now();
 
+			buildTime += (double)(t1 - t0).count() / 1000000.0;
+			buildstage0 += FinishedJobs.back().stage0;
+			buildstage1 += FinishedJobs.back().stage1;
+			buildstage2 += FinishedJobs.back().stage2;
 			count++;
 
 			if ((count % BatchSize) == 0) {

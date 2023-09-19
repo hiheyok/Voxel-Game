@@ -69,13 +69,18 @@ namespace Meshing
 		//Allows you to edit the chunk without remeshing the entire chunk
 		void EditBlock(Block block, int x, int y, int z);
 
+		//Debug timing
+		double stage0 = 0.0;
+		double stage1 = 0.0;
+		double stage2 = 0.0;
+
 	private:
 
 		//Simplifies the Mesh and output it in the vertices array
 		void SimplifyMesh();
 
 		//Compare quad sizes and position
-		bool compareQuads(Quad q0, Quad q1);
+		inline bool compareQuads(Quad& q0, Quad& q1);
 
 		//Generates all the faces and puts them in the cache
 		void GenerateFaceCollection(Chunk& chunk);
@@ -87,7 +92,7 @@ namespace Meshing
 		bool IsFaceVisible(Chunk& chunk, int x, int y, int z, int side);
 
 		//Get face from the cache
-		Quad GetFace(int x, int y, int z, int side);
+		Quad& GetFace(int x, int y, int z, int side);
 
 		//Sets the faces in FaceCollectionCache
 		void SetFace(int x, int y, int z, int side, Quad quad);

@@ -35,7 +35,7 @@ private:
 
 	void GetBlock();
 
-	BlockID HoldingBlock = OAK_PLANK;
+	BlockID HoldingBlock = WHITE_CONCRETE;
 	Entity Player;
 	World* world = nullptr;
 

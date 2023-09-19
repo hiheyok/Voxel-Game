@@ -67,12 +67,11 @@ void Client::GameLoop() {
 				" | Pos: " + std::to_string(MainLocalWorld.GetPlayerPosition().x) + ", " +
 				std::to_string(MainLocalWorld.GetPlayerPosition().y) + ", " +
 				std::to_string(MainLocalWorld.GetPlayerPosition().z) + ", VRAM Fragmentation Rate: " 
-				+ std::to_string(TerrainRender.RendererV2.getFragmentationRate() * 100) +
-				", VRAM Usage (MB):  " + std::to_string(TerrainRender.RendererV2.getVRAMUsageFull() / 1000000)
-				 + ", Gap Count: " + std::to_string(TerrainRender.RendererV2.getGapCount())
+				+ std::to_string(TerrainRender.RendererV2.getFragmentationRate() * 100) 
+				+ ", VRAM Usage (MB): " + std::to_string((double)TerrainRender.RendererV2.getVRAMUsageFull() / 1000000.0)
+				+ " | Mesh All (ms): " + std::to_string(TerrainRender.buildTime)
 			);
 			t2 = high_resolution_clock::now();
-
 		}
 		
 	}

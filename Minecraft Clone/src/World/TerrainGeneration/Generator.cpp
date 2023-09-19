@@ -17,6 +17,8 @@ std::deque<Chunk> Generator::GetOutput() {
 void Generator::Start(int ThreadCount) {
 	WorkerCount = ThreadCount;
 
+	noise.SetNoiseType(noise.NoiseType_OpenSimplex2);
+
 	Workers.resize(ThreadCount);
 	WorkerTask.resize(ThreadCount);
 	WorkerOutput.resize(ThreadCount);
