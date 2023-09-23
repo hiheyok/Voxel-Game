@@ -63,13 +63,18 @@ void Client::GameLoop() {
 		Frametime = (double)(high_resolution_clock::now() - t0).count() / 1000000000.0;
 
 		if ((high_resolution_clock::now() - t2).count() > 250000000) {
-			UpdateWindowName("Voxel Engine | FPS: " + std::to_string(1.0 / Frametime) + 
-				" | Pos: " + std::to_string(MainLocalWorld.GetPlayerPosition().x) + ", " +
-				std::to_string(MainLocalWorld.GetPlayerPosition().y) + ", " +
-				std::to_string(MainLocalWorld.GetPlayerPosition().z) + ", VRAM Fragmentation Rate: " 
-				+ std::to_string(TerrainRender.RendererV2.getFragmentationRate() * 100) 
+			UpdateWindowName(
+				"FPS: " + std::to_string(1.0 / Frametime)
+				+ " | Pos: " + std::to_string(MainLocalWorld.GetPlayerPosition().x) + ", " 
+				+ std::to_string(MainLocalWorld.GetPlayerPosition().y) + ", " 
+				+ std::to_string(MainLocalWorld.GetPlayerPosition().z)
+				+ ", VRAM Fragmentation Rate: " + std::to_string(TerrainRender.RendererV2.getFragmentationRate() * 100) 
 				+ ", VRAM Usage (MB): " + std::to_string((double)TerrainRender.RendererV2.getVRAMUsageFull() / 1000000.0)
 				+ " | Mesh All (ms): " + std::to_string(TerrainRender.buildTime)
+				+ " | S0 (ms): " + std::to_string(TerrainRender.buildstage0)
+				+ " | S1 (ms): " + std::to_string(TerrainRender.buildstage1)
+				+ " | S2 (ms): " + std::to_string(TerrainRender.buildstage2)
+
 			);
 			t2 = high_resolution_clock::now();
 		}

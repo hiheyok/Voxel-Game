@@ -12,6 +12,39 @@
 namespace Meshing
 {
 
+	struct CompactBooleanData {
+
+		inline void InsertBit(size_t index) {
+			size_t NumIndex = index >> 6;
+			size_t Index = index & 0b111111;
+
+			data[NumIndex] |= (0b1LL << Index);
+
+		}
+
+		inline bool Getbit(size_t index) {
+			size_t NumIndex = index >> 6;
+			size_t Index = index & 0b111111;
+			return (data[NumIndex] >> Index) & 0b1;
+		}
+
+		inline void InsertBitPos(uint16_t x, uint16_t y, uint16_t z) {
+			InsertBit((x << 8) + (y << 4) + z);
+		}
+
+		inline bool GetBitPos(uint16_t x, uint16_t y, uint16_t z) {
+			return Getbit((x << 8) + (y << 4) + z);
+		}
+
+		inline void clear() {
+			for (int i = 0; i < 64; i++) {
+				data[i] = 0;
+			}
+		}
+
+		uint64_t data[4 * 16]{};
+	};
+
 	struct Quad {
 		//Position in the slice 
 		uint8_t x = 0, y = 0;
@@ -19,21 +52,26 @@ namespace Meshing
 		uint8_t w = 0, h = 0;
 
 		//Lighting; stored as 16 bit to save mem
-		uint16_t Lighting = 0xFFFF;
-		uint16_t Texture = 0;
+		uint32_t Data = 0xFFFF; //Contain Light and Texture
+
 		inline char getLight(uint8_t Location) {
-			return 0b1111 & (Lighting >> (Location * 4));
+			return 0b1111 & (Data >> (Location * 4));
 		}
 
 		inline void setLight(uint8_t Location, uint8_t Val) {
-			Lighting = Lighting & (~(0b1111 << (Location * 4))); // Clears light value for that location
-			Lighting |= (Val << (Location * 4)); //Inserts light value
+			Data = Data & (~(0b1111 << (Location * 4))); // Clears light value for that location
+			Data |= (Val << (Location * 4)); //Inserts light value
 		}
 
-		//int L_NN = 15, L_NP = 15, L_PP = 15, L_PN = 15; // Lighting : P = Positive; N = Negative
+		inline uint16_t getTexture() {
+			return Data >> 16;
+		}
+
+		inline void setTexture(uint32_t tex) {
+			Data = (Data & 0xFFFF) | (tex << 16);
+		}
 
 		/*
-
 		Relative to x-axis
 			L_NP = Negative Y , Positive Z
 		Relative to y-axis
@@ -42,7 +80,6 @@ namespace Meshing
 			L_NP = Negative X , Positive Y
 		*/
 
-		
 	};
 
 	class ChunkMeshData {
@@ -69,10 +106,16 @@ namespace Meshing
 		//Allows you to edit the chunk without remeshing the entire chunk
 		void EditBlock(Block block, int x, int y, int z);
 
-		//Debug timing
+		//Debug timing and stuff
 		double stage0 = 0.0;
 		double stage1 = 0.0;
 		double stage2 = 0.0;
+
+		size_t IsFaceVisibleCalls = 0;
+		size_t GetFaceCalls = 0;
+		size_t SetFaceCalls = 0;
+		size_t GetTextureCalls = 0;
+		size_t CompareQuadCalls = 0;
 
 	private:
 
@@ -80,7 +123,7 @@ namespace Meshing
 		void SimplifyMesh();
 
 		//Compare quad sizes and position
-		inline bool compareQuads(Quad& q0, Quad& q1);
+		inline bool compareQuads(const Quad& q0, const Quad& q1);
 
 		//Generates all the faces and puts them in the cache
 		void GenerateFaceCollection(Chunk& chunk);
@@ -89,31 +132,36 @@ namespace Meshing
 		void GenerateAmbientOcculsion(Chunk& chunk);
 
 		//Check if the player can see the mesh
-		bool IsFaceVisible(Chunk& chunk, int x, int y, int z, int side);
+		inline bool IsFaceVisible(Chunk& chunk, int x, int y, int z, uint8_t side);
+		inline bool IsFaceVisibleUnsafe(Chunk& chunk, int x, int y, int z, uint8_t side);
 
 		//Get face from the cache
-		Quad& GetFace(int x, int y, int z, int side);
+		inline Quad& GetFace(int x, int y, int z, uint8_t side);
+		inline Quad& GetFaceUnsafe(int x, int y, int z, uint8_t side);
 
 		//Sets the faces in FaceCollectionCache
-		void SetFace(int x, int y, int z, int side, Quad quad);
+		inline void SetFace(int x, int y, int z, uint8_t side, Quad quad);
+		inline void SetFaceUnsafe(int x, int y, int z, uint8_t side, Quad quad);
 
 		//Gets block texture 
-		int GetTexture(Chunk& chunk, int x, int y, int z, int side);
+		inline int GetTexture(Chunk& chunk, int x, int y, int z, uint8_t side);
+		inline int GetTextureUnsafe(Chunk& chunk, int x, int y, int z, uint8_t side);
 
 		//Face data
 		Quad* FaceCollectionCache;
 
 		//Add faces to the mesh
-		void AddFacetoMesh(Quad quad, int slice, int axis, int face);
+		inline void AddFacetoMesh(Quad& quad, int slice, int axis, uint8_t face);
 
 
-		void AddFacetoMesh_X(Quad quad, int slice, int face);
-		void AddFacetoMesh_Y(Quad quad, int slice, int face);
-		void AddFacetoMesh_Z(Quad quad, int slice, int face);
+		inline void AddFacetoMesh_X(Quad& quad, int slice, uint8_t face);
+		inline void AddFacetoMesh_Y(Quad& quad, int slice, uint8_t face);
+		inline void AddFacetoMesh_Z(Quad& quad, int slice, uint8_t face);
 
 		//To check if a block had been used in the Greedy Meshing Algorithm
-
 		Quad NullQuad;
+
+		CompactBooleanData booleanMap;
 
 	};
 

@@ -9,36 +9,35 @@ double TREE_RAND_VAL_RANGE = .01f;
 
 using namespace std;
 
-map<float, float> Continentalness = {
-	{0.f, 0.75f},
-	{0.2f, 0.82f},
-	{0.23f, 0.8f},
-	{0.28f, 0.5f},
-	{0.38f, 0.2f},
-	{0.75f, 0.1f},
-	{1.f, 0.3f},
+vector<values2x> ContinentalnessInterpolation{
+	values2x(0.f, 0.75f),
+	values2x(0.2f, 0.82f),
+	values2x(0.23f, 0.8f),
+	values2x(0.28f, 0.5f),
+	values2x(0.38f, 0.2f),
+	values2x(0.75f, 0.1f),
+	values2x(1.f, 0.3f),
 };
 
-map<float, float> Erosionness = {
-	{0.f, 0.9f},
-	{0.075f, 0.5f},
-	{0.15f, 0.55f},
-	{0.3f, 0.3f},
-	{0.75f, 0.1f},
-	{0.8f, 0.3f},
-	{0.9f, 0.2f},
-	{1.f, 0.0f},
+vector<values2x> ErosionnessInterpolation{
+	values2x(0.f, 0.75f),
+	values2x(0.2f, 0.82f ),
+	values2x(0.23f, 0.8f ),
+	values2x(0.28f, 0.5f ),
+	values2x(0.38f, 0.2f ),
+	values2x(0.75f, 0.1f ),
+	values2x(1.f, 0.3f ),
 };
 
-map<float, float> PeaksValley = {
-	{0.f, 0.0f},
-	{0.075f, 0.0f},
-	{0.15f, 0.25f},
-	{0.5f, 0.35f},
-	{0.6f, 0.75f},
-	{0.75f, 0.85f},
-	{0.9f, 0.83f},
-	{1.f, 0.84f},
+vector<values2x> PeaksValleyInterpolation{
+	values2x(0.f, 0.0f),
+	values2x(0.075f, 0.0f),
+	values2x(0.15f, 0.25f),
+	values2x(0.5f, 0.35f),
+	values2x(0.6f, 0.75f),
+	values2x(0.75f, 0.85f),
+	values2x(0.9f, 0.83f),
+	values2x(1.f, 0.84f),
 };
 
 void Chunk::GenSuperFlat() {
@@ -98,10 +97,6 @@ void Chunk::Generate(FastNoiseLite* noise) {
 					}
 				}
 
-				/*if ((x == 16) || (z == 16) || (y == 16)) {
-					SetBlock(DIAMOND_BLOCK, x - cx, y - cy, z - cz);
-				}*/
-
 				if (y < 10) {
 					SetBlock(WATER, x - cx, y - cy, z - cz);
 					isEmpty = false;
@@ -122,8 +117,6 @@ void Chunk::Generate(FastNoiseLite* noise) {
 							SetBlock(DIRT, x - cx, y - cy, z - cz);
 							isEmpty = false;
 						}
-
-						//std::cout << a << "\n";
 
 
 
@@ -362,28 +355,26 @@ float Chunk::getNoise2D(int x, int z, int samples, float frequency, FastNoiseLit
 	return out;
 }
 
-map<float, float>::iterator getItr(std::map<float, float>& map, float bottomBound) {
-	std::map<float, float>::iterator itr = map.begin();
-	
-	while (itr != map.end()) {
-		if (itr->first >= bottomBound) {
-			return --itr;
+int getIndex(vector<values2x>& vec, float bottomBound) {
+	for (int i = 0; i < vec.size(); i++) {
+		if (vec[i].x >= bottomBound) {
+			return i - 1;
 		}
-		itr++;
 	}
-	return itr;
+
+	return vec.size() - 1;
 }
 
 float Chunk::continentialNoise(float n) {
-	std::map<float, float>::iterator itr = getItr(Continentalness, n);
+	int index = getIndex(ContinentalnessInterpolation, n);
 
-	float x1 = itr->first;
-	float y1 = itr->second;
+	float x1 = ContinentalnessInterpolation[index].x;
+	float y1 = ContinentalnessInterpolation[index].y;
 
-	itr++;
+	index++;
 
-	float x2 = itr->first;
-	float y2 = itr->second;
+	float x2 = ContinentalnessInterpolation[index].x;
+	float y2 = ContinentalnessInterpolation[index].y;
 
 	float m = (y1 - y2) / (x1 - x2);
 
@@ -394,15 +385,15 @@ float Chunk::continentialNoise(float n) {
 }
 
 float Chunk::erosionNoise(float n) {
-	std::map<float, float>::iterator itr = getItr(Continentalness, n);
+	int index = getIndex(ErosionnessInterpolation, n);
 
-	float x1 = itr->first;
-	float y1 = itr->second;
+	float x1 = ErosionnessInterpolation[index].x;
+	float y1 = ErosionnessInterpolation[index].y;
 
-	itr++;
+	index++;
 
-	float x2 = itr->first;
-	float y2 = itr->second;
+	float x2 = ErosionnessInterpolation[index].x;
+	float y2 = ErosionnessInterpolation[index].y;
 
 	float m = (y1 - y2) / (x1 - x2);
 
@@ -412,15 +403,15 @@ float Chunk::erosionNoise(float n) {
 }
 
 float Chunk::peaksandvalley(float n) {
-	std::map<float, float>::iterator itr = getItr(PeaksValley, n);
+	int index = getIndex(PeaksValleyInterpolation, n);
 
-	float x1 = itr->first;
-	float y1 = itr->second;
+	float x1 = PeaksValleyInterpolation[index].x;
+	float y1 = PeaksValleyInterpolation[index].y;
 
-	itr++;
+	index++;
 
-	float x2 = itr->first;
-	float y2 = itr->second;
+	float x2 = PeaksValleyInterpolation[index].x;
+	float y2 = PeaksValleyInterpolation[index].y;
 
 	float m = (y1 - y2) / (x1 - x2);
 

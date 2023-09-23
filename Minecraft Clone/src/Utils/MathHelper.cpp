@@ -9,8 +9,8 @@ double toRadians(double x)
     return x* 0.01745329251;
 }
 
-double FindDistanceNoSqrt(double x, double y, double z, double x1, double y1, double z1) {
-	return ((double)x - (double)x1) * ((double)x - (double)x1) + ((double)y - (double)y1) * ((double)y - (double)y1) + ((double)z - (double)z1) * ((double)z - (double)z1);
+float FindDistanceNoSqrt(float x, float y, float z, float x1, float y1, float z1) {
+	return (x - x1) * (x - x1) + (y - y1) * (y - y1) + (z - z1) * (z - z1);
 }
 
 double FindDistanceNoSqrt(int x, int y, int x1, int y1) {

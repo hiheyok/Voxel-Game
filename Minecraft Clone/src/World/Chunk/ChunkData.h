@@ -5,6 +5,11 @@
 #include "ChunkID.h"
 #include <atomic>
 
+#ifndef CHUNKDATA_H
+#define CHUNKDATA_H
+
+
+
 #define PX 0x00
 #define NX 0x01
 #define PY 0x02
@@ -23,10 +28,12 @@ public:
 	void ClearNeighbors();
 
 	BlockID GetBlock(int x, int y, int z);
+	BlockID GetBlockUnsafe(int x, int y, int z);
 
 	void SetBlock(BlockID block, int x, int y, int z);
+	void SetBlockUnsafe(BlockID block, int x, int y, int z);
 
-	ChunkContainer* GetNeighbor(unsigned int Side);
+	inline ChunkContainer* GetNeighbor(unsigned int Side);
 	
 	void SetPosition(int x, int y, int z);
 
@@ -41,3 +48,5 @@ private:
 
 	BlockContainer Blocks;
 };
+
+#endif

@@ -33,6 +33,10 @@ BlockID ChunkContainer::GetBlock(int x, int y, int z) {
 	}
 }
 
+BlockID ChunkContainer::GetBlockUnsafe(int x, int y, int z) {
+	return Blocks.GetBlock(x, y, z);
+}
+
 void ChunkContainer::SetBlock(BlockID block, int x, int y, int z) {
 	if (x >= 16 || y >= 16 || z >= 16 || x < 0 || y < 0 || z < 0) {
 		if (x < 0) {
@@ -69,8 +73,11 @@ void ChunkContainer::SetBlock(BlockID block, int x, int y, int z) {
 		Blocks.ChangeBlock(block, (uint32_t)x, (uint32_t)y, (uint32_t)z);
 		isEmpty = false;
 	}
+}
 
-	
+void ChunkContainer::SetBlockUnsafe(BlockID block, int x, int y, int z) {
+	Blocks.ChangeBlock(block, (uint32_t)x, (uint32_t)y, (uint32_t)z);
+	isEmpty = false;
 }
 
 void ChunkContainer::SetPosition(int x, int y, int z) {
@@ -80,7 +87,7 @@ void ChunkContainer::SetPosition(int x, int y, int z) {
 	chunkID = getChunkID(x, y, z);
 }
 
-ChunkContainer* ChunkContainer::GetNeighbor(unsigned int Side) {
+inline ChunkContainer* ChunkContainer::GetNeighbor(unsigned int Side) {
 	return Neighbors[Side];
 }
 

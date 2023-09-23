@@ -1,6 +1,5 @@
 #include "ChunkBatch.h"
 #include <iterator>
-#include <optional>
 
 using namespace glm;
 using namespace std;
@@ -79,8 +78,8 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
 	for (const auto& data_ : RenderList) {
 		auto& data = data_.second;
 		if (FindDistanceNoSqrt(data.x, data.y, data.z, Position.x, Position.y, Position.z) < RenderDistance * RenderDistance) {
-			if (Frustum.SphereInFrustum((float)data.x * 16, (float)data.y * 16, (float)data.z * 16, (float)32)) {
-				DrawCommands.emplace_back((unsigned int)data.size / (sizeof(unsigned int) * 2), 1, (unsigned int)data.offset / (sizeof(unsigned int) * 2), Index);
+			if (Frustum.SphereInFrustum((float)(data.x << 4), (float)(data.y << 4), (float)(data.z << 4), 32.f)) { // << 4 means multiply by 4
+				DrawCommands.emplace_back(data.size >> 3, 1, data.offset >> 3, Index);
 				ChunkShaderPos.emplace_back(data.x);
 				ChunkShaderPos.emplace_back(data.y);
 				ChunkShaderPos.emplace_back(data.z);
@@ -133,14 +132,19 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int
 		auto RenderListIterator = RenderList.find(iteratorOffset);
 		//Update Insert Map
 
-		std::optional<ChunkID> lastID;
-		std::optional<ChunkID> frontID;
+
+		ChunkID lastID = 0;
+		ChunkID frontID = 0;
+
+		bool lastIDB = false;
+		bool frontIDB  = false;
 
 		if (RenderListIterator != RenderList.begin()) {
 			RenderListIterator--;
 			DataBufferAddress& lastChunk = RenderListIterator->second;
 			lastID = getChunkID(lastChunk.x, lastChunk.y, lastChunk.z);
-			InsertSpaceIteratorsFront.erase(lastID.value());
+			lastIDB = true;
+			InsertSpaceIteratorsFront.erase(lastID);
 			RenderListIterator++;
 		}
 
@@ -148,7 +152,8 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int
 			RenderListIterator++;
 			DataBufferAddress& frontChunk = RenderListIterator->second;
 			frontID = getChunkID(frontChunk.x, frontChunk.y, frontChunk.z);
-			InsertSpaceIteratorsBack.erase(frontID.value());
+			frontIDB = true;
+			InsertSpaceIteratorsBack.erase(frontID);
 			RenderListIterator--;
 		}
 
@@ -160,8 +165,8 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int
 
 			std::multimap<size_t, size_t>::iterator nextIterator = InsertSpace.insert(pair<size_t, size_t>(size, offset));
 
-			if (frontID.has_value()) {
-				InsertSpaceIteratorsBack[frontID.value()] = nextIterator;
+			if (frontIDB) {
+				InsertSpaceIteratorsBack[frontID] = nextIterator;
 			}
 			InsertSpaceIteratorsFront[id] = nextIterator;
 		}

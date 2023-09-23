@@ -18,7 +18,7 @@ void ChunkMeshData::GenerateMesh(Chunk& chunk) {
 	NullQuad.x = 255;
 	NullQuad.y = 255;
 
-	NullQuad.Texture = 255;
+	NullQuad.setTexture(255);
 
 	Quad cache[4096 * 6]{};
 
@@ -45,29 +45,64 @@ void ChunkMeshData::GenerateMesh(Chunk& chunk) {
 }
 
 //Checks if there are anything different between q0 and q1
-inline bool ChunkMeshData::compareQuads(Quad& q0, Quad& q1) {
-	return (q0.Lighting == q1.Lighting) && (q0.Texture == q1.Texture);
+inline bool ChunkMeshData::compareQuads(const Quad& q0, const Quad& q1) {
+	//CompareQuadCalls++;
+	return q0.Data == q1.Data;
 }
 
 //Loops through all the blocks in the chunk and check if each block side is visible. If a block side is visible, it generates the quad and puts it in the cache
 
 void ChunkMeshData::GenerateFaceCollection(Chunk& chunk) {
-	for (int x = 0; x < 16; x++) {
-		for (int y = 0; y < 16; y++) {
-			for (int z = 0; z < 16; z++) {
-				if (chunk.GetBlock(x, y, z) == AIR)
+	for (int x = 1; x < 15; x++) {
+		for (int y = 1; y < 15; y++) {
+			for (int z = 1; z < 15; z++) {
+				if (chunk.GetBlockUnsafe(x, y, z) == AIR)
 					continue;
+				int skip = false;
 
-				for (int side = 0; side < 6; side++) {
-					if (!IsFaceVisible(chunk, x, y, z, side))
+				for (uint8_t side = 0; side < 6; side++) {
+					if (!IsFaceVisibleUnsafe(chunk, x, y, z, side))
 						continue;
 
 					Quad quad;
-					quad.Texture = GetTexture(chunk, x, y, z, side);
-					SetFace(x, y, z, side, quad);
+					quad.setTexture(GetTextureUnsafe(chunk, x, y, z, side));
+					SetFaceUnsafe(x, y, z, side, quad);
+					booleanMap.InsertBitPos(x, y, z);
+					skip = (side == PZ);
 				}
+
+				z += skip;
 			}
 		}
+	}
+
+	for (int faces = 0; faces < 6; faces++) {
+		for (int u = 0; u < 16; u++) {
+			for (int v = 0; v < 16; v++) {
+				int axis = faces >> 1;
+
+				int p[3]{0,0,0};
+
+				p[axis] = 15 * (faces & 0b1);
+				p[(axis + 1) % 3] = u;
+				p[(axis + 2) % 3] = v;
+
+				if (chunk.GetBlockUnsafe(p[0],p[1],p[2]) == AIR)
+					continue;
+
+				for (uint8_t side = 0; side < 6; side++) {
+					if (!IsFaceVisible(chunk, p[0], p[1], p[2], side))
+						continue;
+
+					Quad quad;
+					quad.setTexture(GetTextureUnsafe(chunk, p[0], p[1], p[2], side));
+					SetFaceUnsafe(p[0], p[1], p[2], side, quad);
+					booleanMap.InsertBitPos(p[0], p[1], p[2]);
+				}
+
+			}
+		}
+
 	}
 }
 
@@ -92,9 +127,8 @@ void ChunkMeshData::SimplifyMesh() {
 			for (x[Axis2] = 0; x[Axis2] < 16; x[Axis2]++) {
 				for (x[Axis1] = 0; x[Axis1] < 16; x[Axis1]++) {
 					for (x[Axis0] = 0; x[Axis0] < 16; x[Axis0]++) {
-
-						if (!compareQuads(GetFace(x[0], x[1], x[2], axis * 2 + facing), NullQuad)) { // Check if quad actually exist first
-							LastQuad = GetFace(x[0], x[1], x[2], axis * 2 + facing); //Load in quad face
+						if (!compareQuads(GetFaceUnsafe(x[0], x[1], x[2], (axis << 1) + facing), NullQuad)) { // Check if quad actually exist first
+							LastQuad = GetFaceUnsafe(x[0], x[1], x[2], (axis << 1) + facing); //Load in quad face
 
 							int Axis1W = 1;
 							int Axis0H = 1;
@@ -105,7 +139,7 @@ void ChunkMeshData::SimplifyMesh() {
 								q[Axis1] = x[Axis1] + Axis1W;
 								q[Axis2] = x[Axis2];
 
-								bool IsSame = compareQuads(GetFace(q[0], q[1], q[2], axis * 2 + facing), LastQuad);
+								bool IsSame = compareQuads(GetFace(q[0], q[1], q[2], (axis << 1) + facing), LastQuad);
 
 								if (!IsSame)
 									break;
@@ -121,7 +155,7 @@ void ChunkMeshData::SimplifyMesh() {
 								q[Axis1] = x[Axis1];
 								q[Axis2] = x[Axis2];
 
-								if (!compareQuads(GetFace(q[0], q[1], q[2], axis * 2 + facing), LastQuad)) { //Checks if it can expand in the other direction first
+								if (!compareQuads(GetFaceUnsafe(q[0], q[1], q[2], (axis << 1) + facing), LastQuad)) { //Checks if it can expand in the other direction first
 									Axis1K = Axis1W;
 									break;
 								}
@@ -133,7 +167,7 @@ void ChunkMeshData::SimplifyMesh() {
 									q[Axis1] = x[Axis1] + Axis1K;
 									q[Axis2] = x[Axis2];
 
-									if (!compareQuads(GetFace(q[0], q[1], q[2], axis * 2 + facing), LastQuad)) {
+									if (!compareQuads(GetFaceUnsafe(q[0], q[1], q[2], (axis << 1) + facing), LastQuad)) {
 										done = true;
 										break;
 									}
@@ -149,7 +183,7 @@ void ChunkMeshData::SimplifyMesh() {
 									q[Axis0] = x[Axis0] + Axis0H_TMP;
 									q[Axis1] = x[Axis1] + Axis1K_TMP;
 									q[Axis2] = x[Axis2];
-									SetFace(q[0], q[1], q[2], axis * 2 + facing, NullQuad);
+									SetFaceUnsafe(q[0], q[1], q[2], (axis << 1) + facing, NullQuad);
 								}
 							}
 
@@ -177,7 +211,7 @@ void ChunkMeshData::SimplifyMesh() {
 
 
 
-void ChunkMeshData::AddFacetoMesh(Quad quad, int slice, int axis, int face) {
+inline void ChunkMeshData::AddFacetoMesh(Quad& quad, int slice, int axis, uint8_t face) {
 
 	if (axis == 0) { //0 = x axis
 		AddFacetoMesh_X(quad, slice, face);
@@ -193,7 +227,7 @@ void ChunkMeshData::AddFacetoMesh(Quad quad, int slice, int axis, int face) {
 	}
 }
 
-void ChunkMeshData::AddFacetoMesh_X(Quad quad, int slice, int face) {
+inline void ChunkMeshData::AddFacetoMesh_X(Quad& quad, int slice, uint8_t face) {
 	uint32_t P0[3]{};
 	uint32_t P1[3]{};
 
@@ -242,7 +276,7 @@ void ChunkMeshData::AddFacetoMesh_X(Quad quad, int slice, int face) {
 		sy0 = sy_tmp;
 	}
 
-	int tex = quad.Texture << textureBitOffset;
+	uint32_t tex = (uint32_t)quad.getTexture() << textureBitOffset;
 
 	switch (face) {
 	case 1:
@@ -276,7 +310,7 @@ void ChunkMeshData::AddFacetoMesh_X(Quad quad, int slice, int face) {
 	}
 }
 
-void ChunkMeshData::AddFacetoMesh_Y(Quad quad, int slice, int face) {
+inline void ChunkMeshData::AddFacetoMesh_Y(Quad& quad, int slice, uint8_t face) {
 	uint32_t P0[3]{};
 	uint32_t P1[3]{};
 
@@ -325,7 +359,7 @@ void ChunkMeshData::AddFacetoMesh_Y(Quad quad, int slice, int face) {
 		sx0 = sx_tmp;
 	}
 
-	int tex = quad.Texture << textureBitOffset; //x : z
+	uint32_t tex = (uint32_t)quad.getTexture() << textureBitOffset; //x : z
 
 	switch (face) {
 	case 1:
@@ -341,7 +375,7 @@ void ChunkMeshData::AddFacetoMesh_Y(Quad quad, int slice, int face) {
 		SolidVertices.push_back(0u | sx0 | sy | tex);
 		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset)); //5
 		SolidVertices.push_back(0u | sx | sy | tex);
-		
+
 		break;
 	case 0:
 		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
@@ -360,7 +394,7 @@ void ChunkMeshData::AddFacetoMesh_Y(Quad quad, int slice, int face) {
 	}
 }
 
-void ChunkMeshData::AddFacetoMesh_Z(Quad quad, int slice, int face) { //x : x
+inline void ChunkMeshData::AddFacetoMesh_Z(Quad& quad, int slice, uint8_t face) { //x : x
 	uint32_t P0[3]{};
 	uint32_t P1[3]{};
 
@@ -388,7 +422,7 @@ void ChunkMeshData::AddFacetoMesh_Z(Quad quad, int slice, int face) { //x : x
 	int sx0 = 0;
 
 	if ((int)NN + (int)PP > (int)NP + (int)PN) {
-		int PTMP[3]{ P0[0], P0[1], P0[2] };
+		uint32_t PTMP[3]{ P0[0], P0[1], P0[2] };
 
 		P0[1] = P1[1];
 
@@ -409,7 +443,7 @@ void ChunkMeshData::AddFacetoMesh_Z(Quad quad, int slice, int face) { //x : x
 		face = !face;
 	}
 
-	int tex = quad.Texture << textureBitOffset;
+	uint32_t tex = (uint32_t)quad.getTexture() << textureBitOffset;
 
 	switch (face) {
 	case 1:
@@ -446,127 +480,153 @@ void ChunkMeshData::AddFacetoMesh_Z(Quad quad, int slice, int face) { //x : x
 //Creates ambient occulsion 
 
 void ChunkMeshData::GenerateAmbientOcculsion(Chunk& chunk) {
+	for (int x = 0; x < 16; x++) {
+		for (int y = 0; y < 16; y++) {
+			for (int z = 0; z < 16; z++) {
 
-	for (int axis = 0; axis < 3; axis++) {
-		for (int face = 0; face < 2; face++) {
-			int p[3]{ 0,0,0 };
+				if ((!booleanMap.GetBitPos(x, y, z))) {
+					continue;
+				}
 
-			int axis0 = axis;
-			int axis1 = (axis + 1) % 3; //u
-			int axis2 = (axis + 2) % 3; //v
+				int pos[3]{ x, y, z };
 
-			int offset = 1 - (2 * face); // main axis offset
+				for (int side = 0; side < 6; side++) {
+					uint8_t axis = side >> 1;
+					uint8_t face = side & 0b1;
 
-			for (p[axis0] = -1; p[axis0] < 17; p[axis0]++) {
-				for (p[axis1] = -1; p[axis1] < 17; p[axis1]++) {
-					for (p[axis2] = -1; p[axis2] < 17; p[axis2]++) {
+					uint8_t axis1 = (axis + 1) % 3;
+					uint8_t axis2 = (axis + 2) % 3;
 
-						Quad& q = GetFace(p[0], p[1], p[2], axis * 2 + face);
+					char offset = 1 - (2 * face);
 
-						if (compareQuads(NullQuad, q)) //Checks if face doesnt exist
-							continue;
+					Quad& q = GetFaceUnsafe(x, y, z, side);
 
-						int check[3]{ p[0],p[1],p[2] };
+					if (compareQuads(NullQuad, q)) //Checks if face doesnt exist
+						continue;
 
-						check[axis0] += offset;
+					int check[3]{ x, y, z };
 
-						for (int u = -1; u <= 1; u++) {
+					check[axis] += offset;
 
-							for (int v = -1; v <= 1; v++) {
+					for (int u = -1; u <= 1; u++) {
 
-								if (v == 0 && u == 0)
-									continue;
+						for (int v = -1; v <= 1; v++) {
 
-								check[axis1] = u + p[axis1];
-								check[axis2] = v + p[axis2];
+							if (v == 0 && u == 0)
+								continue;
 
-								if (chunk.GetBlock(check[0], check[1], check[2]) == AIR)
-									continue;
+							check[axis1] = u + pos[axis1];
+							check[axis2] = v + pos[axis2];
 
-								uint8_t CornerIndex = 0;
+							if (chunk.GetBlock(check[0], check[1], check[2]) == AIR)
+								continue;
 
-								if ((u != 0) && (v != 0)) { //Corners
+							uint8_t CornerIndex = 0;
 
-									CornerIndex |= 0b10 * (u == 1);
-									CornerIndex |= 0b01 * (v == 1);
+							if ((u != 0) && (v != 0)) { //Corners
 
-									if (q.getLight(CornerIndex) > 1) {
-										q.setLight(CornerIndex, q.getLight(CornerIndex) - 2);
-									}
+								CornerIndex |= 0b10 * (u == 1);
+								CornerIndex |= 0b01 * (v == 1);
 
-									continue;
+								if (q.getLight(CornerIndex) > 1) {
+									q.setLight(CornerIndex, q.getLight(CornerIndex) - 2);
 								}
 
-								if (u != 0) {
+								continue;
+							}
 
-									CornerIndex |= 0b10 * (u == 1);
+							if (u != 0) {
 
-									if (q.getLight(CornerIndex) > 1) {
-										q.setLight(CornerIndex, q.getLight(CornerIndex) - 2);
-									}
-									if (q.getLight(CornerIndex | 0b01) > 1) {
-										q.setLight(CornerIndex | 0b01, q.getLight(CornerIndex | 0b01) - 2);
-									}
+								CornerIndex |= 0b10 * (u == 1);
 
-									continue;
+								if (q.getLight(CornerIndex) > 1) {
+									q.setLight(CornerIndex, q.getLight(CornerIndex) - 2);
+								}
+								if (q.getLight(CornerIndex | 0b01) > 1) {
+									q.setLight(CornerIndex | 0b01, q.getLight(CornerIndex | 0b01) - 2);
 								}
 
-								if (v != 0) {
+								continue;
+							}
 
-									CornerIndex |= 0b01 * (v == 1);
+							if (v != 0) {
 
-									if (q.getLight(CornerIndex) > 1) {
-										q.setLight(CornerIndex, q.getLight(CornerIndex) - 2);
-									}
-									if (q.getLight(CornerIndex | 0b10) > 1) {
-										q.setLight(CornerIndex | 0b10, q.getLight(CornerIndex | 0b10) - 2);
-									}
+								CornerIndex |= 0b01 * (v == 1);
 
-									continue;
+								if (q.getLight(CornerIndex) > 1) {
+									q.setLight(CornerIndex, q.getLight(CornerIndex) - 2);
 								}
+								if (q.getLight(CornerIndex | 0b10) > 1) {
+									q.setLight(CornerIndex | 0b10, q.getLight(CornerIndex | 0b10) - 2);
+								}
+
+								continue;
 							}
 						}
-
 					}
 				}
 			}
 		}
 	}
+
+	
 }
 
 //Checks if a block side is visible to the player
-bool ChunkMeshData::IsFaceVisible(Chunk& chunk, int x, int y, int z, int side) {
-	switch (side)
-	{
-	case NX:
-		return chunk.GetBlock(x - 1, y, z) == AIR;
-	case PX:
-		return chunk.GetBlock(x + 1, y, z) == AIR;
-	case NY:
-		return chunk.GetBlock(x, y - 1, z) == AIR;
-	case PY:
-		return chunk.GetBlock(x, y + 1, z) == AIR;
-	case NZ:
-		return chunk.GetBlock(x, y, z - 1) == AIR;
-	case PZ:
-		return chunk.GetBlock(x, y, z + 1) == AIR;
-	default:
-		return false;
-	}
+inline bool ChunkMeshData::IsFaceVisible(Chunk& chunk, int x, int y, int z, uint8_t side) {
+	//IsFaceVisibleCalls++;
+
+	uint8_t axis = (side >> 1); //Get side
+
+	int p[3]{ x,y,z };
+
+	p[axis] += 1 - 2 * (side & 0b1);
+
+	return chunk.GetBlock(p[0], p[1], p[2]) == AIR;
 }
 
-Quad& ChunkMeshData::GetFace(int x, int y, int z, int side) {
+inline bool ChunkMeshData::IsFaceVisibleUnsafe(Chunk& chunk, int x, int y, int z, uint8_t side) {
+	//IsFaceVisibleCalls++;
+
+	uint8_t axis = (side >> 1); //Get side
+
+	int p[3]{ x,y,z };
+
+	p[axis] += 1 - 2 * (side & 0b1);
+
+	return chunk.GetBlockUnsafe(p[0], p[1], p[2]) == AIR;
+}
+
+inline Quad& ChunkMeshData::GetFace(int x, int y, int z, uint8_t side) {
+	//GetFaceCalls++;
 	if (x >= 16 || y >= 16 || z >= 16 || x < 0 || y < 0 || z < 0)
 		return NullQuad;
-	return FaceCollectionCache[(x * 256 + y * 16 + z) * 6 + side];
+	return FaceCollectionCache[((x << 8) + (y << 4) + z) * 6 + side];
 }
 
-void ChunkMeshData::SetFace(int x, int y, int z, int side, Quad quad) {
+inline Quad& ChunkMeshData::GetFaceUnsafe(int x, int y, int z, uint8_t side) {
+	//GetFaceCalls++;
+	return FaceCollectionCache[((x << 8) + (y << 4) + z) * 6 + side];
+}
+
+inline void ChunkMeshData::SetFace(int x, int y, int z, uint8_t side, Quad quad) {
+	//SetFaceCalls++;
 	if (x >= 16 || y >= 16 || z >= 16 || x < 0 || y < 0 || z < 0)
 		return;
-	FaceCollectionCache[(x * 256 + y * 16 + z) * 6 + side] = quad;
+	FaceCollectionCache[((x << 8) + (y << 4) + z) * 6 + side] = quad;
 }
 
-int ChunkMeshData::GetTexture(Chunk& chunk, int x, int y, int z, int side) {
+inline void ChunkMeshData::SetFaceUnsafe(int x, int y, int z, uint8_t side, Quad quad) {
+//	SetFaceCalls++;
+	FaceCollectionCache[((x << 8) + (y << 4) + z) * 6 + side] = quad;
+}
+
+inline int ChunkMeshData::GetTexture(Chunk& chunk, int x, int y, int z, uint8_t side) {
+	//GetTextureCalls++;
 	return BlockList[chunk.GetBlock(x, y, z)]->Texture->GetFace(side);
+}
+
+inline int ChunkMeshData::GetTextureUnsafe(Chunk& chunk, int x, int y, int z, uint8_t side) {
+	//GetTextureCalls++;
+	return BlockList[chunk.GetBlockUnsafe(x, y, z)]->Texture->GetFace(side);
 }
