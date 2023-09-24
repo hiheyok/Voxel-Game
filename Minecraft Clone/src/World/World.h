@@ -37,10 +37,7 @@ private:
 	float GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int direction, int distancetest);
 
 	std::thread MainWorldThread;
-
 	std::thread Loader;
-
-	bool stop = false;
 
 	glm::vec3 PlayerPos = glm::vec3(0.f,0.f,0.f);
 
@@ -50,6 +47,7 @@ private:
 
 	std::unordered_set<ChunkID> ChunksInQueue;
 
+	bool stop = false;
 };
 
 #endif // !WORLD_H

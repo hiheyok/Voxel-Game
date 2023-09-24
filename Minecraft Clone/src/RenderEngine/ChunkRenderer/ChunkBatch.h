@@ -70,7 +70,7 @@ public:
 
 	double debugTime = 0.0;
 private:
-	
+
 	CFrustum Frustum;
 	Buffer VBO, IBO, SSBO;
 	VertexArray Array;
@@ -85,9 +85,9 @@ private:
 
 	std::unordered_map<ChunkID, std::multimap<size_t, size_t>::iterator> InsertSpaceIteratorsFront;
 	std::unordered_map<ChunkID, std::multimap<size_t, size_t>::iterator> InsertSpaceIteratorsBack;
-	
+
 	std::vector<DrawCommandIndirect> DrawCommands;
 
-	
+
 
 };

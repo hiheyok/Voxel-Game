@@ -73,13 +73,13 @@ BlockID WorldData::GetBlock(int x, int y, int z) {
 	return WorldChunkData.GetBlockGlobal(x, y, z);
 }
 
-void WorldData::SetChunk(Chunk chunk) {
+void WorldData::SetChunk(Chunk* chunk) {
 	WorldChunkData.InsertChunk(chunk);
-	ChunkUpdate(chunk.Position.x, chunk.Position.y, chunk.Position.z);
+	ChunkUpdate(chunk->Position.x, chunk->Position.y, chunk->Position.z);
 
 	for (int axis = 0; axis < 3; axis++) {
 		for (int face = 0; face < 2; face++) {
-			vec3 temp = chunk.Position;
+			vec3 temp = chunk->Position;
 
 			temp[axis] += (-2 * face) + 1;
 
@@ -107,12 +107,15 @@ bool WorldData::CheckChunk(ChunkID id) {
 	return CheckChunk(pos.x, pos.y, pos.z);
 }
 
-Chunk& WorldData::GetChunk(ChunkID id) {
-	return WorldChunkData[id];
+Chunk* WorldData::GetChunk(ChunkID id) {
+
+	ivec3 p = ChunkIDToPOS(id);
+
+	return GetChunk(p.x, p.y, p.z);
 }
 
-Chunk& WorldData::GetChunk(int x, int y, int z) {
-	return GetChunk(getChunkID(x, y, z));
+Chunk* WorldData::GetChunk(int x, int y, int z) {
+	return WorldChunkData.GetChunk(x,y,z);
 }
 
 void WorldData::ChunkUpdate(int x, int y, int z) {

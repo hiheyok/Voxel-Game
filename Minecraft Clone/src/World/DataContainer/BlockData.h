@@ -26,7 +26,7 @@ public:
 private:
 
 	inline static unsigned int GetDataIndex(unsigned int x, unsigned int y, unsigned int z) {
-		return (x * 256) + (z * 16) + y;
+		return (x << 8) + (z << 4) + y;
 	}
 	
 	BlockID Data[4096]{AIR};

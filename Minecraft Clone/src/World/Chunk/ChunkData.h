@@ -19,6 +19,7 @@
 
 typedef unsigned long long int ChunkID;
 
+
 class ChunkContainer {
 	
 public:
@@ -33,6 +34,10 @@ public:
 	void SetBlock(BlockID block, int x, int y, int z);
 	void SetBlockUnsafe(BlockID block, int x, int y, int z);
 
+	void Use();
+
+	void Unuse();
+
 	inline ChunkContainer* GetNeighbor(unsigned int Side);
 	
 	void SetPosition(int x, int y, int z);
@@ -44,8 +49,10 @@ public:
 
 	ChunkContainer* Neighbors[6]{nullptr};
 	std::vector<SetBlockRelative> OutsideBlockToPlace[6]{};
-private:
 
+	
+private:
+	bool InUse = false;
 	BlockContainer Blocks;
 };
 

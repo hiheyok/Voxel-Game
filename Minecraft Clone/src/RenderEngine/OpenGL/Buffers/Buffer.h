@@ -38,6 +38,8 @@ public:
 
 	void InsertData(GLsizeiptr Size, const void* Data, GLenum Usage);
 	void InsertSubData(GLintptr Offset, GLsizeiptr Size, const void* Data);
+
+	void CopyTo(Buffer& destination, size_t offset, size_t desOffset, size_t size);
 private:
 	unsigned int BufferID = NULL;
 	GLenum Type = NULL, Usage = NULL;

@@ -16,11 +16,11 @@ public:
 
 	void Generate(int x, int y, int z);
 
-	std::deque<Chunk> GetOutput();
+	std::deque<Chunk*> GetOutput();
 
 private:
 
-	std::deque<Chunk> Output; //Once a chunk is generated, the chunk is added here
+	std::deque<Chunk*> Output; //Once a chunk is generated, the chunk is added here
 
 	void TaskScheduler(); //Manages how jobs gets distributed between the workers and manages the output of the workers
 
@@ -32,7 +32,7 @@ private:
 
 	std::deque<std::thread> Workers;
 	std::deque<std::deque<ChunkID>> WorkerTask;
-	std::deque<std::deque<Chunk>> WorkerOutput;
+	std::deque<std::deque<Chunk*>> WorkerOutput;
 	std::deque<std::mutex> WorkerLocks;
 
 	std::thread Scheduler;

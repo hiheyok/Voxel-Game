@@ -71,6 +71,15 @@ void Buffer::getData(uint32_t* ptr, size_t offset, size_t size) {
 	Unbind();
 }
 
+void Buffer::CopyTo(Buffer& destination, size_t offset, size_t desOffset, size_t size) {
+	Bind();
+	destination.Bind();
+//	glCopyNamedBufferSubData(BufferID, destination.BufferID, offset, desOffset, size);
+	glCopyBufferSubData(Type, destination.Type, offset, desOffset, size);
+	Unbind();
+	destination.Unbind();
+}
+
 void VertexArray::Bind() {
 	glBindVertexArray(ArrayID);
 }

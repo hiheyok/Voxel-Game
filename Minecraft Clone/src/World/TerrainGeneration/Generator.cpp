@@ -5,9 +5,9 @@
 using namespace std;
 using namespace glm;
 
-std::deque<Chunk> Generator::GetOutput() {
+std::deque<Chunk*> Generator::GetOutput() {
 	SchedulerLock.lock();
-	std::deque<Chunk> out = Output;
+	std::deque<Chunk*> out = Output;
 	Output.clear();
 	SchedulerLock.unlock();
 
@@ -47,7 +47,7 @@ void Generator::Worker(int id) {
 
 	deque<ChunkID> Jobs;
 
-	deque<Chunk> FinishedJobs;
+	deque<Chunk*> FinishedJobs;
 
 	while (!stop) {
 		//Fetches all of the tasks and put it in "Jobs"
@@ -76,7 +76,9 @@ void Generator::Worker(int id) {
 
 			TerrainType type = MOUNTAINS;
 
-			FinishedJobs.emplace_back(x, y, z, type, noise);
+			Chunk* chunk = new Chunk(x, y, z, type, noise);
+
+			FinishedJobs.push_back(chunk);
 
 			count++;
 			if ((count % BatchSize) == 0) {
@@ -103,7 +105,7 @@ void Generator::TaskScheduler() {
 	int WorkerSelection = 0;
 
 	std::deque<std::deque<ChunkID>> DistributedTasks;
-	std::deque<std::deque<Chunk>> ChunkOutputs;
+	std::deque<std::deque<Chunk*>> ChunkOutputs;
 
 	DistributedTasks.resize(WorkerCount);
 	ChunkOutputs.resize(WorkerCount);

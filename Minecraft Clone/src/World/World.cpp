@@ -72,7 +72,6 @@ bool World::RayIntersection(Ray& ray) {
 		BlockPos[0] += ((int)mask[0]) * Direction[0];
 		BlockPos[1] += ((int)mask[1]) * Direction[1];
 		BlockPos[2] += ((int)mask[2]) * Direction[2];
-
 	}
 
 	return false;
@@ -109,7 +108,7 @@ float World::GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int dire
 		}
 	}
 
-	return -1;
+	return -1.f;
 }
 
 dvec3 World::GetTimeTillCollusion(Entity entity) {
@@ -158,7 +157,6 @@ dvec3 World::GetTimeTillCollusion(Entity entity) {
 
 				if (!IsPointOnHitboxSurface) //Checks if the origin is on the surface to optimize stuff
 					continue;
-
 
 				if (entity.Velocity[axis] != 0.f) { //First checks if the velocity isn't 0 because if it is 0, it's not moving in that axis so it's not going to collide in that direction
 					int direction = axis * 2 + (entity.Velocity[axis] < 0); // The "+1" indicates that the direction is negative 
@@ -229,24 +227,24 @@ void World::WorldThread() {
 			}
 		}
 
-		deque<Chunk> GenOutput = WorldGenerator.GetOutput();
+		deque<Chunk*> GenOutput = WorldGenerator.GetOutput();
 
 		while (!GenOutput.empty()) {
 
-			Chunk chunk = GenOutput.front();
+			Chunk* chunk = GenOutput.front();
 			GenOutput.pop_front();
 
 			SetChunk(chunk);
-			ChunksInQueue.erase(chunk.chunkID);
+			ChunksInQueue.erase(chunk->chunkID);
 
 			ChunksPerTick++;
 		}
 
 		timerSleepNotPrecise((int)(1000.f / (float)TPS));
 
-	//	float MSPT = (float)((double)(high_resolution_clock::now() - t0).count() / 1000000.0);
+		float MSPT = (float)((double)(high_resolution_clock::now() - t0).count() / 1000000.0);
 
-		//getLogger()->LogInfo("World", "MSPT: " + std::to_string(MSPT) + " | Chunks Per Second: " + std::to_string((float)ChunksPerTick / (MSPT / 1000)));
+		getLogger()->LogInfo("World", "MSPT: " + std::to_string(MSPT) + " | Chunks Per Second: " + std::to_string((float)ChunksPerTick / (MSPT / 1000)));
 	}
 
 	getLogger()->LogInfo("World","Shutting down main world thread");

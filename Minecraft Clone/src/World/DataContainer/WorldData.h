@@ -17,15 +17,13 @@ public:
 	BlockID GetBlock(int x, int y, int z);
 	bool SetBlock(BlockID block, int x, int y, int z);
 
-	void SetChunk(Chunk chunk);
+	void SetChunk(Chunk* chunk);
 
 	bool CheckChunk(int x, int y, int z);
 	bool CheckChunk(ChunkID id);
 
-	Chunk& GetChunk(int x, int y, int z);
-	Chunk& GetChunk(ChunkID id);
-
-	Chunk GetCopyOfChunk(int x, int y, int z);
+	Chunk* GetChunk(int x, int y, int z);
+	Chunk* GetChunk(ChunkID id);
 
 	bool EraseChunk(int x, int y, int z);
 

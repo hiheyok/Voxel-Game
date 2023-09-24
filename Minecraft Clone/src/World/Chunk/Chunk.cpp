@@ -50,7 +50,7 @@ void Chunk::GenSuperFlat() {
 		for (int z = 0; z < 16; z++) {
 			for (int y = 0; y < 16; y++) {
 				if (y + cy < 10) {
-					SetBlock(WHITE_CONCRETE, x, y, z);
+					SetBlockUnsafe(WHITE_CONCRETE, x, y, z);
 				}
 			}
 		}
@@ -80,7 +80,6 @@ void Chunk::Generate(FastNoiseLite* noise) {
 				if ((a == y || a + 1 == y || a + 2 == y || a + 3 == y || a + 4 == y) && a > 10) {
 					if (TREE_MAP >= (TREE_RAND_VAL - TREE_RAND_VAL_RANGE) && TREE_MAP <= (TREE_RAND_VAL + TREE_RAND_VAL_RANGE)) {
 						SetBlock(OAK_LOG,x - cx, y - cy, z - cz);
-						isEmpty = false;
 
 					}
 				}
@@ -98,24 +97,21 @@ void Chunk::Generate(FastNoiseLite* noise) {
 				}
 
 				if (y < 10) {
-					SetBlock(WATER, x - cx, y - cy, z - cz);
-					isEmpty = false;
+					SetBlockUnsafe(WATER, x - cx, y - cy, z - cz);
 				}
 
 				if (a > y) {
 					if (y < 12) {
-						SetBlock(SAND, x - cx, y - cy, z - cz);
-						isEmpty = false;
+						SetBlockUnsafe(SAND, x - cx, y - cy, z - cz);
 					}
 					else {
 
 						if (a >= y) {
-							SetBlock(GRASS, x - cx, y - cy, z - cz);
+							SetBlockUnsafe(GRASS, x - cx, y - cy, z - cz);
 							isEmpty = false;
 						}
 						if (a - 1 > y) {
-							SetBlock(DIRT, x - cx, y - cy, z - cz);
-							isEmpty = false;
+							SetBlockUnsafe(DIRT, x - cx, y - cy, z - cz);
 						}
 
 
@@ -130,6 +126,16 @@ void Chunk::Generate(FastNoiseLite* noise) {
 		}
 	}
 	
+}
+
+void Chunk::GenerateBlankChunk() {
+	for (int x = 0; x < 16; x++) {
+		for (int y = 0; y < 16; y++) {
+			for (int z = 0; z < 16; z++) {
+				SetBlock(AIR, (unsigned int)x, (unsigned int)y, (unsigned int)z);
+			}
+		}
+	}
 }
 
 void Chunk::GenerateV2(FastNoiseLite* noise) {
@@ -156,7 +162,7 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 
 				float gy = (float)(y + cy);
 
-				float n =  getNoise3D(x, y, z, 4,1.f, noise);
+				float n = getNoise3D(x, y, z, 4,1.f, noise);
 
 				n = n + noiseOffset;
 
@@ -166,14 +172,13 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 
 				n = n * exp(-gy / heightBias);
 
-				//getLogger()->LogInfo("Chunk Generator", "Continential Noise: " + to_string(continental));
 				if (n > 0.5f) {
 					if (n < 0.54f) {
-						SetBlock(DIRT, x, y, z);
+						SetBlockUnsafe(DIRT, x, y, z);
 						SetBlock(GRASS, x, y + 1, z);
 					}
 					else {
-						SetBlock(STONE, x, y, z);
+						SetBlockUnsafe(STONE, x, y, z);
 					}
 
 					
@@ -198,15 +203,15 @@ void Chunk::GenerateEnvironment(FastNoiseLite* noise) {
 		for (int z = 0; z < 16; z++) {
 			for (int y = 0; y < 16; y++) {
 				if (y + cy < 35) {
-					if ((GetBlock(x, y, z) != DIRT) && (GetBlock(x, y, z) != STONE)) {
-						SetBlock(WATER, x, y, z);
+					if ((GetBlockUnsafe(x, y, z) != DIRT) && (GetBlockUnsafe(x, y, z) != STONE)) {
+						SetBlockUnsafe(WATER, x, y, z);
 						SetBlock(WATER, x, y + 1, z);
 					}
 				} 
 
 				if (y + cy == 35) {
-					if (GetBlock(x, y, z) == GRASS) {
-						SetBlock(SAND, x, y, z);
+					if (GetBlockUnsafe(x, y, z) == GRASS) {
+						SetBlockUnsafe(SAND, x, y, z);
 					}
 
 					if (GetBlock(x, y + 1, z) == GRASS) {

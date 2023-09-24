@@ -65,7 +65,7 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
 
 	DrawCommands.clear();
 	ChunkShaderPos.clear();
-	
+
 	DrawCommands.reserve(lastRenderSize);
 	ChunkShaderPos.reserve(lastRenderSize * 3);
 
@@ -80,9 +80,7 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
 		if (FindDistanceNoSqrt(data.x, data.y, data.z, Position.x, Position.y, Position.z) < RenderDistance * RenderDistance) {
 			if (Frustum.SphereInFrustum((float)(data.x << 4), (float)(data.y << 4), (float)(data.z << 4), 32.f)) { // << 4 means multiply by 4
 				DrawCommands.emplace_back(data.size >> 3, 1, data.offset >> 3, Index);
-				ChunkShaderPos.emplace_back(data.x);
-				ChunkShaderPos.emplace_back(data.y);
-				ChunkShaderPos.emplace_back(data.z);
+				ChunkShaderPos.insert(ChunkShaderPos.end(), {data.x, data.y, data.z});
 				Index++;
 			}
 		}
@@ -137,7 +135,7 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int
 		ChunkID frontID = 0;
 
 		bool lastIDB = false;
-		bool frontIDB  = false;
+		bool frontIDB = false;
 
 		if (RenderListIterator != RenderList.begin()) {
 			RenderListIterator--;
@@ -250,7 +248,7 @@ void ChunkDrawBatch::DeleteChunkVertices(ChunkID id) {
 		}
 
 		//Erase Iterators
-		
+
 		if (FrontGap) {
 
 			if (FrontChunkB) {
@@ -272,7 +270,7 @@ void ChunkDrawBatch::DeleteChunkVertices(ChunkID id) {
 		}
 
 		//Add new iterators
-		
+
 		auto NewIterator = InsertSpace.insert(std::pair<size_t, size_t>(size, offset));
 
 		if (FrontChunkB) {
@@ -322,12 +320,12 @@ void ChunkDrawBatch::Defrager(int iterations) {
 	std::multimap<size_t, size_t>::iterator it;
 
 	while (i < iterations) {
-		
+
 		if (InsertSpace.size() == 1) {
 			return;
 		}
 
-		
+
 
 		std::multimap<size_t, size_t>::iterator it0 = --(--InsertSpace.end());
 		std::multimap<size_t, size_t>::iterator it1 = (--InsertSpace.end());
@@ -350,7 +348,7 @@ void ChunkDrawBatch::Defrager(int iterations) {
 		ChunkID id = getChunkID(data.x, data.y, data.z);
 
 		std::vector<uint32_t> VertexData(bufferSize / sizeof(unsigned int));
-		
+
 		VBO.getData(VertexData.data(), bufferOffset, bufferSize);
 
 		int x = data.x;
@@ -358,7 +356,7 @@ void ChunkDrawBatch::Defrager(int iterations) {
 		int z = data.z;
 
 		DeleteChunkVertices(id);
-		
+
 		AddChunkVertices(VertexData, x, y, z);
 
 		i++;

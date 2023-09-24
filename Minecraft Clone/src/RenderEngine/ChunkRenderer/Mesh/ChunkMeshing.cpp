@@ -10,7 +10,7 @@ using namespace glm;
 const int blockShadingBitOffset = 15;
 const int textureBitOffset = 20;
 
-void ChunkMeshData::GenerateMesh(Chunk& chunk) {
+void ChunkMeshData::GenerateMesh(Chunk* chunk) {
 	//Initialize
 
 	NullQuad.h = 255;
@@ -28,9 +28,11 @@ void ChunkMeshData::GenerateMesh(Chunk& chunk) {
 		FaceCollectionCache[i] = NullQuad;
 	}
 
-	Position = chunk.Position;
+	Position = chunk->Position;
 
 	//Generates the unsimplified mesh first
+
+	chunk->Use();
 	auto t0 = std::chrono::high_resolution_clock::now();
 	GenerateFaceCollection(chunk); //Generates face with their respected textures
 	auto t1 = std::chrono::high_resolution_clock::now();
@@ -38,7 +40,7 @@ void ChunkMeshData::GenerateMesh(Chunk& chunk) {
 	auto t2 = std::chrono::high_resolution_clock::now();
 	SimplifyMesh(); //Simplifies mesh (Greedy Meshing)
 	auto t3 = std::chrono::high_resolution_clock::now();
-
+	chunk->Unuse();
 	stage0 = (double)(t1 - t0).count() / 1000000.0;
 	stage1 = (double)(t2 - t1).count() / 1000000.0;
 	stage2 = (double)(t3 - t2).count() / 1000000.0;
@@ -52,11 +54,11 @@ inline bool ChunkMeshData::compareQuads(const Quad& q0, const Quad& q1) {
 
 //Loops through all the blocks in the chunk and check if each block side is visible. If a block side is visible, it generates the quad and puts it in the cache
 
-void ChunkMeshData::GenerateFaceCollection(Chunk& chunk) {
+void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 	for (int x = 1; x < 15; x++) {
 		for (int y = 1; y < 15; y++) {
 			for (int z = 1; z < 15; z++) {
-				if (chunk.GetBlockUnsafe(x, y, z) == AIR)
+				if (chunk->GetBlockUnsafe(x, y, z) == AIR)
 					continue;
 				int skip = false;
 
@@ -87,7 +89,7 @@ void ChunkMeshData::GenerateFaceCollection(Chunk& chunk) {
 				p[(axis + 1) % 3] = u;
 				p[(axis + 2) % 3] = v;
 
-				if (chunk.GetBlockUnsafe(p[0],p[1],p[2]) == AIR)
+				if (chunk->GetBlockUnsafe(p[0],p[1],p[2]) == AIR)
 					continue;
 
 				for (uint8_t side = 0; side < 6; side++) {
@@ -134,12 +136,12 @@ void ChunkMeshData::SimplifyMesh() {
 							int Axis0H = 1;
 							int Axis1K = 1;
 
-							for (Axis1W = 1; Axis1W + x[Axis1] <= 16; Axis1W++) { //Go as far as it can until it hit a quad that is different
+							for (Axis1W = 1; Axis1W + x[Axis1] < 16; Axis1W++) { //Go as far as it can until it hit a quad that is different
 								q[Axis0] = x[Axis0];
 								q[Axis1] = x[Axis1] + Axis1W;
 								q[Axis2] = x[Axis2];
+								bool IsSame = compareQuads(GetFaceUnsafe(q[0], q[1], q[2], (axis << 1) + facing), LastQuad);
 
-								bool IsSame = compareQuads(GetFace(q[0], q[1], q[2], (axis << 1) + facing), LastQuad);
 
 								if (!IsSame)
 									break;
@@ -280,32 +282,35 @@ inline void ChunkMeshData::AddFacetoMesh_X(Quad& quad, int slice, uint8_t face) 
 
 	switch (face) {
 	case 1:
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx0 | sy0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | tex);
+		SolidVertices.insert(SolidVertices.end(), { 
+		0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset)
+		,0u | sx0 | sy0 | tex
+		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
+		,0u | sx0 | sy | tex
+		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
+		,0u | sx | sy0 | tex
+		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
+		,0u | sx | sy0 | tex
+		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
+		,0u | sx0 | sy | tex
+		,0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset)
+		,0u | sx | sy | tex });
 		break;
 	case 0:
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx0 | sy0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx0 | sy | tex);
+		SolidVertices.insert(SolidVertices.end(), {
+		0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset)
+		,0u | sx0 | sy0 | tex
+		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
+		,0u | sx | sy0 | tex
+		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
+		,0u | sx0 | sy | tex
+		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
+		,0u | sx | sy0 | tex
+		,0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset)
+		,0u | sx | sy | tex
+		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
+		,0u | sx0 | sy | tex
+			});
 		break;
 	}
 }
@@ -363,33 +368,38 @@ inline void ChunkMeshData::AddFacetoMesh_Y(Quad& quad, int slice, uint8_t face) 
 
 	switch (face) {
 	case 1:
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset)); //0
-		SolidVertices.push_back(0u | sx0 | sy0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset)); //1
-		SolidVertices.push_back(0u | sx0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset)); //2
-		SolidVertices.push_back(0u | sx | sy0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset)); //3
-		SolidVertices.push_back(0u | sx | sy0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset)); //4
-		SolidVertices.push_back(0u | sx0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset)); //5
-		SolidVertices.push_back(0u | sx | sy | tex);
 
+		SolidVertices.insert(SolidVertices.end(), {
+			0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset) //0
+		,0u | sx0 | sy0 | tex
+		,0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset) //1
+		,0u | sx0 | sy | tex
+		,0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset) //2
+		,0u | sx | sy0 | tex
+		,0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset) //3
+		,0u | sx | sy0 | tex
+		,0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset) //4
+		,0u | sx0 | sy | tex
+		,0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset) //5
+		,0u | sx | sy | tex
+			});
 		break;
 	case 0:
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx0 | sy0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx0 | sy | tex);
+
+		SolidVertices.insert(SolidVertices.end(), {
+			0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset)
+		,0u | sx0 | sy0 | tex
+		,0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset)
+		,0u | sx | sy0 | tex
+		,0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset)
+		,0u | sx0 | sy | tex
+		,0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset)
+		,0u | sx | sy0 | tex
+		,0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset)
+		,0u | sx | sy | tex
+		,0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset)
+		,0u | sx0 | sy | tex
+			});
 		break;
 	}
 }
@@ -447,39 +457,43 @@ inline void ChunkMeshData::AddFacetoMesh_Z(Quad& quad, int slice, uint8_t face) 
 
 	switch (face) {
 	case 1:
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx0 | sy0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | tex);
+		SolidVertices.insert(SolidVertices.end(), {
+			0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset)
+		,0u | sx0 | sy0 | tex
+		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
+		,0u | sx | sy0 | tex
+		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
+		,0u | sx0 | sy | tex
+		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
+		,0u | sx0 | sy | tex
+		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
+		,0u | sx | sy0 | tex
+		,0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset)
+		,0u | sx | sy | tex
+			});
 		break;
 	case 0:
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx0 | sy0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy0 | tex);
-		SolidVertices.push_back(0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx0 | sy | tex);
-		SolidVertices.push_back(0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset));
-		SolidVertices.push_back(0u | sx | sy | tex);
+		SolidVertices.insert(SolidVertices.end(), {
+			0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset)
+		,0u | sx0 | sy0 | tex
+		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
+		,0u | sx0 | sy | tex
+		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
+		,0u | sx | sy0 | tex
+		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
+		,0u | sx | sy0 | tex
+		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
+		,0u | sx0 | sy | tex
+		,0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset)
+		,0u | sx | sy | tex
+			});
 		break;
 	}
 }
 
 //Creates ambient occulsion 
 
-void ChunkMeshData::GenerateAmbientOcculsion(Chunk& chunk) {
+void ChunkMeshData::GenerateAmbientOcculsion(Chunk* chunk) {
 	for (int x = 0; x < 16; x++) {
 		for (int y = 0; y < 16; y++) {
 			for (int z = 0; z < 16; z++) {
@@ -518,7 +532,7 @@ void ChunkMeshData::GenerateAmbientOcculsion(Chunk& chunk) {
 							check[axis1] = u + pos[axis1];
 							check[axis2] = v + pos[axis2];
 
-							if (chunk.GetBlock(check[0], check[1], check[2]) == AIR)
+							if (chunk->GetBlock(check[0], check[1], check[2]) == AIR)
 								continue;
 
 							uint8_t CornerIndex = 0;
@@ -573,7 +587,7 @@ void ChunkMeshData::GenerateAmbientOcculsion(Chunk& chunk) {
 }
 
 //Checks if a block side is visible to the player
-inline bool ChunkMeshData::IsFaceVisible(Chunk& chunk, int x, int y, int z, uint8_t side) {
+inline bool ChunkMeshData::IsFaceVisible(Chunk* chunk, int x, int y, int z, uint8_t side) {
 	//IsFaceVisibleCalls++;
 
 	uint8_t axis = (side >> 1); //Get side
@@ -582,10 +596,10 @@ inline bool ChunkMeshData::IsFaceVisible(Chunk& chunk, int x, int y, int z, uint
 
 	p[axis] += 1 - 2 * (side & 0b1);
 
-	return chunk.GetBlock(p[0], p[1], p[2]) == AIR;
+	return chunk->GetBlock(p[0], p[1], p[2]) == AIR;
 }
 
-inline bool ChunkMeshData::IsFaceVisibleUnsafe(Chunk& chunk, int x, int y, int z, uint8_t side) {
+inline bool ChunkMeshData::IsFaceVisibleUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side) {
 	//IsFaceVisibleCalls++;
 
 	uint8_t axis = (side >> 1); //Get side
@@ -594,7 +608,7 @@ inline bool ChunkMeshData::IsFaceVisibleUnsafe(Chunk& chunk, int x, int y, int z
 
 	p[axis] += 1 - 2 * (side & 0b1);
 
-	return chunk.GetBlockUnsafe(p[0], p[1], p[2]) == AIR;
+	return chunk->GetBlockUnsafe(p[0], p[1], p[2]) == AIR;
 }
 
 inline Quad& ChunkMeshData::GetFace(int x, int y, int z, uint8_t side) {
@@ -621,12 +635,12 @@ inline void ChunkMeshData::SetFaceUnsafe(int x, int y, int z, uint8_t side, Quad
 	FaceCollectionCache[((x << 8) + (y << 4) + z) * 6 + side] = quad;
 }
 
-inline int ChunkMeshData::GetTexture(Chunk& chunk, int x, int y, int z, uint8_t side) {
+inline int ChunkMeshData::GetTexture(Chunk* chunk, int x, int y, int z, uint8_t side) {
 	//GetTextureCalls++;
-	return BlockList[chunk.GetBlock(x, y, z)]->Texture->GetFace(side);
+	return BlockList[chunk->GetBlock(x, y, z)]->Texture->GetFace(side);
 }
 
-inline int ChunkMeshData::GetTextureUnsafe(Chunk& chunk, int x, int y, int z, uint8_t side) {
+inline int ChunkMeshData::GetTextureUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side) {
 	//GetTextureCalls++;
-	return BlockList[chunk.GetBlockUnsafe(x, y, z)]->Texture->GetFace(side);
+	return BlockList[chunk->GetBlockUnsafe(x, y, z)]->Texture->GetFace(side);
 }

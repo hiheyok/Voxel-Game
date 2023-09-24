@@ -12,7 +12,7 @@ void WorldRender::Render() {
 }
 
 void WorldRender::LoadChunkToRenderer(ChunkID chunk) {
-	if (!world->GetChunk(chunk).isEmpty) {
+	if (!world->GetChunk(chunk)->isEmpty) {
 		SchedulerLock.lock();
 		TaskList.push_back(chunk);
 		SchedulerLock.unlock();

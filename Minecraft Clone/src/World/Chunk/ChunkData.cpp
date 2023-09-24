@@ -100,3 +100,12 @@ void ChunkContainer::ClearNeighbors() {
 		Neighbors[i] = nullptr;
 	}
 }
+
+void ChunkContainer::Use() {
+	while (InUse) {};
+	InUse = true;
+}
+
+void ChunkContainer::Unuse() {
+	InUse = false;
+}

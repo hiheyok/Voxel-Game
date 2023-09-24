@@ -89,7 +89,7 @@ namespace Meshing
 
 		}
 
-		ChunkMeshData(Chunk& chunk) {
+		ChunkMeshData(Chunk* chunk) {
 			GenerateMesh(chunk);
 		}
 
@@ -101,7 +101,7 @@ namespace Meshing
 		glm::ivec3 Position = glm::ivec3(0,0,0);
 		
 		//Generate the Mesh
-		void GenerateMesh(Chunk& chunk);
+		void GenerateMesh(Chunk* chunk);
 
 		//Allows you to edit the chunk without remeshing the entire chunk
 		void EditBlock(Block block, int x, int y, int z);
@@ -126,14 +126,14 @@ namespace Meshing
 		inline bool compareQuads(const Quad& q0, const Quad& q1);
 
 		//Generates all the faces and puts them in the cache
-		void GenerateFaceCollection(Chunk& chunk);
+		void GenerateFaceCollection(Chunk* chunk);
 
 		//Ambient Occulsion
-		void GenerateAmbientOcculsion(Chunk& chunk);
+		void GenerateAmbientOcculsion(Chunk* chunk);
 
 		//Check if the player can see the mesh
-		inline bool IsFaceVisible(Chunk& chunk, int x, int y, int z, uint8_t side);
-		inline bool IsFaceVisibleUnsafe(Chunk& chunk, int x, int y, int z, uint8_t side);
+		inline bool IsFaceVisible(Chunk* chunk, int x, int y, int z, uint8_t side);
+		inline bool IsFaceVisibleUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side);
 
 		//Get face from the cache
 		inline Quad& GetFace(int x, int y, int z, uint8_t side);
@@ -144,8 +144,8 @@ namespace Meshing
 		inline void SetFaceUnsafe(int x, int y, int z, uint8_t side, Quad quad);
 
 		//Gets block texture 
-		inline int GetTexture(Chunk& chunk, int x, int y, int z, uint8_t side);
-		inline int GetTextureUnsafe(Chunk& chunk, int x, int y, int z, uint8_t side);
+		inline int GetTexture(Chunk* chunk, int x, int y, int z, uint8_t side);
+		inline int GetTextureUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side);
 
 		//Face data
 		Quad* FaceCollectionCache;

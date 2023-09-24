@@ -18,7 +18,7 @@ void Client::run() {
 
 	DisableCursor();
 
-	MainLocalWorld.SetPlayerPosition(0.,70.0,0.);
+	MainLocalWorld.SetPlayerPosition(0.,60.0,0.);
 	MainLocalWorld.SetPlayerRotation(0.,-30.);
 
 	MainWorld.horizontaltickingdistance = 64;
