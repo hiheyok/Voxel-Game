@@ -22,7 +22,7 @@ void ChunkDrawBatch::SetupBuffers() {
 
 	VBO.SetMaxSize(MaxBufferSize);
 	VBO.InitializeData();
-	IBO.SetMaxSize((size_t)(MaxBufferSize / 1000));
+	IBO.SetMaxSize((size_t)(MaxBufferSize / 100));
 	IBO.InitializeData();
 
 	VBO.Bind();
@@ -31,7 +31,7 @@ void ChunkDrawBatch::SetupBuffers() {
 	VBO.Unbind();
 	Array.Unbind();
 
-	SSBO.SetMaxSize((size_t)(MaxBufferSize / 1000));
+	SSBO.SetMaxSize((size_t)(MaxBufferSize / 100));
 	SSBO.InitializeData();
 
 	InsertSpace.insert(pair<size_t, size_t>((size_t)MaxBufferSize, 0ULL));
@@ -79,8 +79,11 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
 		auto& data = data_.second;
 		if (FindDistanceNoSqrt(data.x, data.y, data.z, Position.x, Position.y, Position.z) < RenderDistance * RenderDistance) {
 			if (Frustum.SphereInFrustum((float)(data.x << 4), (float)(data.y << 4), (float)(data.z << 4), 32.f)) { // << 4 means multiply by 4
-				DrawCommands.emplace_back(data.size >> 3, 1, data.offset >> 3, Index);
-				ChunkShaderPos.insert(ChunkShaderPos.end(), {data.x, data.y, data.z});
+
+					DrawCommands.emplace_back(data.size >> 3, 1, data.offset >> 3, Index);
+					ChunkShaderPos.insert(ChunkShaderPos.end(), { data.x, data.y, data.z });
+
+				
 				Index++;
 			}
 		}

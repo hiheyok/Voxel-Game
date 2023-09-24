@@ -13,6 +13,10 @@ const int textureBitOffset = 20;
 void ChunkMeshData::GenerateMesh(Chunk* chunk) {
 	//Initialize
 
+	if (chunk == nullptr) {
+		return;
+	}
+
 	NullQuad.h = 255;
 	NullQuad.w = 255;
 	NullQuad.x = 255;
@@ -48,7 +52,6 @@ void ChunkMeshData::GenerateMesh(Chunk* chunk) {
 
 //Checks if there are anything different between q0 and q1
 inline bool ChunkMeshData::compareQuads(const Quad& q0, const Quad& q1) {
-	//CompareQuadCalls++;
 	return q0.Data == q1.Data;
 }
 

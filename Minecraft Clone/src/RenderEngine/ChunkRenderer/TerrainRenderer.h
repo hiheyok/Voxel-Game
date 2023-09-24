@@ -131,16 +131,16 @@ public:
 		for (int batchIndex = 0; batchIndex < ChunkBatches.size(); batchIndex++) {
 			size_t MeshDataSize = MeshData->SolidVertices.size();
 
-			auto& it = --ChunkBatches[batchIndex].InsertSpace.end();
-			
-			if (it->first >= MeshDataSize * sizeof(unsigned int)) {
+			size_t size = (--(ChunkBatches[batchIndex].InsertSpace.end()))->first;
+
+			if (size >= MeshDataSize * sizeof(unsigned int)) {
 				ChunkBatches[batchIndex].AddChunkVertices(MeshData->SolidVertices, MeshData->Position.x, MeshData->Position.y, MeshData->Position.z);
 				ChunkBatchLookup[id] = batchIndex;
 				delete MeshData;
 				return;
 			}
 		}
-
+		delete MeshData;
 		getLogger()->LogInfo("Terrain Renderer", "Unable to add chunk. Buffers are full!");
 	}
 
@@ -187,9 +187,7 @@ public:
 				continue;
 			}
 
-			auto& RenderListEnd = --ChunkBatches[batchIndex].RenderList.end();
-
-			memUsage += RenderListEnd->second.size + RenderListEnd->second.offset;
+			memUsage += (--ChunkBatches[batchIndex].RenderList.end())->second.size + (--ChunkBatches[batchIndex].RenderList.end())->second.offset;
 		}
 
 		return memUsage;

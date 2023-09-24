@@ -101,9 +101,7 @@ void WorldRender::Update() {
 	std::unordered_set<ChunkID> ChunksToUpdate;
 
 	world->ChunkUpdateLock.lock();
-	for (ChunkID task : world->ChunksUpdated) {
-		ChunksToUpdate.insert(task);
-	}
+	ChunksToUpdate = world->ChunksUpdated;
 	world->ChunksUpdated.clear();
 	world->ChunkUpdateLock.unlock();
 

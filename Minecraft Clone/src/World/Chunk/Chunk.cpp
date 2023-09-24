@@ -293,23 +293,26 @@ void Chunk::GenerateDecor(FastNoiseLite* noise) {
 }
 
 void Chunk::UpdateGen() {
-	for (int axis = 0; axis < 3; axis++) {
-		for (int face = 0; face < 2; face++) {
-			int index = axis * 2 + face;
+	for (int side = 0; side < 6; side++) {
+		int axis = side >> 1;
+		int face = side & 0b1;
 
-			if (Neighbors[index] == nullptr)
-				continue;
+		if (Neighbors[side] == nullptr)
+			continue;
 
-			std::vector<SetBlockRelative> blocks = Neighbors[index]->OutsideBlockToPlace[axis * 2 + (!face)];
-
-			Neighbors[index]->OutsideBlockToPlace[axis * 2 + (!face)].clear();
-
-			for (const auto& b : blocks) {
-				SetBlock(b.m_block, b.m_x, b.m_y, b.m_z);
-			}
-
-			blocks.clear();
+		if (Neighbors[side]->OutsideBlockToPlace[axis * 2 + (!face)].size() == 0) {
+			continue;
 		}
+
+		std::vector<SetBlockRelative> blocks = Neighbors[side]->OutsideBlockToPlace[axis * 2 + (!face)];
+
+		Neighbors[side]->OutsideBlockToPlace[axis * 2 + (!face)].clear();
+
+		for (int i = 0; i < blocks.size(); i++) {
+			SetBlock(blocks[i].m_block, blocks[i].m_x, blocks[i].m_y, blocks[i].m_z);
+		}
+
+		blocks.clear();
 	}
 }
 

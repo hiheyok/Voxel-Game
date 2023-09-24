@@ -1,5 +1,6 @@
 #pragma once
 
+
 typedef unsigned char BlockID;
 
 struct BlockType {
