@@ -109,9 +109,9 @@ public:
 		SolidShader.bindTextureArray2D(0,BlockTextureArray.textureID,"BlockTexture");
 	}
 
-	void AddChunk(Meshing::ChunkMeshData MeshData) {
+	void AddChunk(Meshing::ChunkMeshData* MeshData) {
 
-		ChunkID id = getChunkID(MeshData.Position);
+		ChunkID id = getChunkID(MeshData->Position);
 
 		if (ChunkBatchLookup.count(id)) {
 			size_t BatchIndex = ChunkBatchLookup[id];
@@ -123,18 +123,20 @@ public:
 
 		UpdateDrawCommands = true;
 
-		if (MeshData.SolidVertices.size() == 0) {
+		if (MeshData->SolidVertices.size() == 0) {
+			delete MeshData;
 			return;
 		}
 
 		for (int batchIndex = 0; batchIndex < ChunkBatches.size(); batchIndex++) {
-			size_t MeshDataSize = MeshData.SolidVertices.size();
+			size_t MeshDataSize = MeshData->SolidVertices.size();
 
-			auto it = --ChunkBatches[batchIndex].InsertSpace.end();
+			auto& it = --ChunkBatches[batchIndex].InsertSpace.end();
 			
 			if (it->first >= MeshDataSize * sizeof(unsigned int)) {
-				ChunkBatches[batchIndex].AddChunkVertices(MeshData.SolidVertices, MeshData.Position.x, MeshData.Position.y, MeshData.Position.z);
+				ChunkBatches[batchIndex].AddChunkVertices(MeshData->SolidVertices, MeshData->Position.x, MeshData->Position.y, MeshData->Position.z);
 				ChunkBatchLookup[id] = batchIndex;
+				delete MeshData;
 				return;
 			}
 		}
@@ -163,7 +165,6 @@ public:
 			auto& batch = ChunkBatches[batchIndex];
 
 			if (batch.RenderList.size() != 0) {
-				int index = batch.RenderList.size() - 1;
 
 				size_t FullMemoryUse = (--batch.RenderList.end())->second.size + (--batch.RenderList.end())->second.offset; //Include gaps
 				size_t MemoryUse = ChunkBatches[batchIndex].MemoryUsage; //Only include vertex data
@@ -186,7 +187,7 @@ public:
 				continue;
 			}
 
-			auto RenderListEnd = --ChunkBatches[batchIndex].RenderList.end();
+			auto& RenderListEnd = --ChunkBatches[batchIndex].RenderList.end();
 
 			memUsage += RenderListEnd->second.size + RenderListEnd->second.offset;
 		}

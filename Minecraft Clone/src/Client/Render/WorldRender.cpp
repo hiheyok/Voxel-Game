@@ -28,7 +28,7 @@ void WorldRender::Worker(int id) {
 
 	deque<ChunkID> Jobs;
 
-	deque<ChunkMeshData> FinishedJobs;
+	deque<ChunkMeshData*> FinishedJobs;
 
 	while (!stop) {
 		//Fetches all of the tasks and put it in "Jobs"
@@ -50,14 +50,16 @@ void WorldRender::Worker(int id) {
 			//Generates the meshes
 			auto t0 = std::chrono::high_resolution_clock::now();
 
-			FinishedJobs.emplace_back(world->GetChunk(pos.x, pos.y, pos.z));
+			ChunkMeshData* Mesh = new ChunkMeshData(world->GetChunk(pos.x, pos.y, pos.z));
+
+			FinishedJobs.push_back(Mesh);
 			
 			auto t1 = std::chrono::high_resolution_clock::now();
 
 			buildTime += (double)(t1 - t0).count() / 1000000.0;
-			buildstage0 += FinishedJobs.back().stage0;
-			buildstage1 += FinishedJobs.back().stage1;
-			buildstage2 += FinishedJobs.back().stage2;
+			buildstage0 += Mesh->stage0;
+			buildstage1 += Mesh->stage1;
+			buildstage2 += Mesh->stage2;
 			count++;
 
 			if ((count % BatchSize) == 0) {
@@ -180,7 +182,7 @@ void WorldRender::TaskScheduler() {
 
 			WorkerSelection++;
 
-			if (WorkerSelection % WorkerCount == 0)
+			if (WorkerSelection == WorkerCount)
 				WorkerSelection = 0;
 		}
 

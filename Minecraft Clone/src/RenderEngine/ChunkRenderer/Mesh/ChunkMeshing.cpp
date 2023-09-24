@@ -542,9 +542,8 @@ void ChunkMeshData::GenerateAmbientOcculsion(Chunk* chunk) {
 								CornerIndex |= 0b10 * (u == 1);
 								CornerIndex |= 0b01 * (v == 1);
 
-								if (q.getLight(CornerIndex) > 1) {
-									q.setLight(CornerIndex, q.getLight(CornerIndex) - 2);
-								}
+								q.setLight(CornerIndex, q.getLight(CornerIndex) - 2 * (q.getLight(CornerIndex) > 1));
+	
 
 								continue;
 							}
@@ -553,12 +552,8 @@ void ChunkMeshData::GenerateAmbientOcculsion(Chunk* chunk) {
 
 								CornerIndex |= 0b10 * (u == 1);
 
-								if (q.getLight(CornerIndex) > 1) {
-									q.setLight(CornerIndex, q.getLight(CornerIndex) - 2);
-								}
-								if (q.getLight(CornerIndex | 0b01) > 1) {
-									q.setLight(CornerIndex | 0b01, q.getLight(CornerIndex | 0b01) - 2);
-								}
+								q.setLight(CornerIndex, q.getLight(CornerIndex) - 2 * (q.getLight(CornerIndex) > 1));
+								q.setLight(CornerIndex | 0b01, q.getLight(CornerIndex | 0b01) - 2 * (q.getLight(CornerIndex | 0b01) > 1));
 
 								continue;
 							}
@@ -567,12 +562,8 @@ void ChunkMeshData::GenerateAmbientOcculsion(Chunk* chunk) {
 
 								CornerIndex |= 0b01 * (v == 1);
 
-								if (q.getLight(CornerIndex) > 1) {
-									q.setLight(CornerIndex, q.getLight(CornerIndex) - 2);
-								}
-								if (q.getLight(CornerIndex | 0b10) > 1) {
-									q.setLight(CornerIndex | 0b10, q.getLight(CornerIndex | 0b10) - 2);
-								}
+								q.setLight(CornerIndex, q.getLight(CornerIndex) - 2 * (q.getLight(CornerIndex) > 1));
+								q.setLight(CornerIndex | 0b10, q.getLight(CornerIndex | 0b10) - 2 * (q.getLight(CornerIndex | 0b10) > 1));
 
 								continue;
 							}

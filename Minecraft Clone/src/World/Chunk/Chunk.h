@@ -62,6 +62,4 @@ private:
 	float continentialNoise(float n);
 	float erosionNoise(float n);
 	float peaksandvalley(float n);
-public:
-	bool operator==(const Chunk& other) const = default;
 };
