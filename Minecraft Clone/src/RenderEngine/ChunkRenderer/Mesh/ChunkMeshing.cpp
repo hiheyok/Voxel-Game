@@ -17,20 +17,11 @@ void ChunkMeshData::GenerateMesh(Chunk* chunk) {
 		return;
 	}
 
-	NullQuad.h = 255;
-	NullQuad.w = 255;
-	NullQuad.x = 255;
-	NullQuad.y = 255;
-
-	NullQuad.setTexture(255);
+	NullQuad.Data = 0xFFFFFFFF;
 
 	Quad cache[4096 * 6]{};
 
 	FaceCollectionCache = cache;
-
-	for (int i = 0; i < 4096 * 6; i++) {
-		FaceCollectionCache[i] = NullQuad;
-	}
 
 	Position = chunk->Position;
 
@@ -45,6 +36,7 @@ void ChunkMeshData::GenerateMesh(Chunk* chunk) {
 	SimplifyMesh(); //Simplifies mesh (Greedy Meshing)
 	auto t3 = std::chrono::high_resolution_clock::now();
 	chunk->Unuse();
+
 	stage0 = (double)(t1 - t0).count() / 1000000.0;
 	stage1 = (double)(t2 - t1).count() / 1000000.0;
 	stage2 = (double)(t3 - t2).count() / 1000000.0;
@@ -81,12 +73,14 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 		}
 	}
 
+	uint8_t p[3]{ 0,0,0 };
+
 	for (int faces = 0; faces < 6; faces++) {
 		for (int u = 0; u < 16; u++) {
 			for (int v = 0; v < 16; v++) {
 				int axis = faces >> 1;
 
-				int p[3]{0,0,0};
+				
 
 				p[axis] = 15 * (faces & 0b1);
 				p[(axis + 1) % 3] = u;
@@ -127,26 +121,26 @@ void ChunkMeshData::SimplifyMesh() {
 		for (int facing = 0; facing < 2; facing++) {
 			//iterate through each slice of a chunk 
 
-			Quad LastQuad = NullQuad;
+			//Quad LastQuad = NullQuad;
+
+			uint32_t LastQuadData = 0xFFFFFFFF;
 
 			for (x[Axis2] = 0; x[Axis2] < 16; x[Axis2]++) {
 				for (x[Axis1] = 0; x[Axis1] < 16; x[Axis1]++) {
 					for (x[Axis0] = 0; x[Axis0] < 16; x[Axis0]++) {
-						if (!compareQuads(GetFaceUnsafe(x[0], x[1], x[2], (axis << 1) + facing), NullQuad)) { // Check if quad actually exist first
-							LastQuad = GetFaceUnsafe(x[0], x[1], x[2], (axis << 1) + facing); //Load in quad face
+						if (GetFaceUnsafe(x[0], x[1], x[2], (axis << 1) + facing).Data != 0xFFFFFFFF) { // Check if quad actually exist first
+							LastQuadData = GetFaceUnsafe(x[0], x[1], x[2], (axis << 1) + facing).Data; //Load in quad face
 
 							int Axis1W = 1;
 							int Axis0H = 1;
 							int Axis1K = 1;
 
-							for (Axis1W = 1; Axis1W + x[Axis1] < 16; Axis1W++) { //Go as far as it can until it hit a quad that is different
+							for (Axis1W = 1; Axis1W + x[Axis1] <= 16; Axis1W++) { //Go as far as it can until it hit a quad that is different
 								q[Axis0] = x[Axis0];
 								q[Axis1] = x[Axis1] + Axis1W;
 								q[Axis2] = x[Axis2];
-								bool IsSame = compareQuads(GetFaceUnsafe(q[0], q[1], q[2], (axis << 1) + facing), LastQuad);
 
-
-								if (!IsSame)
+								if (GetFace(q[0], q[1], q[2], (axis << 1) + facing).Data != LastQuadData) //If isn't same, break
 									break;
 							}
 
@@ -154,13 +148,15 @@ void ChunkMeshData::SimplifyMesh() {
 
 							//This starts at 1 because we already know that at Axis0H = 0, there's a valid quad
 
+							
+
 							for (Axis0H = 0; Axis0H + x[Axis0] < 16; Axis0H++) {
 
 								q[Axis0] = x[Axis0] + Axis0H;
 								q[Axis1] = x[Axis1];
 								q[Axis2] = x[Axis2];
 
-								if (!compareQuads(GetFaceUnsafe(q[0], q[1], q[2], (axis << 1) + facing), LastQuad)) { //Checks if it can expand in the other direction first
+								if (GetFaceUnsafe(q[0], q[1], q[2], (axis << 1) + facing).Data != LastQuadData) { //Checks if it can expand in the other direction first
 									Axis1K = Axis1W;
 									break;
 								}
@@ -172,7 +168,7 @@ void ChunkMeshData::SimplifyMesh() {
 									q[Axis1] = x[Axis1] + Axis1K;
 									q[Axis2] = x[Axis2];
 
-									if (!compareQuads(GetFaceUnsafe(q[0], q[1], q[2], (axis << 1) + facing), LastQuad)) {
+									if (GetFaceUnsafe(q[0], q[1], q[2], (axis << 1) + facing).Data != LastQuadData) {
 										done = true;
 										break;
 									}
@@ -183,16 +179,18 @@ void ChunkMeshData::SimplifyMesh() {
 							}
 
 							//Set all of the used quads as NullQuads to prevent them from being used again;
+							q[Axis2] = x[Axis2];
 							for (int Axis0H_TMP = 0; Axis0H_TMP < Axis0H; Axis0H_TMP++) {
+
+								q[Axis0] = x[Axis0] + Axis0H_TMP;
+
 								for (int Axis1K_TMP = 0; Axis1K_TMP < Axis1K; Axis1K_TMP++) {
-									q[Axis0] = x[Axis0] + Axis0H_TMP;
 									q[Axis1] = x[Axis1] + Axis1K_TMP;
-									q[Axis2] = x[Axis2];
-									SetFaceUnsafe(q[0], q[1], q[2], (axis << 1) + facing, NullQuad);
+									SetFaceRawUnsafe(q[0], q[1], q[2], (axis << 1) + facing, 0xFFFFFFFF);
 								}
 							}
 
-							Quad finalq = LastQuad;
+							QuadWPos finalq;
 
 							finalq.y = x[Axis0];
 							finalq.x = x[Axis1];
@@ -200,9 +198,11 @@ void ChunkMeshData::SimplifyMesh() {
 							finalq.h = Axis0H;
 							finalq.w = Axis1W;
 
+							finalq.Data = LastQuadData;
+
 							AddFacetoMesh(finalq, x[Axis2], axis, facing);
 
-							LastQuad = NullQuad;
+							LastQuadData = 0xFFFFFFFF;
 
 							x[Axis0] += Axis0H - 1;
 						}
@@ -216,7 +216,7 @@ void ChunkMeshData::SimplifyMesh() {
 
 
 
-inline void ChunkMeshData::AddFacetoMesh(Quad& quad, int slice, int axis, uint8_t face) {
+inline void ChunkMeshData::AddFacetoMesh(QuadWPos& quad, int slice, int axis, uint8_t face) {
 
 	if (axis == 0) { //0 = x axis
 		AddFacetoMesh_X(quad, slice, face);
@@ -232,7 +232,7 @@ inline void ChunkMeshData::AddFacetoMesh(Quad& quad, int slice, int axis, uint8_
 	}
 }
 
-inline void ChunkMeshData::AddFacetoMesh_X(Quad& quad, int slice, uint8_t face) {
+inline void ChunkMeshData::AddFacetoMesh_X(QuadWPos& quad, int slice, uint8_t face) {
 	uint32_t P0[3]{};
 	uint32_t P1[3]{};
 
@@ -318,7 +318,7 @@ inline void ChunkMeshData::AddFacetoMesh_X(Quad& quad, int slice, uint8_t face) 
 	}
 }
 
-inline void ChunkMeshData::AddFacetoMesh_Y(Quad& quad, int slice, uint8_t face) {
+inline void ChunkMeshData::AddFacetoMesh_Y(QuadWPos& quad, int slice, uint8_t face) {
 	uint32_t P0[3]{};
 	uint32_t P1[3]{};
 
@@ -407,7 +407,7 @@ inline void ChunkMeshData::AddFacetoMesh_Y(Quad& quad, int slice, uint8_t face) 
 	}
 }
 
-inline void ChunkMeshData::AddFacetoMesh_Z(Quad& quad, int slice, uint8_t face) { //x : x
+inline void ChunkMeshData::AddFacetoMesh_Z(QuadWPos& quad, int slice, uint8_t face) { //x : x
 	uint32_t P0[3]{};
 	uint32_t P1[3]{};
 
@@ -594,8 +594,6 @@ inline bool ChunkMeshData::IsFaceVisible(Chunk* chunk, int x, int y, int z, uint
 }
 
 inline bool ChunkMeshData::IsFaceVisibleUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side) {
-	//IsFaceVisibleCalls++;
-
 	uint8_t axis = (side >> 1); //Get side
 
 	int p[3]{ x,y,z };
@@ -606,35 +604,40 @@ inline bool ChunkMeshData::IsFaceVisibleUnsafe(Chunk* chunk, int x, int y, int z
 }
 
 inline Quad& ChunkMeshData::GetFace(int x, int y, int z, uint8_t side) {
-	//GetFaceCalls++;
 	if (x >= 16 || y >= 16 || z >= 16 || x < 0 || y < 0 || z < 0)
 		return NullQuad;
-	return FaceCollectionCache[((x << 8) + (y << 4) + z) * 6 + side];
+	return GetFaceUnsafe(x, y, z, side);
 }
 
 inline Quad& ChunkMeshData::GetFaceUnsafe(int x, int y, int z, uint8_t side) {
-	//GetFaceCalls++;
-	return FaceCollectionCache[((x << 8) + (y << 4) + z) * 6 + side];
+	return FaceCollectionCache[((uint16_t)side << 12) + ((x << 8) + (y << 4) + z)];
 }
 
 inline void ChunkMeshData::SetFace(int x, int y, int z, uint8_t side, Quad quad) {
-	//SetFaceCalls++;
 	if (x >= 16 || y >= 16 || z >= 16 || x < 0 || y < 0 || z < 0)
 		return;
-	FaceCollectionCache[((x << 8) + (y << 4) + z) * 6 + side] = quad;
+	SetFaceUnsafe(x, y, z, side, quad);
 }
 
 inline void ChunkMeshData::SetFaceUnsafe(int x, int y, int z, uint8_t side, Quad quad) {
-//	SetFaceCalls++;
-	FaceCollectionCache[((x << 8) + (y << 4) + z) * 6 + side] = quad;
+	FaceCollectionCache[((uint16_t)side << 12) + ((x << 8) + (y << 4) + z)] = quad;
+}
+
+
+inline void ChunkMeshData::SetFaceRaw(int x, int y, int z, uint8_t side, uint32_t data) {
+	if (x >= 16 || y >= 16 || z >= 16 || x < 0 || y < 0 || z < 0)
+		return;
+	SetFaceRawUnsafe(x, y, z, side, data);
+}
+
+inline void ChunkMeshData::SetFaceRawUnsafe(int x, int y, int z, uint8_t side, uint32_t data) {
+	FaceCollectionCache[((uint16_t)side << 12) + ((x << 8) + (y << 4) + z)].Data = data;
 }
 
 inline int ChunkMeshData::GetTexture(Chunk* chunk, int x, int y, int z, uint8_t side) {
-	//GetTextureCalls++;
 	return BlockList[chunk->GetBlock(x, y, z)]->Texture->GetFace(side);
 }
 
 inline int ChunkMeshData::GetTextureUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side) {
-	//GetTextureCalls++;
 	return BlockList[chunk->GetBlockUnsafe(x, y, z)]->Texture->GetFace(side);
 }

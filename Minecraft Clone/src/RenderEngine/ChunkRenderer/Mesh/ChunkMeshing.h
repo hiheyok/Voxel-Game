@@ -46,6 +46,39 @@ namespace Meshing
 	};
 
 	struct Quad {
+		uint32_t Data = 0xFFFFFFFF; //Contain Light and Texture
+		//Light: first 16 bit
+		//Texture:: last 16 bit
+
+		inline char getLight(uint8_t Location) {
+			return 0b1111 & (Data >> (Location * 4));
+		}
+
+		inline void setLight(uint8_t Location, uint8_t Val) {
+			Data = Data & (~(0b1111 << (Location * 4))); // Clears light value for that location
+			Data |= (Val << (Location * 4)); //Inserts light value
+		}
+
+		inline uint16_t getTexture() {
+			return Data >> 16;
+		}
+
+		inline void setTexture(uint32_t tex) {
+			Data = (Data & 0xFFFF) | (tex << 16);
+		}
+
+		/*
+		Relative to x-axis
+			L_NP = Negative Y , Positive Z
+		Relative to y-axis
+			L_NP = Negative Z , Positive X
+		Relative to z-axis
+			L_NP = Negative X , Positive Y
+		*/
+
+	};
+
+	struct QuadWPos {
 		//Position in the slice 
 		uint8_t x = 0, y = 0;
 		//Size
@@ -143,6 +176,10 @@ namespace Meshing
 		inline void SetFace(int x, int y, int z, uint8_t side, Quad quad);
 		inline void SetFaceUnsafe(int x, int y, int z, uint8_t side, Quad quad);
 
+		//Raw
+		inline void SetFaceRaw(int x, int y, int z, uint8_t side, uint32_t data);
+		inline void SetFaceRawUnsafe(int x, int y, int z, uint8_t side, uint32_t data);
+
 		//Gets block texture 
 		inline int GetTexture(Chunk* chunk, int x, int y, int z, uint8_t side);
 		inline int GetTextureUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side);
@@ -151,12 +188,12 @@ namespace Meshing
 		Quad* FaceCollectionCache;
 
 		//Add faces to the mesh
-		inline void AddFacetoMesh(Quad& quad, int slice, int axis, uint8_t face);
+		inline void AddFacetoMesh(QuadWPos& quad, int slice, int axis, uint8_t face);
 
 
-		inline void AddFacetoMesh_X(Quad& quad, int slice, uint8_t face);
-		inline void AddFacetoMesh_Y(Quad& quad, int slice, uint8_t face);
-		inline void AddFacetoMesh_Z(Quad& quad, int slice, uint8_t face);
+		inline void AddFacetoMesh_X(QuadWPos& quad, int slice, uint8_t face);
+		inline void AddFacetoMesh_Y(QuadWPos& quad, int slice, uint8_t face);
+		inline void AddFacetoMesh_Z(QuadWPos& quad, int slice, uint8_t face);
 
 		//To check if a block had been used in the Greedy Meshing Algorithm
 		Quad NullQuad;

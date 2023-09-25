@@ -66,8 +66,8 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
 	DrawCommands.clear();
 	ChunkShaderPos.clear();
 
-	DrawCommands.reserve(lastRenderSize);
-	ChunkShaderPos.reserve(lastRenderSize * 3);
+	DrawCommands.reserve((size_t)lastRenderSize);
+	ChunkShaderPos.reserve((size_t)lastRenderSize * 3);
 
 	Frustum.CalculateFrustum(camera);
 
