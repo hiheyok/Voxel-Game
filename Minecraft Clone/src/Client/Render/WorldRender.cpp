@@ -52,11 +52,13 @@ void WorldRender::Worker(int id) {
 
 			ChunkMeshData* Mesh = new ChunkMeshData(world->GetChunk(pos.x, pos.y, pos.z));
 
+			amountOfMeshGenerated++;
+
 			FinishedJobs.push_back(Mesh);
 			
 			auto t1 = std::chrono::high_resolution_clock::now();
 
-			buildTime += (double)(t1 - t0).count() / 1000000.0;
+			buildTime += (double)(t1 - t0).count() / 1000.0;
 			buildstage0 += Mesh->stage0;
 			buildstage1 += Mesh->stage1;
 			buildstage2 += Mesh->stage2;

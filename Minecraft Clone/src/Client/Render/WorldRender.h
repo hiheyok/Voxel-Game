@@ -46,6 +46,8 @@ public:
 	size_t GetTextureCalls = 0;
 	size_t CompareQuadCalls = 0;
 
+	size_t amountOfMeshGenerated = 1;
+
 private:
 
 	void Worker(int id);

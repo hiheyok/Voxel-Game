@@ -202,6 +202,8 @@ public:
 		ChunkBatchLookup.clear();
 	}
 
+	size_t amountOfMeshGenerated = 1;
+
 private:
 	void SetupShaders() {
 		SolidShader.init("assets/shaders/vert.glsl", "assets/shaders/frag.glsl");

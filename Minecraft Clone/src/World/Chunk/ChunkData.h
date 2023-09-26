@@ -50,6 +50,9 @@ public:
 	ChunkContainer* Neighbors[6]{nullptr};
 	std::vector<SetBlockRelative> OutsideBlockToPlace[6]{};
 
+	uint8_t X_block[16]{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+	uint8_t Y_block[16]{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+	uint8_t Z_block[16]{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 	
 private:
 	bool InUse = false;

@@ -37,9 +37,9 @@ void ChunkMeshData::GenerateMesh(Chunk* chunk) {
 	auto t3 = std::chrono::high_resolution_clock::now();
 	chunk->Unuse();
 
-	stage0 = (double)(t1 - t0).count() / 1000000.0;
-	stage1 = (double)(t2 - t1).count() / 1000000.0;
-	stage2 = (double)(t3 - t2).count() / 1000000.0;
+	stage0 = (double)(t1 - t0).count() / 1000.0;
+	stage1 = (double)(t2 - t1).count() / 1000.0;
+	stage2 = (double)(t3 - t2).count() / 1000.0;
 }
 
 //Checks if there are anything different between q0 and q1
@@ -50,43 +50,100 @@ inline bool ChunkMeshData::compareQuads(const Quad& q0, const Quad& q1) {
 //Loops through all the blocks in the chunk and check if each block side is visible. If a block side is visible, it generates the quad and puts it in the cache
 
 void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
-	for (int x = 1; x < 15; x++) {
+	for (int z = 1; z < 15; z++) { //Test along x-faces
+
+		if ((chunk->Z_block[z] & 0b11111111) == 0) {
+			continue;
+		}
+
 		for (int y = 1; y < 15; y++) {
-			for (int z = 1; z < 15; z++) {
+			for (int x = 1; x < 15; x++) {
+
 				if (chunk->GetBlockUnsafe(x, y, z) == AIR)
 					continue;
-				int skip = false;
 
-				for (uint8_t side = 0; side < 6; side++) {
-					if (!IsFaceVisibleUnsafe(chunk, x, y, z, side))
+				for (uint8_t side = 0; side < 2; side++) {
+
+					if (!IsFaceVisibleUnsafe(chunk, x, y, z, 1 - side))
 						continue;
 
 					Quad quad;
-					quad.setTexture(GetTextureUnsafe(chunk, x, y, z, side));
-					SetFaceUnsafe(x, y, z, side, quad);
+					quad.setTexture(GetTextureUnsafe(chunk, x, y, z, 1 - side));
+					SetFaceUnsafe(x, y, z, 1 - side, quad);
 					booleanMap.InsertBitPos(x, y, z);
-					skip = (side == PZ);
+					x += (side == 1);
 				}
-
-				z += skip;
 			}
 		}
 	}
 
-	uint8_t p[3]{ 0,0,0 };
+	for (int x = 1; x < 15; x++) { //Test along y-faces
+
+		if ((chunk->X_block[x] & 0b11111111) == 0) {
+			continue;
+		}
+
+		for (int z = 1; z < 15; z++) {
+			for (int y = 1; y < 15; y++) {
+
+				if (chunk->GetBlockUnsafe(x, y, z) == AIR)
+					continue;
+
+				for (uint8_t side = 0; side < 2; side++) {
+
+					if (!IsFaceVisibleUnsafe(chunk, x, y, z, 3 - side))
+						continue;
+
+					Quad quad;
+					quad.setTexture(GetTextureUnsafe(chunk, x, y, z, 3 - side));
+					SetFaceUnsafe(x, y, z, 3 - side, quad);
+					booleanMap.InsertBitPos(x, y, z);
+					y += (side == 1);
+				}
+			}
+		}
+	}
+
+	for (int y = 1; y < 15; y++) { //Test along z-faces
+
+		if ((chunk->Y_block[y] & 0b11111111) == 0) {
+			continue;
+		}
+
+		for (int x = 1; x < 15; x++) {
+			for (int z = 1; z < 15; z++) {
+
+				if (chunk->GetBlockUnsafe(x, y, z) == AIR)
+					continue;
+
+				for (uint8_t side = 0; side < 2; side++) {
+
+					if (!IsFaceVisibleUnsafe(chunk, x, y, z, 5 - side))
+						continue;
+
+					Quad quad;
+					quad.setTexture(GetTextureUnsafe(chunk, x, y, z, 5 - side));
+					SetFaceUnsafe(x, y, z, 5 - side, quad);
+					booleanMap.InsertBitPos(x, y, z);
+					z += (side == 1);
+				}
+
+			}
+		}
+	}
 
 	for (int faces = 0; faces < 6; faces++) {
 		for (int u = 0; u < 16; u++) {
 			for (int v = 0; v < 16; v++) {
 				int axis = faces >> 1;
 
-				
+				int p[3]{ 0,0,0 };
 
 				p[axis] = 15 * (faces & 0b1);
 				p[(axis + 1) % 3] = u;
 				p[(axis + 2) % 3] = v;
 
-				if (chunk->GetBlockUnsafe(p[0],p[1],p[2]) == AIR)
+				if (chunk->GetBlockUnsafe(p[0], p[1], p[2]) == AIR)
 					continue;
 
 				for (uint8_t side = 0; side < 6; side++) {

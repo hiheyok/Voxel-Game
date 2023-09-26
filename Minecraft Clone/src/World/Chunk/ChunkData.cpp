@@ -70,13 +70,26 @@ void ChunkContainer::SetBlock(BlockID block, int x, int y, int z) {
 		}
 	}
 	else {
+		int16_t count = (block != AIR) * (Blocks.GetBlock(x, y, z) == AIR) - (block == AIR);
+
 		Blocks.ChangeBlock(block, (uint32_t)x, (uint32_t)y, (uint32_t)z);
 		isEmpty = false;
+
+		X_block[x] += count;
+		Y_block[y] += count;
+		Z_block[z] += count;
 	}
 }
 
 void ChunkContainer::SetBlockUnsafe(BlockID block, int x, int y, int z) {
+	int16_t count = (block != AIR) * (Blocks.GetBlock(x, y, z) == AIR) - (block == AIR);
+
 	Blocks.ChangeBlock(block, (uint32_t)x, (uint32_t)y, (uint32_t)z);
+
+	X_block[x] += count;
+	Y_block[y] += count;
+	Z_block[z] += count;
+
 	isEmpty = false;
 }
 

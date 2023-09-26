@@ -1,4 +1,4 @@
-#include "Client.h"
+﻿#include "Client.h"
 #include "../Utils/LogUtils.h"
 #include "../World/Chunk/Block/Blocks.h"
 #include "../World/Entity/Entities.h"
@@ -21,13 +21,13 @@ void Client::run() {
 	MainLocalWorld.SetPlayerPosition(0.,60.0,0.);
 	MainLocalWorld.SetPlayerRotation(0.,-30.);
 
-	MainWorld.horizontaltickingdistance = 64;
+	MainWorld.horizontaltickingdistance = 32;
 
 	MainWorld.Start();
 
 	getLogger()->LogInfo("World", "Generating World");
-	TerrainRender.renderDistance = 64;
-	TerrainRender.Start(getWindow(), &MainWorld, 16);
+	TerrainRender.renderDistance = 32;
+	TerrainRender.Start(getWindow(), &MainWorld, 6);
 
 	MainLocalWorld.SetWorld(&MainWorld);
 
@@ -70,10 +70,10 @@ void Client::GameLoop() {
 				+ std::to_string(MainLocalWorld.GetPlayerPosition().z)
 				+ ", VRAM Fragmentation Rate: " + std::to_string(TerrainRender.RendererV2.getFragmentationRate() * 100) 
 				+ ", VRAM Usage (MB): " + std::to_string((double)TerrainRender.RendererV2.getVRAMUsageFull() / 1000000.0)
-				+ " | Mesh All (ms): " + std::to_string(TerrainRender.buildTime)
-				+ " | S0 (ms): " + std::to_string(TerrainRender.buildstage0)
-				+ " | S1 (ms): " + std::to_string(TerrainRender.buildstage1)
-				+ " | S2 (ms): " + std::to_string(TerrainRender.buildstage2)
+				+ " | Mesh All (μs): " + std::to_string(TerrainRender.buildTime / TerrainRender.amountOfMeshGenerated)
+				+ " | S0 (μs): " + std::to_string(TerrainRender.buildstage0 / TerrainRender.amountOfMeshGenerated)
+				+ " | S1 (μs): " + std::to_string(TerrainRender.buildstage1 / TerrainRender.amountOfMeshGenerated)
+				+ " | S2 (μs): " + std::to_string(TerrainRender.buildstage2 / TerrainRender.amountOfMeshGenerated)
 
 			);
 			t2 = high_resolution_clock::now();
