@@ -34,6 +34,6 @@ public:
 	std::mutex ChunkUpdateLock;
 
 private:
-
+	size_t tickCount = 0;
 	ChunkMap WorldChunkData;
 };

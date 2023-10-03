@@ -189,66 +189,58 @@ void World::SetPlayerPos(glm::dvec3 pos) {
 	PlayerPos = pos;
 }
 
-void World::Start() {
-	stop = false;
-
-	WorldGenerator.Start(6);
+void World::Start(WorldSettings settings) {
+	WorldGenerator.Start(settings.genThreads);
 
 	MainWorldThread = std::thread(&World::WorldThread, this);
 }
 
 void World::Stop() {
-	stop = true;
-	MainWorldThread.join();
 	WorldGenerator.Stop();
 }
 
 void World::WorldThread() {
-	while (!stop) {
-		int ChunksPerTick = 0;
-		auto t0 = high_resolution_clock::now();
-		
-		vec3 pos = PlayerPos / 16.f;
+	getLogger()->LogInfo("World","Shutting down main world thread");
+}
 
-		deque<ChunkID> jobs;
+void World::Tick() {
+	auto t0 = high_resolution_clock::now();
 
-		for (int x = -horizontaltickingdistance; x <= horizontaltickingdistance; x++) {
-			for (int y = -0; y <= 8; y++) {
-				for (int z = -horizontaltickingdistance; z <= horizontaltickingdistance; z++) {
-					int offsetx = (int)floor(pos.x) + x;
-					int offsety = y;
-					int offsetz = (int)floor(pos.z) + z;
+	vec3 pos = PlayerPos / 16.f;
 
-					if (!CheckChunk(offsetx, offsety, offsetz) && (!ChunksInQueue.count(getChunkID(offsetx, offsety, offsetz)))) {
-						WorldGenerator.Generate(offsetx, offsety, offsetz);
-						ChunksInQueue.insert(getChunkID(offsetx, offsety, offsetz));
-					}
+	for (int x = -H_RenderDistance; x <= H_RenderDistance; x++) {
+		for (int y = -0; y <= V_RenderDistance; y++) {
+			for (int z = -H_RenderDistance; z <= H_RenderDistance; z++) {
+
+				int offsetx = (int)floor(pos.x) + x;
+				int offsety = y;
+				int offsetz = (int)floor(pos.z) + z;
+
+				if (!CheckChunk(offsetx, offsety, offsetz) && (!ChunksInQueue.count(getChunkID(offsetx, offsety, offsetz)))) {
+					WorldGenerator.Generate(offsetx, offsety, offsetz);
+					ChunksInQueue.insert(getChunkID(offsetx, offsety, offsetz));
 				}
+
+				Chunk* chunk = GetChunk(offsetx, offsety, offsetz);
 			}
 		}
-
-		deque<Chunk*> GenOutput = WorldGenerator.GetOutput();
-
-		while (!GenOutput.empty()) {
-
-			Chunk* chunk = GenOutput.front();
-			GenOutput.pop_front();
-
-			SetChunk(chunk);
-			ChunksInQueue.erase(chunk->chunkID);
-
-			ChunksPerTick++;
-		}
-
-		timerSleepNotPrecise((int)(1000.f / (float)TPS));
-
-	//	float MSPT = (float)((double)(high_resolution_clock::now() - t0).count() / 1000000.0);
-
-	//	getLogger()->LogInfo("World", "MSPT: " + std::to_string(MSPT) + " | Chunks Per Second: " + std::to_string((float)ChunksPerTick / (MSPT / 1000)));
 	}
 
-	getLogger()->LogInfo("World","Shutting down main world thread");
+	
 
+}
+
+void World::Load() {
+	deque<Chunk*> GenOutput = WorldGenerator.GetOutput();
+
+	while (!GenOutput.empty()) {
+
+		Chunk* chunk = GenOutput.front();
+		GenOutput.pop_front();
+
+		SetChunk(chunk);
+		ChunksInQueue.erase(chunk->chunkID);
+	}
 }
 
 bool World::IsEntityOnGround(Entity entity) {

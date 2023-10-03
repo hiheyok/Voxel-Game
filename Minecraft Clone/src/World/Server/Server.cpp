@@ -1,0 +1,55 @@
+#include "Server.h"
+
+#include "../../Utils/LogUtils.h"
+#include "Time/Timer.h"
+#include <thread>
+#include <chrono>
+#include <Windows.h>
+
+void Server::Start(ServerSettings serverSettings) {
+	getLogger()->LogInfo("Server", "Starting");
+
+	if (world == nullptr) {
+		world = new World;
+	}
+
+	WorldSettings worldSettings;
+	worldSettings.genThreads = genThreads;
+
+	world->H_RenderDistance = serverSettings.H_RenderDistance;
+	world->V_RenderDistance = serverSettings.V_RenderDistance;
+
+	world->Start(worldSettings);
+
+	type = INTEGRATED_SERVER; 
+
+	mainThread = std::thread(&Server::ServerLoop, this);
+}
+
+void Server::Stop() {
+	world->Stop();
+	stop = true;
+	mainThread.join();
+}
+
+void Server::ServerLoop() {
+
+	getLogger()->LogInfo("Server", "Starting server main thread");
+
+	while (!stop) {
+		Timer time;
+
+		world->Tick();
+		world->Load();
+		
+		int MSPT = time.GetTimePassed_ms();
+
+		if (MSPT < 50) {
+			timeBeginPeriod(1);
+			std::this_thread::sleep_for(std::chrono::milliseconds(50 - MSPT));
+			timeEndPeriod(1);
+		}
+		getLogger()->LogInfo("Server", "MSPT: " + time.StrGetTimePassed_ms());
+		
+	}
+}

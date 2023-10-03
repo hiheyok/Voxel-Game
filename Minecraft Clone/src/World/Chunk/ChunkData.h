@@ -53,10 +53,11 @@ public:
 	uint8_t X_block[16]{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 	uint8_t Y_block[16]{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 	uint8_t Z_block[16]{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-	
+
+	BlockContainer Blocks;
 private:
 	bool InUse = false;
-	BlockContainer Blocks;
+	
 };
 
 #endif

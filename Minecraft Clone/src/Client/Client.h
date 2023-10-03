@@ -1,9 +1,12 @@
 #pragma once
 #include "../RenderEngine/Window.h"
 #include "../RenderEngine/Camera/camera.h"
-#include "../World/World.h"
+#include "../World/Server/Server.h"
 #include "Render/WorldRender.h"
 #include "LocalWorld/LocalWorld.h"
+
+
+
 class Client : protected Window {
 public:
 	void run();
@@ -17,6 +20,6 @@ private:
 
 	LocalWorld MainLocalWorld;
 
-	World MainWorld;
+	Server server;
 	WorldRender TerrainRender;
 };

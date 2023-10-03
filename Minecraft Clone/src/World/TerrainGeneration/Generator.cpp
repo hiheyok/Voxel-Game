@@ -81,7 +81,7 @@ void Generator::Worker(int id) {
 			FinishedJobs.push_back(chunk);
 
 			count++;
-			if ((count % BatchSize) == 0) {
+			if (count == BatchSize) {
 				break;
 			}
 		}
@@ -132,7 +132,7 @@ void Generator::TaskScheduler() {
 			
 			WorkerSelection++;
 
-			if (WorkerSelection % WorkerCount == 0)
+			if (WorkerSelection == WorkerCount)
 				WorkerSelection = 0;
 		}
 

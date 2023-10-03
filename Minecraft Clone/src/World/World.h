@@ -13,11 +13,18 @@
 #include <deque>
 #include <mutex>
 
+struct WorldSettings {
+	size_t genThreads = 0;
+};
+
 class World : public WorldData {
 public:
-	void Start();
+	void Start(WorldSettings settings);
 
 	void Stop();
+
+	void Tick();
+	void Load();
 
 	bool RayIntersection(Ray& ray);
 
@@ -27,10 +34,15 @@ public:
 
 	bool IsEntityOnGround(Entity entity);
 
+	int H_RenderDistance = 16;
+	int V_RenderDistance = 8;
+
 	int horizontaltickingdistance = 16;
 	int vertialtickingdistance = 8;
 
 private:
+
+	
 
 	void WorldThread();
 	

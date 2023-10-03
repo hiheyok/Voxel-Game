@@ -153,7 +153,7 @@ namespace Meshing
 	private:
 
 		//Simplifies the Mesh and output it in the vertices array
-		void SimplifyMesh();
+		void SimplifyMesh(Chunk* chunk);
 
 		//Compare quad sizes and position
 		inline bool compareQuads(const Quad& q0, const Quad& q1);

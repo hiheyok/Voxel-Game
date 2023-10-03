@@ -23,7 +23,6 @@ void LocalWorld::UpdateIO(std::unordered_set<char> Keys, bool shift, float curso
 
 	sprint = Keys.count(0x01); // ctrl
 
-
 	RotatePlayer(cursorx, cursory);
 
 	MovePlayer(Keys.count('W'), Keys.count('A'), Keys.count('S'), Keys.count('D'), Keys.count(' '), shift, delta);
@@ -120,8 +119,6 @@ void LocalWorld::MovePlayer(bool KeyW, bool KeyA, bool KeyS, bool KeyD, bool Key
 	if (KeySpace) {
 		Player.Velocity.y += velocity;
 	}
-
-
 	
 
 	if (enableCollusion) {
@@ -148,8 +145,6 @@ void LocalWorld::MovePlayer(bool KeyW, bool KeyA, bool KeyS, bool KeyD, bool Key
 
 	Player.Position += Player.Velocity * delta / 2.f;
 	Player.Velocity = Player.Velocity * powf(3.f / 25.f, delta);
-
-
 
 }
 

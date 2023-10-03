@@ -21,15 +21,17 @@ void Client::run() {
 	MainLocalWorld.SetPlayerPosition(0.,60.0,0.);
 	MainLocalWorld.SetPlayerRotation(0.,-30.);
 
-	MainWorld.horizontaltickingdistance = 32;
+	ServerSettings serverSettings;
+	serverSettings.H_RenderDistance = 32;
+	serverSettings.V_RenderDistance = 8;
 
-	MainWorld.Start();
+	server.Start(serverSettings);
 
 	getLogger()->LogInfo("World", "Generating World");
 	TerrainRender.renderDistance = 32;
-	TerrainRender.Start(getWindow(), &MainWorld, 6);
+	TerrainRender.Start(getWindow(), server.world, 16);
 
-	MainLocalWorld.SetWorld(&MainWorld);
+	MainLocalWorld.SetWorld(server.world);
 
 	getLogger()->LogInfo("Client", "Starting Gameloop");
 	GameLoop();
@@ -38,7 +40,7 @@ void Client::run() {
 
 void Client::Cleanup() {
 	TerrainRender.Stop();
-	MainWorld.Stop();
+	server.Stop();
 	getLogger()->Stop();
 	getLogger()->LoggingThread.join();
 
@@ -70,10 +72,11 @@ void Client::GameLoop() {
 				+ std::to_string(MainLocalWorld.GetPlayerPosition().z)
 				+ ", VRAM Fragmentation Rate: " + std::to_string(TerrainRender.RendererV2.getFragmentationRate() * 100) 
 				+ ", VRAM Usage (MB): " + std::to_string((double)TerrainRender.RendererV2.getVRAMUsageFull() / 1000000.0)
-				+ " | Mesh All (μs): " + std::to_string(TerrainRender.buildTime / TerrainRender.amountOfMeshGenerated)
-				+ " | S0 (μs): " + std::to_string(TerrainRender.buildstage0 / TerrainRender.amountOfMeshGenerated)
-				+ " | S1 (μs): " + std::to_string(TerrainRender.buildstage1 / TerrainRender.amountOfMeshGenerated)
-				+ " | S2 (μs): " + std::to_string(TerrainRender.buildstage2 / TerrainRender.amountOfMeshGenerated)
+				+ " | Mesh All (ms): " + std::to_string(TerrainRender.buildTime / 1000.f)
+				+ " | S0 (ms): " + std::to_string(TerrainRender.buildstage0 / 1000.f)
+				+ " | S1 (ms): " + std::to_string(TerrainRender.buildstage1 / 1000.f)
+				+ " | S2 (ms): " + std::to_string(TerrainRender.buildstage2 / 1000.f)
+				+ " | Total Mesh: " + std::to_string(TerrainRender.amountOfMeshGenerated)
 
 			);
 			t2 = high_resolution_clock::now();
@@ -108,7 +111,7 @@ void Client::Update() {
 	PressedMiddle = false;
 	PressedRight = false;
 
-	MainWorld.SetPlayerPos(MainLocalWorld.GetPlayerPosition());
+	server.world->SetPlayerPos(MainLocalWorld.GetPlayerPosition());
 
 	cursormovementx = 0;
 	cursormovementy = 0;
