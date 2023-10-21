@@ -64,7 +64,7 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 
 			for (int x = 1; x < 15; x++) {
 
-				if (chunk->GetBlockUnsafe(x, y, z) == AIR)
+				if (chunk->GetBlockUnsafe(x, y, z) == Blocks.AIR)
 					continue;
 
 				for (uint8_t side = 0; side < 2; side++) {
@@ -96,7 +96,7 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 
 			for (int y = 1; y < 15; y++) {
 
-				if (chunk->GetBlockUnsafe(x, y, z) == AIR)
+				if (chunk->GetBlockUnsafe(x, y, z) == Blocks.AIR)
 					continue;
 
 				for (uint8_t side = 0; side < 2; side++) {
@@ -128,7 +128,7 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 
 			for (int z = 1; z < 15; z++) {
 
-				if (chunk->GetBlockUnsafe(x, y, z) == AIR)
+				if (chunk->GetBlockUnsafe(x, y, z) == Blocks.AIR)
 					continue;
 
 				for (uint8_t side = 0; side < 2; side++) {
@@ -158,7 +158,7 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 				p[(axis + 1) % 3] = u;
 				p[(axis + 2) % 3] = v;
 
-				if (chunk->GetBlockUnsafe(p[0], p[1], p[2]) == AIR)
+				if (chunk->GetBlockUnsafe(p[0], p[1], p[2]) == Blocks.AIR)
 					continue;
 
 				for (uint8_t side = 0; side < 6; side++) {
@@ -610,7 +610,7 @@ void ChunkMeshData::GenerateAmbientOcculsion(Chunk* chunk) {
 							check[axis1] = u + pos[axis1];
 							check[axis2] = v + pos[axis2];
 
-							if (chunk->GetBlock(check[0], check[1], check[2]) == AIR)
+							if (chunk->GetBlock(check[0], check[1], check[2]) == Blocks.AIR)
 								continue;
 
 							uint8_t CornerIndex = 0;
@@ -665,7 +665,7 @@ inline bool ChunkMeshData::IsFaceVisible(Chunk* chunk, int x, int y, int z, uint
 
 	p[axis] += 1 - 2 * (side & 0b1);
 
-	return chunk->GetBlock(p[0], p[1], p[2]) == AIR;
+	return chunk->GetBlock(p[0], p[1], p[2]) == Blocks.AIR;
 }
 
 inline bool ChunkMeshData::IsFaceVisibleUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side) {
@@ -675,7 +675,7 @@ inline bool ChunkMeshData::IsFaceVisibleUnsafe(Chunk* chunk, int x, int y, int z
 
 	p[axis] += 1 - 2 * (side & 0b1);
 
-	return chunk->GetBlockUnsafe(p[0], p[1], p[2]) == AIR;
+	return chunk->GetBlockUnsafe(p[0], p[1], p[2]) == Blocks.AIR;
 }
 
 inline Quad& ChunkMeshData::GetFace(int x, int y, int z, uint8_t side) {
@@ -710,9 +710,9 @@ inline void ChunkMeshData::SetFaceRawUnsafe(int x, int y, int z, uint8_t side, u
 }
 
 inline int ChunkMeshData::GetTexture(Chunk* chunk, int x, int y, int z, uint8_t side) {
-	return BlockList[chunk->GetBlock(x, y, z)]->Texture->GetFace(side);
+	return  Blocks.getBlockType(chunk->GetBlock(x, y, z))->Texture->GetFace(side);
 }
 
 inline int ChunkMeshData::GetTextureUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side) {
-	return BlockList[chunk->GetBlockUnsafe(x, y, z)]->Texture->GetFace(side);
+	return Blocks.getBlockType(chunk->GetBlockUnsafe(x, y, z))->Texture->GetFace(side);
 }

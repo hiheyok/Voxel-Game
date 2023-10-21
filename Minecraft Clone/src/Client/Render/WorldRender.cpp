@@ -80,7 +80,7 @@ void WorldRender::Worker(int id) {
 		timerSleepNotPrecise(1);
 	}
 
-	getLogger()->LogInfo("Mesher", "Shutting down mesh worker: " + std::to_string(WorkerID));
+	Logger.LogInfo("Mesher", "Shutting down mesh worker: " + std::to_string(WorkerID));
 }
 
 void WorldRender::Update() {
@@ -200,6 +200,6 @@ void WorldRender::TaskScheduler() {
 
 	}
 
-	getLogger()->LogInfo("Mesher", "Shutting down mesh scheduler");
+	Logger.LogInfo("Mesher", "Shutting down mesh scheduler");
 	
 }

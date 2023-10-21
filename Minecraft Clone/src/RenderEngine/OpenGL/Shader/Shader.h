@@ -61,7 +61,7 @@ public:
         }
         catch (std::ifstream::failure& e)
         {
-            getLogger()->LogError("OpenGL Shader", "Failed to read file(s): " + std::string(vertexPath) + ", " + std::string(fragmentPath));
+            Logger.LogError("OpenGL Shader", "Failed to read file(s): " + std::string(vertexPath) + ", " + std::string(fragmentPath));
         }
         const char* vShaderCode = vertexCode.c_str();
         const char* fShaderCode = fragmentCode.c_str();
@@ -234,7 +234,7 @@ private:
             if (!success)
             {
                 glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-                getLogger()->LogError("OpenGL Shader", "Failed to compile" + type + " Shader: \n" + std::string(infoLog) + "\n");
+                Logger.LogError("OpenGL Shader", "Failed to compile" + type + " Shader: \n" + std::string(infoLog) + "\n");
             }
         }
         else
@@ -243,7 +243,7 @@ private:
             if (!success)
             {
                 glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-                getLogger()->LogError("OpenGL Shader", "Failed to link Shader Program: \n" + std::string(infoLog) + "\n");
+                Logger.LogError("OpenGL Shader", "Failed to link Shader Program: \n" + std::string(infoLog) + "\n");
             }
         }
     }

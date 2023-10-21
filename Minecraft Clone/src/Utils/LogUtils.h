@@ -24,6 +24,15 @@ struct LogData {
 class LogUtils {
 public:
 
+	LogUtils() {
+		Start();
+	}
+
+	~LogUtils() {
+		Stop();
+	}
+
+
 	void Start();
 	
 	void Stop();
@@ -49,11 +58,7 @@ private:
 	void MainLogger();
 
 	std::chrono::high_resolution_clock::time_point InitTime = std::chrono::high_resolution_clock::now();
-
-	
 	
 	std::deque<LogData> Logs;
 	std::deque<LogData> LogsCache;
-};
-
-LogUtils* getLogger();
+} __declspec(selectany) Logger;

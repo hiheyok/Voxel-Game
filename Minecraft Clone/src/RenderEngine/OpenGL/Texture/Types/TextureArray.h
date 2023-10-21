@@ -55,14 +55,14 @@ public:
 				}
 			}
 			else {
-				getLogger()->LogError("Texture Array Loader", "Width or height doesn't match");
+				Logger.LogError("Texture Array Loader", "Width or height doesn't match");
 				return false;
 			}
 
 
 		}
 		else {
-			getLogger()->LogError("Texture Array Loader", "No texture");
+			Logger.LogError("Texture Array Loader", "No texture");
 			return false;
 		}
 		return true;
@@ -70,10 +70,10 @@ public:
 	bool AddTextureToArray(std::string file) {
 		RawTextureData tex = GetImageData(file.c_str());
 		if (AddTextureToArray(&tex)) {
-			getLogger()->LogInfo("Image Loader", "Loaded: " + file + " | Size: " + std::to_string(tex.height) + ", " + std::to_string(tex.width));
+			Logger.LogInfo("Image Loader", "Loaded: " + file + " | Size: " + std::to_string(tex.height) + ", " + std::to_string(tex.width));
 			return true;
 		}
-		getLogger()->LogError("Image Loader", "Unable to load: " + file);
+		Logger.LogError("Image Loader", "Unable to load: " + file);
 		return false;
 	}
 	int GetLayers() {

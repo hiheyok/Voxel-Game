@@ -9,12 +9,10 @@ using namespace chrono;
 using namespace glm;
 
 void Client::run() {
-	
 
 	Start();
 
-	InitializeEntities();
-	InitializeBlockTextures();
+	Blocks.Initialize();
 
 	DisableCursor();
 
@@ -22,18 +20,19 @@ void Client::run() {
 	MainLocalWorld.SetPlayerRotation(0.,-30.);
 
 	ServerSettings serverSettings;
-	serverSettings.H_RenderDistance = 32;
+	serverSettings.H_RenderDistance = 64;
 	serverSettings.V_RenderDistance = 8;
+	serverSettings.genThreads = 16;
 
 	server.Start(serverSettings);
 
-	getLogger()->LogInfo("World", "Generating World");
-	TerrainRender.renderDistance = 32;
-	TerrainRender.Start(getWindow(), server.world, 16);
+	Logger.LogInfo("World", "Generating World");
+	TerrainRender.renderDistance = 64;
+	TerrainRender.Start(getWindow(), server.world, 8);
 
 	MainLocalWorld.SetWorld(server.world);
 
-	getLogger()->LogInfo("Client", "Starting Gameloop");
+	Logger.LogInfo("Client", "Starting Gameloop");
 	GameLoop();
 	Cleanup();
 }
@@ -41,8 +40,8 @@ void Client::run() {
 void Client::Cleanup() {
 	TerrainRender.Stop();
 	server.Stop();
-	getLogger()->Stop();
-	getLogger()->LoggingThread.join();
+	Logger.Stop();
+	Logger.LoggingThread.join();
 
 	glfwDestroyWindow(getWindow());
 }
@@ -96,13 +95,12 @@ void Client::Update() {
 	}
 
 	if (TestForKeyInputs(GLFW_KEY_Z)) {
-		getLogger()->LogInfo("Client", "FPS: " + std::to_string(1.f / (float)Frametime));
+		Logger.LogInfo("Client", "FPS: " + std::to_string(1.f / (float)Frametime));
 	}
 
 	if (TestForKeyInputs(GLFW_KEY_ESCAPE)) {
 		glfwSetWindowShouldClose(getWindow(), true);
 	}
-
 
 	UpdateKeyPressSet();
 

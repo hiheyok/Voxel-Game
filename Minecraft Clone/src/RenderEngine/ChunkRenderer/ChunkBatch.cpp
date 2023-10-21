@@ -1,5 +1,6 @@
 #include "ChunkBatch.h"
 #include <iterator>
+#include "../../World/Server/Time/Timer.h"
 
 using namespace glm;
 using namespace std;
@@ -60,14 +61,16 @@ void ChunkDrawBatch::Cleanup() {
 }
 
 void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
+
+	Timer time;
+
+	if (AmountOfChunks > DrawCommands.size()) {
+		UpdateCommandBufferSize();
+	}
+
+
 	if (!UpdateCommands)
 		return;
-
-	DrawCommands.clear();
-	ChunkShaderPos.clear();
-
-	DrawCommands.reserve((size_t)lastRenderSize);
-	ChunkShaderPos.reserve((size_t)lastRenderSize * 3);
 
 	Frustum.CalculateFrustum(camera);
 
@@ -80,8 +83,10 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
 		if (FindDistanceNoSqrt(data.x, data.y, data.z, Position.x, Position.y, Position.z) < RenderDistance * RenderDistance) {
 			if (Frustum.SphereInFrustum((float)(data.x << 4), (float)(data.y << 4), (float)(data.z << 4), 32.f)) { // << 4 means multiply by 4
 
-					DrawCommands.emplace_back(data.size >> 3, 1, data.offset >> 3, Index);
-					ChunkShaderPos.insert(ChunkShaderPos.end(), { data.x, data.y, data.z });
+				DrawCommands[Index - 1].set(data.size >> 3, 1, data.offset >> 3, Index);
+				ChunkShaderPos[(Index - 1) * 3 + 0] = data.x;
+				ChunkShaderPos[(Index - 1) * 3 + 1] = data.y;
+				ChunkShaderPos[(Index - 1) * 3 + 2] = data.z;
 
 				
 				Index++;
@@ -89,10 +94,19 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
 		}
 	}
 
-	lastRenderSize = DrawCommands.size();
+	Index--;
 
-	SSBO.InsertSubData(0, ChunkShaderPos.size() * sizeof(int), ChunkShaderPos.data());
-	IBO.InsertSubData(0, DrawCommands.size() * sizeof(DrawCommandIndirect), DrawCommands.data());
+	SSBO.InsertSubData(0, (Index * 3) * sizeof(int), ChunkShaderPos.data());
+	IBO.InsertSubData(0, Index * sizeof(DrawCommandIndirect), DrawCommands.data());
+
+	AmountOfChunkBeingRendered = Index;
+
+	//Logger.LogInfo("Rendering","CMD rebuild time (ms): " + std::to_string(time.GetTimePassed_ms()));
+}
+
+void ChunkDrawBatch::UpdateCommandBufferSize() {
+	DrawCommands.resize(AmountOfChunks);
+	ChunkShaderPos.resize(AmountOfChunks * 3);
 }
 
 bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int y, int z) {
@@ -172,10 +186,11 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int
 			InsertSpaceIteratorsFront[id] = nextIterator;
 		}
 
+		AmountOfChunks++;
 		return true;
 	}
 
-	getLogger()->LogDebug("Chunk Renderer", "Draw Batch Out of Memory: " + std::to_string(MemoryUsage) + " | " + std::to_string(it->first));
+	Logger.LogDebug("Chunk Renderer", "Draw Batch Out of Memory: " + std::to_string(MemoryUsage) + " | " + std::to_string(it->first));
 	return false;
 }
 
@@ -286,6 +301,7 @@ void ChunkDrawBatch::DeleteChunkVertices(ChunkID id) {
 
 		RenderList.erase(ChunkDataIterator);
 		RenderListOffsetLookup.erase(id);
+		AmountOfChunks--;
 	}
 }
 
@@ -310,7 +326,7 @@ void ChunkDrawBatch::Unbind() {
 }
 
 void ChunkDrawBatch::Draw() {
-	glMultiDrawArraysIndirect(GL_TRIANGLES, (GLvoid*)0, (GLsizei)DrawCommands.size(), 0);
+	glMultiDrawArraysIndirect(GL_TRIANGLES, (GLvoid*)0, (GLsizei)AmountOfChunkBeingRendered, 0);
 }
 
 void ChunkDrawBatch::Defrager(int iterations) {

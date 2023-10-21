@@ -97,7 +97,7 @@ void Generator::Worker(int id) {
 	}
 
 	Jobs.clear();
-	getLogger()->LogInfo("World", "Shutting down world gen worker: " + std::to_string(WorkerID));
+	Logger.LogInfo("World", "Shutting down world gen worker: " + std::to_string(WorkerID));
 }
 
 void Generator::TaskScheduler() {
@@ -166,7 +166,7 @@ void Generator::TaskScheduler() {
 
 	}
 
-	getLogger()->LogInfo("World", "Shutting down world gen scheduler");
+	Logger.LogInfo("World", "Shutting down world gen scheduler");
 }
 
 void Generator::Generate(int x, int y, int z) {

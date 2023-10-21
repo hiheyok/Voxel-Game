@@ -3,6 +3,7 @@
 #include "../World.h"
 #include <thread>
 
+const float TPS = 20.f;
 
 enum ServerType
 {
@@ -12,16 +13,18 @@ enum ServerType
 struct ServerSettings {
 	int V_RenderDistance = 0; //Vertical
 	int H_RenderDistance = 0; //Horizontal
+	int genThreads = 0;
 };
 
 class Server {
 public:
 	void Start(ServerSettings settings);
 	void Stop();
+	void Join();
 
 	void ServerLoop();
 
-	size_t genThreads = 16;
+	ServerSettings settings;
 
 	World* world = nullptr;
 private:

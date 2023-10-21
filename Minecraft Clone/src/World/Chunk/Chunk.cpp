@@ -50,7 +50,7 @@ void Chunk::GenSuperFlat() {
 		for (int z = 0; z < 16; z++) {
 			for (int y = 0; y < 16; y++) {
 				if (y + cy < 10) {
-					SetBlockUnsafe(WHITE_CONCRETE, x, y, z);
+					SetBlockUnsafe(Blocks.WHITE_CONCRETE, x, y, z);
 				}
 			}
 		}
@@ -79,7 +79,7 @@ void Chunk::Generate(FastNoiseLite* noise) {
 			for (int y = 0 + cy; y < 16 + cy; y++) {
 				if ((a == y || a + 1 == y || a + 2 == y || a + 3 == y || a + 4 == y) && a > 10) {
 					if (TREE_MAP >= (TREE_RAND_VAL - TREE_RAND_VAL_RANGE) && TREE_MAP <= (TREE_RAND_VAL + TREE_RAND_VAL_RANGE)) {
-						SetBlock(OAK_LOG,x - cx, y - cy, z - cz);
+						SetBlock(Blocks.OAK_LOG,x - cx, y - cy, z - cz);
 
 					}
 				}
@@ -88,7 +88,7 @@ void Chunk::Generate(FastNoiseLite* noise) {
 						for (int tx = -2; tx <= 2; tx++) {
 							for (int ty = -2; ty <= 2; ty++) {
 								for (int tz = -2; tz <= 2; tz++) {
-									SetBlock(OAK_LEAF,x + tx - cx, y + ty - cy, z + tz - cz);
+									SetBlock(Blocks.OAK_LEAF,x + tx - cx, y + ty - cy, z + tz - cz);
 								}
 							}
 						}
@@ -97,21 +97,21 @@ void Chunk::Generate(FastNoiseLite* noise) {
 				}
 
 				if (y < 10) {
-					SetBlockUnsafe(WATER, x - cx, y - cy, z - cz);
+					SetBlockUnsafe(Blocks.WATER, x - cx, y - cy, z - cz);
 				}
 
 				if (a > y) {
 					if (y < 12) {
-						SetBlockUnsafe(SAND, x - cx, y - cy, z - cz);
+						SetBlockUnsafe(Blocks.SAND, x - cx, y - cy, z - cz);
 					}
 					else {
 
 						if (a >= y) {
-							SetBlockUnsafe(GRASS, x - cx, y - cy, z - cz);
+							SetBlockUnsafe(Blocks.GRASS, x - cx, y - cy, z - cz);
 							isEmpty = false;
 						}
 						if (a - 1 > y) {
-							SetBlockUnsafe(DIRT, x - cx, y - cy, z - cz);
+							SetBlockUnsafe(Blocks.DIRT, x - cx, y - cy, z - cz);
 						}
 
 
@@ -132,7 +132,7 @@ void Chunk::GenerateBlankChunk() {
 	for (int x = 0; x < 16; x++) {
 		for (int y = 0; y < 16; y++) {
 			for (int z = 0; z < 16; z++) {
-				SetBlock(AIR, (unsigned int)x, (unsigned int)y, (unsigned int)z);
+				SetBlock(Blocks.AIR, (unsigned int)x, (unsigned int)y, (unsigned int)z);
 			}
 		}
 	}
@@ -174,11 +174,11 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 
 				if (n > 0.5f) {
 					if (n < 0.54f) {
-						SetBlockUnsafe(DIRT, x, y, z);
-						SetBlock(GRASS, x, y + 1, z);
+						SetBlockUnsafe(Blocks.DIRT, x, y, z);
+						SetBlock(Blocks.GRASS, x, y + 1, z);
 					}
 					else {
-						SetBlockUnsafe(STONE, x, y, z);
+						SetBlockUnsafe(Blocks.STONE, x, y, z);
 					}
 
 					
@@ -203,19 +203,19 @@ void Chunk::GenerateEnvironment(FastNoiseLite* noise) {
 		for (int z = 0; z < 16; z++) {
 			for (int y = 0; y < 16; y++) {
 				if (y + cy < 35) {
-					if ((GetBlockUnsafe(x, y, z) != DIRT) && (GetBlockUnsafe(x, y, z) != STONE)) {
-						SetBlockUnsafe(WATER, x, y, z);
-						SetBlock(WATER, x, y + 1, z);
+					if ((GetBlockUnsafe(x, y, z) != Blocks.DIRT) && (GetBlockUnsafe(x, y, z) != Blocks.STONE)) {
+						SetBlockUnsafe(Blocks.WATER, x, y, z);
+						SetBlock(Blocks.WATER, x, y + 1, z);
 					}
 				} 
 
 				if (y + cy == 35) {
-					if (GetBlockUnsafe(x, y, z) == GRASS) {
-						SetBlockUnsafe(SAND, x, y, z);
+					if (GetBlockUnsafe(x, y, z) == Blocks.GRASS) {
+						SetBlockUnsafe(Blocks.SAND, x, y, z);
 					}
 
-					if (GetBlock(x, y + 1, z) == GRASS) {
-						SetBlock(SAND, x, y + 1, z);
+					if (GetBlock(x, y + 1, z) == Blocks.GRASS) {
+						SetBlock(Blocks.SAND, x, y + 1, z);
 					}
 				}
 				
@@ -244,7 +244,7 @@ void Chunk::GenerateDecor(FastNoiseLite* noise) {
 
 			float TREE_MAP = (float)((double)(noise->GetNoise((float)gx * 100.f, (float)gz * 100.f, (float)SEED) + 1.f) / 2.f);
 			for (int y = 0; y < 16; y++) {
-				if (GetBlock(x, y - 1, z) == GRASS) {
+				if (GetBlock(x, y - 1, z) == Blocks.GRASS) {
 
 					if (TREE_MAP <= 0.04) {
 						for (int tx = -2; tx <= 2; tx++) {
@@ -254,7 +254,7 @@ void Chunk::GenerateDecor(FastNoiseLite* noise) {
 								}
 
 								for (int ty = tree_height; ty <= tree_height + 1; ty++) {
-									SetBlock(OAK_LEAF, x + tx, y + ty, z + tz);
+									SetBlock(Blocks.OAK_LEAF, x + tx, y + ty, z + tz);
 								}
 
 							}
@@ -270,14 +270,14 @@ void Chunk::GenerateDecor(FastNoiseLite* noise) {
 										continue;
 									}
 
-									SetBlock(OAK_LEAF, x + tx, y + ty, z + tz);
+									SetBlock(Blocks.OAK_LEAF, x + tx, y + ty, z + tz);
 								}
 
 							}
 						}
 
 						for (int ty = 0; ty < tree_height + 2; ty++) {
-							SetBlock(OAK_LOG, x, y + ty, z);
+							SetBlock(Blocks.OAK_LOG, x, y + ty, z);
 						}
 
 					}

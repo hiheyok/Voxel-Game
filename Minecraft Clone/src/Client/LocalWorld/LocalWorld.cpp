@@ -181,7 +181,7 @@ void LocalWorld::BreakBlock() {
 		sin(Player.Rotation.x * 0.0174533) * cos(Player.Rotation.y * 0.0174533));
 
 	if (world->RayIntersection(ray)) {
-		world->SetBlock(AIR, (int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z));
+		world->SetBlock(Blocks.AIR, (int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z));
 	}
 }
 

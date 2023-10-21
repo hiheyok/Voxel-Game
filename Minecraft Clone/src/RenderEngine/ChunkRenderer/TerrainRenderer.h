@@ -106,7 +106,7 @@ public:
 	}
 
 	void LoadAssets() {
-		SolidShader.bindTextureArray2D(0,BlockTextureArray.textureID,"BlockTexture");
+		SolidShader.bindTextureArray2D(0,Blocks.BlockTextureArray.textureID,"BlockTexture");
 	}
 
 	void AddChunk(Meshing::ChunkMeshData* MeshData) {
@@ -141,7 +141,7 @@ public:
 			}
 		}
 		delete MeshData;
-		getLogger()->LogInfo("Terrain Renderer", "Unable to add chunk. Buffers are full!");
+		Logger.LogInfo("Terrain Renderer", "Unable to add chunk. Buffers are full!");
 	}
 
 	double getDebugTime() {

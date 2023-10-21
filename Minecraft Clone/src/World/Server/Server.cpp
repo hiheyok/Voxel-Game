@@ -7,17 +7,18 @@
 #include <Windows.h>
 
 void Server::Start(ServerSettings serverSettings) {
-	getLogger()->LogInfo("Server", "Starting");
+	Logger.LogInfo("Server", "Starting");
 
 	if (world == nullptr) {
 		world = new World;
 	}
 
 	WorldSettings worldSettings;
-	worldSettings.genThreads = genThreads;
-
+	worldSettings.genThreads = serverSettings.genThreads;
 	world->H_RenderDistance = serverSettings.H_RenderDistance;
 	world->V_RenderDistance = serverSettings.V_RenderDistance;
+
+	settings = serverSettings;
 
 	world->Start(worldSettings);
 
@@ -34,7 +35,7 @@ void Server::Stop() {
 
 void Server::ServerLoop() {
 
-	getLogger()->LogInfo("Server", "Starting server main thread");
+	Logger.LogInfo("Server", "Starting server main thread");
 
 	while (!stop) {
 		Timer time;
@@ -44,12 +45,16 @@ void Server::ServerLoop() {
 		
 		int MSPT = time.GetTimePassed_ms();
 
-		if (MSPT < 50) {
+		if (MSPT < (1000.f / TPS)) {
 			timeBeginPeriod(1);
-			std::this_thread::sleep_for(std::chrono::milliseconds(50 - MSPT));
+			std::this_thread::sleep_for(std::chrono::milliseconds((int)(1000.f / TPS) - MSPT));
 			timeEndPeriod(1);
 		}
-		getLogger()->LogInfo("Server", "MSPT: " + time.StrGetTimePassed_ms());
+		Logger.LogInfo("Server", "MSPT: " + time.StrGetTimePassed_ms());
 		
 	}
+}
+
+void Server::Join() {
+
 }

@@ -30,10 +30,10 @@ public:
 	void ChunkUpdate(int x, int y, int z);
 
 	std::unordered_set<ChunkID> ChunksUpdated;
-
 	std::mutex ChunkUpdateLock;
-
 private:
 	size_t tickCount = 0;
+	
+	std::unordered_map<EntityID, Entity> Entities;
 	ChunkMap WorldChunkData;
 };

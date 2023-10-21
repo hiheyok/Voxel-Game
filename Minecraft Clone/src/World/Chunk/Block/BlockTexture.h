@@ -12,72 +12,61 @@
 #define RIGHT 0x04
 #define LEFT 0x05
 
-
-__declspec(selectany) TextureArray BlockTextureArray;
+__declspec(selectany) 
 
 class BlockTexture {
 public:
-    int SetFaceFront(std::string file) {
-        BlockTextureArray.AddTextureToArray(file);
-        TextureIndex[FRONT] = BlockTextureArray.GetLayers();
-        return BlockTextureArray.GetLayers();
+    void SetFaceFront(int TexID) {
+        TextureIndex[FRONT] = TexID;
     }
-    int SetFaceBack(std::string file) {
-        BlockTextureArray.AddTextureToArray(file);
-        TextureIndex[BACK] = BlockTextureArray.GetLayers();
-        return BlockTextureArray.GetLayers();
+    void SetFaceBack(int TexID) {
+        TextureIndex[BACK] = TexID;
     }
-    int SetFaceWest(std::string file) {
-        BlockTextureArray.AddTextureToArray(file);
-        TextureIndex[RIGHT] = BlockTextureArray.GetLayers();
-        return BlockTextureArray.GetLayers();
+    void SetFaceWest(int TexID) {
+        TextureIndex[RIGHT] = TexID;
     }
-    int SetFaceEast(std::string file) {
-        BlockTextureArray.AddTextureToArray(file);
-        TextureIndex[LEFT] = BlockTextureArray.GetLayers();
-        return BlockTextureArray.GetLayers();
+    void SetFaceEast(int TexID) {
+        TextureIndex[LEFT] = TexID;
     }
-    int SetFaceTop(std::string file) {
-        BlockTextureArray.AddTextureToArray(file);
-        TextureIndex[TOP] = BlockTextureArray.GetLayers();
-        return BlockTextureArray.GetLayers();
+    void SetFaceTop(int TexID) {
+        TextureIndex[TOP] = TexID;
     }
-    int SetFaceBottom(std::string file) {
-        BlockTextureArray.AddTextureToArray(file);
-        TextureIndex[BOTTOM] = BlockTextureArray.GetLayers();
-        return BlockTextureArray.GetLayers();
+    void SetFaceBottom(int TexID) {
+        TextureIndex[BOTTOM] = TexID;
     }
-    int SetFacesCustom(std::string file, int side0 = 0xFF, int side1 = 0xFF, int side2 = 0xFF, int side3 = 0xFF, int side4 = 0xFF, int side5 = 0xFF) {
-        BlockTextureArray.AddTextureToArray(file);
+    void SetFacesCustom(int TexID, int side0 = 0xFF, int side1 = 0xFF, int side2 = 0xFF, int side3 = 0xFF, int side4 = 0xFF, int side5 = 0xFF) {
 
         if (side0 != 0xFF) {
-            TextureIndex[side0] = BlockTextureArray.GetLayers();
+            TextureIndex[side0] = TexID;
         }
 
         if (side1 != 0xFF) {
-            TextureIndex[side1] = BlockTextureArray.GetLayers();
+            TextureIndex[side1] = TexID;
         }
 
         if (side2 != 0xFF) {
-            TextureIndex[side2] = BlockTextureArray.GetLayers();
+            TextureIndex[side2] = TexID;
         }
 
         if (side3 != 0xFF) {
-            TextureIndex[side3] = BlockTextureArray.GetLayers();
+            TextureIndex[side3] = TexID;
         }
 
         if (side4 != 0xFF) {
-            TextureIndex[side4] = BlockTextureArray.GetLayers();
+            TextureIndex[side4] = TexID;
         }
 
         if (side5 != 0xFF) {
-            TextureIndex[side5] = BlockTextureArray.GetLayers();
+            TextureIndex[side5] = TexID;
         }
-        return BlockTextureArray.GetLayers();
     }
 
     int GetFace(int side) {
         return TextureIndex[side];
+    }
+
+    int& operator[](int i){
+        return TextureIndex[i];
     }
 
 private:

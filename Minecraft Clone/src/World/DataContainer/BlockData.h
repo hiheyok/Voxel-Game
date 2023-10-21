@@ -29,5 +29,5 @@ private:
 		return (x << 8) | (z << 4) | y;
 	}
 	
-	BlockID Data[4096]{AIR};
+	BlockID Data[4096]{Blocks.AIR};
 };

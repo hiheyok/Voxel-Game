@@ -59,7 +59,7 @@ void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, unsigned int id,
 
 
     if (str.str().size() != 0) {
-        getLogger()->LogError("OpenGL", str.str());
+        Logger.LogError("OpenGL", str.str());
         std::cout << "OpenGL: " << str.str() << "\n";
     }
 
@@ -76,15 +76,14 @@ bool Window::WindowCloseCheck() {
 void Window::Start() {
 
     if (init) {
-        getLogger()->LogError("OpenGL","Already initialized");
+        Logger.LogError("OpenGL","Already initialized");
         return;
     }
 
-    Logger = getLogger();
     glfwInit();
     if (!glfwInit())
     {
-        Logger->LogError("OpenGL", "Initialization Failed: GLFW");
+        Logger.LogError("OpenGL", "Initialization Failed: GLFW");
         return;
     }
 
@@ -102,13 +101,13 @@ void Window::Start() {
 
     if (window == nullptr)
     {
-        Logger->LogError("OpenGL", "Failed to create GLFW Window");
+        Logger.LogError("OpenGL", "Failed to create GLFW Window");
 
         glfwTerminate();
         return;
     }
     else {
-        Logger->LogInfo("OpenGL","Created GLFW Window");
+        Logger.LogInfo("OpenGL","Created GLFW Window");
     }
 
     glfwSetWindowUserPointer(window, this);
@@ -121,13 +120,13 @@ void Window::Start() {
     glewInit();
 
     if (glewInit() != GLEW_OK) {
-        Logger->LogError("OpenGL", "Initialization Failed: GLEW");
+        Logger.LogError("OpenGL", "Initialization Failed: GLEW");
         return;
     }
 
     std::stringstream str;
     str << "OpenGL Version: " << glGetString(GL_VERSION);
-    Logger->LogInfo("OpenGL", str.str());
+    Logger.LogInfo("OpenGL", str.str());
 
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -166,7 +165,7 @@ void Window::resize_window(int x, int y) {
     sizex = x;
     sizey = y;
     std::stringstream str;
-    Logger->LogInfo("OpenGL"," Resized Window: " + std::to_string(sizex) + ", " + std::to_string(sizey));
+    Logger.LogInfo("OpenGL"," Resized Window: " + std::to_string(sizex) + ", " + std::to_string(sizey));
 }
 
 void Window::Refresh() {

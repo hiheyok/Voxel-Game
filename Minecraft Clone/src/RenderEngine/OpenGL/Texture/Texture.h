@@ -28,7 +28,7 @@ public:
             break;
         default:
             Erase();
-            getLogger()->LogWarn("Image Loader", "Image invalid format");
+            Logger.LogWarn("Image Loader", "Image invalid format");
         }
     }
     unsigned char operator[](int index) {

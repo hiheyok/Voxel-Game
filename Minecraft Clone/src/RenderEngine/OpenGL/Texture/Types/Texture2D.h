@@ -15,7 +15,7 @@ public:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         }
         else {
-            getLogger()->LogError("Texture Loader", "Image is not loaded");
+            Logger.LogError("Texture Loader", "Image is not loaded");
         }
         
 	}

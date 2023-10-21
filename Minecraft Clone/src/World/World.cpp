@@ -43,7 +43,7 @@ bool World::RayIntersection(Ray& ray) {
 	while (iterations < max_iterations) {
 		iterations++;
 
-		if ((GetBlock(BlockPos.x, BlockPos.y, BlockPos.z) != AIR) && (GetBlock(BlockPos.x, BlockPos.y, BlockPos.z) != NULL_BLOCK)) {
+		if ((GetBlock(BlockPos.x, BlockPos.y, BlockPos.z) != Blocks.AIR) && (GetBlock(BlockPos.x, BlockPos.y, BlockPos.z) != Blocks.NULL_BLOCK)) {
 
 			ray.EndPoint = (vec3)BlockPos;
 
@@ -103,7 +103,7 @@ float World::GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int dire
 
 		ivec3 Loc = FlooredPos + Move * i;
 
-		if ((GetBlock(Loc.x, Loc.y, Loc.z) != AIR) && (GetBlock(Loc.x, Loc.y, Loc.z) != NULL_BLOCK)) {
+		if ((GetBlock(Loc.x, Loc.y, Loc.z) != Blocks.AIR) && (GetBlock(Loc.x, Loc.y, Loc.z) != Blocks.NULL_BLOCK)) {
 			return (float)i + displacement - 1.f;
 		}
 	}
@@ -112,7 +112,7 @@ float World::GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int dire
 }
 
 dvec3 World::GetTimeTillCollusion(Entity entity) {
-	AABB Hitbox = EntityTypeList[entity.Type]->GetHitbox();
+	AABB Hitbox = EntityList.GetEntity(entity.Type)->GetHitbox();
 
 	vec3 HitboxStart = entity.Position - (Hitbox.size / 2.f);
 	vec3 HitboxEnd = entity.Position + (Hitbox.size / 2.f);
@@ -200,7 +200,7 @@ void World::Stop() {
 }
 
 void World::WorldThread() {
-	getLogger()->LogInfo("World","Shutting down main world thread");
+	Logger.LogInfo("World","Shutting down main world thread");
 }
 
 void World::Tick() {
@@ -244,7 +244,7 @@ void World::Load() {
 }
 
 bool World::IsEntityOnGround(Entity entity) {
-	AABB Hitbox = EntityTypeList[entity.Type]->GetHitbox();
+	AABB Hitbox = EntityList.GetEntity(entity.Type)->GetHitbox();
 
 	vec3 HitboxStart = entity.Position - (Hitbox.size / 2.f);
 	vec3 HitboxEnd = entity.Position + (Hitbox.size / 2.f);

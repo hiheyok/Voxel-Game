@@ -26,15 +26,15 @@ BlockID ChunkContainer::GetBlock(int x, int y, int z) {
 			return Neighbors[PZ]->GetBlock(x, y, z - 16);
 		}
 
-		return AIR;
+		return Blocks.AIR;
 	}
 	else {
-		return Blocks.GetBlock(x, y, z);
+		return BlockStorage.GetBlock(x, y, z);
 	}
 }
 
 BlockID ChunkContainer::GetBlockUnsafe(int x, int y, int z) {
-	return Blocks.GetBlock(x, y, z);
+	return BlockStorage.GetBlock(x, y, z);
 }
 
 void ChunkContainer::SetBlock(BlockID block, int x, int y, int z) {
@@ -70,9 +70,9 @@ void ChunkContainer::SetBlock(BlockID block, int x, int y, int z) {
 		}
 	}
 	else {
-		int16_t count = (block != AIR) * (Blocks.GetBlock(x, y, z) == AIR) - (block == AIR);
+		int16_t count = (block != Blocks.AIR) * (BlockStorage.GetBlock(x, y, z) == Blocks.AIR) - (block == Blocks.AIR);
 
-		Blocks.ChangeBlock(block, (uint32_t)x, (uint32_t)y, (uint32_t)z);
+		BlockStorage.ChangeBlock(block, (uint32_t)x, (uint32_t)y, (uint32_t)z);
 		isEmpty = false;
 
 		X_block[x] += count;
@@ -82,9 +82,9 @@ void ChunkContainer::SetBlock(BlockID block, int x, int y, int z) {
 }
 
 void ChunkContainer::SetBlockUnsafe(BlockID block, int x, int y, int z) {
-	int16_t count = (block != AIR) * (Blocks.GetBlock(x, y, z) == AIR) - (block == AIR);
+	int16_t count = (block != Blocks.AIR) * (BlockStorage.GetBlock(x, y, z) == Blocks.AIR) - (block == Blocks.AIR);
 
-	Blocks.ChangeBlock(block, (uint32_t)x, (uint32_t)y, (uint32_t)z);
+	BlockStorage.ChangeBlock(block, (uint32_t)x, (uint32_t)y, (uint32_t)z);
 
 	X_block[x] += count;
 	Y_block[y] += count;

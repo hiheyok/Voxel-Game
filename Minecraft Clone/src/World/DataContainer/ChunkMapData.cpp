@@ -59,13 +59,13 @@ BlockID ChunkMap::GetBlockGlobal(int x, int y, int z) {
 
 	Region* reg = GetRegion(c[0], c[1], c[2]);
 	if (reg == nullptr) {
-		return AIR;
+		return Blocks.AIR;
 	}
 
 	Chunk* chunk = reg->GetChunkGlobalPos(c[0], c[1], c[2]);
 
 	if (chunk == nullptr) {
-		return AIR;
+		return Blocks.AIR;
 	}
 
 	BlockID block = chunk->GetBlock(l[0], l[1], l[2]);

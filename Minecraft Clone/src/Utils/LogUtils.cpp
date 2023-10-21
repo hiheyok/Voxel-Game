@@ -5,8 +5,6 @@
 
 using namespace std;
 
-LogUtils Logger;
-
 void LogUtils::MainLogger() {
 	while (!stop) {
 		if (!LogsCache.empty()) {

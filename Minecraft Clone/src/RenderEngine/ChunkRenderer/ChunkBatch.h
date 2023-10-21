@@ -28,6 +28,13 @@ struct DrawCommandIndirect {
 	DrawCommandIndirect(uint32_t count_, uint32_t instanceCount_, uint32_t first_, uint32_t baseInstance_) : count(count_), instanceCount(instanceCount_), first(first_), baseInstance(baseInstance_) {
 
 	}
+
+	void set(uint32_t count_, uint32_t instanceCount_, uint32_t first_, uint32_t baseInstance_) {
+		count = count_;
+		instanceCount = instanceCount_;
+		first = first_;
+		baseInstance = baseInstance_;
+	}
 };
 
 struct DataBufferAddress {
@@ -62,6 +69,8 @@ public:
 
 	void Defrager(int iterations);
 
+	void UpdateCommandBufferSize();
+
 	Camera* camera;
 
 	std::multimap<size_t, size_t> InsertSpace; // <Slot Size, Index>
@@ -88,6 +97,8 @@ private:
 
 	std::vector<DrawCommandIndirect> DrawCommands;
 
+	size_t AmountOfChunks = 0;
+	size_t AmountOfChunkBeingRendered = 0;
 
 
 };

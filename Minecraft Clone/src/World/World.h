@@ -4,8 +4,6 @@
 
 #include "DataContainer/WorldData.h"
 #include "TerrainGeneration/Generator.h"
-#include <concurrent_unordered_map.h>
-#include <concurrent_queue.h>
 #include <concurrent_priority_queue.h>
 #include <unordered_set>
 #include <vector>
@@ -42,8 +40,6 @@ public:
 
 private:
 
-	
-
 	void WorldThread();
 	
 	float GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int direction, int distancetest);
@@ -52,8 +48,6 @@ private:
 	std::thread Loader;
 
 	glm::vec3 PlayerPos = glm::vec3(0.f,0.f,0.f);
-
-	const float TPS = 20.f;
 
 	Generator WorldGenerator;
 

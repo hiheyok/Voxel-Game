@@ -6,7 +6,7 @@ class LocalWorld {
 public:
 
 	LocalWorld() {
-		Player.Type = PLAYER;
+		Player.Type = EntityList.PLAYER;
 	}
 
 	void UpdateIO(std::unordered_set<char> Keys, bool shift, float cursorx, float cursory, bool Left, bool Middle, bool Right, float delta);
@@ -35,7 +35,7 @@ private:
 
 	void GetBlock();
 
-	BlockID HoldingBlock = WHITE_CONCRETE;
+	BlockID HoldingBlock = Blocks.WHITE_CONCRETE;
 	Entity Player;
 	World* world = nullptr;
 

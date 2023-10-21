@@ -62,7 +62,6 @@ private:
 
 	std::unordered_set<char> KeyPressed;
 
-	LogUtils* Logger  = nullptr;
 	GLFWwindow* window = nullptr;
 	bool init = false;
 };

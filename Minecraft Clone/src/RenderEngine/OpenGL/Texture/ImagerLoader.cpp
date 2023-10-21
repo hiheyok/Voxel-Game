@@ -15,7 +15,7 @@ RawTextureData GetImageData(const char* path) {
 		Data.format = GL_RGBA;
 		break;
 	default:
-		getLogger()->LogWarn("Image Loader","Image invalid format");
+		Logger.LogWarn("Image Loader","Image invalid format");
 	}
 	return Data;
 }
