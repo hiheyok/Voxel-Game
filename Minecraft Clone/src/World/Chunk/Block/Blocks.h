@@ -8,16 +8,15 @@
 struct Block {
 
 	~Block() {
-		delete block;
+		delete Properties;
 		delete Texture;
 	}
 
 	BlockID ID = NULL;
 
-	BlockType* block = nullptr;
+	BlockType* Properties = nullptr;
 
 	BlockTexture* Texture = nullptr;
-
 };
 
 __declspec(selectany) 
@@ -31,11 +30,11 @@ public:
 	BlockID AIR = RegisterNewBlock(true, false, false);
 	BlockID STONE = RegisterNewBlock(false, true, false);
 	BlockID DIRT = RegisterNewBlock(false, true, false);
-	BlockID WATER = RegisterNewBlock(false, true, false);
+	BlockID WATER = RegisterNewBlock(true, false, true);
 	BlockID GRASS = RegisterNewBlock(false, true, false);
 	BlockID SAND = RegisterNewBlock(false, true, false);
 	BlockID OAK_LOG = RegisterNewBlock(false, true, false);
-	BlockID OAK_LEAF = RegisterNewBlock(false, true, false);
+	BlockID OAK_LEAF = RegisterNewBlock(true, true, false);
 	BlockID DIAMOND_BLOCK = RegisterNewBlock(false, true, false);
 	BlockID OAK_PLANK = RegisterNewBlock(false, true, false);
 	BlockID COBBLESTONE = RegisterNewBlock(false, true, false);
@@ -71,8 +70,11 @@ public:
 		SetFacesCustom(BRICK, "assets/textures/array/block/bricks.png", FRONT, BACK, LEFT, RIGHT, BOTTOM, TOP);
 		SetFacesCustom(WHITE_CONCRETE, "assets/textures/array/block/white_concrete.png", FRONT, BACK, LEFT, RIGHT, BOTTOM, TOP);
 
-
 		BlockTextureArray.UploadToGPU();
+	}
+
+	~BlockList() {
+		BlockTypeData.clear();
 	}
 
 	Block* getBlockType(BlockID id) {
@@ -85,7 +87,7 @@ public:
 
 		Block* block = new Block;
 		block->ID = ID;
-		block->block = NewBlock;
+		block->Properties = NewBlock;
 		block->Texture = new BlockTexture;
 
 		BlockTypeData[ID] = block;
@@ -129,10 +131,5 @@ public:
 	}
 
 } __declspec(selectany) Blocks;
-
-
-
-
-
 
 #endif

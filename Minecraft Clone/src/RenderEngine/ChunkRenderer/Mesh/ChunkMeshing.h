@@ -78,31 +78,13 @@ namespace Meshing
 
 	};
 
-	struct QuadWPos {
+	struct QuadWPos : Quad {
 		//Position in the slice 
-		uint8_t x = 0, y = 0;
+		int8_t x = 0, y = 0;
 		//Size
-		uint8_t w = 0, h = 0;
+		int8_t w = 0, h = 0;
 
-		//Lighting; stored as 16 bit to save mem
-		uint32_t Data = 0xFFFF; //Contain Light and Texture
-
-		inline char getLight(uint8_t Location) {
-			return 0b1111 & (Data >> (Location * 4));
-		}
-
-		inline void setLight(uint8_t Location, uint8_t Val) {
-			Data = Data & (~(0b1111 << (Location * 4))); // Clears light value for that location
-			Data |= (Val << (Location * 4)); //Inserts light value
-		}
-
-		inline uint16_t getTexture() {
-			return Data >> 16;
-		}
-
-		inline void setTexture(uint32_t tex) {
-			Data = (Data & 0xFFFF) | (tex << 16);
-		}
+		BlockID block;
 
 		/*
 		Relative to x-axis
@@ -184,12 +166,14 @@ namespace Meshing
 		inline int GetTexture(Chunk* chunk, int x, int y, int z, uint8_t side);
 		inline int GetTextureUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side);
 
+		inline bool CompareBlockSide(Chunk* chunk, int x, int y, int z, uint8_t side, BlockID b);
+		inline bool CompareBlockSideUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side, BlockID b);
+
 		//Face data
 		Quad* FaceCollectionCache;
 
 		//Add faces to the mesh
 		inline void AddFacetoMesh(QuadWPos& quad, int slice, int axis, uint8_t face);
-
 
 		inline void AddFacetoMesh_X(QuadWPos& quad, int slice, uint8_t face);
 		inline void AddFacetoMesh_Y(QuadWPos& quad, int slice, uint8_t face);

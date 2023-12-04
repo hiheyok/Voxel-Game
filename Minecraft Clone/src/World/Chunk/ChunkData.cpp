@@ -70,27 +70,32 @@ void ChunkContainer::SetBlock(BlockID block, int x, int y, int z) {
 		}
 	}
 	else {
-		int16_t count = (block != Blocks.AIR) * (BlockStorage.GetBlock(x, y, z) == Blocks.AIR) - (block == Blocks.AIR);
-
-		BlockStorage.ChangeBlock(block, (uint32_t)x, (uint32_t)y, (uint32_t)z);
-		isEmpty = false;
-
-		X_block[x] += count;
-		Y_block[y] += count;
-		Z_block[z] += count;
+		SetBlockUnsafe(block, x, y, z);
 	}
 }
 
 void ChunkContainer::SetBlockUnsafe(BlockID block, int x, int y, int z) {
-	int16_t count = (block != Blocks.AIR) * (BlockStorage.GetBlock(x, y, z) == Blocks.AIR) - (block == Blocks.AIR);
+	BlockID current = BlockStorage.GetBlock(x, y, z);
+
+	int16_t count = (block != Blocks.AIR) * (current == Blocks.AIR) - (block == Blocks.AIR);
 
 	BlockStorage.ChangeBlock(block, (uint32_t)x, (uint32_t)y, (uint32_t)z);
 
-	X_block[x] += count;
-	Y_block[y] += count;
-	Z_block[z] += count;
+	bool isDeleting = block == Blocks.AIR;
+
+	bool isTransparent = 
+		(bool)((Blocks.getBlockType(block)->Properties->transparency * (!isDeleting)) + (isDeleting * Blocks.getBlockType(current)->Properties->transparency));
+
+	X_block[x] += count * (!isTransparent);
+	Y_block[y] += count * (!isTransparent);
+	Z_block[z] += count * (!isTransparent);
+
+	TX_block[x] += count * isTransparent;
+	TY_block[y] += count * isTransparent;
+	TZ_block[z] += count * isTransparent;
 
 	isEmpty = false;
+
 }
 
 void ChunkContainer::SetPosition(int x, int y, int z) {

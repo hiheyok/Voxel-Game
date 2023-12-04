@@ -51,31 +51,36 @@ inline bool ChunkMeshData::compareQuads(const Quad& q0, const Quad& q1) {
 
 void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 	for (int z = 1; z < 15; z++) { //Test along x-faces
-
-		if ((chunk->Z_block[z] & 0b11111111) == 0) {
+		/*if ((chunk->Z_block[z] | chunk->TZ_block[z]) == 0) {
 			continue;
-		}
+		}*/
 
 		for (int y = 1; y < 15; y++) {
 
-			if ((chunk->Y_block[y] & 0b11111111) == 0) {
+			/*if ((chunk->Y_block[y] | chunk->TY_block[y]) == 0) {
 				continue;
-			}
+			}*/
 
 			for (int x = 1; x < 15; x++) {
 
-				if (chunk->GetBlockUnsafe(x, y, z) == Blocks.AIR)
+				BlockID b = 0x00;
+
+				b = chunk->GetBlockUnsafe(x, y, z);
+
+				if (b == Blocks.AIR)
 					continue;
 
 				for (uint8_t side = 0; side < 2; side++) {
 
-					if (!IsFaceVisibleUnsafe(chunk, x, y, z, 1 - side))
+					if (!IsFaceVisibleUnsafe(chunk, x, y, z, 1 - side) || CompareBlockSideUnsafe(chunk, x, y, z, 1 - side, b))
 						continue;
 
 					Quad quad;
 					quad.setTexture(GetTextureUnsafe(chunk, x, y, z, 1 - side));
 					SetFaceUnsafe(x, y, z, 1 - side, quad);
-					booleanMap.InsertBitPos(x, y, z);
+					if (!Blocks.getBlockType(b)->Properties->transparency) {
+						booleanMap.InsertBitPos(x, y, z);
+					}
 					x += side ;
 				}
 			}
@@ -84,30 +89,36 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 
 	for (int x = 1; x < 15; x++) { //Test along y-faces
 
-		if ((chunk->X_block[x] & 0b11111111) == 0) {
+		/*if ((chunk->X_block[x] | chunk->TX_block[x]) == 0) {
 			continue;
-		}
+		}*/
 
 		for (int z = 1; z < 15; z++) {
 
-			if ((chunk->Z_block[z] & 0b11111111) == 0) {
+			/*if ((chunk->Z_block[z] | chunk->TZ_block[z]) == 0) {
 				continue;
-			}
+			}*/
 
 			for (int y = 1; y < 15; y++) {
 
-				if (chunk->GetBlockUnsafe(x, y, z) == Blocks.AIR)
+				BlockID b = 0x00;
+
+				b = chunk->GetBlockUnsafe(x, y, z);
+
+				if (b == Blocks.AIR)
 					continue;
 
 				for (uint8_t side = 0; side < 2; side++) {
 
-					if (!IsFaceVisibleUnsafe(chunk, x, y, z, 3 - side))
+					if (!IsFaceVisibleUnsafe(chunk, x, y, z, 3 - side) || CompareBlockSideUnsafe(chunk, x, y, z, 3 - side, b))
 						continue;
 
 					Quad quad;
 					quad.setTexture(GetTextureUnsafe(chunk, x, y, z, 3 - side));
 					SetFaceUnsafe(x, y, z, 3 - side, quad);
-					booleanMap.InsertBitPos(x, y, z);
+					if (!Blocks.getBlockType(b)->Properties->transparency) {
+						booleanMap.InsertBitPos(x, y, z);
+					}
 					y += side;
 				}
 			}
@@ -116,30 +127,37 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 
 	for (int y = 1; y < 15; y++) { //Test along z-faces
 
-		if ((chunk->Y_block[y] & 0b11111111) == 0) {
+		/*if ((chunk->Y_block[y] | chunk->TY_block[y]) == 0) {
 			continue;
-		}
+		}*/
 
 		for (int x = 1; x < 15; x++) {
 
-			if ((chunk->X_block[x] & 0b11111111) == 0) {
+			/*if ((chunk->X_block[y] | chunk->TX_block[y]) == 0) {
 				continue;
-			}
+			}*/
 
 			for (int z = 1; z < 15; z++) {
 
-				if (chunk->GetBlockUnsafe(x, y, z) == Blocks.AIR)
+				BlockID b = 0x00;
+
+				b = chunk->GetBlockUnsafe(x, y, z);
+
+				if (b == Blocks.AIR)
 					continue;
 
 				for (uint8_t side = 0; side < 2; side++) {
 
-					if (!IsFaceVisibleUnsafe(chunk, x, y, z, 5 - side))
+					if (!IsFaceVisibleUnsafe(chunk, x, y, z, 5 - side) || CompareBlockSideUnsafe(chunk, x, y, z, 5 - side, b))
 						continue;
 
 					Quad quad;
 					quad.setTexture(GetTextureUnsafe(chunk, x, y, z, 5 - side));
 					SetFaceUnsafe(x, y, z, 5 - side, quad);
-					booleanMap.InsertBitPos(x, y, z);
+					if (!Blocks.getBlockType(b)->Properties->transparency) {
+						booleanMap.InsertBitPos(x, y, z);
+					}
+					
 					z += side;
 				}
 
@@ -158,17 +176,23 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 				p[(axis + 1) % 3] = u;
 				p[(axis + 2) % 3] = v;
 
-				if (chunk->GetBlockUnsafe(p[0], p[1], p[2]) == Blocks.AIR)
+				BlockID b = 0x00;
+
+				b = chunk->GetBlockUnsafe(p[0], p[1], p[2]);
+
+				if (b == Blocks.AIR)
 					continue;
 
 				for (uint8_t side = 0; side < 6; side++) {
-					if (!IsFaceVisible(chunk, p[0], p[1], p[2], side))
+					if (!IsFaceVisible(chunk, p[0], p[1], p[2], side) || CompareBlockSide(chunk, p[0], p[1], p[2], side, b))
 						continue;
 
 					Quad quad;
 					quad.setTexture(GetTextureUnsafe(chunk, p[0], p[1], p[2], side));
 					SetFaceUnsafe(p[0], p[1], p[2], side, quad);
-					booleanMap.InsertBitPos(p[0], p[1], p[2]);
+					if (!Blocks.getBlockType(b)->Properties->transparency) {
+						booleanMap.InsertBitPos(p[0], p[1], p[2]);
+					}
 				}
 
 			}
@@ -183,7 +207,6 @@ void ChunkMeshData::SimplifyMesh(Chunk* chunk) {
 	int x[3]{};
 	int q[3]{};
 
-	uint8_t* Arr[3]{ chunk->X_block, chunk->Y_block, chunk->Z_block};
 
 	for (int axis = 0; axis < 3; axis++) {
 
@@ -278,6 +301,8 @@ void ChunkMeshData::SimplifyMesh(Chunk* chunk) {
 
 							finalq.Data = LastQuadData;
 
+							finalq.block = chunk->GetBlockUnsafe(x[0], x[1], x[2]);
+
 							AddFacetoMesh(finalq, x[Axis2], axis, facing);
 
 							LastQuadData = 0xFFFFFFFF;
@@ -358,9 +383,20 @@ inline void ChunkMeshData::AddFacetoMesh_X(QuadWPos& quad, int slice, uint8_t fa
 
 	uint32_t tex = (uint32_t)quad.getTexture() << textureBitOffset;
 
+	bool transparency = Blocks.getBlockType(quad.block)->Properties->transparency;
+
+	vector<unsigned int>* out;
+
+	if (transparency) {
+		out = &TransparentVertices;
+	}
+	else {
+		out = &SolidVertices;
+	}
+
 	switch (face) {
 	case 1:
-		SolidVertices.insert(SolidVertices.end(), { 
+		out->insert(out->end(), {
 		0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset)
 		,0u | sx0 | sy0 | tex
 		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
@@ -375,7 +411,7 @@ inline void ChunkMeshData::AddFacetoMesh_X(QuadWPos& quad, int slice, uint8_t fa
 		,0u | sx | sy | tex });
 		break;
 	case 0:
-		SolidVertices.insert(SolidVertices.end(), {
+		out->insert(out->end(), {
 		0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset)
 		,0u | sx0 | sy0 | tex
 		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
@@ -444,10 +480,21 @@ inline void ChunkMeshData::AddFacetoMesh_Y(QuadWPos& quad, int slice, uint8_t fa
 
 	uint32_t tex = (uint32_t)quad.getTexture() << textureBitOffset; //x : z
 
+	bool transparency = Blocks.getBlockType(quad.block)->Properties->transparency;
+
+	vector<unsigned int>* out;
+
+	if (transparency) {
+		out = &TransparentVertices;
+	}
+	else {
+		out = &SolidVertices;
+	}
+
 	switch (face) {
 	case 1:
 
-		SolidVertices.insert(SolidVertices.end(), {
+		out->insert(out->end(), {
 			0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset) //0
 		,0u | sx0 | sy0 | tex
 		,0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset) //1
@@ -464,7 +511,7 @@ inline void ChunkMeshData::AddFacetoMesh_Y(QuadWPos& quad, int slice, uint8_t fa
 		break;
 	case 0:
 
-		SolidVertices.insert(SolidVertices.end(), {
+		out->insert(out->end(), {
 			0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset)
 		,0u | sx0 | sy0 | tex
 		,0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset)
@@ -533,9 +580,20 @@ inline void ChunkMeshData::AddFacetoMesh_Z(QuadWPos& quad, int slice, uint8_t fa
 
 	uint32_t tex = (uint32_t)quad.getTexture() << textureBitOffset;
 
+	bool transparency = Blocks.getBlockType(quad.block)->Properties->transparency;
+
+	vector<unsigned int>* out;
+
+	if (transparency) {
+		out = &TransparentVertices;
+	}
+	else {
+		out = &SolidVertices;
+	}
+
 	switch (face) {
 	case 1:
-		SolidVertices.insert(SolidVertices.end(), {
+		out->insert(out->end(), {
 			0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset)
 		,0u | sx0 | sy0 | tex
 		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
@@ -551,7 +609,7 @@ inline void ChunkMeshData::AddFacetoMesh_Z(QuadWPos& quad, int slice, uint8_t fa
 			});
 		break;
 	case 0:
-		SolidVertices.insert(SolidVertices.end(), {
+		out->insert(out->end(), {
 			0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset)
 		,0u | sx0 | sy0 | tex
 		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
@@ -610,7 +668,7 @@ void ChunkMeshData::GenerateAmbientOcculsion(Chunk* chunk) {
 							check[axis1] = u + pos[axis1];
 							check[axis2] = v + pos[axis2];
 
-							if (chunk->GetBlock(check[0], check[1], check[2]) == Blocks.AIR)
+							if (!Blocks.getBlockType(chunk->GetBlock(check[0], check[1], check[2]))->Properties->isSolid)
 								continue;
 
 							uint8_t CornerIndex = 0;
@@ -665,7 +723,7 @@ inline bool ChunkMeshData::IsFaceVisible(Chunk* chunk, int x, int y, int z, uint
 
 	p[axis] += 1 - 2 * (side & 0b1);
 
-	return chunk->GetBlock(p[0], p[1], p[2]) == Blocks.AIR;
+	return Blocks.getBlockType(chunk->GetBlock(p[0], p[1], p[2]))->Properties->transparency;
 }
 
 inline bool ChunkMeshData::IsFaceVisibleUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side) {
@@ -675,7 +733,29 @@ inline bool ChunkMeshData::IsFaceVisibleUnsafe(Chunk* chunk, int x, int y, int z
 
 	p[axis] += 1 - 2 * (side & 0b1);
 
-	return chunk->GetBlockUnsafe(p[0], p[1], p[2]) == Blocks.AIR;
+	return Blocks.getBlockType(chunk->GetBlockUnsafe(p[0], p[1], p[2]))->Properties->transparency;
+}
+
+inline bool ChunkMeshData::CompareBlockSide(Chunk* chunk, int x, int y, int z, uint8_t side, BlockID b) {
+	//IsFaceVisibleCalls++;
+
+	uint8_t axis = (side >> 1); //Get side
+
+	int p[3]{ x,y,z };
+
+	p[axis] += 1 - 2 * (side & 0b1);
+
+	return chunk->GetBlock(p[0], p[1], p[2]) == b;
+}
+
+inline bool ChunkMeshData::CompareBlockSideUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side, BlockID b) {
+	uint8_t axis = (side >> 1); //Get side
+
+	int p[3]{ x,y,z };
+
+	p[axis] += 1 - 2 * (side & 0b1);
+
+	return chunk->GetBlockUnsafe(p[0], p[1], p[2]) == b;
 }
 
 inline Quad& ChunkMeshData::GetFace(int x, int y, int z, uint8_t side) {
@@ -710,7 +790,7 @@ inline void ChunkMeshData::SetFaceRawUnsafe(int x, int y, int z, uint8_t side, u
 }
 
 inline int ChunkMeshData::GetTexture(Chunk* chunk, int x, int y, int z, uint8_t side) {
-	return  Blocks.getBlockType(chunk->GetBlock(x, y, z))->Texture->GetFace(side);
+	return Blocks.getBlockType(chunk->GetBlock(x, y, z))->Texture->GetFace(side);
 }
 
 inline int ChunkMeshData::GetTextureUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side) {

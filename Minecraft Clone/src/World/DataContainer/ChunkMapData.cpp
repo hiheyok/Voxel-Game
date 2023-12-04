@@ -184,7 +184,7 @@ bool Region::CheckChunkGlobalPos(int32_t x, int32_t y, int32_t z) {
 	uint16_t RegCY = y & 0b11111;
 	uint16_t RegCZ = z & 0b11111;
 
-	return GetChunk(RegCX, RegCY, RegCZ);
+	return CheckChunk(RegCX, RegCY, RegCZ);
 }
 
 Chunk* Region::GetChunkGlobalPos(int32_t x, int32_t y, int32_t z) {

@@ -52,14 +52,14 @@ public:
         screen->bindTexture2D(0, texture, "screenTexture");
         ShaderID = screen->ShaderID;
         float quadVertices[] = { // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates. NOTE that this plane is now much smaller and at the top of the screen
-      // positions   // texCoords
-      -1.f,  1.0f,  0.0f, 1.0f,
-      -1.f,  -1.f,  0.0f, 0.0f,
-       1.f,  -1.f,  1.0f, 0.0f,
+          // positions   // texCoords
+          -1.f,  1.0f,  0.0f, 1.0f,
+          -1.f,  -1.f,  0.0f, 0.0f,
+           1.f,  -1.f,  1.0f, 0.0f,
 
-      -1.f,  1.0f,  0.0f, 1.0f,
-       1.f,  -1.0f,  1.0f, 0.0f,
-       1.f,  1.0f,  1.0f, 1.0f
+          -1.f,  1.0f,  0.0f, 1.0f,
+           1.f,  -1.0f,  1.0f, 0.0f,
+           1.f,  1.0f,  1.0f, 1.0f
         };
 
 

@@ -2,16 +2,15 @@
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "../../Utils/LogUtils.h"
-#include "../Camera/camera.h"
-#include "../Frustum/frustum.h"
-#include "../../Utils/MathHelper.h"
-#include "../../World/Chunk/Chunk.h"
-#include "../OpenGL/Buffers/Buffer.h"
+#include "../../../Utils/LogUtils.h"
+#include "../../Camera/camera.h"
+#include "../../Frustum/frustum.h"
+#include "../../../Utils/MathHelper.h"
+#include "../../../World/Chunk/Chunk.h"
+#include "../../OpenGL/Buffers/Buffer.h"
 #include <unordered_map>
 #include <list>
 #include <map>
-#include <stack>
 #include <array>
 
 

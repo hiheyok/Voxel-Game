@@ -4,7 +4,7 @@
 
 #include "DataContainer/WorldData.h"
 #include "TerrainGeneration/Generator.h"
-#include <concurrent_priority_queue.h>
+#include "Event/EventSystem.h"
 #include <unordered_set>
 #include <vector>
 #include "../Utils/Math/Ray/Ray.h"
@@ -35,9 +35,6 @@ public:
 	int H_RenderDistance = 16;
 	int V_RenderDistance = 8;
 
-	int horizontaltickingdistance = 16;
-	int vertialtickingdistance = 8;
-
 private:
 
 	void WorldThread();
@@ -50,6 +47,8 @@ private:
 	glm::vec3 PlayerPos = glm::vec3(0.f,0.f,0.f);
 
 	Generator WorldGenerator;
+
+	EventSystem EventManager;
 
 	std::unordered_set<ChunkID> ChunksInQueue;
 

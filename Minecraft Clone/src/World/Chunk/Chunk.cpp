@@ -174,8 +174,11 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 
 				if (n > 0.5f) {
 					if (n < 0.54f) {
-						SetBlockUnsafe(Blocks.DIRT, x, y, z);
-						SetBlock(Blocks.GRASS, x, y + 1, z);
+						SetBlockUnsafe(Blocks.GRASS, x, y, z);
+
+						SetBlock(Blocks.DIRT, x, y - 1, z);
+						
+						
 					}
 					else {
 						SetBlockUnsafe(Blocks.STONE, x, y, z);
@@ -202,25 +205,16 @@ void Chunk::GenerateEnvironment(FastNoiseLite* noise) {
 	for (int x = 0; x < 16; x++) {
 		for (int z = 0; z < 16; z++) {
 			for (int y = 0; y < 16; y++) {
-				if (y + cy < 35) {
-					if ((GetBlockUnsafe(x, y, z) != Blocks.DIRT) && (GetBlockUnsafe(x, y, z) != Blocks.STONE)) {
-						SetBlockUnsafe(Blocks.WATER, x, y, z);
-						SetBlock(Blocks.WATER, x, y + 1, z);
-					}
-				} 
 
-				if (y + cy == 35) {
-					if (GetBlockUnsafe(x, y, z) == Blocks.GRASS) {
+				if (y + cy < 34) {
+					if ((GetBlockUnsafe(x, y, z) == Blocks.AIR)) {
+						SetBlockUnsafe(Blocks.WATER, x, y, z);
+					}
+
+					if ((GetBlockUnsafe(x, y, z) == Blocks.GRASS)) {
 						SetBlockUnsafe(Blocks.SAND, x, y, z);
 					}
-
-					if (GetBlock(x, y + 1, z) == Blocks.GRASS) {
-						SetBlock(Blocks.SAND, x, y + 1, z);
-					}
 				}
-				
-
-
 			}
 		}
 	}

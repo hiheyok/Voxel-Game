@@ -1,6 +1,6 @@
 #include "ChunkBatch.h"
 #include <iterator>
-#include "../../World/Server/Time/Timer.h"
+#include "../../../World/Server/Time/Timer.h"
 
 using namespace glm;
 using namespace std;
@@ -340,11 +340,8 @@ void ChunkDrawBatch::Defrager(int iterations) {
 
 	while (i < iterations) {
 
-		if (InsertSpace.size() == 1) {
+		if (InsertSpace.size() == 1)
 			return;
-		}
-
-
 
 		std::multimap<size_t, size_t>::iterator it0 = --(--InsertSpace.end());
 		std::multimap<size_t, size_t>::iterator it1 = (--InsertSpace.end());
@@ -379,9 +376,9 @@ void ChunkDrawBatch::Defrager(int iterations) {
 		AddChunkVertices(VertexData, x, y, z);
 
 		i++;
-		if (i > iterations) {
+
+		if (i > iterations)
 			return;
-		}
 	}
 
 

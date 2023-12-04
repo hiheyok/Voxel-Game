@@ -4,6 +4,8 @@
 #include "../Utils/Math/vectorOperations.h"
 #include <glm/vec3.hpp>
 #include <chrono>
+#include <glm/geometric.hpp>
+
 
 using namespace std;
 using namespace chrono;
@@ -43,7 +45,9 @@ bool World::RayIntersection(Ray& ray) {
 	while (iterations < max_iterations) {
 		iterations++;
 
-		if ((GetBlock(BlockPos.x, BlockPos.y, BlockPos.z) != Blocks.AIR) && (GetBlock(BlockPos.x, BlockPos.y, BlockPos.z) != Blocks.NULL_BLOCK)) {
+		BlockID b = GetBlock(BlockPos.x, BlockPos.y, BlockPos.z);
+
+		if (Blocks.getBlockType(b)->Properties->isSolid) {
 
 			ray.EndPoint = (vec3)BlockPos;
 
@@ -103,7 +107,9 @@ float World::GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int dire
 
 		ivec3 Loc = FlooredPos + Move * i;
 
-		if ((GetBlock(Loc.x, Loc.y, Loc.z) != Blocks.AIR) && (GetBlock(Loc.x, Loc.y, Loc.z) != Blocks.NULL_BLOCK)) {
+		BlockID b = GetBlock(Loc.x, Loc.y, Loc.z);
+
+		if (Blocks.getBlockType(b)->Properties->isSolid) {
 			return (float)i + displacement - 1.f;
 		}
 	}
@@ -206,32 +212,53 @@ void World::WorldThread() {
 void World::Tick() {
 	auto t0 = high_resolution_clock::now();
 
-	vec3 pos = PlayerPos / 16.f;
-
-	for (int x = -H_RenderDistance; x <= H_RenderDistance; x++) {
-		for (int y = -0; y <= V_RenderDistance; y++) {
-			for (int z = -H_RenderDistance; z <= H_RenderDistance; z++) {
-
-				int offsetx = (int)floor(pos.x) + x;
-				int offsety = y;
-				int offsetz = (int)floor(pos.z) + z;
-
-				if (!CheckChunk(offsetx, offsety, offsetz) && (!ChunksInQueue.count(getChunkID(offsetx, offsety, offsetz)))) {
-					WorldGenerator.Generate(offsetx, offsety, offsetz);
-					ChunksInQueue.insert(getChunkID(offsetx, offsety, offsetz));
-				}
-
-				Chunk* chunk = GetChunk(offsetx, offsety, offsetz);
-			}
-		}
-	}
-
-	
-
 }
 
 void World::Load() {
+	vec3 pos = PlayerPos / 16.f;
+
+	ivec3 InitalPos((int)pos.x, (int)pos.y, (int)pos.z);
+
+	deque<ivec3> FIFO;
+
+	FIFO.push_back(InitalPos);
+
+	while (!FIFO.empty()) { 
+	
+		ivec3 ChunkPos = FIFO.front();
+		FIFO.pop_front();
+
+		ivec3 Offset = InitalPos - ChunkPos;
+
+		if (Offset.x * Offset.x + Offset.z * Offset.z > H_RenderDistance * H_RenderDistance) {
+			continue;
+		}
+
+		if (abs(Offset.y) > V_RenderDistance) {
+			continue;
+		}
+
+		if (CheckChunk(ChunkPos.x, ChunkPos.y, ChunkPos.z) || ChunksInQueue.count(getChunkID(ChunkPos.x, ChunkPos.y, ChunkPos.z))) {
+			continue;
+		}
+
+		WorldGenerator.Generate(ChunkPos.x, ChunkPos.y, ChunkPos.z);
+		ChunksInQueue.insert(getChunkID(ChunkPos.x, ChunkPos.y, ChunkPos.z));
+
+		for (int side = 0; side < 6; side++) {
+
+			ivec3 newObj = ChunkPos;
+
+			newObj[side % 3] += ((side & 0b1) << 1) - 1;
+
+			FIFO.push_back(newObj);
+		}
+	}
+
+
 	deque<Chunk*> GenOutput = WorldGenerator.GetOutput();
+	
+	
 
 	while (!GenOutput.empty()) {
 
