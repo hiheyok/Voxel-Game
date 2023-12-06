@@ -48,6 +48,17 @@ void LogUtils::MainLogger() {
 
 void LogUtils::Start() {
 	if (!Started) {
+
+		/*time_t timept = std::chrono::system_clock::to_time_t(chrono::system_clock::now());
+
+		const char* timestamp = strtok(ctime(&timept), "\n");
+
+		std::string fileName(timestamp, strlen(timestamp));
+
+		fileName += ".log";
+
+		file = new ofstream(fileName);*/
+
 		LoggingThread = std::thread(&LogUtils::MainLogger, this);
 		LogInfo("Logger","Started Logger");
 	}

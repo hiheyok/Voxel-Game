@@ -62,7 +62,7 @@ void Generator::Worker(int id) {
 		const int NumJobs = Jobs.size();
 
 		int count = 0;
-		int BatchSize = 500;
+		int BatchSize = 50;
 
 		for (int i = 0; i < NumJobs; i++) {
 			ChunkID task = Jobs.front(); //fetches task

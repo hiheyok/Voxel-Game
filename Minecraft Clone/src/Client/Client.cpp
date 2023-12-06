@@ -20,14 +20,14 @@ void Client::run() {
 	MainLocalWorld.SetPlayerRotation(0.,-30.);
 
 	ServerSettings serverSettings;
-	serverSettings.H_RenderDistance = 32;
-	serverSettings.V_RenderDistance = 8;
+	serverSettings.H_RenderDistance = 16;
+	serverSettings.V_RenderDistance = 4;
 	serverSettings.genThreads = 16;
 
 	server.Start(serverSettings);
 
 	Logger.LogInfo("World", "Generating World");
-	TerrainRender.renderDistance = 32;
+	TerrainRender.renderDistance =64;
 	TerrainRender.Start(getWindow(), server.world, 4);
 
 	MainLocalWorld.SetWorld(server.world);

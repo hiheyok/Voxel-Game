@@ -4,7 +4,6 @@
 #include <unordered_map>
 #include "Block.h"
 #include "BlockTexture.h"
-
 struct Block {
 
 	~Block() {
@@ -19,7 +18,9 @@ struct Block {
 	BlockTexture* Texture = nullptr;
 };
 
-__declspec(selectany) 
+//__declspec(selectany) 
+
+
 
 class BlockList {
 private:
@@ -42,6 +43,10 @@ public:
 	BlockID WHITE_CONCRETE = RegisterNewBlock(false, true, false);
 
 	BlockID NULL_BLOCK = RegisterNewBlock(false, false, false);
+
+	void RegisterBlock() {
+
+	}
 
 	void Initialize() {
 		BlockTextureArray.Gen();
@@ -74,6 +79,11 @@ public:
 	}
 
 	~BlockList() {
+
+		for (const auto& obj : BlockTypeData) {
+			delete obj.second;
+		}
+
 		BlockTypeData.clear();
 	}
 
@@ -91,7 +101,7 @@ public:
 		block->Texture = new BlockTexture;
 
 		BlockTypeData[ID] = block;
-
+		Logger.LogInfo("Register","Registered new block (ID): " + std::to_string(ID));
 		return ID;
 	}
 
@@ -130,6 +140,6 @@ public:
 
 	}
 
-} __declspec(selectany) Blocks;
+} __declspec(selectany)  Blocks;
 
 #endif

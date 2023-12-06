@@ -223,6 +223,15 @@ void World::Load() {
 
 	FIFO.push_back(InitalPos);
 
+
+	for (const auto& element : FIFOOutOfRange) {
+		ivec3 ChunkPos = ChunkIDToPOS(element);
+
+		FIFO.push_back(ChunkPos);
+	}
+
+	int MaxIndex = 0; 
+
 	while (!FIFO.empty()) { 
 	
 		ivec3 ChunkPos = FIFO.front();
@@ -231,10 +240,12 @@ void World::Load() {
 		ivec3 Offset = InitalPos - ChunkPos;
 
 		if (Offset.x * Offset.x + Offset.z * Offset.z > H_RenderDistance * H_RenderDistance) {
+			FIFOOutOfRange.insert(getChunkID(ChunkPos));
 			continue;
 		}
 
 		if (abs(Offset.y) > V_RenderDistance) {
+			FIFOOutOfRange.insert(getChunkID(ChunkPos));
 			continue;
 		}
 
@@ -245,6 +256,10 @@ void World::Load() {
 		WorldGenerator.Generate(ChunkPos.x, ChunkPos.y, ChunkPos.z);
 		ChunksInQueue.insert(getChunkID(ChunkPos.x, ChunkPos.y, ChunkPos.z));
 
+		if (FIFOOutOfRange.count(getChunkID(ChunkPos))) {
+			FIFOOutOfRange.erase(getChunkID(ChunkPos));
+		}
+
 		for (int side = 0; side < 6; side++) {
 
 			ivec3 newObj = ChunkPos;
@@ -254,6 +269,8 @@ void World::Load() {
 			FIFO.push_back(newObj);
 		}
 	}
+
+	Logger.LogInfo("World", "FIFO Out Of Range Queue Size: " + to_string(FIFOOutOfRange.size()));
 
 
 	deque<Chunk*> GenOutput = WorldGenerator.GetOutput();

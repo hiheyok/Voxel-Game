@@ -172,7 +172,6 @@ void TerrainRenderer::AddChunk(Meshing::ChunkMeshData* MeshData) {
 	}
 
 
-
 	if (ChunkBatchTransparentLookup.count(id)) {
 		size_t BatchIndex = ChunkBatchTransparentLookup[id];
 
@@ -183,9 +182,7 @@ void TerrainRenderer::AddChunk(Meshing::ChunkMeshData* MeshData) {
 
 	UpdateDrawCommands = true;
 
-	if (MeshData->TransparentVertices.size() == 0) {
-	}
-	else {
+	if (MeshData->TransparentVertices.size() != 0) {
 		bool success = false;
 
 		for (int batchIndex = 0; batchIndex < ChunkTransparentBatches.size(); batchIndex++) {

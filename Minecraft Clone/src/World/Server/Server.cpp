@@ -50,7 +50,7 @@ void Server::ServerLoop() {
 			std::this_thread::sleep_for(std::chrono::milliseconds((int)(1000.f / TPS) - MSPT));
 			timeEndPeriod(1);
 		}
-		Logger.LogInfo("Server", "MSPT: " + time.StrGetTimePassed_ms());
+	//	Logger.LogInfo("Server", "MSPT: " + time.StrGetTimePassed_ms());
 		
 	}
 }

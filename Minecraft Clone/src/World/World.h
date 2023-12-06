@@ -52,6 +52,8 @@ private:
 
 	std::unordered_set<ChunkID> ChunksInQueue;
 
+	std::unordered_set<ChunkID> FIFOOutOfRange;
+
 	bool stop = false;
 };
 

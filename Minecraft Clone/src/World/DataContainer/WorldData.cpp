@@ -5,57 +5,35 @@ using namespace glm;
 
 bool WorldData::SetBlock(BlockID block, int x, int y, int z) {
 
-	int c[3]{ (int)floor((float)x / 16.f) ,(int)floor((float)y / 16.f) ,(int)floor((float)z / 16.f) }; //Location of chunk
+	int c[3]{ x >> 4 ,y >> 4,z >> 4 }; //Location of chunk
 	int b[3]{ x,y,z };
 
-	if (WorldChunkData.CheckChunk(c[0],c[1], c[2])) {
+	if (!WorldChunkData.CheckChunk(c[0], c[1], c[2]))
+		return false;
 
-		WorldChunkData.SetBlockGlobal(block, x, y, z);
-		ChunkUpdate(c[0], c[1], c[2]);
+	WorldChunkData.SetBlockGlobal(block, x, y, z);
+	ChunkUpdate(c[0], c[1], c[2]);
 
-		int offx = (abs(b[0] + 1)) % 16;// 0 = back; != 0 = front
-		int offy = (abs(b[1] + 1)) % 16;
-		int offz = (abs(b[2] + 1)) % 16;
+	int offx = (abs(b[0] + 1)) % 16;// 0 = back; != 0 = front
+	int offy = (abs(b[1] + 1)) % 16;
+	int offz = (abs(b[2] + 1)) % 16;
 
-		int off[3]{offx, offy, offz};
+	int off[3]{ offx, offy, offz };
 
-		for (int axis = 0; axis < 3; axis++) {
-
-			int p[3]{ c[0] ,c[1] ,c[2] }; // p[3] is just the position of the neighboring chunk
-
-			bool update = false;
-
-			if (off[axis] == 0) {
-				p[axis] += 1;
-				update = true;
-			}
-
-			if ((off[axis] == 15) || (off[axis] == 1)) {
-				p[axis] -= 1;
-				update = true;
-			}
-
-			if (update) {
-				if (CheckChunk(p[0], p[1], p[2])) {
-					ChunkUpdate(p[0], p[1], p[2]);
-				}
-			}
-		}
+	for (int axis = 0; axis < 3; axis++) {
 
 		int p[3]{ c[0] ,c[1] ,c[2] }; // p[3] is just the position of the neighboring chunk
+
 		bool update = false;
 
-		for (int axis = 0; axis < 3; axis++) {
+		if (off[axis] == 0) {
+			p[axis] += 1;
+			update = true;
+		}
 
-			if (off[axis] == 0) {
-				p[axis] += 1;
-				update = true;
-			}
-
-			if ((off[axis] == 15) || (off[axis] == 1)) {
-				p[axis] -= 1;
-				update = true;
-			}
+		if ((off[axis] == 15) || (off[axis] == 1)) {
+			p[axis] -= 1;
+			update = true;
 		}
 
 		if (update) {
@@ -63,10 +41,31 @@ bool WorldData::SetBlock(BlockID block, int x, int y, int z) {
 				ChunkUpdate(p[0], p[1], p[2]);
 			}
 		}
-
-		return true;
 	}
-	return false;
+
+	int p[3]{ c[0] ,c[1] ,c[2] }; // p[3] is just the position of the neighboring chunk
+	bool update = false;
+
+	for (int axis = 0; axis < 3; axis++) {
+
+		if (off[axis] == 0) {
+			p[axis] += 1;
+			update = true;
+		}
+
+		if ((off[axis] == 15) || (off[axis] == 1)) {
+			p[axis] -= 1;
+			update = true;
+		}
+	}
+
+	if (update) {
+		if (CheckChunk(p[0], p[1], p[2])) {
+			ChunkUpdate(p[0], p[1], p[2]);
+		}
+	}
+
+	return true;
 }
 
 BlockID WorldData::GetBlock(int x, int y, int z) {

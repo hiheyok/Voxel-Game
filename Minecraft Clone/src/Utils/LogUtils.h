@@ -6,6 +6,7 @@
 #include <sstream>
 #include <chrono>
 #include <mutex>
+#include <fstream>
 #define _CRTDBG_MAP_ALLOC
 #define LOG_TYPE_DEBUG 0x00;
 #define LOG_TYPE_INFO 0x01;
@@ -61,4 +62,6 @@ private:
 	
 	std::deque<LogData> Logs;
 	std::deque<LogData> LogsCache;
+
+	std::ofstream* file;
 } __declspec(selectany) Logger;

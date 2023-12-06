@@ -2,7 +2,7 @@
 
 typedef unsigned long long int EventID;
 
-constexpr size_t MAX_EVENT_SIZE = 16;
+constexpr size_t MAX_EVENT_SIZE = 32;
 
 enum EventType {
 	NULL_EVENT,
@@ -16,8 +16,9 @@ union Event
 {
 	EventType Type = NULL_EVENT;
 
-	struct _BlockEvent {
+	struct _BlockEvent { //21
 		int x = 0; int y = 0; int z = 0;
+		BlockID block;
 		EventID id = 0;
 
 	} BlockEvent;
