@@ -1,7 +1,6 @@
 #include "LocalWorld.h"
-
 #include <glm/geometric.hpp>
-
+#include "../../World/Event/EventHandler.h"
 #include <glm/gtx/common.hpp>
 
 using namespace std;
@@ -122,7 +121,7 @@ void LocalWorld::MovePlayer(bool KeyW, bool KeyA, bool KeyS, bool KeyD, bool Key
 	
 
 	if (enableCollusion) {
-		float gravity = 0;
+		float gravity = -80;
 
 		Player.Velocity.y += gravity * delta;
 
@@ -166,7 +165,16 @@ void LocalWorld::PlaceBlock() {
 
 		PlacePos[(int)floor(BounceSurface / 2)] += (BounceSurface % 2) - (BounceSurface + 1) % 2; //Offsets block location to be placed by 1 block
 
-		world->SetBlock(HoldingBlock, PlacePos.x, PlacePos.y, PlacePos.z);
+		Event placeBlock;
+		placeBlock.Type = BLOCK_EVENT;
+		placeBlock.Data.BlockEvent.block = HoldingBlock;
+		placeBlock.Data.BlockEvent.z = PlacePos.z;
+		placeBlock.Data.BlockEvent.x = PlacePos.x;
+		placeBlock.Data.BlockEvent.y = PlacePos.y;
+		
+		placeBlock.Data.BlockEvent.id = EventHandler.BlockPlace;
+
+		world->QueueEvent(placeBlock);
 	}
 }
 

@@ -10,12 +10,8 @@ public:
 	EventSystem() {
 		NullEvent.Type = NULL_EVENT;
 	}
-
+	//Gets event; if empty, return null event
 	Event GetNextEvent() {
-		if (EventQueue.empty()) {
-			return NullEvent;
-		}
-
 		Event e = EventQueue.front();
 		EventQueue.pop_front();
 		return e;
@@ -23,6 +19,10 @@ public:
 
 	void AddEvent(Event e) {
 		EventQueue.push_back(e);
+	}
+
+	size_t getSize() {
+		return EventQueue.size();
 	}
 
 private:

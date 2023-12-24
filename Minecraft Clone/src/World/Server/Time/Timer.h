@@ -19,6 +19,8 @@ public:
 	std::string StrGetTimePassed_ms();
 	std::string StrGetTimePassed_s();
 
+	void Set();
+
 private:
 	std::chrono::steady_clock::time_point First;
 

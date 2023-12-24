@@ -281,7 +281,7 @@ void TerrainRenderer::SetupShaders() {
 void TerrainRenderer::CreateNewSolidBatch() {
 	ChunkSolidBatches.emplace_back();
 	size_t i = ChunkSolidBatches.size() - 1;
-	ChunkSolidBatches[i].SetMaxSize(2000000000);
+	ChunkSolidBatches[i].SetMaxSize(3000000000);
 	ChunkSolidBatches[i].SetupBuffers();
 	ChunkSolidBatches[i].camera = camera;
 }
@@ -289,7 +289,7 @@ void TerrainRenderer::CreateNewSolidBatch() {
 void TerrainRenderer::CreateNewTransparentBatch() {
 	ChunkTransparentBatches.emplace_back();
 	size_t i = ChunkTransparentBatches.size() - 1;
-	ChunkTransparentBatches[i].SetMaxSize(2000000000);
+	ChunkTransparentBatches[i].SetMaxSize(3000000000);
 	ChunkTransparentBatches[i].SetupBuffers();
 	ChunkTransparentBatches[i].camera = camera;
 }

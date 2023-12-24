@@ -3,6 +3,7 @@
 #include "../World/Chunk/Block/Blocks.h"
 #include "../World/Entity/Entities.h"
 #include <chrono>
+#include "../World/Server/Time/Timer.h"
 
 using namespace std;
 using namespace chrono;
@@ -16,19 +17,19 @@ void Client::run() {
 
 	DisableCursor();
 
-	MainLocalWorld.SetPlayerPosition(0.,60.0,0.);
+	MainLocalWorld.SetPlayerPosition(0.,66.0,0.);
 	MainLocalWorld.SetPlayerRotation(0.,-30.);
 
 	ServerSettings serverSettings;
-	serverSettings.H_RenderDistance = 16;
-	serverSettings.V_RenderDistance = 4;
+	serverSettings.H_RenderDistance = 32;
+	serverSettings.V_RenderDistance = 8;
 	serverSettings.genThreads = 16;
 
 	server.Start(serverSettings);
 
 	Logger.LogInfo("World", "Generating World");
-	TerrainRender.renderDistance =64;
-	TerrainRender.Start(getWindow(), server.world, 4);
+	TerrainRender.renderDistance = 32;
+	TerrainRender.Start(getWindow(), server.world, 16);
 
 	MainLocalWorld.SetWorld(server.world);
 
@@ -46,12 +47,29 @@ void Client::Cleanup() {
 	glfwDestroyWindow(getWindow());
 }
 
+void Client::SetWindowName() {
+	UpdateWindowName(
+		"FPS: " + std::to_string(1.0 / Frametime)
+		+ " | Pos: " + std::to_string(MainLocalWorld.GetPlayerPosition().x) + ", "
+		+ std::to_string(MainLocalWorld.GetPlayerPosition().y) + ", "
+		+ std::to_string(MainLocalWorld.GetPlayerPosition().z)
+		+ ", VRAM Fragmentation Rate: " + std::to_string(TerrainRender.RendererV2.getFragmentationRate() * 100)
+		+ ", VRAM Usage (MB): " + std::to_string((double)TerrainRender.RendererV2.getVRAMUsageFull() / 1000000.0)
+		+ " | Mesh All (ms): " + std::to_string(TerrainRender.buildTime / 1000.f)
+		+ " | S0 (ms): " + std::to_string(TerrainRender.buildstage0 / 1000.f)
+		+ " | S1 (ms): " + std::to_string(TerrainRender.buildstage1 / 1000.f)
+		+ " | S2 (ms): " + std::to_string(TerrainRender.buildstage2 / 1000.f)
+		+ " | Total Mesh: " + std::to_string(TerrainRender.amountOfMeshGenerated)
+
+	);
+}
+
 void Client::GameLoop() {
 
-	auto t2 = high_resolution_clock::now();
+	Timer time;
 
 	while (!WindowCloseCheck()) {
-		auto t0 = high_resolution_clock::now();
+		Timer FrametimeTracker;
 
 		Update();
 
@@ -61,24 +79,11 @@ void Client::GameLoop() {
 
 		Refresh();
 
-		Frametime = (double)(high_resolution_clock::now() - t0).count() / 1000000000.0;
+		Frametime = FrametimeTracker.GetTimePassed_s();
 
-		if ((high_resolution_clock::now() - t2).count() > 250000000) {
-			UpdateWindowName(
-				"FPS: " + std::to_string(1.0 / Frametime)
-				+ " | Pos: " + std::to_string(MainLocalWorld.GetPlayerPosition().x) + ", " 
-				+ std::to_string(MainLocalWorld.GetPlayerPosition().y) + ", " 
-				+ std::to_string(MainLocalWorld.GetPlayerPosition().z)
-				+ ", VRAM Fragmentation Rate: " + std::to_string(TerrainRender.RendererV2.getFragmentationRate() * 100) 
-				+ ", VRAM Usage (MB): " + std::to_string((double)TerrainRender.RendererV2.getVRAMUsageFull() / 1000000.0)
-				+ " | Mesh All (ms): " + std::to_string(TerrainRender.buildTime / 1000.f)
-				+ " | S0 (ms): " + std::to_string(TerrainRender.buildstage0 / 1000.f)
-				+ " | S1 (ms): " + std::to_string(TerrainRender.buildstage1 / 1000.f)
-				+ " | S2 (ms): " + std::to_string(TerrainRender.buildstage2 / 1000.f)
-				+ " | Total Mesh: " + std::to_string(TerrainRender.amountOfMeshGenerated)
-
-			);
-			t2 = high_resolution_clock::now();
+		if (time.GetTimePassed_ms() > 250) {
+			SetWindowName();
+			time.Set();
 		}
 		
 	}

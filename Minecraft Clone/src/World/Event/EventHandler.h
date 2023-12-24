@@ -1,19 +1,38 @@
 #pragma once
-
-#include "Event.h"
+#ifndef EVENT_HANDLES
+#define EVENT_HANDLES
 #include <unordered_map>
 
+#include "Event.h"
+#include "../../World/Chunk/Block/Block.h"
+#include "BlockEventHandles/BlockHandles.h"
+
+
 class _EventHandler {
-public:
-	EventID BlockPlace = 0x01;
-
-	void ExecuteEvent() {
-
+private:
+	int counter = 0;
+	EventID RegisterBlockEvent(void (*func)(BlockID, int, int, int)) {
+		counter++;
+		BlockEventHandles[counter] = func;
+		return counter;
 	}
 
-private:
+	std::unordered_map<EventID, void (*)(BlockID, int, int, int)> BlockEventHandles;
+
 	
-	std::unordered_map<EventID, void (*)(...)> BlockEventHandles;
+
+public:
+	EventID BlockPlace = RegisterBlockEvent(HandlePlaceBlock);
+	EventID DirtTick = RegisterBlockEvent(HandleDirtTick);
+
+	void ExecuteEvent(Event event) {
+		if (event.Type = BLOCK_EVENT) {
+			Event::EventDataType data = event.Data;
+			(*BlockEventHandles[data.BlockEvent.id])(data.BlockEvent.block, data.BlockEvent.x, data.BlockEvent.y, data.BlockEvent.z);
+		}
+	}
 
 
-} EventHandler;
+} __declspec(selectany) EventHandler;
+
+#endif // !EVENT_HANDLES

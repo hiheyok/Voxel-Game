@@ -35,11 +35,11 @@ private:
 
 	void GetBlock();
 
-	BlockID HoldingBlock = Blocks.WHITE_CONCRETE;
+	BlockID HoldingBlock = Blocks.GRASS;
 	Entity Player;
 	World* world = nullptr;
 
-	bool enableCollusion = true;
+	bool enableCollusion = false;
 	bool sprint = false;
 	float speed = 100.f;
 };

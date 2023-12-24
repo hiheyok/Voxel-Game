@@ -16,6 +16,8 @@ private:
 	void Update();
 	void Cleanup();
 
+	void SetWindowName();
+
 	double Frametime = 0.5;
 
 	LocalWorld MainLocalWorld;

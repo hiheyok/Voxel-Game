@@ -12,23 +12,34 @@ enum EventType {
 	CHUNK_UNLOAD_EVENT
 };
 
-union Event
+struct Event
 {
 	EventType Type = NULL_EVENT;
 
-	struct _BlockEvent { //21
-		int x = 0; int y = 0; int z = 0;
-		BlockID block;
-		EventID id = 0;
+	Event() {
 
-	} BlockEvent;
+	}
 
-	struct _ChunkEvent {
-		int x = 0; int y = 0; int z = 0;
-		EventID id = 0;
-	} ChunkEvent;
+	union EventDataType {
+		EventDataType() {
 
-	struct _Data {
-		char d[MAX_EVENT_SIZE]{};
+		}
+
+		struct _BlockEvent { //21 Bytes
+			int z = 0; int y = 0; int x = 0; // 12
+			BlockID block; //1
+			EventID id = 0; //8
+
+		} BlockEvent;
+
+		struct _ChunkEvent {
+			int x = 0; int y = 0; int z = 0;
+			EventID id = 0;
+		} ChunkEvent;
+
+		struct _Data {
+			char d[MAX_EVENT_SIZE]{};
+		} __Data;
 	} Data;
+	
 };

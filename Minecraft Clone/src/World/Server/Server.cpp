@@ -58,3 +58,7 @@ void Server::ServerLoop() {
 void Server::Join() {
 
 }
+
+void Server::SendPlayerEvent(Event event) {
+	world->QueueEvent(event);
+}

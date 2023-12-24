@@ -23,14 +23,9 @@ public:
 
 	void Tick();
 	void Load();
-
-	bool RayIntersection(Ray& ray);
+	void QueueEvent(Event event);
 
 	void SetPlayerPos(glm::dvec3 pos);
-
-	glm::dvec3 GetTimeTillCollusion(Entity entity);
-
-	bool IsEntityOnGround(Entity entity);
 
 	int H_RenderDistance = 16;
 	int V_RenderDistance = 8;
@@ -38,8 +33,6 @@ public:
 private:
 
 	void WorldThread();
-	
-	float GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int direction, int distancetest);
 
 	std::thread MainWorldThread;
 	std::thread Loader;
@@ -49,6 +42,7 @@ private:
 	Generator WorldGenerator;
 
 	EventSystem EventManager;
+
 
 	std::unordered_set<ChunkID> ChunksInQueue;
 

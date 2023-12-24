@@ -12,12 +12,8 @@ int main() {
 	
 	stbi_set_flip_vertically_on_load(true);
 
-//	Blocks = *(new BlockList());
-
 	Client GameClient;
 	GameClient.run();
-
-
 
 	Logger.Stop();
 	return 0;

@@ -21,6 +21,7 @@ public:
 	void Start(ServerSettings settings);
 	void Stop();
 	void Join();
+	void SendPlayerEvent(Event event);
 
 	void ServerLoop();
 

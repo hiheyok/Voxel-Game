@@ -174,7 +174,7 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 
 				if (n > 0.5f) {
 					if (n < 0.54f) {
-						SetBlockUnsafe(Blocks.GRASS, x, y, z);
+						SetBlockUnsafe(Blocks.GRASS, x, y, z); 
 
 						SetBlock(Blocks.DIRT, x, y - 1, z);
 						

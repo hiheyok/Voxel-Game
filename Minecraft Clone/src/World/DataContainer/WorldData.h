@@ -2,8 +2,7 @@
 
 #include "ChunkMapData.h"
 #include "../Entity/Entity.h"
-
-#include <concurrent_unordered_set.h>
+#include "../../Utils/Math/Ray/Ray.h"
 
 /*
 Contains all of the world data and basic functions to manage it
@@ -29,8 +28,17 @@ public:
 
 	void ChunkUpdate(int x, int y, int z);
 
+	bool RayIntersection(Ray& ray);
+
+	glm::dvec3 GetTimeTillCollusion(Entity entity);
+
+	bool IsEntityOnGround(Entity entity);
+
 	std::unordered_set<ChunkID> ChunksUpdated;
 	std::mutex ChunkUpdateLock;
+
+protected:
+	float GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int direction, int distancetest);
 private:
 	size_t tickCount = 0;
 	

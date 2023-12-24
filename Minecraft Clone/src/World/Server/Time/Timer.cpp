@@ -3,6 +3,10 @@
 using namespace std;
 using namespace chrono;
 
+void Timer::Set() {
+	First = high_resolution_clock::now();
+}
+
 double Timer::GetTimePassed_s() {
 	return (double)(high_resolution_clock::now() - First).count() / 1000000000.0;
 }
