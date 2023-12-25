@@ -7,6 +7,11 @@ struct FLUID_BLOCK : Block {
 
 		World* CurrentWorld = static_cast<World*>(Block::WorldPTR);
 
+		//BlockID CurrentBlock = CurrentWorld->GetBlock(x, y, z);
+
+
+		Logger.LogInfo("Water Tick", std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z));
+
 		for (int side = 0; side < 6; side++) {
 			int pos[3]{x, y, z};
 
@@ -21,6 +26,12 @@ struct FLUID_BLOCK : Block {
 			if (block != Blocks.AIR) {
 				continue;
 			}
+
+			if (CurrentWorld->CheckTickUsed(x, y, z)) {
+				return;
+			}
+
+			CurrentWorld->TickUsed(x, y, z);
 
 			Event event;
 			event.Type = BLOCK_EVENT;

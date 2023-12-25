@@ -1,5 +1,6 @@
 #pragma once
 #include "BlockTexture.h"
+#include "BlockMaterial.h"
 
 typedef unsigned char BlockID;
 
@@ -33,6 +34,8 @@ struct Block {
 	BlockType* Properties = nullptr;
 
 	BlockTexture* Texture = nullptr;
+
+	BlockMaterial Material = MATERIAL_NONE;
 };
 
 __declspec(selectany) void* Block::WorldPTR = nullptr;

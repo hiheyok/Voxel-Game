@@ -48,6 +48,8 @@ void World::Tick() {
 		EventHandler.ExecuteEvent(e);
 	}
 
+	TickUsage.clear();
+
 	MSPT = time.GetTimePassed_ms();
 	
 }

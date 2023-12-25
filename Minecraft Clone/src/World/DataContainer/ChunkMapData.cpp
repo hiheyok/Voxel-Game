@@ -55,7 +55,7 @@ BlockID ChunkMap::GetBlockGlobal(int x, int y, int z) {
 
 	int l[3]{ x & 0b1111 ,y & 0b1111,z & 0b1111 };
 
-	int r[3]{ x >> 9 ,y >> 9 ,z >> 9 };
+	int r[3]{ x >> 9 ,y >> 9 ,z >> 9 }; // region 
 
 	Region* reg = GetRegion(c[0], c[1], c[2]);
 	if (reg == nullptr) {

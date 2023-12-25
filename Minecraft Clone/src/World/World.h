@@ -27,6 +27,13 @@ public:
 
 	void SetPlayerPos(glm::dvec3 pos);
 
+	void TickUsed(int x, int y, int z) {//temp solution
+		TickUsage.insert(getChunkID(x, y, z));
+	}
+	bool CheckTickUsed(int x, int y, int z) {//temp sol
+		return TickUsage.contains(getChunkID(x, y, z));
+	}
+
 	int H_RenderDistance = 16;
 	int V_RenderDistance = 8;
 	EventSystem EventManager;
@@ -34,6 +41,8 @@ public:
 	double MSPT = 0;
 
 private:
+
+	std::unordered_set<ChunkID> TickUsage;
 
 	void WorldThread();
 

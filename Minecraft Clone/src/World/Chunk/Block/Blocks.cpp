@@ -27,6 +27,7 @@ BlockID BlockList::RegisterNewBlock(BlockMaterial material, bool transparency, b
 	block->ID = ID;
 	block->Properties = NewBlock;
 	block->Texture = new BlockTexture;
+	block->Material = material;
 
 	BlockTypeData.emplace(ID, block);
 	Logger.LogInfo("Register", "Registered new block (ID): " + std::to_string(ID));
