@@ -45,6 +45,14 @@ void World::Tick() {
 		Event e = EventManager.GetNextEvent();
 		if (e.Type == NULL_EVENT)
 			break;
+		if (e.Type == BLOCK_EVENT) {
+			if (CheckTickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.x, e.Data.BlockEvent.y, e.Data.BlockEvent.z)) {
+				continue;
+			}
+		}
+
+		TickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.x, e.Data.BlockEvent.y, e.Data.BlockEvent.z);
+
 		EventHandler.ExecuteEvent(e);
 	}
 

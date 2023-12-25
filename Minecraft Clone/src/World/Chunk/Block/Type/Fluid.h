@@ -24,11 +24,11 @@ struct FLUID_BLOCK : Block {
 				continue;
 			}
 
-			if (CurrentWorld->CheckTickUsed(x, y, z)) {
+			/*if (CurrentWorld->CheckTickUsed(x, y, z)) {
 				return;
 			}
 
-			CurrentWorld->TickUsed(x, y, z);
+			CurrentWorld->TickUsed(x, y, z);*/
 
 			Event event;
 			event.Type = BLOCK_EVENT;

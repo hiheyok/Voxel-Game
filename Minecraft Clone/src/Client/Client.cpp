@@ -23,13 +23,13 @@ void Client::run() {
 	ServerSettings serverSettings;
 	serverSettings.H_RenderDistance = 32;
 	serverSettings.V_RenderDistance = 8;
-	serverSettings.genThreads = 6;
+	serverSettings.genThreads = 8;
 
 	server.Start(serverSettings);
 
 	Logger.LogInfo("World", "Generating World");
 	TerrainRender.renderDistance = 32;
-	TerrainRender.Start(getWindow(), server.world, 6);
+	TerrainRender.Start(getWindow(), server.world, 16);
 
 	MainLocalWorld.SetWorld(server.world);
 
