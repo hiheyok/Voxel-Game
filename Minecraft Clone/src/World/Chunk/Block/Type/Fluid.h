@@ -9,9 +9,6 @@ struct FLUID_BLOCK : Block {
 
 		//BlockID CurrentBlock = CurrentWorld->GetBlock(x, y, z);
 
-
-		Logger.LogInfo("Water Tick", std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z));
-
 		for (int side = 0; side < 6; side++) {
 			int pos[3]{x, y, z};
 
