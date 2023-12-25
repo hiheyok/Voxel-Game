@@ -2,6 +2,7 @@
 #include <glm/geometric.hpp>
 #include "../../World/Event/EventHandler.h"
 #include <glm/gtx/common.hpp>
+#include "../../Utils/Math/vectorOperations.h"
 
 using namespace std;
 using namespace glm;
@@ -74,6 +75,19 @@ void LocalWorld::RotatePlayer(float cursorx, float cursory) {
 
 }
 
+float velocityCurve(float current, float max, float delta) {
+
+	int currentTime = -log(max - current) + log(max);
+
+	int x = delta - log(max) - currentTime;
+
+	if (x <= 0) {
+		x = 0;
+	}
+
+	return max - exp(-x);
+}
+
 void LocalWorld::MovePlayer(bool KeyW, bool KeyA, bool KeyS, bool KeyD, bool KeySpace, bool shift, float delta) {
 
 	vec3 front(
@@ -87,27 +101,31 @@ void LocalWorld::MovePlayer(bool KeyW, bool KeyA, bool KeyS, bool KeyD, bool Key
 	vec3 right = normalize(cross(front, glm::vec3(0.0, 1.0, 0.0)));
 	right.y = 0;
 
-	float velocity = speed * delta;
+	float velocity = speed;
 
 	if (sprint) {
 		velocity *= 4.f;
 	}
 
+	float v = velocityCurve(magnitude(Player.Velocity), velocity, delta) / sqrtf(2);
+
+	Player.Velocity = vec3(0.f, 0.f, 0.f);
+
 	if (KeyW) {
-		Player.Velocity += front * velocity;
+		Player.Velocity += front * v;
 	}
 	if (KeyA) {
-		Player.Velocity -= right * velocity;
+		Player.Velocity += -right * v;
 	}
 	if (KeyS) {
-		Player.Velocity -= front * velocity;
+		Player.Velocity += -front * v;
 	}
 	if (KeyD) {
-		Player.Velocity += right * velocity;
+		Player.Velocity += right * v;
 	}
 
 	if (shift) {
-		Player.Velocity.y += -velocity;
+		Player.Velocity.y += -velocityCurve(magnitude(Player.Velocity), velocity, delta);
 	}
 
 
@@ -168,10 +186,9 @@ void LocalWorld::PlaceBlock() {
 		Event placeBlock;
 		placeBlock.Type = BLOCK_EVENT;
 		placeBlock.Data.BlockEvent.block = HoldingBlock;
-		placeBlock.Data.BlockEvent.z = PlacePos.z;
 		placeBlock.Data.BlockEvent.x = PlacePos.x;
 		placeBlock.Data.BlockEvent.y = PlacePos.y;
-		
+		placeBlock.Data.BlockEvent.z = PlacePos.z;
 		placeBlock.Data.BlockEvent.id = EventHandler.BlockPlace;
 
 		world->QueueEvent(placeBlock);
@@ -189,7 +206,14 @@ void LocalWorld::BreakBlock() {
 		sin(Player.Rotation.x * 0.0174533) * cos(Player.Rotation.y * 0.0174533));
 
 	if (world->RayIntersection(ray)) {
-		world->SetBlock(Blocks.AIR, (int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z));
+		Event placeBlock;
+		placeBlock.Type = BLOCK_EVENT;
+		placeBlock.Data.BlockEvent.block = Blocks.AIR;
+		placeBlock.Data.BlockEvent.x = (int)floor(ray.EndPoint.x);
+		placeBlock.Data.BlockEvent.y = (int)floor(ray.EndPoint.y);
+		placeBlock.Data.BlockEvent.z = (int)floor(ray.EndPoint.z);
+		placeBlock.Data.BlockEvent.id = EventHandler.BlockPlace;
+		world->QueueEvent(placeBlock);
 	}
 }
 

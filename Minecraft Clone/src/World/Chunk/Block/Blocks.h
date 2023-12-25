@@ -15,8 +15,8 @@ public:
 	BlockID AIR = RegisterNewBlock(MATERIAL_NONE, true, false, false);
 	BlockID STONE = RegisterNewBlock(MATERIAL_NONE, false, true, false);
 	BlockID DIRT = RegisterNewBlock(MATERIAL_DIRT, false, true, false);
-	BlockID WATER = RegisterNewBlock(MATERIAL_NONE, true, false, true);
-	BlockID GRASS = RegisterNewBlock(MATERIAL_NONE, false, true, false);
+	BlockID WATER = RegisterNewBlock(MATERIAL_FLUID, true, false, true);
+	BlockID GRASS = RegisterNewBlock(MATERIAL_GRASS, false, true, false);
 	BlockID SAND = RegisterNewBlock(MATERIAL_NONE, false, true, false);
 	BlockID OAK_LOG = RegisterNewBlock(MATERIAL_NONE, false, true, false);
 	BlockID OAK_LEAF = RegisterNewBlock(MATERIAL_NONE, true, true, false);
@@ -28,10 +28,6 @@ public:
 
 	BlockID NULL_BLOCK = RegisterNewBlock(MATERIAL_NONE, false, false, false);
 
-	void RegisterBlock() {
-
-	}
-
 	void Initialize() {
 		BlockTextureArray.Gen();
 		BlockTextureArray.height = 16;
@@ -41,8 +37,8 @@ public:
 		SetFacesCustom(DIRT, "assets/textures/array/block/dirt.png", FRONT, BACK, LEFT, RIGHT, BOTTOM, TOP);
 		SetFacesCustom(WATER, "assets/textures/array/block/water_still.png", FRONT, BACK, LEFT, RIGHT, BOTTOM, TOP);
 
-		SetFaceTop(GRASS, "assets/textures/array/block/grass_block_top.png");
-		SetFaceBottom(GRASS, "assets/textures/array/block/dirt.png");
+		SetFacesCustom(GRASS, "assets/textures/array/block/grass_block_top.png", TOP);
+		SetFacesCustom(GRASS, "assets/textures/array/block/dirt.png", BOTTOM);
 		SetFacesCustom(GRASS, "assets/textures/array/block/grass_block_side.png", LEFT, RIGHT, FRONT, BACK);
 
 		SetFacesCustom(SAND, "assets/textures/array/block/sand.png", FRONT, BACK, LEFT, RIGHT, BOTTOM, TOP);
@@ -75,33 +71,33 @@ public:
 		return BlockTypeData[id];
 	}
 
-	inline BlockID RegisterNewBlock(BlockMaterial material, bool transparency, bool solid, bool isFluid);
+	BlockID RegisterNewBlock(BlockMaterial material, bool transparency, bool solid, bool isFluid);
 
-	int SetFaceFront(BlockID id, std::string file) {
+	void SetFaceFront(BlockID id, std::string file) {
 		BlockTextureArray.AddTextureToArray(file);
 		BlockTypeData[id]->Texture->SetFaceFront(id);
 	}
-	int SetFaceBack(BlockID id, std::string file) {
+	void SetFaceBack(BlockID id, std::string file) {
 		BlockTextureArray.AddTextureToArray(file);
 		BlockTypeData[id]->Texture->SetFaceBack(id);
 	}
-	int SetFaceWest(BlockID id, std::string file) {
+	void SetFaceWest(BlockID id, std::string file) {
 		BlockTextureArray.AddTextureToArray(file);
 		BlockTypeData[id]->Texture->SetFaceWest(id);
 	}
-	int SetFaceEast(BlockID id, std::string file) {
+	void SetFaceEast(BlockID id, std::string file) {
 		BlockTextureArray.AddTextureToArray(file);
 		BlockTypeData[id]->Texture->SetFaceEast(id);
 	}
-	int SetFaceTop(BlockID id, std::string file) {
+	void SetFaceTop(BlockID id, std::string file) {
 		BlockTextureArray.AddTextureToArray(file);
 		BlockTypeData[id]->Texture->SetFaceTop(id);
 	}
-	int SetFaceBottom(BlockID id, std::string file) {
+	void SetFaceBottom(BlockID id, std::string file) {
 		BlockTextureArray.AddTextureToArray(file);
 		BlockTypeData[id]->Texture->SetFaceBottom(id);
 	}
-	int SetFacesCustom(BlockID id, std::string file, int side0 = 0xFF, int side1 = 0xFF, int side2 = 0xFF, int side3 = 0xFF, int side4 = 0xFF, int side5 = 0xFF) {
+	void SetFacesCustom(BlockID id, std::string file, int side0 = 0xFF, int side1 = 0xFF, int side2 = 0xFF, int side3 = 0xFF, int side4 = 0xFF, int side5 = 0xFF) {
 		BlockTextureArray.AddTextureToArray(file);
 
 		int TexID = BlockTextureArray.GetLayers();

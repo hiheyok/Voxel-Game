@@ -24,6 +24,7 @@ private:
 public:
 	EventID BlockPlace = RegisterBlockEvent(HandlePlaceBlock);
 	EventID DirtTick = RegisterBlockEvent(HandleDirtTick);
+	EventID BlockTick = RegisterBlockEvent(HandleBlockTick);
 
 	void ExecuteEvent(Event event) {
 		if (event.Type = BLOCK_EVENT) {

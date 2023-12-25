@@ -23,13 +23,13 @@ void Client::run() {
 	ServerSettings serverSettings;
 	serverSettings.H_RenderDistance = 32;
 	serverSettings.V_RenderDistance = 8;
-	serverSettings.genThreads = 16;
+	serverSettings.genThreads = 6;
 
 	server.Start(serverSettings);
 
 	Logger.LogInfo("World", "Generating World");
 	TerrainRender.renderDistance = 32;
-	TerrainRender.Start(getWindow(), server.world, 16);
+	TerrainRender.Start(getWindow(), server.world, 6);
 
 	MainLocalWorld.SetWorld(server.world);
 
@@ -55,11 +55,13 @@ void Client::SetWindowName() {
 		+ std::to_string(MainLocalWorld.GetPlayerPosition().z)
 		+ ", VRAM Fragmentation Rate: " + std::to_string(TerrainRender.RendererV2.getFragmentationRate() * 100)
 		+ ", VRAM Usage (MB): " + std::to_string((double)TerrainRender.RendererV2.getVRAMUsageFull() / 1000000.0)
-		+ " | Mesh All (ms): " + std::to_string(TerrainRender.buildTime / 1000.f)
+		/*+ " | Mesh All (ms): " + std::to_string(TerrainRender.buildTime / 1000.f)
 		+ " | S0 (ms): " + std::to_string(TerrainRender.buildstage0 / 1000.f)
 		+ " | S1 (ms): " + std::to_string(TerrainRender.buildstage1 / 1000.f)
 		+ " | S2 (ms): " + std::to_string(TerrainRender.buildstage2 / 1000.f)
-		+ " | Total Mesh: " + std::to_string(TerrainRender.amountOfMeshGenerated)
+		+ " | Total Mesh: " + std::to_string(TerrainRender.amountOfMeshGenerated)*/
+		+", Event Queue Size: " + to_string(((World*)Block::WorldPTR)->EventManager.getSize())
+		+ ", Server Tick (MSPT): " + to_string(((World*)Block::WorldPTR)->MSPT)
 
 	);
 }

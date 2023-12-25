@@ -6,11 +6,13 @@
 
 class EntityTypes {
 private:
-	std::unordered_map<EntityID, EntityType*> EntityTypeList;
+	
 public:
+	std::unordered_map<EntityID, EntityType*> EntityTypeList;
 
 	EntityID HUMAN = RegisterNewEntity();
 	EntityID PLAYER = RegisterNewEntity();
+	EntityID ZOMBIE = RegisterNewEntity();
 
 	EntityTypes() {
 
@@ -19,6 +21,9 @@ public:
 
 		EntityTypeList[HUMAN]->ChangeHitboxSize(0.8f, 1.8f, 0.8f);
 		EntityTypeList[HUMAN]->RenderModel.AddRectangle(0.8f, 1.8f, 0.8f);
+
+		EntityTypeList[ZOMBIE]->ChangeHitboxSize(0.8f, 1.8f, 0.8f);
+		EntityTypeList[ZOMBIE]->RenderModel.AddRectangle(0.8f, 1.8f, 0.8f);
 	}
 
 	inline EntityID RegisterNewEntity() {

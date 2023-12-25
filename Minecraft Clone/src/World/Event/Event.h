@@ -16,6 +16,8 @@ struct Event
 {
 	EventType Type = NULL_EVENT;
 
+	int TickTime = 0;
+
 	Event() {
 
 	}

@@ -1,8 +1,9 @@
 #include "Blocks.h"
-
+#include "Type/Grass.h"
 #include "Type/Dirt.h"
+#include "Type/Fluid.h"
 
-inline BlockID BlockList::RegisterNewBlock(BlockMaterial material, bool transparency, bool solid, bool isFluid) {
+BlockID BlockList::RegisterNewBlock(BlockMaterial material, bool transparency, bool solid, bool isFluid) {
 	BlockID ID = (BlockID)BlockTypeData.size();
 	BlockType* NewBlock = new BlockType(transparency, solid, isFluid);
 
@@ -11,6 +12,12 @@ inline BlockID BlockList::RegisterNewBlock(BlockMaterial material, bool transpar
 	switch (material) {
 	case MATERIAL_DIRT:
 		block = new DIRT_BLOCK;
+		break;
+	case MATERIAL_GRASS:
+		block = new GRASS_BLOCK;
+		break;
+	case MATERIAL_FLUID:
+		block = new FLUID_BLOCK;
 		break;
 	case MATERIAL_NONE:
 		block = new Block;

@@ -41,6 +41,7 @@ private:
 
 	bool enableCollusion = false;
 	bool sprint = false;
-	float speed = 100.f;
+	float speed = 25.f;
+	float walkingForce = 100.f;
 };
 

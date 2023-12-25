@@ -35,7 +35,7 @@ void World::WorldThread() {
 }
 
 void World::Tick() {
-	auto t0 = high_resolution_clock::now();
+	Timer time;
 
 	int QueueSize = EventManager.getSize();
 
@@ -47,6 +47,8 @@ void World::Tick() {
 			break;
 		EventHandler.ExecuteEvent(e);
 	}
+
+	MSPT = time.GetTimePassed_ms();
 	
 }
 

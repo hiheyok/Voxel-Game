@@ -29,6 +29,9 @@ public:
 
 	int H_RenderDistance = 16;
 	int V_RenderDistance = 8;
+	EventSystem EventManager;
+
+	double MSPT = 0;
 
 private:
 
@@ -41,7 +44,7 @@ private:
 
 	Generator WorldGenerator;
 
-	EventSystem EventManager;
+	
 
 
 	std::unordered_set<ChunkID> ChunksInQueue;
