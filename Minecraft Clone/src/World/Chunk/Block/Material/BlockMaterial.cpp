@@ -1,22 +1,27 @@
 #include "BlockMaterial.h"
 #include "../Type/BlockTypes.h"
 
-void MaterialNone::SetBlockProperties(Block* block) {
-	//Nothing
+Block* MaterialNone::BuildNewBlockType() {
+	return new Block();
 }
 
-void MaterialFluid::SetBlockProperties(Block* block) {
-	Fluid* fluid = static_cast<Fluid*>(block);
-
+Block* MaterialFluid::BuildNewBlockType() {
+	Fluid* fluid = new Fluid;
 	fluid->Properties.SpreadRate = Spread;
+
+	return static_cast<Block*>(fluid);
 }
 
-void MaterialGrass::SetBlockProperties(Block* block) {
-	GrassBlock* grass = static_cast<GrassBlock*>(block);
+Block* MaterialGrass::BuildNewBlockType() {
+	GrassBlock* grass = new GrassBlock;
 	grass->Properties.BreakChance = BreakChance;
 	grass->Properties.SpreadChance = SpreadChance;
+
+	return static_cast<Block*>(grass);
 }
 
-void MaterialDirt::SetBlockProperties(Block* block) {
-	//Do nothing right now.
+Block* MaterialDirt::BuildNewBlockType() {
+	DirtBlock* dirt = new DirtBlock();
+
+	return static_cast<Block*>(dirt);
 }

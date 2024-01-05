@@ -8,8 +8,12 @@ enum MaterialType {
 struct Material {
 	MaterialType type = MATERIAL_NONE;
 
-	virtual void SetBlockProperties(Block* block) {
+	virtual ~Material() {
 
+	}
+
+	virtual Block* BuildNewBlockType() {
+		return new Block();
 	}
 };
 
@@ -18,7 +22,7 @@ struct MaterialNone : Material {
 		type = MATERIAL_NONE;
 	}
 
-	void SetBlockProperties(Block* block) override;
+	Block* BuildNewBlockType() override;
 };
 
 struct MaterialFluid : Material {
@@ -30,7 +34,7 @@ struct MaterialFluid : Material {
 		Spread = SpreadRate;
 	}
 
-	void SetBlockProperties(Block* block) override;
+	Block* BuildNewBlockType() override;
 };
 
 struct MaterialDirt : Material {
@@ -38,7 +42,7 @@ struct MaterialDirt : Material {
 		type = MATERIAL_DIRT;
 	}
 
-	void SetBlockProperties(Block* block) override;
+	Block* BuildNewBlockType() override;
 };
 
 struct MaterialGrass : Material {
@@ -46,10 +50,10 @@ struct MaterialGrass : Material {
 	double BreakChance = 0.001;
 
 	MaterialGrass(double _SpreadChance, double _BreakChance) {
-		type = MATERIAL_DIRT;
+		type = MATERIAL_GRASS;
 		SpreadChance = _SpreadChance;
 		BreakChance = _BreakChance;
 	}
 
-	void SetBlockProperties(Block* block) override;
+	Block* BuildNewBlockType() override;
 };

@@ -6,27 +6,42 @@
 #include "Material/BlockMaterial.h"
 #include "Texture/BlockTexture.h"
 
+struct BlockRegistration {
+	Material* material = nullptr;
+	bool transparency = false;
+	bool solid = false;
+	bool isFluid = false;
+
+	BlockID blockID = 0;
+};
+
 class BlockList {
 private:
 	std::unordered_map<unsigned int, Block*> BlockTypeData;
+
+	std::deque<BlockRegistration> RegistrationQueue;
+
+	int BlockTypeCount = 0;
 public:
 	TextureArray BlockTextureArray;
 
-	BlockID AIR = RegisterNewBlock(new MaterialNone(), true, false, false);
-	BlockID STONE = RegisterNewBlock(new MaterialNone(), false, true, false);
-	BlockID DIRT = RegisterNewBlock(new MaterialDirt(), false, true, false);
-	BlockID WATER = RegisterNewBlock(new MaterialFluid(5), true, false, true);
-	BlockID GRASS = RegisterNewBlock(new MaterialGrass(0.001,0.101), false, true, false);
-	BlockID SAND = RegisterNewBlock(new MaterialNone(), false, true, false);
-	BlockID OAK_LOG = RegisterNewBlock(new MaterialNone(), false, true, false);
-	BlockID OAK_LEAF = RegisterNewBlock(new MaterialNone(), true, true, false);
-	BlockID DIAMOND_BLOCK = RegisterNewBlock(new MaterialNone(), false, true, false);
-	BlockID OAK_PLANK = RegisterNewBlock(new MaterialNone(), false, true, false);
-	BlockID COBBLESTONE = RegisterNewBlock(new MaterialNone(), false, true, false);
-	BlockID BRICK = RegisterNewBlock(new MaterialNone(), false, true, false);
-	BlockID WHITE_CONCRETE = RegisterNewBlock(new MaterialNone(), false, true, false);
+	BlockID AIR = QueueRegister(new MaterialNone(), true, false, false);
+	BlockID STONE = QueueRegister(new MaterialNone(), false, true, false);
+	BlockID DIRT = QueueRegister(new MaterialDirt(), false, true, false);
+	BlockID WATER = QueueRegister(new MaterialFluid(5), true, false, true);
+	BlockID GRASS = QueueRegister(new MaterialGrass(0.001,0.101), false, true, false);
+	BlockID SAND = QueueRegister(new MaterialNone(), false, true, false);
+	BlockID OAK_LOG = QueueRegister(new MaterialNone(), false, true, false);
+	BlockID OAK_LEAF = QueueRegister(new MaterialNone(), true, true, false);
+	BlockID DIAMOND_BLOCK = QueueRegister(new MaterialNone(), false, true, false);
+	BlockID OAK_PLANK = QueueRegister(new MaterialNone(), false, true, false);
+	BlockID COBBLESTONE = QueueRegister(new MaterialNone(), false, true, false);
+	BlockID BRICK = QueueRegister(new MaterialNone(), false, true, false);
+	BlockID WHITE_CONCRETE = QueueRegister(new MaterialNone(), false, true, false);
 
-	BlockID NULL_BLOCK = RegisterNewBlock(new MaterialNone(), false, false, false);
+	BlockID NULL_BLOCK = QueueRegister(new MaterialNone(), false, false, false);
+
+	void RegisterAll();
 
 	void Initialize() {
 		BlockTextureArray.Gen();
@@ -59,7 +74,11 @@ public:
 	}
 
 	~BlockList() {
+		CleanUp();
+		
+	}
 
+	void CleanUp() {
 		for (const auto& obj : BlockTypeData) {
 			delete obj.second;
 		}
@@ -71,7 +90,9 @@ public:
 		return BlockTypeData[id];
 	}
 
-	BlockID RegisterNewBlock(Material* material, bool transparency, bool solid, bool isFluid);
+	void RegisterNewBlock(BlockRegistration reg);
+
+	BlockID QueueRegister(Material* material, bool transparency, bool solid, bool isFluid);
 
 	void SetFaceFront(BlockID id, std::string file) {
 		BlockTextureArray.AddTextureToArray(file);
@@ -105,7 +126,6 @@ public:
 		Block* b = BlockTypeData[id];
 		
 		b->Texture->SetFacesCustom(TexID, side0, side1, side2 , side3, side4, side5);
-
 	}
 
 } __declspec(selectany)  Blocks;

@@ -5,6 +5,7 @@
 #include "../../../Event/EventHandler.h"
 
 struct DirtBlock : Block {
+
 	void tick(int x, int y, int z) override {
 		bool isGrassNearby = false;
 		World* CurrentWorld = (World*)Block::WorldPTR;

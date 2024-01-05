@@ -18,9 +18,17 @@ struct BlockType {
 
 struct Block {
 
-	~Block() {
-		delete Properties;
-		delete Texture;
+	virtual ~Block() {
+		Clean();
+	}
+
+	void Clean() {
+		if (Properties != nullptr) {
+			delete Properties;
+		}
+		if (Texture != nullptr) {
+			delete Texture;
+		}
 	}
 
 	virtual void tick(int x, int y, int z) {

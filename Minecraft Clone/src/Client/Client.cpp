@@ -13,6 +13,7 @@ void Client::run() {
 
 	Start();
 
+	Blocks.RegisterAll();
 	Blocks.Initialize();
 
 	DisableCursor();
@@ -43,7 +44,7 @@ void Client::Cleanup() {
 	server.Stop();
 	Logger.Stop();
 	Logger.LoggingThread.join();
-
+	Blocks.CleanUp();
 	glfwDestroyWindow(getWindow());
 }
 

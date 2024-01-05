@@ -17,12 +17,15 @@ struct GrassBlock : Block {
 	void tick(int x, int y, int z) override {
 		World* CurrentWorld = static_cast<World*>(Block::WorldPTR);
 
+		//Checks if ticking block changes 
+		if (CurrentWorld->GetBlock(x, y, z) != Blocks.GRASS) {
+			return;
+		}
+
 		//If there is space above then preserve the grass block
 		if (CurrentWorld->GetBlock(x, y + 1, z) == Blocks.AIR) {
 			return;
 		}
-
-		std::cout << "test\n";
 
 		//Chance it -doesn't break-
 		if (TestProbability(1 - Properties.BreakChance)) {
