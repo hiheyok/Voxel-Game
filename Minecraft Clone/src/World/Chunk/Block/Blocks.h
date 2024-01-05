@@ -29,7 +29,7 @@ public:
 	BlockID STONE = QueueRegister(new MaterialNone(), false, true, false);
 	BlockID DIRT = QueueRegister(new MaterialDirt(), false, true, false);
 	BlockID WATER = QueueRegister(new MaterialFluid(5), true, false, true);
-	BlockID GRASS = QueueRegister(new MaterialGrass(0.001,0.101), false, true, false);
+	BlockID GRASS = QueueRegister(new MaterialGrass(0.1,0.1), false, true, false);
 	BlockID SAND = QueueRegister(new MaterialNone(), false, true, false);
 	BlockID OAK_LOG = QueueRegister(new MaterialNone(), false, true, false);
 	BlockID OAK_LEAF = QueueRegister(new MaterialNone(), true, true, false);
