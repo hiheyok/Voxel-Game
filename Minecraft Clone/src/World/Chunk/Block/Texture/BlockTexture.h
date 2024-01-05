@@ -2,7 +2,7 @@
 #ifndef BLOCK_TEX
 #define BLOCK_TEX
 
-#include "../../../RenderEngine/OpenGL/Texture/Types/TextureArray.h"
+#include "../../../../RenderEngine/OpenGL/Texture/Types/TextureArray.h"
 #include <string>
 
 #define FRONT 0x00

@@ -30,26 +30,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2023</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2023</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2023</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2023</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -111,6 +111,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <FloatingPointModel>Precise</FloatingPointModel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -135,6 +136,11 @@
       <UseProcessorExtensions>ALDERLAKE</UseProcessorExtensions>
       <OptimizeForWindowsApplication>true</OptimizeForWindowsApplication>
       <BufferSecurityCheck>false</BufferSecurityCheck>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LoopUnrolling>
+      </LoopUnrolling>
+      <StructMemberAlignment>8Bytes</StructMemberAlignment>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -151,15 +157,23 @@
     <ClCompile Include="src\Client\Render\PlayerPOV.cpp" />
     <ClCompile Include="src\Client\Render\WorldRender.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Math\Matrix.cpp" />
     <ClCompile Include="src\RenderEngine\Camera\camera.cpp" />
-    <ClCompile Include="src\RenderEngine\ChunkRenderer\ChunkBatch.cpp" />
+    <ClCompile Include="src\RenderEngine\ChunkRenderer\Batch\ChunkBatch.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshing.cpp" />
+    <ClCompile Include="src\RenderEngine\ChunkRenderer\TerrainRenderer.cpp" />
     <ClCompile Include="src\RenderEngine\Frustum\frustum.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Buffers\Buffer.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\OpenGL.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\Shader.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Texture\ImagerLoader.cpp" />
     <ClCompile Include="src\RenderEngine\Window.cpp" />
+    <ClCompile Include="src\Utils\Math\Probability\Probability.cpp" />
+    <ClCompile Include="src\World\Chunk\Block\Blocks.cpp" />
+    <ClCompile Include="src\World\Chunk\Block\Material\BlockMaterial.cpp" />
+    <ClCompile Include="src\World\Collusion\CollusionTest.cpp" />
+    <ClCompile Include="src\World\Event\BlockEventHandles\BlockHandles.cpp" />
+    <ClCompile Include="src\World\Server\Server.cpp" />
     <ClCompile Include="src\Utils\Clock.cpp" />
     <ClCompile Include="src\Utils\LogUtils.cpp" />
     <ClCompile Include="src\Utils\MathHelper.cpp" />
@@ -167,8 +181,10 @@
     <ClCompile Include="src\World\Chunk\Block\Block.cpp" />
     <ClCompile Include="src\World\Chunk\Chunk.cpp" />
     <ClCompile Include="src\World\Chunk\ChunkData.cpp" />
+    <ClCompile Include="src\World\DataContainer\ChunkMapData.cpp" />
     <ClCompile Include="src\World\DataContainer\WorldData.cpp" />
     <ClCompile Include="src\World\Entity\Entity.cpp" />
+    <ClCompile Include="src\World\Server\Time\Timer.cpp" />
     <ClCompile Include="src\World\TerrainGeneration\Generator.cpp" />
     <ClCompile Include="src\World\World.cpp" />
   </ItemGroup>
@@ -178,12 +194,13 @@
     <ClInclude Include="src\Client\Player.h" />
     <ClInclude Include="src\Client\Render\PlayerPOV.h" />
     <ClInclude Include="src\Client\Render\WorldRender.h" />
+    <ClInclude Include="src\Math\Matrix.h" />
     <ClInclude Include="src\RenderEngine\Camera\camera.h" />
-    <ClInclude Include="src\RenderEngine\ChunkRenderer\ChunkBatch.h" />
-    <ClInclude Include="src\RenderEngine\ChunkRenderer\ChunkRenderer.h" />
+    <ClInclude Include="src\RenderEngine\ChunkRenderer\Batch\ChunkBatch.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\BakedChunkMesh.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshing.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\Mesher.h" />
+    <ClInclude Include="src\RenderEngine\ChunkRenderer\Occulsion\Graph.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\TerrainRenderer.h" />
     <ClInclude Include="src\RenderEngine\EntityRenderer\EntityRenderer.h" />
     <ClInclude Include="src\RenderEngine\Frustum\frustum.h" />
@@ -196,11 +213,22 @@
     <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\Texture2D.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureArray.h" />
     <ClInclude Include="src\RenderEngine\Window.h" />
-    <ClInclude Include="src\Utils\BetterMutex.h" />
+    <ClInclude Include="src\Utils\Math\Probability\Probability.h" />
+    <ClInclude Include="src\Utils\Math\vectorOperations.h" />
+    <ClInclude Include="src\World\Chunk\Block\Material\BlockMaterial.h" />
+    <ClInclude Include="src\World\Chunk\Block\Type\BlockTypes.h" />
+    <ClInclude Include="src\World\Chunk\Block\Type\Dirt.h" />
+    <ClInclude Include="src\World\Chunk\Block\Type\Fluid.h" />
+    <ClInclude Include="src\World\Event\BlockEventHandles\BlockHandles.h" />
+    <ClInclude Include="src\World\Event\Event.h" />
+    <ClInclude Include="src\World\Event\EventHandler.h" />
+    <ClInclude Include="src\World\Event\EventSystem.h" />
+    <ClInclude Include="src\World\Server\Server.h" />
     <ClInclude Include="src\Utils\Clock.h" />
     <ClInclude Include="src\Utils\FastNoiseLite.h" />
     <ClInclude Include="src\Utils\LogUtils.h" />
     <ClInclude Include="src\Utils\MathHelper.h" />
+    <ClInclude Include="src\World\Chunk\Block\Type\Grass.h" />
     <ClInclude Include="src\World\Chunk\ChunkID.h" />
     <ClInclude Include="src\Utils\Math\FastMath.h" />
     <ClInclude Include="src\Utils\Math\Matrix\mat4.h" />
@@ -210,7 +238,7 @@
     <ClInclude Include="src\Utils\stb_image.h" />
     <ClInclude Include="src\World\Chunk\Block\Block.h" />
     <ClInclude Include="src\World\Chunk\Block\Blocks.h" />
-    <ClInclude Include="src\World\Chunk\Block\BlockTexture.h" />
+    <ClInclude Include="src\World\Chunk\Block\Texture\BlockTexture.h" />
     <ClInclude Include="src\World\Chunk\Chunk.h" />
     <ClInclude Include="src\World\Chunk\ChunkData.h" />
     <ClInclude Include="src\World\DataContainer\BlockData.h" />
@@ -220,6 +248,7 @@
     <ClInclude Include="src\World\Entity\EntityType.h" />
     <ClInclude Include="src\World\Entity\Entity.h" />
     <ClInclude Include="src\World\Entity\Hitbox.h" />
+    <ClInclude Include="src\World\Server\Time\Timer.h" />
     <ClInclude Include="src\World\TerrainGeneration\Generator.h" />
     <ClInclude Include="src\World\TerrainGeneration\Structures\Structure.h" />
     <ClInclude Include="src\World\World.h" />

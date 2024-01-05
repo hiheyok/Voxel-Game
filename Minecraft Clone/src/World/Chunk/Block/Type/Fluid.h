@@ -2,7 +2,14 @@
 #include "../Block.h"
 #include "../../../World.h"
 
-struct FLUID_BLOCK : Block {
+struct FluidProperties {
+	int SpreadRate = 1; // Ticks for fluid to spread
+};
+
+struct Fluid : Block {
+
+	FluidProperties Properties;
+
 	void tick(int x, int y, int z) override {
 
 		World* CurrentWorld = static_cast<World*>(Block::WorldPTR);

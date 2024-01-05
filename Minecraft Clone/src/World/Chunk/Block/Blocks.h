@@ -3,8 +3,8 @@
 #define BLOCKS_H
 #include <unordered_map>
 #include "Block.h"
-#include "BlockMaterial.h"
-#include "BlockTexture.h"
+#include "Material/BlockMaterial.h"
+#include "Texture/BlockTexture.h"
 
 class BlockList {
 private:
@@ -12,21 +12,21 @@ private:
 public:
 	TextureArray BlockTextureArray;
 
-	BlockID AIR = RegisterNewBlock(MATERIAL_NONE, true, false, false);
-	BlockID STONE = RegisterNewBlock(MATERIAL_NONE, false, true, false);
-	BlockID DIRT = RegisterNewBlock(MATERIAL_DIRT, false, true, false);
-	BlockID WATER = RegisterNewBlock(MATERIAL_FLUID, true, false, true);
-	BlockID GRASS = RegisterNewBlock(MATERIAL_GRASS, false, true, false);
-	BlockID SAND = RegisterNewBlock(MATERIAL_NONE, false, true, false);
-	BlockID OAK_LOG = RegisterNewBlock(MATERIAL_NONE, false, true, false);
-	BlockID OAK_LEAF = RegisterNewBlock(MATERIAL_NONE, true, true, false);
-	BlockID DIAMOND_BLOCK = RegisterNewBlock(MATERIAL_NONE, false, true, false);
-	BlockID OAK_PLANK = RegisterNewBlock(MATERIAL_NONE, false, true, false);
-	BlockID COBBLESTONE = RegisterNewBlock(MATERIAL_NONE, false, true, false);
-	BlockID BRICK = RegisterNewBlock(MATERIAL_NONE, false, true, false);
-	BlockID WHITE_CONCRETE = RegisterNewBlock(MATERIAL_NONE, false, true, false);
+	BlockID AIR = RegisterNewBlock(new MaterialNone(), true, false, false);
+	BlockID STONE = RegisterNewBlock(new MaterialNone(), false, true, false);
+	BlockID DIRT = RegisterNewBlock(new MaterialDirt(), false, true, false);
+	BlockID WATER = RegisterNewBlock(new MaterialFluid(5), true, false, true);
+	BlockID GRASS = RegisterNewBlock(new MaterialGrass(0.001,0.101), false, true, false);
+	BlockID SAND = RegisterNewBlock(new MaterialNone(), false, true, false);
+	BlockID OAK_LOG = RegisterNewBlock(new MaterialNone(), false, true, false);
+	BlockID OAK_LEAF = RegisterNewBlock(new MaterialNone(), true, true, false);
+	BlockID DIAMOND_BLOCK = RegisterNewBlock(new MaterialNone(), false, true, false);
+	BlockID OAK_PLANK = RegisterNewBlock(new MaterialNone(), false, true, false);
+	BlockID COBBLESTONE = RegisterNewBlock(new MaterialNone(), false, true, false);
+	BlockID BRICK = RegisterNewBlock(new MaterialNone(), false, true, false);
+	BlockID WHITE_CONCRETE = RegisterNewBlock(new MaterialNone(), false, true, false);
 
-	BlockID NULL_BLOCK = RegisterNewBlock(MATERIAL_NONE, false, false, false);
+	BlockID NULL_BLOCK = RegisterNewBlock(new MaterialNone(), false, false, false);
 
 	void Initialize() {
 		BlockTextureArray.Gen();
@@ -71,7 +71,7 @@ public:
 		return BlockTypeData[id];
 	}
 
-	BlockID RegisterNewBlock(BlockMaterial material, bool transparency, bool solid, bool isFluid);
+	BlockID RegisterNewBlock(Material* material, bool transparency, bool solid, bool isFluid);
 
 	void SetFaceFront(BlockID id, std::string file) {
 		BlockTextureArray.AddTextureToArray(file);

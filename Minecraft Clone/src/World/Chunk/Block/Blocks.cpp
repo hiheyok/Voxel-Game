@@ -1,35 +1,41 @@
 #include "Blocks.h"
-#include "Type/Grass.h"
-#include "Type/Dirt.h"
-#include "Type/Fluid.h"
+#include "Type/BlockTypes.h"
 
-BlockID BlockList::RegisterNewBlock(BlockMaterial material, bool transparency, bool solid, bool isFluid) {
+BlockID BlockList::RegisterNewBlock(Material* material, bool transparency, bool solid, bool isFluid) {
 	BlockID ID = (BlockID)BlockTypeData.size();
 	BlockType* NewBlock = new BlockType(transparency, solid, isFluid);
 
 	Block* block;
 
-	switch (material) {
+	MaterialType Type = material->type;
+
+	switch (Type) {
 	case MATERIAL_DIRT:
-		block = new DIRT_BLOCK;
+		block = new DirtBlock;
 		break;
 	case MATERIAL_GRASS:
-		block = new GRASS_BLOCK;
+		block = new GrassBlock;
 		break;
 	case MATERIAL_FLUID:
-		block = new FLUID_BLOCK;
+		block = new Fluid;
 		break;
 	case MATERIAL_NONE:
 		block = new Block;
 		break;
 	}
 
+	material->SetBlockProperties(block);
+
 	block->ID = ID;
 	block->Properties = NewBlock;
 	block->Texture = new BlockTexture;
-	block->Material = material;
 
 	BlockTypeData.emplace(ID, block);
+
+	
 	Logger.LogInfo("Register", "Registered new block (ID): " + std::to_string(ID));
+
+
+	//delete material; idk why this break
 	return ID;
 }

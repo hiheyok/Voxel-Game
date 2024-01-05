@@ -4,7 +4,7 @@
 #include "../../../../Utils/Math/Probability/Probability.h"
 #include "../../../Event/EventHandler.h"
 
-struct DIRT_BLOCK : Block {
+struct DirtBlock : Block {
 	void tick(int x, int y, int z) override {
 		bool isGrassNearby = false;
 		World* CurrentWorld = (World*)Block::WorldPTR;

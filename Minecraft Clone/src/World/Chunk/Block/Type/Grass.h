@@ -5,7 +5,15 @@
 #include "../../../../Utils/Math/Probability/Probability.h"
 #include "../../../Event/EventHandler.h"
 
-struct GRASS_BLOCK : Block {
+struct GrassProperties {
+	double SpreadChance = 0.001;
+	double BreakChance = 0.001;
+};
+
+struct GrassBlock : Block {
+
+	GrassProperties Properties;
+
 	void tick(int x, int y, int z) override {
 		World* CurrentWorld = static_cast<World*>(Block::WorldPTR);
 
@@ -14,9 +22,10 @@ struct GRASS_BLOCK : Block {
 			return;
 		}
 
-		double GRASS_DESTROY_ODDS = 0.0001; //0.1% Per tick
+		std::cout << "test\n";
 
-		if (TestProbability(1 - GRASS_DESTROY_ODDS)) {
+		//Chance it -doesn't break-
+		if (TestProbability(1 - Properties.BreakChance)) {
 			Event event;
 			event.Type = BLOCK_EVENT;
 			event.Data.BlockEvent.id = EventHandler.BlockTick;

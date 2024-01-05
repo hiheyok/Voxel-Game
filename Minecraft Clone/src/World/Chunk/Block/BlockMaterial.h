@@ -1,5 +1,0 @@
-#pragma once
-
-enum BlockMaterial {
-	MATERIAL_DIRT, MATERIAL_GRASS, MATERIAL_FLUID, MATERIAL_NONE
-};
