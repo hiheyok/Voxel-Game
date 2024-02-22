@@ -26,7 +26,7 @@ void ChunkMeshData::GenerateMesh(Chunk* chunk) {
 	Position = chunk->Position;
 
 	//Generates the unsimplified mesh first
-
+	
 	chunk->Use();
 	auto t0 = std::chrono::high_resolution_clock::now();
 	GenerateFaceCollection(chunk); //Generates face with their respected textures
@@ -207,7 +207,6 @@ void ChunkMeshData::SimplifyMesh(Chunk* chunk) {
 	int x[3]{};
 	int q[3]{};
 
-
 	for (int axis = 0; axis < 3; axis++) {
 
 		int Axis0 = (axis + 2) % 3;
@@ -318,15 +317,14 @@ void ChunkMeshData::SimplifyMesh(Chunk* chunk) {
 
 inline void ChunkMeshData::AddFacetoMesh(QuadWPos& quad, int slice, int axis, uint8_t face) {
 
-	if (axis == 0) { //0 = x axis
+	switch (axis) {
+	case 0:
 		AddFacetoMesh_X(quad, slice, face);
 		return;
-	}
-	if (axis == 1) { //1 = y axis
+	case 1:
 		AddFacetoMesh_Y(quad, slice, face);
 		return;
-	}
-	if (axis == 2) { //2 = z axis
+	case 2:
 		AddFacetoMesh_Z(quad, slice, face);
 		return;
 	}
@@ -385,14 +383,7 @@ inline void ChunkMeshData::AddFacetoMesh_X(QuadWPos& quad, int slice, uint8_t fa
 
 	bool transparency = Blocks.getBlockType(quad.block)->Properties->transparency;
 
-	vector<unsigned int>* out;
-
-	if (transparency) {
-		out = &TransparentVertices;
-	}
-	else {
-		out = &SolidVertices;
-	}
+	vector<unsigned int>* out = (transparency ? &TransparentVertices : &SolidVertices);
 
 	switch (face) {
 	case 1:
@@ -482,14 +473,7 @@ inline void ChunkMeshData::AddFacetoMesh_Y(QuadWPos& quad, int slice, uint8_t fa
 
 	bool transparency = Blocks.getBlockType(quad.block)->Properties->transparency;
 
-	vector<unsigned int>* out;
-
-	if (transparency) {
-		out = &TransparentVertices;
-	}
-	else {
-		out = &SolidVertices;
-	}
+	vector<unsigned int>* out = (transparency ? &TransparentVertices : &SolidVertices);
 
 	switch (face) {
 	case 1:
@@ -582,14 +566,7 @@ inline void ChunkMeshData::AddFacetoMesh_Z(QuadWPos& quad, int slice, uint8_t fa
 
 	bool transparency = Blocks.getBlockType(quad.block)->Properties->transparency;
 
-	vector<unsigned int>* out;
-
-	if (transparency) {
-		out = &TransparentVertices;
-	}
-	else {
-		out = &SolidVertices;
-	}
+	vector<unsigned int>* out = (transparency ? &TransparentVertices : &SolidVertices);
 
 	switch (face) {
 	case 1:

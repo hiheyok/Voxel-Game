@@ -36,6 +36,7 @@ void TerrainRenderer::PrepareRenderer() {
 void TerrainRenderer::SetupCallSolid() {
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
@@ -45,6 +46,7 @@ void TerrainRenderer::SetupCallTransparent() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE);
 	glDisable(GL_CULL_FACE);
 }
 
@@ -70,6 +72,8 @@ void TerrainRenderer::Render() {
 		DrawBatch.Draw();
 		DrawBatch.Unbind();
 	}
+
+	glDepthMask(GL_TRUE);
 }
 
 void TerrainRenderer::Defrag(int iterations) {
@@ -124,6 +128,9 @@ void TerrainRenderer::Update() {
 	TransparentShader.setMat4("projection", projection);
 	TransparentShader.setFloat("RenderDistance", (float)(m_RenderDistance * 16));
 	TransparentShader.setVec3("camPos", camera->Position);
+	TransparentShader.setFloat("far", 1000000.0f);
+	TransparentShader.setFloat("near", 0.1f);
+
 }
 
 void TerrainRenderer::setSettings(uint32_t RenderDistance, float FOV) {

@@ -1,13 +1,15 @@
 #pragma once
+
+#include "Properties/EntityProperties.h"
+#include "Type/EntityType.h"
 #include "Entities.h"
 
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
+typedef unsigned long long int EntityUUID; //UUID
 
-struct Entity {
-	glm::vec3 Velocity = glm::vec3(0.f, 0.f, 0.f);
-	glm::vec3 Position = glm::vec3(0.f, 0.f, 0.f);
-	glm::vec2 Rotation = glm::vec2(0.f, 0.f);
+struct Entity  {
+	EntityTypeID Type = NULL; //State what type of entity is it. Zombie? Human??
+	EntityProperty Properties; //Provide properties such as position, acceleration, etc.
+	EntityUUID EntityUUID = 0x00000000;
 
-	EntityID Type = NULL;
+	void Tick();
 };

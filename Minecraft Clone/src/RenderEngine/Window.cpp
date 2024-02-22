@@ -59,8 +59,9 @@ void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, unsigned int id,
 
 
     if (str.str().size() != 0) {
-        Logger.LogError("OpenGL", str.str());
+    //    
         std::cout << "OpenGL: " << str.str() << "\n";
+        Logger.LogError("OpenGL", str.str());
     }
 
 }

@@ -1,14 +1,8 @@
 #pragma once
 
 #include "../Chunk/Chunk.h"
-
-#include <concurrent_unordered_map.h>
-#include <concurrent_unordered_set.h>
-
-#include <unordered_map>
 #include <unordered_set>
-
-#include <atomic>
+#include <unordered_map>
 
 typedef unsigned long long int RegionID;
 
@@ -32,13 +26,10 @@ class ChunkMap {
 public:
 
 	bool CheckChunk(int x, int y, int z);
-	bool CheckChunk(ChunkID id);
 
 	BlockID GetBlockGlobal(int x, int y, int z);
 
 	bool SetBlockGlobal(BlockID block, int x, int y, int z);
-
-	
 
 	void InsertChunk(Chunk* chunk);
 

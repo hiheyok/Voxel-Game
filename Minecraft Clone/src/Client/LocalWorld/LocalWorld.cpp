@@ -36,19 +36,19 @@ void LocalWorld::SetWorld(World* world_) {
 }
 
 void LocalWorld::SetPlayerPosition(double x, double y, double z) {
-	Player.Position = dvec3(x, y, z);
+	Player.Properties.Position = dvec3(x, y, z);
 }
 
 void LocalWorld::SetPlayerRotation(double x, double y) {
-	Player.Rotation = dvec2(x, y);
+	Player.Properties.Rotation = dvec2(x, y);
 }
 
 vec3 LocalWorld::GetPlayerPosition() {
-	return Player.Position;
+	return Player.Properties.Position;
 }
 
 vec2 LocalWorld::GetPlayerRotation() {
-	return Player.Rotation;
+	return Player.Properties.Rotation;
 }
 
 void LocalWorld::WorldInteractions(bool Left, bool Middle, bool Right) {
@@ -65,13 +65,13 @@ void LocalWorld::WorldInteractions(bool Left, bool Middle, bool Right) {
 void LocalWorld::RotatePlayer(float cursorx, float cursory) {
 	float CamSensitivity = 0.1f;
 
-	Player.Rotation.x += cursorx * CamSensitivity;
-	Player.Rotation.y -= cursory * CamSensitivity;
+	Player.Properties.Rotation.x += cursorx * CamSensitivity;
+	Player.Properties.Rotation.y -= cursory * CamSensitivity;
 
-	if (Player.Rotation.y > 89.9999f)
-		Player.Rotation.y = 89.9999f;
-	if (Player.Rotation.y < -89.9999f)
-		Player.Rotation.y = -89.9999f;
+	if (Player.Properties.Rotation.y > 89.9999f)
+		Player.Properties.Rotation.y = 89.9999f;
+	if (Player.Properties.Rotation.y < -89.9999f)
+		Player.Properties.Rotation.y = -89.9999f;
 
 }
 
@@ -91,9 +91,9 @@ float velocityCurve(float current, float max, float delta) {
 void LocalWorld::MovePlayer(bool KeyW, bool KeyA, bool KeyS, bool KeyD, bool KeySpace, bool shift, float delta) {
 
 	vec3 front(
-			cos(Player.Rotation.x * 0.0174533) * cos(Player.Rotation.y * 0.0174533),
+			cos(Player.Properties.Rotation.x * 0.0174533) * cos(Player.Properties.Rotation.y * 0.0174533),
 			0,
-			sin(Player.Rotation.x * 0.0174533) * cos(Player.Rotation.y * 0.0174533)
+			sin(Player.Properties.Rotation.x * 0.0174533) * cos(Player.Properties.Rotation.y * 0.0174533)
 		);
 
 	front = normalize(front);
@@ -107,73 +107,73 @@ void LocalWorld::MovePlayer(bool KeyW, bool KeyA, bool KeyS, bool KeyD, bool Key
 		velocity *= 4.f;
 	}
 
-	float v = velocityCurve(magnitude(Player.Velocity), velocity, delta) / sqrtf(2);
+	float v = velocityCurve(magnitude(Player.Properties.Velocity), velocity, delta) / sqrtf(2);
 
-	Player.Velocity = vec3(0.f, 0.f, 0.f);
+	Player.Properties.Velocity = vec3(0.f, 0.f, 0.f);
 
 	if (KeyW) {
-		Player.Velocity += front * v;
+		Player.Properties.Velocity += front * v;
 	}
 	if (KeyA) {
-		Player.Velocity += -right * v;
+		Player.Properties.Velocity += -right * v;
 	}
 	if (KeyS) {
-		Player.Velocity += -front * v;
+		Player.Properties.Velocity += -front * v;
 	}
 	if (KeyD) {
-		Player.Velocity += right * v;
+		Player.Properties.Velocity += right * v;
 	}
 
 	if (shift) {
-		Player.Velocity.y += -velocityCurve(magnitude(Player.Velocity), velocity, delta);
+		Player.Properties.Velocity.y += -velocityCurve(magnitude(Player.Properties.Velocity), velocity, delta);
 	}
 
 
 	if (KeySpace && (world->IsEntityOnGround(Player) && enableCollusion)) {
-		Player.Velocity.y +=  delta * 75000.f;
+		Player.Properties.Velocity.y +=  delta * 75000.f;
 	}
 
 	if (KeySpace) {
-		Player.Velocity.y += velocity;
+		Player.Properties.Velocity.y += velocity;
 	}
 	
 
 	if (enableCollusion) {
 		float gravity = -80;
 
-		Player.Velocity.y += gravity * delta;
+		Player.Properties.Velocity.y += gravity * delta;
 
 		vec3 time = world->GetTimeTillCollusion(Player);
 
 		if ((time.x != -1.) && (time.x <= delta)) {
-			Player.Velocity.x = 0;
+			Player.Properties.Velocity.x = 0;
 		}
 		if ((time.y != -1.) && (time.y <= delta)) {
-			Player.Velocity.y = 0;
+			Player.Properties.Velocity.y = 0;
 
-			Player.Velocity.x = Player.Velocity.x * powf(1.f / 250.f, delta);
-			Player.Velocity.z = Player.Velocity.z * powf(1.f / 250.f, delta);
+			Player.Properties.Velocity.x = Player.Properties.Velocity.x * powf(1.f / 250.f, delta);
+			Player.Properties.Velocity.z = Player.Properties.Velocity.z * powf(1.f / 250.f, delta);
 		}
 		if ((time.z != -1.) && (time.z <= delta)) {
-			Player.Velocity.z = 0;
+			Player.Properties.Velocity.z = 0;
 		}
 	}
 	
 
-	Player.Position += Player.Velocity * delta / 2.f;
-	Player.Velocity = Player.Velocity * powf(3.f / 25.f, delta);
+	Player.Properties.Position += Player.Properties.Velocity * delta / 2.f;
+	Player.Properties.Velocity = Player.Properties.Velocity * powf(3.f / 25.f, delta);
 
 }
 
 void LocalWorld::PlaceBlock() {
 	Ray ray;
 
-	ray.Origin = Player.Position;
+	ray.Origin = Player.Properties.Position;
 
 	ray.Direction = dvec3(
-		cos(Player.Rotation.x * 0.0174533) * cos(Player.Rotation.y * 0.0174533), 
-		sin(Player.Rotation.y * 0.0174533), 
-		sin(Player.Rotation.x * 0.0174533) * cos(Player.Rotation.y * 0.0174533));
+		cos(Player.Properties.Rotation.x * 0.0174533) * cos(Player.Properties.Rotation.y * 0.0174533),
+		sin(Player.Properties.Rotation.y * 0.0174533),
+		sin(Player.Properties.Rotation.x * 0.0174533) * cos(Player.Properties.Rotation.y * 0.0174533));
 
 	if (world->RayIntersection(ray)) {
 
@@ -198,12 +198,12 @@ void LocalWorld::PlaceBlock() {
 void LocalWorld::BreakBlock() {
 	Ray ray;
 
-	ray.Origin = Player.Position;
+	ray.Origin = Player.Properties.Position;
 
 	ray.Direction = dvec3(
-		cos(Player.Rotation.x * 0.0174533) * cos(Player.Rotation.y * 0.0174533), 
-		sin(Player.Rotation.y * 0.0174533), 
-		sin(Player.Rotation.x * 0.0174533) * cos(Player.Rotation.y * 0.0174533));
+		cos(Player.Properties.Rotation.x * 0.0174533) * cos(Player.Properties.Rotation.y * 0.0174533),
+		sin(Player.Properties.Rotation.y * 0.0174533),
+		sin(Player.Properties.Rotation.x * 0.0174533) * cos(Player.Properties.Rotation.y * 0.0174533));
 
 	if (world->RayIntersection(ray)) {
 		Event placeBlock;
@@ -220,12 +220,12 @@ void LocalWorld::BreakBlock() {
 void LocalWorld::GetBlock() {
 	Ray ray;
 
-	ray.Origin = Player.Position;
+	ray.Origin = Player.Properties.Position;
 
 	ray.Direction = dvec3(
-		cos(Player.Rotation.x * 0.0174533) * cos(Player.Rotation.y * 0.0174533), 
-		sin(Player.Rotation.y * 0.0174533), 
-		sin(Player.Rotation.x * 0.0174533) * cos(Player.Rotation.y * 0.0174533)
+		cos(Player.Properties.Rotation.x * 0.0174533) * cos(Player.Properties.Rotation.y * 0.0174533),
+		sin(Player.Properties.Rotation.y * 0.0174533),
+		sin(Player.Properties.Rotation.x * 0.0174533) * cos(Player.Properties.Rotation.y * 0.0174533)
 	);
 
 	if (world->RayIntersection(ray)) {

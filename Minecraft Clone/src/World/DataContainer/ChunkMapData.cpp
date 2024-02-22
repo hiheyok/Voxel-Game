@@ -89,10 +89,6 @@ void ChunkMap::InsertChunk(Chunk* chunk) {
 
 	Region* reg = GetRegion(x, y, z);
 
-	int RegCX = x & 0b11111;
-	int RegCY = y & 0b11111;
-	int RegCZ = z & 0b11111;
-
 	int rx = x >> 5;
 	int ry = y >> 5;
 	int rz = z >> 5;

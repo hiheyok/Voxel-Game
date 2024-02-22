@@ -11,35 +11,59 @@ struct BlockRegistration {
 	bool transparency = false;
 	bool solid = false;
 	bool isFluid = false;
+	std::string BlockName = "";
 
 	BlockID blockID = 0;
 };
 
 class BlockList {
 private:
-	std::unordered_map<unsigned int, Block*> BlockTypeData;
+	
 
 	std::deque<BlockRegistration> RegistrationQueue;
-
+	std::unordered_map<std::string, BlockID> BlockIDNameData;
 	int BlockTypeCount = 0;
+
+	void InitializeTextures();
 public:
+	std::unordered_map<unsigned int, Block*> BlockTypeData;
+
 	TextureArray BlockTextureArray;
 
-	BlockID AIR = QueueRegister(new MaterialNone(), true, false, false);
-	BlockID STONE = QueueRegister(new MaterialNone(), false, true, false);
-	BlockID DIRT = QueueRegister(new MaterialDirt(), false, true, false);
-	BlockID WATER = QueueRegister(new MaterialFluid(5), true, false, true);
-	BlockID GRASS = QueueRegister(new MaterialGrass(0.1,0.1), false, true, false);
-	BlockID SAND = QueueRegister(new MaterialNone(), false, true, false);
-	BlockID OAK_LOG = QueueRegister(new MaterialNone(), false, true, false);
-	BlockID OAK_LEAF = QueueRegister(new MaterialNone(), true, true, false);
-	BlockID DIAMOND_BLOCK = QueueRegister(new MaterialNone(), false, true, false);
-	BlockID OAK_PLANK = QueueRegister(new MaterialNone(), false, true, false);
-	BlockID COBBLESTONE = QueueRegister(new MaterialNone(), false, true, false);
-	BlockID BRICK = QueueRegister(new MaterialNone(), false, true, false);
-	BlockID WHITE_CONCRETE = QueueRegister(new MaterialNone(), false, true, false);
+	BlockID AIR = QueueRegister("air", new MaterialNone(), true, false, false);
+	BlockID STONE = QueueRegister("stone", new MaterialNone(), false, true, false);
+	BlockID DIRT = QueueRegister("dirt", new MaterialDirt(), false, true, false);
+	BlockID WATER = QueueRegister("water_still", new MaterialFluid(5), true, false, true);
+	BlockID LAVA = QueueRegister("lava", new MaterialFluid(5), true, false, true);
+	BlockID GRASS = QueueRegister("grass_block", new MaterialGrass(0.1, 0.1), false, true, false);
+	BlockID SAND = QueueRegister("sand", new MaterialNone(), false, true, false);
+	BlockID OAK_LOG = QueueRegister("oak_log", new MaterialNone(), false, true, false);
+	BlockID OAK_LEAF = QueueRegister("oak_leaf", new MaterialNone(), true, true, false);
+	BlockID DIAMOND_BLOCK = QueueRegister("diamond_block", new MaterialNone(), false, true, false);
+	BlockID OAK_PLANK = QueueRegister("oak_plank", new MaterialNone(), false, true, false);
+	BlockID COBBLESTONE = QueueRegister("cobblestone", new MaterialNone(), false, true, false);
+	BlockID BRICK = QueueRegister("brick", new MaterialNone(), false, true, false);
+	BlockID WHITE_CONCRETE = QueueRegister("white_concrete", new MaterialNone(), false, true, false);
 
-	BlockID NULL_BLOCK = QueueRegister(new MaterialNone(), false, false, false);
+
+	BlockID BLUE_STAINED_GLASS = QueueRegister("blue_stained_glass", new MaterialNone(), true, true, false);
+	BlockID GREEN_STAINED_GLASS = QueueRegister("green_stained_glass", new MaterialNone(), true, true, false);
+	BlockID BLACK_STAINED_GLASS = QueueRegister("black_stained_glass", new MaterialNone(), true, true, false);
+	BlockID BROWN_STAINED_GLASS = QueueRegister("brown_stained_glass", new MaterialNone(), true, true, false);
+	BlockID CYAN_STAINED_GLASS = QueueRegister("cyan_stained_glass", new MaterialNone(), true, true, false);
+	BlockID GRAY_STAINED_GLASS = QueueRegister("gray_stained_glass", new MaterialNone(), true, true, false);
+	BlockID LIGHT_BLUE_STAINED_GLASS = QueueRegister("light_blue_stained_glass", new MaterialNone(), true, true, false);
+	BlockID LIGHT_GRAY_STAINED_GLASS = QueueRegister("light_gray_stained_glass", new MaterialNone(), true, true, false);
+	BlockID LIME_STAINED_GLASS = QueueRegister("lime_stained_glass", new MaterialNone(), true, true, false);
+	BlockID MAGENTA_STAINED_GLASS = QueueRegister("magenta_stained_glass", new MaterialNone(), true, true, false);
+	BlockID ORANGE_STAINED_GLASS = QueueRegister("orange_stained_glass", new MaterialNone(), true, true, false);
+	BlockID PINK_STAINED_GLASS = QueueRegister("pink_stained_glass", new MaterialNone(), true, true, false);
+	BlockID PURPLE_STAINED_GLASS = QueueRegister("purple_stained_glass", new MaterialNone(), true, true, false);
+	BlockID RED_STAINED_GLASS = QueueRegister("red_stained_glass", new MaterialNone(), true, true, false);
+	BlockID WHITE_STAINED_GLASS = QueueRegister("white_stained_glass", new MaterialNone(), true, true, false);
+	BlockID YELLOW_STAINED_GLASS = QueueRegister("yellow_stained_glass", new MaterialNone(), true, true, false);
+
+	BlockID NULL_BLOCK = QueueRegister("null_block", new MaterialNone(), false, false, false);
 
 	void RegisterAll();
 
@@ -48,27 +72,7 @@ public:
 		BlockTextureArray.height = 16;
 		BlockTextureArray.width = 16;
 
-		SetFacesCustom(STONE, "assets/textures/array/block/stone.png", FRONT, BACK, LEFT, RIGHT, BOTTOM, TOP);
-		SetFacesCustom(DIRT, "assets/textures/array/block/dirt.png", FRONT, BACK, LEFT, RIGHT, BOTTOM, TOP);
-		SetFacesCustom(WATER, "assets/textures/array/block/water_still.png", FRONT, BACK, LEFT, RIGHT, BOTTOM, TOP);
-
-		SetFacesCustom(GRASS, "assets/textures/array/block/grass_block_top.png", TOP);
-		SetFacesCustom(GRASS, "assets/textures/array/block/dirt.png", BOTTOM);
-		SetFacesCustom(GRASS, "assets/textures/array/block/grass_block_side.png", LEFT, RIGHT, FRONT, BACK);
-
-		SetFacesCustom(SAND, "assets/textures/array/block/sand.png", FRONT, BACK, LEFT, RIGHT, BOTTOM, TOP);
-
-		SetFacesCustom(OAK_LOG, "assets/textures/array/block/oak_log_top.png", TOP, BOTTOM);
-		SetFacesCustom(OAK_LOG, "assets/textures/array/block/oak_log.png", LEFT, RIGHT, FRONT, BACK);
-
-		SetFacesCustom(OAK_LEAF, "assets/textures/array/block/oak_leaves.png", FRONT, BACK, LEFT, RIGHT, BOTTOM, TOP);
-		SetFacesCustom(DIAMOND_BLOCK, "assets/textures/array/block/diamond_block.png", FRONT, BACK, LEFT, RIGHT, BOTTOM, TOP);
-
-		SetFacesCustom(COBBLESTONE, "assets/textures/array/block/cobblestone.png", FRONT, BACK, LEFT, RIGHT, BOTTOM, TOP);
-		SetFacesCustom(OAK_PLANK, "assets/textures/array/block/oak_planks.png", FRONT, BACK, LEFT, RIGHT, BOTTOM, TOP);
-
-		SetFacesCustom(BRICK, "assets/textures/array/block/bricks.png", FRONT, BACK, LEFT, RIGHT, BOTTOM, TOP);
-		SetFacesCustom(WHITE_CONCRETE, "assets/textures/array/block/white_concrete.png", FRONT, BACK, LEFT, RIGHT, BOTTOM, TOP);
+		InitializeTextures();
 
 		BlockTextureArray.UploadToGPU();
 	}
@@ -92,7 +96,7 @@ public:
 
 	void RegisterNewBlock(BlockRegistration reg);
 
-	BlockID QueueRegister(Material* material, bool transparency, bool solid, bool isFluid);
+	BlockID QueueRegister(std::string BlockName, Material* material, bool transparency, bool solid, bool isFluid);
 
 	void SetFaceFront(BlockID id, std::string file) {
 		BlockTextureArray.AddTextureToArray(file);

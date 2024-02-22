@@ -234,8 +234,8 @@ float WorldData::GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int 
 dvec3 WorldData::GetTimeTillCollusion(Entity entity) {
 	AABB Hitbox = EntityList.GetEntity(entity.Type)->GetHitbox();
 
-	vec3 HitboxStart = entity.Position - (Hitbox.size / 2.f);
-	vec3 HitboxEnd = entity.Position + (Hitbox.size / 2.f);
+	vec3 HitboxStart = entity.Properties.Position - (Hitbox.size / 2.f);
+	vec3 HitboxEnd = entity.Properties.Position + (Hitbox.size / 2.f);
 
 	int ix = (int)floor(Hitbox.size.x) + 1;
 	int iy = (int)floor(Hitbox.size.y) + 1;
@@ -260,7 +260,7 @@ dvec3 WorldData::GetTimeTillCollusion(Entity entity) {
 			for (int v = 0; v <= i_bound[v_axis]; v++) {
 				ivec3 offset(0, 0, 0);
 
-				offset[axis] = i_bound[axis] * (entity.Velocity[axis] >= 0);
+				offset[axis] = i_bound[axis] * (entity.Properties.Velocity[axis] >= 0);
 				offset[u_axis] = u;
 				offset[v_axis] = v;
 
@@ -284,10 +284,10 @@ dvec3 WorldData::GetTimeTillCollusion(Entity entity) {
 				if (!IsPointOnHitboxSurface) //Checks if the origin is on the surface to optimize stuff
 					continue;
 
-				if (entity.Velocity[axis] == 0.f) //First checks if the velocity isn't 0 because if it is 0, it's not moving in that axis so it's not going to collide in that direction
+				if (entity.Properties.Velocity[axis] == 0.f) //First checks if the velocity isn't 0 because if it is 0, it's not moving in that axis so it's not going to collide in that direction
 					continue;
 
-				int direction = axis * 2 + (entity.Velocity[axis] < 0); // The "+1" indicates that the direction is negative 
+				int direction = axis * 2 + (entity.Properties.Velocity[axis] < 0); // The "+1" indicates that the direction is negative 
 
 				float distance = GetDistanceUntilCollusionSingleDirection(origin, direction, (int)floor(LeastDistance) + 2);
 
@@ -297,7 +297,7 @@ dvec3 WorldData::GetTimeTillCollusion(Entity entity) {
 				if (distance == -1.f) // -1.f means that it cannot find any blocks that could collide in that range (5)
 					continue;
 
-				float time = abs(distance / entity.Velocity[axis]);// This gets the time it takes for the entity to travel that distance
+				float time = abs(distance / entity.Properties.Velocity[axis]);// This gets the time it takes for the entity to travel that distance
 
 				if (time < leasttime[axis]) {
 					leasttime[axis] = time;
@@ -317,8 +317,8 @@ dvec3 WorldData::GetTimeTillCollusion(Entity entity) {
 bool WorldData::IsEntityOnGround(Entity entity) {
 	AABB Hitbox = EntityList.GetEntity(entity.Type)->GetHitbox();
 
-	vec3 HitboxStart = entity.Position - (Hitbox.size / 2.f);
-	vec3 HitboxEnd = entity.Position + (Hitbox.size / 2.f);
+	vec3 HitboxStart = entity.Properties.Position - (Hitbox.size / 2.f);
+	vec3 HitboxEnd = entity.Properties.Position + (Hitbox.size / 2.f);
 
 	int ix = (int)floor(Hitbox.size.x) + 1;
 	int iz = (int)floor(Hitbox.size.z) + 1;
@@ -329,7 +329,7 @@ bool WorldData::IsEntityOnGround(Entity entity) {
 
 	float OnGroundError = 0.001f;
 
-	if (entity.Velocity.y > 0.f) {
+	if (entity.Properties.Velocity.y > 0.f) {
 		return false;
 	}
 

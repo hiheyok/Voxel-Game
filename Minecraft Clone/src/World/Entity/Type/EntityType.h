@@ -1,8 +1,10 @@
 #pragma once
 
-#include "Hitbox.h"
-#include "EntityModel.h"
-typedef unsigned short EntityID;
+#include "../Collusion/Hitbox.h"
+#include "../Properties/EntityProperties.h"
+#include "../../../RenderEngine/EntityRenderer/Models/EntityModel.h"
+
+typedef unsigned short EntityTypeID;
 
 class EntityType {
 public:
@@ -23,7 +25,11 @@ public:
 		return Hitbox;
 	}
 
-	EntityID ID = NULL;
+	virtual void tick(EntityProperty* entity) {
+
+	}
+
+	EntityTypeID ID = NULL;
 
 	EntityModel RenderModel;
 

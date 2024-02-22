@@ -93,7 +93,15 @@ struct GrassBlock : Block {
 
 					//Chance it spread
 					if (TestProbability(Properties.SpreadChance)) {
-						CurrentWorld->SetBlock(Blocks.GRASS, x2, y2, z2);
+
+						Event event;
+						event.Type = BLOCK_EVENT;
+						event.Data.BlockEvent.id = EventHandler.BlockPlace;
+						event.Data.BlockEvent.x = x2;
+						event.Data.BlockEvent.y = y2;
+						event.Data.BlockEvent.z = z2;
+						event.Data.BlockEvent.block = Blocks.GRASS;
+						CurrentWorld->QueueEvent(event);
 
 						continue;
 					}

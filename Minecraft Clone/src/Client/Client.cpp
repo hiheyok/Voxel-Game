@@ -15,6 +15,9 @@ void Client::run() {
 
 	Blocks.RegisterAll();
 	Blocks.Initialize();
+	EntityList.Initialize();
+	EntityRender.Initialize();
+	EntityRender.SetWindow(getWindow());
 
 	DisableCursor();
 
@@ -22,7 +25,7 @@ void Client::run() {
 	MainLocalWorld.SetPlayerRotation(0.,-30.);
 
 	ServerSettings serverSettings;
-	serverSettings.H_RenderDistance = 32;
+	serverSettings.H_RenderDistance = 8;
 	serverSettings.V_RenderDistance = 8;
 	serverSettings.genThreads = 8;
 
@@ -34,9 +37,18 @@ void Client::run() {
 
 	MainLocalWorld.SetWorld(server.world);
 
+	Entity test;
+	test.Type = EntityList.ZOMBIE;
+	test.Properties.Position = vec3(0.f, 60.f, 0.f);
+	test.EntityUUID = 0xFFFFF;
+	EntityRender.AddEntity(test);
+	
+
 	Logger.LogInfo("Client", "Starting Gameloop");
 	GameLoop();
 	Cleanup();
+
+	
 }
 
 void Client::Cleanup() {
@@ -77,8 +89,11 @@ void Client::GameLoop() {
 		Update();
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearDepth(1.f);
 
 		TerrainRender.Render();
+		EntityRender.PrepareRenderer();
+		EntityRender.Render();
 
 		Refresh();
 
@@ -125,6 +140,10 @@ void Client::Update() {
 	TerrainRender.SetPosition(MainLocalWorld.GetPlayerPosition());
 	TerrainRender.SetRotation(MainLocalWorld.GetPlayerRotation());
 
+	EntityRender.SetPosition(MainLocalWorld.GetPlayerPosition());
+	EntityRender.SetRotation(MainLocalWorld.GetPlayerRotation());
+
+	EntityRender.Update();
 	TerrainRender.Update();
 
 }

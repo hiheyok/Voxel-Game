@@ -221,6 +221,24 @@ void Chunk::GenerateEnvironment(FastNoiseLite* noise) {
 
 }
 
+void Chunk::GenerateDebug() {
+	if (Position.y == 0) {
+		for (int x = 0; x < 16; x++) {
+			for (int z = 0; z < 16; z++) {
+				SetBlockUnsafe(Blocks.WHITE_CONCRETE, x, 0, z);
+			}
+
+		}
+
+		int i = 0;
+
+		for (const auto& b : Blocks.BlockTypeData) {
+			SetBlockUnsafe(b.first, (i & 0b1111), 1, i >> 4);
+			i++;
+		}
+	}
+}
+
 void Chunk::GenerateDecor(FastNoiseLite* noise) {
 
 	int cx = Position.x * 16;

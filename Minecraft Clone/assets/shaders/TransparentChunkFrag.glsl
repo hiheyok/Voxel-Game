@@ -7,6 +7,8 @@ in float texturePosition;
 in vec3 FragPos;  
 in vec2 textureSize;
 in vec3 poss;
+in float z_val;
+
 
 uniform vec3 camPos;
 uniform float RenderDistance;
@@ -31,12 +33,18 @@ void main()
 
 	float depth = dot(posvec, posvec) / pow(RenderDistance,2);
 
+	float z_Depth = gl_FragCoord.z;
+
+	if (z_val > z_Depth) {
+		discard;
+	}
+
 	depth = depth * depth;
 	depth = 1 - depth;
 
 	vec4 texture_ =  vec4(texture(BlockTexture, vec3(textureSize.x,textureSize.y, texturePosition - 1)).rgba);
 
-	vec4 color = (texture_ * vec4(lights,lights, lights,1.0f));
+	vec4 color = (texture_ * vec4(lights,lights, lights,1.0f)); 
 	
 	if (depth < -0.1f) {
 		discard;
@@ -49,6 +57,8 @@ void main()
 		float depthg = color.g - ((1 - depth) * (color.g - skyColor.g));
 		float depthb = color.b - ((1 - depth) * (color.b - skyColor.b));
 		final = vec4(depthr, depthg, depthb, texture_.a);
+
+	//	final = vec4(gl_FragCoord.z, gl_FragCoord.z, gl_FragCoord.z, texture_.a);
 	}
 	
 }

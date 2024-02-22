@@ -17,8 +17,6 @@ int main() {
 	Client GameClient;
 	GameClient.run();
 
-	
-
 	Logger.Stop();
 	return 0;
 }

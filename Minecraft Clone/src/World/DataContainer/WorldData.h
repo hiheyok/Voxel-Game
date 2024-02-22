@@ -42,6 +42,6 @@ protected:
 private:
 	size_t tickCount = 0;
 	
-	std::unordered_map<EntityID, Entity> Entities;
+	std::unordered_map<EntityUUID, Entity> Entities;
 	ChunkMap WorldChunkData;
 };

@@ -36,6 +36,7 @@ public:
 
 	int H_RenderDistance = 16;
 	int V_RenderDistance = 8;
+
 	EventSystem EventManager;
 
 	double MSPT = 0;
@@ -53,9 +54,6 @@ private:
 
 	Generator WorldGenerator;
 
-	
-
-
 	std::unordered_set<ChunkID> ChunksInQueue;
 
 	std::unordered_set<ChunkID> FIFOOutOfRange;
@@ -64,4 +62,3 @@ private:
 };
 
 #endif // !WORLD_H
-

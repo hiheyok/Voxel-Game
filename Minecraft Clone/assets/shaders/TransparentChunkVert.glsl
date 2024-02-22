@@ -15,10 +15,14 @@ out float lights;
 out vec3 FragPos;
 out vec3 poss;
 out vec2 textureSize;
+out float z_val;
 
-uniform mat4 model;
+uniform mat4 model; //delete
 uniform mat4 projection;
 uniform mat4 view;
+
+uniform float far;
+uniform float near;
 
 int xDataBitOffset = 0;
 int yDataBitOffset = 5;
@@ -34,6 +38,14 @@ float tdataToFloat(int index, int size) {
     return (((1u << size) - 1u) & (tdata >> index));
 }
 
+float getZ(float far1, float near1, float z) {
+    float a = (far1 + near1) / (far1 - near1);
+    float b = (-2 * far1 * near1) / (far1 - near1);
+
+    return (1 / z) * b + a;
+
+}
+
 void main()
 {
     
@@ -46,7 +58,13 @@ void main()
 
     poss = VerticePos;
     lights = light / 16.f;
-    gl_Position = projection * view * model * vec4(VerticePos, 1.f);
+
+
+    gl_Position = view * vec4(VerticePos, 1.f);
+
+    z_val = getZ(far, near, gl_Position.w);
+
+    gl_Position = projection * gl_Position;
     FragPos = vec3(model * vec4(VerticePos, 1.0));
   
 }

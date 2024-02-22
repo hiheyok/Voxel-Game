@@ -41,6 +41,8 @@ struct Block {
 	BlockType* Properties = nullptr;
 
 	BlockTexture* Texture = nullptr;
+
+	std::string BlockName = "";
 };
 
 __declspec(selectany) void* Block::WorldPTR = nullptr;
