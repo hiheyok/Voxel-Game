@@ -1,7 +1,7 @@
 #include "Server.h"
 
 #include "../../Utils/LogUtils.h"
-#include "Time/Timer.h"
+
 #include <thread>
 #include <chrono>
 #include <Windows.h>
@@ -38,6 +38,7 @@ void Server::ServerLoop() {
 	Logger.LogInfo("Server", "Starting server main thread");
 
 	while (!stop) {
+		stime.Set();
 		Timer time;
 
 		world->Tick();

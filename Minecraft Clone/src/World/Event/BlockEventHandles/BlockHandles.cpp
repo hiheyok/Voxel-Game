@@ -40,7 +40,6 @@ void UpdateSurrounding(int x, int y, int z) {
 void HandlePlaceBlock(BlockID block, int x, int y, int z) {
 	World* CurrentWorld = (World*)Block::WorldPTR;
 	CurrentWorld->SetBlock(block, x, y, z);
-
 	UpdateSurrounding(x, y, z);
 }
 

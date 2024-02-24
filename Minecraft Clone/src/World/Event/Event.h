@@ -1,6 +1,7 @@
 #pragma once
+#include "../Entity/Entity.h"
+#include "../Typenames.h"
 
-typedef unsigned long long int EventID;
 
 constexpr size_t MAX_EVENT_SIZE = 32;
 
@@ -27,14 +28,22 @@ struct Event
 
 		}
 
-		struct _BlockEvent { //21 Bytes
+		struct _BlockEvent { //32 Bytes
 			int z = 0; int y = 0; int x = 0; // 12
 			BlockID block; //1
 			EventID id = 0; //8
+			char BypassLimit = 0;
 
 		} BlockEvent;
 
-		struct _ChunkEvent {
+		struct _EntityEvent { //32 byte
+			int x = 0, y = 0, z = 0;
+			EntityTypeID entityType;
+			EntityUUID EntityID;
+			EventID id = 0;
+		} EntityEvent;
+
+		struct _ChunkEvent { //24 byte
 			int x = 0; int y = 0; int z = 0;
 			EventID id = 0;
 		} ChunkEvent;

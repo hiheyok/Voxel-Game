@@ -1,24 +1,45 @@
 #pragma once
 
 #include "Type/EntityType.h"
-#include <unordered_map>
-#include <iostream>
 
-class EntityTypes {
+#include <unordered_map>
+#include <deque>
+
+
+enum EntityTypeEnums {
+	ENTITY_PASSIVE, ENTITY_HOSTILE, ENTITY_FALLING_BLOCK
+};
+
+struct EntityRegistration {
+	EntityTypeEnums Type;
+	std::string EntityName;
+	EntityTypeID id = 0;
+};
+
+class EntitiesList {
 private:
-	
+	std::deque<EntityRegistration> RegisterQueue;
+
+	int EntityTypeCount = 0;
 public:
 	std::unordered_map<EntityTypeID, EntityType*> EntityTypeList;
 
-	EntityTypeID HUMAN = RegisterNewEntity();
-	EntityTypeID PLAYER = RegisterNewEntity();
-	EntityTypeID ZOMBIE = RegisterNewEntity();
+	EntityTypeID HUMAN = QueueRegisterEntity("Human", ENTITY_PASSIVE);
+	EntityTypeID PLAYER = QueueRegisterEntity("Player", ENTITY_PASSIVE);
+	EntityTypeID ZOMBIE = QueueRegisterEntity("zombie", ENTITY_HOSTILE);
+	EntityTypeID SAND_GRAVITY_BLOCK = QueueRegisterEntity("sand", ENTITY_FALLING_BLOCK);
 
-	EntityTypes() {
+	EntitiesList() {
 
 	}
 
+	void RegisterNewEntity(EntityRegistration reg);
+
+	void RegisterAll();
+
 	void Initialize() {
+		RegisterAll();
+
 		EntityTypeList[PLAYER]->ChangeHitboxSize(0.8f, 1.8f, 0.8f);
 		EntityTypeList[PLAYER]->RenderModel.AddRectangle(glm::vec3(0.8f, 1.8f, 0.8f), glm::vec3(0.f, 0.f, 0.f));
 
@@ -33,17 +54,23 @@ public:
 		EntityTypeList[ZOMBIE]->RenderModel.AddRectangle(glm::vec3(0.50f, 0.50f, 0.50f), glm::vec3(0.f, 1.5f, -0.125f)); //HEAD
 		EntityTypeList[ZOMBIE]->RenderModel.AddRectangle(glm::vec3(0.25f, 0.75f, 0.25f), glm::vec3(-0.25f, 0.75f, 0.f)); //ARM
 		EntityTypeList[ZOMBIE]->RenderModel.AddRectangle(glm::vec3(0.25f, 0.75f, 0.25f), glm::vec3(0.50f, 0.75f, 0.f)); //ARM
+
+		EntityTypeList[SAND_GRAVITY_BLOCK]->ChangeHitboxSize(1.f, 1.f, 1.f);
+		EntityTypeList[SAND_GRAVITY_BLOCK]->RenderModel.AddRectangle(glm::vec3(1.f,1.f,1.f),glm::vec3(0.f,0.f,0.f));
 	}
 
-	inline EntityTypeID RegisterNewEntity() {
-		EntityTypeID ID = (EntityTypeID)EntityTypeList.size();
-		EntityType* NewEntity = new EntityType();
+	
 
-		NewEntity->ID = ID;
+	inline EntityTypeID QueueRegisterEntity(std::string EntityName, EntityTypeEnums type) {
+		EntityRegistration reg;
+		reg.Type = type;
+		reg.id = EntityTypeCount;
+		reg.EntityName = EntityName;
+		EntityTypeCount++;
 
-		EntityTypeList[ID] = NewEntity;
+		RegisterQueue.push_back(reg);
 
-		return ID;
+		return EntityTypeCount - 1;
 	}
 
 	EntityType* GetEntity(EntityTypeID id) {

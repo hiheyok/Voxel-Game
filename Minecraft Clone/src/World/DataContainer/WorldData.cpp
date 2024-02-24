@@ -1,9 +1,21 @@
 #include "WorldData.h"
 #include "../../Utils/Math/vectorOperations.h"
-
+#include "../Entity/Entities.h"
 
 using namespace std;
 using namespace glm;
+
+void WorldData::AddEntity(Entity entity) {
+	EntityData.AddEntities(entity);
+}
+
+void WorldData::RemoveEntity(EntityUUID entityID) {
+	EntityData.RemoveEntity(entityID);
+}
+
+Entity* WorldData::GetEntity(EntityUUID entityID) {
+	return EntityData.getEntity(entityID);
+}
 
 bool WorldData::SetBlock(BlockID block, int x, int y, int z) {
 
@@ -80,7 +92,7 @@ void WorldData::SetChunk(Chunk* chunk) {
 
 	for (int axis = 0; axis < 3; axis++) {
 		for (int face = 0; face < 2; face++) {
-			vec3 temp = chunk->Position;
+			ivec3 temp = chunk->Position;
 
 			temp[axis] += (-2 * face) + 1;
 

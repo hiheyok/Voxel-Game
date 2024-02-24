@@ -36,7 +36,7 @@ public:
 	BlockID WATER = QueueRegister("water_still", new MaterialFluid(5), true, false, true);
 	BlockID LAVA = QueueRegister("lava", new MaterialFluid(5), true, false, true);
 	BlockID GRASS = QueueRegister("grass_block", new MaterialGrass(0.1, 0.1), false, true, false);
-	BlockID SAND = QueueRegister("sand", new MaterialNone(), false, true, false);
+	BlockID SAND = QueueRegister("sand", new MaterialGravity(), false, true, false);
 	BlockID OAK_LOG = QueueRegister("oak_log", new MaterialNone(), false, true, false);
 	BlockID OAK_LEAF = QueueRegister("oak_leaf", new MaterialNone(), true, true, false);
 	BlockID DIAMOND_BLOCK = QueueRegister("diamond_block", new MaterialNone(), false, true, false);
@@ -44,8 +44,6 @@ public:
 	BlockID COBBLESTONE = QueueRegister("cobblestone", new MaterialNone(), false, true, false);
 	BlockID BRICK = QueueRegister("brick", new MaterialNone(), false, true, false);
 	BlockID WHITE_CONCRETE = QueueRegister("white_concrete", new MaterialNone(), false, true, false);
-
-
 	BlockID BLUE_STAINED_GLASS = QueueRegister("blue_stained_glass", new MaterialNone(), true, true, false);
 	BlockID GREEN_STAINED_GLASS = QueueRegister("green_stained_glass", new MaterialNone(), true, true, false);
 	BlockID BLACK_STAINED_GLASS = QueueRegister("black_stained_glass", new MaterialNone(), true, true, false);
@@ -79,7 +77,6 @@ public:
 
 	~BlockList() {
 		CleanUp();
-		
 	}
 
 	void CleanUp() {
@@ -97,40 +94,6 @@ public:
 	void RegisterNewBlock(BlockRegistration reg);
 
 	BlockID QueueRegister(std::string BlockName, Material* material, bool transparency, bool solid, bool isFluid);
-
-	void SetFaceFront(BlockID id, std::string file) {
-		BlockTextureArray.AddTextureToArray(file);
-		BlockTypeData[id]->Texture->SetFaceFront(id);
-	}
-	void SetFaceBack(BlockID id, std::string file) {
-		BlockTextureArray.AddTextureToArray(file);
-		BlockTypeData[id]->Texture->SetFaceBack(id);
-	}
-	void SetFaceWest(BlockID id, std::string file) {
-		BlockTextureArray.AddTextureToArray(file);
-		BlockTypeData[id]->Texture->SetFaceWest(id);
-	}
-	void SetFaceEast(BlockID id, std::string file) {
-		BlockTextureArray.AddTextureToArray(file);
-		BlockTypeData[id]->Texture->SetFaceEast(id);
-	}
-	void SetFaceTop(BlockID id, std::string file) {
-		BlockTextureArray.AddTextureToArray(file);
-		BlockTypeData[id]->Texture->SetFaceTop(id);
-	}
-	void SetFaceBottom(BlockID id, std::string file) {
-		BlockTextureArray.AddTextureToArray(file);
-		BlockTypeData[id]->Texture->SetFaceBottom(id);
-	}
-	void SetFacesCustom(BlockID id, std::string file, int side0 = 0xFF, int side1 = 0xFF, int side2 = 0xFF, int side3 = 0xFF, int side4 = 0xFF, int side5 = 0xFF) {
-		BlockTextureArray.AddTextureToArray(file);
-
-		int TexID = BlockTextureArray.GetLayers();
-
-		Block* b = BlockTypeData[id];
-		
-		b->Texture->SetFacesCustom(TexID, side0, side1, side2 , side3, side4, side5);
-	}
 
 } __declspec(selectany)  Blocks;
 

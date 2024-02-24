@@ -10,6 +10,7 @@
 #include "../Utils/Math/Ray/Ray.h"
 #include <deque>
 #include <mutex>
+#include "WorldProperties.h"
 
 struct WorldSettings {
 	size_t genThreads = 0;
@@ -39,9 +40,14 @@ public:
 
 	EventSystem EventManager;
 
+	WorldProperties Properties;
+
 	double MSPT = 0;
 
+	
+
 private:
+
 
 	std::unordered_map<EventID, std::unordered_set<ChunkID>> TickUsage;
 

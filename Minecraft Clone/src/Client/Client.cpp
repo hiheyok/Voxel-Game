@@ -36,12 +36,6 @@ void Client::run() {
 	TerrainRender.Start(getWindow(), server.world, 16);
 
 	MainLocalWorld.SetWorld(server.world);
-
-	Entity test;
-	test.Type = EntityList.ZOMBIE;
-	test.Properties.Position = vec3(0.f, 60.f, 0.f);
-	test.EntityUUID = 0xFFFFF;
-	EntityRender.AddEntity(test);
 	
 
 	Logger.LogInfo("Client", "Starting Gameloop");
@@ -92,7 +86,7 @@ void Client::GameLoop() {
 		glClearDepth(1.f);
 
 		TerrainRender.Render();
-		EntityRender.PrepareRenderer();
+		
 		EntityRender.Render();
 
 		Refresh();
@@ -143,7 +137,23 @@ void Client::Update() {
 	EntityRender.SetPosition(MainLocalWorld.GetPlayerPosition());
 	EntityRender.SetRotation(MainLocalWorld.GetPlayerRotation());
 
+	server.world->EntityUpdateLock.lock();
+	std::unordered_map<EntityUUID, Entity> UpdatedEntities = server.world->EntityUpdated;
+	std::unordered_set<EntityUUID> RemovedEntities = server.world->RemovedEntity;
+	server.world->EntityUpdated.clear();
+	server.world->RemovedEntity.clear();
+	server.world->EntityUpdateLock.unlock();
+	
+	for (auto& entity : UpdatedEntities) {
+		EntityRender.AddEntity(entity.second);
+	}
+	for (auto& entity : RemovedEntities) {
+		EntityRender.RemoveEntity(entity);
+	}
+
+	EntityRender.SetTimePastTick(server.stime.GetTimePassed_s());
 	EntityRender.Update();
+	
 	TerrainRender.Update();
 
 }

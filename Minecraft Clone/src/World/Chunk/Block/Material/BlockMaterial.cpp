@@ -25,3 +25,9 @@ Block* MaterialDirt::BuildNewBlockType() {
 
 	return static_cast<Block*>(dirt);
 }
+
+Block* MaterialGravity::BuildNewBlockType() {
+	GravityBlock* gravity = new GravityBlock();
+
+	return static_cast<Block*>(gravity);
+}

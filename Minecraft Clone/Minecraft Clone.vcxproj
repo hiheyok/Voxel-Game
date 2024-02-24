@@ -45,6 +45,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -162,6 +163,7 @@
     <ClCompile Include="src\RenderEngine\ChunkRenderer\Batch\ChunkBatch.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshing.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRenderer\TerrainRenderer.cpp" />
+    <ClCompile Include="src\RenderEngine\EntityRenderer\Models\EntityModels.cpp" />
     <ClCompile Include="src\RenderEngine\Frustum\frustum.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Buffers\Buffer.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\OpenGL.cpp" />
@@ -172,7 +174,10 @@
     <ClCompile Include="src\World\Chunk\Block\Blocks.cpp" />
     <ClCompile Include="src\World\Chunk\Block\Material\BlockMaterial.cpp" />
     <ClCompile Include="src\World\Collusion\CollusionTest.cpp" />
+    <ClCompile Include="src\World\Entity\Entity.cpp" />
+    <ClCompile Include="src\World\Entity\Entities.cpp" />
     <ClCompile Include="src\World\Event\BlockEventHandles\BlockHandles.cpp" />
+    <ClCompile Include="src\World\Event\EntityEventHandles\EntityHandles.cpp" />
     <ClCompile Include="src\World\Server\Server.cpp" />
     <ClCompile Include="src\Utils\Clock.cpp" />
     <ClCompile Include="src\Utils\LogUtils.cpp" />
@@ -183,7 +188,6 @@
     <ClCompile Include="src\World\Chunk\ChunkData.cpp" />
     <ClCompile Include="src\World\DataContainer\ChunkMapData.cpp" />
     <ClCompile Include="src\World\DataContainer\WorldData.cpp" />
-    <ClCompile Include="src\World\Entity\Entity.cpp" />
     <ClCompile Include="src\World\Server\Time\Timer.cpp" />
     <ClCompile Include="src\World\TerrainGeneration\Generator.cpp" />
     <ClCompile Include="src\World\World.cpp" />
@@ -200,9 +204,13 @@
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\BakedChunkMesh.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshing.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\Mesher.h" />
-    <ClInclude Include="src\RenderEngine\ChunkRenderer\Occulsion\Graph.h" />
+    <ClInclude Include="src\RenderEngine\ChunkRenderer\Occulsion\Data\OcculsionData.h" />
+    <ClInclude Include="src\RenderEngine\ChunkRenderer\Occulsion\Data\OcculsionDataManager.h" />
+    <ClInclude Include="src\RenderEngine\ChunkRenderer\Occulsion\Graph\Graph.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\TerrainRenderer.h" />
+    <ClInclude Include="src\RenderEngine\EntityRenderer\EntityRenderCache.h" />
     <ClInclude Include="src\RenderEngine\EntityRenderer\EntityRenderer.h" />
+    <ClInclude Include="src\RenderEngine\EntityRenderer\EntityUpdates.h" />
     <ClInclude Include="src\RenderEngine\Frustum\frustum.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Buffers\Buffer.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Framebuffer\Framebuffer.h" />
@@ -219,7 +227,14 @@
     <ClInclude Include="src\World\Chunk\Block\Type\BlockTypes.h" />
     <ClInclude Include="src\World\Chunk\Block\Type\Dirt.h" />
     <ClInclude Include="src\World\Chunk\Block\Type\Fluid.h" />
+    <ClInclude Include="src\World\Chunk\Block\Type\GravityBlock.h" />
+    <ClInclude Include="src\World\DataContainer\EntityContainer.h" />
+    <ClInclude Include="src\World\Entity\Properties\EntityProperties.h" />
+    <ClInclude Include="src\World\Entity\Type\FallingBlock.h" />
+    <ClInclude Include="src\World\Entity\Type\Hostile.h" />
+    <ClInclude Include="src\World\Entity\Type\Passive.h" />
     <ClInclude Include="src\World\Event\BlockEventHandles\BlockHandles.h" />
+    <ClInclude Include="src\World\Event\EntityEventHandles\EntityHandles.h" />
     <ClInclude Include="src\World\Event\Event.h" />
     <ClInclude Include="src\World\Event\EventHandler.h" />
     <ClInclude Include="src\World\Event\EventSystem.h" />
@@ -244,15 +259,17 @@
     <ClInclude Include="src\World\DataContainer\BlockData.h" />
     <ClInclude Include="src\World\DataContainer\ChunkMapData.h" />
     <ClInclude Include="src\World\Entity\Entities.h" />
-    <ClInclude Include="src\World\Entity\EntityModel.h" />
-    <ClInclude Include="src\World\Entity\EntityType.h" />
+    <ClInclude Include="src\RenderEngine\EntityRenderer\Models\EntityModel.h" />
+    <ClInclude Include="src\World\Entity\Type\EntityType.h" />
     <ClInclude Include="src\World\Entity\Entity.h" />
-    <ClInclude Include="src\World\Entity\Hitbox.h" />
+    <ClInclude Include="src\World\Entity\Collusion\Hitbox.h" />
     <ClInclude Include="src\World\Server\Time\Timer.h" />
     <ClInclude Include="src\World\TerrainGeneration\Generator.h" />
     <ClInclude Include="src\World\TerrainGeneration\Structures\Structure.h" />
+    <ClInclude Include="src\World\Typenames.h" />
     <ClInclude Include="src\World\World.h" />
     <ClInclude Include="src\World\DataContainer\WorldData.h" />
+    <ClInclude Include="src\World\WorldProperties.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

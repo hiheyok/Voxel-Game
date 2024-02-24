@@ -1,6 +1,7 @@
 #pragma once
 #include "../../World/Entity/Entity.h"
 #include "../../World/World.h"
+#include "../../World/Entity/Entities.h"
 
 class LocalWorld {
 public:
@@ -35,7 +36,7 @@ private:
 
 	void GetBlock();
 
-	BlockID HoldingBlock = Blocks.LAVA;
+	BlockID HoldingBlock = Blocks.SAND;
 	Entity Player;
 	World* world = nullptr;
 

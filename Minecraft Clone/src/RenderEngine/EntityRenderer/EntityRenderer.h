@@ -4,6 +4,8 @@
 #include "../OpenGL/Buffers/Buffer.h"
 #include "../OpenGL/Shader/Shader.h"
 #include "../../Client/Render/PlayerPOV.h"
+#include "../../World/Entity/Type/EntityType.h"
+#include "../../World/Entity/Entities.h"
 class EntityRenderer {
 private:
 	EntityRenderCache cachedEntities;
@@ -17,6 +19,8 @@ private:
 	PlayerPOV player;
 	Camera* camera;
 	GLFWwindow* window;
+
+	double TimePastTick = 0.0;
 public:
 	void AddEntity(Entity entity) {
 		cachedEntities.AddEntity(entity);
@@ -47,7 +51,7 @@ public:
 				indices.emplace_back(ModelIndex + model.Indices[i]);
 			}
 
-			glm::vec3 EntityPosition = entity.second.Properties.Position;
+			glm::vec3 EntityPosition = entity.second.Properties.Position + (float)TimePastTick * entity.second.Properties.Velocity;
 
 			for (int i = 0; i < model.Vertices.size(); i++) {
 				vertices.emplace_back(EntityPosition[i % 3] + model.Vertices[i]);
@@ -56,6 +60,10 @@ public:
 		//	Logger.LogInfo("Entity Render Debug", "Added Entity");
 
 		}
+	}
+
+	void SetTimePastTick(double t) {
+		TimePastTick = t;
 	}
 
 	void Render() {
@@ -82,7 +90,7 @@ public:
 		VAO.Bind();
 		EBO.Bind();
 		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-		Logger.LogInfo("Entity Render Debug", std::to_string(indices.size()));
+		//Logger.LogInfo("Entity Render Debug", std::to_string(indices.size()));
 
 		//Clean
 
@@ -123,6 +131,8 @@ public:
 		shader.setMat4("view", view);
 		shader.setMat4("model", model);
 		shader.setMat4("projection", projection);
+
+		PrepareRenderer();
 	}
 
 

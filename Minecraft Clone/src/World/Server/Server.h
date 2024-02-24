@@ -2,7 +2,7 @@
 
 #include "../World.h"
 #include <thread>
-
+#include "Time/Timer.h"
 const float TPS = 20.f;
 
 enum ServerType
@@ -28,6 +28,8 @@ public:
 	ServerSettings settings;
 
 	World* world = nullptr;
+
+	Timer stime;
 private:
 
 	void CreateWorld();

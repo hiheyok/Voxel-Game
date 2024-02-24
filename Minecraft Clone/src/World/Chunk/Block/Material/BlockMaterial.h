@@ -2,7 +2,7 @@
 #include "../Block.h"
 
 enum MaterialType {
-	MATERIAL_DIRT, MATERIAL_GRASS, MATERIAL_FLUID, MATERIAL_NONE
+	MATERIAL_DIRT, MATERIAL_GRASS, MATERIAL_FLUID, MATERIAL_NONE, MATERIAL_GRAVITY
 };
 
 struct Material {
@@ -53,6 +53,14 @@ struct MaterialGrass : Material {
 		type = MATERIAL_GRASS;
 		SpreadChance = _SpreadChance;
 		BreakChance = _BreakChance;
+	}
+
+	Block* BuildNewBlockType() override;
+};
+
+struct MaterialGravity : Material {
+	MaterialGravity() {
+		type = MATERIAL_GRAVITY;
 	}
 
 	Block* BuildNewBlockType() override;

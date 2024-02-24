@@ -39,24 +39,37 @@ void World::Tick() {
 
 	int QueueSize = EventManager.getSize();
 
-	//Logger.LogInfo("Event Queue", to_string(QueueSize));
-
 	for (int i = 0; i < QueueSize; i++) {
 		Event e = EventManager.GetNextEvent();
 		if (e.Type == NULL_EVENT)
 			break;
 		if (e.Type == BLOCK_EVENT) {
-			if (CheckTickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.x, e.Data.BlockEvent.y, e.Data.BlockEvent.z)) {
+			if (CheckTickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.x, e.Data.BlockEvent.y, e.Data.BlockEvent.z) && (e.Data.BlockEvent.BypassLimit == 0)) {
 				continue;
 			}
+			TickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.x, e.Data.BlockEvent.y, e.Data.BlockEvent.z);
 		}
-
-		TickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.x, e.Data.BlockEvent.y, e.Data.BlockEvent.z);
 
 		EventHandler.ExecuteEvent(e);
 	}
 
 	TickUsage.clear();
+
+	//Tick all entities
+
+	EntityData.Tick();
+
+	std::unordered_map<EntityUUID, Entity> UpdatedEntities = EntityData.ClientGetEntityUpdate();
+	std::unordered_set<EntityUUID> Removed = EntityData.getRemovedEntities();
+
+	EntityUpdateLock.lock();
+	for (auto& e : UpdatedEntities) {
+		EntityUpdated[e.first] = e.second;
+	}
+	for (auto& e : Removed) {
+		RemovedEntity.insert(e);
+	}
+	EntityUpdateLock.unlock();
 
 	MSPT = time.GetTimePassed_ms();
 	
@@ -139,8 +152,6 @@ void World::Load() {
 			FIFO.push_back(newObj);
 		}
 	}
-
-//	Logger.LogInfo("World", "FIFO Out Of Range Queue Size: " + to_string(FIFOOutOfRange.size()) + " Time: " + time.StrGetTimePassed_μs());
 
 	deque<Chunk*> GenOutput = WorldGenerator.GetOutput();
 

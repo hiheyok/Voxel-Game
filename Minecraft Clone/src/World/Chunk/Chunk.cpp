@@ -67,6 +67,8 @@ void Chunk::Generate(FastNoiseLite* noise) {
 	int cy = Position.y * 16;
 
 
+	
+
 	for (int x = 0 + cx; x < 16 + cx; x++) {
 		for (int z = 0 + cz; z < 16 + cz; z++) {
 
@@ -237,6 +239,9 @@ void Chunk::GenerateDebug() {
 			i++;
 		}
 	}
+
+	
+
 }
 
 void Chunk::GenerateDecor(FastNoiseLite* noise) {
@@ -299,6 +304,19 @@ void Chunk::GenerateDecor(FastNoiseLite* noise) {
 
 				}
 
+			}
+		}
+	}
+
+
+
+	for (int x = 0 + cx; x < 16 + cx; x++) {
+		for (int z = 0 + cz; z < 16 + cz; z++) {
+			for (int y = 0 + cy; y < 16 + cy; y++) {
+				if ((x * x) + (y - 100) * (y - 100) + z * z < 25) {
+					SetBlock(Blocks.SAND, x - cx, y - cy, z - cz);
+
+				}
 			}
 		}
 	}

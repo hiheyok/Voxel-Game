@@ -3,6 +3,7 @@
 #include "ChunkMapData.h"
 #include "../Entity/Entity.h"
 #include "../../Utils/Math/Ray/Ray.h"
+#include "EntityContainer.h"
 
 /*
 Contains all of the world data and basic functions to manage it
@@ -15,6 +16,10 @@ public:
 
 	BlockID GetBlock(int x, int y, int z);
 	bool SetBlock(BlockID block, int x, int y, int z);
+
+	void AddEntity(Entity entity);
+	void RemoveEntity(EntityUUID entityID);
+	Entity* GetEntity(EntityUUID entityID);
 
 	void SetChunk(Chunk* chunk);
 
@@ -35,13 +40,16 @@ public:
 	bool IsEntityOnGround(Entity entity);
 
 	std::unordered_set<ChunkID> ChunksUpdated;
+	std::unordered_map<EntityUUID, Entity> EntityUpdated;
+	std::unordered_set<EntityUUID> RemovedEntity;
 	std::mutex ChunkUpdateLock;
+	std::mutex EntityUpdateLock;
+	EntityContainer	EntityData;
 
 protected:
 	float GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int direction, int distancetest);
 private:
 	size_t tickCount = 0;
-	
-	std::unordered_map<EntityUUID, Entity> Entities;
 	ChunkMap WorldChunkData;
+	
 };

@@ -1,7 +1,7 @@
 #pragma once
 #include "Texture/BlockTexture.h"
+#include "../../Typenames.h"
 
-typedef unsigned char BlockID;
 
 struct BlockType {
 

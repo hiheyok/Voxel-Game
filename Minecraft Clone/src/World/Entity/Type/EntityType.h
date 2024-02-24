@@ -1,10 +1,8 @@
 #pragma once
-
+#include "../Typenames.h"
 #include "../Collusion/Hitbox.h"
-#include "../Properties/EntityProperties.h"
 #include "../../../RenderEngine/EntityRenderer/Models/EntityModel.h"
-
-typedef unsigned short EntityTypeID;
+#include "../Entity.h"
 
 class EntityType {
 public:
@@ -25,13 +23,15 @@ public:
 		return Hitbox;
 	}
 
-	virtual void tick(EntityProperty* entity) {
-
+	virtual void Tick(Entity* entity) {
+		
 	}
 
 	EntityTypeID ID = NULL;
 
 	EntityModel RenderModel;
+
+	std::string EntityName;
 
 private:
 	
