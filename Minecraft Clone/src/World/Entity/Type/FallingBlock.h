@@ -19,12 +19,12 @@ class FallingBlock : public EntityType {
 
 		entity->Properties.Velocity += entity->Properties.Acceleration * MSPT;
 
-		glm::dvec3 TimeTillCollusion = CurrentWorld->GetTimeTillCollusion(*entity);
+		float TimeTillCollusion = abs(CurrentWorld->GetDistanceUntilCollusionSingleDirection(entity->Properties.Position, NY, 100) / entity->Properties.Velocity.y);
 
 		bool CollideWithGround = false;
 
-		if (TimeTillCollusion[1] > MSPT) {
-			entity->Properties.Position[1] += entity->Properties.Velocity[1] * (float)TimeTillCollusion[1];
+		if (TimeTillCollusion < MSPT) {
+			entity->Properties.Position[1] += entity->Properties.Velocity[1] * (float)TimeTillCollusion;
 			entity->Properties.Velocity[1] = 0.f;
 			entity->Properties.Acceleration[1] = 0.f;
 
@@ -33,7 +33,6 @@ class FallingBlock : public EntityType {
 		else {
 			entity->Properties.Position[1] += entity->Properties.Velocity[1] * MSPT;
 		}
-
 		entity->isDirty = true;
 
 		if (CollideWithGround) {

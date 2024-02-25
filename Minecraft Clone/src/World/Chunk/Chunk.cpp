@@ -309,11 +309,13 @@ void Chunk::GenerateDecor(FastNoiseLite* noise) {
 	}
 
 
+	int radius = 5;
+
 
 	for (int x = 0 + cx; x < 16 + cx; x++) {
 		for (int z = 0 + cz; z < 16 + cz; z++) {
 			for (int y = 0 + cy; y < 16 + cy; y++) {
-				if ((x * x) + (y - 100) * (y - 100) + z * z < 25) {
+				if ((x * x) + (y - 100) * (y - 100) + z * z <= radius * radius) {
 					SetBlock(Blocks.SAND, x - cx, y - cy, z - cz);
 
 				}

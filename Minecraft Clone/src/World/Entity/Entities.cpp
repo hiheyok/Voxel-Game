@@ -22,6 +22,8 @@ void EntitiesList::RegisterNewEntity(EntityRegistration reg) {
 
 	NewEntity->EntityName = reg.EntityName;
 
+	Logger.LogInfo("Entity Register", "Registered new entity: " + reg.EntityName + " | EntityID: " + std::to_string(reg.id));
+
 	NewEntity->ID = ID;
 
 	EntityTypeList[ID] = NewEntity;

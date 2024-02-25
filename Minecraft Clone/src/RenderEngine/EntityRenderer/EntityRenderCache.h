@@ -15,4 +15,20 @@ struct EntityRenderCache { // stores all entity to be rendered
 		EntityContainer.erase(EntityUUID);
 	}
 
+	std::unordered_map<EntityTypeID, std::vector<Entity>> GetEntitiesTypeSeparated() {
+		std::unordered_map<EntityTypeID, std::vector<Entity>> out;
+		
+		for (auto& e : EntityContainer) {
+			EntityTypeID type = e.second.Type;
+
+			if (!out.count(type)) {
+				out[type] = std::vector<Entity>();
+			}
+
+			out[type].push_back(e.second);
+		}
+
+		return out;
+	}
+
 };

@@ -20,7 +20,7 @@ struct GravityBlock : Block {
 			destroyBlock.Data.BlockEvent.y = y;
 			destroyBlock.Data.BlockEvent.z = z;
 			destroyBlock.Data.BlockEvent.block = Blocks.AIR;
-			destroyBlock.Data.BlockEvent.BypassLimit = 1;
+			//destroyBlock.Data.BlockEvent.BypassLimit = 1;
 
 			Event summonSand;
 			summonSand.Type = ENTITY_EVENT;

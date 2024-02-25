@@ -1,5 +1,5 @@
 #pragma once
-#include "../Typenames.h"
+#include "../../Typenames.h"
 #include "../Collusion/Hitbox.h"
 #include "../../../RenderEngine/EntityRenderer/Models/EntityModel.h"
 #include "../Entity.h"

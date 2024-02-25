@@ -6,7 +6,7 @@
 class Buffer {
 public:
 	Buffer() {
-		glGenBuffers(1, &BufferID);
+		//glGenBuffers(1, &BufferID);
 	}
 	~Buffer() {
 		glDeleteBuffers(1, &BufferID);
@@ -49,7 +49,7 @@ private:
 class VertexArray {
 public:
 	VertexArray() {
-		glGenVertexArrays(1, &ArrayID);
+		//glGenVertexArrays(1, &ArrayID);
 	}
 	~VertexArray() {
 		glDeleteVertexArrays(1, &ArrayID);

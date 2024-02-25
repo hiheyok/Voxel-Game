@@ -5,6 +5,7 @@
 #include "Render/WorldRender.h"
 #include "LocalWorld/LocalWorld.h"
 #include "../RenderEngine/EntityRenderer/EntityRenderer.h"
+#include "../RenderEngine/EntityRenderer/MultiEntityRender.h"
 
 
 class Client : protected Window {
@@ -24,6 +25,6 @@ private:
 
 	Server server;
 	WorldRender TerrainRender;
-	EntityRenderer EntityRender;
+	MultiEntityRenderer EntityRender;
 	
 };

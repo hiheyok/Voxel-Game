@@ -71,6 +71,10 @@ public:
 		Buffer VBO;
 		Buffer EBO;
 
+		VAO.GenArray();
+		VBO.GenBuffer();
+		EBO.GenBuffer();
+
 		VAO.Bind();
 		VBO.SetType(GL_ARRAY_BUFFER);
 		VBO.SetMaxSize(vertices.size() * sizeof(float));

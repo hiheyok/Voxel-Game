@@ -35,7 +35,7 @@ public:
 
 	bool RayIntersection(Ray& ray);
 
-	glm::dvec3 GetTimeTillCollusion(Entity entity);
+	glm::dvec3 GetTimeTillCollusion(Entity entity, int DistanceTest = -1);
 
 	bool IsEntityOnGround(Entity entity);
 
@@ -46,7 +46,6 @@ public:
 	std::mutex EntityUpdateLock;
 	EntityContainer	EntityData;
 
-protected:
 	float GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int direction, int distancetest);
 private:
 	size_t tickCount = 0;
