@@ -19,11 +19,15 @@ class FallingBlock : public EntityType {
 
 		entity->Properties.Velocity += entity->Properties.Acceleration * MSPT;
 
-		float TimeTillCollusion = abs(CurrentWorld->GetDistanceUntilCollusionSingleDirection(entity->Properties.Position, NY, 100) / entity->Properties.Velocity.y);
+		int DistanceCheck = (int)ceil(abs(entity->Properties.Velocity.y * MSPT));
+
+		float CollusionDistance = CurrentWorld->GetDistanceUntilCollusionSingleDirection(entity->Properties.Position, NY, DistanceCheck + 1);
+
+		float TimeTillCollusion = abs(CollusionDistance / entity->Properties.Velocity.y);
 
 		bool CollideWithGround = false;
 
-		if (TimeTillCollusion < MSPT) {
+		if ((TimeTillCollusion < MSPT) && (CollusionDistance != -1.f)) {
 			entity->Properties.Position[1] += entity->Properties.Velocity[1] * (float)TimeTillCollusion;
 			entity->Properties.Velocity[1] = 0.f;
 			entity->Properties.Acceleration[1] = 0.f;

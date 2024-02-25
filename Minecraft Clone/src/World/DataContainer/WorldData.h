@@ -35,7 +35,7 @@ public:
 
 	bool RayIntersection(Ray& ray);
 
-	glm::dvec3 GetTimeTillCollusion(Entity entity, int DistanceTest = -1);
+	glm::dvec3 GetTimeTillCollusion(Entity entity);
 
 	bool IsEntityOnGround(Entity entity);
 

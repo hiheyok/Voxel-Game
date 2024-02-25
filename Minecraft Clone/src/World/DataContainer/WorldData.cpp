@@ -213,27 +213,24 @@ float WorldData::GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int 
 	float displacement = 0;
 
 	ivec3 FlooredPos(floor(Origin.x), floor(Origin.y), floor(Origin.z));
-	ivec3 Move(0, 0, 0);
+	int Move = 0;
 
-	if (direction % 2 == 0) { //Negative direction has a " + 1". So by taking the modulus, you can find if it is negative or positive. Explaination: PX = 0, NX = 1
+	int axis = direction >> 1;
 
-		int axis = (direction >> 1);
-
-		displacement = 1 - (Origin[axis] - (float)FlooredPos[axis]);
-		Move[axis] = 1;
+	if (direction & 0b1) { 
+		displacement = Origin[axis] - (float)FlooredPos[axis];
+		Move = -1;
 	}
 	else {
-		int axis = (direction - 1) >> 1;
-
-		displacement = Origin[axis] - (float)FlooredPos[axis];
-		Move[axis] = -1;
+		displacement = 1 - (Origin[axis] - (float)FlooredPos[axis]);
+		Move = 1;
 	}
 
 	for (int i = 0; i < distancetest; i++) {
 
-		ivec3 Loc = FlooredPos + Move * i;
+		FlooredPos[axis] += Move * (int)(i != 0);
 
-		BlockID b = GetBlock(Loc.x, Loc.y, Loc.z);
+		BlockID b = GetBlock(FlooredPos.x, FlooredPos.y, FlooredPos.z);
 
 		if (Blocks.getBlockType(b)->Properties->isSolid) {
 			return (float)i + displacement - 1.f;
@@ -243,7 +240,7 @@ float WorldData::GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int 
 	return -1.f;
 }
 
-dvec3 WorldData::GetTimeTillCollusion(Entity entity, int DistanceTest) {
+dvec3 WorldData::GetTimeTillCollusion(Entity entity) {
 	AABB Hitbox = EntityList.GetEntity(entity.Type)->GetHitbox();
 
 	vec3 HitboxStart = entity.Properties.Position - (Hitbox.size / 2.f);
@@ -258,10 +255,6 @@ dvec3 WorldData::GetTimeTillCollusion(Entity entity, int DistanceTest) {
 	vec3 leasttime(-1.f, -1.f, -1.f);
 
 	int SearchDistance = 5;
-
-	if (DistanceTest != -1) {
-		SearchDistance = DistanceTest;
-	}
 
 
 	float LeastDistance = (float)SearchDistance;

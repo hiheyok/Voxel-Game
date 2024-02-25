@@ -30,6 +30,8 @@ private:
 	Buffer EBO;
 	Buffer SSBO;
 	VertexArray VAO;
+
+	std::vector<float> PositionArr;
 	
 	double TimePastTick = 0.0;
 public:
@@ -57,7 +59,7 @@ public:
 
 			int ModelIndex = EntityVertices.size();
 
-			EntityElementIndex[EntityModels.first] = model.Indices.size()*5;
+			EntityElementIndex[EntityModels.first] = model.Indices.size()*5; //temp solution
 			EntityElementSize[EntityModels.first] = model.Indices.size();
 
 			for (int i = 0; i < model.Indices.size(); i++) {
@@ -92,6 +94,8 @@ public:
 		VAO.EnableAttriPTR(0, 3, GL_FLOAT, GL_FALSE, 3, 0);
 		VBO.Unbind();
 		VAO.Unbind();
+
+		PositionArr.resize(10000000);
 	}
 
 	void SetTimePastTick(double t) {
@@ -102,8 +106,8 @@ public:
 		
 		std::unordered_map<EntityTypeID, std::vector<Entity>> renderThis = RenderableEntities.GetEntitiesTypeSeparated();
 
-		std::vector<float> PositionArr;
-		PositionArr.resize(10000000);
+		
+		
 
 		for (auto& entityarr : renderThis) {
 
