@@ -129,6 +129,9 @@
     <ClCompile Include="src\World\Event\EntityEventHandles\EntityHandles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\RenderEngine\EntityRenderer\MultiEntityRender.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\World\World.h">
