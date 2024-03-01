@@ -64,9 +64,9 @@ public:
 		for (auto& EntityModels : EntityCachedModels) {
 			Model::ModelData model = EntityModels.second.GetVertices();
 
-			int ModelIndex = EntityVertices.size();
+			int ModelIndex = EntityVertices.size() / 3;
 
-			EntityElementIndex[EntityModels.first] = ModelIndex - model.Indices.size(); //temp solution
+			EntityElementIndex[EntityModels.first] = EntityIndices.size(); //temp solution
 			EntityElementSize[EntityModels.first] = model.Indices.size();
 
 			for (int i = 0; i < model.Indices.size(); i++) {
