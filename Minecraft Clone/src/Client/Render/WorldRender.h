@@ -22,7 +22,7 @@ public:
 	void Render();
 
 	void LoadChunkToRenderer(ChunkID chunk);
-	
+
 	void Start(GLFWwindow* window_, World* world_, int ThreadCount);
 
 	void Stop();
@@ -30,6 +30,7 @@ public:
 	void Update();
 
 	int renderDistance = 16;
+	int verticalRenderDistance = 16;
 	TerrainRenderer RendererV2;
 
 
@@ -71,7 +72,7 @@ private:
 
 	std::thread Scheduler;
 	std::mutex SchedulerLock;
-	
+
 	//Debugging stuff
 	int count = 0;
 };

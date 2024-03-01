@@ -25,11 +25,11 @@ void TerrainRenderer::Initialize(GLFWwindow* window_, Camera* camera_) {
 
 void TerrainRenderer::PrepareRenderer() {
 	for (ChunkDrawBatch& DrawBatch : ChunkSolidBatches) {
-		DrawBatch.GenDrawCommands(m_RenderDistance);
+		DrawBatch.GenDrawCommands(m_RenderDistance, m_VerticalRenderDistance);
 	}
 
 	for (ChunkDrawBatch& DrawBatch : ChunkTransparentBatches) {
-		DrawBatch.GenDrawCommands(m_RenderDistance);
+		DrawBatch.GenDrawCommands(m_RenderDistance, m_VerticalRenderDistance);
 	}
 }
 
@@ -119,6 +119,7 @@ void TerrainRenderer::Update() {
 	SolidShader.setMat4("model", model);
 	SolidShader.setMat4("projection", projection);
 	SolidShader.setFloat("RenderDistance", (float)(m_RenderDistance * 16));
+	SolidShader.setFloat("VerticalRenderDistance", (float)(m_VerticalRenderDistance * 16));
 	SolidShader.setVec3("camPos", camera->Position);
 
 	TransparentShader.use();
@@ -127,14 +128,16 @@ void TerrainRenderer::Update() {
 	TransparentShader.setMat4("model", model);
 	TransparentShader.setMat4("projection", projection);
 	TransparentShader.setFloat("RenderDistance", (float)(m_RenderDistance * 16));
+	TransparentShader.setFloat("VerticalRenderDistance", (float)(m_VerticalRenderDistance * 16));
 	TransparentShader.setVec3("camPos", camera->Position);
 	TransparentShader.setFloat("far", 1000000.0f);
 	TransparentShader.setFloat("near", 0.1f);
 
 }
 
-void TerrainRenderer::setSettings(uint32_t RenderDistance, float FOV) {
+void TerrainRenderer::setSettings(uint32_t RenderDistance, uint32_t VerticalRenderDistance, float FOV) {
 	m_RenderDistance = RenderDistance;
+	m_VerticalRenderDistance = VerticalRenderDistance;
 	m_FOV = FOV;
 }
 
@@ -288,7 +291,7 @@ void TerrainRenderer::SetupShaders() {
 void TerrainRenderer::CreateNewSolidBatch() {
 	ChunkSolidBatches.emplace_back();
 	size_t i = ChunkSolidBatches.size() - 1;
-	ChunkSolidBatches[i].SetMaxSize(2000000000);
+	ChunkSolidBatches[i].SetMaxSize(1000000000);
 	ChunkSolidBatches[i].SetupBuffers();
 	ChunkSolidBatches[i].camera = camera;
 }
@@ -296,7 +299,7 @@ void TerrainRenderer::CreateNewSolidBatch() {
 void TerrainRenderer::CreateNewTransparentBatch() {
 	ChunkTransparentBatches.emplace_back();
 	size_t i = ChunkTransparentBatches.size() - 1;
-	ChunkTransparentBatches[i].SetMaxSize(2000000000);
+	ChunkTransparentBatches[i].SetMaxSize(1000000000);
 	ChunkTransparentBatches[i].SetupBuffers();
 	ChunkTransparentBatches[i].camera = camera;
 }

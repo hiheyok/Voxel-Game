@@ -44,7 +44,7 @@ public:
 
 	double MSPT = 0;
 
-	
+
 
 private:
 
@@ -56,7 +56,7 @@ private:
 	std::thread MainWorldThread;
 	std::thread Loader;
 
-	glm::vec3 PlayerPos = glm::vec3(0.f,0.f,0.f);
+	glm::vec3 PlayerPos = glm::vec3(0.f, 0.f, 0.f);
 
 	Generator WorldGenerator;
 

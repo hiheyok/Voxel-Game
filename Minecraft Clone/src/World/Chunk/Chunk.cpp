@@ -21,12 +21,12 @@ vector<values2x> ContinentalnessInterpolation{
 
 vector<values2x> ErosionnessInterpolation{
 	values2x(0.f, 0.75f),
-	values2x(0.2f, 0.82f ),
-	values2x(0.23f, 0.8f ),
-	values2x(0.28f, 0.5f ),
-	values2x(0.38f, 0.2f ),
-	values2x(0.75f, 0.1f ),
-	values2x(1.f, 0.3f ),
+	values2x(0.2f, 0.82f),
+	values2x(0.23f, 0.8f),
+	values2x(0.28f, 0.5f),
+	values2x(0.38f, 0.2f),
+	values2x(0.75f, 0.1f),
+	values2x(1.f, 0.3f),
 };
 
 vector<values2x> PeaksValleyInterpolation{
@@ -67,7 +67,7 @@ void Chunk::Generate(FastNoiseLite* noise) {
 	int cy = Position.y * 16;
 
 
-	
+
 
 	for (int x = 0 + cx; x < 16 + cx; x++) {
 		for (int z = 0 + cz; z < 16 + cz; z++) {
@@ -81,7 +81,7 @@ void Chunk::Generate(FastNoiseLite* noise) {
 			for (int y = 0 + cy; y < 16 + cy; y++) {
 				if ((a == y || a + 1 == y || a + 2 == y || a + 3 == y || a + 4 == y) && a > 10) {
 					if (TREE_MAP >= (TREE_RAND_VAL - TREE_RAND_VAL_RANGE) && TREE_MAP <= (TREE_RAND_VAL + TREE_RAND_VAL_RANGE)) {
-						SetBlock(Blocks.OAK_LOG,x - cx, y - cy, z - cz);
+						SetBlock(Blocks.OAK_LOG, x - cx, y - cy, z - cz);
 
 					}
 				}
@@ -90,7 +90,7 @@ void Chunk::Generate(FastNoiseLite* noise) {
 						for (int tx = -2; tx <= 2; tx++) {
 							for (int ty = -2; ty <= 2; ty++) {
 								for (int tz = -2; tz <= 2; tz++) {
-									SetBlock(Blocks.OAK_LEAF,x + tx - cx, y + ty - cy, z + tz - cz);
+									SetBlock(Blocks.OAK_LEAF, x + tx - cx, y + ty - cy, z + tz - cz);
 								}
 							}
 						}
@@ -127,7 +127,7 @@ void Chunk::Generate(FastNoiseLite* noise) {
 
 		}
 	}
-	
+
 }
 
 void Chunk::GenerateBlankChunk() {
@@ -156,7 +156,7 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 	for (int x = 0; x < 16; x++) {
 		for (int z = 0; z < 16; z++) {
 
-			float continental = continentialNoise(getNoise2D(x, z, 3,0.3f, noise));
+			float continental = continentialNoise(getNoise2D(x, z, 3, 0.3f, noise));
 			float erosion = erosionNoise(getNoise2D(x + 4345, z + 6443, 3, 1.f, noise)) / 2.f;
 			float pv = peaksandvalley(getNoise2D(x + 65345, z + 12323, 3, 4.f, noise)) / 8;
 
@@ -164,7 +164,7 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 
 				float gy = (float)(y + cy);
 
-				float n = getNoise3D(x, y, z, 4,1.f, noise);
+				float n = getNoise3D(x, y, z, 4, 1.f, noise);
 
 				n = n + noiseOffset;
 
@@ -176,17 +176,17 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 
 				if (n > 0.5f) {
 					if (n < 0.54f) {
-						SetBlockUnsafe(Blocks.GRASS, x, y, z); 
+						SetBlockUnsafe(Blocks.GRASS, x, y, z);
 
 						SetBlock(Blocks.DIRT, x, y - 1, z);
-						
-						
+
+
 					}
 					else {
 						SetBlockUnsafe(Blocks.STONE, x, y, z);
 					}
 
-					
+
 				}
 
 
@@ -199,11 +199,11 @@ void Chunk::GenerateV2(FastNoiseLite* noise) {
 }
 
 void Chunk::GenerateEnvironment(FastNoiseLite* noise) {
-	
+
 	//int cx = Position.x * 16;
 	//int cz = Position.z * 16;
 	int cy = Position.y * 16;
-	
+
 	for (int x = 0; x < 16; x++) {
 		for (int z = 0; z < 16; z++) {
 			for (int y = 0; y < 16; y++) {
@@ -240,7 +240,7 @@ void Chunk::GenerateDebug() {
 		}
 	}
 
-	
+
 
 }
 
@@ -279,7 +279,7 @@ void Chunk::GenerateDecor(FastNoiseLite* noise) {
 
 						for (int tx = -1; tx <= 1; tx++) {
 							for (int tz = -1; tz <= 1; tz++) {
-								
+
 
 								for (int ty = tree_height + 2; ty <= tree_height + 3; ty++) {
 
@@ -299,7 +299,7 @@ void Chunk::GenerateDecor(FastNoiseLite* noise) {
 
 					}
 
-					
+
 
 
 				}
@@ -309,23 +309,23 @@ void Chunk::GenerateDecor(FastNoiseLite* noise) {
 	}
 
 
-	//int radius = 5;
+	int radius = 40;
 
 
-	//for (int x = 0 + cx; x < 16 + cx; x++) {
-	//	for (int z = 0 + cz; z < 16 + cz; z++) {
-	//		for (int y = 0 + cy; y < 16 + cy; y++) {
-	//			if ((x * x) + (y - 100) * (y - 100) + z * z <= radius * radius) {
-	//				SetBlock(Blocks.SAND, x - cx, y - cy, z - cz);
+	for (int x = 0 + cx; x < 16 + cx; x++) {
+		for (int z = 0 + cz; z < 16 + cz; z++) {
+			for (int y = 0 + cy; y < 16 + cy; y++) {
+				if ((x * x) + (y - 140) * (y - 140) + z * z <= radius * radius) {
+					SetBlock(Blocks.SAND, x - cx, y - cy, z - cz);
 
-	//			}
+				}
 
-	//			if (y == 90) {
-	//				SetBlock(Blocks.SAND, x - cx, y - cy, z - cz);
-	//			}
-	//		}
-	//	}
-	//}
+				//if (y == 90) {
+				//	SetBlock(Blocks.SAND, x - cx, y - cy, z - cz);
+				//}
+			}
+		}
+	}
 }
 
 void Chunk::UpdateGen() {

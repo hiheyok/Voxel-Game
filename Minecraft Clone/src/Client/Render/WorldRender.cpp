@@ -16,9 +16,9 @@ void WorldRender::LoadChunkToRenderer(ChunkID chunk) {
 		SchedulerLock.lock();
 		TaskList.push_back(chunk);
 		SchedulerLock.unlock();
-		
+
 	}
-	
+
 }
 
 
@@ -37,7 +37,7 @@ void WorldRender::Worker(int id) {
 		Jobs.insert(Jobs.end(), WorkerTask[WorkerID].begin(), WorkerTask[WorkerID].end());
 		WorkerTask[WorkerID].clear();
 		WorkerLocks[WorkerID].unlock();
-		
+
 		int count = 0;
 
 		int BatchSize = 500;
@@ -55,7 +55,7 @@ void WorldRender::Worker(int id) {
 			amountOfMeshGenerated++;
 
 			FinishedJobs.push_back(Mesh);
-			
+
 			auto t1 = std::chrono::high_resolution_clock::now();
 
 			buildTime += (double)(t1 - t0).count() / 1000.0;
@@ -68,14 +68,14 @@ void WorldRender::Worker(int id) {
 				break;
 			}
 		}
-		
+
 		if (FinishedJobs.size() != 0) {
 			WorkerLocks[WorkerID].lock();
 			WorkerOutput[WorkerID].insert(WorkerOutput[WorkerID].end(), FinishedJobs.begin(), FinishedJobs.end());
 			FinishedJobs.clear();
 			WorkerLocks[WorkerID].unlock();
 		}
-		
+
 
 		timerSleepNotPrecise(1);
 	}
@@ -86,7 +86,7 @@ void WorldRender::Worker(int id) {
 void WorldRender::Update() {
 
 	for (int WorkerID = 0; WorkerID < WorkerCount; WorkerID++) {
-		
+
 		WorkerLocks[WorkerID].lock();
 
 		while (!WorkerOutput[WorkerID].empty()) {
@@ -110,7 +110,7 @@ void WorldRender::Update() {
 	for (ChunkID chunkid : ChunksToUpdate) {
 		LoadChunkToRenderer(chunkid);
 	}
-	
+
 	RendererV2.Defrag(100);
 	RendererV2.Update();
 	RendererV2.PrepareRenderer();
@@ -125,20 +125,20 @@ void WorldRender::Stop() {
 	}
 
 	RendererV2.Cleanup();
-	
+
 }
 
-void WorldRender::Start(GLFWwindow* window_,World* world_, int ThreadCount) {
+void WorldRender::Start(GLFWwindow* window_, World* world_, int ThreadCount) {
 	stop = false;
 
 	window = window_;
 	world = world_;
 	WorkerCount = ThreadCount;
-	
+
 	RendererV2.Initialize(window, player.getCamera());
 	RendererV2.LoadAssets();
-	RendererV2.setSettings(renderDistance, 90);
-	
+	RendererV2.setSettings(renderDistance, verticalRenderDistance, 90);
+
 	WorkerCount = ThreadCount;
 
 	Workers.resize(ThreadCount);
@@ -153,7 +153,7 @@ void WorldRender::Start(GLFWwindow* window_,World* world_, int ThreadCount) {
 }
 
 void WorldRender::TaskScheduler() {
-	
+
 	int WorkerSelection = 0;
 
 	std::deque<std::deque<ChunkID>> DistributedTasks;
@@ -201,5 +201,5 @@ void WorldRender::TaskScheduler() {
 	}
 
 	Logger.LogInfo("Mesher", "Shutting down mesh scheduler");
-	
+
 }

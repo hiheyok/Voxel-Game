@@ -32,9 +32,16 @@ private:
 	VertexArray VAO;
 
 	std::vector<float> PositionArr;
-	
+
+	int NumEntityRendered = 0;
+
 	double TimePastTick = 0.0;
 public:
+
+	int getNumEntityRendered() {
+		return NumEntityRendered;
+	}
+
 	void AddEntity(Entity entity) {
 		RenderableEntities.AddEntity(entity);
 	}
@@ -59,7 +66,7 @@ public:
 
 			int ModelIndex = EntityVertices.size();
 
-			EntityElementIndex[EntityModels.first] = model.Indices.size()*5; //temp solution
+			EntityElementIndex[EntityModels.first] = model.Indices.size() * 5; //temp solution
 			EntityElementSize[EntityModels.first] = model.Indices.size();
 
 			for (int i = 0; i < model.Indices.size(); i++) {
@@ -69,14 +76,14 @@ public:
 			EntityVertices.insert(EntityVertices.end(), model.Vertices.begin(), model.Vertices.end());
 		}
 
-		
+
 		VBO.GenBuffer();
 		EBO.GenBuffer();
 		SSBO.GenBuffer();
 		VAO.GenArray();
 
 		VAO.Bind();
-		
+
 		VBO.SetType(GL_ARRAY_BUFFER);
 		VBO.SetUsage(GL_STATIC_DRAW);
 		VBO.InsertData(EntityVertices.size() * sizeof(float), EntityVertices.data(), GL_STATIC_DRAW);
@@ -103,25 +110,28 @@ public:
 	}
 
 	void Render() {
-		
-		std::unordered_map<EntityTypeID, std::vector<Entity>> renderThis = RenderableEntities.GetEntitiesTypeSeparated();
 
-		
-		
+		int n = 0;
 
-		for (auto& entityarr : renderThis) {
+		for (auto& entityarr : RenderableEntities.EntitySeparated) {
 
 			//Fill SSBO POS data
-			for (int i = 0; i < entityarr.second.size(); i++) {
 
-				EntityProperty properties = entityarr.second[i].Properties;
+			int i = 0;
 
-				PositionArr[(i * 3 + 0)] = (properties.Position.x + properties.Velocity.x * TimePastTick);
-				PositionArr[(i * 3 + 1)] = (properties.Position.y + properties.Velocity.y * TimePastTick);
-				PositionArr[(i * 3 + 2)] = (properties.Position.z + properties.Velocity.z * TimePastTick);
+			for (auto& e : entityarr.second) {
+				EntityProperty properties = e.second.Properties;
+
+				PositionArr[(i * 3 + 0)] = (properties.Position.x + properties.Velocity.x * TimePastTick + properties.Acceleration.x * TimePastTick * TimePastTick * 0.5f);
+				PositionArr[(i * 3 + 1)] = (properties.Position.y + properties.Velocity.y * TimePastTick + properties.Acceleration.y * TimePastTick * TimePastTick * 0.5f);
+				PositionArr[(i * 3 + 2)] = (properties.Position.z + properties.Velocity.z * TimePastTick + properties.Acceleration.z * TimePastTick * TimePastTick * 0.5f);
+
+				i++;
 			}
 
-			SSBO.InsertSubData(0, (entityarr.second.size() * 3) * sizeof(float), PositionArr.data());
+			n += i;
+
+			SSBO.InsertSubData(0, (i * 3) * sizeof(float), PositionArr.data());
 			shader.use();
 
 			VAO.Bind();
@@ -130,15 +140,15 @@ public:
 			SSBO.Bind();
 			SSBO.BindBase(2);
 
-			glDrawElementsInstanced(GL_TRIANGLES, EntityElementSize[entityarr.first], GL_UNSIGNED_INT, (void*)(EntityElementIndex[entityarr.first] * sizeof(unsigned int)), entityarr.second.size());
-			Logger.LogInfo("Entity Render", std::to_string(EntityElementIndex[entityarr.first]));
+			glDrawElementsInstanced(GL_TRIANGLES, EntityElementSize[entityarr.first], GL_UNSIGNED_INT, (void*)(EntityElementIndex[entityarr.first] * sizeof(unsigned int)), i);
+
 			SSBO.UnbindBase(2);
 			SSBO.Unbind();
 			VBO.Unbind();
 			EBO.Unbind();
 			VAO.Unbind();
 		}
-		
+		NumEntityRendered = n;
 
 
 	}

@@ -21,7 +21,14 @@ private:
 	GLFWwindow* window;
 
 	double TimePastTick = 0.0;
+
+	int NumEntityRendered = 0;
 public:
+
+	int getNumEntityRendered() {
+		return NumEntityRendered;
+	}
+
 	void AddEntity(Entity entity) {
 		cachedEntities.AddEntity(entity);
 	}
@@ -57,7 +64,7 @@ public:
 				vertices.emplace_back(EntityPosition[i % 3] + model.Vertices[i]);
 			}
 
-		//	Logger.LogInfo("Entity Render Debug", "Added Entity");
+			//	Logger.LogInfo("Entity Render Debug", "Added Entity");
 
 		}
 	}
@@ -80,7 +87,7 @@ public:
 		VBO.SetMaxSize(vertices.size() * sizeof(float));
 		VBO.InsertData(vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
-		
+
 		EBO.SetType(GL_ELEMENT_ARRAY_BUFFER);
 		EBO.SetMaxSize(indices.size() * sizeof(float));
 		EBO.InsertData(indices.size() * sizeof(float), indices.data(), GL_STATIC_DRAW);
@@ -94,9 +101,8 @@ public:
 		VAO.Bind();
 		EBO.Bind();
 		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-		//Logger.LogInfo("Entity Render Debug", std::to_string(indices.size()));
 
-		//Clean
+		NumEntityRendered = cachedEntities.EntityContainer.size();
 
 		vertices.clear();
 

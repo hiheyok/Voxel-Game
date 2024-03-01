@@ -31,7 +31,7 @@ void World::Stop() {
 }
 
 void World::WorldThread() {
-	Logger.LogInfo("World","Shutting down main world thread");
+	Logger.LogInfo("World", "Shutting down main world thread");
 }
 
 void World::Tick() {
@@ -72,7 +72,7 @@ void World::Tick() {
 	EntityUpdateLock.unlock();
 
 	MSPT = time.GetTimePassed_ms();
-	
+
 }
 
 void World::QueueEvent(Event event) {
@@ -81,7 +81,7 @@ void World::QueueEvent(Event event) {
 
 void World::Load() {
 
-//	Timer time;
+	//	Timer time;
 
 	vec3 pos = PlayerPos / 16.f;
 
@@ -99,10 +99,10 @@ void World::Load() {
 
 	FIFO.push_back(InitalPos);
 
-	int MaxIndex = 0; 
+	int MaxIndex = 0;
 
-	while (!FIFO.empty()) { 
-	
+	while (!FIFO.empty()) {
+
 		ivec3 ChunkPos = FIFO.front();
 		FIFO.pop_front();
 

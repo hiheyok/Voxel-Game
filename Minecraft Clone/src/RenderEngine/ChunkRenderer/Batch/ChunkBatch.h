@@ -50,7 +50,7 @@ public:
 
 	void Reset();
 
-	void GenDrawCommands(int RenderDistance);
+	void GenDrawCommands(int RenderDistance, int VerticalRenderDistance);
 
 	bool AddChunkVertices(std::vector<unsigned int> Data, int x, int y, int z);
 

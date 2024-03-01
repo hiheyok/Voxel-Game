@@ -10,6 +10,7 @@ in vec3 poss;
 
 uniform vec3 camPos;
 uniform float RenderDistance;
+uniform float VerticalRenderDistance;
 uniform sampler2DArray BlockTexture;
 
 float near = 0.25; 
@@ -27,6 +28,8 @@ void main()
 	vec3 skyColor = vec3(0.46274509803f, 0.65882352941f,1.0f);
 
 	vec3 posvec = poss - camPos;
+
+	posvec.y *= RenderDistance / VerticalRenderDistance;
 
 	float depth = dot(posvec, posvec) / pow(RenderDistance,2);
 

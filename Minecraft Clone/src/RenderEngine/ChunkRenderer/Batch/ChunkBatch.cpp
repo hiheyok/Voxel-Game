@@ -60,7 +60,7 @@ void ChunkDrawBatch::Cleanup() {
 
 }
 
-void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
+void ChunkDrawBatch::GenDrawCommands(int RenderDistance, int VerticalRenderDistance) {
 
 	Timer time;
 
@@ -80,7 +80,17 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
 
 	for (const auto& data_ : RenderList) {
 		auto& data = data_.second;
-		if (FindDistanceNoSqrt(data.x, data.y, data.z, Position.x, Position.y, Position.z) < RenderDistance * RenderDistance) {
+
+		int deltaX = data.x - Position.x;
+		int deltaY = data.y - Position.y;
+		int deltaZ = data.z - Position.z;
+
+		int dx2 = deltaX * deltaX / (RenderDistance * RenderDistance);
+		int dy2 = deltaY * deltaY / (VerticalRenderDistance * VerticalRenderDistance);
+		int dz2 = deltaZ * deltaZ / (RenderDistance * RenderDistance);
+
+
+		if (dx2 + dy2 + dz2 < 1.f) {
 			if (Frustum.SphereInFrustum((float)(data.x << 4), (float)(data.y << 4), (float)(data.z << 4), 32.f)) { // << 4 means multiply by 4
 
 				DrawCommands[Index - 1].set(data.size >> 3, 1, data.offset >> 3, Index);
@@ -88,7 +98,7 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance) {
 				ChunkShaderPos[(Index - 1) * 3 + 1] = data.y;
 				ChunkShaderPos[(Index - 1) * 3 + 2] = data.z;
 
-				
+
 				Index++;
 			}
 		}

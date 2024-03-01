@@ -35,7 +35,7 @@ namespace Model {
 
 class EntityModel {
 public:
-	
+
 	void AddRectangle(glm::vec3 size, glm::vec3 offset) {
 		shapes.emplace_back(size, offset);
 	}
@@ -48,7 +48,7 @@ public:
 			Model::ModelData SubModel = shape.GetVertices();
 
 			int CurrentIndex = model.VerticesCount;
-			
+
 			for (int i = 0; i < SubModel.Vertices.size(); i++) {
 				model.Vertices.push_back(SubModel.Vertices[i] + shape.offset[i % 3]);
 			}
