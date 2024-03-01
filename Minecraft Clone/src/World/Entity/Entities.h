@@ -21,11 +21,14 @@ private:
 	std::deque<EntityRegistration> RegisterQueue;
 
 	int EntityTypeCount = 0;
+
+	void InitializeModels();
+	std::unordered_map<std::string, EntityTypeID> EntityNameID;
 public:
 	std::unordered_map<EntityTypeID, EntityType*> EntityTypeList;
 
-	EntityTypeID HUMAN = QueueRegisterEntity("Human", ENTITY_PASSIVE);
-	EntityTypeID PLAYER = QueueRegisterEntity("Player", ENTITY_PASSIVE);
+	EntityTypeID HUMAN = QueueRegisterEntity("human", ENTITY_PASSIVE);
+	EntityTypeID PLAYER = QueueRegisterEntity("player", ENTITY_PASSIVE);
 	EntityTypeID ZOMBIE = QueueRegisterEntity("zombie", ENTITY_HOSTILE);
 	EntityTypeID SAND_GRAVITY_BLOCK = QueueRegisterEntity("sand", ENTITY_FALLING_BLOCK);
 
@@ -39,24 +42,7 @@ public:
 
 	void Initialize() {
 		RegisterAll();
-
-		EntityTypeList[PLAYER]->ChangeHitboxSize(0.8f, 1.8f, 0.8f);
-		EntityTypeList[PLAYER]->RenderModel.AddRectangle(glm::vec3(0.8f, 1.8f, 0.8f), glm::vec3(0.f, 0.f, 0.f));
-
-		EntityTypeList[HUMAN]->ChangeHitboxSize(0.8f, 1.8f, 0.8f);
-		EntityTypeList[HUMAN]->RenderModel.AddRectangle(glm::vec3(0.8f, 1.8f, 0.8f), glm::vec3(0.f, 0.f, 0.f));
-
-		EntityTypeList[ZOMBIE]->ChangeHitboxSize(0.8f, 2.0f, 0.8f);
-		EntityTypeList[ZOMBIE]->RenderModel.AddRectangle(glm::vec3(0.25f, 0.75f, 0.25f), glm::vec3(0.f, 0.f, 0.f)); //legs
-		EntityTypeList[ZOMBIE]->RenderModel.AddRectangle(glm::vec3(0.25f, 0.75f, 0.25f), glm::vec3(0.25f, 0.f, 0.f)); //legs
-		EntityTypeList[ZOMBIE]->RenderModel.AddRectangle(glm::vec3(0.50f, 0.75f, 0.25f), glm::vec3(0.f, 0.75f, 0.f)); //TORSO
-		EntityTypeList[ZOMBIE]->RenderModel.AddRectangle(glm::vec3(0.50f, 0.50f, 0.50f), glm::vec3(0.f, 1.5f, -0.125f)); //HEAD
-		EntityTypeList[ZOMBIE]->RenderModel.AddRectangle(glm::vec3(0.50f, 0.50f, 0.50f), glm::vec3(0.f, 1.5f, -0.125f)); //HEAD
-		EntityTypeList[ZOMBIE]->RenderModel.AddRectangle(glm::vec3(0.25f, 0.75f, 0.25f), glm::vec3(-0.25f, 0.75f, 0.f)); //ARM
-		EntityTypeList[ZOMBIE]->RenderModel.AddRectangle(glm::vec3(0.25f, 0.75f, 0.25f), glm::vec3(0.50f, 0.75f, 0.f)); //ARM
-
-		EntityTypeList[SAND_GRAVITY_BLOCK]->ChangeHitboxSize(1.f, 1.f, 1.f);
-		EntityTypeList[SAND_GRAVITY_BLOCK]->RenderModel.AddRectangle(glm::vec3(1.f,1.f,1.f),glm::vec3(0.f,0.f,0.f));
+		InitializeModels();
 	}
 
 	

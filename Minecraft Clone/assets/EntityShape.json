@@ -1,0 +1,108 @@
+{
+	"sand": {
+		"Hitbox": [ 1, 1, 1 ],
+		"Shape": [
+			{
+				"Type": "RECTANGLE_PRISM",
+				"Size": [ 1, 1, 1 ],
+				"Offset": [ 0, 0, 0 ],
+				"Texture": [
+				]
+
+			}
+
+		]
+	},
+	"human": {
+		"Hitbox": [ 0.8, 0.8, 0.8 ],
+		"Shape": [
+			{
+				"Type": "RECTANGLE_PRISM",
+				"Size": [ 0.8, 1.8, 0.8 ],
+				"Offset": [ 0, 0, 0 ],
+				"Texture": [
+				]
+
+			}
+
+		]
+	},
+	"player": {
+		"Hitbox": [ 0.8, 0.8, 0.8 ],
+		"Shape": [
+			{
+				"Type": "RECTANGLE_PRISM",
+				"Size": [ 0.8, 1.8, 0.8 ],
+				"Offset": [ 0, 0, 0 ],
+				"Texture": [
+				]
+
+			}
+
+		]
+	},
+	"zombie": {
+		"Hitbox": [ 0.8, 0.8, 0.8 ],
+		"Shape": [
+			{
+				"Type": "RECTANGLE_PRISM",
+				"Size": [ 0.25, 0.75, 0.25 ],
+				"Offset": [ 0, 0, 0 ],
+				"Texture": [
+				]
+
+			},
+			{
+				"Type": "RECTANGLE_PRISM",
+				"Size": [ 0.25, 0.75, 0.25 ],
+				"Offset": [ 0.25, 0, 0 ],
+				"Texture": [
+				]
+
+			},
+			{
+				"Type": "RECTANGLE_PRISM",
+				"Size": [ 0.50, 0.75, 0.25 ],
+				"Offset": [ 0, 0.75, 0 ],
+				"Texture": [
+				]
+
+			},
+			{
+				"Type": "RECTANGLE_PRISM",
+				"Size": [ 0.50, 0.50, 0.50 ],
+				"Offset": [ 0, 1.5, -0.125 ],
+				"Texture": [
+				]
+
+			},
+			{
+				"Type": "RECTANGLE_PRISM",
+				"Size": [ 0.50, 0.50, 0.50 ],
+				"Offset": [ 0, 1.5, -0.125 ],
+				"Texture": [
+				]
+
+			},
+			{
+				"Type": "RECTANGLE_PRISM",
+				"Size": [ 0.25, 0.75, 0.25 ],
+				"Offset": [ -0.25, 0.75, 0 ],
+				"Texture": [
+				]
+
+			},
+			{
+				"Type": "RECTANGLE_PRISM",
+				"Size": [ 0.25, 0.75, 0.25 ],
+				"Offset": [ 0.5, 0.75, 0 ],
+				"Texture": [
+				]
+
+			}
+
+
+		]
+	}
+
+}

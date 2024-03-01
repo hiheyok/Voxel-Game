@@ -66,7 +66,7 @@ public:
 
 			int ModelIndex = EntityVertices.size();
 
-			EntityElementIndex[EntityModels.first] = model.Indices.size() * 5; //temp solution
+			EntityElementIndex[EntityModels.first] = ModelIndex - model.Indices.size(); //temp solution
 			EntityElementSize[EntityModels.first] = model.Indices.size();
 
 			for (int i = 0; i < model.Indices.size(); i++) {
