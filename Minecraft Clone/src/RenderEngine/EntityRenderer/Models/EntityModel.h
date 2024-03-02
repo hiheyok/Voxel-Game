@@ -1,16 +1,22 @@
 #pragma once
 
 #include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
 #include <iostream>
 #include <vector>
 
 namespace Model {
-	struct ModelData {
+	typedef struct  {
 		std::vector<float> Vertices;
 		std::vector<unsigned int> Indices;
 
 		int VerticesCount = 0;
-	};
+	} ModelData;
+
+	typedef struct {
+		glm::vec2 p0;
+		glm::vec2 p1;
+	} UV;
 
 	struct RectangularPrism {
 
@@ -30,6 +36,8 @@ namespace Model {
 		glm::vec3 offset = glm::vec3(0.f, 0.f, 0.f);
 
 		glm::vec3 size = glm::vec3(0.f, 0.f, 0.f);
+
+		UV UV_MAP[6]{};
 	};
 }
 

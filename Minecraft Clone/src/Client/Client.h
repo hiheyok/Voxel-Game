@@ -4,7 +4,6 @@
 #include "../World/Server/Server.h"
 #include "Render/WorldRender.h"
 #include "LocalWorld/LocalWorld.h"
-#include "../RenderEngine/EntityRenderer/EntityRenderer.h"
 #include "../RenderEngine/EntityRenderer/MultiEntityRender.h"
 
 

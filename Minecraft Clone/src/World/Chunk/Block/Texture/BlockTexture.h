@@ -4,13 +4,8 @@
 
 #include "../../../../RenderEngine/OpenGL/Texture/Types/TextureArray.h"
 #include <string>
+#include "../../../Typenames.h"
 
-#define FRONT 0x00
-#define BACK 0x01
-#define TOP 0x02
-#define BOTTOM 0x03
-#define RIGHT 0x04
-#define LEFT 0x05
 
 __declspec(selectany) 
 

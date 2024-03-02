@@ -64,7 +64,7 @@ public:
 		for (auto& EntityModels : EntityCachedModels) {
 			Model::ModelData model = EntityModels.second.GetVertices();
 
-			int ModelIndex = EntityVertices.size() / 3;
+			int ModelIndex = EntityVertices.size() / 5;
 
 			EntityElementIndex[EntityModels.first] = EntityIndices.size(); //temp solution
 			EntityElementSize[EntityModels.first] = model.Indices.size();
@@ -98,7 +98,8 @@ public:
 		SSBO.InitializeData();
 
 		VBO.Bind();
-		VAO.EnableAttriPTR(0, 3, GL_FLOAT, GL_FALSE, 3, 0);
+		VAO.EnableAttriPTR(0, 3, GL_FLOAT, GL_FALSE, 5, 0);
+		VAO.EnableAttriPTR(1, 3, GL_FLOAT, GL_FALSE, 5, 2);
 		VBO.Unbind();
 		VAO.Unbind();
 

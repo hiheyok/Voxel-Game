@@ -58,11 +58,15 @@ void EntitiesList::InitializeModels() {
 
         json::iterator d = b.value().begin();
 
+		if (d.value().is_string()) {
+			d++;
+		}
+
         vec3 hitboxSize(d.value().at(0), d.value().at(1), d.value().at(2));
 
         EntityTypeList[entityType]->ChangeHitboxSize(hitboxSize);
 		
-        d++;
+        d++; 
 
         for (auto& SubData : d.value().items()) {
             json::iterator it = SubData.value().begin();

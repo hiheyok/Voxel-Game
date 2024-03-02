@@ -7,6 +7,7 @@ layout (std430, binding = 2) buffer EntityPosBuffer {
 };
 
 layout (location = 0) in vec3 pos;
+layout (location = 1) in vec2 UV;
 
 uniform mat4 model;
 uniform mat4 projection;

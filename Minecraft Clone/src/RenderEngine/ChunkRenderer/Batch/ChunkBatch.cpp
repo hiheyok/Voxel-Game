@@ -81,13 +81,13 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance, int VerticalRenderDista
 	for (const auto& data_ : RenderList) {
 		auto& data = data_.second;
 
-		int deltaX = data.x - Position.x;
-		int deltaY = data.y - Position.y;
-		int deltaZ = data.z - Position.z;
+		float deltaX = data.x - Position.x;
+		float deltaY = data.y - Position.y;
+		float deltaZ = data.z - Position.z;
 
-		int dx2 = deltaX * deltaX / (RenderDistance * RenderDistance);
-		int dy2 = deltaY * deltaY / (VerticalRenderDistance * VerticalRenderDistance);
-		int dz2 = deltaZ * deltaZ / (RenderDistance * RenderDistance);
+		float dx2 = deltaX * deltaX / (RenderDistance * RenderDistance);
+		float dy2 = deltaY * deltaY / (VerticalRenderDistance * VerticalRenderDistance);
+		float dz2 = deltaZ * deltaZ / (RenderDistance * RenderDistance);
 
 
 		if (dx2 + dy2 + dz2 < 1.f) {
