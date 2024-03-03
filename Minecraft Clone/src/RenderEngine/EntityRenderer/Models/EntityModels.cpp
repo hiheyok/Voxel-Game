@@ -8,23 +8,23 @@ Model::ModelData Model::RectangularPrism::GetVertices() {
 	model.Vertices.insert(model.Vertices.begin(), {
 		//Front
 		0.f,0.f,0.f,			// 0
-		UV_MAP[FRONT].p0.x,UV_MAP[FRONT].p0.y,
-		size.x, 0.f,0.f,		// 1
 		UV_MAP[FRONT].p1.x,UV_MAP[FRONT].p0.y,
+		size.x, 0.f,0.f,		// 1
+		UV_MAP[FRONT].p0.x,UV_MAP[FRONT].p0.y,
 		size.x, size.y, 0.f,	// 2
-		UV_MAP[FRONT].p1.x,UV_MAP[FRONT].p1.y,
-		0.f, size.y, 0.f,		// 3
 		UV_MAP[FRONT].p0.x,UV_MAP[FRONT].p1.y,
+		0.f, size.y, 0.f,		// 3
+		UV_MAP[FRONT].p1.x,UV_MAP[FRONT].p1.y,
 
 		//Back
 		0.f,0.f,size.z,			// 4
-		UV_MAP[BACK].p0.x,UV_MAP[BACK].p0.y,
-		size.x, 0.f,size.z,		// 5
 		UV_MAP[BACK].p1.x,UV_MAP[BACK].p0.y,
+		size.x, 0.f,size.z,		// 5
+		UV_MAP[BACK].p0.x,UV_MAP[BACK].p0.y,
 		size.x, size.y, size.z,	// 6
-		UV_MAP[BACK].p1.x,UV_MAP[BACK].p1.y,
-		0.f, size.y, size.z,	// 7
 		UV_MAP[BACK].p0.x,UV_MAP[BACK].p1.y,
+		0.f, size.y, size.z,	// 7
+		UV_MAP[BACK].p1.x,UV_MAP[BACK].p1.y,
 
 		//Right
 		size.x,0.f,0.f,			// 8
@@ -48,23 +48,23 @@ Model::ModelData Model::RectangularPrism::GetVertices() {
 
 		//Top
 		0.f,size.y,0.f,			// 16
-		UV_MAP[TOP].p0.x,UV_MAP[TOP].p0.y,
-		size.x,size.y,0.f,		// 17
 		UV_MAP[TOP].p1.x,UV_MAP[TOP].p0.y,
+		size.x,size.y,0.f,		// 17
+		UV_MAP[TOP].p0.x,UV_MAP[TOP].p0.y,
 		size.x,size.y,size.z,	// 18
-		UV_MAP[TOP].p1.x,UV_MAP[TOP].p1.y,
-		0.f,size.y,size.z,		// 19
 		UV_MAP[TOP].p0.x,UV_MAP[TOP].p1.y,
+		0.f,size.y,size.z,		// 19
+		UV_MAP[TOP].p1.x,UV_MAP[TOP].p1.y,
 
 		//Bottom
 		0.f,0.f,0.f,			// 20
-		UV_MAP[BOTTOM].p0.x,UV_MAP[BOTTOM].p0.y,
-		size.x,0.f,0.f,			// 21
 		UV_MAP[BOTTOM].p1.x,UV_MAP[BOTTOM].p0.y,
+		size.x,0.f,0.f,			// 21
+		UV_MAP[BOTTOM].p0.x,UV_MAP[BOTTOM].p0.y,
 		size.x,0.f,size.z,		// 22
-		UV_MAP[BOTTOM].p1.x,UV_MAP[BOTTOM].p1.y,
+		UV_MAP[BOTTOM].p0.x,UV_MAP[BOTTOM].p1.y,
 		0.f,0.f,size.z,			// 23
-		UV_MAP[BOTTOM].p0.x,UV_MAP[BOTTOM].p1.y
+		UV_MAP[BOTTOM].p1.x,UV_MAP[BOTTOM].p1.y
 		});
 
 
