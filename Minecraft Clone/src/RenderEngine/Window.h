@@ -6,7 +6,6 @@
 #include "../Utils/LogUtils.h"
 #include <unordered_set>
 #include <vector>
-#define _CRTDBG_MAP_ALLOC
 
 #define KEY_CTRL 0x01
 
@@ -48,12 +47,17 @@ protected:
 
 	void UpdateKeyPressSet();
 
+	int sizex = 1280;
+	int sizey = 720;
+
+	bool WindowSizeDirty = false;
+	bool DrawSolid = true;
+
 private:
 	static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam);
 	void resize_window(int x, int y);
 	
-	int sizex = 1280;
-	int sizey = 720;
+	
 
 	int cursorlastx = 0;
 	int cursorlasty = 0;

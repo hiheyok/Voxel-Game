@@ -5,7 +5,7 @@
 #include "Render/WorldRender.h"
 #include "LocalWorld/LocalWorld.h"
 #include "../RenderEngine/EntityRenderer/MultiEntityRender.h"
-
+#include "../RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
 
 class Client : protected Window {
 public:
@@ -25,5 +25,6 @@ private:
 	Server server;
 	WorldRender TerrainRender;
 	MultiEntityRenderer EntityRender;
+	TexturedFrameBuffer Framebuffer;
 	
 };

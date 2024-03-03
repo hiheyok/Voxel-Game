@@ -113,7 +113,16 @@ public:
 		TimePastTick = t;
 	}
 
+	void SetupCall() {
+		glDisable(GL_BLEND);
+		glEnable(GL_DEPTH_TEST);
+		glDepthMask(GL_TRUE);
+		glDisable(GL_CULL_FACE);
+	}
+
 	void Render() {
+
+		SetupCall();
 
 		int n = 0;
 

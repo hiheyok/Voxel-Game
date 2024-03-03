@@ -19,6 +19,8 @@ void Client::run() {
 	EntityRender.Initialize();
 	EntityRender.SetWindow(getWindow());
 
+	Framebuffer.genBuffer(sizex, sizey, 2);
+
 	DisableCursor();
 
 	MainLocalWorld.SetPlayerPosition(0.,66.0,0.);
@@ -83,12 +85,30 @@ void Client::GameLoop() {
 
 		Update();
 
+		Framebuffer.bindFBO();
+		Framebuffer.bindRBO();
+
+		
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearDepth(1.f);
+		if (!DrawSolid) {
+			renderLines();
+		}
+
 		EntityRender.Render();
 		TerrainRender.Render();
+
+		if (!DrawSolid) {
+			renderSolid();
+		}
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+		Framebuffer.unbindFBO();
+		Framebuffer.unbindRBO();
 		
-		
+		Framebuffer.render();
 
 		Refresh();
 
@@ -106,10 +126,10 @@ void Client::Update() {
 	PollInputs();
 
 	if (TestForKeyInputs(GLFW_KEY_F)) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		DrawSolid = false;
 	}
 	if (TestForKeyInputs(GLFW_KEY_G)) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		DrawSolid = true;
 	}
 
 	if (TestForKeyInputs(GLFW_KEY_R)) {
@@ -122,6 +142,13 @@ void Client::Update() {
 
 	if (TestForKeyInputs(GLFW_KEY_ESCAPE)) {
 		glfwSetWindowShouldClose(getWindow(), true);
+	}
+
+	if (WindowSizeDirty) {
+		WindowSizeDirty = false;
+
+		Framebuffer.clear();
+		Framebuffer.genBuffer(sizex, sizey, 2);
 	}
 
 	UpdateKeyPressSet();

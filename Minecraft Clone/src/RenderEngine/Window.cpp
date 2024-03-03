@@ -165,6 +165,7 @@ void Window::resize_window(int x, int y) {
     glViewport(0, 0, x, y);
     sizex = x;
     sizey = y;
+    WindowSizeDirty = true;
     std::stringstream str;
     Logger.LogInfo("OpenGL"," Resized Window: " + std::to_string(sizex) + ", " + std::to_string(sizey));
 }

@@ -5,7 +5,17 @@ in vec2 TexCoords;
 
 uniform sampler2D screenTexture;
 
+uniform vec2 Resolution;
+
 void main()
 { 
-    FragColor = texture(screenTexture, TexCoords);
+    vec2 uv = gl_FragCoord.xy / Resolution.xy;
+
+    uv *=  1.0 - uv.yx;
+
+    float vig = uv.y * uv.x * 50;
+
+    vig = pow(vig, 0.125);
+
+    FragColor = vec4(vig,vig,vig, 1)* texture(screenTexture, TexCoords);
 }

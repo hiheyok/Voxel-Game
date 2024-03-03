@@ -21,6 +21,7 @@ public:
     void genBuffer(GLint x, GLint y, float muti) {
 
         screen->init("assets/shaders/screen/vert.glsl", "assets/shaders/screen/frag.glsl");
+        screen->setVec2("Resolution", glm::vec2((x), (y)));
 
         sy = y;
         sx = x;
@@ -94,7 +95,7 @@ public:
             glBindTexture(GL_TEXTURE_2D, texture);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (int)(sx * smuti), (int)(sy * smuti), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
             glBindRenderbuffer(GL_RENDERBUFFER, RBO);
-            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, (int)(sx * smuti), (int)sy * smuti));
+            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, (int)(sx * smuti), (int)(sy * smuti));
             glTextSizeY = sy;
             glTextSizeX = sx;
         }
@@ -125,7 +126,6 @@ public:
     }
 
     void updateTexture() {
-        std::cout << screen << "\n";
 
     }
 
@@ -141,5 +141,7 @@ public:
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
+
+        
     }
 };
