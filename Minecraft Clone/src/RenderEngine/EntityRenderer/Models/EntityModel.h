@@ -14,8 +14,8 @@ namespace Model {
 	} ModelData;
 
 	typedef struct {
-		glm::vec2 p0;
-		glm::vec2 p1;
+		glm::vec2 p0 = glm::vec2(0.f, 0.f);
+		glm::vec2 p1 = glm::vec2(0.f, 0.f);
 	} UV;
 
 	struct RectangularPrism {
@@ -44,8 +44,9 @@ namespace Model {
 class EntityModel {
 public:
 
-	void AddRectangle(glm::vec3 size, glm::vec3 offset) {
+	Model::RectangularPrism* AddRectangle(glm::vec3 size, glm::vec3 offset) {
 		shapes.emplace_back(size, offset);
+		return &shapes.back();
 	}
 
 	Model::ModelData GetVertices() {
@@ -58,7 +59,13 @@ public:
 			int CurrentIndex = model.VerticesCount;
 
 			for (int i = 0; i < SubModel.Vertices.size(); i++) {
-				model.Vertices.push_back(SubModel.Vertices[i] + shape.offset[i % 3]);
+				if ((i % 5) < 3) {
+					model.Vertices.push_back(SubModel.Vertices[i] + shape.offset[i % 5]);
+				}
+				else {
+					model.Vertices.push_back(SubModel.Vertices[i]);
+				}
+				
 			}
 
 			for (int i = 0; i < SubModel.Indices.size(); i++) {

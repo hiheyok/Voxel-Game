@@ -2,7 +2,7 @@
 	"stone" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/stone.png",
+				"File" : "assets/textures/block/stone.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -10,7 +10,7 @@
 	"dirt" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/dirt.png",
+				"File" : "assets/textures/block/dirt.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -18,7 +18,7 @@
 	"water_still" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/water_still.png",
+				"File" : "assets/textures/block/water_still.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -26,7 +26,7 @@
 	"blue_stained_glass" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/blue_stained_glass.png",
+				"File" : "assets/textures/block/blue_stained_glass.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -34,7 +34,7 @@
 	"green_stained_glass" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/green_stained_glass.png",
+				"File" : "assets/textures/block/green_stained_glass.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -42,7 +42,7 @@
 	"black_stained_glass" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/black_stained_glass.png",
+				"File" : "assets/textures/block/black_stained_glass.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -50,7 +50,7 @@
 	"brown_stained_glass" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/brown_stained_glass.png",
+				"File" : "assets/textures/block/brown_stained_glass.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -58,7 +58,7 @@
 	"cyan_stained_glass" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/cyan_stained_glass.png",
+				"File" : "assets/textures/block/cyan_stained_glass.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -66,7 +66,7 @@
 	"gray_stained_glass" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/gray_stained_glass.png",
+				"File" : "assets/textures/block/gray_stained_glass.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -74,7 +74,7 @@
 	"light_blue_stained_glass" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/light_blue_stained_glass.png",
+				"File" : "assets/textures/block/light_blue_stained_glass.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -82,7 +82,7 @@
 	"light_gray_stained_glass" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/light_gray_stained_glass.png",
+				"File" : "assets/textures/block/light_gray_stained_glass.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -90,7 +90,7 @@
 	"lime_stained_glass" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/lime_stained_glass.png",
+				"File" : "assets/textures/block/lime_stained_glass.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -98,7 +98,7 @@
 	"magenta_stained_glass" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/magenta_stained_glass.png",
+				"File" : "assets/textures/block/magenta_stained_glass.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -106,7 +106,7 @@
 	"orange_stained_glass" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/orange_stained_glass.png",
+				"File" : "assets/textures/block/orange_stained_glass.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -114,7 +114,7 @@
 	"pink_stained_glass" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/pink_stained_glass.png",
+				"File" : "assets/textures/block/pink_stained_glass.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -122,7 +122,7 @@
 	"purple_stained_glass" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/purple_stained_glass.png",
+				"File" : "assets/textures/block/purple_stained_glass.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -130,7 +130,7 @@
 	"red_stained_glass" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/red_stained_glass.png",
+				"File" : "assets/textures/block/red_stained_glass.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -138,7 +138,7 @@
 	"white_stained_glass" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/white_stained_glass.png",
+				"File" : "assets/textures/block/white_stained_glass.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -146,7 +146,7 @@
 	"yellow_stained_glass" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/yellow_stained_glass.png",
+				"File" : "assets/textures/block/yellow_stained_glass.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -154,15 +154,15 @@
 	"grass_block" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/grass_block_top.png",
+				"File" : "assets/textures/block/grass_block_top.png",
 				"Side " : ["TOP"]
 			},
 			{
-				"File" : "assets/textures/array/block/dirt.png",
+				"File" : "assets/textures/block/dirt.png",
 				"Side " : ["BOTTOM"]
 			},
 			{
-				"File" : "assets/textures/array/block/grass_block_side.png",
+				"File" : "assets/textures/block/grass_block_side.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT"]
 			}
 		]
@@ -170,7 +170,7 @@
 	"sand" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/sand.png",
+				"File" : "assets/textures/block/sand.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -178,11 +178,11 @@
 	"oak_log" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/oak_log_top.png",
+				"File" : "assets/textures/block/oak_log_top.png",
 				"Side " : ["BOTTOM", "TOP"]
 			},
 			{
-				"File" : "assets/textures/array/block/oak_log.png",
+				"File" : "assets/textures/block/oak_log.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT"]
 			}
 		]
@@ -190,7 +190,7 @@
 	"oak_leaf" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/oak_leaves.png",
+				"File" : "assets/textures/block/oak_leaves.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -198,7 +198,7 @@
 	"diamond_block" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/diamond_block.png",
+				"File" : "assets/textures/block/diamond_block.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -206,7 +206,7 @@
 	"cobblestone" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/cobblestone.png",
+				"File" : "assets/textures/block/cobblestone.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -214,7 +214,7 @@
 	"oak_plank" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/oak_planks.png",
+				"File" : "assets/textures/block/oak_planks.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -222,7 +222,7 @@
 	"brick" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/bricks.png",
+				"File" : "assets/textures/block/bricks.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]
@@ -230,7 +230,7 @@
 	"white_concrete" : {
 		"Texture" :[
 			{
-				"File" : "assets/textures/array/block/white_concrete.png",
+				"File" : "assets/textures/block/white_concrete.png",
 				"Side " : ["FRONT", "BACK", "LEFT", "RIGHT", "BOTTOM", "TOP"]
 			}
 		]

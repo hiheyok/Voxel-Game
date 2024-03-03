@@ -59,8 +59,14 @@ void EntitiesList::InitializeModels() {
         json::iterator d = b.value().begin();
 
 		if (d.value().is_string()) {
-			d++;
+			Logger.LogInfo("Entity Texture", "Entity: " + b.key() + " | Texture Loading: " + (string)d.value());
+			RawTextureData TexData;
+			TexData.Load(((string)d.value()).c_str());
+			EntityTypeList[entityType]->texture.Gen();
+			EntityTypeList[entityType]->texture.Load(TexData);
 		}
+
+		d++;
 
         vec3 hitboxSize(d.value().at(0), d.value().at(1), d.value().at(2));
 
@@ -77,7 +83,58 @@ void EntitiesList::InitializeModels() {
 
             vec3 ShapeSize(it.value().at(0), it.value().at(1), it.value().at(2));
 
-			EntityTypeList[entityType]->RenderModel.AddRectangle(ShapeSize, Offset);
+			it++;
+
+			Model::RectangularPrism* model = EntityTypeList[entityType]->RenderModel.AddRectangle(ShapeSize, Offset);
+
+			for (auto& ShapeUV : it.value().items()) {
+				json::iterator uv_iterator = ShapeUV.value().begin();
+
+				vector<int> UV_Faces = {};
+
+				for (auto& UV_Face : uv_iterator.value().items()) {
+					int s = 0xFF;
+
+					string texSide = UV_Face.value();
+
+					if (!strcmp(texSide.c_str(), "FRONT")) {
+						s = FRONT;
+					}
+					if (!strcmp(texSide.c_str(), "BACK")) {
+						s = BACK;
+					}
+					if (!strcmp(texSide.c_str(), "LEFT")) {
+						s = LEFT;
+					}
+					if (!strcmp(texSide.c_str(), "RIGHT")) {
+						s = RIGHT;
+					}
+					if (!strcmp(texSide.c_str(), "TOP")) {
+						s = TOP;
+					}
+					if (!strcmp(texSide.c_str(), "BOTTOM")) {
+						s = BOTTOM;
+					}
+
+					UV_Faces.push_back(s);
+				}
+
+				uv_iterator++;
+				
+				vec2 pts[2]{};
+
+				int index = 0;
+
+				for (auto& UV_Points : uv_iterator.value().items()) { //iterate though uv points
+					pts[index] = vec2(UV_Points.value().at(0), UV_Points.value().at(1));
+					index++;
+				}
+
+				for (int& face : UV_Faces) {
+					model->UV_MAP[face].p0 = pts[0];
+					model->UV_MAP[face].p1 = pts[1];
+				}
+			}
         }
     }
 }

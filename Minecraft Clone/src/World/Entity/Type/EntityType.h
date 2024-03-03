@@ -3,6 +3,7 @@
 #include "../Collusion/Hitbox.h"
 #include "../../../RenderEngine/EntityRenderer/Models/EntityModel.h"
 #include "../Entity.h"
+#include "../../../RenderEngine/OpenGL/Texture/Types/Texture2D.h"
 
 class EntityType {
 public:
@@ -30,6 +31,8 @@ public:
 	EntityTypeID ID = NULL;
 
 	EntityModel RenderModel;
+
+	Texture2D texture;
 
 	std::string EntityName;
 

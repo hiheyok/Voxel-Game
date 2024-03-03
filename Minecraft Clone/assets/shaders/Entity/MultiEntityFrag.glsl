@@ -1,6 +1,10 @@
 #version 450 core
 out vec4 FragOut;
 
+in vec2 UVa;
+
+uniform sampler2D EntityTexture;
+
 void main() {
-	FragOut = vec4(1.f,1.f,1.f,1.f);
+	FragOut = texture(EntityTexture, UVa);
 }

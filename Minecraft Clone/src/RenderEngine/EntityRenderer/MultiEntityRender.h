@@ -99,7 +99,7 @@ public:
 
 		VBO.Bind();
 		VAO.EnableAttriPTR(0, 3, GL_FLOAT, GL_FALSE, 5, 0);
-		VAO.EnableAttriPTR(1, 3, GL_FLOAT, GL_FALSE, 5, 2);
+		VAO.EnableAttriPTR(1, 2, GL_FLOAT, GL_FALSE, 5, 3);
 		VBO.Unbind();
 		VAO.Unbind();
 
@@ -133,6 +133,7 @@ public:
 			n += i;
 
 			SSBO.InsertSubData(0, (i * 3) * sizeof(float), PositionArr.data());
+			shader.bindTexture2D(0, EntityList.EntityTypeList[entityarr.first]->texture.get(), "EntityTexture");
 			shader.use();
 
 			VAO.Bind();

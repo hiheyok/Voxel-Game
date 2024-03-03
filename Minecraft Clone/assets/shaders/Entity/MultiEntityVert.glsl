@@ -13,7 +13,9 @@ uniform mat4 model;
 uniform mat4 projection;
 uniform mat4 view;
 
-void main()
-{
+out vec2 UVa;
+
+void main() {
+    UVa = UV;
     gl_Position = projection * view * model * vec4(pos + vec3(EntityPos[gl_InstanceID * 3 + 0], EntityPos[gl_InstanceID * 3 + 1], EntityPos[gl_InstanceID * 3 + 2]), 1.f);
 }
