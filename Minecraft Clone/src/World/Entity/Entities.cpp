@@ -126,7 +126,7 @@ void EntitiesList::InitializeModels() {
 				int index = 0;
 
 				for (auto& UV_Points : uv_iterator.value().items()) { //iterate though uv points
-					pts[index] = vec2(UV_Points.value().at(0), UV_Points.value().at(1));
+					pts[1 - index] = vec2((float)UV_Points.value().at(0), 1.f - (float)UV_Points.value().at(1));
 					index++;
 				}
 

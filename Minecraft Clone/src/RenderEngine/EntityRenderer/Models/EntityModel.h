@@ -79,6 +79,10 @@ public:
 		return model;
 	}
 
+	void Clear() {
+		shapes.clear();
+	}
+
 private:
 	std::vector<Model::RectangularPrism> shapes;
 };

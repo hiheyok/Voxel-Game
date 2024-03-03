@@ -28,23 +28,23 @@ Model::ModelData Model::RectangularPrism::GetVertices() {
 
 		//Right
 		size.x,0.f,0.f,			// 8
-		UV_MAP[RIGHT].p0.x,UV_MAP[RIGHT].p0.y,
-		size.x,size.y,0.f,		// 9
 		UV_MAP[RIGHT].p1.x,UV_MAP[RIGHT].p0.y,
-		size.x,size.y,size.z,	// 10
+		size.x,size.y,0.f,		// 9
 		UV_MAP[RIGHT].p1.x,UV_MAP[RIGHT].p1.y,
-		size.x,0.f,size.z,		// 11
+		size.x,size.y,size.z,	// 10
 		UV_MAP[RIGHT].p0.x,UV_MAP[RIGHT].p1.y,
+		size.x,0.f,size.z,		// 11
+		UV_MAP[RIGHT].p0.x,UV_MAP[RIGHT].p0.y,
 
 		//Left
 		0.f,0.f,0.f,			// 12
-		UV_MAP[LEFT].p0.x,UV_MAP[LEFT].p0.y,
-		0.f,size.y,0.f,			// 13
 		UV_MAP[LEFT].p1.x,UV_MAP[LEFT].p0.y,
-		0.f,size.y,size.z,		// 14
+		0.f,size.y,0.f,			// 13
 		UV_MAP[LEFT].p1.x,UV_MAP[LEFT].p1.y,
-		0.f,0.f,size.z,			// 15
+		0.f,size.y,size.z,		// 14
 		UV_MAP[LEFT].p0.x,UV_MAP[LEFT].p1.y,
+		0.f,0.f,size.z,			// 15
+		UV_MAP[LEFT].p0.x,UV_MAP[LEFT].p0.y,
 
 		//Top
 		0.f,size.y,0.f,			// 16

@@ -38,6 +38,9 @@ private:
 	double TimePastTick = 0.0;
 public:
 
+	int VerticalRenderDistance = 16;
+	int HorizontalRenderDistance = 16;
+
 	int getNumEntityRendered() {
 		return NumEntityRendered;
 	}
@@ -186,6 +189,26 @@ public:
 		shader.setMat4("view", view);
 		shader.setMat4("model", model);
 		shader.setMat4("projection", projection);
+		shader.setFloat("RenderDistance", (float)(HorizontalRenderDistance * 16));
+		shader.setFloat("VerticalRenderDistance", (float)(VerticalRenderDistance * 16));
+		shader.setVec3("camPos", camera->Position);
+	}
+
+	void Reload() {
+
+		//reset gpu data
+		VBO.Delete();
+		EBO.Delete();
+		VAO.ResetArray();
+
+		//reset entity models
+		for (auto e : EntityList.EntityTypeList) {
+			e.second->RenderModel.Clear();
+		}
+
+		EntityList.Initialize();
+
+		Initialize();
 	}
 
 

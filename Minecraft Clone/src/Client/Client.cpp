@@ -112,6 +112,10 @@ void Client::Update() {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
+	if (TestForKeyInputs(GLFW_KEY_R)) {
+		EntityRender.Reload();
+	}
+
 	if (TestForKeyInputs(GLFW_KEY_Z)) {
 		Logger.LogInfo("Client", "FPS: " + std::to_string(1.f / (float)Frametime));
 	}

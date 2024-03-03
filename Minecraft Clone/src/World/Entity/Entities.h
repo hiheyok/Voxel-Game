@@ -22,7 +22,7 @@ private:
 
 	int EntityTypeCount = 0;
 
-	void InitializeModels();
+	
 	std::unordered_map<std::string, EntityTypeID> EntityNameID;
 public:
 	std::unordered_map<EntityTypeID, EntityType*> EntityTypeList;
@@ -35,6 +35,8 @@ public:
 	EntitiesList() {
 
 	}
+
+	void InitializeModels();
 
 	void RegisterNewEntity(EntityRegistration reg);
 

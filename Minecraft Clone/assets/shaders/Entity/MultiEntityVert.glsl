@@ -14,8 +14,10 @@ uniform mat4 projection;
 uniform mat4 view;
 
 out vec2 UVa;
+out vec3 GlobalPos;
 
 void main() {
     UVa = UV;
-    gl_Position = projection * view * model * vec4(pos + vec3(EntityPos[gl_InstanceID * 3 + 0], EntityPos[gl_InstanceID * 3 + 1], EntityPos[gl_InstanceID * 3 + 2]), 1.f);
+    GlobalPos = pos + vec3(EntityPos[gl_InstanceID * 3 + 0], EntityPos[gl_InstanceID * 3 + 1], EntityPos[gl_InstanceID * 3 + 2]);
+    gl_Position = projection * view * model * vec4(GlobalPos, 1.f);
 }

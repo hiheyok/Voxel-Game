@@ -13,14 +13,6 @@ void LocalWorld::UpdateIO(std::unordered_set<char> Keys, bool shift, float curso
 		enableCollusion = !enableCollusion;
 	}
 
-	if (Keys.count('R')) {
-		speed++;
-	}
-
-	if (Keys.count('T')) {
-		speed--;
-	}
-
 	sprint = Keys.count(0x01); // ctrl
 
 	RotatePlayer(cursorx, cursory);
