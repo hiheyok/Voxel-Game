@@ -6,21 +6,8 @@
 #include "Material/BlockMaterial.h"
 #include "Texture/BlockTexture.h"
 
-struct BlockRegistration {
-	Material* material = nullptr;
-	bool transparency = false;
-	bool solid = false;
-	bool isFluid = false;
-	std::string BlockName = "";
-
-	BlockID blockID = 0;
-};
-
-class BlockList {
+typedef class BlockList{
 private:
-	
-
-	std::deque<BlockRegistration> RegistrationQueue;
 	std::unordered_map<std::string, BlockID> BlockIDNameData;
 	int BlockTypeCount = 0;
 
@@ -30,40 +17,38 @@ public:
 
 	TextureArray BlockTextureArray;
 
-	BlockID AIR = QueueRegister("air", new MaterialNone(), true, false, false);
-	BlockID STONE = QueueRegister("stone", new MaterialNone(), false, true, false);
-	BlockID DIRT = QueueRegister("dirt", new MaterialDirt(), false, true, false);
-	BlockID WATER = QueueRegister("water_still", new MaterialFluid(5), true, false, true);
-	BlockID LAVA = QueueRegister("lava", new MaterialFluid(5), true, false, true);
-	BlockID GRASS = QueueRegister("grass_block", new MaterialGrass(0.1, 0.1), false, true, false);
-	BlockID SAND = QueueRegister("sand", new MaterialGravity(), false, true, false);
-	BlockID OAK_LOG = QueueRegister("oak_log", new MaterialNone(), false, true, false);
-	BlockID OAK_LEAF = QueueRegister("oak_leaf", new MaterialNone(), true, true, false);
-	BlockID DIAMOND_BLOCK = QueueRegister("diamond_block", new MaterialNone(), false, true, false);
-	BlockID OAK_PLANK = QueueRegister("oak_plank", new MaterialNone(), false, true, false);
-	BlockID COBBLESTONE = QueueRegister("cobblestone", new MaterialNone(), false, true, false);
-	BlockID BRICK = QueueRegister("brick", new MaterialNone(), false, true, false);
-	BlockID WHITE_CONCRETE = QueueRegister("white_concrete", new MaterialNone(), false, true, false);
-	BlockID BLUE_STAINED_GLASS = QueueRegister("blue_stained_glass", new MaterialNone(), true, true, false);
-	BlockID GREEN_STAINED_GLASS = QueueRegister("green_stained_glass", new MaterialNone(), true, true, false);
-	BlockID BLACK_STAINED_GLASS = QueueRegister("black_stained_glass", new MaterialNone(), true, true, false);
-	BlockID BROWN_STAINED_GLASS = QueueRegister("brown_stained_glass", new MaterialNone(), true, true, false);
-	BlockID CYAN_STAINED_GLASS = QueueRegister("cyan_stained_glass", new MaterialNone(), true, true, false);
-	BlockID GRAY_STAINED_GLASS = QueueRegister("gray_stained_glass", new MaterialNone(), true, true, false);
-	BlockID LIGHT_BLUE_STAINED_GLASS = QueueRegister("light_blue_stained_glass", new MaterialNone(), true, true, false);
-	BlockID LIGHT_GRAY_STAINED_GLASS = QueueRegister("light_gray_stained_glass", new MaterialNone(), true, true, false);
-	BlockID LIME_STAINED_GLASS = QueueRegister("lime_stained_glass", new MaterialNone(), true, true, false);
-	BlockID MAGENTA_STAINED_GLASS = QueueRegister("magenta_stained_glass", new MaterialNone(), true, true, false);
-	BlockID ORANGE_STAINED_GLASS = QueueRegister("orange_stained_glass", new MaterialNone(), true, true, false);
-	BlockID PINK_STAINED_GLASS = QueueRegister("pink_stained_glass", new MaterialNone(), true, true, false);
-	BlockID PURPLE_STAINED_GLASS = QueueRegister("purple_stained_glass", new MaterialNone(), true, true, false);
-	BlockID RED_STAINED_GLASS = QueueRegister("red_stained_glass", new MaterialNone(), true, true, false);
-	BlockID WHITE_STAINED_GLASS = QueueRegister("white_stained_glass", new MaterialNone(), true, true, false);
-	BlockID YELLOW_STAINED_GLASS = QueueRegister("yellow_stained_glass", new MaterialNone(), true, true, false);
+	BlockID AIR = RegisterBlock("air", new MaterialNone(), true, false, false);
+	BlockID STONE = RegisterBlock("stone", new MaterialNone(), false, true, false);
+	BlockID DIRT = RegisterBlock("dirt", new MaterialDirt(), false, true, false);
+	BlockID WATER = RegisterBlock("water_still", new MaterialFluid(5), true, false, true);
+	BlockID LAVA = RegisterBlock("lava", new MaterialFluid(5), true, false, true);
+	BlockID GRASS = RegisterBlock("grass_block", new MaterialGrass(0.1, 0.1), false, true, false);
+	BlockID SAND = RegisterBlock("sand", new MaterialGravity(), false, true, false);
+	BlockID OAK_LOG = RegisterBlock("oak_log", new MaterialNone(), false, true, false);
+	BlockID OAK_LEAF = RegisterBlock("oak_leaf", new MaterialNone(), true, true, false);
+	BlockID DIAMOND_BLOCK = RegisterBlock("diamond_block", new MaterialNone(), false, true, false);
+	BlockID OAK_PLANK = RegisterBlock("oak_plank", new MaterialNone(), false, true, false);
+	BlockID COBBLESTONE = RegisterBlock("cobblestone", new MaterialNone(), false, true, false);
+	BlockID BRICK = RegisterBlock("brick", new MaterialNone(), false, true, false);
+	BlockID WHITE_CONCRETE = RegisterBlock("white_concrete", new MaterialNone(), false, true, false);
+	BlockID BLUE_STAINED_GLASS = RegisterBlock("blue_stained_glass", new MaterialNone(), true, true, false);
+	BlockID GREEN_STAINED_GLASS = RegisterBlock("green_stained_glass", new MaterialNone(), true, true, false);
+	BlockID BLACK_STAINED_GLASS = RegisterBlock("black_stained_glass", new MaterialNone(), true, true, false);
+	BlockID BROWN_STAINED_GLASS = RegisterBlock("brown_stained_glass", new MaterialNone(), true, true, false);
+	BlockID CYAN_STAINED_GLASS = RegisterBlock("cyan_stained_glass", new MaterialNone(), true, true, false);
+	BlockID GRAY_STAINED_GLASS = RegisterBlock("gray_stained_glass", new MaterialNone(), true, true, false);
+	BlockID LIGHT_BLUE_STAINED_GLASS = RegisterBlock("light_blue_stained_glass", new MaterialNone(), true, true, false);
+	BlockID LIGHT_GRAY_STAINED_GLASS = RegisterBlock("light_gray_stained_glass", new MaterialNone(), true, true, false);
+	BlockID LIME_STAINED_GLASS = RegisterBlock("lime_stained_glass", new MaterialNone(), true, true, false);
+	BlockID MAGENTA_STAINED_GLASS = RegisterBlock("magenta_stained_glass", new MaterialNone(), true, true, false);
+	BlockID ORANGE_STAINED_GLASS = RegisterBlock("orange_stained_glass", new MaterialNone(), true, true, false);
+	BlockID PINK_STAINED_GLASS = RegisterBlock("pink_stained_glass", new MaterialNone(), true, true, false);
+	BlockID PURPLE_STAINED_GLASS = RegisterBlock("purple_stained_glass", new MaterialNone(), true, true, false);
+	BlockID RED_STAINED_GLASS = RegisterBlock("red_stained_glass", new MaterialNone(), true, true, false);
+	BlockID WHITE_STAINED_GLASS = RegisterBlock("white_stained_glass", new MaterialNone(), true, true, false);
+	BlockID YELLOW_STAINED_GLASS = RegisterBlock("yellow_stained_glass", new MaterialNone(), true, true, false);
 
-	BlockID NULL_BLOCK = QueueRegister("null_block", new MaterialNone(), false, false, false);
-
-	void RegisterAll();
+	BlockID NULL_BLOCK = RegisterBlock("null_block", new MaterialNone(), false, false, false);
 
 	void Initialize() {
 		BlockTextureArray.Gen();
@@ -91,10 +76,10 @@ public:
 		return BlockTypeData[id];
 	}
 
-	void RegisterNewBlock(BlockRegistration reg);
+	BlockID RegisterBlock(std::string BlockName, Material* material, bool transparency, bool solid, bool isFluid);
 
-	BlockID QueueRegister(std::string BlockName, Material* material, bool transparency, bool solid, bool isFluid);
+} ;
 
-} __declspec(selectany)  Blocks;
+extern BlockList Blocks;
 
 #endif

@@ -1,6 +1,7 @@
 #pragma once
 #include "../DataContainer/BlockData.h"
 #include "../TerrainGeneration/Structures/Structure.h"
+#include "../Typenames.h"
 #include <glm/vec3.hpp>
 #include "ChunkID.h"
 #include <atomic>
@@ -10,14 +11,7 @@
 
 
 
-#define PX 0x00
-#define NX 0x01
-#define PY 0x02
-#define NY 0x03
-#define PZ 0x04
-#define NZ 0x05
 
-typedef unsigned long long int ChunkID;
 
 
 class ChunkContainer {

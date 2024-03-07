@@ -8,57 +8,29 @@ using namespace std;
 
 using json = nlohmann::json;
 
-BlockID BlockList::QueueRegister(std::string BlockName, Material* material, bool transparency, bool solid, bool isFluid) {
-	BlockRegistration reg;
-	reg.blockID = BlockTypeCount;
-	reg.isFluid = isFluid;
-	reg.solid = solid;
-	reg.transparency = transparency;
-	reg.material = material;
-	reg.BlockName = BlockName;
-
-	BlockTypeCount++;
-
-	RegistrationQueue.push_back(reg);
-
-	return BlockTypeCount - 1;
-}
-
-void BlockList::RegisterAll() {
-	while (!RegistrationQueue.empty()) {
-		BlockRegistration reg = RegistrationQueue.front();
-		RegistrationQueue.pop_front();
-
-		RegisterNewBlock(reg);
-
-	}
-}
-
-void BlockList::RegisterNewBlock(BlockRegistration reg) {
-	bool transparency = reg.transparency;
-	bool solid = reg.solid;
-	bool isFluid = reg.isFluid;
-
-	BlockID ID = reg.blockID;
+BlockID BlockList::RegisterBlock(std::string BlockName, Material* material, bool transparency, bool solid, bool isFluid) {
+	BlockID blockID = BlockTypeCount;
+	BlockID ID = BlockTypeCount;
 	BlockType* NewBlock = new BlockType(transparency, solid, isFluid);
 
-	Block* block = reg.material->BuildNewBlockType();
+	Block* block = material->BuildNewBlockType();
 
-	MaterialType Type = reg.material->type;
+	MaterialType Type = material->type;
 
 	block->ID = ID;
 	block->Properties = NewBlock;
 	block->Texture = new BlockTexture;
-	block->BlockName = reg.BlockName;
+	block->BlockName = BlockName;
 
 	BlockTypeData[ID] = block;
 
-	BlockIDNameData[reg.BlockName] = ID;
-	
+	BlockIDNameData[BlockName] = ID;
+
 	Logger.LogInfo("Register", "Registered new block (ID): " + std::to_string(ID));
 
-	delete reg.material;
-	
+	BlockTypeCount++;
+
+	return BlockTypeCount - 1;
 }
 
 void BlockList::InitializeTextures() {

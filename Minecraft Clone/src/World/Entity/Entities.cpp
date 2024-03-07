@@ -1,8 +1,6 @@
 #include "Entities.h"
 
-#include "Type/Passive.h"
-#include "Type/FallingBlock.h"
-#include "Type/Hostile.h"
+#include "Type/Types.h"
 
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -13,11 +11,13 @@ using namespace glm;
 
 using json = nlohmann::json;
 
-void EntitiesList::RegisterNewEntity(EntityRegistration reg) {
-	EntityTypeID ID = reg.id;
+EntityTypeID EntitiesList::RegisterEntity(std::string EntityName, EntityTypeEnums type) {
+	EntityTypeID ID = EntityTypeCount;
 	EntityType* NewEntity;
 
-	switch (reg.Type) {
+	EntityTypeCount++;
+
+	switch (type) {
 	case ENTITY_PASSIVE:
 		NewEntity = static_cast<EntityType*>(new Passive());
 		break;
@@ -29,24 +29,19 @@ void EntitiesList::RegisterNewEntity(EntityRegistration reg) {
 		break;
 	}
 
-	NewEntity->EntityName = reg.EntityName;
+	NewEntity->EntityName = EntityName;
 
-	Logger.LogInfo("Entity Register", "Registered new entity: " + reg.EntityName + " | EntityID: " + std::to_string(reg.id));
+	Logger.LogInfo("Entity Register", "Registered new entity: " + EntityName + " | EntityID: " + std::to_string(ID));
 
 	NewEntity->ID = ID;
 
 	EntityTypeList[ID] = NewEntity;
-    EntityNameID[reg.EntityName] = ID;
+    EntityNameID[EntityName] = ID;
+
+	return EntityTypeCount - 1;
 
 }
 
-void EntitiesList::RegisterAll() {
-	for (auto& reg : RegisterQueue) {
-		RegisterNewEntity(reg);
-	}
-
-	RegisterQueue.clear();
-}
 
 void EntitiesList::InitializeModels() {
     ifstream file("assets/EntityShape.json");
@@ -97,24 +92,18 @@ void EntitiesList::InitializeModels() {
 
 					string texSide = UV_Face.value();
 
-					if (!strcmp(texSide.c_str(), "FRONT")) {
+					if (!strcmp(texSide.c_str(), "FRONT"))
 						s = FRONT;
-					}
-					if (!strcmp(texSide.c_str(), "BACK")) {
+					if (!strcmp(texSide.c_str(), "BACK"))
 						s = BACK;
-					}
-					if (!strcmp(texSide.c_str(), "LEFT")) {
+					if (!strcmp(texSide.c_str(), "LEFT"))
 						s = LEFT;
-					}
-					if (!strcmp(texSide.c_str(), "RIGHT")) {
+					if (!strcmp(texSide.c_str(), "RIGHT"))
 						s = RIGHT;
-					}
-					if (!strcmp(texSide.c_str(), "TOP")) {
+					if (!strcmp(texSide.c_str(), "TOP"))
 						s = TOP;
-					}
-					if (!strcmp(texSide.c_str(), "BOTTOM")) {
+					if (!strcmp(texSide.c_str(), "BOTTOM"))
 						s = BOTTOM;
-					}
 
 					UV_Faces.push_back(s);
 				}

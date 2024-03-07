@@ -13,7 +13,6 @@ void Client::run() {
 
 	Start();
 
-	Blocks.RegisterAll();
 	Blocks.Initialize();
 	EntityList.Initialize();
 	EntityRender.Initialize();
@@ -27,14 +26,14 @@ void Client::run() {
 	MainLocalWorld.SetPlayerRotation(0.,-30.);
 
 	ServerSettings serverSettings;
-	serverSettings.H_RenderDistance = 16;
+	serverSettings.H_RenderDistance = 24;
 	serverSettings.V_RenderDistance = 8;
 	serverSettings.genThreads = 8;
 
 	server.Start(serverSettings);
 
 	Logger.LogInfo("World", "Generating World");
-	TerrainRender.renderDistance = 16;
+	TerrainRender.renderDistance = 24;
 	TerrainRender.verticalRenderDistance = 8;
 	TerrainRender.Start(getWindow(), server.world, 16);
 
@@ -88,8 +87,6 @@ void Client::GameLoop() {
 		Framebuffer.bindFBO();
 		Framebuffer.bindRBO();
 
-		
-
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearDepth(1.f);
 		if (!DrawSolid) {
@@ -108,6 +105,7 @@ void Client::GameLoop() {
 		Framebuffer.unbindFBO();
 		Framebuffer.unbindRBO();
 		
+
 		Framebuffer.render();
 
 		Refresh();

@@ -64,4 +64,6 @@ private:
 	std::deque<LogData> LogsCache;
 
 	std::ofstream* file;
-} __declspec(selectany) Logger;
+};
+
+extern LogUtils Logger;

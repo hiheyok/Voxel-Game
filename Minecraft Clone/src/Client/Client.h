@@ -26,5 +26,6 @@ private:
 	WorldRender TerrainRender;
 	MultiEntityRenderer EntityRender;
 	TexturedFrameBuffer Framebuffer;
+	TexturedFrameBuffer FramebufferSuperres;
 	
 };

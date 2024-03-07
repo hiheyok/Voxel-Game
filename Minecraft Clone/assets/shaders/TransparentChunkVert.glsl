@@ -28,7 +28,7 @@ int xDataBitOffset = 0;
 int yDataBitOffset = 5;
 int zDataBitOffset = 10;
 int blockShadingBitOffset = 15;
-int textureBitOffset = 20;
+int textureBitOffset = 10;
 
 float dataToFloat(int index, int size) {
     return (((1u << size) - 1u) & (data >> index));
@@ -51,7 +51,7 @@ void main()
     
     vec3 pos = vec3(dataToFloat(xDataBitOffset, 5),dataToFloat(yDataBitOffset, 5),dataToFloat(zDataBitOffset, 5));
     texturePosition = tdataToFloat(textureBitOffset, 5);
-    textureSize = vec2(tdataToFloat(0, 5),tdataToFloat(10, 5));
+    textureSize = vec2(tdataToFloat(0, 5),tdataToFloat(5, 5));
     float light = dataToFloat(blockShadingBitOffset, 5);
 
     vec3 VerticePos = vec3(pos.x + (ChunkPos[0 + (3 * gl_DrawIDARB)]* 16),pos.y + (ChunkPos[1 + (3 * gl_DrawIDARB)] * 16),pos.z + (ChunkPos[2 + (3 * gl_DrawIDARB)] * 16));

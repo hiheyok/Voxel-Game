@@ -7,22 +7,13 @@
 class TextureArray : public Texture {
 public:
 	void UploadToGPU() {
-
-
-		std::ofstream file;
-		file.open("BlockTexDump.dmp");
-		for (size_t i = 0; i < ArrayData.size(); i++) {
-			file << ArrayData.data()[i];
-		}
-		file.close();
-
-		GLsizei mipLevelCount = 3;
+		GLsizei mipLevelCount = 4;
 
 		glBindTexture(GL_TEXTURE_2D_ARRAY, textureID);
 		glTexStorage3D(GL_TEXTURE_2D_ARRAY, mipLevelCount, GL_RGBA8, 16, 16, Layers);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, width, height, Layers, GL_RGBA, GL_UNSIGNED_BYTE, ArrayData.data());
 		glGenerateMipmap(GL_TEXTURE_2D_ARRAY);

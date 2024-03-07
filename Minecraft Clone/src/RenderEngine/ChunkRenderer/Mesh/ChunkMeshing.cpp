@@ -8,7 +8,7 @@ using namespace std;
 using namespace glm;
 
 const int blockShadingBitOffset = 15;
-const int textureBitOffset = 20;
+const int textureBitOffset = 10;
 
 void ChunkMeshData::GenerateMesh(Chunk* chunk) {
 	//Initialize
@@ -351,7 +351,7 @@ inline void ChunkMeshData::AddFacetoMesh_X(QuadWPos& quad, int slice, uint8_t fa
 	char PN = quad.getLight(L_PN);
 	char PP = quad.getLight(L_PP);
 
-	int sy = quad.w << 10;
+	int sy = quad.w << 5;
 	int sx = quad.h << 0;
 
 	int sy0 = 0;
@@ -442,7 +442,8 @@ inline void ChunkMeshData::AddFacetoMesh_Y(QuadWPos& quad, int slice, uint8_t fa
 	char PP = quad.getLight(L_PP);
 
 	int sx = quad.h << 0;
-	int sy = quad.w << 10;
+	int sy = quad.w << 5;
+
 
 	int sy0 = 0;
 	int sx0 = 0;
@@ -534,7 +535,7 @@ inline void ChunkMeshData::AddFacetoMesh_Z(QuadWPos& quad, int slice, uint8_t fa
 	char PN = quad.getLight(L_PN);
 	char PP = quad.getLight(L_PP);
 
-	int sy = quad.h << 10;
+	int sy = quad.h << 5;
 	int sx = quad.w << 0;
 
 	int sy0 = 0;

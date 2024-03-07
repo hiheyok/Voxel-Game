@@ -13,9 +13,14 @@ void main()
 
     uv *=  1.0 - uv.yx;
 
-    float vig = uv.y * uv.x * 50;
+    float vig = uv.y * uv.x * 100;
 
-    vig = pow(vig, 0.125);
+    vig = pow(vig, 0.125) + 0.1f;
+
+    if (vig > 1.f) {
+        vig = 1.f;
+    }
+
 
     FragColor = vec4(vig,vig,vig, 1)* texture(screenTexture, TexCoords);
 }
