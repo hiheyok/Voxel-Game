@@ -2,6 +2,7 @@
 #include <iomanip>
 #include "LogUtils.h"
 #include "Clock.h"
+#include <ctime>
 
 using namespace std;
 
@@ -16,18 +17,28 @@ void LogUtils::MainLogger() {
 
 			const char* timestamp = strtok(ctime(&timept), "\n");
 
+
+			std::string str;
+
 			if (log.type == 0x01) {
 				printf("[ %s NS ] [ %s ] [ INFO / %s ]: %s\n",to_string(log.RTime).c_str(), timestamp, log.Subtype.c_str(), log.message.c_str());
+				str = "[ " + to_string(log.RTime) + " ] [ " + string(timestamp) + " ] [ INFO / " + log.Subtype + " ]: " + log.message;
 			}
 			if (log.type == 0x03) {
 				printf("[ %s NS ] [ %s ] [ WARN / %s ]: %s\n",to_string(log.RTime).c_str(),  timestamp, log.Subtype.c_str(), log.message.c_str());
+				str = "[ " + to_string(log.RTime) + " ] [ " + string(timestamp) + " ] [ WARN / " + log.Subtype + " ]: " + log.message;
 			}
 			if (log.type == 0x02) {
 				printf("[ %s NS ] [ %s ] [ ERROR / %s ]: %s\n", to_string(log.RTime).c_str(), timestamp, log.Subtype.c_str(), log.message.c_str());
+				str = "[ " + to_string(log.RTime) + " ] [ " + string(timestamp) + " ] [ ERROR / " + log.Subtype + " ]: " + log.message;
 			}
 			if (log.type == 0x00) {
 				printf("[ %s NS ] [ %s ] [ DEBUG / %s ]: %s\n", to_string(log.RTime).c_str(), timestamp, log.Subtype.c_str(), log.message.c_str());
+				str = "[ " + to_string(log.RTime) + " ] [ " + string(timestamp) + " ] [ DEBUG / " + log.Subtype + " ]: " + log.message;
 			}
+
+
+			file << str << "\n";
 
 			
 		}
@@ -49,15 +60,17 @@ void LogUtils::MainLogger() {
 void LogUtils::Start() {
 	if (!Started) {
 
-		/*time_t timept = std::chrono::system_clock::to_time_t(chrono::system_clock::now());
+		auto t = std::time(nullptr);
+		auto tm = *std::localtime(&t);
 
-		const char* timestamp = strtok(ctime(&timept), "\n");
+		std::ostringstream oss;
+		oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
+		auto str = oss.str() + ".log";
 
-		std::string fileName(timestamp, strlen(timestamp));
 
-		fileName += ".log";
 
-		file = new ofstream(fileName);*/
+		file.open(str);
+
 
 		LoggingThread = std::thread(&LogUtils::MainLogger, this);
 		LogInfo("Logger","Started Logger");

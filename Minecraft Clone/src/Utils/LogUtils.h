@@ -63,7 +63,7 @@ private:
 	std::deque<LogData> Logs;
 	std::deque<LogData> LogsCache;
 
-	std::ofstream* file;
+	std::ofstream file;
 };
 
 extern LogUtils Logger;
