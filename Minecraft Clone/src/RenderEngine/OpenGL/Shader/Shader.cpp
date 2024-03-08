@@ -42,6 +42,7 @@ void Shader::init(const char* vertexPath, const char* fragmentPath, const char* 
     {
         Logger.LogError("OpenGL Shader", "Failed to read file(s): " + std::string(vertexPath) + ", " + std::string(fragmentPath));
     }
+    Logger.LogDebug("OpengGL Shader", "Compiling shader: " + std::string(vertexPath) + ", " + std::string(fragmentPath));
     const char* vShaderCode = vertexCode.c_str();
     const char* fShaderCode = fragmentCode.c_str();
     // 2. compile shaders

@@ -2,12 +2,14 @@
 
 #include "Inventory.h"
 #include "../../Chunk/Block/Blocks.h"
-
+#include "../../Item/Items.h"
 class PlayerInventory : public Inventory {
 public:
 	PlayerInventory() {
-		Inventory(Blocks.BlockTypeData.size()); 
+		Inventory(Items.GetTotalItemCount()); 
 	}
+
+
 
 private:
 };

@@ -74,7 +74,7 @@ void Generator::Worker(int id) {
 			int y = pos.y;
 			int z = pos.z;
 
-			TerrainType type = MOUNTAINS;
+			TerrainType type = DEBUG_WORLD;
 
 			Chunk* chunk = new Chunk(x, y, z, type, noise);
 

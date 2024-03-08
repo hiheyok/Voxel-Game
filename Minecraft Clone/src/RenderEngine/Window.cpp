@@ -96,7 +96,7 @@ void Window::Start() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    window = glfwCreateWindow(sizex, sizey, "1.1.1A (DEV)", NULL, NULL);
+    window = glfwCreateWindow(sizex, sizey, "1.2.0A (DEV)", NULL, NULL);
 
     glfwMakeContextCurrent(window);
 

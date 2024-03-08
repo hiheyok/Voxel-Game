@@ -7,15 +7,19 @@ RawTextureData GetImageData(const char* path) {
 	switch (Data.format) {
 	case 1:
 		Data.format = GL_RED;
+		Logger.LogDebug("Image Loader", "Loaded image: " + std::string(path));
 		break;
 	case 3:
 		Data.format = GL_RGB;
+		Logger.LogDebug("Image Loader", "Loaded image: " + std::string(path));
 		break;
 	case 4:
 		Data.format = GL_RGBA;
+		Logger.LogDebug("Image Loader", "Loaded image: " + std::string(path));
 		break;
 	default:
 		Logger.LogWarn("Image Loader","Image invalid format");
 	}
+	
 	return Data;
 }

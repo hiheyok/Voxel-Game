@@ -1,9 +1,14 @@
 #pragma once
+#include "../../World/Item/Inventory/PlayerInventory.h"
 
 class MainPlayer {
 public:
 
-private:
+	void Update() {
 
+	}
+
+private:
+	PlayerInventory inventory;
 
 };

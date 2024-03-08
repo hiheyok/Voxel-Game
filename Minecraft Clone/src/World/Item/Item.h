@@ -11,7 +11,7 @@ public:
 
 	}
 
-	BlockID getBlock() {
+	const BlockID GetBlock() {
 		return Properties.block;
 	}
 

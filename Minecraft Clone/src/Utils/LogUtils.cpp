@@ -67,10 +67,7 @@ void LogUtils::Start() {
 		oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
 		auto str = oss.str() + ".log";
 
-
-
 		file.open(str);
-
 
 		LoggingThread = std::thread(&LogUtils::MainLogger, this);
 		LogInfo("Logger","Started Logger");

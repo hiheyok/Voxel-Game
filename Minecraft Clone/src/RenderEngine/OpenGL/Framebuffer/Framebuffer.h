@@ -73,6 +73,8 @@ public:
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+        Logger.LogDebug("Framebuffer", "Created new frame buffer: " + std::to_string(FBO));
     }
 
     void UpdateResolution(GLint x, GLint y, float muti = 1.f) {

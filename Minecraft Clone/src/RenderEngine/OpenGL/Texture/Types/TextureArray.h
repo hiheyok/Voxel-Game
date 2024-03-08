@@ -17,6 +17,7 @@ public:
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, width, height, Layers, GL_RGBA, GL_UNSIGNED_BYTE, ArrayData.data());
 		glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
+		Logger.LogDebug("Texture Loader", "Loaded Texture Array: " + std::to_string(textureID));
 	}
 	void SetSize(int width_, int height_) {
 		width = width_;

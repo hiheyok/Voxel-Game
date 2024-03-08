@@ -31,11 +31,15 @@ struct Fluid : Block {
 				continue;
 			}
 
-			/*if (CurrentWorld->CheckTickUsed(x, y, z)) {
+			if (block == Blocks.WATER) {
+				continue;
+			}
+
+			if (CurrentWorld->CheckTickUsed(EventHandler.BlockPlace, x, y, z)) {
 				return;
 			}
 
-			CurrentWorld->TickUsed(x, y, z);*/
+			CurrentWorld->TickUsed(EventHandler.BlockPlace, x, y, z);
 
 			Event event;
 			event.Type = BLOCK_EVENT;
