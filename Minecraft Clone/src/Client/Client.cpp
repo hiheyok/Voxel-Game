@@ -123,24 +123,26 @@ void Client::GameLoop() {
 void Client::Update() {
 	PollInputs();
 
-	if (TestForKeyInputs(GLFW_KEY_F)) {
+	if (Inputs.CheckKey(GLFW_KEY_F)) {
 		DrawSolid = false;
 	}
-	if (TestForKeyInputs(GLFW_KEY_G)) {
+	if (Inputs.CheckKey(GLFW_KEY_G)) {
 		DrawSolid = true;
 	}
 
-	if (TestForKeyInputs(GLFW_KEY_R)) {
+	if (Inputs.CheckKey(GLFW_KEY_R)) {
 		EntityRender.Reload();
 	}
 
-	if (TestForKeyInputs(GLFW_KEY_Z)) {
+	if (Inputs.CheckKey(GLFW_KEY_Z)) {
 		Logger.LogInfo("Client", "FPS: " + std::to_string(1.f / (float)Frametime));
 	}
 
-	if (TestForKeyInputs(GLFW_KEY_ESCAPE)) {
+	if (Inputs.CheckKey(GLFW_KEY_ESCAPE)) {
 		glfwSetWindowShouldClose(getWindow(), true);
 	}
+
+	
 
 	if (WindowSizeDirty) {
 		WindowSizeDirty = false;
@@ -149,17 +151,12 @@ void Client::Update() {
 		Framebuffer.genBuffer(sizex, sizey, 2);
 	}
 
-	UpdateKeyPressSet();
-
-	MainLocalWorld.UpdateIO(GetKeyboardDump(), TestForKeyInputs(GLFW_KEY_LEFT_SHIFT), (float)cursormovementx, (float)cursormovementy, PressedLeft, PressedMiddle, PressedRight, (float)Frametime);
-	PressedLeft = false;
-	PressedMiddle = false;
-	PressedRight = false;
+	MainLocalWorld.UpdateIO(Inputs);
 
 	server.world->SetPlayerPos(MainLocalWorld.GetPlayerPosition());
 
-	cursormovementx = 0;
-	cursormovementy = 0;
+	Inputs.Mouse.Displacement = glm::dvec2(0.0,0.0);
+	Inputs.delta = Frametime;
 
 	TerrainRender.SetPosition(MainLocalWorld.GetPlayerPosition());
 	TerrainRender.SetRotation(MainLocalWorld.GetPlayerRotation());
@@ -185,5 +182,18 @@ void Client::Update() {
 	EntityRender.Update();
 	
 	TerrainRender.Update();
+
+
+	if (Inputs.Mouse.LEFT == Inputs.Mouse.PRESS) {
+		Inputs.Mouse.LEFT = Inputs.Mouse.HOLD;
+	}
+
+	if (Inputs.Mouse.RIGHT == Inputs.Mouse.PRESS) {
+		Inputs.Mouse.RIGHT = Inputs.Mouse.HOLD;
+	}
+
+	if (Inputs.Mouse.MIDDLE == Inputs.Mouse.PRESS) {
+		Inputs.Mouse.MIDDLE = Inputs.Mouse.HOLD;
+	}
 
 }

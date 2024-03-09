@@ -4,6 +4,8 @@
 #include <sstream>
 #include <string>
 
+#include "../Client/IO/KEY_CODE.h"
+
 #define _CRTDBG_MAP_ALLOC
 
 using namespace std;
@@ -115,7 +117,7 @@ void Window::Start() {
     glfwSetFramebufferSizeCallback(window, [](GLFWwindow* win, int a, int b) { static_cast<Window*>(glfwGetWindowUserPointer(win))->resize_window(a, b); });
     glfwSetCursorPosCallback(window, +[](GLFWwindow* win, double a, double b) { static_cast<Window*>(glfwGetWindowUserPointer(win))->mouse_callback(a, b); });
     glfwSetMouseButtonCallback(window, +[](GLFWwindow* win, int a, int b, int c) { static_cast<Window*>(glfwGetWindowUserPointer(win))->onMouseButton(a, b); });
-    
+    glfwSetKeyCallback(window, +[](GLFWwindow* win, int key, int scancode, int action, int mods) { static_cast<Window*>(glfwGetWindowUserPointer(win))->KeyboardCallback(win, key, scancode, action, mods); });
     // glfwSetScrollCallback(window, +[](GLFWwindow* win, double a, double b) { static_cast<Window*>(glfwGetWindowUserPointer(win))->scroll_callback(win, a, b); });
     glewExperimental = GL_TRUE;
     glewInit();
@@ -141,11 +143,8 @@ void Window::Start() {
 }
 
 void Window::mouse_callback(double xpos, double ypos) {
-    cursormovementx = xpos - cursorx;
-    cursormovementy = ypos - cursory;
-
-    cursorx = (int)xpos;
-    cursory = (int)ypos;
+    Inputs.Mouse.Displacement = glm::dvec2(xpos, ypos) - Inputs.Mouse.Position;
+    Inputs.Mouse.Position = glm::dvec2(xpos, ypos);
 }
 
 void Window::UpdateWindowName(std::string name) {
@@ -166,7 +165,7 @@ void Window::resize_window(int x, int y) {
     sizex = x;
     sizey = y;
     WindowSizeDirty = true;
-    std::stringstream str;
+
     Logger.LogInfo("OpenGL"," Resized Window: " + std::to_string(sizex) + ", " + std::to_string(sizey));
 }
 
@@ -186,115 +185,65 @@ void Window::EnableCursor() {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
-bool Window::TestForKeyInputs(int Key) {
-    if (glfwGetKey(window,Key) == GLFW_PRESS)
-        return true;
-    return false;
-}
+void Window::KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (action == GLFW_RELEASE) {
+        Inputs.ReleaseIndividualKey(key);
+        return;
+    }
 
-void Window::UpdateKeyPressSet() {
-    KeyPressed.clear();
-
-    if (TestForKeyInputs(GLFW_KEY_0))
-        KeyPressed.insert('0');
-    if (TestForKeyInputs(GLFW_KEY_1))
-        KeyPressed.insert('1');
-    if (TestForKeyInputs(GLFW_KEY_2))
-        KeyPressed.insert('2');
-    if (TestForKeyInputs(GLFW_KEY_3))
-        KeyPressed.insert('3');
-    if (TestForKeyInputs(GLFW_KEY_4))
-        KeyPressed.insert('4');
-    if (TestForKeyInputs(GLFW_KEY_5))
-        KeyPressed.insert('5');
-    if (TestForKeyInputs(GLFW_KEY_6))
-        KeyPressed.insert('6');
-    if (TestForKeyInputs(GLFW_KEY_7))
-        KeyPressed.insert('7');
-    if (TestForKeyInputs(GLFW_KEY_8))
-        KeyPressed.insert('8');
-    if (TestForKeyInputs(GLFW_KEY_9))
-        KeyPressed.insert('9');
-
-    if (TestForKeyInputs(GLFW_KEY_Q))
-        KeyPressed.insert('Q');
-    if (TestForKeyInputs(GLFW_KEY_W))
-        KeyPressed.insert('W');
-    if (TestForKeyInputs(GLFW_KEY_E))
-        KeyPressed.insert('E');
-    if (TestForKeyInputs(GLFW_KEY_R))
-        KeyPressed.insert('R');
-    if (TestForKeyInputs(GLFW_KEY_T))
-        KeyPressed.insert('T');
-    if (TestForKeyInputs(GLFW_KEY_Y))
-        KeyPressed.insert('Y');
-    if (TestForKeyInputs(GLFW_KEY_U))
-        KeyPressed.insert('U');
-    if (TestForKeyInputs(GLFW_KEY_I))
-        KeyPressed.insert('I');
-    if (TestForKeyInputs(GLFW_KEY_O))
-        KeyPressed.insert('O');
-    if (TestForKeyInputs(GLFW_KEY_P))
-        KeyPressed.insert('P');
-
-    if (TestForKeyInputs(GLFW_KEY_A))
-        KeyPressed.insert('A');
-    if (TestForKeyInputs(GLFW_KEY_S))
-        KeyPressed.insert('S');
-    if (TestForKeyInputs(GLFW_KEY_D))
-        KeyPressed.insert('D');
-    if (TestForKeyInputs(GLFW_KEY_F))
-        KeyPressed.insert('F');
-    if (TestForKeyInputs(GLFW_KEY_G))
-        KeyPressed.insert('G');
-    if (TestForKeyInputs(GLFW_KEY_H))
-        KeyPressed.insert('H');
-    if (TestForKeyInputs(GLFW_KEY_J))
-        KeyPressed.insert('J');
-    if (TestForKeyInputs(GLFW_KEY_K))
-        KeyPressed.insert('K');
-    if (TestForKeyInputs(GLFW_KEY_L))
-        KeyPressed.insert('L');
-
-    if (TestForKeyInputs(GLFW_KEY_Z))
-        KeyPressed.insert('Z');
-    if (TestForKeyInputs(GLFW_KEY_X))
-        KeyPressed.insert('X');
-    if (TestForKeyInputs(GLFW_KEY_C))
-        KeyPressed.insert('C');
-    if (TestForKeyInputs(GLFW_KEY_V))
-        KeyPressed.insert('V');
-    if (TestForKeyInputs(GLFW_KEY_B))
-        KeyPressed.insert('B');
-    if (TestForKeyInputs(GLFW_KEY_N))
-        KeyPressed.insert('N');
-    if (TestForKeyInputs(GLFW_KEY_M))
-        KeyPressed.insert('M');
-
-    if (TestForKeyInputs(GLFW_KEY_SPACE))
-        KeyPressed.insert(' ');
-
-    if (TestForKeyInputs(GLFW_KEY_LEFT_CONTROL))
-        KeyPressed.insert(KEY_CTRL);
-
-
+    if ((action == GLFW_REPEAT) || (action == GLFW_PRESS)) { //prob irrelevant
+        Inputs.PressIndividualKey(key);
+    }
 }
 
 void Window::onMouseButton(int button, int action) {
-    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+    if (button == GLFW_MOUSE_BUTTON_RIGHT)
     {
-        PressedRight = true;
+        if (action == GLFW_PRESS) {
+            if (Inputs.Mouse.RIGHT == Inputs.Mouse.PRESS) {
+                Inputs.Mouse.RIGHT = Inputs.Mouse.HOLD;
+                Logger.LogDebug("Mouse", "Hold");
+            }
+            else {
+                Inputs.Mouse.RIGHT = Inputs.Mouse.PRESS;
+                Logger.LogDebug("Mouse", "Press");
+            }
+            
+        }
+        else {
+            Inputs.Mouse.RIGHT = Inputs.Mouse.RELEASE;
+            Logger.LogDebug("Mouse", "Released");
+        }
+        
     }
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+    if (button == GLFW_MOUSE_BUTTON_LEFT)
     {
-        PressedLeft = true;
-    }
-    if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS)
-    {
-        PressedMiddle = true;
-    }
-}
+        if (action == GLFW_PRESS) {
+            if (Inputs.Mouse.LEFT == Inputs.Mouse.PRESS) {
+                Inputs.Mouse.LEFT = Inputs.Mouse.HOLD;
+            }
+            else {
+                Inputs.Mouse.LEFT = Inputs.Mouse.PRESS;
+            }
 
-std::unordered_set<char> Window::GetKeyboardDump() {
-    return KeyPressed;
+        }
+        else {
+            Inputs.Mouse.LEFT = Inputs.Mouse.RELEASE;
+        }
+    }
+    if (button == GLFW_MOUSE_BUTTON_MIDDLE)
+    {
+        if (action == GLFW_PRESS) {
+            if (Inputs.Mouse.MIDDLE == Inputs.Mouse.PRESS) {
+                Inputs.Mouse.MIDDLE = Inputs.Mouse.HOLD;
+            }
+            else {
+                Inputs.Mouse.MIDDLE = Inputs.Mouse.PRESS;
+            }
+
+        }
+        else {
+            Inputs.Mouse.MIDDLE = Inputs.Mouse.RELEASE;
+        }
+    }
 }

@@ -10,11 +10,6 @@ public:
 		Properties.IsBlockItem = true;
 	}
 
-	//operator Item() {
-	//	return *static_cast<Item*>(this);
-	//}
-
-
 private:
 
 

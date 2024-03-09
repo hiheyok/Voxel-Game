@@ -3,6 +3,8 @@
 #include "../../World/World.h"
 #include "../../World/Entity/Entities.h"
 
+#include "../IO/IO.h"
+
 class LocalWorld {
 public:
 
@@ -10,7 +12,7 @@ public:
 		Player.Type = EntityList.PLAYER;
 	}
 
-	void UpdateIO(std::unordered_set<char> Keys, bool shift, float cursorx, float cursory, bool Left, bool Middle, bool Right, float delta);
+	void UpdateIO(UserInputs Inputs);
 
 	void SetWorld(World* world_);
 

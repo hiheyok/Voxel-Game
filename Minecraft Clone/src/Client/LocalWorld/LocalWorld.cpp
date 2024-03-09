@@ -3,23 +3,30 @@
 #include "../../World/Event/EventHandler.h"
 #include <glm/gtx/common.hpp>
 #include "../../Utils/Math/vectorOperations.h"
+#include "../IO/IO.h"
+#include "../IO/KEY_CODE.h"
 
 using namespace std;
 using namespace glm;
 
-void LocalWorld::UpdateIO(std::unordered_set<char> Keys, bool shift, float cursorx, float cursory, bool Left, bool Middle, bool Right, float delta) {
+void LocalWorld::UpdateIO(UserInputs Inputs) {
 
-	if (Keys.count('C')) {
+	if (Inputs.CheckKey(KEY_C)) {
 		enableCollusion = !enableCollusion;
 	}
 
-	sprint = Keys.count(0x01); // ctrl
+	sprint = Inputs.CheckKey(KEY_LEFT_CONTROL); // ctrl
 
-	RotatePlayer(cursorx, cursory);
+	bool left = Inputs.Mouse.LEFT == Inputs.Mouse.PRESS;
+	bool right = Inputs.Mouse.RIGHT == Inputs.Mouse.PRESS;
+	bool middle = Inputs.Mouse.MIDDLE == Inputs.Mouse.PRESS;
 
-	MovePlayer(Keys.count('W'), Keys.count('A'), Keys.count('S'), Keys.count('D'), Keys.count(' '), shift, delta);
+	RotatePlayer(Inputs.Mouse.Displacement.x, Inputs.Mouse.Displacement.y);
 
-	WorldInteractions(Left, Middle, Right);
+	MovePlayer(Inputs.CheckKey(KEY_W), Inputs.CheckKey(KEY_A), Inputs.CheckKey(KEY_S), Inputs.CheckKey(KEY_D), Inputs.CheckKey(KEY_SPACE), Inputs.CheckKey(KEY_LEFT_SHIFT), Inputs.delta);
+
+
+	WorldInteractions(left, middle, right);
 
 }
 
