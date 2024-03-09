@@ -14,17 +14,9 @@ void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, unsigned int id,
 
     std::stringstream str;
 
-
-    // ignore non-significant error/warning codes
     if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
 
-    /* std::cout << "---------------" << std::endl;
-     std::cout << "Debug message (" << id << "): " << message << std::endl;*/
-
-     // std::cout  << "---------------" << std::endl;
     str << " (OPENGL) Debug message (" << id << "): " << message << " | ";
-
-
 
     switch (source)
     {
@@ -59,10 +51,7 @@ void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, unsigned int id,
 
     str.seekg(0, ios::end);
 
-
     if (str.str().size() != 0) {
-    //    
-        std::cout << "OpenGL: " << str.str() << "\n";
         Logger.LogError("OpenGL", str.str());
     }
 
@@ -78,7 +67,7 @@ bool Window::WindowCloseCheck() {
 
 void Window::Start() {
 
-    if (init) {
+    if (Properties.Initialized) {
         Logger.LogError("OpenGL","Already initialized");
         return;
     }
@@ -94,11 +83,7 @@ void Window::Start() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-
-    window = glfwCreateWindow(sizex, sizey, "1.2.0A (DEV)", NULL, NULL);
+    window = glfwCreateWindow(Properties.WindowSizeX, Properties.WindowSizeY, "1.2.0A (DEV)", NULL, NULL);
 
     glfwMakeContextCurrent(window);
 
@@ -114,11 +99,11 @@ void Window::Start() {
     }
 
     glfwSetWindowUserPointer(window, this);
-    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* win, int a, int b) { static_cast<Window*>(glfwGetWindowUserPointer(win))->resize_window(a, b); });
-    glfwSetCursorPosCallback(window, +[](GLFWwindow* win, double a, double b) { static_cast<Window*>(glfwGetWindowUserPointer(win))->mouse_callback(a, b); });
-    glfwSetMouseButtonCallback(window, +[](GLFWwindow* win, int a, int b, int c) { static_cast<Window*>(glfwGetWindowUserPointer(win))->onMouseButton(a, b); });
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* win, int a, int b) { static_cast<Window*>(glfwGetWindowUserPointer(win))->ResizeWindowCallback(a, b); });
+    glfwSetCursorPosCallback(window, +[](GLFWwindow* win, double a, double b) { static_cast<Window*>(glfwGetWindowUserPointer(win))->MousePositionCallback(a, b); });
+    glfwSetMouseButtonCallback(window, +[](GLFWwindow* win, int a, int b, int c) { static_cast<Window*>(glfwGetWindowUserPointer(win))->MouseButtonCallback(a, b); });
     glfwSetKeyCallback(window, +[](GLFWwindow* win, int key, int scancode, int action, int mods) { static_cast<Window*>(glfwGetWindowUserPointer(win))->KeyboardCallback(win, key, scancode, action, mods); });
-    // glfwSetScrollCallback(window, +[](GLFWwindow* win, double a, double b) { static_cast<Window*>(glfwGetWindowUserPointer(win))->scroll_callback(win, a, b); });
+    glfwSetScrollCallback(window, +[](GLFWwindow* win, double a, double b) { static_cast<Window*>(glfwGetWindowUserPointer(win))->ScrollCallback(win, a, b); });
     glewExperimental = GL_TRUE;
     glewInit();
 
@@ -142,7 +127,7 @@ void Window::Start() {
     glfwSwapInterval(0);
 }
 
-void Window::mouse_callback(double xpos, double ypos) {
+void Window::MousePositionCallback(double xpos, double ypos) {
     Inputs.Mouse.Displacement = glm::dvec2(xpos, ypos) - Inputs.Mouse.Position;
     Inputs.Mouse.Position = glm::dvec2(xpos, ypos);
 }
@@ -160,13 +145,25 @@ void Window::renderSolid() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-void Window::resize_window(int x, int y) {
+void Window::ResizeWindowCallback(int x, int y) {
     glViewport(0, 0, x, y);
-    sizex = x;
-    sizey = y;
-    WindowSizeDirty = true;
+    Properties.WindowSizeX = x;
+    Properties.WindowSizeY = y;
+    Properties.WindowSizeDirty = true;
 
-    Logger.LogInfo("OpenGL"," Resized Window: " + std::to_string(sizex) + ", " + std::to_string(sizey));
+    Logger.LogInfo("OpenGL"," Resized Window: " + std::to_string(x) + ", " + std::to_string(y));
+}
+
+void Window::ScrollCallback(GLFWwindow* win, double xoffset, double yoffset) {
+    if (yoffset == -1.0) {
+        Inputs.Mouse.ScrollDirection = Inputs.Mouse.SCROLL_DOWN;
+        return;
+    }
+
+    if (yoffset == 1.0) {
+        Inputs.Mouse.ScrollDirection = Inputs.Mouse.SCROLL_UP;
+        return;
+    }
 }
 
 void Window::Refresh() {
@@ -196,23 +193,20 @@ void Window::KeyboardCallback(GLFWwindow* window, int key, int scancode, int act
     }
 }
 
-void Window::onMouseButton(int button, int action) {
+void Window::MouseButtonCallback(int button, int action) {
     if (button == GLFW_MOUSE_BUTTON_RIGHT)
     {
         if (action == GLFW_PRESS) {
             if (Inputs.Mouse.RIGHT == Inputs.Mouse.PRESS) {
                 Inputs.Mouse.RIGHT = Inputs.Mouse.HOLD;
-                Logger.LogDebug("Mouse", "Hold");
             }
             else {
                 Inputs.Mouse.RIGHT = Inputs.Mouse.PRESS;
-                Logger.LogDebug("Mouse", "Press");
             }
             
         }
         else {
             Inputs.Mouse.RIGHT = Inputs.Mouse.RELEASE;
-            Logger.LogDebug("Mouse", "Released");
         }
         
     }

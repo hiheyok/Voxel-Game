@@ -15,7 +15,10 @@ public:
 	}
 
 	~Inventory() {
-		delete[] Storage;
+		if (Storage != nullptr) {
+			//delete[] Storage;
+		}
+		
 	}
 
 	ItemStack GetItem(int slot) {

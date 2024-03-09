@@ -4,8 +4,15 @@
 
 #include <string>
 
+struct ItemProperties {
+	int MAX_STACK = 64;
+	bool IsBlockItem = false;
+	BlockID block = NULL;
+	ItemID ID = NULL;
+	std::string Name = "";
+};
 
-typedef class Item {
+class Item {
 public:
 	Item() {
 
@@ -19,13 +26,7 @@ public:
 		return Properties.IsBlockItem;
 	}
 
-	struct ItemProperties {
-		int MAX_STACK = 64;
-		bool IsBlockItem = false;
-		BlockID block = NULL;
-		ItemID ID = NULL;
-		std::string Name = "";
-	} Properties;
+	ItemProperties Properties;
 	
 private:
 

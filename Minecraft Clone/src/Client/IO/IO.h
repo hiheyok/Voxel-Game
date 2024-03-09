@@ -6,13 +6,19 @@
 
 
 struct MouseInputs {
-	static enum ButtonState {
+	enum ButtonState {
 		RELEASE, PRESS, HOLD
+	};
+
+	enum ScrollState {
+		SCROLL_NONE, SCROLL_DOWN, SCROLL_UP
 	};
 
 	ButtonState LEFT;
 	ButtonState MIDDLE;
 	ButtonState RIGHT;
+
+	ScrollState ScrollDirection = SCROLL_NONE; //-1 or 1
 
 	glm::dvec2 Displacement = glm::dvec2(0.f, 0.f);
 	glm::dvec2 Position = glm::dvec2(0.f, 0.f);
@@ -23,7 +29,7 @@ class UserInputs {
 
 private:
 
-	static enum KeyStatus {
+	enum KeyStatus {
 		PRESS, HOLD
 	};
 
@@ -31,6 +37,12 @@ private:
 
 
 public:
+
+	void UpdateAllKey() {
+		for (const auto& key : Keys) {
+			Keys[key.first] = HOLD;
+		}
+	}
 
 	void PressIndividualKey(int key) {
 		if (Keys.count(key)) {

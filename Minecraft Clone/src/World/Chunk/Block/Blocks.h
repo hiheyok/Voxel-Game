@@ -6,7 +6,7 @@
 #include "Material/BlockMaterial.h"
 #include "Texture/BlockTexture.h"
 
-typedef class BlockList{
+class BlockList{
 private:
 	std::unordered_map<std::string, BlockID> BlockIDNameData;
 	int BlockTypeCount = 0;

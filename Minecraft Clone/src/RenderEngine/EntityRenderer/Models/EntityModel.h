@@ -6,17 +6,17 @@
 #include <vector>
 
 namespace Model {
-	typedef struct  {
+	struct ModelData {
 		std::vector<float> Vertices;
 		std::vector<unsigned int> Indices;
 
 		int VerticesCount = 0;
-	} ModelData;
+	} ;
 
-	typedef struct {
+	struct UV {
 		glm::vec2 p0 = glm::vec2(0.f, 0.f);
 		glm::vec2 p1 = glm::vec2(0.f, 0.f);
-	} UV;
+	} ;
 
 	struct RectangularPrism {
 

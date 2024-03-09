@@ -10,6 +10,7 @@ Item ItemList::RegisterBlockItem(BlockID block) {
 	item.Properties.Name = Blocks.getBlockType(block)->BlockName;
 
 	ItemContainer[ItemCount] = item;
+	BlockItemIDs[block] = ItemCount;
 
 	ItemCount++;
 	

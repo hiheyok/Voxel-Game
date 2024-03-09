@@ -10,6 +10,7 @@ private:
 
 	int ItemCount = 0;
 	std::unordered_map<ItemID, Item> ItemContainer;
+	std::unordered_map<BlockID, ItemID> BlockItemIDs;
 
 public:
 	Item AIR = RegisterBlockItem(Blocks.AIR);
@@ -42,6 +43,14 @@ public:
 	Item RED_STAINED_GLASS = RegisterBlockItem(Blocks.RED_STAINED_GLASS);
 	Item WHITE_STAINED_GLASS = RegisterBlockItem(Blocks.WHITE_STAINED_GLASS);
 	Item YELLOW_STAINED_GLASS = RegisterBlockItem(Blocks.YELLOW_STAINED_GLASS);
+
+	Item GetItem(ItemID id) {
+		return ItemContainer[id];
+	}
+
+	ItemID GetBlockItem(BlockID block) {
+		return BlockItemIDs[block];
+	}
 
 	int GetTotalItemCount();
 };

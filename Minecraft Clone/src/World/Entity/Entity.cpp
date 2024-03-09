@@ -3,5 +3,4 @@
 
 void Entity::Tick() {
 	EntityList.EntityTypeList[Type]->Tick(this);
-	
 }

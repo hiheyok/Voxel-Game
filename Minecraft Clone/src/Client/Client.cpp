@@ -9,8 +9,7 @@ using namespace std;
 using namespace chrono;
 using namespace glm;
 
-void Client::run() {
-
+void Client::Initialize() {
 	Start();
 
 	Blocks.Initialize();
@@ -18,12 +17,12 @@ void Client::run() {
 	EntityRender.Initialize();
 	EntityRender.SetWindow(getWindow());
 
-	Framebuffer.genBuffer(sizex, sizey, 2);
+	Framebuffer.genBuffer(Properties.WindowSizeX, Properties.WindowSizeY, 2);
 
 	DisableCursor();
 
-	MainLocalWorld.SetPlayerPosition(0.,66.0,0.);
-	MainLocalWorld.SetPlayerRotation(0.,-30.);
+	m_MainPlayer.SetPlayerPosition(0., 66.0, 0.);
+	m_MainPlayer.SetPlayerRotation(0., -30.);
 
 	ServerSettings serverSettings;
 	serverSettings.H_RenderDistance = 24;
@@ -36,15 +35,13 @@ void Client::run() {
 	TerrainRender.renderDistance = 24;
 	TerrainRender.verticalRenderDistance = 8;
 	TerrainRender.Start(getWindow(), server.world, 16);
-
-	MainLocalWorld.SetWorld(server.world);
-	
-
 	Logger.LogInfo("Client", "Starting Gameloop");
+}
+
+void Client::run() {
+	Initialize();
 	GameLoop();
 	Cleanup();
-
-	
 }
 
 void Client::Cleanup() {
@@ -59,9 +56,9 @@ void Client::Cleanup() {
 void Client::SetWindowName() {
 	UpdateWindowName(
 		"FPS: " + std::to_string(1.0 / Frametime)
-		+ " | Pos: " + std::to_string(MainLocalWorld.GetPlayerPosition().x) + ", "
-		+ std::to_string(MainLocalWorld.GetPlayerPosition().y) + ", "
-		+ std::to_string(MainLocalWorld.GetPlayerPosition().z)
+		+ " | Pos: " + std::to_string(m_MainPlayer.GetEntityProperties().Position.x) + ", "
+		+ std::to_string(m_MainPlayer.GetEntityProperties().Position.y) + ", "
+		+ std::to_string(m_MainPlayer.GetEntityProperties().Position.z)
 		+ ", VRAM Fragmentation Rate: " + std::to_string(TerrainRender.RendererV2.getFragmentationRate() * 100)
 		+ ", VRAM Usage (MB): " + std::to_string((double)TerrainRender.RendererV2.getVRAMUsageFull() / 1000000.0)
 		/*+ " | Mesh All (ms): " + std::to_string(TerrainRender.buildTime / 1000.f)
@@ -89,14 +86,14 @@ void Client::GameLoop() {
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearDepth(1.f);
-		if (!DrawSolid) {
+		if (!Properties.DrawSolid) {
 			renderLines();
 		}
 
 		EntityRender.Render();
 		TerrainRender.Render();
 
-		if (!DrawSolid) {
+		if (!Properties.DrawSolid) {
 			renderSolid();
 		}
 
@@ -112,6 +109,8 @@ void Client::GameLoop() {
 
 		Frametime = FrametimeTracker.GetTimePassed_s();
 
+		Inputs.delta = Frametime;
+
 		if (time.GetTimePassed_ms() > 250) {
 			SetWindowName();
 			time.Set();
@@ -124,10 +123,10 @@ void Client::Update() {
 	PollInputs();
 
 	if (Inputs.CheckKey(GLFW_KEY_F)) {
-		DrawSolid = false;
+		Properties.DrawSolid = false;
 	}
 	if (Inputs.CheckKey(GLFW_KEY_G)) {
-		DrawSolid = true;
+		Properties.DrawSolid = true;
 	}
 
 	if (Inputs.CheckKey(GLFW_KEY_R)) {
@@ -142,27 +141,22 @@ void Client::Update() {
 		glfwSetWindowShouldClose(getWindow(), true);
 	}
 
-	
-
-	if (WindowSizeDirty) {
-		WindowSizeDirty = false;
+	if (Properties.WindowSizeDirty) {
+		Properties.WindowSizeDirty = false;
 
 		Framebuffer.clear();
-		Framebuffer.genBuffer(sizex, sizey, 2);
+		Framebuffer.genBuffer(Properties.WindowSizeX, Properties.WindowSizeY, 2);
 	}
 
-	MainLocalWorld.UpdateIO(Inputs);
+	m_MainPlayer.Update(Inputs);
 
-	server.world->SetPlayerPos(MainLocalWorld.GetPlayerPosition());
+	server.world->SetPlayerPos(m_MainPlayer.GetEntityProperties().Position);
 
-	Inputs.Mouse.Displacement = glm::dvec2(0.0,0.0);
-	Inputs.delta = Frametime;
+	TerrainRender.SetPosition(m_MainPlayer.GetEntityProperties().Position);
+	TerrainRender.SetRotation(m_MainPlayer.GetEntityProperties().Rotation);
 
-	TerrainRender.SetPosition(MainLocalWorld.GetPlayerPosition());
-	TerrainRender.SetRotation(MainLocalWorld.GetPlayerRotation());
-
-	EntityRender.SetPosition(MainLocalWorld.GetPlayerPosition());
-	EntityRender.SetRotation(MainLocalWorld.GetPlayerRotation());
+	EntityRender.SetPosition(m_MainPlayer.GetEntityProperties().Position);
+	EntityRender.SetRotation(m_MainPlayer.GetEntityProperties().Rotation);
 
 	server.world->EntityUpdateLock.lock();
 	std::unordered_map<EntityUUID, Entity> UpdatedEntities = server.world->EntityUpdated;
@@ -180,9 +174,13 @@ void Client::Update() {
 
 	EntityRender.SetTimePastTick(server.stime.GetTimePassed_s());
 	EntityRender.Update();
-	
 	TerrainRender.Update();
 
+	Inputs.UpdateAllKey();
+
+	Inputs.Mouse.ScrollDirection = Inputs.Mouse.SCROLL_NONE;
+
+	Inputs.Mouse.Displacement = glm::dvec2(0.0, 0.0);
 
 	if (Inputs.Mouse.LEFT == Inputs.Mouse.PRESS) {
 		Inputs.Mouse.LEFT = Inputs.Mouse.HOLD;
