@@ -5,24 +5,14 @@
 
 struct EntityRenderCache { // stores all entity to be rendered
 
-	std::unordered_map<EntityUUID, Entity> EntityContainer;
+	std::unordered_map<EntityUUID, EntityProperty> EntityContainer;
 
-	std::unordered_map<EntityTypeID, std::unordered_map<EntityUUID, Entity>> EntitySeparated;
+	std::unordered_map<EntityTypeID, std::unordered_map<EntityUUID, EntityProperty>> EntitySeparated;
 
-	void AddEntity(Entity entity) {
-		EntityContainer[entity.EntityUUID] = entity;
-		EntitySeparated[entity.Type][entity.EntityUUID] = entity;
-	}
+	void AddEntity(EntityProperty& entity);
 
-	void RemoveEntity(EntityUUID EntityUUID) {
-		Entity e = EntityContainer[EntityUUID];
+	void RemoveEntity(EntityUUID EntityUUID);
 
-		EntitySeparated[e.Type].erase(EntityUUID);
-		EntityContainer.erase(EntityUUID);
-	}
-
-	std::unordered_map<EntityTypeID, std::unordered_map<EntityUUID, Entity>>& GetEntitiesTypeSeparated() {
-		return EntitySeparated;
-	}
+	std::unordered_map<EntityTypeID, std::unordered_map<EntityUUID, EntityProperty>>& GetEntitiesTypeSeparated();
 
 };

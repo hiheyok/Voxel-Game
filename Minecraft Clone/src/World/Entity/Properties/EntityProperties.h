@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
+#include "../../Typenames.h"
 
 struct EntityProperty {
 	glm::vec3 Velocity = glm::vec3(0.f, 0.f, 0.f);
@@ -11,4 +12,7 @@ struct EntityProperty {
 	float MaxSpeed = 25;
 
 	bool onGround = false;
+
+	EntityUUID EntityUUID = 0x00000000;
+	EntityTypeID Type = NULL; //State what type of entity is it. Zombie? Human??
 };

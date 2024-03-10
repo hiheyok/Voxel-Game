@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <GLFW/glfw3.h>
 #include <glm/vec2.hpp>
+#include "KEY_CODE.h"
 
 
 struct MouseInputs {

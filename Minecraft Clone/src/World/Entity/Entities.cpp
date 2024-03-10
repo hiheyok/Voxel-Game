@@ -12,10 +12,8 @@ using namespace glm;
 using json = nlohmann::json;
 
 EntityTypeID EntitiesList::RegisterEntity(std::string EntityName, EntityTypeEnums type) {
-	EntityTypeID ID = EntityTypeCount;
+	EntityTypeID ID = EntityTypeList.size();
 	EntityType* NewEntity;
-
-	EntityTypeCount++;
 
 	switch (type) {
 	case ENTITY_PASSIVE:
@@ -35,10 +33,10 @@ EntityTypeID EntitiesList::RegisterEntity(std::string EntityName, EntityTypeEnum
 
 	NewEntity->ID = ID;
 
-	EntityTypeList[ID] = NewEntity;
+	EntityTypeList.emplace_back(NewEntity);
     EntityNameID[EntityName] = ID;
 
-	return EntityTypeCount - 1;
+	return ID;
 
 }
 

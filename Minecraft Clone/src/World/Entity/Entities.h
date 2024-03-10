@@ -16,7 +16,7 @@ private:
 
 	std::unordered_map<std::string, EntityTypeID> EntityNameID;
 public:
-	std::unordered_map<EntityTypeID, EntityType*> EntityTypeList;
+	std::vector<EntityType*> EntityTypeList;
 
 	EntityTypeID HUMAN = RegisterEntity("human", ENTITY_PASSIVE);
 	EntityTypeID PLAYER = RegisterEntity("player", ENTITY_PASSIVE);

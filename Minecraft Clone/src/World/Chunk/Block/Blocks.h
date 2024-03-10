@@ -13,7 +13,7 @@ private:
 
 	void InitializeTextures();
 public:
-	std::unordered_map<unsigned int, Block*> BlockTypeData;
+	std::vector<Block*> BlockTypeData;
 
 	TextureArray BlockTextureArray;
 
@@ -66,7 +66,7 @@ public:
 
 	void CleanUp() {
 		for (const auto& obj : BlockTypeData) {
-			delete obj.second;
+			delete obj;
 		}
 
 		BlockTypeData.clear();

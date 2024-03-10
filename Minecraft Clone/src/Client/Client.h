@@ -4,6 +4,7 @@
 #include "../World/Server/Server.h"
 #include "Render/WorldRender.h"
 #include "../RenderEngine/EntityRenderer/MultiEntityRender.h"
+#include "../RenderEngine/EntityRenderer/EntityRenderUpdate.h"`
 #include "../RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
 #include "Player/MainPlayer.h"
 
@@ -25,6 +26,7 @@ private:
 	Server server;
 	WorldRender TerrainRender;
 	MultiEntityRenderer EntityRender;
+	EntityRendererUpdater EntityUpdater;
 	TexturedFrameBuffer Framebuffer;
 	
 };

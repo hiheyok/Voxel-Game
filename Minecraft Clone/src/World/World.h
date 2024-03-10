@@ -49,7 +49,7 @@ public:
 private:
 
 
-	std::unordered_map<EventID, std::unordered_set<ChunkID>> TickUsage;
+	std::unordered_map<int, std::unordered_set<ChunkID>> TickUsage;
 
 	void WorldThread();
 

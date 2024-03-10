@@ -3,8 +3,15 @@
 
 using namespace std;
 using namespace glm;
-
 using namespace Meshing;
+
+void WorldRender::SetRotation(dvec2 rotation) {
+	player.SetRotation(rotation);
+}
+
+void WorldRender::SetPosition(dvec3 position) {
+	player.SetPosition(position);
+}
 
 void WorldRender::Render() {
 	RendererV2.RenderSky();
@@ -16,7 +23,6 @@ void WorldRender::LoadChunkToRenderer(ChunkID chunk) {
 		SchedulerLock.lock();
 		TaskList.push_back(chunk);
 		SchedulerLock.unlock();
-
 	}
 
 }
@@ -137,7 +143,7 @@ void WorldRender::Start(GLFWwindow* window_, World* world_, int ThreadCount) {
 
 	RendererV2.Initialize(window, player.getCamera());
 	RendererV2.LoadAssets();
-	RendererV2.setSettings(renderDistance, verticalRenderDistance, 90);
+	RendererV2.setSettings(HorizontalRenderDistance, VerticalRenderDistance, 90);
 
 	WorkerCount = ThreadCount;
 

@@ -1,6 +1,5 @@
 #pragma once
-#include <gl/glew.h>
-#include <GLFW/glfw3.h>
+
 #include "Mesh/ChunkMeshing.h"
 #include "../Camera/camera.h"
 #include "Batch/ChunkBatch.h"
@@ -55,7 +54,7 @@ private:
 
 	bool UpdateDrawCommands = false;
 
-	int m_RenderDistance = 16;
+	int m_HorizontalRenderDistance = 16;
 	int m_VerticalRenderDistance = 16;
 	float m_FOV = 80.f;
 

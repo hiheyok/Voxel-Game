@@ -9,8 +9,7 @@ using namespace std;
 using json = nlohmann::json;
 
 BlockID BlockList::RegisterBlock(std::string BlockName, Material* material, bool transparency, bool solid, bool isFluid) {
-	BlockID blockID = BlockTypeCount;
-	BlockID ID = BlockTypeCount;
+	BlockID ID = BlockTypeData.size();
 	BlockType* NewBlock = new BlockType(transparency, solid, isFluid);
 
 	Block* block = material->BuildNewBlockType();
@@ -22,15 +21,14 @@ BlockID BlockList::RegisterBlock(std::string BlockName, Material* material, bool
 	block->Texture = new BlockTexture;
 	block->BlockName = BlockName;
 
-	BlockTypeData[ID] = block;
+	BlockTypeData.emplace_back(block);
 
 	BlockIDNameData[BlockName] = ID;
 
 	Logger.LogInfo("Register", "Registered new block (ID): " + std::to_string(ID));
 
-	BlockTypeCount++;
 
-	return BlockTypeCount - 1;
+	return ID;
 }
 
 void BlockList::InitializeTextures() {

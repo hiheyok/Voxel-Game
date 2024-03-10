@@ -32,7 +32,7 @@ struct Event
 			int z = 0; int y = 0; int x = 0; // 12
 			BlockID block; //1
 			EventID id = 0; //8
-			char BypassLimit = 0;
+			char UniqueID = 0;
 
 		} BlockEvent;
 
@@ -41,11 +41,13 @@ struct Event
 			EntityTypeID entityType;
 			EntityUUID EntityID;
 			EventID id = 0;
+			char UniqueID = 0;
 		} EntityEvent;
 
 		struct _ChunkEvent { //24 byte
 			int x = 0; int y = 0; int z = 0;
 			EventID id = 0;
+			char UniqueID = 0;
 		} ChunkEvent;
 
 		struct _Data {

@@ -7,20 +7,26 @@ private:
 	std::unordered_map<EntityUUID, Entity> Entities;
 	std::unordered_set<EntityUUID> RemovedEntity;
 	EntityUUID UniqueID = 0;
+	int EntityCount = 0;
 public:
-	void AddEntities(Entity e) {
-		e.EntityUUID = UniqueID;
-		Entities[e.EntityUUID] = e;
+	void AddEntities(Entity& e) {
+		e.Properties.EntityUUID = UniqueID;
+		Entities.emplace(UniqueID, e);
 		UniqueID++;
+		EntityCount++;
 	}
 
-	std::unordered_map<EntityUUID, Entity> ClientGetEntityUpdate() {
-		std::unordered_map<EntityUUID, Entity> UpdatedData;
+	int GetEntityCount() {
+		return EntityCount;
+	}
+
+	std::unordered_map<EntityUUID, EntityProperty> ClientGetEntityUpdate() {
+		std::unordered_map<EntityUUID, EntityProperty> UpdatedData;
 
 		for (auto& entity : Entities) {
 			if (entity.second.isDirty)  {
 				entity.second.isDirty = false;
-				UpdatedData[entity.first] = entity.second;
+				UpdatedData.emplace(entity.second.Properties.EntityUUID, entity.second.Properties);
 			}
 		}
 
@@ -29,7 +35,8 @@ public:
 
 	void RemoveEntity(EntityUUID EntityID) {
 		Entities.erase(EntityID);
-		RemovedEntity.insert(EntityID);
+		RemovedEntity.emplace(EntityID);
+		EntityCount--;
 	}
 
 	std::unordered_set<EntityUUID> getRemovedEntities() {

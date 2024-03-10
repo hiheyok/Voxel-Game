@@ -2,5 +2,5 @@
 #include "Entities.h"
 
 void Entity::Tick() {
-	EntityList.EntityTypeList[Type]->Tick(this);
+	EntityList.EntityTypeList[Properties.Type]->Tick(this);
 }

@@ -3,6 +3,7 @@
 #include "../../../World/Chunk/Block/Blocks.h"
 #include "../ItemStack.h"
 #include <unordered_map>
+#include <vector>
 
 
 typedef class Inventory {
@@ -15,9 +16,7 @@ public:
 	}
 
 	~Inventory() {
-		if (Storage != nullptr) {
-			//delete[] Storage;
-		}
+		Storage.clear();
 		
 	}
 
@@ -33,19 +32,20 @@ public:
 		return NumOfSlots;
 	}
 
-	int ChangeSlotSize() {
-		//do later
+	int ChangeSlotSize(int slotCount) {
+		Storage.resize(slotCount);
+		NumOfSlots = slotCount;
 	}
 
 protected:
 	void Initialize(int slotCount) {
 		NumOfSlots = slotCount;
-		Storage = new ItemStack[slotCount];
+		Storage.resize(slotCount);
 	}
 
 private:
 	
 	int NumOfSlots = 64;
-	ItemStack* Storage;
+	std::vector<ItemStack> Storage;
 
 };

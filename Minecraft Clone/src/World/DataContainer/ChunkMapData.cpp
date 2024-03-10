@@ -128,10 +128,13 @@ Region* ChunkMap::GetRegion(int x, int y, int z) {
 
 	RegionID regID = getChunkID(rx, ry, rz);
 
-	if (!LiveRegion.count(regID)) {
+	std::unordered_map<RegionID, Region>::iterator it = LiveRegion.find(regID);
+
+	if (it == LiveRegion.end()) {
 		return nullptr;
 	}
-	return &LiveRegion[regID];
+
+	return &it->second;
 }
 //_____________________________________________________
 

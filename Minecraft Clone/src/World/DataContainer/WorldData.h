@@ -17,7 +17,7 @@ public:
 	BlockID GetBlock(int x, int y, int z);
 	bool SetBlock(BlockID block, int x, int y, int z);
 
-	void AddEntity(Entity entity);
+	void AddEntity(Entity& entity);
 	void RemoveEntity(EntityUUID entityID);
 	Entity* GetEntity(EntityUUID entityID);
 
@@ -35,12 +35,12 @@ public:
 
 	bool RayIntersection(Ray& ray);
 
-	glm::dvec3 GetTimeTillCollusion(Entity entity);
+	glm::dvec3 GetTimeTillCollusion(Entity* entity);
 
-	bool IsEntityOnGround(Entity entity);
+	bool IsEntityOnGround(Entity* entity);
 
 	std::unordered_set<ChunkID> ChunksUpdated;
-	std::unordered_map<EntityUUID, Entity> EntityUpdated;
+	std::unordered_map<EntityUUID, EntityProperty> EntityUpdated;
 	std::unordered_set<EntityUUID> RemovedEntity;
 	std::mutex ChunkUpdateLock;
 	std::mutex EntityUpdateLock;

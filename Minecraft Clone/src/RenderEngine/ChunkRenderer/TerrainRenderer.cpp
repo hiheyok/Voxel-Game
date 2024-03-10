@@ -25,11 +25,11 @@ void TerrainRenderer::Initialize(GLFWwindow* window_, Camera* camera_) {
 
 void TerrainRenderer::PrepareRenderer() {
 	for (ChunkDrawBatch& DrawBatch : ChunkSolidBatches) {
-		DrawBatch.GenDrawCommands(m_RenderDistance, m_VerticalRenderDistance);
+		DrawBatch.GenDrawCommands(m_HorizontalRenderDistance, m_VerticalRenderDistance);
 	}
 
 	for (ChunkDrawBatch& DrawBatch : ChunkTransparentBatches) {
-		DrawBatch.GenDrawCommands(m_RenderDistance, m_VerticalRenderDistance);
+		DrawBatch.GenDrawCommands(m_HorizontalRenderDistance, m_VerticalRenderDistance);
 	}
 }
 
@@ -118,7 +118,7 @@ void TerrainRenderer::Update() {
 	SolidShader.setMat4("view", view);
 	SolidShader.setMat4("model", model);
 	SolidShader.setMat4("projection", projection);
-	SolidShader.setFloat("RenderDistance", (float)(m_RenderDistance * 16));
+	SolidShader.setFloat("RenderDistance", (float)(m_HorizontalRenderDistance * 16));
 	SolidShader.setFloat("VerticalRenderDistance", (float)(m_VerticalRenderDistance * 16));
 	SolidShader.setVec3("camPos", camera->Position);
 
@@ -127,7 +127,7 @@ void TerrainRenderer::Update() {
 	TransparentShader.setMat4("view", view);
 	TransparentShader.setMat4("model", model);
 	TransparentShader.setMat4("projection", projection);
-	TransparentShader.setFloat("RenderDistance", (float)(m_RenderDistance * 16));
+	TransparentShader.setFloat("RenderDistance", (float)(m_HorizontalRenderDistance * 16));
 	TransparentShader.setFloat("VerticalRenderDistance", (float)(m_VerticalRenderDistance * 16));
 	TransparentShader.setVec3("camPos", camera->Position);
 	TransparentShader.setFloat("far", 1000000.0f);
@@ -136,7 +136,7 @@ void TerrainRenderer::Update() {
 }
 
 void TerrainRenderer::setSettings(uint32_t RenderDistance, uint32_t VerticalRenderDistance, float FOV) {
-	m_RenderDistance = RenderDistance;
+	m_HorizontalRenderDistance = RenderDistance;
 	m_VerticalRenderDistance = VerticalRenderDistance;
 	m_FOV = FOV;
 }

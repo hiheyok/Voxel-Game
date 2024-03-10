@@ -15,6 +15,8 @@ class FallingBlock : public EntityType {
 
 		//Physics
 
+		//Logger.LogInfo("Sand", std::to_string(entity->Properties.Position.y));
+
 		entity->Properties.Acceleration.y = -CurrentWorld->Properties.Gravity;
 
 		entity->Properties.Velocity += entity->Properties.Acceleration * MSPT;
@@ -52,7 +54,8 @@ class FallingBlock : public EntityType {
 			Event removeEntity;
 			removeEntity.Type = ENTITY_EVENT;
 			removeEntity.Data.EntityEvent.id = EventHandler.RemoveEntity;
-			removeEntity.Data.EntityEvent.EntityID = entity->EntityUUID;
+			removeEntity.Data.EntityEvent.EntityID = entity->Properties.EntityUUID;
+			removeEntity.Data.EntityEvent.UniqueID = 200;
 			CurrentWorld->QueueEvent(removeEntity);
 		}
 	}

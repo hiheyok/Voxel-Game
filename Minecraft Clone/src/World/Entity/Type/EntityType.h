@@ -20,7 +20,7 @@ public:
 		Hitbox.size = glm::vec3(x, y, z);
 	}
 
-	AABB GetHitbox() {
+	AABB& GetHitbox() {
 		return Hitbox;
 	}
 

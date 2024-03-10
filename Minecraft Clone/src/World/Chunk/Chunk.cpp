@@ -235,7 +235,7 @@ void Chunk::GenerateDebug() {
 		int i = 0;
 
 		for (const auto& b : Blocks.BlockTypeData) {
-			SetBlockUnsafe(b.first, (i & 0b1111), 1, i >> 4);
+			SetBlockUnsafe(i, (i & 0b1111), 1, i >> 4);
 			i++;
 		}
 	}
@@ -308,24 +308,45 @@ void Chunk::GenerateDecor(FastNoiseLite* noise) {
 		}
 	}
 
+	//Cube 
 
-	int radius = 40;
+	int xSize = 100;
+	int ySize = 100;
+	int zSize = 100;
 
+	int xOffset = 0;
+	int yOffset = 160;
+	int zOffset = 0;
 
 	for (int x = 0 + cx; x < 16 + cx; x++) {
 		for (int z = 0 + cz; z < 16 + cz; z++) {
 			for (int y = 0 + cy; y < 16 + cy; y++) {
-				if ((x * x) + (y - 140) * (y - 140) + z * z <= radius * radius) {
+				if (((x - xOffset) >= 0) && ((x - xOffset) < xSize) &&
+					((y - yOffset) >= 0) && ((y - yOffset) < ySize) &&
+					((z - zOffset) >= 0) && ((z - zOffset) < zSize)) {
 					SetBlock(Blocks.SAND, x - cx, y - cy, z - cz);
- 
 				}
-
-				//if (y == 90) {
-				//	SetBlock(Blocks.SAND, x - cx, y - cy, z - cz);
-				//}
 			}
 		}
 	}
+
+
+	//int radius = 80;
+
+	//for (int x = 0 + cx; x < 16 + cx; x++) {
+	//	for (int z = 0 + cz; z < 16 + cz; z++) {
+	//		for (int y = 0 + cy; y < 16 + cy; y++) {
+	//			if ((x * x) + (y - 140) * (y - 140) + z * z <= radius * radius) {
+	//				SetBlock(Blocks.SAND, x - cx, y - cy, z - cz);
+ //
+	//			}
+
+	//			//if (y == 90) {
+	//			//	SetBlock(Blocks.SAND, x - cx, y - cy, z - cz);
+	//			//}
+	//		}
+	//	}
+	//}
 }
 
 void Chunk::UpdateGen() {

@@ -44,10 +44,18 @@ void World::Tick() {
 		if (e.Type == NULL_EVENT)
 			break;
 		if (e.Type == BLOCK_EVENT) {
-			if (CheckTickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.x, e.Data.BlockEvent.y, e.Data.BlockEvent.z) && (e.Data.BlockEvent.BypassLimit == 0)) {
+			if (CheckTickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.x, e.Data.BlockEvent.y, e.Data.BlockEvent.z)) {
 				continue;
 			}
 			TickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.x, e.Data.BlockEvent.y, e.Data.BlockEvent.z);
+		}
+		if (e.Type == ENTITY_EVENT) {
+			if ((e.Data.EntityEvent.UniqueID != 0) && CheckTickUsed(e.Data.EntityEvent.UniqueID, e.Data.EntityEvent.x, e.Data.EntityEvent.y, e.Data.EntityEvent.z)) {
+				continue;
+			}
+			if ((e.Data.EntityEvent.UniqueID != 0)) {
+				TickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.x, e.Data.BlockEvent.y, e.Data.BlockEvent.z);
+			}
 		}
 
 		EventHandler.ExecuteEvent(e);
@@ -59,16 +67,12 @@ void World::Tick() {
 
 	EntityData.Tick();
 
-	std::unordered_map<EntityUUID, Entity> UpdatedEntities = EntityData.ClientGetEntityUpdate();
+	std::unordered_map<EntityUUID, EntityProperty> UpdatedEntities = EntityData.ClientGetEntityUpdate();
 	std::unordered_set<EntityUUID> Removed = EntityData.getRemovedEntities();
 
 	EntityUpdateLock.lock();
-	for (auto& e : UpdatedEntities) {
-		EntityUpdated[e.first] = e.second;
-	}
-	for (auto& e : Removed) {
-		RemovedEntity.insert(e);
-	}
+	EntityUpdated.merge(UpdatedEntities);
+	RemovedEntity.merge(Removed);
 	EntityUpdateLock.unlock();
 
 	MSPT = time.GetTimePassed_ms();

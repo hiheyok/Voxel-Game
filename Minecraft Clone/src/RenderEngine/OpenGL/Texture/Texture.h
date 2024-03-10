@@ -11,6 +11,14 @@
 class RawTextureData {
 public:
 
+    RawTextureData() {
+
+    }
+
+    RawTextureData(const char* path) {
+        Load(path);
+    }
+
     void Erase() { stbi_image_free(data); }
     void Load(const char* path) {
         ImagePath = path;

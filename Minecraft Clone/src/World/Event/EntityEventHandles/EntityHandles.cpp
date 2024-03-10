@@ -14,7 +14,7 @@ void HandleEntitySummon(Event::EventDataType::_EntityEvent e) {
 	entity.Properties.Position.x = e.x;
 	entity.Properties.Position.y = e.y;
 	entity.Properties.Position.z = e.z;
-	entity.Type = e.entityType;
+	entity.Properties.Type = e.entityType;
 	world->AddEntity(entity);
 }
 

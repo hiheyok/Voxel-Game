@@ -51,12 +51,12 @@ namespace Meshing
 		//Texture:: last 16 bit
 
 		inline char getLight(uint8_t Location) {
-			return 0b1111 & (Data >> (Location * 4));
+			return 0b1111 & (Data >> (Location << 2));
 		}
 
 		inline void setLight(uint8_t Location, uint8_t Val) {
-			Data = Data & (~(0b1111 << (Location * 4))); // Clears light value for that location
-			Data |= (Val << (Location * 4)); //Inserts light value
+			Data = Data & (~(0b1111 << (Location << 2))); // Clears light value for that location
+			Data |= (Val << (Location << 2)); //Inserts light value
 		}
 
 		inline uint16_t getTexture() {

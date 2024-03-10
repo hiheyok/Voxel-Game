@@ -4,7 +4,7 @@
 #include "../../Item/Items.h"
 class EntityInventory : public Inventory {
 public:
-	EntityInventory(int SlotCount = 32) {
+	EntityInventory(int SlotCount = 1) {
 		Initialize(SlotCount);
 	}
 

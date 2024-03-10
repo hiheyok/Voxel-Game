@@ -5,7 +5,7 @@
 class BlockContainer {
 public:
 	
-	inline BlockID GetBlock(unsigned int x, unsigned int y, unsigned int z) {
+	inline BlockID& GetBlock(unsigned int x, unsigned int y, unsigned int z) {
 		return Data[GetDataIndex(x,y,z)];
 	}
 

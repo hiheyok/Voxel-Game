@@ -3,11 +3,14 @@
 #include "../World/Item/Items.h"
 #include "../Utils/LogUtils.h"
 #include "Initializer.h"
+#include "../World/Entity/Entity.h"
 
 LogUtils Logger;
 BlockList Blocks;
 EntitiesList EntityList;
 ItemList Items;
+
+int AmountEntityDestroy = 0;
 
 void Initialize() {
 	

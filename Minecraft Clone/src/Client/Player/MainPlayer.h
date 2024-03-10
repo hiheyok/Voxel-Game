@@ -3,67 +3,25 @@
 #include "WorldInteraction.h"
 #include "PlayerMovement.h"
 #include "../IO/IO.h"
+#include "../../World/Entity/Mobs/Player.h"
 
 class MainPlayer {
 public:
 
-	void Update(UserInputs Inputs) {
-		InventoryUpdate(Inputs.Mouse);
-		m_Interactions.Interact(&Player, Inputs);
-		Movement.Update(&Player, Inputs, static_cast<World*>(Block::WorldPTR));
-	}
+	void Update(UserInputs Inputs);
 
-	EntityProperty GetEntityProperties() {
-		return Player.Properties;
-	}
+	EntityProperty GetEntityProperties();
 
-	void SetPlayerRotation(float x, float y) {
-		Player.Properties.Rotation = glm::vec2(x, y);
-	}
+	void SetPlayerRotation(float x, float y);
 
-	void SetPlayerPosition(float x, float y, float z) {
-		Player.Properties.Position = glm::vec3(x, y, z);
-	}
+	void SetPlayerPosition(float x, float y, float z);
 
 private:
 
-	void InventoryUpdate(MouseInputs Inputs) {
-		int Direction = 0;
+	void InventoryUpdate(MouseInputs Inputs);
 
-		switch (Inputs.ScrollDirection) {
-		case Inputs.SCROLL_DOWN:
-			Direction = -1;
-			break;
-		case Inputs.SCROLL_UP:
-			Direction = 1;
-			break;
-		case Inputs.SCROLL_NONE:
-			break;
-		}
-
-		if (Direction == 0) {
-			return;
-		}
-
-		int CurrentInventorySlot = Player.m_EntityInventory.RightHandSlot;
-		int MaxInventorySize = Player.m_EntityInventory.GetSlotCount();
-
-		if (CurrentInventorySlot + Direction == MaxInventorySize) {
-			return;
-		}
-
-		if (CurrentInventorySlot + Direction == -1) {
-			return;
-		}
-
-		CurrentInventorySlot += Direction;
-
-		Player.m_EntityInventory.RightHandSlot = CurrentInventorySlot;
-	}
-
-	PlayerMovement Movement;
+	PlayerMovement m_Movement;
 	WorldInteraction m_Interactions;
-
-	Entity Player;
+	Player m_Player;
 
 };

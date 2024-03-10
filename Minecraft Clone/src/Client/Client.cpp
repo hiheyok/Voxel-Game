@@ -17,6 +17,8 @@ void Client::Initialize() {
 	EntityRender.Initialize();
 	EntityRender.SetWindow(getWindow());
 
+	
+
 	Framebuffer.genBuffer(Properties.WindowSizeX, Properties.WindowSizeY, 2);
 
 	DisableCursor();
@@ -26,14 +28,19 @@ void Client::Initialize() {
 
 	ServerSettings serverSettings;
 	serverSettings.H_RenderDistance = 24;
-	serverSettings.V_RenderDistance = 8;
+	serverSettings.V_RenderDistance = 12;
 	serverSettings.genThreads = 8;
 
 	server.Start(serverSettings);
 
+
+	EntityUpdater.SetEntityRenderer(&EntityRender, &server.stime);
+
+	EntityUpdater.Start();
+
 	Logger.LogInfo("World", "Generating World");
-	TerrainRender.renderDistance = 24;
-	TerrainRender.verticalRenderDistance = 8;
+	TerrainRender.HorizontalRenderDistance = 24;
+	TerrainRender.VerticalRenderDistance = 12;
 	TerrainRender.Start(getWindow(), server.world, 16);
 	Logger.LogInfo("Client", "Starting Gameloop");
 }
@@ -48,6 +55,7 @@ void Client::Cleanup() {
 	TerrainRender.Stop();
 	server.Stop();
 	Logger.Stop();
+	EntityUpdater.Stop();
 	Logger.LoggingThread.join();
 	Blocks.CleanUp();
 	glfwDestroyWindow(getWindow());
@@ -59,16 +67,16 @@ void Client::SetWindowName() {
 		+ " | Pos: " + std::to_string(m_MainPlayer.GetEntityProperties().Position.x) + ", "
 		+ std::to_string(m_MainPlayer.GetEntityProperties().Position.y) + ", "
 		+ std::to_string(m_MainPlayer.GetEntityProperties().Position.z)
-		+ ", VRAM Fragmentation Rate: " + std::to_string(TerrainRender.RendererV2.getFragmentationRate() * 100)
+		//+ ", VRAM Fragmentation Rate: " + std::to_string(TerrainRender.RendererV2.getFragmentationRate() * 100)
 		+ ", VRAM Usage (MB): " + std::to_string((double)TerrainRender.RendererV2.getVRAMUsageFull() / 1000000.0)
-		/*+ " | Mesh All (ms): " + std::to_string(TerrainRender.buildTime / 1000.f)
-		+ " | S0 (ms): " + std::to_string(TerrainRender.buildstage0 / 1000.f)
-		+ " | S1 (ms): " + std::to_string(TerrainRender.buildstage1 / 1000.f)
-		+ " | S2 (ms): " + std::to_string(TerrainRender.buildstage2 / 1000.f)
-		+ " | Total Mesh: " + std::to_string(TerrainRender.amountOfMeshGenerated)*/
+		//+ " | Mesh All (ms): " + std::to_string(TerrainRender.buildTime / 1000.f)
+		//+ " | S0 (ms): " + std::to_string(TerrainRender.buildstage0 / 1000.f)
+		//+ " | S1 (ms): " + std::to_string(TerrainRender.buildstage1 / 1000.f)
+		//+ " | S2 (ms): " + std::to_string(TerrainRender.buildstage2 / 1000.f)
+	//	+ " | Total Mesh: " + std::to_string(TerrainRender.amountOfMeshGenerated)
+		+ ", Entity Count: " + to_string(((World*)Block::WorldPTR)->EntityData.GetEntityCount())
 		+", Event Queue Size: " + to_string(((World*)Block::WorldPTR)->EventManager.getSize())
 		+ ", Server Tick (MSPT): " + to_string(((World*)Block::WorldPTR)->MSPT)
-
 	);
 }
 
@@ -129,7 +137,7 @@ void Client::Update() {
 		Properties.DrawSolid = true;
 	}
 
-	if (Inputs.CheckKey(GLFW_KEY_R)) {
+	if (Inputs.CheckKeyPress(GLFW_KEY_R)) {
 		EntityRender.Reload();
 	}
 
@@ -158,22 +166,9 @@ void Client::Update() {
 	EntityRender.SetPosition(m_MainPlayer.GetEntityProperties().Position);
 	EntityRender.SetRotation(m_MainPlayer.GetEntityProperties().Rotation);
 
-	server.world->EntityUpdateLock.lock();
-	std::unordered_map<EntityUUID, Entity> UpdatedEntities = server.world->EntityUpdated;
-	std::unordered_set<EntityUUID> RemovedEntities = server.world->RemovedEntity;
-	server.world->EntityUpdated.clear();
-	server.world->RemovedEntity.clear();
-	server.world->EntityUpdateLock.unlock();
-	
-	for (auto& entity : UpdatedEntities) {
-		EntityRender.AddEntity(entity.second);
-	}
-	for (auto& entity : RemovedEntities) {
-		EntityRender.RemoveEntity(entity);
-	}
-
 	EntityRender.SetTimePastTick(server.stime.GetTimePassed_s());
 	EntityRender.Update();
+
 	TerrainRender.Update();
 
 	Inputs.UpdateAllKey();
