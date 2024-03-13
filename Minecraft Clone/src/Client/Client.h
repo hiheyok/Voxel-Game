@@ -1,12 +1,13 @@
 #pragma once
 #include "../RenderEngine/Window.h"
-#include "../RenderEngine/Camera/camera.h"
 #include "../World/Server/Server.h"
 #include "Render/WorldRender.h"
 #include "../RenderEngine/EntityRenderer/MultiEntityRender.h"
 #include "../RenderEngine/EntityRenderer/EntityRenderUpdate.h"`
 #include "../RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
 #include "Player/MainPlayer.h"
+#include "../RenderEngine/GUI/GUI.h"
+
 
 class Client : protected Window {
 public:
@@ -28,5 +29,7 @@ private:
 	MultiEntityRenderer EntityRender;
 	EntityRendererUpdater EntityUpdater;
 	TexturedFrameBuffer Framebuffer;
+	GUI ClientGUI;
+	
 	
 };

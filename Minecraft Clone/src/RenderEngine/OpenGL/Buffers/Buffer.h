@@ -6,13 +6,6 @@
 
 class Buffer {
 public:
-	Buffer() {
-		//glGenBuffers(1, &BufferID);
-	}
-	~Buffer() {
-		glDeleteBuffers(1, &BufferID);
-	}
-
 	void GenBuffer();
 
 	void SetType(GLenum Type_);
@@ -49,12 +42,7 @@ private:
 
 class VertexArray {
 public:
-	VertexArray() {
-		//glGenVertexArrays(1, &ArrayID);
-	}
-	~VertexArray() {
-		glDeleteVertexArrays(1, &ArrayID);
-	}
+	void Delete();
 
 	void GenArray();
 

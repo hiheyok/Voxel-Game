@@ -28,10 +28,14 @@ private:
 
 	Buffer VBO;
 	Buffer EBO;
-	Buffer SSBO;
+	Buffer SSBO_Pos, SSBO_Vel, SSBO_Acc;
 	VertexArray VAO;
 
 	std::vector<float> PositionArr;
+	std::vector<float> VelocityArr;
+	std::vector<float> AccelerationArr;
+
+	bool isDirty = true;
 
 	int NumEntityRendered = 0;
 
@@ -40,6 +44,8 @@ public:
 
 	int VerticalRenderDistance = 16;
 	int HorizontalRenderDistance = 16;
+
+	void clean();
 
 	int getNumEntityRendered();
 

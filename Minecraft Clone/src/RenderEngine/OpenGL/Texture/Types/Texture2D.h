@@ -4,6 +4,14 @@
 
 class Texture2D : public Texture {
 public:
+    Texture2D(RawTextureData data) {
+        Logger.LogDebug("GUI", "Addex TextureO*(&BNT*O(&");
+        Load(data);
+    }
+
+    Texture2D() {
+    }
+
 	bool Load(RawTextureData data) override {
         if (data.data) {
             glBindTexture(GL_TEXTURE_2D, textureID);

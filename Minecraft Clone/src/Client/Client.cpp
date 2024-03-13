@@ -17,8 +17,6 @@ void Client::Initialize() {
 	EntityRender.Initialize();
 	EntityRender.SetWindow(getWindow());
 
-	
-
 	Framebuffer.genBuffer(Properties.WindowSizeX, Properties.WindowSizeY, 2);
 
 	DisableCursor();
@@ -33,7 +31,6 @@ void Client::Initialize() {
 
 	server.Start(serverSettings);
 
-
 	EntityUpdater.SetEntityRenderer(&EntityRender, &server.stime);
 
 	EntityUpdater.Start();
@@ -43,6 +40,14 @@ void Client::Initialize() {
 	TerrainRender.VerticalRenderDistance = 12;
 	TerrainRender.Start(getWindow(), server.world, 16);
 	Logger.LogInfo("Client", "Starting Gameloop");
+
+
+	ClientGUI.Initialize(getWindow());
+
+	GUISet GUI1;
+	GUI1.AddGUIElement("Hotbar", "", vec2(1.35f, 0.15f), vec2(0.f, -0.75f));
+	GUI1.EditGUIElementTexture("Hotbar","assets/textures/gui/widgets.png", vec2(0.f,0.f), vec2(182.f/256.f, 22.f/256.f));
+	ClientGUI.AddGUI(GUI1);
 }
 
 void Client::run() {
@@ -52,6 +57,7 @@ void Client::run() {
 }
 
 void Client::Cleanup() {
+	EntityRender.clean();
 	TerrainRender.Stop();
 	server.Stop();
 	Logger.Stop();
@@ -89,6 +95,8 @@ void Client::GameLoop() {
 
 		Update();
 
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		Framebuffer.bindFBO();
 		Framebuffer.bindRBO();
 
@@ -112,6 +120,8 @@ void Client::GameLoop() {
 		
 
 		Framebuffer.render();
+
+		ClientGUI.Render();
 
 		Refresh();
 
@@ -156,6 +166,7 @@ void Client::Update() {
 		Framebuffer.genBuffer(Properties.WindowSizeX, Properties.WindowSizeY, 2);
 	}
 
+	ClientGUI.PrepareRenderer();
 	m_MainPlayer.Update(Inputs);
 
 	server.world->SetPlayerPos(m_MainPlayer.GetEntityProperties().Position);

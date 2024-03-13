@@ -8,7 +8,7 @@
 #include "../../../Utils/stb_image.h"
 #include "../../../Utils/LogUtils.h"
 
-class RawTextureData {
+class RawTextureData { //mem leak
 public:
 
     RawTextureData() {
