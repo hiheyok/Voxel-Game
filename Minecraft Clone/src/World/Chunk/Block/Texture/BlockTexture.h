@@ -63,10 +63,9 @@ public:
     int& operator[](int i){
         return TextureIndex[i];
     }
-
 private:
     int TextureIndex[6]{ NULL };
-    RawTextureData* BlockTex[6]{ nullptr };
+    
 };
 
 

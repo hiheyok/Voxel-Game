@@ -17,7 +17,7 @@ private:
 	void GameLoop();
 	void Update();
 	void Cleanup();
-
+	void Render();
 	void SetWindowName();
 
 	double Frametime = 0.5;
@@ -29,7 +29,4 @@ private:
 	MultiEntityRenderer EntityRender;
 	EntityRendererUpdater EntityUpdater;
 	TexturedFrameBuffer Framebuffer;
-	GUI ClientGUI;
-	
-	
 };

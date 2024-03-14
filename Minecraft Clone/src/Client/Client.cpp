@@ -21,13 +21,14 @@ void Client::Initialize() {
 
 	DisableCursor();
 
+	m_MainPlayer.Initialize(getWindow());
 	m_MainPlayer.SetPlayerPosition(0., 66.0, 0.);
 	m_MainPlayer.SetPlayerRotation(0., -30.);
 
 	ServerSettings serverSettings;
-	serverSettings.H_RenderDistance = 24;
-	serverSettings.V_RenderDistance = 12;
-	serverSettings.genThreads = 8;
+	serverSettings.H_RenderDistance = 12;
+	serverSettings.V_RenderDistance = 6;
+	serverSettings.genThreads = 2;
 
 	server.Start(serverSettings);
 
@@ -36,18 +37,13 @@ void Client::Initialize() {
 	EntityUpdater.Start();
 
 	Logger.LogInfo("World", "Generating World");
-	TerrainRender.HorizontalRenderDistance = 24;
-	TerrainRender.VerticalRenderDistance = 12;
-	TerrainRender.Start(getWindow(), server.world, 16);
+	TerrainRender.HorizontalRenderDistance = 12;
+	TerrainRender.VerticalRenderDistance = 6;
+	TerrainRender.Start(getWindow(), server.world, 2);
 	Logger.LogInfo("Client", "Starting Gameloop");
 
 
-	ClientGUI.Initialize(getWindow());
-
-	GUISet GUI1;
-	GUI1.AddGUIElement("Hotbar", "", vec2(1.35f, 0.15f), vec2(0.f, -0.75f));
-	GUI1.EditGUIElementTexture("Hotbar","assets/textures/gui/widgets.png", vec2(0.f,0.f), vec2(182.f/256.f, 22.f/256.f));
-	ClientGUI.AddGUI(GUI1);
+	
 }
 
 void Client::run() {
@@ -86,6 +82,31 @@ void Client::SetWindowName() {
 	);
 }
 
+void Client::Render() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	Framebuffer.bindFBO();
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	if (!Properties.DrawSolid)
+		renderLines();
+
+	EntityRender.Render();
+	TerrainRender.Render();
+
+	if (!Properties.DrawSolid)
+		renderSolid();
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	Framebuffer.unbindFBO();
+
+	Framebuffer.render();
+
+	m_MainPlayer.RenderGUIs();
+}
+
 void Client::GameLoop() {
 
 	Timer time;
@@ -95,33 +116,9 @@ void Client::GameLoop() {
 
 		Update();
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		Framebuffer.bindFBO();
-		Framebuffer.bindRBO();
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearDepth(1.f);
-		if (!Properties.DrawSolid) {
-			renderLines();
-		}
-
-		EntityRender.Render();
-		TerrainRender.Render();
-
-		if (!Properties.DrawSolid) {
-			renderSolid();
-		}
-
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-		Framebuffer.unbindFBO();
-		Framebuffer.unbindRBO();
 		
 
-		Framebuffer.render();
-
-		ClientGUI.Render();
+		Render();
 
 		Refresh();
 
@@ -165,12 +162,9 @@ void Client::Update() {
 		Framebuffer.clear();
 		Framebuffer.genBuffer(Properties.WindowSizeX, Properties.WindowSizeY, 2);
 	}
-
-	ClientGUI.PrepareRenderer();
 	m_MainPlayer.Update(Inputs);
 
 	server.world->SetPlayerPos(m_MainPlayer.GetEntityProperties().Position);
-
 	TerrainRender.SetPosition(m_MainPlayer.GetEntityProperties().Position);
 	TerrainRender.SetRotation(m_MainPlayer.GetEntityProperties().Rotation);
 

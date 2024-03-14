@@ -22,6 +22,10 @@ public:
 		return Properties.block;
 	}
 
+	RawTextureData GetTexture() {
+
+	}
+
 	bool CheckIsBlockItem() {
 		return Properties.IsBlockItem;
 	}

@@ -17,7 +17,7 @@ public:
 		shader.init("assets/shaders/GUI/GUIVert.glsl", "assets/shaders/GUI/GUIFrag.glsl");
 	}
 
-	int AddGUI(GUISet set) {
+	int AddGUI(std::string Name, GUISet set) {
 		GUIs.emplace_back(set);
 		return GUIs.size() - 1;
 	}
@@ -40,9 +40,10 @@ public:
 
 		shader.use();
 		for (auto& gui : GUIs) {
+			shader.bindTexture2D(0, gui.GUITexture.get(), "GUITexture");
 			for (int i = 0; i < gui.NumOfRenderableObjects; i++) {
 			//	std::cout << gui.Textures[i]->get() << "\n";
-				shader.bindTexture2D(0, gui.Textures[i]->get(), "GUITexture");
+				
 				gui.VAOs[i].Bind();
 				gui.EBOs[i].Bind();
 				glDrawElements(GL_TRIANGLES, gui.VBOSize[i], GL_UNSIGNED_INT, 0);
