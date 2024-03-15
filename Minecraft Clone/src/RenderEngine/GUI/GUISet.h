@@ -54,6 +54,27 @@ public:
 			EBO.Delete();
 	}
 
+	void AddGUIElementNorm(std::string Name, std::string Text, glm::vec2 Size, glm::vec2 Position, glm::vec2 UV_P0, glm::vec2 UV_P1) {
+
+		if (!isInitialized) {
+			Initialize();
+			isInitialized = true;
+		}
+
+		if (GUIElementIndex.find(Name) == GUIElementIndex.end()) {
+			Elements.emplace_back(Text, Size, Position);
+			Elements.back().BufferIndex = AddRenderingObj();
+			Elements.back().UV_P0 = UV_P0;
+			Elements.back().UV_P1 = UV_P1;
+			GUIElementIndex.emplace(Name, Elements.size() - 1);
+			NumOfRenderableObjects++;
+			isDirty = true;
+		}
+		else {
+			Logger.LogError("GUI", "Element " + Name + " already exist!");
+		}
+	}
+
 	void AddGUIElement(std::string Name, std::string Text, glm::vec2 Size, glm::vec2 Position, glm::vec2 UV_P0, glm::vec2 UV_P1) {
 
 		if (!isInitialized) {
@@ -92,8 +113,26 @@ public:
 		}
 	}
 
+	void EditElementUVNorm(std::string Name, glm::vec2 UV0, glm::vec2 UV1) {
+		if (GUIElementIndex.find(Name) != GUIElementIndex.end()) {
+			int Index = GUIElementIndex[Name];
+			Elements[Index].UV_P0 = UV0;
+			Elements[Index].UV_P1 = UV1;
+			isDirty = true;
+		}
+		else {
+			Logger.LogError("GUI", "Element " + Name + " doesn't exist!");
+		}
+	}
+
 	void SetGUITexture(std::string file) {
 		GUITexture = Texture2D(RawTextureData(file.c_str()));
+	}
+
+	void SetGUITexture(GLuint TextureID, size_t x, size_t y) {
+		GUITexture.textureID = TextureID;
+		GUITexture.width = x;
+		GUITexture.height = y;
 	}
 
 	void PrepareRenderer() {

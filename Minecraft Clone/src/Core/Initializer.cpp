@@ -3,12 +3,14 @@
 #include "../World/Item/Items.h"
 #include "../Utils/LogUtils.h"
 #include "Initializer.h"
+#include "../World/Item/ItemTextureAtlas.h"
 #include "../World/Entity/Entity.h"
 
 LogUtils Logger;
 BlockList Blocks;
 EntitiesList EntityList;
 ItemList Items;
+ItemTextureAtlas ItemAtlas;
 
 int AmountEntityDestroy = 0;
 

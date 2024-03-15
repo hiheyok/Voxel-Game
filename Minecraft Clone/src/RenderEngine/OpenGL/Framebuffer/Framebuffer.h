@@ -1,10 +1,11 @@
+#pragma once
 #include <vector>
 #include <GL/glew.h>
 #include <glfw/glfw3.h>
 #include <unordered_map>
 #include "../shader/shader.h"
 #include "../../../Utils/LogUtils.h"
-#define _CRTDBG_MAP_ALLOC
+
 class TexturedFrameBuffer {
 public:
 
@@ -18,7 +19,7 @@ public:
 
     Shader* screen = new Shader;
 
-    void genBuffer(GLint x, GLint y, float muti) {
+    void genBuffer(GLint x, GLint y, float muti, GLuint FORMAT = GL_RGBA) {
 
         screen->init("assets/shaders/screen/vert.glsl", "assets/shaders/screen/frag.glsl");
         screen->setVec2("Resolution", glm::vec2((x), (y)));
@@ -35,7 +36,7 @@ public:
         // create a color attachment texture
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (int)(x * muti), (int)(y * muti), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, FORMAT, (int)(x * muti), (int)(y * muti), 0, FORMAT, GL_UNSIGNED_BYTE, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);

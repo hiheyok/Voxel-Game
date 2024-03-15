@@ -7,6 +7,7 @@
 #include "../RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
 #include "Player/MainPlayer.h"
 #include "../RenderEngine/GUI/GUI.h"
+#include "../World/Item/ItemTextureAtlas.h"
 
 
 class Client : protected Window {

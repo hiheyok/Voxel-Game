@@ -10,11 +10,16 @@ public:
 
 	ItemStack(Item item) {
 		m_item = item;
+		Initialized = true;
+	}
+
+	bool IsInitialized() {
+		return Initialized;
 	}
 
 	Item m_item;
 	int ItemCount = 1;
 private:
-
+	bool Initialized = false;
 
 };

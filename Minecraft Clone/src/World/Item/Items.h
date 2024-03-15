@@ -9,10 +9,12 @@ private:
 	Item RegisterBlockItem(BlockID block);
 
 	int ItemCount = 0;
-	std::unordered_map<ItemID, Item> ItemContainer;
+	
 	std::unordered_map<BlockID, ItemID> BlockItemIDs;
 
 public:
+	std::unordered_map<ItemID, Item> ItemContainer;
+
 	Item AIR = RegisterBlockItem(Blocks.AIR);
 	Item STONE = RegisterBlockItem(Blocks.STONE);
 	Item DIRT = RegisterBlockItem(Blocks.DIRT);

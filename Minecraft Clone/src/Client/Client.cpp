@@ -17,18 +17,23 @@ void Client::Initialize() {
 	EntityRender.Initialize();
 	EntityRender.SetWindow(getWindow());
 
-	Framebuffer.genBuffer(Properties.WindowSizeX, Properties.WindowSizeY, 2);
+	ItemAtlas.Initialize(256 * 8, 32 * 8);
+	for (auto& item : Items.ItemContainer) {
+		ItemAtlas.AddItem(item.second);
+	}
+
+	Framebuffer.genBuffer(Properties.WindowSizeX, Properties.WindowSizeY, 2.f, GL_RGB);
 
 	DisableCursor();
 
 	m_MainPlayer.Initialize(getWindow());
 	m_MainPlayer.SetPlayerPosition(0., 66.0, 0.);
-	m_MainPlayer.SetPlayerRotation(0., -30.);
+	m_MainPlayer.SetPlayerRotation(-135.f, -30.);
 
 	ServerSettings serverSettings;
 	serverSettings.H_RenderDistance = 12;
 	serverSettings.V_RenderDistance = 6;
-	serverSettings.genThreads = 2;
+	serverSettings.genThreads = 6;
 
 	server.Start(serverSettings);
 
@@ -39,10 +44,11 @@ void Client::Initialize() {
 	Logger.LogInfo("World", "Generating World");
 	TerrainRender.HorizontalRenderDistance = 12;
 	TerrainRender.VerticalRenderDistance = 6;
-	TerrainRender.Start(getWindow(), server.world, 2);
+	TerrainRender.Start(getWindow(), server.world, 6);
 	Logger.LogInfo("Client", "Starting Gameloop");
 
-
+	
+	
 	
 }
 
@@ -115,8 +121,6 @@ void Client::GameLoop() {
 		Timer FrametimeTracker;
 
 		Update();
-
-		
 
 		Render();
 

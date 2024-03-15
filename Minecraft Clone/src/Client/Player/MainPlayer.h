@@ -37,4 +37,6 @@ private:
 	int ItemGUIIndex = 0;
 	int SlotIndex = 0;
 
+	float HotbarSize = 0.135;
+
 };
