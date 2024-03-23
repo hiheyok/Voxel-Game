@@ -11,7 +11,7 @@ struct values2x {
 };
 
 enum TerrainType {
-	SUPERFLAT, FASTTERRAIN, MOUNTAINS, DEBUG_WORLD
+	SUPERFLAT, FASTTERRAIN, MOUNTAINS, DEBUG_WORLD, MATH_WORLD
 };
 
 
@@ -34,6 +34,9 @@ public:
 		case DEBUG_WORLD:
 			GenerateDebug();
 			break;
+		case MATH_WORLD:
+			GenerateMath();
+			break;
 		}
 	}
 
@@ -54,6 +57,8 @@ public:
 	void UpdateGen();
 
 private:
+
+	void GenerateMath();
 
 	//Generate Decor
 	void GenerateDecor(FastNoiseLite* noise);

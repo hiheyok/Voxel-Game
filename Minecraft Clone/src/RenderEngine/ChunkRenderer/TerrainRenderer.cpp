@@ -291,7 +291,7 @@ void TerrainRenderer::SetupShaders() {
 void TerrainRenderer::CreateNewSolidBatch() {
 	ChunkSolidBatches.emplace_back();
 	size_t i = ChunkSolidBatches.size() - 1;
-	ChunkSolidBatches[i].SetMaxSize(1000000000);
+	ChunkSolidBatches[i].SetMaxSize(500000000);
 	ChunkSolidBatches[i].SetupBuffers();
 	ChunkSolidBatches[i].camera = camera;
 }

@@ -21,7 +21,10 @@ void WorldInteraction::Interact(Player* player, UserInputs Inputs) {
 	}
 	if (Inputs.Mouse.MIDDLE == Inputs.Mouse.PRESS) {
 		BlockID newBlock = GetBlock(ray, world);
-		player->m_EntityInventory.SetSlot(player->m_EntityInventory.RightHandSlot, ItemStack(Items.GetItem(Items.GetBlockItem(newBlock))));
+		if (newBlock != Blocks.AIR) {
+			player->m_EntityInventory.SetSlot(player->m_EntityInventory.RightHandSlot, ItemStack(Items.GetItem(Items.GetBlockItem(newBlock))));
+		}
+		
 	}
 }
 

@@ -47,6 +47,7 @@ public:
 	BlockID RED_STAINED_GLASS = RegisterBlock("red_stained_glass", new MaterialNone(), true, true, false);
 	BlockID WHITE_STAINED_GLASS = RegisterBlock("white_stained_glass", new MaterialNone(), true, true, false);
 	BlockID YELLOW_STAINED_GLASS = RegisterBlock("yellow_stained_glass", new MaterialNone(), true, true, false);
+	BlockID asdsadasd = RegisterBlock("yellow_stained_glass", new MaterialNone(), true, true, false);
 
 	BlockID NULL_BLOCK = RegisterBlock("null_block", new MaterialNone(), false, false, false);
 

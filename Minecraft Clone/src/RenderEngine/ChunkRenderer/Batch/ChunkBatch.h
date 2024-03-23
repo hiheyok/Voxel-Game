@@ -54,6 +54,8 @@ public:
 
 	bool AddChunkVertices(std::vector<unsigned int> Data, int x, int y, int z);
 
+	bool AddChunkVertices(Buffer GPUData, size_t DataSize, int x, int y, int z);
+
 	void DeleteChunkVertices(ChunkID ID);
 
 	void SetMaxSize(size_t size);
@@ -99,5 +101,5 @@ private:
 	size_t AmountOfChunks = 0;
 	size_t AmountOfChunkBeingRendered = 0;
 
-
+	Buffer TransferBuffer;
 };

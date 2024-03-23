@@ -15,8 +15,8 @@ void ChunkDrawBatch::SetupBuffers() {
 	IBO.SetType(GL_DRAW_INDIRECT_BUFFER);
 	SSBO.SetType(GL_SHADER_STORAGE_BUFFER);
 
-	VBO.SetUsage(GL_DYNAMIC_DRAW);
-	IBO.SetUsage(GL_DYNAMIC_DRAW);
+	VBO.SetUsage(GL_STATIC_DRAW);
+	IBO.SetUsage(GL_STATIC_DRAW);
 	SSBO.SetUsage(GL_DYNAMIC_COPY);
 
 	Array.Bind();
@@ -36,6 +36,12 @@ void ChunkDrawBatch::SetupBuffers() {
 	SSBO.InitializeData();
 
 	InsertSpace.insert(pair<size_t, size_t>((size_t)MaxBufferSize, 0ULL));
+
+	TransferBuffer.GenBuffer();
+	TransferBuffer.SetType(GL_COPY_WRITE_BUFFER);
+	TransferBuffer.SetUsage(GL_STATIC_COPY);
+	TransferBuffer.SetMaxSize(10000000);
+	TransferBuffer.InitializeData();
 }
 
 void ChunkDrawBatch::Reset() {
@@ -150,6 +156,89 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int
 		MemoryUsage += DataSize;
 		RenderingData.offset = iteratorOffset;
 		VBO.InsertSubData(RenderingData.offset, Data.size() * sizeof(unsigned int), Data.data());
+		RenderList[iteratorOffset] = RenderingData;
+		RenderListOffsetLookup[id] = iteratorOffset;
+		UpdateCommands = true;
+
+		auto RenderListIterator = RenderList.find(iteratorOffset);
+		//Update Insert Map
+
+
+		ChunkID lastID = 0;
+		ChunkID frontID = 0;
+
+		bool lastIDB = false;
+		bool frontIDB = false;
+
+		if (RenderListIterator != RenderList.begin()) {
+			RenderListIterator--;
+			DataBufferAddress& lastChunk = RenderListIterator->second;
+			lastID = getChunkID(lastChunk.x, lastChunk.y, lastChunk.z);
+			lastIDB = true;
+			InsertSpaceIteratorsFront.erase(lastID);
+			RenderListIterator++;
+		}
+
+		if (RenderListIterator != (--RenderList.end())) {
+			RenderListIterator++;
+			DataBufferAddress& frontChunk = RenderListIterator->second;
+			frontID = getChunkID(frontChunk.x, frontChunk.y, frontChunk.z);
+			frontIDB = true;
+			InsertSpaceIteratorsBack.erase(frontID);
+			RenderListIterator--;
+		}
+
+		InsertSpace.erase(it);
+
+		if (iteratorSize != DataSize) {
+			size_t offset = iteratorOffset + DataSize;
+			size_t size = iteratorSize - DataSize;
+
+			std::multimap<size_t, size_t>::iterator nextIterator = InsertSpace.insert(pair<size_t, size_t>(size, offset));
+
+			if (frontIDB) {
+				InsertSpaceIteratorsBack[frontID] = nextIterator;
+			}
+			InsertSpaceIteratorsFront[id] = nextIterator;
+		}
+
+		AmountOfChunks++;
+		return true;
+	}
+
+	Logger.LogDebug("Chunk Renderer", "Draw Batch Out of Memory: " + std::to_string(MemoryUsage) + " | " + std::to_string(it->first));
+	return false;
+}
+
+bool ChunkDrawBatch::AddChunkVertices(Buffer GPUData, size_t DataSize, int x, int y, int z) {
+	ChunkID id = getChunkID(x, y, z);
+
+	DataBufferAddress RenderingData;
+	RenderingData.x = x;
+	RenderingData.y = y;
+	RenderingData.z = z;
+	RenderingData.size = DataSize;
+
+	std::multimap<size_t, size_t>::iterator it;
+
+	if (InsertSpace.size() > 1) {
+		it = --(--InsertSpace.end());
+
+		if (it->first < DataSize) {
+			it++;
+		}
+	}
+	else {
+		it = InsertSpace.begin();
+	}
+
+	size_t iteratorOffset = it->second;
+	size_t iteratorSize = it->first;
+
+	if (iteratorSize >= DataSize) {
+		MemoryUsage += DataSize;
+		RenderingData.offset = iteratorOffset;
+		VBO.CopyFrom(GPUData, 0, RenderingData.offset, DataSize);
 		RenderList[iteratorOffset] = RenderingData;
 		RenderListOffsetLookup[id] = iteratorOffset;
 		UpdateCommands = true;
@@ -373,9 +462,7 @@ void ChunkDrawBatch::Defrager(int iterations) {
 
 		ChunkID id = getChunkID(data.x, data.y, data.z);
 
-		std::vector<uint32_t> VertexData(bufferSize / sizeof(unsigned int));
-
-		VBO.getData(VertexData.data(), bufferOffset, bufferSize);
+		TransferBuffer.CopyFrom(VBO, bufferOffset, 0, bufferSize);
 
 		int x = data.x;
 		int y = data.y;
@@ -383,7 +470,7 @@ void ChunkDrawBatch::Defrager(int iterations) {
 
 		DeleteChunkVertices(id);
 
-		AddChunkVertices(VertexData, x, y, z);
+		AddChunkVertices(TransferBuffer, bufferSize, x, y, z);
 
 		i++;
 

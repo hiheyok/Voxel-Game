@@ -17,7 +17,7 @@ void Client::Initialize() {
 	EntityRender.Initialize();
 	EntityRender.SetWindow(getWindow());
 
-	ItemAtlas.Initialize(256 * 8, 32 * 8);
+	ItemAtlas.Initialize(256*8, 32*8);
 	for (auto& item : Items.ItemContainer) {
 		ItemAtlas.AddItem(item.second);
 	}
@@ -27,12 +27,12 @@ void Client::Initialize() {
 	DisableCursor();
 
 	m_MainPlayer.Initialize(getWindow());
-	m_MainPlayer.SetPlayerPosition(0., 66.0, 0.);
+	m_MainPlayer.SetPlayerPosition(0., 0., 0.);
 	m_MainPlayer.SetPlayerRotation(-135.f, -30.);
 
 	ServerSettings serverSettings;
-	serverSettings.H_RenderDistance = 12;
-	serverSettings.V_RenderDistance = 6;
+	serverSettings.H_RenderDistance = 32;
+	serverSettings.V_RenderDistance = 32;
 	serverSettings.genThreads = 6;
 
 	server.Start(serverSettings);
@@ -42,8 +42,8 @@ void Client::Initialize() {
 	EntityUpdater.Start();
 
 	Logger.LogInfo("World", "Generating World");
-	TerrainRender.HorizontalRenderDistance = 12;
-	TerrainRender.VerticalRenderDistance = 6;
+	TerrainRender.HorizontalRenderDistance = 32;
+	TerrainRender.VerticalRenderDistance = 32;
 	TerrainRender.Start(getWindow(), server.world, 6);
 	Logger.LogInfo("Client", "Starting Gameloop");
 

@@ -72,6 +72,12 @@ void Buffer::getData(uint32_t* ptr, size_t offset, size_t size) {
 	Unbind();
 }
 
+void Buffer::CopyFrom(Buffer buffer, size_t ReadOffset, size_t WriteOffset, size_t Size) {
+
+	glCopyNamedBufferSubData(buffer.BufferID, BufferID, ReadOffset, WriteOffset, Size);
+
+}
+
 void Buffer::CopyTo(Buffer& destination, size_t offset, size_t desOffset, size_t size) {
 	Bind();
 	destination.Bind();
