@@ -6,46 +6,35 @@ using namespace glm;
 using namespace std;
 
 void ChunkDrawBatch::SetupBuffers() {
-	VBO.GenBuffer();
+	MemoryPool.Allocate(MaxBufferSize);
+
 	IBO.GenBuffer();
 	SSBO.GenBuffer();
 	Array.GenArray();
 
-	VBO.SetType(GL_ARRAY_BUFFER);
 	IBO.SetType(GL_DRAW_INDIRECT_BUFFER);
 	SSBO.SetType(GL_SHADER_STORAGE_BUFFER);
 
-	VBO.SetUsage(GL_STATIC_DRAW);
 	IBO.SetUsage(GL_STATIC_DRAW);
 	SSBO.SetUsage(GL_DYNAMIC_COPY);
 
 	Array.Bind();
 
-	VBO.SetMaxSize(MaxBufferSize);
-	VBO.InitializeData();
 	IBO.SetMaxSize((size_t)(MaxBufferSize / 100));
 	IBO.InitializeData();
 
-	VBO.Bind();
+	MemoryPool.buffer.Bind();
 	Array.EnableAttriPTR(0, 1, GL_FLOAT, GL_FALSE, 2, 0);
 	Array.EnableAttriPTR(1, 1, GL_FLOAT, GL_FALSE, 2, 1);
-	VBO.Unbind();
+	MemoryPool.buffer.Unbind();
 	Array.Unbind();
 
 	SSBO.SetMaxSize((size_t)(MaxBufferSize / 100));
 	SSBO.InitializeData();
-
-	InsertSpace.insert(pair<size_t, size_t>((size_t)MaxBufferSize, 0ULL));
-
-	TransferBuffer.GenBuffer();
-	TransferBuffer.SetType(GL_COPY_WRITE_BUFFER);
-	TransferBuffer.SetUsage(GL_STATIC_COPY);
-	TransferBuffer.SetMaxSize(10000000);
-	TransferBuffer.InitializeData();
 }
 
 void ChunkDrawBatch::Reset() {
-	VBO.ResetBuffer();
+	MemoryPool.buffer.ResetBuffer();
 	IBO.ResetBuffer();
 	SSBO.ResetBuffer();
 	Array.ResetArray();
@@ -53,8 +42,7 @@ void ChunkDrawBatch::Reset() {
 }
 
 void ChunkDrawBatch::Cleanup() {
-	VBO.Delete();
-	VBO.Delete();
+	MemoryPool.buffer.Delete();
 	IBO.Delete();
 	SSBO.Delete();
 	Array.~VertexArray();
@@ -70,10 +58,17 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance, int VerticalRenderDista
 
 	Timer time;
 
-	if (AmountOfChunks > DrawCommands.size()) {
-		UpdateCommandBufferSize();
+	std::vector<ChunkMemoryPoolOffset> UpdatedOffsets = MemoryPool.GetUpdatedChunks();
+
+	for (const auto& chunk : UpdatedOffsets) {
+		RenderList.erase(RenderListOffsetLookup[getChunkID(chunk.x, chunk.y, chunk.z)]);
+		RenderList[chunk.MemOffset] = chunk;
+		RenderListOffsetLookup[getChunkID(chunk.x, chunk.y, chunk.z)] = chunk.MemOffset;
 	}
 
+	if (RenderList.size() > DrawCommands.size()) {
+		UpdateCommandBufferSize();
+	}
 
 	if (!UpdateCommands)
 		return;
@@ -95,16 +90,14 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance, int VerticalRenderDista
 		float dy2 = deltaY * deltaY / (VerticalRenderDistance * VerticalRenderDistance);
 		float dz2 = deltaZ * deltaZ / (RenderDistance * RenderDistance);
 
-
 		if (dx2 + dy2 + dz2 < 1.f) {
 			if (Frustum.SphereInFrustum((float)(data.x << 4), (float)(data.y << 4), (float)(data.z << 4), 32.f)) { // << 4 means multiply by 4
 
-				DrawCommands[Index - 1].set(data.size >> 3, 1, data.offset >> 3, Index);
+				DrawCommands[Index - 1].set(data.MemSize >> 3, 1, data.MemOffset >> 3, Index);
 				ChunkShaderPos[(Index - 1) * 3 + 0] = data.x;
 				ChunkShaderPos[(Index - 1) * 3 + 1] = data.y;
 				ChunkShaderPos[(Index - 1) * 3 + 2] = data.z;
-
-
+				
 				Index++;
 			}
 		}
@@ -121,286 +114,35 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance, int VerticalRenderDista
 }
 
 void ChunkDrawBatch::UpdateCommandBufferSize() {
-	DrawCommands.resize(AmountOfChunks);
-	ChunkShaderPos.resize(AmountOfChunks * 3);
+	DrawCommands.resize(RenderList.size());
+	ChunkShaderPos.resize(RenderList.size() * 3);
 }
 
-bool ChunkDrawBatch::AddChunkVertices(std::vector<unsigned int> Data, int x, int y, int z) {
+bool ChunkDrawBatch::AddChunkVertices(std::vector<uint32_t>& Data, int x, int y, int z) {
 	ChunkID id = getChunkID(x, y, z);
 
-	size_t DataSize = Data.size() * sizeof(unsigned int);
+	size_t DataSize = Data.size() * sizeof(uint32_t);
 
-	DataBufferAddress RenderingData;
-	RenderingData.x = x;
-	RenderingData.y = y;
-	RenderingData.z = z;
-	RenderingData.size = DataSize;
+	ChunkMemoryPoolOffset MemPoolOffset = MemoryPool.AddChunk(Data, x, y, z, NULL);
 
-	std::multimap<size_t, size_t>::iterator it;
+	if (MemPoolOffset.MemOffset == ULLONG_MAX)
+		return false;
 
-	if (InsertSpace.size() > 1) {
-		it = --(--InsertSpace.end());
-
-		if (it->first < DataSize) {
-			it++;
-		}
-	}
-	else {
-		it = InsertSpace.begin();
-	}
-
-	size_t iteratorOffset = it->second;
-	size_t iteratorSize = it->first;
-
-	if (iteratorSize >= DataSize) {
-		MemoryUsage += DataSize;
-		RenderingData.offset = iteratorOffset;
-		VBO.InsertSubData(RenderingData.offset, Data.size() * sizeof(unsigned int), Data.data());
-		RenderList[iteratorOffset] = RenderingData;
-		RenderListOffsetLookup[id] = iteratorOffset;
-		UpdateCommands = true;
-
-		auto RenderListIterator = RenderList.find(iteratorOffset);
-		//Update Insert Map
-
-
-		ChunkID lastID = 0;
-		ChunkID frontID = 0;
-
-		bool lastIDB = false;
-		bool frontIDB = false;
-
-		if (RenderListIterator != RenderList.begin()) {
-			RenderListIterator--;
-			DataBufferAddress& lastChunk = RenderListIterator->second;
-			lastID = getChunkID(lastChunk.x, lastChunk.y, lastChunk.z);
-			lastIDB = true;
-			InsertSpaceIteratorsFront.erase(lastID);
-			RenderListIterator++;
-		}
-
-		if (RenderListIterator != (--RenderList.end())) {
-			RenderListIterator++;
-			DataBufferAddress& frontChunk = RenderListIterator->second;
-			frontID = getChunkID(frontChunk.x, frontChunk.y, frontChunk.z);
-			frontIDB = true;
-			InsertSpaceIteratorsBack.erase(frontID);
-			RenderListIterator--;
-		}
-
-		InsertSpace.erase(it);
-
-		if (iteratorSize != DataSize) {
-			size_t offset = iteratorOffset + DataSize;
-			size_t size = iteratorSize - DataSize;
-
-			std::multimap<size_t, size_t>::iterator nextIterator = InsertSpace.insert(pair<size_t, size_t>(size, offset));
-
-			if (frontIDB) {
-				InsertSpaceIteratorsBack[frontID] = nextIterator;
-			}
-			InsertSpaceIteratorsFront[id] = nextIterator;
-		}
-
-		AmountOfChunks++;
-		return true;
-	}
-
-	Logger.LogDebug("Chunk Renderer", "Draw Batch Out of Memory: " + std::to_string(MemoryUsage) + " | " + std::to_string(it->first));
-	return false;
-}
-
-bool ChunkDrawBatch::AddChunkVertices(Buffer GPUData, size_t DataSize, int x, int y, int z) {
-	ChunkID id = getChunkID(x, y, z);
-
-	DataBufferAddress RenderingData;
-	RenderingData.x = x;
-	RenderingData.y = y;
-	RenderingData.z = z;
-	RenderingData.size = DataSize;
-
-	std::multimap<size_t, size_t>::iterator it;
-
-	if (InsertSpace.size() > 1) {
-		it = --(--InsertSpace.end());
-
-		if (it->first < DataSize) {
-			it++;
-		}
-	}
-	else {
-		it = InsertSpace.begin();
-	}
-
-	size_t iteratorOffset = it->second;
-	size_t iteratorSize = it->first;
-
-	if (iteratorSize >= DataSize) {
-		MemoryUsage += DataSize;
-		RenderingData.offset = iteratorOffset;
-		VBO.CopyFrom(GPUData, 0, RenderingData.offset, DataSize);
-		RenderList[iteratorOffset] = RenderingData;
-		RenderListOffsetLookup[id] = iteratorOffset;
-		UpdateCommands = true;
-
-		auto RenderListIterator = RenderList.find(iteratorOffset);
-		//Update Insert Map
-
-
-		ChunkID lastID = 0;
-		ChunkID frontID = 0;
-
-		bool lastIDB = false;
-		bool frontIDB = false;
-
-		if (RenderListIterator != RenderList.begin()) {
-			RenderListIterator--;
-			DataBufferAddress& lastChunk = RenderListIterator->second;
-			lastID = getChunkID(lastChunk.x, lastChunk.y, lastChunk.z);
-			lastIDB = true;
-			InsertSpaceIteratorsFront.erase(lastID);
-			RenderListIterator++;
-		}
-
-		if (RenderListIterator != (--RenderList.end())) {
-			RenderListIterator++;
-			DataBufferAddress& frontChunk = RenderListIterator->second;
-			frontID = getChunkID(frontChunk.x, frontChunk.y, frontChunk.z);
-			frontIDB = true;
-			InsertSpaceIteratorsBack.erase(frontID);
-			RenderListIterator--;
-		}
-
-		InsertSpace.erase(it);
-
-		if (iteratorSize != DataSize) {
-			size_t offset = iteratorOffset + DataSize;
-			size_t size = iteratorSize - DataSize;
-
-			std::multimap<size_t, size_t>::iterator nextIterator = InsertSpace.insert(pair<size_t, size_t>(size, offset));
-
-			if (frontIDB) {
-				InsertSpaceIteratorsBack[frontID] = nextIterator;
-			}
-			InsertSpaceIteratorsFront[id] = nextIterator;
-		}
-
-		AmountOfChunks++;
-		return true;
-	}
-
-	Logger.LogDebug("Chunk Renderer", "Draw Batch Out of Memory: " + std::to_string(MemoryUsage) + " | " + std::to_string(it->first));
-	return false;
+	RenderList[MemPoolOffset.MemOffset] = MemPoolOffset;
+	RenderListOffsetLookup[id] = MemPoolOffset.MemOffset;
+	AmountOfChunks++;
+	UpdateCommands = true;
+	return true;
 }
 
 void ChunkDrawBatch::DeleteChunkVertices(ChunkID id) {
-	if (RenderListOffsetLookup.count(id)) {
-		auto ChunkDataIterator = RenderList.find(RenderListOffsetLookup[id]);
-
-		auto& RemovalChunk = ChunkDataIterator->second;
-
-		MemoryUsage -= RemovalChunk.size;
-
-		size_t offset = 0;
-		size_t size = 0;
-
-		bool FrontGap = false;
-		bool BackGap = false;
-
-		std::multimap<size_t, size_t>::iterator FrontIt;
-		std::multimap<size_t, size_t>::iterator BackIt;
-
-		if (InsertSpaceIteratorsFront.count(id)) {
-			FrontIt = InsertSpaceIteratorsFront[id];
-			FrontGap = true;
-		}
-
-		if (InsertSpaceIteratorsBack.count(id)) {
-			BackIt = InsertSpaceIteratorsBack[id];
-			BackGap = true;
-		}
-
-		//Manages gap space
-		if ((FrontGap) && (!BackGap)) {
-			offset = RemovalChunk.offset;
-			size = RemovalChunk.size + FrontIt->first;
-		}
-
-		if ((FrontGap) && (BackGap)) {
-			offset = BackIt->second;
-			size = BackIt->first + RemovalChunk.size + FrontIt->first;
-		}
-
-		if ((!FrontGap) && (BackGap)) {
-			offset = BackIt->second;
-			size = BackIt->first + RemovalChunk.size;
-		}
-
-		if ((!FrontGap) && (!BackGap)) {
-			offset = RemovalChunk.offset;
-			size = RemovalChunk.size;
-		}
-		//Get Front and Back chunks
-
-		bool FrontChunkB = false;
-		bool BackChunkB = false;
-
-		ChunkID FrontChunk;
-		ChunkID BackChunk;
-
-		if (ChunkDataIterator != (--RenderList.end())) {
-			ChunkDataIterator++;
-			auto& FrontGapChunk = ChunkDataIterator->second;
-			FrontChunk = getChunkID(FrontGapChunk.x, FrontGapChunk.y, FrontGapChunk.z);
-			FrontChunkB = true;
-			ChunkDataIterator--;
-		}
-
-		if (ChunkDataIterator != RenderList.begin()) {
-			ChunkDataIterator--;
-			auto& BackGapChunk = ChunkDataIterator->second;
-			BackChunk = getChunkID(BackGapChunk.x, BackGapChunk.y, BackGapChunk.z);
-			BackChunkB = true;
-			ChunkDataIterator++;
-		}
-
-		//Erase Iterators
-
-		if (FrontGap) {
-
-			if (FrontChunkB) {
-				InsertSpaceIteratorsBack.erase(FrontChunk);
-			}
-
-			InsertSpaceIteratorsFront.erase(id);
-			InsertSpace.erase(FrontIt);
-		}
-
-		if (BackGap) {
-
-			if (BackChunkB) {
-				InsertSpaceIteratorsFront.erase(BackChunk);
-			}
-
-			InsertSpaceIteratorsBack.erase(id);
-			InsertSpace.erase(BackIt);
-		}
-
-		//Add new iterators
-
-		auto NewIterator = InsertSpace.insert(std::pair<size_t, size_t>(size, offset));
-
-		if (FrontChunkB) {
-			InsertSpaceIteratorsBack[FrontChunk] = NewIterator;
-		}
-
-		if (BackChunkB) {
-			InsertSpaceIteratorsFront[BackChunk] = NewIterator;
-		}
-
-		RenderList.erase(ChunkDataIterator);
+	if (MemoryPool.CheckChunk(id)) {
+		ChunkMemoryPoolOffset ChunkMemOffset = MemoryPool.GetChunkMemoryPoolOffset(id);
+		MemoryPool.DeleteChunk(id, NULL);
+		RenderList.erase(ChunkMemOffset.MemOffset);
 		RenderListOffsetLookup.erase(id);
 		AmountOfChunks--;
+		UpdateCommands = true;
 	}
 }
 
@@ -411,7 +153,7 @@ void ChunkDrawBatch::SetMaxSize(size_t size) {
 void ChunkDrawBatch::Bind() {
 	Array.Bind();
 	IBO.Bind();
-	VBO.Bind();
+	MemoryPool.buffer.Bind();
 	SSBO.Bind();
 	SSBO.BindBase(2);
 }
@@ -420,7 +162,7 @@ void ChunkDrawBatch::Unbind() {
 	SSBO.UnbindBase(2);
 	SSBO.Unbind();
 	IBO.Unbind();
-	VBO.Unbind();
+	MemoryPool.buffer.Unbind();
 	Array.Unbind();
 }
 
@@ -429,55 +171,6 @@ void ChunkDrawBatch::Draw() {
 }
 
 void ChunkDrawBatch::Defrager(int iterations) {
-	int i = 0;
-
-	if (InsertSpace.size() == 1) { //space already fully defragged
-		return;
-	}
-
-	std::multimap<size_t, size_t>::iterator it;
-
-	while (i < iterations) {
-
-		if (InsertSpace.size() == 1)
-			return;
-
-		std::multimap<size_t, size_t>::iterator it0 = --(--InsertSpace.end());
-		std::multimap<size_t, size_t>::iterator it1 = (--InsertSpace.end());
-
-		if (it0->second > it1->second) {
-			it = it1;
-		}
-		else {
-			it = it0;
-		}
-
-		size_t offset = it->second;
-		size_t size = it->first;
-
-		auto& data = RenderList[offset + size];
-
-		size_t bufferOffset = data.offset;
-		size_t bufferSize = data.size;
-
-		ChunkID id = getChunkID(data.x, data.y, data.z);
-
-		TransferBuffer.CopyFrom(VBO, bufferOffset, 0, bufferSize);
-
-		int x = data.x;
-		int y = data.y;
-		int z = data.z;
-
-		DeleteChunkVertices(id);
-
-		AddChunkVertices(TransferBuffer, bufferSize, x, y, z);
-
-		i++;
-
-		if (i > iterations)
-			return;
-	}
-
-
-
+	MemoryPool.DefragMemoryPool(iterations);
+	UpdateCommands = true;
 }

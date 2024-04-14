@@ -27,7 +27,7 @@ void Client::Initialize() {
 	DisableCursor();
 
 	m_MainPlayer.Initialize(getWindow());
-	m_MainPlayer.SetPlayerPosition(0., 0., 0.);
+	m_MainPlayer.SetPlayerPosition(0., 80., 0.);
 	m_MainPlayer.SetPlayerRotation(-135.f, -30.);
 
 	ServerSettings serverSettings;
@@ -75,7 +75,7 @@ void Client::SetWindowName() {
 		+ " | Pos: " + std::to_string(m_MainPlayer.GetEntityProperties().Position.x) + ", "
 		+ std::to_string(m_MainPlayer.GetEntityProperties().Position.y) + ", "
 		+ std::to_string(m_MainPlayer.GetEntityProperties().Position.z)
-		//+ ", VRAM Fragmentation Rate: " + std::to_string(TerrainRender.RendererV2.getFragmentationRate() * 100)
+		+ ", VRAM Fragmentation Rate: " + std::to_string(TerrainRender.RendererV2.getFragmentationRate() * 100)
 		+ ", VRAM Usage (MB): " + std::to_string((double)TerrainRender.RendererV2.getVRAMUsageFull() / 1000000.0)
 		//+ " | Mesh All (ms): " + std::to_string(TerrainRender.buildTime / 1000.f)
 		//+ " | S0 (ms): " + std::to_string(TerrainRender.buildstage0 / 1000.f)
@@ -152,6 +152,11 @@ void Client::Update() {
 		EntityRender.Reload();
 	}
 
+	if (Inputs.CheckKeyPress(GLFW_KEY_U)) {
+		int k = 3;
+		int a = k + 4;
+	}
+
 	if (Inputs.CheckKey(GLFW_KEY_Z)) {
 		Logger.LogInfo("Client", "FPS: " + std::to_string(1.f / (float)Frametime));
 	}
@@ -159,6 +164,8 @@ void Client::Update() {
 	if (Inputs.CheckKey(GLFW_KEY_ESCAPE)) {
 		glfwSetWindowShouldClose(getWindow(), true);
 	}
+
+
 
 	if (Properties.WindowSizeDirty) {
 		Properties.WindowSizeDirty = false;

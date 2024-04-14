@@ -86,19 +86,6 @@ void TerrainRenderer::Defrag(int iterations) {
 	}
 }
 
-uint32_t TerrainRenderer::getGapCount() {
-	int n = 0;
-
-	for (auto& DrawBatch : ChunkSolidBatches) {
-		n += DrawBatch.InsertSpace.size();
-	}
-
-	for (auto& DrawBatch : ChunkTransparentBatches) {
-		n += DrawBatch.InsertSpace.size();
-	}
-
-	return n;
-}
 
 void TerrainRenderer::Update() {
 	int width, height;
@@ -150,25 +137,21 @@ void TerrainRenderer::AddChunk(Meshing::ChunkMeshData* MeshData) {
 
 	if (ChunkBatchSolidLookup.count(id)) {
 		size_t BatchIndex = ChunkBatchSolidLookup[id];
-
 		ChunkSolidBatches[BatchIndex].DeleteChunkVertices(id);
 
 		ChunkBatchSolidLookup.erase(id);
+		
 	}
 
 	UpdateDrawCommands = true;
 
-	if (MeshData->SolidVertices.size() == 0) {
-	}
-	else {
+	if (MeshData->SolidVertices.size() != 0) {
 		bool success = false;
 
 		for (int batchIndex = 0; batchIndex < ChunkSolidBatches.size(); batchIndex++) {
-			size_t MeshDataSize = MeshData->SolidVertices.size();
+			size_t MeshDataSize = MeshData->SolidVertices.size() * sizeof(uint32_t);
 
-			size_t size = (--(ChunkSolidBatches[batchIndex].InsertSpace.end()))->first;
-
-			if (size >= MeshDataSize * sizeof(unsigned int)) {
+			if (ChunkSolidBatches[batchIndex].MemoryPool.MemoryPool.FindFreeSpace(MeshDataSize) != ULLONG_MAX) {
 				ChunkSolidBatches[batchIndex].AddChunkVertices(MeshData->SolidVertices, MeshData->Position.x, MeshData->Position.y, MeshData->Position.z);
 				ChunkBatchSolidLookup[id] = batchIndex;
 				success = true;
@@ -196,11 +179,9 @@ void TerrainRenderer::AddChunk(Meshing::ChunkMeshData* MeshData) {
 		bool success = false;
 
 		for (int batchIndex = 0; batchIndex < ChunkTransparentBatches.size(); batchIndex++) {
-			size_t MeshDataSize = MeshData->TransparentVertices.size();
+			size_t MeshDataSize = MeshData->TransparentVertices.size() * sizeof(uint32_t);
 
-			size_t size = (--(ChunkTransparentBatches[batchIndex].InsertSpace.end()))->first;
-
-			if (size >= MeshDataSize * sizeof(unsigned int)) {
+			if (ChunkTransparentBatches[batchIndex].MemoryPool.MemoryPool.FindFreeSpace(MeshDataSize) != ULLONG_MAX) {
 				ChunkTransparentBatches[batchIndex].AddChunkVertices(MeshData->TransparentVertices, MeshData->Position.x, MeshData->Position.y, MeshData->Position.z);
 				ChunkBatchTransparentLookup[id] = batchIndex;
 				success = true;
@@ -240,10 +221,10 @@ double TerrainRenderer::getFragmentationRate() {
 
 		if (batch.RenderList.size() != 0) {
 
-			size_t FullMemoryUse = (--batch.RenderList.end())->second.size + (--batch.RenderList.end())->second.offset; //Include gaps
-			size_t MemoryUse = ChunkSolidBatches[batchIndex].MemoryUsage; //Only include vertex data
+			size_t FullMemoryUse = batch.MemoryPool.Statistics.FullMemoryUsage; //Include gaps
+			size_t MemoryUse = batch.MemoryPool.Statistics.MemoryUsage; //Only include vertex data
 
-			fragRate += ((double)MemoryUse / (double)FullMemoryUse) / ((double)n);
+			fragRate += (batch.MemoryPool.Statistics.FragmentationRate / (double)n);
 		}
 
 
@@ -261,7 +242,7 @@ size_t TerrainRenderer::getVRAMUsageFull() {
 			continue;
 		}
 
-		memUsage += (--ChunkSolidBatches[batchIndex].RenderList.end())->second.size + (--ChunkSolidBatches[batchIndex].RenderList.end())->second.offset;
+		memUsage += ChunkSolidBatches[batchIndex].MemoryPool.Statistics.FullMemoryUsage;
 	}
 
 	return memUsage;

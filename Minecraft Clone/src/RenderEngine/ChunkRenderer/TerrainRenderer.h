@@ -25,8 +25,6 @@ public:
 
 	void Defrag(int iterations);
 
-	uint32_t getGapCount();
-
 	void Update();
 
 	void setSettings(uint32_t RenderDistance, uint32_t VerticalRenderDistance, float FOV);

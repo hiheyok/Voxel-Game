@@ -8,6 +8,7 @@
 #include "../../../Utils/MathHelper.h"
 #include "../../../World/Chunk/Chunk.h"
 #include "../../OpenGL/Buffers/Buffer.h"
+#include "../../ChunkRendererV2/MemoryPool/ChunkMemoryPool.h"
 #include <unordered_map>
 #include <list>
 #include <map>
@@ -36,13 +37,6 @@ struct DrawCommandIndirect {
 	}
 };
 
-struct DataBufferAddress {
-	size_t offset = 0;
-	size_t size = 0;
-	int x, y, z;
-};
-
-
 class ChunkDrawBatch {
 public:
 
@@ -52,9 +46,7 @@ public:
 
 	void GenDrawCommands(int RenderDistance, int VerticalRenderDistance);
 
-	bool AddChunkVertices(std::vector<unsigned int> Data, int x, int y, int z);
-
-	bool AddChunkVertices(Buffer GPUData, size_t DataSize, int x, int y, int z);
+	bool AddChunkVertices(std::vector<uint32_t>& Data, int x, int y, int z);
 
 	void DeleteChunkVertices(ChunkID ID);
 
@@ -74,15 +66,17 @@ public:
 
 	Camera* camera;
 
-	std::multimap<size_t, size_t> InsertSpace; // <Slot Size, Index>
-	size_t MemoryUsage = 0;
-	std::map<size_t, DataBufferAddress> RenderList; //Offset, Render List
+	std::map<size_t, ChunkMemoryPoolOffset> RenderList; //Offset, Render List
 
 	double debugTime = 0.0;
+
+	ChunkGPUMemoryPool MemoryPool;
 private:
 
+	
+
 	CFrustum Frustum;
-	Buffer VBO, IBO, SSBO;
+	Buffer IBO, SSBO;
 	VertexArray Array;
 	size_t MaxBufferSize = NULL;
 
@@ -90,11 +84,6 @@ private:
 
 	std::unordered_map<ChunkID, size_t> RenderListOffsetLookup;
 	std::vector<GLint> ChunkShaderPos;
-
-	int lastRenderSize = 0;
-
-	std::unordered_map<ChunkID, std::multimap<size_t, size_t>::iterator> InsertSpaceIteratorsFront;
-	std::unordered_map<ChunkID, std::multimap<size_t, size_t>::iterator> InsertSpaceIteratorsBack;
 
 	std::vector<DrawCommandIndirect> DrawCommands;
 
