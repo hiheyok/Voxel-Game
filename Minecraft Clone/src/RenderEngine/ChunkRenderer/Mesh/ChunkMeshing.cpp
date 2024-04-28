@@ -47,22 +47,34 @@ inline bool ChunkMeshData::compareQuads(const Quad& q0, const Quad& q1) {
 	return q0.Data == q1.Data;
 }
 
+unsigned trailing_zeros(unsigned n) {
+	unsigned bits = 0;
+	bits |= ((n & 0x0000FFFF) == 0) << 4;
+	n >>= ((n & 0x0000FFFF) == 0) << 4;
+	bits |= ((n & 0x000000FF) == 0) << 3;
+	n >>= ((n & 0x000000FF) == 0) << 3;
+	bits |= ((n & 0x0000000F) == 0) << 2;
+	n >>= ((n & 0x0000000F) == 0) << 2;
+	bits |= ((n & 0x00000003) == 0) << 1;
+	n >>= ((n & 0x00000003) == 0) << 1;
+	bits |= (n & 1) ^ 1;
+	return bits;
+}
+
 //Loops through all the blocks in the chunk and check if each block side is visible. If a block side is visible, it generates the quad and puts it in the cache
 
 void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
-	for (int z = 1; z < 15; z++) { //Test along x-faces
-		/*if ((chunk->Z_block[z] | chunk->TZ_block[z]) == 0) {
-			continue;
-		}*/
+	uint32_t CHUNK_SIZE_P = 16 + 2;
+	uint32_t CoordOffset = CHUNK_SIZE_P * CHUNK_SIZE_P;
 
-		for (int y = 1; y < 15; y++) {
+	std::vector<uint32_t> Bits(CoordOffset * 6);
 
-			/*if ((chunk->Y_block[y] | chunk->TY_block[y]) == 0) {
-				continue;
-			}*/
+	memset(Bits.data(), 0, CoordOffset * 6);
 
-			for (int x = 1; x < 15; x++) {
-
+	//Get main voxels'
+	for (int x = 0; x < 16; x++) {
+		for (int y = 0; y < 16; y++) {
+			for (int z = 0; z < 16; z++) {
 				BlockID b = 0x00;
 
 				b = chunk->GetBlockUnsafe(x, y, z);
@@ -70,101 +82,18 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 				if (b == Blocks.AIR)
 					continue;
 
-				for (uint8_t side = 0; side < 2; side++) {
+				int xp = x + 1;
+				int yp = y + 1;
+				int zp = z + 1;
 
-					if (!IsFaceVisibleUnsafe(chunk, x, y, z, 1 - side) || CompareBlockSideUnsafe(chunk, x, y, z, 1 - side, b))
-						continue;
-
-					Quad quad;
-					quad.setTexture(GetTextureUnsafe(chunk, x, y, z, 1 - side));
-					SetFaceUnsafe(x, y, z, 1 - side, quad);
-					if (!Blocks.getBlockType(b)->Properties->transparency) {
-						booleanMap.InsertBitPos(x, y, z);
-					}
-					x += side ;
-				}
+				Bits[yp + zp * 18] |= 1U << xp;
+				Bits[zp + xp * 18 + CoordOffset * 2] |= 1U << yp;
+				Bits[xp + yp * 18 + CoordOffset * 4] |= 1U << zp;
 			}
 		}
 	}
 
-	for (int x = 1; x < 15; x++) { //Test along y-faces
-
-		/*if ((chunk->X_block[x] | chunk->TX_block[x]) == 0) {
-			continue;
-		}*/
-
-		for (int z = 1; z < 15; z++) {
-
-			/*if ((chunk->Z_block[z] | chunk->TZ_block[z]) == 0) {
-				continue;
-			}*/
-
-			for (int y = 1; y < 15; y++) {
-
-				BlockID b = 0x00;
-
-				b = chunk->GetBlockUnsafe(x, y, z);
-
-				if (b == Blocks.AIR)
-					continue;
-
-				for (uint8_t side = 0; side < 2; side++) {
-
-					if (!IsFaceVisibleUnsafe(chunk, x, y, z, 3 - side) || CompareBlockSideUnsafe(chunk, x, y, z, 3 - side, b))
-						continue;
-
-					Quad quad;
-					quad.setTexture(GetTextureUnsafe(chunk, x, y, z, 3 - side));
-					SetFaceUnsafe(x, y, z, 3 - side, quad);
-					if (!Blocks.getBlockType(b)->Properties->transparency) {
-						booleanMap.InsertBitPos(x, y, z);
-					}
-					y += side;
-				}
-			}
-		}
-	}
-
-	for (int y = 1; y < 15; y++) { //Test along z-faces
-
-		/*if ((chunk->Y_block[y] | chunk->TY_block[y]) == 0) {
-			continue;
-		}*/
-
-		for (int x = 1; x < 15; x++) {
-
-			/*if ((chunk->X_block[y] | chunk->TX_block[y]) == 0) {
-				continue;
-			}*/
-
-			for (int z = 1; z < 15; z++) {
-
-				BlockID b = 0x00;
-
-				b = chunk->GetBlockUnsafe(x, y, z);
-
-				if (b == Blocks.AIR)
-					continue;
-
-				for (uint8_t side = 0; side < 2; side++) {
-
-					if (!IsFaceVisibleUnsafe(chunk, x, y, z, 5 - side) || CompareBlockSideUnsafe(chunk, x, y, z, 5 - side, b))
-						continue;
-
-					Quad quad;
-					quad.setTexture(GetTextureUnsafe(chunk, x, y, z, 5 - side));
-					SetFaceUnsafe(x, y, z, 5 - side, quad);
-					if (!Blocks.getBlockType(b)->Properties->transparency) {
-						booleanMap.InsertBitPos(x, y, z);
-					}
-					
-					z += side;
-				}
-
-			}
-		}
-	}
-
+	//Get side voxels
 	for (int faces = 0; faces < 6; faces++) {
 		for (int u = 0; u < 16; u++) {
 			for (int v = 0; v < 16; v++) {
@@ -172,32 +101,88 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 
 				int p[3]{ 0,0,0 };
 
-				p[axis] = 15 * (faces & 0b1);
+				p[axis] = 17 * (faces & 0b1) - 1;
 				p[(axis + 1) % 3] = u;
 				p[(axis + 2) % 3] = v;
 
 				BlockID b = 0x00;
 
-				b = chunk->GetBlockUnsafe(p[0], p[1], p[2]);
+				b = chunk->GetBlock(p[0], p[1], p[2]);
 
 				if (b == Blocks.AIR)
 					continue;
 
-				for (uint8_t side = 0; side < 6; side++) {
-					if (!IsFaceVisible(chunk, p[0], p[1], p[2], side) || CompareBlockSide(chunk, p[0], p[1], p[2], side, b))
-						continue;
+				int xp = p[0] + 1;
+				int yp = p[1] + 1;
+				int zp = p[2] + 1;
 
-					Quad quad;
-					quad.setTexture(GetTextureUnsafe(chunk, p[0], p[1], p[2], side));
-					SetFaceUnsafe(p[0], p[1], p[2], side, quad);
-					if (!Blocks.getBlockType(b)->Properties->transparency) {
-						booleanMap.InsertBitPos(p[0], p[1], p[2]);
-					}
-				}
-
+				Bits[yp + zp * 18] |= 1U << xp;
+				Bits[zp + xp * 18 + CoordOffset * 2] |= 1U << yp;
+				Bits[xp + yp * 18 + CoordOffset * 4] |= 1U << zp;
 			}
 		}
+	}
 
+	memcpy(Bits.data() + CoordOffset, Bits.data(), CoordOffset * sizeof(uint32_t));
+	memcpy(Bits.data() + 3 * CoordOffset, Bits.data() + 2 * CoordOffset, CoordOffset * sizeof(uint32_t));
+	memcpy(Bits.data() + 5 * CoordOffset, Bits.data() + 4 * CoordOffset, CoordOffset * sizeof(uint32_t));
+
+	//Cull
+
+	for (int face = 0; face < 6; face++) {
+		for (int i = 0; i < CHUNK_SIZE_P * CHUNK_SIZE_P; i++) {
+			uint32_t tmp = Bits[i + face * CHUNK_SIZE_P * CHUNK_SIZE_P];
+
+			if (face & 0b1) {
+				tmp <<= 1;
+			}
+			else {
+				tmp >>= 1;
+			}
+
+			tmp = ~tmp;
+			Bits[i + face * CHUNK_SIZE_P * CHUNK_SIZE_P] &= tmp;
+		}
+	}
+
+	uint32_t P[3]{ 0 };
+
+	for (uint32_t face = 0; face < 6; face++) {
+		for (int u = 1; u < 17; u++) {
+			for (int v = 1; v < 17; v++) {
+				uint16_t c = (Bits[u + (v * CHUNK_SIZE_P) + (face * CoordOffset)] >> 1) & 0xFFFF;
+				uint32_t tOffset = 0;
+
+				while (c != 0) {
+					int TrailingZeroCount = trailing_zeros((uint32_t)c);
+					c = c >> TrailingZeroCount;
+					tOffset += TrailingZeroCount;
+
+					if (c == 0) break;
+
+					uint32_t D = face >> 1;
+
+					P[D] = tOffset;
+					P[(D + 1) % 3] = u - 1;
+					P[(D + 2) % 3] = v - 1;
+
+					int x = P[0];
+					int y = P[1];
+					int z = P[2];
+
+					Quad quad;
+					quad.setTexture(GetTextureUnsafe(chunk, x, y, z, face));
+					SetFaceUnsafe(x, y, z, face, quad);
+
+					if (!Blocks.getBlockType(chunk->GetBlockUnsafe(x, y, z))->Properties->transparency) {
+						booleanMap.InsertBitPos(x, y, z);
+					}
+
+					c >>= 1;
+					tOffset++;
+				}
+			}
+		}
 	}
 }
 

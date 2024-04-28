@@ -74,8 +74,6 @@ public:
 
 	std::vector<unsigned char> ArrayData;
 
-private:
-
 	int Layers = 0;
 
 };

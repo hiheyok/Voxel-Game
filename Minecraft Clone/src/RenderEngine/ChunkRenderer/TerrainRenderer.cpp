@@ -131,12 +131,10 @@ void TerrainRenderer::setSettings(uint32_t RenderDistance, uint32_t VerticalRend
 void TerrainRenderer::GetDebugInfo() {
 	for (auto& batch : ChunkSolidBatches) {
 		batch.GetDebugLogs();
-		batch.MemoryPool.MemoryPool.Debug();
 		batch.ErrorCheck();
 	}
 	for (auto& batch : ChunkTransparentBatches) {
 		batch.GetDebugLogs();
-		batch.MemoryPool.MemoryPool.Debug();
 		batch.ErrorCheck();
 	}
 }

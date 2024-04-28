@@ -81,19 +81,6 @@ void ChunkContainer::SetBlockUnsafe(BlockID block, int x, int y, int z) {
 
 	BlockStorage.ChangeBlock(block, (uint32_t)x, (uint32_t)y, (uint32_t)z);
 
-	bool isDeleting = block == Blocks.AIR;
-
-	bool isTransparent = 
-		(bool)((Blocks.getBlockType(block)->Properties->transparency * (!isDeleting)) + (isDeleting * Blocks.getBlockType(current)->Properties->transparency));
-
-	X_block[x] += count * (!isTransparent);
-	Y_block[y] += count * (!isTransparent);
-	Z_block[z] += count * (!isTransparent);
-
-	TX_block[x] += count * isTransparent;
-	TY_block[y] += count * isTransparent;
-	TZ_block[z] += count * isTransparent;
-
 	isEmpty = false;
 
 }

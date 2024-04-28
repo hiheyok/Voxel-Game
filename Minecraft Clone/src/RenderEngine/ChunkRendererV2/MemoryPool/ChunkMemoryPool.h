@@ -175,50 +175,6 @@ namespace MemoryManagement {
 			ReservedMemoryBlocks.Delete(MemOffset);
 		}
 
-		void Debug() { //Looks for errors
-			if (ReservedMemoryBlocks.size() == 0) {
-				return;
-			}
-
-			std::string Logs = "";
-
-			Logs += "Memory Pool Debugging Info\n";
-			Logs += "Errors: \n";
-
-			auto itReserved = ReservedMemoryBlocks.begin();
-			auto itFree = FreeMemoryBlocks.begin();
-
-			while (itFree != FreeMemoryBlocks.end()) {
-				if (ReservedMemoryBlocks.getIterator(itFree->second.Offset + itFree->second.Size) == ReservedMemoryBlocks.end()) {
-					if (itFree->second.Offset + itFree->second.Size != PoolSize) {
-						Logs += "Block Offset: " + std::to_string(itFree->second.Offset) + ", Block Size: " + std::to_string(itFree->second.Size) + "\n";
-					}
-				}
-				itFree++;
-			}
-
-			Logs += "----------------------------------------------------------\n";
-			Logs += "Memory Pool Free Blocks:\n";
-
-			itFree = FreeMemoryBlocks.begin();
-
-			while (itFree != FreeMemoryBlocks.end()) {
-				Logs += "Block Offset: " + std::to_string(itFree->second.Offset) + ", Block Size: " + std::to_string(itFree->second.Size) + "\n";
-				itFree++;
-			}
-
-			Logs += "----------------------------------------------------------\n";
-			Logs += "Memory Pool Reserved Blocks:\n";
-
-			while (itReserved != ReservedMemoryBlocks.end()) {
-				Logs += "Block Offset: " + std::to_string(itReserved->second.Offset) + ", Block Size: " + std::to_string(itReserved->second.Size) + "\n";
-				itReserved++;
-			}
-
-			Logger.LogDebug("Memory Pool Debug Info", Logs);
-
-		}
-
 		size_t FindFreeSpace(size_t MemSize) {
 			std::map<size_t, MemoryBlock>::iterator it = FreeMemoryBlocks.begin();
 			std::map<size_t, MemoryBlock>::iterator end = FreeMemoryBlocks.end();
@@ -438,8 +394,6 @@ private:
 	std::unordered_map<size_t, ChunkID> MemoryChunkOffset;
 
 	std::unordered_map<ChunkID, ChunkMemoryPoolOffset> UpdatedChunkMemoryOffsets;
-
-	std::string Logs = "";
 
 	int MEMORY_POOL_SIZE = 0;
 

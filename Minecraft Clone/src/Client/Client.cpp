@@ -31,9 +31,9 @@ void Client::Initialize() {
 	m_MainPlayer.SetPlayerRotation(-135.f, -30.);
 
 	ServerSettings serverSettings;
-	serverSettings.H_RenderDistance = 32;
-	serverSettings.V_RenderDistance = 32;
-	serverSettings.genThreads = 6;
+	serverSettings.H_RenderDistance = 64;
+	serverSettings.V_RenderDistance = 8;
+	serverSettings.genThreads = 16;
 
 	server.Start(serverSettings);
 
@@ -42,9 +42,9 @@ void Client::Initialize() {
 	EntityUpdater.Start();
 
 	Logger.LogInfo("World", "Generating World");
-	TerrainRender.HorizontalRenderDistance = 32;
-	TerrainRender.VerticalRenderDistance = 32;
-	TerrainRender.Start(getWindow(), server.world, 6);
+	TerrainRender.HorizontalRenderDistance = 64;
+	TerrainRender.VerticalRenderDistance = 8;
+	TerrainRender.Start(getWindow(), server.world, 10);
 	Logger.LogInfo("Client", "Starting Gameloop");
 
 	
@@ -77,11 +77,11 @@ void Client::SetWindowName() {
 		+ std::to_string(m_MainPlayer.GetEntityProperties().Position.z)
 		+ ", VRAM Fragmentation Rate: " + std::to_string(TerrainRender.RendererV2.getFragmentationRate() * 100)
 		+ ", VRAM Usage (MB): " + std::to_string((double)TerrainRender.RendererV2.getVRAMUsageFull() / 1000000.0)
-		//+ " | Mesh All (ms): " + std::to_string(TerrainRender.buildTime / 1000.f)
-		//+ " | S0 (ms): " + std::to_string(TerrainRender.buildstage0 / 1000.f)
-		//+ " | S1 (ms): " + std::to_string(TerrainRender.buildstage1 / 1000.f)
-		//+ " | S2 (ms): " + std::to_string(TerrainRender.buildstage2 / 1000.f)
-	//	+ " | Total Mesh: " + std::to_string(TerrainRender.amountOfMeshGenerated)
+		+ " | Mesh All (ms): " + std::to_string(TerrainRender.buildTime / 1000.f)
+		+ " | S0 (ms): " + std::to_string(TerrainRender.buildstage0 / 1000.f)
+		+ " | S1 (ms): " + std::to_string(TerrainRender.buildstage1 / 1000.f)
+		+ " | S2 (ms): " + std::to_string(TerrainRender.buildstage2 / 1000.f)
+		+ " | Total Mesh: " + std::to_string(TerrainRender.amountOfMeshGenerated)
 		+ ", Entity Count: " + to_string(((World*)Block::WorldPTR)->EntityData.GetEntityCount())
 		+", Event Queue Size: " + to_string(((World*)Block::WorldPTR)->EventManager.getSize())
 		+ ", Server Tick (MSPT): " + to_string(((World*)Block::WorldPTR)->MSPT)
