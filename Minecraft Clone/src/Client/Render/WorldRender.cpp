@@ -96,10 +96,7 @@ void WorldRender::Update() {
 		WorkerLocks[WorkerID].lock();
 
 		while (!WorkerOutput[WorkerID].empty()) {
-
-
 			RendererV2.AddChunk(WorkerOutput[(uint64_t)WorkerID].front());
-			RendererV2.Defrag(1);
 			WorkerOutput[WorkerID].pop_front();
 		}
 
@@ -117,7 +114,7 @@ void WorldRender::Update() {
 		LoadChunkToRenderer(chunkid);
 	}
 
-	RendererV2.Defrag(100);
+	RendererV2.Defrag(25);
 	RendererV2.Update();
 	RendererV2.PrepareRenderer();
 

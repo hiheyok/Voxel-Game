@@ -147,14 +147,12 @@ void Client::Update() {
 	if (Inputs.CheckKey(GLFW_KEY_G)) {
 		Properties.DrawSolid = true;
 	}
+	if (Inputs.CheckKeyPress(GLFW_KEY_J)) {
+		TerrainRender.RendererV2.GetDebugInfo();
+	}
 
 	if (Inputs.CheckKeyPress(GLFW_KEY_R)) {
 		EntityRender.Reload();
-	}
-
-	if (Inputs.CheckKeyPress(GLFW_KEY_U)) {
-		int k = 3;
-		int a = k + 4;
 	}
 
 	if (Inputs.CheckKey(GLFW_KEY_Z)) {
