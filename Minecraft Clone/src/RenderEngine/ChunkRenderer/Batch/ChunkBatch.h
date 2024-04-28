@@ -64,16 +64,22 @@ public:
 
 	void UpdateCommandBufferSize();
 
+	void ErrorCheck();
+
+	void GetDebugLogs() {
+		Logger.LogDebug("Chunk Batch", "Debug Logs:\n" + Logs);
+	}
+
 	Camera* camera;
 
-	std::map<size_t, ChunkMemoryPoolOffset> RenderList; //Offset, Render List
+	std::map<size_t, ChunkMemoryPoolOffset> RenderList; //f: Offset -> RenderInfo
 
 	double debugTime = 0.0;
 
 	ChunkGPUMemoryPool MemoryPool;
 private:
 
-	
+	std::string Logs = "";
 
 	CFrustum Frustum;
 	Buffer IBO, SSBO;
@@ -82,7 +88,7 @@ private:
 
 	bool UpdateCommands = false;
 
-	std::unordered_map<ChunkID, size_t> RenderListOffsetLookup;
+	std::unordered_map<ChunkID, size_t> RenderListOffsetLookup; //f: ChunkID  -> Offset
 	std::vector<GLint> ChunkShaderPos;
 
 	std::vector<DrawCommandIndirect> DrawCommands;

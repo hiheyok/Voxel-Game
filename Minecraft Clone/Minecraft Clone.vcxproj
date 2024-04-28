@@ -30,27 +30,27 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2023</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2023</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2023</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2023</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -141,7 +141,7 @@
       <LoopUnrolling>
       </LoopUnrolling>
       <StructMemberAlignment>8Bytes</StructMemberAlignment>
-      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -154,18 +154,25 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Client\Client.cpp" />
-    <ClCompile Include="src\Client\LocalWorld\LocalWorld.cpp" />
+    <ClCompile Include="src\Client\Player\MainPlayer.cpp" />
+    <ClCompile Include="src\Client\Player\PlayerMovement.cpp" />
+    <ClCompile Include="src\Client\Player\WorldInteraction.cpp" />
     <ClCompile Include="src\Client\Render\PlayerPOV.cpp" />
     <ClCompile Include="src\Client\Render\WorldRender.cpp" />
+    <ClCompile Include="src\Core\Initializer.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Math\Matrix.cpp" />
     <ClCompile Include="src\RenderEngine\Camera\camera.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRenderer\Batch\ChunkBatch.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshing.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRenderer\TerrainRenderer.cpp" />
+    <ClCompile Include="src\RenderEngine\EntityRenderer\EntityRenderCache.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRenderer\Models\EntityModels.cpp" />
+    <ClCompile Include="src\RenderEngine\EntityRenderer\MultiEntityRender.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRenderer\MultiEntityRender.h" />
+    <ClCompile Include="src\RenderEngine\EntityRenderer\EntityRenderUpdate.cpp" />
     <ClCompile Include="src\RenderEngine\Frustum\frustum.cpp" />
+    <ClCompile Include="src\RenderEngine\GUI\GUI.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Buffers\Buffer.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\OpenGL.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\Shader.cpp" />
@@ -179,11 +186,11 @@
     <ClCompile Include="src\World\Entity\Entities.cpp" />
     <ClCompile Include="src\World\Event\BlockEventHandles\BlockHandles.cpp" />
     <ClCompile Include="src\World\Event\EntityEventHandles\EntityHandles.cpp" />
+    <ClCompile Include="src\World\Item\Items.cpp" />
     <ClCompile Include="src\World\Server\Server.cpp" />
     <ClCompile Include="src\Utils\Clock.cpp" />
     <ClCompile Include="src\Utils\LogUtils.cpp" />
     <ClCompile Include="src\Utils\MathHelper.cpp" />
-    <ClCompile Include="src\Utils\NumGen.cpp" />
     <ClCompile Include="src\World\Chunk\Block\Block.cpp" />
     <ClCompile Include="src\World\Chunk\Chunk.cpp" />
     <ClCompile Include="src\World\Chunk\ChunkData.cpp" />
@@ -195,8 +202,24 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Client\Client.h" />
-    <ClInclude Include="src\Client\LocalWorld\LocalWorld.h" />
+    <ClInclude Include="src\Client\IO\IO.h" />
+    <ClInclude Include="src\Client\IO\KEY_CODE.h" />
     <ClInclude Include="src\Client\Player.h" />
+    <ClInclude Include="src\Client\Player\PlayerMovement.h" />
+    <ClInclude Include="src\Client\Player\WorldInteraction.h" />
+    <ClInclude Include="src\Client\Render\WorldRenderInfo.h" />
+    <ClInclude Include="src\Core\Initializer.h" />
+    <ClInclude Include="src\RenderEngine\ChunkRendererV2\MemoryPool\ChunkMemoryPool.h" />
+    <ClInclude Include="src\RenderEngine\EntityRenderer\EntityRenderUpdate.h" />
+    <ClInclude Include="src\RenderEngine\GUI\GUI.h" />
+    <ClInclude Include="src\RenderEngine\GUI\GUIObject.h" />
+    <ClInclude Include="src\RenderEngine\GUI\GUISet.h" />
+    <ClInclude Include="src\RenderEngine\ItemRender\BlockItemRender.h" />
+    <ClInclude Include="src\Utils\Containers\BitStorage.h" />
+    <ClInclude Include="src\World\Entity\Mobs\Player.h" />
+    <ClInclude Include="src\World\Item\Inventory\EntityInventory.h" />
+    <ClInclude Include="src\World\Item\Inventory\Inventory.h" />
+    <ClInclude Include="src\Client\Player\MainPlayer.h" />
     <ClInclude Include="src\Client\Render\PlayerPOV.h" />
     <ClInclude Include="src\Client\Render\WorldRender.h" />
     <ClInclude Include="src\Math\Matrix.h" />
@@ -210,8 +233,6 @@
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Occulsion\Graph\Graph.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\TerrainRenderer.h" />
     <ClInclude Include="src\RenderEngine\EntityRenderer\EntityRenderCache.h" />
-    <ClInclude Include="src\RenderEngine\EntityRenderer\EntityRenderer.h" />
-    <ClInclude Include="src\RenderEngine\EntityRenderer\EntityUpdates.h" />
     <ClInclude Include="src\RenderEngine\Frustum\frustum.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Buffers\Buffer.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Framebuffer\Framebuffer.h" />
@@ -234,11 +255,18 @@
     <ClInclude Include="src\World\Entity\Type\FallingBlock.h" />
     <ClInclude Include="src\World\Entity\Type\Hostile.h" />
     <ClInclude Include="src\World\Entity\Type\Passive.h" />
+    <ClInclude Include="src\World\Entity\Type\Types.h" />
     <ClInclude Include="src\World\Event\BlockEventHandles\BlockHandles.h" />
     <ClInclude Include="src\World\Event\EntityEventHandles\EntityHandles.h" />
     <ClInclude Include="src\World\Event\Event.h" />
     <ClInclude Include="src\World\Event\EventHandler.h" />
     <ClInclude Include="src\World\Event\EventSystem.h" />
+    <ClInclude Include="src\World\Item\Inventory\PlayerInventory.h" />
+    <ClInclude Include="src\World\Item\Item.h" />
+    <ClInclude Include="src\World\Item\Items.h" />
+    <ClInclude Include="src\World\Item\ItemStack.h" />
+    <ClInclude Include="src\World\Item\ItemTextureAtlas.h" />
+    <ClInclude Include="src\World\Item\Type\BlockItem.h" />
     <ClInclude Include="src\World\Server\Server.h" />
     <ClInclude Include="src\Utils\Clock.h" />
     <ClInclude Include="src\Utils\FastNoiseLite.h" />
@@ -249,8 +277,6 @@
     <ClInclude Include="src\Utils\Math\FastMath.h" />
     <ClInclude Include="src\Utils\Math\Matrix\mat4.h" />
     <ClInclude Include="src\Utils\Math\Ray\Ray.h" />
-    <ClInclude Include="src\Utils\MutithreadedData.h" />
-    <ClInclude Include="src\Utils\NumGen.h" />
     <ClInclude Include="src\Utils\stb_image.h" />
     <ClInclude Include="src\World\Chunk\Block\Block.h" />
     <ClInclude Include="src\World\Chunk\Block\Blocks.h" />

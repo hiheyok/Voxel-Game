@@ -12,8 +12,8 @@ struct ChunkMemoryPoolOffset {
 	int x = 0, y = 0, z = 0;
 
 	ChunkMemoryPoolOffset() {};
-	ChunkMemoryPoolOffset(uint64_t Offset, uint64_t Size) : MemOffset(Offset), MemSize(Size) {};
-	ChunkMemoryPoolOffset(uint64_t Offset, uint64_t Size, int X, int Y, int Z) : MemOffset(Offset), MemSize(Size), x(X), y(Y), z(Z) {};
+	ChunkMemoryPoolOffset(size_t Offset, size_t Size) : MemOffset(Offset), MemSize(Size) {};
+	ChunkMemoryPoolOffset(size_t Offset, size_t Size, int X, int Y, int Z) : MemOffset(Offset), MemSize(Size), x(X), y(Y), z(Z) {};
 };
 
 
@@ -35,15 +35,18 @@ namespace MemoryManagement {
 		}
 
 		void Delete(size_t Offset) {
-			if (!MemBlocksIterators.count(Offset)) return;
+			if (!MemBlocksIterators.count(Offset)) {
+				return;
+			}
 			std::map<size_t, MemoryBlock>::iterator it = MemBlocksIterators[Offset];
-			MemBlocks.erase(it);
-			MemBlocksIterators.erase(Offset);
+			Delete(it);
 		}
 
 		void Delete(std::map<size_t, MemoryBlock>::iterator it) {
-			MemBlocksIterators.erase(it->first);
+			size_t offset = it->first;
+
 			MemBlocks.erase(it);
+			MemBlocksIterators.erase(offset);
 		}
 
 		std::map<size_t, MemoryBlock>::iterator getIterator(size_t offset) {
@@ -66,17 +69,17 @@ namespace MemoryManagement {
 			return MemBlocks.rend();
 		}
 
-		std::map<size_t, MemoryBlock>::iterator lower_bound(uint64_t k) { //Get latest element less than k
+		std::map<size_t, MemoryBlock>::iterator lower_bound(size_t k) { //Get latest element less than k
 			auto it = MemBlocks.lower_bound(k);
 			it--;
 			return it;
 		}
 
-		std::map<size_t, MemoryBlock>::iterator upper_bound(uint64_t k) { //Get latest element greater than k
+		std::map<size_t, MemoryBlock>::iterator upper_bound(size_t k) { //Get latest element greater than k
 			return MemBlocks.upper_bound(k);
 		}
 
-		uint64_t size() {
+		size_t size() {
 			return MemBlocks.size();
 		}
 
@@ -91,12 +94,12 @@ namespace MemoryManagement {
 
 	class MemoryPoolManager {
 	public:
-		void Initialize(int SpaceAvailable) {
+		void Initialize(size_t SpaceAvailable) {
 			PoolSize = SpaceAvailable;
 			FreeMemoryBlocks.Add(MemoryBlock(0, PoolSize));
 		}
 
-		void AllocateSpace(size_t MemOffset, size_t MemSize) {
+		void AllocateSpace(size_t MemOffset, size_t MemSize) { //Assumes input are valid
 
 			ReservedMemoryBlocks.Add(MemoryBlock(MemOffset, MemSize));
 
@@ -105,11 +108,12 @@ namespace MemoryManagement {
 			MemoryBlock current = left->second;
 
 			FreeMemoryBlocks.Delete(left);
+
 			if (current.Size == MemSize)
 				return;
 
 			MemoryBlock NewFreeBlock(MemOffset + MemSize, current.Size - MemSize);
-
+			
 			FreeMemoryBlocks.Add(NewFreeBlock);
 		}
 
@@ -138,7 +142,7 @@ namespace MemoryManagement {
 				}
 			}
 
-			int MemoryRight = 0, MemoryLeft = 0;
+			size_t MemoryRight = 0, MemoryLeft = 0;
 
 			if (isFreeBlockRight) {
 				MemoryRight = RightBlockFree->second.Offset + RightBlockFree->second.Size;
@@ -154,24 +158,64 @@ namespace MemoryManagement {
 				MemoryLeft = MemOffset;
 			}
 
-			int FreeMemoryOffset = MemoryLeft;
-			int FreeMemorySize = MemoryRight - MemoryLeft;
+			size_t FreeMemoryOffset = MemoryLeft;
+			size_t FreeMemorySize = MemoryRight - MemoryLeft;
 
 			//Clear Free Spaces
 
-			if (isFreeBlockLeft) {
+			if (isFreeBlockLeft)
 				FreeMemoryBlocks.Delete(LeftBlockFree);
-			}
-			if (isFreeBlockRight) {
+			if (isFreeBlockRight)
 				FreeMemoryBlocks.Delete(RightBlockFree);
-			}
 
 			//Add Free Space
 			FreeMemoryBlocks.Add(MemoryBlock(FreeMemoryOffset, FreeMemorySize));
 
 			//Clear Reserve Space
 			ReservedMemoryBlocks.Delete(MemOffset);
+		}
 
+		void Debug() { //Looks for errors
+			if (ReservedMemoryBlocks.size() == 0) {
+				return;
+			}
+
+			std::string Logs = "";
+
+			Logs += "Memory Pool Debugging Info\n";
+			Logs += "Errors: \n";
+
+			auto itReserved = ReservedMemoryBlocks.begin();
+			auto itFree = FreeMemoryBlocks.begin();
+
+			while (itFree != FreeMemoryBlocks.end()) {
+				if (ReservedMemoryBlocks.getIterator(itFree->second.Offset + itFree->second.Size) == ReservedMemoryBlocks.end()) {
+					if (itFree->second.Offset + itFree->second.Size != PoolSize) {
+						Logs += "Block Offset: " + std::to_string(itFree->second.Offset) + ", Block Size: " + std::to_string(itFree->second.Size) + "\n";
+					}
+				}
+				itFree++;
+			}
+
+			Logs += "----------------------------------------------------------\n";
+			Logs += "Memory Pool Free Blocks:\n";
+
+			itFree = FreeMemoryBlocks.begin();
+
+			while (itFree != FreeMemoryBlocks.end()) {
+				Logs += "Block Offset: " + std::to_string(itFree->second.Offset) + ", Block Size: " + std::to_string(itFree->second.Size) + "\n";
+				itFree++;
+			}
+
+			Logs += "----------------------------------------------------------\n";
+			Logs += "Memory Pool Reserved Blocks:\n";
+
+			while (itReserved != ReservedMemoryBlocks.end()) {
+				Logs += "Block Offset: " + std::to_string(itReserved->second.Offset) + ", Block Size: " + std::to_string(itReserved->second.Size) + "\n";
+				itReserved++;
+			}
+
+			Logger.LogDebug("Memory Pool Debug Info", Logs);
 
 		}
 
@@ -204,8 +248,8 @@ namespace MemoryManagement {
 
 	struct MemoryPoolStatistics {
 		double FragmentationRate = 0.0f;
-		uint64_t MemoryUsage = 0;
-		uint64_t FullMemoryUsage = 0;
+		size_t MemoryUsage = 0;
+		size_t FullMemoryUsage = 0;
 	};
 }
 
@@ -215,11 +259,7 @@ public:
 	void Allocate(int MemoryPoolSize) {
 		MEMORY_POOL_SIZE = MemoryPoolSize;
 
-		buffer.SetUsage(GL_DYNAMIC_DRAW);
-		buffer.SetType(GL_ARRAY_BUFFER);
-		buffer.SetMaxSize(MemoryPoolSize);
-		buffer.GenBuffer();
-		buffer.InitializeData();
+		buffer.Create(GL_ARRAY_BUFFER, MemoryPoolSize);
 
 		StaggingBuffer.GenBuffer();
 		StaggingBuffer.SetType(GL_COPY_WRITE_BUFFER);
@@ -230,11 +270,11 @@ public:
 		MemoryPool.Initialize(MEMORY_POOL_SIZE);
 	}
 
-	void DeleteChunk(int x, int y, int z, int side) {
-		DeleteChunk(getChunkID(x, y, z), side);
+	void DeleteChunk(int x, int y, int z) {
+		DeleteChunk(getChunkID(x, y, z));
 	}
 
-	void DeleteChunk(ChunkID id, int side) {
+	void DeleteChunk(ChunkID id) {
 		if (!ChunkMemoryOffsets.count(id)) {
 			Logger.LogDebug("GPU Memory Pool","Attempted to delete non-existant chunk with ID " + std::to_string(id));
 			return;
@@ -246,7 +286,7 @@ public:
 		if (UpdatedChunkMemoryOffsets.count(id)) {
 			UpdatedChunkMemoryOffsets.erase(id);
 		}
-		
+
 		MemoryChunkOffset.erase(ChunkOffsetData.MemOffset);
 
 		Statistics.MemoryUsage -= ChunkOffsetData.MemSize;
@@ -254,8 +294,10 @@ public:
 	}
 
 	ChunkMemoryPoolOffset AddChunk(std::vector<uint32_t>& vertices, int x, int y, int z, int side) { //assumes vertices.size() != 0
-		uint64_t BlockSize = vertices.size() * sizeof(uint32_t);
-		uint64_t BlockOffset = MemoryPool.FindFreeSpace(BlockSize);
+		size_t BlockSize = vertices.size() * sizeof(uint32_t);
+		size_t BlockOffset = MemoryPool.FindFreeSpace(BlockSize);
+
+		ChunkID ID = getChunkID(x, y, z);
 
 		if (BlockOffset == ULLONG_MAX) { //Check if it is out of space
 			Logger.LogError("GPU Memory Pool", "Out of space!");
@@ -272,11 +314,11 @@ public:
 		MemoryPool.AllocateSpace(BlockOffset, BlockSize);
 
 		//Send Vertices Data into GPU
-		buffer.InsertSubData(BlockOffset, BlockSize, vertices.data());
+		buffer.InsertData(BlockOffset, BlockSize, vertices.data());
 
 		//Store Memory Offset
-		ChunkMemoryOffsets[getChunkID(x, y, z)] = ChunkMemoryBlock;
-		MemoryChunkOffset[BlockOffset] = getChunkID(x, y, z);
+		ChunkMemoryOffsets[ID] = ChunkMemoryBlock;
+		MemoryChunkOffset[BlockOffset] = ID;
 
 		Statistics.MemoryUsage += BlockSize;
 		Update();
@@ -298,7 +340,7 @@ public:
 			i++;
 
 			if (MemoryPool.FreeMemoryBlocks.size() == 1) {
-				return;
+				return true;
 			}
 
 			MemoryManagement::MemoryBlock FreeMemoryBlock = MemoryPool.FreeMemoryBlocks.begin()->second;
@@ -311,9 +353,9 @@ public:
 
 			ChunkID ID = MemoryChunkOffset[ReservedBlock.Offset];
 
-			DeleteChunk(ID, 0);
+			DeleteChunk(ID);
 
-			StaggingBuffer.CopyFrom(buffer, ReservedBlock.Offset, 0, ReservedBlock.Size);
+			buffer.CopyTo(StaggingBuffer, ReservedBlock.Offset, 0, ReservedBlock.Size);
 
 			UpdatedChunkMemoryOffsets[ID] = AddChunkStaggingBuffer(ID, NULL, FreeSpaceOffset, ReservedBlock.Size);
 		}
@@ -337,7 +379,7 @@ public:
 
 		int i = 0;
 
-		for (const auto& c : UpdatedChunkMemoryOffsets) {
+		for (auto c : UpdatedChunkMemoryOffsets) {
 			Chunks[i] = c.second;
 			i++;
 		}
@@ -352,7 +394,8 @@ public:
 	}
 
 	MemoryManagement::MemoryPoolStatistics Statistics;
-	Buffer buffer, StaggingBuffer;
+	Buffer StaggingBuffer;
+	BufferStorage buffer;
 
 	MemoryManagement::MemoryPoolManager MemoryPool;
 private:
@@ -392,9 +435,11 @@ private:
 	}
 
 	std::unordered_map<ChunkID, ChunkMemoryPoolOffset> ChunkMemoryOffsets;
-	std::unordered_map<uint64_t, ChunkID> MemoryChunkOffset;
+	std::unordered_map<size_t, ChunkID> MemoryChunkOffset;
 
 	std::unordered_map<ChunkID, ChunkMemoryPoolOffset> UpdatedChunkMemoryOffsets;
+
+	std::string Logs = "";
 
 	int MEMORY_POOL_SIZE = 0;
 

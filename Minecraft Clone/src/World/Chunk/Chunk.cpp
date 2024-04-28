@@ -131,6 +131,10 @@ void Chunk::Generate(FastNoiseLite* noise) {
 
 }
 
+void Chunk::GenerateDebug2() {
+	SetBlock(Blocks.COBBLESTONE, 8, 8, 8);
+}
+
 void Chunk::GenerateBlankChunk() {
 	for (int x = 0; x < 16; x++) {
 		for (int y = 0; y < 16; y++) {

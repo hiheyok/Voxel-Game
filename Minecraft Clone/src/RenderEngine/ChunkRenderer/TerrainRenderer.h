@@ -41,26 +41,28 @@ public:
 
 	void Cleanup();
 
+	void GetDebugInfo();
+
 	size_t amountOfMeshGenerated = 1;
 
 private:
+	void AddChunk(ChunkID ID, std::vector<uint32_t> data, std::vector<ChunkDrawBatch>* BatchType, std::unordered_map<ChunkID, int>* LookUpMap);
+
 	void SetupShaders();
 
 	void CreateNewSolidBatch();
 
 	void CreateNewTransparentBatch();
 
-	bool UpdateDrawCommands = false;
-
 	int m_HorizontalRenderDistance = 16;
 	int m_VerticalRenderDistance = 16;
 	float m_FOV = 80.f;
 
 	std::vector<ChunkDrawBatch> ChunkSolidBatches;
-	std::unordered_map<ChunkID, int> ChunkBatchSolidLookup;
+	std::unordered_map<ChunkID, int> ChunkBatchSolidLookup; //f: ChunkID -> SolidBatchIndex
 
 	std::vector<ChunkDrawBatch> ChunkTransparentBatches;
-	std::unordered_map<ChunkID, int> ChunkBatchTransparentLookup;
+	std::unordered_map<ChunkID, int> ChunkBatchTransparentLookup; //f: ChunkID -> TransparentBatchIndex
 
 	GLFWwindow* window = nullptr;
 

@@ -1,7 +1,7 @@
 #include "ChunkBatch.h"
 #include <iterator>
 #include "../../../World/Server/Time/Timer.h"
-
+#include <unordered_set>
 using namespace glm;
 using namespace std;
 
@@ -34,7 +34,7 @@ void ChunkDrawBatch::SetupBuffers() {
 }
 
 void ChunkDrawBatch::Reset() {
-	MemoryPool.buffer.ResetBuffer();
+//	MemoryPool.buffer.ResetBuffer();
 	IBO.ResetBuffer();
 	SSBO.ResetBuffer();
 	Array.ResetArray();
@@ -64,6 +64,7 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance, int VerticalRenderDista
 		RenderList.erase(RenderListOffsetLookup[getChunkID(chunk.x, chunk.y, chunk.z)]);
 		RenderList[chunk.MemOffset] = chunk;
 		RenderListOffsetLookup[getChunkID(chunk.x, chunk.y, chunk.z)] = chunk.MemOffset;
+		UpdateCommands = true;
 	}
 
 	if (RenderList.size() > DrawCommands.size()) {
@@ -118,27 +119,48 @@ void ChunkDrawBatch::UpdateCommandBufferSize() {
 	ChunkShaderPos.resize(RenderList.size() * 3);
 }
 
+std::unordered_set<ChunkID> Deleted;
+
 bool ChunkDrawBatch::AddChunkVertices(std::vector<uint32_t>& Data, int x, int y, int z) {
 	ChunkID id = getChunkID(x, y, z);
 
 	size_t DataSize = Data.size() * sizeof(uint32_t);
 
-	ChunkMemoryPoolOffset MemPoolOffset = MemoryPool.AddChunk(Data, x, y, z, NULL);
+	ChunkMemoryPoolOffset MemoryPoolBlockData = MemoryPool.AddChunk(Data, x, y, z, NULL);
 
-	if (MemPoolOffset.MemOffset == ULLONG_MAX)
+	Logs += "Adding Chunk: " + std::to_string(id) + ", Offset: " + std::to_string(MemoryPoolBlockData.MemOffset) + ", Size: " + std::to_string(MemoryPoolBlockData.MemSize) + "\n";
+
+	if (Deleted.count(MemoryPoolBlockData.MemOffset)) {
+		Deleted.erase(MemoryPoolBlockData.MemOffset);
+	}
+
+
+	if (MemoryPoolBlockData.MemOffset == ULLONG_MAX) {
 		return false;
+	}
 
-	RenderList[MemPoolOffset.MemOffset] = MemPoolOffset;
-	RenderListOffsetLookup[id] = MemPoolOffset.MemOffset;
+	
+	RenderList[MemoryPoolBlockData.MemOffset] = MemoryPoolBlockData;
+	RenderListOffsetLookup[id] = MemoryPoolBlockData.MemOffset;
 	AmountOfChunks++;
 	UpdateCommands = true;
 	return true;
 }
 
+int i = 0;
+
 void ChunkDrawBatch::DeleteChunkVertices(ChunkID id) {
 	if (MemoryPool.CheckChunk(id)) {
 		ChunkMemoryPoolOffset ChunkMemOffset = MemoryPool.GetChunkMemoryPoolOffset(id);
-		MemoryPool.DeleteChunk(id, NULL);
+		if (ChunkMemOffset.MemOffset == ULLONG_MAX) {
+			Logger.LogError("Chunk Batch", "Failed to delete chunk: " + std::to_string(id));
+			return;
+		}
+
+		Logs += "Deleting Chunk: " + std::to_string(id) + ", Offset: " + std::to_string(ChunkMemOffset.MemOffset) + ", Size: " + std::to_string(ChunkMemOffset.MemSize) + "\n";
+
+		MemoryPool.DeleteChunk(id);
+
 		RenderList.erase(ChunkMemOffset.MemOffset);
 		RenderListOffsetLookup.erase(id);
 		AmountOfChunks--;
@@ -172,5 +194,25 @@ void ChunkDrawBatch::Draw() {
 
 void ChunkDrawBatch::Defrager(int iterations) {
 	MemoryPool.DefragMemoryPool(iterations);
-	UpdateCommands = true;
+}
+
+
+
+void ChunkDrawBatch::ErrorCheck() {
+	std::unordered_set<ChunkID> UsedChunk;
+	std::string Logs = "";
+
+	for (const auto& c : RenderList) {
+		if (UsedChunk.count(getChunkID(c.second.x, c.second.y, c.second.z))) {
+			Logs += "Chunk: " + std::to_string(c.first) + "\n";
+		}
+		else {
+			UsedChunk.insert(getChunkID(c.second.x, c.second.y, c.second.z));
+		}
+
+	}
+
+	Logger.LogDebug("Chunk Batch", "Errors: \n" + Logs);
+
+
 }

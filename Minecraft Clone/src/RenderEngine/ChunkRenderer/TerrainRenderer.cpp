@@ -128,73 +128,62 @@ void TerrainRenderer::setSettings(uint32_t RenderDistance, uint32_t VerticalRend
 	m_FOV = FOV;
 }
 
+void TerrainRenderer::GetDebugInfo() {
+	for (auto& batch : ChunkSolidBatches) {
+		batch.GetDebugLogs();
+		batch.MemoryPool.MemoryPool.Debug();
+		batch.ErrorCheck();
+	}
+	for (auto& batch : ChunkTransparentBatches) {
+		batch.GetDebugLogs();
+		batch.MemoryPool.MemoryPool.Debug();
+		batch.ErrorCheck();
+	}
+}
+
 void TerrainRenderer::LoadAssets() {
 	SolidShader.bindTextureArray2D(0, Blocks.BlockTextureArray.textureID, "BlockTexture");
 }
 
-void TerrainRenderer::AddChunk(Meshing::ChunkMeshData* MeshData) {
-	ChunkID id = getChunkID(MeshData->Position);
+void TerrainRenderer::AddChunk(ChunkID ID, std::vector<uint32_t> data, std::vector<ChunkDrawBatch>* BatchType, std::unordered_map<ChunkID, int>* LookUpMap) {
+	if (LookUpMap->count(ID)) {
+		size_t BatchIndex = LookUpMap->at(ID);
+		BatchType->at(BatchIndex).DeleteChunkVertices(ID);
+		LookUpMap->erase(ID);
+	}
 
-	if (ChunkBatchSolidLookup.count(id)) {
-		size_t BatchIndex = ChunkBatchSolidLookup[id];
-		ChunkSolidBatches[BatchIndex].DeleteChunkVertices(id);
+	if (data.size() == 0)
+		return;
 
-		ChunkBatchSolidLookup.erase(id);
+	glm::ivec3 ChunkPos = ChunkIDToPOS(ID);
+
+	bool Success = false;
+
+	for (int batchIndex = 0; batchIndex < BatchType->size(); batchIndex++) {
+		size_t MeshDataSize = data.size() * sizeof(uint32_t);
+
+		if (BatchType->at(batchIndex).MemoryPool.MemoryPool.FindFreeSpace(MeshDataSize) == ULLONG_MAX)
+			continue;
+
+		bool InsertSuccess = BatchType->at(batchIndex).AddChunkVertices(data, ChunkPos.x, ChunkPos.y, ChunkPos.z);
+
+		if (!InsertSuccess) continue;
+
+		LookUpMap->emplace(std::pair<ChunkID, int>(ID, batchIndex));
+		Success = true;
+		break;
 		
 	}
 
-	UpdateDrawCommands = true;
-
-	if (MeshData->SolidVertices.size() != 0) {
-		bool success = false;
-
-		for (int batchIndex = 0; batchIndex < ChunkSolidBatches.size(); batchIndex++) {
-			size_t MeshDataSize = MeshData->SolidVertices.size() * sizeof(uint32_t);
-
-			if (ChunkSolidBatches[batchIndex].MemoryPool.MemoryPool.FindFreeSpace(MeshDataSize) != ULLONG_MAX) {
-				ChunkSolidBatches[batchIndex].AddChunkVertices(MeshData->SolidVertices, MeshData->Position.x, MeshData->Position.y, MeshData->Position.z);
-				ChunkBatchSolidLookup[id] = batchIndex;
-				success = true;
-				break;
-			}
-		}
-
-		if (!success) {
-			Logger.LogInfo("Terrain Renderer", "Unable to add chunk. Solid buffers are full!");
-		}
+	if (!Success) {
+		Logger.LogInfo("Terrain Renderer", "Unable to add chunk. Solid buffers are full!");
 	}
+}
 
-
-	if (ChunkBatchTransparentLookup.count(id)) {
-		size_t BatchIndex = ChunkBatchTransparentLookup[id];
-
-		ChunkTransparentBatches[BatchIndex].DeleteChunkVertices(id);
-
-		ChunkBatchTransparentLookup.erase(id);
-	}
-
-	UpdateDrawCommands = true;
-
-	if (MeshData->TransparentVertices.size() != 0) {
-		bool success = false;
-
-		for (int batchIndex = 0; batchIndex < ChunkTransparentBatches.size(); batchIndex++) {
-			size_t MeshDataSize = MeshData->TransparentVertices.size() * sizeof(uint32_t);
-
-			if (ChunkTransparentBatches[batchIndex].MemoryPool.MemoryPool.FindFreeSpace(MeshDataSize) != ULLONG_MAX) {
-				ChunkTransparentBatches[batchIndex].AddChunkVertices(MeshData->TransparentVertices, MeshData->Position.x, MeshData->Position.y, MeshData->Position.z);
-				ChunkBatchTransparentLookup[id] = batchIndex;
-				success = true;
-				break;
-			}
-		}
-
-		if (!success) {
-			Logger.LogInfo("Terrain Renderer", "Unable to add chunk. Transparent buffers are full!");
-		}
-
-	}
-
+void TerrainRenderer::AddChunk(Meshing::ChunkMeshData* MeshData) {
+	ChunkID ID = getChunkID(MeshData->Position);
+	AddChunk(ID, MeshData->SolidVertices, &ChunkSolidBatches, &ChunkBatchSolidLookup);
+	AddChunk(ID, MeshData->TransparentVertices, &ChunkTransparentBatches, &ChunkBatchTransparentLookup);
 	delete MeshData;
 }
 
@@ -280,7 +269,7 @@ void TerrainRenderer::CreateNewSolidBatch() {
 void TerrainRenderer::CreateNewTransparentBatch() {
 	ChunkTransparentBatches.emplace_back();
 	size_t i = ChunkTransparentBatches.size() - 1;
-	ChunkTransparentBatches[i].SetMaxSize(1000000000);
+	ChunkTransparentBatches[i].SetMaxSize(500000000);
 	ChunkTransparentBatches[i].SetupBuffers();
 	ChunkTransparentBatches[i].camera = camera;
 }
