@@ -176,6 +176,7 @@ namespace Meshing
 		//Face data
 		Quad* FaceCollectionCache;
 		uint16_t* BitsFaceExistCache;
+		uint32_t* BitsSolidBlockCache;
 
 		//Add faces to the mesh
 		inline void AddFacetoMesh(QuadWPos& quad, int slice, int axis, uint8_t face);

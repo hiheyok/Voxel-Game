@@ -91,13 +91,22 @@ void WorldRender::Worker(int id) {
 
 void WorldRender::Update() {
 
+	int LoadingLimit = 100;
+
+	int LoadedAmount = 0;
+
 	for (int WorkerID = 0; WorkerID < WorkerCount; WorkerID++) {
 
 		WorkerLocks[WorkerID].lock();
 
 		while (!WorkerOutput[WorkerID].empty()) {
+			if (LoadingLimit < LoadedAmount) {
+				break;
+			}
+
 			RendererV2.AddChunk(WorkerOutput[(uint64_t)WorkerID].front());
 			WorkerOutput[WorkerID].pop_front();
+			LoadedAmount++;
 		}
 
 		WorkerLocks[WorkerID].unlock();

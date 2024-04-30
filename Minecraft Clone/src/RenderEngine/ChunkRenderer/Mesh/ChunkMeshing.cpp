@@ -40,6 +40,9 @@ void ChunkMeshData::GenerateMesh(Chunk* chunk) {
 	stage0 = (double)(t1 - t0).count() / 1000.0;
 	stage1 = (double)(t2 - t1).count() / 1000.0;
 	stage2 = (double)(t3 - t2).count() / 1000.0;
+
+	delete[] BitsFaceExistCache;
+	delete[] BitsSolidBlockCache;
 }
 
 //Checks if there are anything different between q0 and q1
@@ -81,8 +84,10 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 	uint32_t CoordOffset = CHUNK_SIZE_P * CHUNK_SIZE_P;
 	uint32_t TypeOffset = CoordOffset * 6;
 	BitsFaceExistCache = new uint16_t[16 * 16 * 6]{0};
+	BitsSolidBlockCache = new uint32_t[18 * 18]{ 0 };
 
 	memset(BitsFaceExistCache, 0, 16 * 16 * 6 * sizeof(uint16_t));
+	memset(BitsSolidBlockCache, 0, 16 * 16 * sizeof(uint32_t));
 
 	std::vector<uint32_t> isTransparentCache(Blocks.BlockTypeData.size());
 
@@ -106,6 +111,10 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 					continue;
 
 				int BlockTypeOffset = isTransparentCache[b] * TypeOffset;
+
+				if (Blocks.getBlockType(b)->Properties->isSolid) {
+					BitsSolidBlockCache[(x + 1) + (y + 1) * 18] |= 1U << (z + 1);
+				}
 
 				int xp = x + 1;
 				int yp = y + 1;
@@ -145,6 +154,10 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 					continue;
 
 				int BlockTypeOffset = isTransparentCache[b] * TypeOffset;
+
+				if (Blocks.getBlockType(b)->Properties->isSolid) {
+					BitsSolidBlockCache[(p[0] + 1) + (p[1] + 1) * 18] |= 1U << (p[2] + 1);
+				}
 
 				int xp = p[0] + 1;
 				int yp = p[1] + 1;
@@ -274,6 +287,15 @@ void ChunkMeshData::SimplifyMesh(Chunk* chunk) {
 					if (column == 0) continue;
 
 					for (x[Axis0] = 0; x[Axis0] < 16; x[Axis0]++) {
+
+						uint32_t Zeros = TrailingZeros(column);
+						column = column >> 1;
+						if (Zeros != 0) {
+							column = column >> Zeros - 1;
+							x[Axis0] += Zeros - 1;
+							continue;
+						}
+
 
 						uint32_t TestQuad = GetFaceUnsafe(x[0], x[1], x[2], (axis << 1) + facing).Data;
 
@@ -701,7 +723,9 @@ void ChunkMeshData::GenerateAmbientOcculsion(Chunk* chunk) {
 							check[axis1] = u + pos[axis1];
 							check[axis2] = v + pos[axis2];
 
-							if (!Blocks.getBlockType(chunk->GetBlock(check[0], check[1], check[2]))->Properties->isSolid)
+							bool isSolid = (BitsSolidBlockCache[check[0] + 1 + (check[1] + 1) * 18] >> (check[2] + 1)) & 0b1;
+
+							if (!isSolid)
 								continue;
 
 							uint8_t CornerIndex = 0;
