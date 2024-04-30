@@ -33,7 +33,7 @@ void Client::Initialize() {
 	ServerSettings serverSettings;
 	serverSettings.H_RenderDistance = 64;
 	serverSettings.V_RenderDistance = 8;
-	serverSettings.genThreads = 16;
+	serverSettings.genThreads = 4;
 
 	server.Start(serverSettings);
 
@@ -44,7 +44,7 @@ void Client::Initialize() {
 	Logger.LogInfo("World", "Generating World");
 	TerrainRender.HorizontalRenderDistance = 64;
 	TerrainRender.VerticalRenderDistance = 8;
-	TerrainRender.Start(getWindow(), server.world, 10);
+	TerrainRender.Start(getWindow(), server.world, 4);
 	Logger.LogInfo("Client", "Starting Gameloop");
 
 	

@@ -32,7 +32,7 @@ public:
 
 	void Unuse();
 
-	inline ChunkContainer* GetNeighbor(unsigned int Side);
+	ChunkContainer* GetNeighbor(unsigned int Side);
 	
 	void SetPosition(int x, int y, int z);
 

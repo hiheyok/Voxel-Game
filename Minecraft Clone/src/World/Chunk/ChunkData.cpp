@@ -92,7 +92,7 @@ void ChunkContainer::SetPosition(int x, int y, int z) {
 	chunkID = getChunkID(x, y, z);
 }
 
-inline ChunkContainer* ChunkContainer::GetNeighbor(unsigned int Side) {
+ChunkContainer* ChunkContainer::GetNeighbor(unsigned int Side) {
 	return Neighbors[Side];
 }
 
