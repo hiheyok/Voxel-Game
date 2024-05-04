@@ -43,6 +43,7 @@ void ChunkMeshData::GenerateMesh(Chunk* chunk) {
 
 	delete[] BitsFaceExistCache;
 	delete[] BitsSolidBlockCache;
+	delete[] TextureCache;
 }
 
 //Checks if there are anything different between q0 and q1
@@ -83,17 +84,27 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 	uint32_t CHUNK_SIZE_P = 16 + 2;
 	uint32_t CoordOffset = CHUNK_SIZE_P * CHUNK_SIZE_P;
 	uint32_t TypeOffset = CoordOffset * 6;
+
+	std::vector<BlockType> BlockTypeCache(Blocks.BlockTypeData.size());
+
 	BitsFaceExistCache = new uint16_t[16 * 16 * 6]{0};
 	BitsSolidBlockCache = new uint32_t[18 * 18]{ 0 };
+	TextureCache = new uint32_t[BlockTypeCache.size() * 6]{0};
+
+	for (BlockID b = 0; b < BlockTypeCache.size(); b++) {
+		Block* block = Blocks.BlockTypeData[b];
+
+		BlockTypeCache[b] = *block->Properties;
+
+		for (int face = 0; face < 6; face++) {
+			TextureCache[b * 6 + face] = block->Texture->GetFace(face);
+		}
+
+	}
+	
 
 	memset(BitsFaceExistCache, 0, 16 * 16 * 6 * sizeof(uint16_t));
 	memset(BitsSolidBlockCache, 0, 16 * 16 * sizeof(uint32_t));
-
-	std::vector<uint32_t> isTransparentCache(Blocks.BlockTypeData.size());
-
-	for (int i = 0; i < Blocks.BlockTypeData.size(); i++) {
-		isTransparentCache[i] = Blocks.BlockTypeData[i]->Properties->transparency;
-	}
 
 	std::vector<uint32_t> Bits(CoordOffset * 6 * 2);
 
@@ -110,9 +121,9 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 				if (b == Blocks.AIR)
 					continue;
 
-				int BlockTypeOffset = isTransparentCache[b] * TypeOffset;
+				int BlockTypeOffset = BlockTypeCache[b].transparency * TypeOffset;
 
-				if (Blocks.getBlockType(b)->Properties->isSolid) {
+				if (BlockTypeCache[b].isSolid) {
 					BitsSolidBlockCache[(x + 1) + (y + 1) * 18] |= 1U << (z + 1);
 				}
 
@@ -121,8 +132,8 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 				int zp = z + 1;
 
 				Bits[yp + zp * 18 + BlockTypeOffset] |= 1U << xp;
-				Bits[zp + xp * 18 + CoordOffset * 2 + BlockTypeOffset] |= 1U << yp;
-				Bits[xp + yp * 18 + CoordOffset * 4 + BlockTypeOffset] |= 1U << zp;
+				Bits[zp + xp * 18 + (CoordOffset * 2) + BlockTypeOffset] |= 1U << yp;
+				Bits[xp + yp * 18 + (CoordOffset * 4) + BlockTypeOffset] |= 1U << zp;
 			}
 		}
 	}
@@ -153,9 +164,9 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 				if (b == Blocks.AIR)
 					continue;
 
-				int BlockTypeOffset = isTransparentCache[b] * TypeOffset;
+				int BlockTypeOffset = BlockTypeCache[b].transparency * TypeOffset;
 
-				if (Blocks.getBlockType(b)->Properties->isSolid) {
+				if (BlockTypeCache[b].isSolid) {
 					BitsSolidBlockCache[(p[0] + 1) + (p[1] + 1) * 18] |= 1U << (p[2] + 1);
 				}
 
@@ -186,15 +197,17 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 	__m256i all_ones = _mm256_set_epi32(-1, -1, -1, -1, -1, -1, -1, -1);
 
 	for (int face = 0; face < 6; face++) {
-		for (int i = 0; i < CoordOffset / 8; i++) {
+		int i = 0;
+
+		for (i = 0; i < (CoordOffset / 8); i++) {
 
 			uint32_t index = i * 8;
 
-			Reg1T = _mm256_loadu_epi32(Bits.data() + index + face * CoordOffset);
-			Reg2T = _mm256_loadu_epi32(Bits.data() + index + face * CoordOffset + TypeOffset);
+			Reg1T = _mm256_loadu_si256((const __m256i*)(Bits.data() + index + face * CoordOffset));//_mm256_loadu_epi32(Bits.data() + index + face * CoordOffset);
+			Reg2T = _mm256_loadu_si256((const __m256i*)(Bits.data() + index + face * CoordOffset + TypeOffset));
 
-			Reg1 = _mm256_loadu_epi32(Bits.data() + index + face * CoordOffset);
-			Reg2 = _mm256_loadu_epi32(Bits.data() + index + face * CoordOffset + TypeOffset);
+			Reg1 = _mm256_loadu_si256((const __m256i*)(Bits.data() + index + face * CoordOffset));
+			Reg2 = _mm256_loadu_si256((const __m256i*)(Bits.data() + index + face * CoordOffset + TypeOffset));
 
 			if (face & 0b1) {
 				Reg1 = _mm256_sllv_epi32(Reg1, Bitshift);
@@ -205,14 +218,36 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 				Reg2 = _mm256_srlv_epi32(Reg2, Bitshift);
 			}
 
-			Reg1 = _mm256_xor_epi32(Reg1, all_ones);
-			Reg2 = _mm256_xor_epi32(Reg2, all_ones);
+			Reg1 = _mm256_xor_si256(Reg1, all_ones);
+			Reg2 = _mm256_xor_si256(Reg2, all_ones);
 
-			Reg1 = _mm256_and_epi32(Reg1, Reg1T);
-			Reg2 = _mm256_and_epi32(Reg2, Reg2T);
+			Reg1 = _mm256_and_si256(Reg1, Reg1T);
+			Reg2 = _mm256_and_si256(Reg2, Reg2T);
 
 			memcpy(Bits.data() + index + face * CoordOffset, (uint32_t*)(&Reg1), 8 * 4);
 			memcpy(Bits.data() + index + face * CoordOffset + TypeOffset, (uint32_t*)(&Reg2), 8 * 4);
+		}
+
+		i = i * 8;
+
+		for (; i < CoordOffset; i++) {
+			uint32_t index = i;
+
+			uint32_t tmp1 = Bits[index + face * CoordOffset];
+			uint32_t tmp2 = Bits[index + face * CoordOffset + TypeOffset];
+
+			if (face & 0b1) {
+				tmp1 <<= 1;
+				tmp2 <<= 1;
+			}
+			else {
+				tmp1 >>= 1;
+				tmp2 >>= 1;
+			}
+
+
+			Bits[index + face * CoordOffset] &= ~tmp1;
+			Bits[index + face * CoordOffset + TypeOffset] &= ~tmp2;
 		}
 	}
 
@@ -230,8 +265,6 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 						c = c >> TrailingZeroCount;
 						tOffset += TrailingZeroCount;
 
-						if (c == 0) break;
-
 						uint32_t D = face >> 1;
 
 						P[D] = tOffset;
@@ -242,13 +275,15 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 						int y = P[1];
 						int z = P[2];
 
+						BlockID b = chunk->GetBlockUnsafe(x, y, z);
+
 						Quad quad;
-						quad.setTexture(GetTextureUnsafe(chunk, x, y, z, face));
+						quad.setTexture(TextureCache[b * 6 + face]);
 						SetFaceUnsafe(x, y, z, face, quad);
 
 						BitsFaceExistCache[(u - 1) + (tOffset) * 16 + face * 256] |= 1U << (v - 1);
 
-						if (!Blocks.getBlockType(chunk->GetBlockUnsafe(x, y, z))->Properties->transparency) {
+						if (!BlockTypeCache[b].transparency) {
 							booleanMap.InsertBitPos(x, y, z);
 						}
 
@@ -287,15 +322,6 @@ void ChunkMeshData::SimplifyMesh(Chunk* chunk) {
 					if (column == 0) continue;
 
 					for (x[Axis0] = 0; x[Axis0] < 16; x[Axis0]++) {
-
-						uint32_t Zeros = TrailingZeros(column);
-						column = column >> 1;
-						if (Zeros != 0) {
-							column = column >> Zeros - 1;
-							x[Axis0] += Zeros - 1;
-							continue;
-						}
-
 
 						uint32_t TestQuad = GetFaceUnsafe(x[0], x[1], x[2], (axis << 1) + facing).Data;
 

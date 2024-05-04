@@ -55,7 +55,7 @@ namespace Meshing
 		}
 
 		inline void setLight(uint8_t Location, uint8_t Val) {
-			Data = Data & (~(0b1111 << (Location << 2))); // Clears light value for that location
+			Data &= (~(0b1111 << (Location << 2))); // Clears light value for that location
 			Data |= (Val << (Location << 2)); //Inserts light value
 		}
 
@@ -177,6 +177,8 @@ namespace Meshing
 		Quad* FaceCollectionCache;
 		uint16_t* BitsFaceExistCache;
 		uint32_t* BitsSolidBlockCache;
+		uint32_t* TextureCache;
+
 
 		//Add faces to the mesh
 		inline void AddFacetoMesh(QuadWPos& quad, int slice, int axis, uint8_t face);

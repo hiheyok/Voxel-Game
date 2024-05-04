@@ -97,6 +97,8 @@ namespace MemoryManagement {
 		void Initialize(size_t SpaceAvailable) {
 			PoolSize = SpaceAvailable;
 			FreeMemoryBlocks.Add(MemoryBlock(0, PoolSize));
+			std::multimap<size_t, size_t>::iterator it = SortedMemSizes.insert(std::pair<size_t, size_t>(PoolSize, 0)); //use for deletions
+			SortedMemSizesIterators[0] = it;
 		}
 
 		void AllocateSpace(size_t MemOffset, size_t MemSize) { //Assumes input are valid
@@ -108,12 +110,20 @@ namespace MemoryManagement {
 			MemoryBlock current = left->second;
 
 			FreeMemoryBlocks.Delete(left);
+			SortedMemSizes.erase(SortedMemSizesIterators[left->first]);
+			SortedMemSizesIterators.erase(left->first);
 
 			if (current.Size == MemSize)
 				return;
 
-			MemoryBlock NewFreeBlock(MemOffset + MemSize, current.Size - MemSize);
+			size_t newFreeSpaceOffset = MemOffset + MemSize;
+			size_t newFreeSpaceSize = current.Size - MemSize;
+
+			MemoryBlock NewFreeBlock(newFreeSpaceOffset, newFreeSpaceSize);
 			
+			std::multimap<size_t, size_t>::iterator it = SortedMemSizes.insert(std::pair<size_t, size_t>(newFreeSpaceSize, newFreeSpaceOffset)); //use for deletions
+			SortedMemSizesIterators[newFreeSpaceOffset] = it;
+
 			FreeMemoryBlocks.Add(NewFreeBlock);
 		}
 
@@ -163,27 +173,42 @@ namespace MemoryManagement {
 
 			//Clear Free Spaces
 
-			if (isFreeBlockLeft)
+			if (isFreeBlockLeft) {
 				FreeMemoryBlocks.Delete(LeftBlockFree);
-			if (isFreeBlockRight)
+				SortedMemSizes.erase(SortedMemSizesIterators[LeftBlockFree->first]);
+				SortedMemSizesIterators.erase(LeftBlockFree->first);
+			}
+				
+			if (isFreeBlockRight) {
 				FreeMemoryBlocks.Delete(RightBlockFree);
+				SortedMemSizes.erase(SortedMemSizesIterators[RightBlockFree->first]);
+				SortedMemSizesIterators.erase(RightBlockFree->first);
+			}
+				
 
 			//Add Free Space
 			FreeMemoryBlocks.Add(MemoryBlock(FreeMemoryOffset, FreeMemorySize));
+
+			std::multimap<size_t, size_t>::iterator it = SortedMemSizes.insert(std::pair<size_t, size_t>(FreeMemorySize, FreeMemoryOffset)); //use for deletions
+			SortedMemSizesIterators[FreeMemoryOffset] = it;
 
 			//Clear Reserve Space
 			ReservedMemoryBlocks.Delete(MemOffset);
 		}
 
 		size_t FindFreeSpace(size_t MemSize) {
-			std::map<size_t, MemoryBlock>::iterator it = FreeMemoryBlocks.begin();
-			std::map<size_t, MemoryBlock>::iterator end = FreeMemoryBlocks.end();
+			//std::map<size_t, MemoryBlock>::iterator it = FreeMemoryBlocks.begin();
+			//std::map<size_t, MemoryBlock>::iterator end = FreeMemoryBlocks.end();
 
-			while (it != end) {
-				if (it->second.Size >= MemSize) return it->first;
-				it++;
-			}
+			//while (it != end) {
+			//	if (it->second.Size >= MemSize) return it->first;
+			//	it++;
+			//}
 
+			auto it1 = SortedMemSizes.lower_bound(MemSize);
+
+			if (it1 != SortedMemSizes.end())
+				return it1->second;
 			return ULLONG_MAX;
 		}
 
@@ -200,6 +225,9 @@ namespace MemoryManagement {
 
 	private:
 		size_t PoolSize = 0;
+		
+		std::multimap<size_t, size_t> SortedMemSizes; // BlockSize, BlockOffset
+		std::unordered_map<size_t, std::multimap<size_t, size_t>::iterator> SortedMemSizesIterators; // Offset, iterator
 	};
 
 	struct MemoryPoolStatistics {

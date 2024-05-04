@@ -11,6 +11,10 @@ struct BlockType {
 		isFluid = fluid;
 	}
 
+	BlockType() {
+
+	}
+
 	bool isFluid = NULL;
 	bool transparency = NULL;
 	bool isSolid = NULL;
