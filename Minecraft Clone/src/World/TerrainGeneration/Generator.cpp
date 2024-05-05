@@ -1,11 +1,12 @@
 #include "Generator.h"
 #include "../Chunk/ChunkID.h"
 #include "../../Utils/Clock.h"
+#include "Generators/GeneratorType.h"
 
 using namespace std;
 using namespace glm;
 
-std::deque<Chunk*> Generator::GetOutput() {
+std::deque<Chunk*> ChunkGeneration::GetOutput() {
 	SchedulerLock.lock();
 	std::deque<Chunk*> out = Output;
 	Output.clear();
@@ -14,7 +15,7 @@ std::deque<Chunk*> Generator::GetOutput() {
 	return out;
 }
 
-void Generator::Start(int ThreadCount) {
+void ChunkGeneration::Start(int ThreadCount) {
 	WorkerCount = ThreadCount;
 
 	noise.SetNoiseType(noise.NoiseType_OpenSimplex2);
@@ -27,14 +28,14 @@ void Generator::Start(int ThreadCount) {
 	stop = false;
 
 	for (int i = 0; i < ThreadCount; i++) {
-		Workers[i] = thread(&Generator::Worker, this, i);
+		Workers[i] = thread(&ChunkGeneration::Worker, this, i);
 	}
 
-	Scheduler = thread(&Generator::TaskScheduler, this);
+	Scheduler = thread(&ChunkGeneration::TaskScheduler, this);
 
 }
 
-void Generator::Stop() {
+void ChunkGeneration::Stop() {
 	stop = true;
 	Scheduler.join();
 	for (size_t i = 0; i < Workers.size(); i++) {
@@ -42,7 +43,7 @@ void Generator::Stop() {
 	}
 }
 
-void Generator::Worker(int id) {
+void ChunkGeneration::Worker(int id) {
 	const int WorkerID = id;
 
 	deque<ChunkID> Jobs;
@@ -70,13 +71,10 @@ void Generator::Worker(int id) {
 			//Generate
 			ivec3 pos = ChunkIDToPOS(task);
 
-			int x = pos.x;
-			int y = pos.y;
-			int z = pos.z;
+			Chunk* chunk = Generators.GetGenerator(Generators.FAST_TERRAIN)->Generate(pos);
 
-			TerrainType type = MOUNTAINS;
-
-			Chunk* chunk = new Chunk(x, y, z, type, noise);
+			chunk->Position = pos;
+			chunk->chunkID = task;
 
 			FinishedJobs.push_back(chunk);
 
@@ -100,7 +98,7 @@ void Generator::Worker(int id) {
 	Logger.LogInfo("World", "Shutting down world gen worker: " + std::to_string(WorkerID));
 }
 
-void Generator::TaskScheduler() {
+void ChunkGeneration::TaskScheduler() {
 
 	int WorkerSelection = 0;
 
@@ -169,7 +167,7 @@ void Generator::TaskScheduler() {
 	Logger.LogInfo("World", "Shutting down world gen scheduler");
 }
 
-void Generator::Generate(int x, int y, int z) {
+void ChunkGeneration::Generate(int x, int y, int z) {
 	SchedulerLock.lock();
 	TaskList.push_back(getChunkID(x, y, z));
 	SchedulerLock.unlock();

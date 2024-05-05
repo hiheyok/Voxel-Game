@@ -197,14 +197,6 @@ namespace MemoryManagement {
 		}
 
 		size_t FindFreeSpace(size_t MemSize) {
-			//std::map<size_t, MemoryBlock>::iterator it = FreeMemoryBlocks.begin();
-			//std::map<size_t, MemoryBlock>::iterator end = FreeMemoryBlocks.end();
-
-			//while (it != end) {
-			//	if (it->second.Size >= MemSize) return it->first;
-			//	it++;
-			//}
-
 			auto it1 = SortedMemSizes.lower_bound(MemSize);
 
 			if (it1 != SortedMemSizes.end())

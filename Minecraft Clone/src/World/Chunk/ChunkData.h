@@ -9,11 +9,6 @@
 #ifndef CHUNKDATA_H
 #define CHUNKDATA_H
 
-
-
-
-
-
 class ChunkContainer {
 	
 public:

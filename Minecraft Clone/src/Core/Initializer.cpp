@@ -5,12 +5,14 @@
 #include "Initializer.h"
 #include "../World/Item/ItemTextureAtlas.h"
 #include "../World/Entity/Entity.h"
+#include "../World/TerrainGeneration/Generators/GeneratorType.h"
 
 LogUtils Logger;
 BlockList Blocks;
 EntitiesList EntityList;
 ItemList Items;
 ItemTextureAtlas ItemAtlas;
+GeneratorType Generators;
 
 int AmountEntityDestroy = 0;
 

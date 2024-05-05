@@ -58,7 +58,7 @@ private:
 
 	glm::vec3 PlayerPos = glm::vec3(0.f, 0.f, 0.f);
 
-	Generator WorldGenerator;
+	ChunkGeneration WorldGenerator;
 
 	std::unordered_set<ChunkID> ChunksInQueue;
 

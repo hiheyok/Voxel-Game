@@ -8,7 +8,7 @@
 
 #include <mutex>
 
-class Generator {
+class ChunkGeneration {
 public:
 	void Start(int ThreadCount);
 
