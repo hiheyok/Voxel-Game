@@ -9,7 +9,6 @@ public:
 	}
 
 	virtual Chunk* Generate(glm::ivec3 Position) {
-		std::cout << "test\n";
 		return nullptr;
 	}
 

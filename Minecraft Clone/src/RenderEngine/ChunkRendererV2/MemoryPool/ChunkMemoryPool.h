@@ -333,7 +333,7 @@ public:
 
 			buffer.CopyTo(StaggingBuffer, ReservedBlock.Offset, 0, ReservedBlock.Size);
 
-			UpdatedChunkMemoryOffsets[ID] = AddChunkStaggingBuffer(ID, NULL, FreeSpaceOffset, ReservedBlock.Size);
+			AddChunkStaggingBuffer(ID, NULL, FreeSpaceOffset, ReservedBlock.Size);
 		}
 
 		return true;

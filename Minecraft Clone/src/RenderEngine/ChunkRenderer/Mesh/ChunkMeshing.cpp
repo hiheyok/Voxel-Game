@@ -196,6 +196,9 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 	__m256i Bitshift = _mm256_set_epi32(1, 1, 1, 1, 1, 1, 1, 1);
 	__m256i all_ones = _mm256_set_epi32(-1, -1, -1, -1, -1, -1, -1, -1);
 
+	//Reg1 -> Solids
+	//Reg2 -> Transparent
+
 	for (int face = 0; face < 6; face++) {
 		int i = 0;
 
@@ -251,13 +254,40 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 		}
 	}
 
+
+	//Fixes transparent and solid block overlap
+	for (int direction = 0; direction < 3; direction++) {
+		for (int u = 0; u < 18; u++) {
+			for (int v = 0; v < 18; v++) {
+				int IndexSolid = u + v * 18 + (direction * 2) * CoordOffset;
+				int IndexTransparent = u + v * 18 + (direction * 2 + 1) * CoordOffset + TypeOffset;
+
+				uint32_t ColSolids = Bits[IndexSolid] << 1;
+				uint32_t ColTrans = Bits[IndexTransparent];
+
+				Bits[IndexTransparent] = (ColSolids ^ ColTrans) & (~ColSolids);
+				//Opposite Side
+				IndexSolid = u + v * 18 + (direction * 2 + 1) * CoordOffset;
+				IndexTransparent = u + v * 18 + (direction * 2) * CoordOffset + TypeOffset;
+
+				ColSolids = Bits[IndexSolid] >> 1;
+				ColTrans = Bits[IndexTransparent];
+
+				Bits[IndexTransparent] = (ColSolids ^ ColTrans) & (~ColSolids);
+
+			}
+		}
+	}
+
 	uint32_t P[3]{ 0 };
 
 	for (uint32_t face = 0; face < 6; face++) {
 		for (int u = 1; u < 17; u++) {
 			for (int v = 1; v < 17; v++) {
 				for (int Types = 0; Types < 2; Types++) {
-					uint16_t c = (Bits[u + (v * CHUNK_SIZE_P) + (face * CoordOffset) + TypeOffset * Types] >> 1) & 0xFFFF;
+					uint32_t Index = u + (v * CHUNK_SIZE_P) + (face * CoordOffset);
+
+					uint16_t c = (Bits[Index + TypeOffset * Types] >> 1) & 0xFFFF;
 					uint32_t tOffset = 0;
 
 					while (c != 0) {

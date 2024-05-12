@@ -43,6 +43,22 @@ public:
 		for (const auto& key : Keys) {
 			Keys[key.first] = HOLD;
 		}
+
+		Mouse.ScrollDirection = Mouse.SCROLL_NONE;
+
+		Mouse.Displacement = glm::dvec2(0.0, 0.0);
+
+		if (Mouse.LEFT == Mouse.PRESS) {
+			Mouse.LEFT = Mouse.HOLD;
+		}
+
+		if (Mouse.RIGHT == Mouse.PRESS) {
+			Mouse.RIGHT = Mouse.HOLD;
+		}
+
+		if (Mouse.MIDDLE == Mouse.PRESS) {
+			Mouse.MIDDLE = Mouse.HOLD;
+		}
 	}
 
 	void PressIndividualKey(int key) {

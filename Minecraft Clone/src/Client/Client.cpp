@@ -33,7 +33,7 @@ void Client::Initialize() {
 	ServerSettings serverSettings;
 	serverSettings.H_RenderDistance = 48;
 	serverSettings.V_RenderDistance = 16;
-	serverSettings.genThreads = 8;
+	serverSettings.genThreads = 4;
 
 	server.Start(serverSettings);
 
@@ -182,21 +182,4 @@ void Client::Update() {
 	TerrainRender.Update();
 
 	Inputs.UpdateAllKey();
-
-	Inputs.Mouse.ScrollDirection = Inputs.Mouse.SCROLL_NONE;
-
-	Inputs.Mouse.Displacement = glm::dvec2(0.0, 0.0);
-
-	if (Inputs.Mouse.LEFT == Inputs.Mouse.PRESS) {
-		Inputs.Mouse.LEFT = Inputs.Mouse.HOLD;
-	}
-
-	if (Inputs.Mouse.RIGHT == Inputs.Mouse.PRESS) {
-		Inputs.Mouse.RIGHT = Inputs.Mouse.HOLD;
-	}
-
-	if (Inputs.Mouse.MIDDLE == Inputs.Mouse.PRESS) {
-		Inputs.Mouse.MIDDLE = Inputs.Mouse.HOLD;
-	}
-
 }
