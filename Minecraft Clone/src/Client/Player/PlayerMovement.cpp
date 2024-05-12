@@ -51,7 +51,7 @@ void PlayerMovement::MovePlayer(Player* player, UserInputs Inputs, World* world)
 	float velocity = player->Properties.MaxSpeed;
 
 	if (Inputs.CheckKey(KEY_LEFT_CONTROL)) {
-		velocity *= 4.f;
+		velocity *= 8.f;
 	}
 
 	float v = velocityMovementCurve(magnitude(player->Properties.Velocity), velocity, Inputs.delta) / sqrtf(2);

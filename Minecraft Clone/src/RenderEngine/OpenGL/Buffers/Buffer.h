@@ -68,7 +68,7 @@ public:
 
 		glGenBuffers(1, &BufferStorageID);
 		Bind();
-		GLbitfield flags = GL_MAP_PERSISTENT_BIT | GL_MAP_READ_BIT | GL_MAP_WRITE_BIT| GL_DYNAMIC_STORAGE_BIT;
+		GLbitfield flags = GL_MAP_PERSISTENT_BIT | GL_MAP_READ_BIT | GL_DYNAMIC_STORAGE_BIT;
 		glBufferStorage(Target, Size, nullptr, flags);
 	}
 

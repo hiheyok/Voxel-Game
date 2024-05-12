@@ -75,6 +75,23 @@ struct FastTerrain : WorldGenerator {
 			}
 		}
 
+		//int offx = 10;
+		//int offy = 100;
+		//int offz = 10;
+
+		//int r = 50;
+
+
+		//for (int x = 0 + cx; x < cx + 16; x++) {
+		//	for (int y = 0 + cy; y < cy + 16; y++) {
+		//		for (int z = 0 + cz; z < cz + 16; z++) {
+		//			if (pow(x - offx, 2) + pow(y - offy, 2) + pow(z - offz, 2) < pow(r, 2)) {
+		//				chunk->SetBlockUnsafe(Blocks.SAND, x - cx, y - cy, z - cz);
+		//			}
+		//		}
+		//	}
+		//}
+
 		return chunk;
 	}
 

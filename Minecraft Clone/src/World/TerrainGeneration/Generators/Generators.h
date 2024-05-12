@@ -5,3 +5,4 @@
 #include "Math/MathWorld.h"
 #include "Mountains/Mountains.h"
 #include "Superflat/Superflat.h"
+#include "Minecraft/MinecraftTerrain.h"

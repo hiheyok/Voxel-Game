@@ -20,9 +20,9 @@ struct MountainGenerator : WorldGenerator {
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 
-				float continental = continentialNoise(getNoise2D(glm::ivec2(ChunkPos.x, ChunkPos.z), glm::ivec2(x, z), 3, 0.3f));
-				float erosion = erosionNoise(getNoise2D(glm::ivec2(ChunkPos.x, ChunkPos.z), glm::ivec2(x + 4345, z + 6443), 3, 1.f)) / 2.f;
-				float pv = peaksandvalley(getNoise2D(glm::ivec2(ChunkPos.x, ChunkPos.z), glm::ivec2(x + 65345, z + 12323), 3, 4.f)) / 8;
+				float continental = continentialNoise(getNoise2D(glm::ivec2(Position.x, Position.z), glm::ivec2(x, z), 3, 0.3f));
+				float erosion = erosionNoise(getNoise2D(glm::ivec2(Position.x, Position.z), glm::ivec2(x + 4345, z + 6443), 3, 1.f)) / 2.f;
+				float pv = peaksandvalley(getNoise2D(glm::ivec2(Position.x, Position.z), glm::ivec2(x + 65345, z + 12323), 3, 4.f)) / 8;
 
 				for (int y = 0; y < 16; y++) {
 

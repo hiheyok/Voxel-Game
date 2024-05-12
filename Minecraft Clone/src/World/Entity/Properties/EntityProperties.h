@@ -9,7 +9,7 @@ struct EntityProperty {
 	glm::vec3 Acceleration = glm::vec3(0.f, 0.f, 0.f);
 	glm::vec2 Rotation = glm::vec2(0.f, 0.f);
 
-	float MaxSpeed = 25;
+	float MaxSpeed = 50;
 
 	bool onGround = false;
 

@@ -28,7 +28,7 @@ void EntityRendererUpdater::UpdaterThread() {
 
 		
 		
-		timerSleep(0);
+		timerSleep(0.05);
 	}
 }
 

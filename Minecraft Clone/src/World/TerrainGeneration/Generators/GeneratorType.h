@@ -23,6 +23,7 @@ public:
 	WorldGeneratorID MATH_WORLD = RegisterWorldGenerator(new MathWorld());
 	WorldGeneratorID MOUNTAINS = RegisterWorldGenerator(new MountainGenerator());
 	WorldGeneratorID SUPERFLAT = RegisterWorldGenerator(new SuperflatWorld());
+	WorldGeneratorID MINECRAFT = RegisterWorldGenerator(new MinecraftTerrain());
 
 	WorldGenerator* GetGenerator(WorldGeneratorID ID) {
 		return GeneratorList[ID];

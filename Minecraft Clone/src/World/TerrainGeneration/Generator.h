@@ -39,6 +39,4 @@ private:
 	std::mutex SchedulerLock;
 
 	bool stop = false;
-
-	FastNoiseLite noise;
 };

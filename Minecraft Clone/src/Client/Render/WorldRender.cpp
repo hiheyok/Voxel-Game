@@ -91,7 +91,7 @@ void WorldRender::Worker(int id) {
 
 void WorldRender::Update() {
 
-	int LoadingLimit = 100;
+	int LoadingLimit = 200;
 
 	int LoadedAmount = 0;
 
@@ -123,7 +123,7 @@ void WorldRender::Update() {
 		LoadChunkToRenderer(chunkid);
 	}
 
-	RendererV2.Defrag(25);
+	RendererV2.Defrag(250);
 	RendererV2.Update();
 	RendererV2.PrepareRenderer();
 

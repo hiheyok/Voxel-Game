@@ -18,8 +18,6 @@ std::deque<Chunk*> ChunkGeneration::GetOutput() {
 void ChunkGeneration::Start(int ThreadCount) {
 	WorkerCount = ThreadCount;
 
-	noise.SetNoiseType(noise.NoiseType_OpenSimplex2);
-
 	Workers.resize(ThreadCount);
 	WorkerTask.resize(ThreadCount);
 	WorkerOutput.resize(ThreadCount);
@@ -63,7 +61,7 @@ void ChunkGeneration::Worker(int id) {
 		const int NumJobs = Jobs.size();
 
 		int count = 0;
-		int BatchSize = 50;
+		int BatchSize = 100;
 
 		for (int i = 0; i < NumJobs; i++) {
 			ChunkID task = Jobs.front(); //fetches task
@@ -71,7 +69,7 @@ void ChunkGeneration::Worker(int id) {
 			//Generate
 			ivec3 pos = ChunkIDToPOS(task);
 
-			Chunk* chunk = Generators.GetGenerator(Generators.FAST_TERRAIN)->Generate(pos);
+			Chunk* chunk = Generators.GetGenerator(Generators.MINECRAFT)->Generate(pos);
 
 			chunk->Position = pos;
 			chunk->chunkID = task;
