@@ -4,6 +4,7 @@
 #include "../Camera/camera.h"
 #include "Batch/ChunkBatch.h"
 #include "../OpenGL/Shader/Shader.h"
+#include "../../Core/Options/Option.h"
 
 class TerrainRenderer {
 public:

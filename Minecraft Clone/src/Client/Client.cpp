@@ -4,6 +4,7 @@
 #include "../World/Entity/Entities.h"
 #include <chrono>
 #include "../World/Server/Time/Timer.h"
+#include "../Core/Options/Option.h"
 
 using namespace std;
 using namespace chrono;
@@ -22,7 +23,7 @@ void Client::Initialize() {
 		ItemAtlas.AddItem(item.second);
 	}
 
-	Framebuffer.genBuffer(Properties.WindowSizeX, Properties.WindowSizeY, 2.f, GL_RGB);
+	Framebuffer.genBuffer(Properties.WindowSizeX, Properties.WindowSizeY, (float)AppOptions.GraphicsScale, GL_RGB);
 
 	DisableCursor();
 

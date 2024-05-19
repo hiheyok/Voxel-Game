@@ -122,9 +122,20 @@ public:
 		if (dir == "N/A")
 			d = name;
 		else
-			d = (dir + "/" + name);
+			d = (dir + "//" + name);
 
 
 		return File(d);
+	}
+
+	static void DeleteFile(std::string name, std::string dir = "N/A") {
+		std::string d = "";
+
+		if (dir == "N/A")
+			d = name;
+		else
+			d = (dir + "//" + name);
+
+		remove(d.c_str());
 	}
 };
