@@ -1,5 +1,6 @@
 #include "WorldRender.h"
 #include "../../Utils/Clock.h"
+#include "../../Core/Options/Option.h"
 
 using namespace std;
 using namespace glm;
@@ -91,22 +92,22 @@ void WorldRender::Worker(int id) {
 
 void WorldRender::Update() {
 
-	int LoadingLimit = 4000;
+	int ChunkUpdateLimit = 4000;
 
-	int LoadedAmount = 0;
+	int UpdateAmount = 0;
 
 	for (int WorkerID = 0; WorkerID < WorkerCount; WorkerID++) {
 
 		WorkerLocks[WorkerID].lock();
 
 		while (!WorkerOutput[WorkerID].empty()) {
-			if (LoadingLimit < LoadedAmount) {
+			if (ChunkUpdateLimit < UpdateAmount) {
 				break;
 			}
 
 			RendererV2.AddChunk(WorkerOutput[(uint64_t)WorkerID].front());
 			WorkerOutput[WorkerID].pop_front();
-			LoadedAmount++;
+			UpdateAmount++;
 		}
 
 		WorkerLocks[WorkerID].unlock();
@@ -123,7 +124,10 @@ void WorldRender::Update() {
 		LoadChunkToRenderer(chunkid);
 	}
 
-	RendererV2.Defrag(4000);
+	if (UpdateAmount < ChunkUpdateLimit) {
+		RendererV2.Defrag(ChunkUpdateLimit - UpdateAmount);
+	}
+	
 	RendererV2.Update();
 	RendererV2.PrepareRenderer();
 
@@ -140,8 +144,13 @@ void WorldRender::Stop() {
 
 }
 
-void WorldRender::Start(GLFWwindow* window_, World* world_, int ThreadCount) {
+void WorldRender::Start(GLFWwindow* window_, World* world_) {
 	stop = false;
+
+	HorizontalRenderDistance = AppOptions.HorizontalRenderDistance;
+	VerticalRenderDistance = AppOptions.VerticalRenderDistance;
+
+	int ThreadCount = AppOptions.MeshThreads;
 
 	window = window_;
 	world = world_;

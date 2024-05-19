@@ -21,7 +21,7 @@ public:
 
 	void LoadChunkToRenderer(ChunkID chunk);
 
-	void Start(GLFWwindow* window_, World* world_, int ThreadCount);
+	void Start(GLFWwindow* window_, World* world_);
 
 	void Stop();
 

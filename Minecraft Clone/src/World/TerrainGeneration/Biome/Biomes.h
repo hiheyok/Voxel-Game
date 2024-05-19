@@ -1,4 +1,4 @@
-
+#include "BiomeMapping.h"
 
 struct BiomeParamters {
 	BiomeParamters(float Height, float Flat, float Wet) {
@@ -13,6 +13,7 @@ struct BiomeParamters {
 };
 
 class Biomes {
+public:
 	BiomeParamters Tundra = BiomeParamters(0.7f, 0.2f, 0.4f);
 	BiomeParamters Plains = BiomeParamters(0.3f, 0.7f, 0.2f);
 	BiomeParamters Taiga = BiomeParamters(0.5f, 0.4f, 0.5f);
@@ -23,4 +24,29 @@ class Biomes {
 	BiomeParamters Savanna = BiomeParamters(0.3f, 0.6f, 0.3f);
 	BiomeParamters SeasonalForest = BiomeParamters(0.5f, 0.4f, 0.5f);
 	BiomeParamters RainForest = BiomeParamters(0.8f, 0.2f, 0.99f);
+
+	BiomeParamters GetBiome(BiomeMapping::MAJOR_BIOME_TYPE Biome) {
+		switch (Biome) {
+		case BiomeMapping::TUNDRA:
+			return Tundra;
+		case BiomeMapping::PLAINS:
+			return Plains;
+		case BiomeMapping::TAIGA:
+			return Taiga;
+		case BiomeMapping::SHRUBLAND:
+			return Shrubland;
+		case BiomeMapping::FOREST:
+			return Forest;
+		case BiomeMapping::SWAMP:
+			return Swamp;
+		case BiomeMapping::DESERT:
+			return Desert;
+		case BiomeMapping::SAVANNA:
+			return Savanna;
+		case BiomeMapping::SEASONAL_FOREST:
+			return SeasonalForest;
+		case BiomeMapping::RAIN_FOREST:
+			return RainForest;
+		}
+	}
 };

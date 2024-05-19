@@ -31,9 +31,6 @@ void Client::Initialize() {
 	m_MainPlayer.SetPlayerRotation(-135.f, -30.);
 
 	ServerSettings serverSettings;
-	serverSettings.H_RenderDistance = 48;
-	serverSettings.V_RenderDistance = 16;
-	serverSettings.genThreads = 4;
 
 	server.Start(serverSettings);
 
@@ -42,9 +39,7 @@ void Client::Initialize() {
 	EntityUpdater.Start();
 
 	Logger.LogInfo("World", "Generating World");
-	TerrainRender.HorizontalRenderDistance = 48;
-	TerrainRender.VerticalRenderDistance = 16;
-	TerrainRender.Start(getWindow(), server.world, 5);
+	TerrainRender.Start(getWindow(), server.world);
 	Logger.LogInfo("Client", "Starting Gameloop");
 }
 

@@ -3,6 +3,7 @@
 #include "LogUtils.h"
 #include "Clock.h"
 #include <ctime>
+#include "../FileManager/Files.h"
 
 using namespace std;
 
@@ -59,13 +60,16 @@ void LogUtils::MainLogger() {
 
 void LogUtils::Start() {
 	if (!Started) {
+		if (!FileManager::CheckFolder("Logs")) {
+			FileManager::CreateFolder("Logs");
+		}
 
 		auto t = std::time(nullptr);
 		auto tm = *std::localtime(&t);
 
 		std::ostringstream oss;
 		oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
-		auto str = oss.str() + ".log";
+		auto str = "Logs//" + oss.str() + ".log";
 
 		file.open(str);
 

@@ -1,3 +1,6 @@
+
+
+
 #include "Utils/LogUtils.h"
 
 #include "Client/Client.h"
@@ -9,6 +12,7 @@
 #include "Core/Initializer.h"
 #include <cstdlib> 
 #include <time.h>
+#include "Core/Options/Option.h"
 
 int main() {
 	
@@ -19,6 +23,8 @@ int main() {
 
 	Client GameClient;
 	GameClient.run();
+
+	Options options;
 
 	Logger.Stop();
 	return 0;

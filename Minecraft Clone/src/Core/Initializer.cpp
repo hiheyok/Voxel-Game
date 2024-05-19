@@ -6,8 +6,10 @@
 #include "../World/Item/ItemTextureAtlas.h"
 #include "../World/Entity/Entity.h"
 #include "../World/TerrainGeneration/Generators/GeneratorType.h"
+#include "Options/Option.h"
 
 LogUtils Logger;
+Options AppOptions;
 BlockList Blocks;
 EntitiesList EntityList;
 ItemList Items;

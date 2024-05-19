@@ -5,6 +5,7 @@
 #include <thread>
 #include <chrono>
 #include <Windows.h>
+#include "../../Core/Options/Option.h"
 
 void Server::Start(ServerSettings serverSettings) {
 	Logger.LogInfo("Server", "Starting");
@@ -14,9 +15,9 @@ void Server::Start(ServerSettings serverSettings) {
 	}
 
 	WorldSettings worldSettings;
-	worldSettings.genThreads = serverSettings.genThreads;
-	world->H_RenderDistance = serverSettings.H_RenderDistance;
-	world->V_RenderDistance = serverSettings.V_RenderDistance;
+	worldSettings.genThreads = AppOptions.WorldGenThreads;
+	world->H_RenderDistance = AppOptions.HorizontalRenderDistance;
+	world->V_RenderDistance = AppOptions.VerticalRenderDistance;
 
 	settings = serverSettings;
 
