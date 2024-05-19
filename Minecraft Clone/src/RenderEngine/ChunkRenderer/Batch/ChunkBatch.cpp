@@ -58,17 +58,6 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance, int VerticalRenderDista
 
 	Timer time;
 
-	std::vector<ChunkMemoryPoolOffset> UpdatedOffsets = MemoryPool.GetUpdatedChunks();
-
-	for (const auto& chunk : UpdatedOffsets) {
-		ChunkID ID = getChunkID(chunk.x, chunk.y, chunk.z);
-
-		RenderList.erase(RenderListOffsetLookup[ID]);
-		RenderList[chunk.MemOffset] = chunk;
-		RenderListOffsetLookup[ID] = chunk.MemOffset;
-		UpdateCommands = true;
-	}
-
 	if (RenderList.size() > DrawCommands.size()) {
 		UpdateCommandBufferSize();
 	}
@@ -113,7 +102,7 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance, int VerticalRenderDista
 
 	AmountOfChunkBeingRendered = Index;
 
-	//Logger.LogInfo("Rendering","CMD rebuild time (ms): " + std::to_string(time.GetTimePassed_ms()));
+	Logger.LogInfo("Rendering","CMD rebuild time (ms): " + std::to_string(time.GetTimePassed_ms()));
 }
 
 void ChunkDrawBatch::UpdateCommandBufferSize() {
@@ -127,8 +116,6 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<uint32_t>& Data, int x, int y,
 	size_t DataSize = Data.size() * sizeof(uint32_t);
 
 	ChunkMemoryPoolOffset MemoryPoolBlockData = MemoryPool.AddChunk(Data, x, y, z, NULL);
-
-	Logs += "Adding Chunk: " + std::to_string(id) + ", Offset: " + std::to_string(MemoryPoolBlockData.MemOffset) + ", Size: " + std::to_string(MemoryPoolBlockData.MemSize) + "\n";
 
 	if (MemoryPoolBlockData.MemOffset == ULLONG_MAX) {
 		return false;
@@ -185,8 +172,47 @@ void ChunkDrawBatch::Draw() {
 	glMultiDrawArraysIndirect(GL_TRIANGLES, (GLvoid*)0, (GLsizei)AmountOfChunkBeingRendered, 0);
 }
 
-void ChunkDrawBatch::Defrager(int iterations) {
-	MemoryPool.DefragMemoryPool(iterations);
+void ChunkDrawBatch::Defrager(int Cycles) {
+	int i = 0;
+
+	int FragmentCount = MemoryPool.MemoryPool.GetFreeSpaceFragmentCount();
+
+	if (FragmentCount == 1) {
+		return;
+	}
+
+	Cycles = std::min(Cycles, FragmentCount - 1);
+
+	while (i < Cycles) {
+		i++;
+
+		if (MemoryPool.MemoryPool.FreeMemoryBlocks.size() == 1) {
+			return;
+		}
+
+		MemoryManagement::MemoryBlock FreeMemoryBlock = MemoryPool.MemoryPool.FreeMemoryBlocks.begin()->second;
+
+		int FreeSpaceOffset = FreeMemoryBlock.Offset;
+
+		std::map<size_t, MemoryManagement::MemoryBlock>::iterator Reserve = MemoryPool.MemoryPool.ReservedMemoryBlocks.getIterator(FreeMemoryBlock.Size + FreeMemoryBlock.Offset);
+
+		MemoryManagement::MemoryBlock ReservedBlock = Reserve->second;
+
+		ChunkID ID = MemoryPool.MemoryChunkOffset[ReservedBlock.Offset];
+
+		DeleteChunkVertices(ID);
+
+		MemoryPool.buffer.CopyTo(MemoryPool.StaggingBuffer, ReservedBlock.Offset, 0, ReservedBlock.Size);
+		
+		//Add chunk back
+
+		ChunkMemoryPoolOffset MemoryPoolBlockData = MemoryPool.AddChunkStaggingBuffer(ID, NULL, FreeSpaceOffset, ReservedBlock.Size);
+
+		RenderList[MemoryPoolBlockData.MemOffset] = MemoryPoolBlockData;
+		RenderListOffsetLookup[ID] = MemoryPoolBlockData.MemOffset;
+		AmountOfChunks++;
+		UpdateCommands = true;
+	}
 }
 
 

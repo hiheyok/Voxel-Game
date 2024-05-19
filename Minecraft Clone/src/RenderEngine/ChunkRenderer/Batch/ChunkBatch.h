@@ -8,7 +8,7 @@
 #include "../../../Utils/MathHelper.h"
 #include "../../../World/Chunk/Chunk.h"
 #include "../../OpenGL/Buffers/Buffer.h"
-#include "../../ChunkRendererV2/MemoryPool/ChunkMemoryPool.h"
+#include "../MemoryPool/ChunkMemoryPool.h"
 #include <unordered_map>
 #include <list>
 #include <map>
@@ -16,10 +16,10 @@
 
 
 struct DrawCommandIndirect {
-	unsigned int  count;
-	unsigned int  instanceCount;
-	unsigned int  first;
-	unsigned int  baseInstance;
+	unsigned int  count = 0;
+	unsigned int  instanceCount = 0;
+	unsigned int  first = 0;
+	unsigned int  baseInstance = 0;
 
 	DrawCommandIndirect() {
 
@@ -66,10 +66,6 @@ public:
 
 	void ErrorCheck();
 
-	void GetDebugLogs() {
-		Logger.LogDebug("Chunk Batch", "Debug Logs:\n" + Logs);
-	}
-
 	Camera* camera;
 
 	std::map<size_t, ChunkMemoryPoolOffset> RenderList; //f: Offset -> RenderInfo
@@ -78,8 +74,6 @@ public:
 
 	ChunkGPUMemoryPool MemoryPool;
 private:
-
-	std::string Logs = "";
 
 	CFrustum Frustum;
 	Buffer IBO, SSBO;

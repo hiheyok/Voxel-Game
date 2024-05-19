@@ -57,7 +57,4 @@ private:
 
 	std::thread Scheduler;
 	std::mutex SchedulerLock;
-
-	//Debugging stuff
-	int count = 0;
 };

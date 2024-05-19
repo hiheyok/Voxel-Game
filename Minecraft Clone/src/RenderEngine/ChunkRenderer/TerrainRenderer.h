@@ -42,8 +42,6 @@ public:
 
 	void Cleanup();
 
-	void GetDebugInfo();
-
 	size_t amountOfMeshGenerated = 1;
 
 private:

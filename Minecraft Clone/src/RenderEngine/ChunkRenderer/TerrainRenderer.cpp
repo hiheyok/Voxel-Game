@@ -128,17 +128,6 @@ void TerrainRenderer::setSettings(uint32_t RenderDistance, uint32_t VerticalRend
 	m_FOV = FOV;
 }
 
-void TerrainRenderer::GetDebugInfo() {
-	for (auto& batch : ChunkSolidBatches) {
-		batch.GetDebugLogs();
-		batch.ErrorCheck();
-	}
-	for (auto& batch : ChunkTransparentBatches) {
-		batch.GetDebugLogs();
-		batch.ErrorCheck();
-	}
-}
-
 void TerrainRenderer::LoadAssets() {
 	SolidShader.bindTextureArray2D(0, Blocks.BlockTextureArray.textureID, "BlockTexture");
 }
@@ -207,9 +196,6 @@ double TerrainRenderer::getFragmentationRate() {
 		auto& batch = ChunkSolidBatches[batchIndex];
 
 		if (batch.RenderList.size() != 0) {
-
-			size_t FullMemoryUse = batch.MemoryPool.Statistics.FullMemoryUsage; //Include gaps
-			size_t MemoryUse = batch.MemoryPool.Statistics.MemoryUsage; //Only include vertex data
 
 			fragRate += (batch.MemoryPool.Statistics.FragmentationRate / (double)n);
 		}

@@ -259,9 +259,6 @@ public:
 		ChunkMemoryPoolOffset ChunkOffsetData = ChunkMemoryOffsets[id];
 		MemoryPool.DeallocateSpace(ChunkOffsetData.MemOffset, ChunkOffsetData.MemSize);
 		ChunkMemoryOffsets.erase(id);
-		if (UpdatedChunkMemoryOffsets.count(id)) {
-			UpdatedChunkMemoryOffsets.erase(id);
-		}
 
 		MemoryChunkOffset.erase(ChunkOffsetData.MemOffset);
 
@@ -301,44 +298,6 @@ public:
 		return ChunkMemoryBlock;
 	}
 
-	bool DefragMemoryPool(int Cycles) {
-		int i = 0;
-
-		int FragmentCount = MemoryPool.GetFreeSpaceFragmentCount();
-
-		if (FragmentCount == 1) {
-			return false;
-		}
-		
-		Cycles = std::min(Cycles, FragmentCount - 1);
-
-		while (i < Cycles) {
-			i++;
-
-			if (MemoryPool.FreeMemoryBlocks.size() == 1) {
-				return true;
-			}
-
-			MemoryManagement::MemoryBlock FreeMemoryBlock = MemoryPool.FreeMemoryBlocks.begin()->second;
-
-			int FreeSpaceOffset = FreeMemoryBlock.Offset;
-
-			std::map<size_t, MemoryManagement::MemoryBlock>::iterator Reserve = MemoryPool.ReservedMemoryBlocks.getIterator(FreeMemoryBlock.Size + FreeMemoryBlock.Offset);
-			
-			MemoryManagement::MemoryBlock ReservedBlock = Reserve->second;
-
-			ChunkID ID = MemoryChunkOffset[ReservedBlock.Offset];
-
-			DeleteChunk(ID);
-
-			buffer.CopyTo(StaggingBuffer, ReservedBlock.Offset, 0, ReservedBlock.Size);
-
-			AddChunkStaggingBuffer(ID, NULL, FreeSpaceOffset, ReservedBlock.Size);
-		}
-
-		return true;
-	}
-
 	ChunkMemoryPoolOffset GetChunkMemoryPoolOffset(int x, int y, int z) {
 		return GetChunkMemoryPoolOffset(getChunkID(x, y, z));
 	}
@@ -350,31 +309,9 @@ public:
 		return ChunkMemoryPoolOffset(ULLONG_MAX, ULLONG_MAX, 666, 666, 666);
 	}
 
-	std::vector<ChunkMemoryPoolOffset> GetUpdatedChunks() { //Returns chunks that has been defragged with their new offsets
-		std::vector<ChunkMemoryPoolOffset> Chunks(UpdatedChunkMemoryOffsets.size());
-
-		int i = 0;
-
-		for (auto c : UpdatedChunkMemoryOffsets) {
-			Chunks[i] = c.second;
-			i++;
-		}
-
-		UpdatedChunkMemoryOffsets.clear();
-
-		return Chunks;
-	}
-
 	bool CheckChunk(ChunkID ID) {
 		return ChunkMemoryOffsets.count(ID);
 	}
-
-	MemoryManagement::MemoryPoolStatistics Statistics;
-	Buffer StaggingBuffer;
-	BufferStorage buffer;
-
-	MemoryManagement::MemoryPoolManager MemoryPool;
-private:
 
 	ChunkMemoryPoolOffset AddChunkStaggingBuffer(ChunkID ID, int side, uint64_t BlockOffset, uint64_t BlockSize) { //assumes vertices.size() != 0
 		glm::ivec3 pos = ChunkIDToPOS(ID);
@@ -391,7 +328,6 @@ private:
 		buffer.CopyFrom(StaggingBuffer, 0, BlockOffset, BlockSize);
 
 		ChunkMemoryOffsets[ID] = ChunkMemoryBlock;
-		UpdatedChunkMemoryOffsets[ID] = ChunkMemoryBlock;
 		MemoryChunkOffset[BlockOffset] = ID;
 
 		Statistics.MemoryUsage += BlockSize;
@@ -410,10 +346,13 @@ private:
 		}
 	}
 
+	MemoryManagement::MemoryPoolStatistics Statistics;
+	Buffer StaggingBuffer;
+	BufferStorage buffer;
+
+	MemoryManagement::MemoryPoolManager MemoryPool;
 	std::unordered_map<ChunkID, ChunkMemoryPoolOffset> ChunkMemoryOffsets;
 	std::unordered_map<size_t, ChunkID> MemoryChunkOffset;
-
-	std::unordered_map<ChunkID, ChunkMemoryPoolOffset> UpdatedChunkMemoryOffsets;
 
 	int MEMORY_POOL_SIZE = 0;
 

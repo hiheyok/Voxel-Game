@@ -32,6 +32,7 @@ BlockID WorldInteraction::GetBlock(Ray ray, World* world) {
 	if (world->RayIntersection(ray)) {
 		return world->GetBlock((int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z));
 	}
+	return Blocks.AIR;
 }
 
 void WorldInteraction::BreakBlock(Ray ray, World* world) {
