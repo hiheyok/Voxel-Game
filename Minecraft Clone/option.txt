@@ -1,0 +1,4 @@
+HorizontalRenderDistance:32
+VerticalRenderDistance:8
+WorldGenThreads:6
+MeshThreads:6
