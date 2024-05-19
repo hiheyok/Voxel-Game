@@ -6,9 +6,6 @@
 #include <string>
 #include "../../../Typenames.h"
 
-
-__declspec(selectany) 
-
 class BlockTexture {
 public:
     void SetFaceFront(int TexID) {
@@ -67,8 +64,6 @@ private:
     int TextureIndex[6]{ NULL };
     
 };
-
-
 
 #endif // !BLOCK_TEX
 

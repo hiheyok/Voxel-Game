@@ -44,7 +44,7 @@ void HandlePlaceBlock(BlockID block, int x, int y, int z) {
 }
 
 void HandleDirtTick(BlockID block, int x, int y, int z) {
-	World* CurrentWorld = (World*)Block::WorldPTR;
+	//World* CurrentWorld = (World*)Block::WorldPTR;
 
 
 	Block* b = Blocks.getBlockType(block);
@@ -52,7 +52,7 @@ void HandleDirtTick(BlockID block, int x, int y, int z) {
 }
 
 void HandleBlockTick(BlockID block, int x, int y, int z) {
-	World* CurrentWorld = (World*)Block::WorldPTR;
+	//World* CurrentWorld = (World*)Block::WorldPTR;
 
 	Block* b = Blocks.getBlockType(block);
 	b->tick(x, y, z);

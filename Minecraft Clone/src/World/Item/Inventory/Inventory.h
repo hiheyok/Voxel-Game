@@ -5,8 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
-
-typedef class Inventory {
+class Inventory {
 public:
 
 	Inventory(int InventorySize = 0xFFFFFFFF) {
@@ -32,7 +31,7 @@ public:
 		return NumOfSlots;
 	}
 
-	int ChangeSlotSize(int slotCount) {
+	void ChangeSlotSize(int slotCount) {
 		Storage.resize(slotCount);
 		NumOfSlots = slotCount;
 	}

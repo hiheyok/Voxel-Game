@@ -69,7 +69,7 @@ void ChunkGeneration::Worker(int id) {
 			//Generate
 			ivec3 pos = ChunkIDToPOS(task);
 
-			Chunk* chunk = Generators.GetGenerator(Generators.MOUNTAINS)->Generate(pos);
+			Chunk* chunk = Generators.GetGenerator(Generators.DEBUG)->Generate(pos);
 
 			chunk->Position = pos;
 			chunk->chunkID = task;

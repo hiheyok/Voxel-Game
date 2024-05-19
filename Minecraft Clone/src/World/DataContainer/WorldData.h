@@ -48,7 +48,6 @@ public:
 
 	float GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int direction, int distancetest);
 private:
-	size_t tickCount = 0;
 	ChunkMap WorldChunkData;
 	
 };
