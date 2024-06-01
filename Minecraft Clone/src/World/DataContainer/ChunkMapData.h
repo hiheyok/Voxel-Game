@@ -1,13 +1,14 @@
 #pragma once
 
 #include "../Chunk/Chunk.h"
+#include "../Chunk/ChunkColumn.h"
 #include <unordered_set>
 #include <unordered_map>
 
 typedef unsigned long long int RegionID;
 
 struct Region { //32x32x32 Chunk Region
-	Chunk* region[32 * 32 * 32]{ nullptr };
+	ChunkColumn* region[32 * 32]{ nullptr };
 
 	void AddChunk(Chunk* chunk, uint16_t x, uint16_t y, uint16_t z);
 	void AddChunkGlobalPos(Chunk* chunk, int32_t x, int32_t y, int32_t z);
@@ -20,6 +21,12 @@ struct Region { //32x32x32 Chunk Region
 
 	Chunk* GetChunk(uint16_t x, uint16_t y, uint16_t z);
 	Chunk* GetChunkGlobalPos(int32_t x, int32_t y, int32_t z);
+
+	ChunkColumn* GetChunkColumn(uint16_t x, uint16_t z);
+	ChunkColumn* GetChunkColumnGlobalPos(int32_t x, int32_t z);
+
+	bool CheckChunkColumn(uint16_t x, uint16_t z);
+	bool CheckChunkColumnGlobalPos(int32_t x, int32_t z);
 };
 
 class ChunkMap {

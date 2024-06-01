@@ -109,9 +109,10 @@ namespace MemoryManagement {
 
 			MemoryBlock current = left->second;
 
-			FreeMemoryBlocks.Delete(left);
 			SortedMemSizes.erase(SortedMemSizesIterators[left->first]);
 			SortedMemSizesIterators.erase(left->first);
+			FreeMemoryBlocks.Delete(left);
+			
 
 			if (current.Size == MemSize)
 				return;
@@ -174,15 +175,15 @@ namespace MemoryManagement {
 			//Clear Free Spaces
 
 			if (isFreeBlockLeft) {
-				FreeMemoryBlocks.Delete(LeftBlockFree);
 				SortedMemSizes.erase(SortedMemSizesIterators[LeftBlockFree->first]);
 				SortedMemSizesIterators.erase(LeftBlockFree->first);
+				FreeMemoryBlocks.Delete(LeftBlockFree);
 			}
 				
 			if (isFreeBlockRight) {
-				FreeMemoryBlocks.Delete(RightBlockFree);
 				SortedMemSizes.erase(SortedMemSizesIterators[RightBlockFree->first]);
 				SortedMemSizesIterators.erase(RightBlockFree->first);
+				FreeMemoryBlocks.Delete(RightBlockFree);
 			}
 				
 

@@ -4,6 +4,8 @@
 void MainPlayer::Initialize(GLFWwindow* win) {
 	PlayerGUI.Initialize(win);
 
+	float ItemViewRelativeSize = 0.85f;
+
 	GUISet Hotbar;
 	Hotbar.SetGUITexture("assets/textures/gui/widgets.png");
 	Hotbar.AddGUIElement("Hotbar", "", vec2(9.f * HotbarSize * 1.0055555555f, HotbarSize * 1.05f), vec2(0.f, -1.f + HotbarSize * 0.5f), vec2(0.5f, 0.5f), vec2(181.5f, 21.5f));
@@ -13,7 +15,7 @@ void MainPlayer::Initialize(GLFWwindow* win) {
 	ItemBar.SetGUITexture(ItemAtlas.Atlas.textureID, ItemAtlas.Atlas.width, ItemAtlas.Atlas.height);
 
 	for (int i = 0; i < 9; i++) {
-		ItemBar.AddGUIElementNorm(std::to_string(i), "", vec2(HotbarSize, HotbarSize), vec2(HotbarSize * (float)(i - 4), -1.f + HotbarSize * 0.5f), vec2(0,0), vec2(1,1));
+		ItemBar.AddGUIElementNorm(std::to_string(i), "", vec2(HotbarSize* ItemViewRelativeSize, HotbarSize * ItemViewRelativeSize), vec2(HotbarSize * (float)(i - 4), -1.f + HotbarSize * 0.5f), vec2(0,0), vec2(1,1));
 	}
 
 	GUIIndex = PlayerGUI.AddGUI("PlayerGUI", Hotbar);

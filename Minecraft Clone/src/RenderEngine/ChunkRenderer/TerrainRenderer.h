@@ -5,6 +5,7 @@
 #include "Batch/ChunkBatch.h"
 #include "../OpenGL/Shader/Shader.h"
 #include "../../Core/Options/Option.h"
+#include "../../World/Server/Time/Timer.h"
 
 class TerrainRenderer {
 public:
@@ -56,6 +57,7 @@ private:
 	int m_HorizontalRenderDistance = 16;
 	int m_VerticalRenderDistance = 16;
 	float m_FOV = 80.f;
+	int TextureAminationIndex = 0;
 
 	std::vector<ChunkDrawBatch> ChunkSolidBatches;
 	std::unordered_map<ChunkID, int> ChunkBatchSolidLookup; //f: ChunkID -> SolidBatchIndex
@@ -65,8 +67,8 @@ private:
 
 	GLFWwindow* window = nullptr;
 
-	Shader SolidShader;
-	Shader TransparentShader;
+	Shader CubicShader;
 	Camera* camera;
+	Timer time;
 };
 

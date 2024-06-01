@@ -39,7 +39,7 @@ struct MathWorld : WorldGenerator {
 					//}
 
 					if (gz * gz + gy * gy > 4) {
-						chunk->SetBlock(Blocks.BRICK, x, y, z);
+						chunk->SetBlock(Blocks.BRICKS, x, y, z);
 					}
 
 					int Unit = 1;

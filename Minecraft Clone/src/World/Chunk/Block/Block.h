@@ -43,14 +43,6 @@ struct Block {
 	virtual void tick(int x, int y, int z) {
 
 	}
-	/*
-	
-	layout (location = 0) in ivec3 Vertices;
-	layout (location = 1) in ivec2 UV;
-	layout (location = 2) in unsigned int TexturePosition;
-	layout (location = 3) in unsigned int light;
-
-	*/
 
 	BlockModel GetRenderModel() {
 		BlockModel model;

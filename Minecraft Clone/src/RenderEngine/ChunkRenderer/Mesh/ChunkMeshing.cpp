@@ -9,6 +9,7 @@ using namespace glm;
 
 const int blockShadingBitOffset = 15;
 const int textureBitOffset = 10;
+const int NumTextureBitOffset = 22;
 
 void ChunkMeshData::GenerateMesh(Chunk* chunk) {
 	//Initialize
@@ -307,7 +308,13 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 
 						BlockID b = chunk->GetBlockUnsafe(x, y, z);
 
+						uint8_t LightLvl = chunk->Lighting.GetLighting(x,y,z);
+
 						Quad quad;
+						quad.setLight(L_NN, LightLvl);
+						quad.setLight(L_NP, LightLvl);
+						quad.setLight(L_PP, LightLvl);
+						quad.setLight(L_PN, LightLvl);
 						quad.setTexture(TextureCache[b * 6 + face]);
 						SetFaceUnsafe(x, y, z, face, quad);
 
@@ -490,6 +497,9 @@ inline void ChunkMeshData::AddFacetoMesh_X(QuadWPos& quad, int slice, uint8_t fa
 	int sy0 = 0;
 	int sx0 = 0;
 
+	uint32_t tex = (uint32_t)quad.getTexture() << textureBitOffset;
+	uint32_t NumTex = (uint32_t)Blocks.getBlockType(quad.block)->Texture->GetNumTextures(PX + face) << NumTextureBitOffset;
+
 	if ((int)NN + (int)PP > (int)NP + (int)PN) {
 		int PTMP[3]{ P0[0], P0[1], P0[2] };
 
@@ -512,8 +522,6 @@ inline void ChunkMeshData::AddFacetoMesh_X(QuadWPos& quad, int slice, uint8_t fa
 		sy0 = sy_tmp;
 	}
 
-	uint32_t tex = (uint32_t)quad.getTexture() << textureBitOffset;
-
 	bool transparency = Blocks.getBlockType(quad.block)->Properties->transparency;
 
 	vector<unsigned int>* out = (transparency ? &TransparentVertices : &SolidVertices);
@@ -522,32 +530,32 @@ inline void ChunkMeshData::AddFacetoMesh_X(QuadWPos& quad, int slice, uint8_t fa
 	case 1:
 		out->insert(out->end(), {
 		0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset)
-		,0u | sx0 | sy0 | tex
+		,0u | sx0 | sy0 | tex | NumTex
 		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
-		,0u | sx0 | sy | tex
+		,0u | sx0 | sy | tex | NumTex
 		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
-		,0u | sx | sy0 | tex
+		,0u | sx | sy0 | tex | NumTex
 		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
-		,0u | sx | sy0 | tex
+		,0u | sx | sy0 | tex | NumTex
 		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
-		,0u | sx0 | sy | tex
+		,0u | sx0 | sy | tex | NumTex
 		,0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset)
-		,0u | sx | sy | tex });
+		,0u | sx | sy | tex | NumTex });
 		break;
 	case 0:
 		out->insert(out->end(), {
 		0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset)
-		,0u | sx0 | sy0 | tex
+		,0u | sx0 | sy0 | tex | NumTex
 		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
-		,0u | sx | sy0 | tex
+		,0u | sx | sy0 | tex | NumTex
 		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
-		,0u | sx0 | sy | tex
+		,0u | sx0 | sy | tex | NumTex
 		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
-		,0u | sx | sy0 | tex
+		,0u | sx | sy0 | tex | NumTex
 		,0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset)
-		,0u | sx | sy | tex
+		,0u | sx | sy | tex | NumTex
 		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
-		,0u | sx0 | sy | tex
+		,0u | sx0 | sy | tex | NumTex
 			});
 		break;
 	}
@@ -581,6 +589,9 @@ inline void ChunkMeshData::AddFacetoMesh_Y(QuadWPos& quad, int slice, uint8_t fa
 	int sy0 = 0;
 	int sx0 = 0;
 
+	uint32_t tex = (uint32_t)quad.getTexture() << textureBitOffset;
+	uint32_t NumTex = (uint32_t)Blocks.getBlockType(quad.block)->Texture->GetNumTextures(PY + face) << NumTextureBitOffset;
+
 	if ((int)NN + (int)PP > (int)NP + (int)PN) {
 		int PTMP[3]{ P0[0], P0[1], P0[2] };
 
@@ -603,8 +614,6 @@ inline void ChunkMeshData::AddFacetoMesh_Y(QuadWPos& quad, int slice, uint8_t fa
 		sx0 = sx_tmp;
 	}
 
-	uint32_t tex = (uint32_t)quad.getTexture() << textureBitOffset; //x : z
-
 	bool transparency = Blocks.getBlockType(quad.block)->Properties->transparency;
 
 	vector<unsigned int>* out = (transparency ? &TransparentVertices : &SolidVertices);
@@ -614,34 +623,34 @@ inline void ChunkMeshData::AddFacetoMesh_Y(QuadWPos& quad, int slice, uint8_t fa
 
 		out->insert(out->end(), {
 			0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset) //0
-		,0u | sx0 | sy0 | tex
+		,0u | sx0 | sy0 | tex | NumTex
 		,0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset) //1
-		,0u | sx0 | sy | tex
+		,0u | sx0 | sy | tex | NumTex
 		,0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset) //2
-		,0u | sx | sy0 | tex
+		,0u | sx | sy0 | tex | NumTex
 		,0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset) //3
-		,0u | sx | sy0 | tex
+		,0u | sx | sy0 | tex | NumTex
 		,0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset) //4
-		,0u | sx0 | sy | tex
+		,0u | sx0 | sy | tex | NumTex
 		,0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset) //5
-		,0u | sx | sy | tex
+		,0u | sx | sy | tex | NumTex
 			});
 		break;
 	case 0:
 
 		out->insert(out->end(), {
 			0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset)
-		,0u | sx0 | sy0 | tex
+		,0u | sx0 | sy0 | tex | NumTex
 		,0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset)
-		,0u | sx | sy0 | tex
+		,0u | sx | sy0 | tex | NumTex
 		,0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset)
-		,0u | sx0 | sy | tex
+		,0u | sx0 | sy | tex | NumTex
 		,0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset)
-		,0u | sx | sy0 | tex
+		,0u | sx | sy0 | tex | NumTex
 		,0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset)
-		,0u | sx | sy | tex
+		,0u | sx | sy | tex | NumTex
 		,0u | P0[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset)
-		,0u | sx0 | sy | tex
+		,0u | sx0 | sy | tex | NumTex
 			});
 		break;
 	}
@@ -674,6 +683,9 @@ inline void ChunkMeshData::AddFacetoMesh_Z(QuadWPos& quad, int slice, uint8_t fa
 	int sy0 = 0;
 	int sx0 = 0;
 
+	uint32_t tex = (uint32_t)quad.getTexture() << textureBitOffset;
+	uint32_t NumTex = (uint32_t)Blocks.getBlockType(quad.block)->Texture->GetNumTextures(PZ + face) << NumTextureBitOffset;
+
 	if ((int)NN + (int)PP > (int)NP + (int)PN) {
 		uint32_t PTMP[3]{ P0[0], P0[1], P0[2] };
 
@@ -696,8 +708,6 @@ inline void ChunkMeshData::AddFacetoMesh_Z(QuadWPos& quad, int slice, uint8_t fa
 		face = !face;
 	}
 
-	uint32_t tex = (uint32_t)quad.getTexture() << textureBitOffset;
-
 	bool transparency = Blocks.getBlockType(quad.block)->Properties->transparency;
 
 	vector<unsigned int>* out = (transparency ? &TransparentVertices : &SolidVertices);
@@ -706,33 +716,33 @@ inline void ChunkMeshData::AddFacetoMesh_Z(QuadWPos& quad, int slice, uint8_t fa
 	case 1:
 		out->insert(out->end(), {
 			0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset)
-		,0u | sx0 | sy0 | tex
+		,0u | sx0 | sy0 | tex | NumTex
 		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
-		,0u | sx | sy0 | tex
+		,0u | sx | sy0 | tex | NumTex
 		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
-		,0u | sx0 | sy | tex
+		,0u | sx0 | sy | tex | NumTex
 		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
-		,0u | sx0 | sy | tex
+		,0u | sx0 | sy | tex | NumTex
 		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
-		,0u | sx | sy0 | tex
+		,0u | sx | sy0 | tex | NumTex
 		,0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset)
-		,0u | sx | sy | tex
+		,0u | sx | sy | tex | NumTex
 			});
 		break;
 	case 0:
 		out->insert(out->end(), {
 			0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset)
-		,0u | sx0 | sy0 | tex
+		,0u | sx0 | sy0 | tex | NumTex
 		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
-		,0u | sx0 | sy | tex
+		,0u | sx0 | sy | tex | NumTex
 		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
-		,0u | sx | sy0 | tex
+		,0u | sx | sy0 | tex | NumTex
 		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
-		,0u | sx | sy0 | tex
+		,0u | sx | sy0 | tex | NumTex
 		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
-		,0u | sx0 | sy | tex
+		,0u | sx0 | sy | tex | NumTex
 		,0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset)
-		,0u | sx | sy | tex
+		,0u | sx | sy | tex | NumTex
 			});
 		break;
 	}

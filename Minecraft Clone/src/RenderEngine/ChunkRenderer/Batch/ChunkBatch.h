@@ -2,6 +2,7 @@
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "RenderCommandBuffer.h"
 #include "../../../Utils/LogUtils.h"
 #include "../../Camera/camera.h"
 #include "../../Frustum/frustum.h"
@@ -13,29 +14,6 @@
 #include <list>
 #include <map>
 #include <array>
-
-
-struct DrawCommandIndirect {
-	unsigned int  count = 0;
-	unsigned int  instanceCount = 0;
-	unsigned int  first = 0;
-	unsigned int  baseInstance = 0;
-
-	DrawCommandIndirect() {
-
-	}
-
-	DrawCommandIndirect(uint32_t count_, uint32_t instanceCount_, uint32_t first_, uint32_t baseInstance_) : count(count_), instanceCount(instanceCount_), first(first_), baseInstance(baseInstance_) {
-
-	}
-
-	void set(uint32_t count_, uint32_t instanceCount_, uint32_t first_, uint32_t baseInstance_) {
-		count = count_;
-		instanceCount = instanceCount_;
-		first = first_;
-		baseInstance = baseInstance_;
-	}
-};
 
 class ChunkDrawBatch {
 public:
@@ -74,7 +52,7 @@ public:
 
 	ChunkGPUMemoryPool MemoryPool;
 private:
-
+	ChunkDrawCommandBuffer CommandBuffer;
 	CFrustum Frustum;
 	Buffer IBO, SSBO;
 	VertexArray Array;

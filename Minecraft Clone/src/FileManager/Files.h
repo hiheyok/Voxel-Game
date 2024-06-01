@@ -10,23 +10,25 @@ namespace FileMgr {
 	//struct stat ab;
 }
 
+static std::vector<std::string> Tokenize(std::string str, char divider) {
+	std::vector<std::string> Tokens = {};
+
+	std::stringstream check(str);
+
+	std::string intermediate;
+
+	while (std::getline(check, intermediate, divider)) {
+		Tokens.push_back(intermediate);
+	}
+
+	return Tokens;
+}
+
 class File{
 private:
 	
 
-	std::vector<std::string> Tokenize(std::string str, char divider) {
-		std::vector<std::string> Tokens = {};
-
-		std::stringstream check(str);
-
-		std::string intermediate;
-
-		while (std::getline(check, intermediate, divider)) {
-			Tokens.push_back(intermediate);
-		}
-
-		return Tokens;
-	}
+	
 
 public:
 
@@ -104,7 +106,7 @@ public:
 		
 	}
 
-	static bool CreateFile(std::string name, std::string dir = "N/A") {
+	static void CreateFile(std::string name, std::string dir = "N/A") {
 		std::string d = "";
 
 		if (dir == "N/A")

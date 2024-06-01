@@ -23,40 +23,82 @@ public:
 		width = width_;
 		height = height_;
 	}
-	bool AddTextureToArray(RawTextureData* Data) {
-		Format = GL_RGBA;
-		if (Data->data) {
-			if (width == Data->width && height == Data->height) {
-				if (Data->format == GL_RGB) {
-					for (int index = 0; index < Data->width * Data->height; index++) {
-						ArrayData.push_back(Data->data[(index * 3)]);
-						ArrayData.push_back(Data->data[(index * 3) + 1]);
-						ArrayData.push_back(Data->data[(index * 3) + 2]);
-						ArrayData.push_back(255);
-					}
-					Layers++;
-				}
-				if (Data->format == GL_RGBA) {
-					for (int index = 0; index < Data->width * Data->height; index++) {
-						ArrayData.push_back(Data->data[(index * 4)]);
-						ArrayData.push_back(Data->data[(index * 4) + 1]);
-						ArrayData.push_back(Data->data[(index * 4) + 2]);
-						ArrayData.push_back(Data->data[(index * 4) + 3]);
-					}
-					Layers++;
-				}
-			}
-			else {
-				Logger.LogError("Texture Array Loader", "Width or height doesn't match");
-				return false;
-			}
 
-
+	void AddData(std::vector<uint8_t> Data,int Width, int Height, int Format) {
+		if (Format == GL_RGB) {
+			for (int index = 0; index < Width * Height; index++) {
+				ArrayData.push_back(Data[(index * 3)]);
+				ArrayData.push_back(Data[(index * 3) + 1]);
+				ArrayData.push_back(Data[(index * 3) + 2]);
+				ArrayData.push_back(255);
+			}
+			Layers++;
+		} else  if (Format == GL_RGBA) {
+			for (int index = 0; index < Width * Height; index++) {
+				ArrayData.push_back(Data[(index * 4)]);
+				ArrayData.push_back(Data[(index * 4) + 1]);
+				ArrayData.push_back(Data[(index * 4) + 2]);
+				ArrayData.push_back(Data[(index * 4) + 3]);
+			}
+			Layers++;
+		}
+		else if (Format = GL_RED) {
+			for (int index = 0; index < Width * Height; index++) {
+				ArrayData.push_back(Data[index]);
+				ArrayData.push_back(Data[index]);
+				ArrayData.push_back(Data[index]);
+				ArrayData.push_back(255);
+			}
+			Layers++;
 		}
 		else {
+			std::cout << "break\n";
+		}
+	}
+
+	bool AddTextureToArray(RawTextureData* Data) {
+
+
+		Format = GL_RGBA;
+		if (!Data->data) {
 			Logger.LogError("Texture Array Loader", "No texture");
 			return false;
 		}
+
+		if (((Data->width % width) != 0) || ((Data->height % height) != 0)) {
+			Logger.LogError("Texture Array Loader", "Width or height doesn't match");
+			return false;
+		}
+
+		int ImgsX = Data->width / width;
+		int ImgsY = Data->height / height;
+
+		int ColorSize = 3;
+
+		if (Data->format == GL_RGBA) {
+			ColorSize = 4;
+		}
+		else if (Data->format == GL_RED) {
+			ColorSize = 1;
+		}
+
+		int CWidth = width * ColorSize;
+
+		for (int x = 0; x < ImgsX; x++) {
+			for (int y = 0; y < ImgsY; y++) {
+				int gx = x * width * ColorSize;
+				int gy = y * height * Data->width * ColorSize;
+
+				std::vector<uint8_t> buffer(width * height * ColorSize);
+
+				for (int h = 0; h < height; h++) {
+					memcpy(buffer.data() + (h * CWidth), Data->data + (h * Data->width * ColorSize + gx + gy), CWidth);
+				}
+
+				AddData(buffer, width, height, Data->format);
+			}
+		}
+
 		return true;
 	}
 	bool AddTextureToArray(std::string file) {
@@ -68,6 +110,7 @@ public:
 		Logger.LogError("Image Loader", "Unable to load: " + file);
 		return false;
 	}
+
 	int GetLayers() {
 		return Layers;
 	}

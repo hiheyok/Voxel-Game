@@ -1,7 +1,7 @@
 #include "Blocks.h"
 #include "Type/BlockTypes.h"
 #include <nlohmann/json.hpp>
-
+#include "../../../FileManager/Files.h"
 #include <fstream>
 
 using namespace std;
@@ -31,66 +31,149 @@ BlockID BlockList::RegisterBlock(std::string BlockName, Material* material, bool
 	return ID;
 }
 
-void BlockList::InitializeTextures() {
-	ifstream file("assets/BlockTextures.json");
-
-	json TextureData = json::parse(file);
+void BlockList::InitializeTextureV2() {
+	//Model path
 
 	std::unordered_map<std::string, int> TextureIDs;
+	std::unordered_map<int, int> TextureRepeatCount;
 
-	for (auto& b : TextureData.items()) { //Block
+	//Set null
+	BlockTextureArray.AddTextureToArray("assets/textures/block/null.png");
+	TextureIDs["assets/textures/block/null.png"] = 1;
+	TextureRepeatCount[TextureIDs["assets/textures/block/null.png"]] = 1;
 
-		BlockID id = BlockIDNameData[b.key()];
+	std::string path = "assets/models/block/";
 
-		for (auto& texture : b.value().items().begin().value().items()) {
+	for (const auto& block : BlockIDNameData) {
 
-			json::iterator it = texture.value().begin();
+		std::string jsonPath = path + block.first + ".json";
+		
+		if (!FileManager::CheckFile(jsonPath.c_str())) {
+			Logger.LogError("Block" , "JSON file doesn't exist: " + jsonPath);
+			continue; //Skips if the json doesn't exist
+		}
 
-			string TexFile = it.value();
+		json BlockResourceData;
+
+		try {
+			ifstream file(jsonPath);
+			BlockResourceData = json::parse(file);
+		}
+		catch (exception& e) {
+			Logger.LogDebug("JSON", jsonPath + ":" + std::string(e.what()));
+			continue;
+		}
+
+		json Texture;
+		
+		for (auto& item : BlockResourceData.items()) {
+			if (item.key() == "textures") {
+				Texture = item.value();
+				break;
+			}
+		}
+
+		for (auto& side : Texture.items()) {
+			std::string pos = side.key();
+			std::string str = side.value().items().begin().value();
+			
+			std::vector<std::string> tokens = Tokenize(str, '/');
+
+			if (tokens.size() != 2) {
+				continue;
+			}
+
+			std::string TexFile ="assets/textures/block/" + tokens[1] + ".png";
+
+			int NumLayersBefore = BlockTextureArray.GetLayers();
 
 			if (!TextureIDs.count(TexFile)) {
 				BlockTextureArray.AddTextureToArray(TexFile);
-				TextureIDs[TexFile] = BlockTextureArray.GetLayers();
+				TextureIDs[TexFile] = NumLayersBefore + 1;
+				TextureRepeatCount[TextureIDs[TexFile]] = BlockTextureArray.GetLayers() - NumLayersBefore;
 			}
-
-			it++;
 
 			int sides[6]{ 0xFF,0xFF,0xFF,0xFF,0xFF,0xFF };
 
-			int i = 0;
-
-			for (auto side : it.value().items()) {
-				int s = 0xFF;
-
-				string texSide = side.value();
-
-				if (!strcmp(texSide.c_str(), "FRONT")) {
-					s = FRONT;
-				}
-				if (!strcmp(texSide.c_str(), "BACK")) {
-					s = BACK;
-				}
-				if (!strcmp(texSide.c_str(), "LEFT")) {
-					s = LEFT;
-				}	
-				if (!strcmp(texSide.c_str(), "RIGHT")) {
-					s = RIGHT;
-				}
-				if (!strcmp(texSide.c_str(), "TOP")) {
-					s = TOP;
-				}
-				if (!strcmp(texSide.c_str(), "BOTTOM")) {
-					s = BOTTOM;
-				}
-
-				sides[i] = s;
-				i++;	
-			}
-			
 			int TexID = TextureIDs[TexFile];
 
-			BlockTypeData[id]->Texture->SetFacesCustom(TexID, sides[0], sides[1], sides[2], sides[3], sides[4], sides[5]);
-		}
+			if (!strcmp(pos.c_str(), "top")) {
+				sides[0] = TOP;
+			}
+			else if (!strcmp(pos.c_str(), "bottom")) {
+				sides[0] = BOTTOM;
+			}
+			else if (!strcmp(pos.c_str(), "side")) {
+				sides[0] = LEFT;
+				sides[1] = RIGHT;
+				sides[2] = FRONT;
+				sides[3] = BACK;
+			}
+			else if (!strcmp(pos.c_str(), "end")) {
+				sides[0] = TOP;
+				sides[1] = BOTTOM;
+			} 
+			else if (!strcmp(pos.c_str(), "all")) {
+				sides[0] = LEFT;
+				sides[1] = RIGHT;
+				sides[2] = FRONT;
+				sides[3] = BACK;
+				sides[4] = TOP;
+				sides[5] = BOTTOM;
+			}
+			else if (!strcmp(pos.c_str(), "pattern")) {
+				sides[0] = LEFT; 
+				sides[1] = RIGHT;
+				sides[2] = FRONT;
+				sides[3] = BACK;
+				sides[4] = TOP;
+				sides[5] = BOTTOM;
+			}
+			else if (!strcmp(pos.c_str(), "texture")) {
+				sides[0] = LEFT;
+				sides[1] = RIGHT;
+				sides[2] = FRONT;
+				sides[3] = BACK;
+				sides[4] = TOP;
+				sides[5] = BOTTOM;
+			}
+			else if (!strcmp(pos.c_str(), "down")) {
+				sides[0] = BOTTOM;
+			}
+			else if (!strcmp(pos.c_str(), "east")) {
+				sides[0] = RIGHT;
+			}
+			else if (!strcmp(pos.c_str(), "north")) {
+				sides[0] = FRONT;
+			}
+			else if (!strcmp(pos.c_str(), "south")) {
+				sides[0] = BACK;
+			}
+			else if (!strcmp(pos.c_str(), "up")) {
+				sides[0] = TOP;
+			}
+			else if (!strcmp(pos.c_str(), "west")) {
+				sides[0] = LEFT;
+			}
+			else if (!strcmp(pos.c_str(), "particle")) {
+				BlockTypeData[block.second]->Texture->SetParticle(TexID);
+				if (Blocks.getBlockType(block.second)->Properties->isFluid) {
+					sides[0] = LEFT;
+					sides[1] = RIGHT;
+					sides[2] = FRONT;
+					sides[3] = BACK;
+					sides[4] = TOP;
+					sides[5] = BOTTOM; //TEMP FIX 
+				}
 
+				
+			}
+			else {
+				//idk
+			}
+
+			
+			BlockTypeData[block.second]->Texture->SetFacesCustom(TexID, TextureRepeatCount[TexID], sides[0], sides[1], sides[2], sides[3], sides[4], sides[5]);
+		}
 	}
 }

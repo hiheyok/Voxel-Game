@@ -1,4 +1,5 @@
 #include "ChunkBatch.h"
+
 #include <iterator>
 #include "../../../World/Server/Time/Timer.h"
 #include <unordered_set>
@@ -69,40 +70,59 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance, int VerticalRenderDista
 
 	ivec3 Position(floor(camera->Position.x / 16.f), floor(camera->Position.y / 16.f), floor(camera->Position.z / 16.f));
 
-	int Index = 1;
+	
+	
+	bool UseNew = false;
 
-	for (const auto& data_ : RenderList) {
-		auto& data = data_.second;
+	if (UseNew) {
+		std::vector<DrawCommandIndirect> cmds = {};
+		std::vector<int> cmdpos = {};
 
-		float deltaX = data.x - Position.x;
-		float deltaY = data.y - Position.y;
-		float deltaZ = data.z - Position.z;
+		AmountOfChunkBeingRendered = CommandBuffer.getDrawCommandsSorted(&cmds, &cmdpos);
 
-		float dx2 = deltaX * deltaX / (RenderDistance * RenderDistance);
-		float dy2 = deltaY * deltaY / (VerticalRenderDistance * VerticalRenderDistance);
-		float dz2 = deltaZ * deltaZ / (RenderDistance * RenderDistance);
+		SSBO.InsertSubData(0, (AmountOfChunkBeingRendered * 3) * sizeof(int), cmdpos.data());
+		IBO.InsertSubData(0, AmountOfChunkBeingRendered * sizeof(DrawCommandIndirect), cmds.data());
+	}
+	else {
+		int Index = 1;
 
-		if (dx2 + dy2 + dz2 < 1.f) {
-			if (Frustum.SphereInFrustum((float)(data.x << 4), (float)(data.y << 4), (float)(data.z << 4), 32.f)) { // << 4 means multiply by 4
+		for (auto& data_ : RenderList) {
+			auto& data = data_.second;
 
-				DrawCommands[Index - 1].set(data.MemSize >> 3, 1, data.MemOffset >> 3, Index);
-				ChunkShaderPos[(Index - 1) * 3 + 0] = data.x;
-				ChunkShaderPos[(Index - 1) * 3 + 1] = data.y;
-				ChunkShaderPos[(Index - 1) * 3 + 2] = data.z;
+			float deltaX = data.x - Position.x;
+			float deltaY = data.y - Position.y;
+			float deltaZ = data.z - Position.z;
+
+			float dx2 = deltaX * deltaX / (RenderDistance * RenderDistance);
+			float dy2 = deltaY * deltaY / (VerticalRenderDistance * VerticalRenderDistance);
+			float dz2 = deltaZ * deltaZ / (RenderDistance * RenderDistance);
+
+			if (dx2 + dy2 + dz2 < 1.f) {
+				if (Frustum.SphereInFrustum((float)(data.x << 4), (float)(data.y << 4), (float)(data.z << 4), 32.f)) { // << 4 means multiply by 4
+
+					DrawCommands[Index - 1].set(data.MemSize >> 3, 1, data.MemOffset >> 3, Index);
+					ChunkShaderPos[(Index - 1) * 3 + 0] = data.x;
+					ChunkShaderPos[(Index - 1) * 3 + 1] = data.y;
+					ChunkShaderPos[(Index - 1) * 3 + 2] = data.z;
 				
-				Index++;
+					Index++;
+				}
 			}
 		}
+
+		Index--;
+
+		SSBO.InsertSubData(0, (AmountOfChunkBeingRendered * 3) * sizeof(int), ChunkShaderPos.data());
+		IBO.InsertSubData(0, AmountOfChunkBeingRendered * sizeof(DrawCommandIndirect), DrawCommands.data());
+
+		AmountOfChunkBeingRendered = Index;
 	}
+	
 
-	Index--;
 
-	SSBO.InsertSubData(0, (Index * 3) * sizeof(int), ChunkShaderPos.data());
-	IBO.InsertSubData(0, Index * sizeof(DrawCommandIndirect), DrawCommands.data());
+	
 
-	AmountOfChunkBeingRendered = Index;
-
-	Logger.LogInfo("Rendering","CMD rebuild time (ms): " + std::to_string(time.GetTimePassed_ms()));
+	
 }
 
 void ChunkDrawBatch::UpdateCommandBufferSize() {
@@ -126,6 +146,7 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<uint32_t>& Data, int x, int y,
 	RenderListOffsetLookup[id] = MemoryPoolBlockData.MemOffset;
 	AmountOfChunks++;
 	UpdateCommands = true;
+//	CommandBuffer.AddDrawCommand(DrawCommandIndirect(MemoryPoolBlockData.MemSize >> 3, 1, MemoryPoolBlockData.MemOffset >> 3, 0),x,y,z);
 	return true;
 }
 
@@ -139,12 +160,13 @@ void ChunkDrawBatch::DeleteChunkVertices(ChunkID id) {
 			return;
 		}
 
-		MemoryPool.DeleteChunk(id);
-
 		RenderList.erase(ChunkMemOffset.MemOffset);
+		MemoryPool.DeleteChunk(id);
 		RenderListOffsetLookup.erase(id);
+//		CommandBuffer.DeleteDrawCommand(ChunkIDToPOS(id));
 		AmountOfChunks--;
 		UpdateCommands = true;
+		
 	}
 }
 
@@ -200,6 +222,8 @@ void ChunkDrawBatch::Defrager(int Cycles) {
 
 		ChunkID ID = MemoryPool.MemoryChunkOffset[ReservedBlock.Offset];
 
+		glm::ivec3 pos = ChunkIDToPOS(ID);
+
 		DeleteChunkVertices(ID);
 
 		MemoryPool.buffer.CopyTo(MemoryPool.StaggingBuffer, ReservedBlock.Offset, 0, ReservedBlock.Size);
@@ -210,6 +234,7 @@ void ChunkDrawBatch::Defrager(int Cycles) {
 
 		RenderList[MemoryPoolBlockData.MemOffset] = MemoryPoolBlockData;
 		RenderListOffsetLookup[ID] = MemoryPoolBlockData.MemOffset;
+	//	CommandBuffer.AddDrawCommand(DrawCommandIndirect(MemoryPoolBlockData.MemSize >> 3, 1, MemoryPoolBlockData.MemOffset >> 3, 0), pos.x, pos.y, pos.z);
 		AmountOfChunks++;
 		UpdateCommands = true;
 	}

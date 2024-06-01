@@ -77,7 +77,7 @@ void PlayerMovement::MovePlayer(Player* player, UserInputs Inputs, World* world)
 
 
 	if (Inputs.CheckKey(KEY_SPACE) && (world->IsEntityOnGround(player) && m_EnableCollusion)) {
-		player->Properties.Velocity.y += Inputs.delta * 75000.f;
+		player->Properties.Velocity.y += velocity * 4000;
 	}
 
 	if (Inputs.CheckKey(KEY_SPACE)) {
@@ -88,7 +88,7 @@ void PlayerMovement::MovePlayer(Player* player, UserInputs Inputs, World* world)
 	if (m_EnableCollusion) {
 		float gravity = -80;
 
-		player->Properties.Velocity.y += gravity * Inputs.delta;
+		player->Properties.Velocity.y += gravity;
 
 		vec3 time = world->GetTimeTillCollusion(player);
 

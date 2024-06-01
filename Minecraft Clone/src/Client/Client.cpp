@@ -18,7 +18,7 @@ void Client::Initialize() {
 	EntityRender.Initialize();
 	EntityRender.SetWindow(getWindow());
 
-	ItemAtlas.Initialize(256*8, 32*8);
+	ItemAtlas.Initialize(196*16, 16*8);
 	for (auto& item : Items.ItemContainer) {
 		ItemAtlas.AddItem(item.second);
 	}

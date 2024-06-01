@@ -44,7 +44,7 @@ class ItemTextureAtlas {
 		xCoord = xCoord / (float)(ratio);
 		yCoord = yCoord / (float)(ratio);
 
-		float Size = 1 / (float)(ratio);
+		float Size = 2 / (float)(ratio);
 
 		//Map to NDC
 

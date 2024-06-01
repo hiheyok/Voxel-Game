@@ -139,27 +139,32 @@ Region* ChunkMap::GetRegion(int x, int y, int z) {
 //_____________________________________________________
 
 void Region::AddChunk(Chunk* chunk, uint16_t x, uint16_t y, uint16_t z) {
-	region[x * 1024 + y * 32 + z] = chunk;
+	if (region[x * 32 + z] == nullptr) {
+		region[x * 32 + z] = new ChunkColumn();
+	}
+	region[x * 32 + z]->AddChunk(chunk, y);
 }
 
 void Region::EraseChunk(uint16_t x, uint16_t y, uint16_t z) {
-	Chunk* c = region[x * 1024 + y * 32 + z];
-	if (c == nullptr) {
-		return;
-	}
+	ChunkColumn* c = region[x * 32 + z];
+	if (c == nullptr) return;
+	if (c->GetChunk(y) == nullptr) return;
 
-	c->ClearNeighbors();
+	c->GetChunk(y)->ClearNeighbors();
 
-	delete c;
-	region[x * 1024 + y * 32 + z] = nullptr;
+	delete c->GetChunk(y);
+	region[x * 32 + z] = nullptr;
 }
 
 bool Region::CheckChunk(uint16_t x, uint16_t y, uint16_t z) {
-	return region[x * 1024 + y * 32 + z] != nullptr;
+	if (!CheckChunkColumn(x, z)) {
+		return false;
+	}
+	return region[x * 32 + z]->GetChunk(y) != nullptr;
 }
 
 Chunk* Region::GetChunk(uint16_t x, uint16_t y, uint16_t z) {
-	return region[x * 1024 + y * 32 + z];
+	return region[x * 32 + z]->GetChunk(y);
 }
 
 void Region::AddChunkGlobalPos(Chunk* chunk, int32_t x, int32_t y, int32_t z) {
@@ -192,4 +197,25 @@ Chunk* Region::GetChunkGlobalPos(int32_t x, int32_t y, int32_t z) {
 	uint16_t RegCZ = z & 0b11111;
 
 	return GetChunk(RegCX, RegCY, RegCZ);
+}
+
+ChunkColumn* Region::GetChunkColumn(uint16_t x, uint16_t z) {
+	return region[x * 32 + z];
+}
+
+ChunkColumn* Region::GetChunkColumnGlobalPos(int32_t x, int32_t z) {
+	uint16_t RegCX = x & 0b11111;
+	uint16_t RegCZ = z & 0b11111;
+
+	return GetChunkColumn(RegCX, RegCZ);
+}
+
+bool Region::CheckChunkColumn(uint16_t x, uint16_t z) {
+	return region[x * 32 + z] != nullptr;
+}
+bool Region::CheckChunkColumnGlobalPos(int32_t x, int32_t z) {
+	uint16_t RegCX = x & 0b11111;
+	uint16_t RegCZ = z & 0b11111;
+
+	return CheckChunkColumn(RegCX, RegCZ);
 }

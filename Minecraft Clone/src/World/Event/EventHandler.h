@@ -48,7 +48,6 @@ public:
 		case ENTITY_EVENT:
 			(*EntityEventHandles[data.EntityEvent.id])(data.EntityEvent);
 			break;
-		default:
 
 		}
 	}

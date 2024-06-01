@@ -3,6 +3,7 @@
 #include "ChunkData.h"
 #include "../../Utils/FastNoiseLite.h"
 
+
 struct values2x {
 	float x = 0;
 	float y = 0;

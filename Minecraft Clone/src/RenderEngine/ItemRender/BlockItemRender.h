@@ -15,7 +15,7 @@ private:
 
 	void SetCamera() {
 		camera.FOV = 57;
-		camera.Position = glm::vec3(1.5f,1.5f,1.5f);
+		camera.Position = glm::vec3(1.1f,1.1f,1.1f);
 		camera.Pitch = -35;
 		camera.Yaw = -135;
 
@@ -50,8 +50,21 @@ public:
 		VAO.EnableAttriPTR(3, 1, GL_FLOAT, GL_FALSE, 7, 6);
 		VAO.Unbind();
 		VBO.Unbind();
-
 		SetCamera();
+
+		float dimensions = 0.85f;
+
+		glm::mat4 view = camera.GetViewMatrix();
+		glm::mat4 modelMat = glm::mat4(1.f);
+		glm::mat4 orthoProj = glm::ortho(-dimensions, dimensions, -dimensions, dimensions, 0.001f, 3.0f);
+		shader.use();
+
+		shader.setMat4("view", view);
+		shader.setMat4("model", modelMat);
+		shader.setMat4("projection", orthoProj);
+
+
+		shader.bindTextureArray2D(0, Blocks.BlockTextureArray.get(), "BlockTexture");
 	}
 
 	void RenderBlock(Item item) {
@@ -60,23 +73,10 @@ public:
 		VBO.InsertData(model.Vertices.size() * sizeof(float), model.Vertices.data(), GL_STATIC_DRAW);
 		EBO.InsertData(model.Indices.size() * sizeof(float), model.Indices.data(), GL_STATIC_DRAW);
 
-		glm::mat4 modelMat = glm::mat4(1.f);
-
 		camera.screenRes = glm::vec2(16.f, 16.f);
 
-		glm::mat4 view = camera.GetViewMatrix();
-
-	//	glm::mat4 projection = glm::perspective(glm::radians(camera.FOV), 1.f, 0.001f, 10000.0f);
-		glm::mat4 orthoProj = glm::ortho(-1.f, 1.f, -1.f, 1.f, 0.001f, 3.0f);
 		shader.use();
-
-		shader.setMat4("view", view);
-		shader.setMat4("model", modelMat);
-		shader.setMat4("projection", orthoProj);
-
 		setDrawCalls();
-
-		shader.bindTextureArray2D(0, Blocks.BlockTextureArray.get(), "BlockTexture");
 		VAO.Bind();
 		EBO.Bind();
 		VBO.Bind();

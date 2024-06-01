@@ -19,12 +19,14 @@ out vec2 textureSize;
 uniform mat4 model;
 uniform mat4 projection;
 uniform mat4 view;
+uniform int TextureAimIndex;
 
 int xDataBitOffset = 0;
 int yDataBitOffset = 5;
 int zDataBitOffset = 10;
 int blockShadingBitOffset = 15;
 int textureBitOffset = 10;
+int NumTextureBitOffset = 22;
 
 float dataToFloat(int index, int size) {
     return (((1u << size) - 1u) & (data >> index));
@@ -36,9 +38,9 @@ float tdataToFloat(int index, int size) {
 
 void main()
 {
-    
+    int NumTexture = int(tdataToFloat(NumTextureBitOffset, 12));
     vec3 pos = vec3(dataToFloat(xDataBitOffset, 5),dataToFloat(yDataBitOffset, 5),dataToFloat(zDataBitOffset, 5));
-    texturePosition = tdataToFloat(textureBitOffset, 5);
+    texturePosition = tdataToFloat(textureBitOffset, 12) + (TextureAimIndex % NumTexture);
     textureSize = vec2(tdataToFloat(0, 5),tdataToFloat(5, 5));
     float light = dataToFloat(blockShadingBitOffset, 5);
 

@@ -65,3 +65,14 @@ private:
 
 	int32_t SEED_OFFSET = 0x93496;
 };
+
+class NoiseMaps1122 {
+public:
+	FastNoiseLite minLimitPerlinNoise;
+	FastNoiseLite maxLimitPerlinNoise;
+	FastNoiseLite mainPerlinNoise;
+	FastNoiseLite surfaceNoise;
+	FastNoiseLite scaleNoise;
+	FastNoiseLite depthNoise;
+	FastNoiseLite forestNoise;
+};

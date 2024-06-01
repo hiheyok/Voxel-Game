@@ -47,7 +47,7 @@ public:
 	EntityContainer	EntityData;
 
 	float GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int direction, int distancetest);
-private:
+
 	ChunkMap WorldChunkData;
 	
 };

@@ -36,7 +36,7 @@ void main()
 	depth = depth * depth;
 	depth = 1 - depth;
 
-	vec4 texture_ =  vec4(texture(BlockTexture, vec3(textureSize.x,textureSize.y, texturePosition - 1)).rgb , 1);
+	vec4 texture_ =  texture(BlockTexture, vec3(textureSize.x,textureSize.y, texturePosition - 1));
 
 	vec4 color = (texture_ * vec4(lights,lights, lights,1.0f));
 	
@@ -50,7 +50,7 @@ void main()
 		float depthr = color.r - ((1 - depth) * (color.r - skyColor.r));
 		float depthg = color.g - ((1 - depth) * (color.g - skyColor.g));
 		float depthb = color.b - ((1 - depth) * (color.b - skyColor.b));
-		final = vec4(depthr, depthg, depthb, 1.0f);
+		final = vec4(depthr, depthg, depthb, texture_.w);
 	}
 	
 }

@@ -19,6 +19,8 @@ void TerrainRenderer::Initialize(GLFWwindow* window_, Camera* camera_) {
 	SetupShaders();
 	LoadAssets();
 
+	time.Set();
+
 	CreateNewSolidBatch();
 	CreateNewTransparentBatch();
 }
@@ -59,7 +61,7 @@ void TerrainRenderer::Render() {
 
 	for (ChunkDrawBatch& DrawBatch : ChunkSolidBatches) {
 		DrawBatch.Bind();
-		SolidShader.use();
+		CubicShader.use();
 		DrawBatch.Draw();
 		DrawBatch.Unbind();
 	}
@@ -68,7 +70,7 @@ void TerrainRenderer::Render() {
 
 	for (ChunkDrawBatch& DrawBatch : ChunkTransparentBatches) {
 		DrawBatch.Bind();
-		TransparentShader.use();
+		CubicShader.use();
 		DrawBatch.Draw();
 		DrawBatch.Unbind();
 	}
@@ -100,25 +102,25 @@ void TerrainRenderer::Update() {
 	int x = width;
 	int y = height;
 	glm::mat4 projection = glm::perspective(glm::radians(camera->FOV), (float)x / (float)y, 0.1f, 1000000.0f);
-	SolidShader.use();
+	CubicShader.use();
 
-	SolidShader.setMat4("view", view);
-	SolidShader.setMat4("model", model);
-	SolidShader.setMat4("projection", projection);
-	SolidShader.setFloat("RenderDistance", (float)(m_HorizontalRenderDistance * 16));
-	SolidShader.setFloat("VerticalRenderDistance", (float)(m_VerticalRenderDistance * 16));
-	SolidShader.setVec3("camPos", camera->Position);
+	CubicShader.setMat4("view", view);
+	CubicShader.setMat4("model", model);
+	CubicShader.setMat4("projection", projection);
+	CubicShader.setFloat("RenderDistance", (float)(m_HorizontalRenderDistance * 16));
+	CubicShader.setFloat("VerticalRenderDistance", (float)(m_VerticalRenderDistance * 16));
+	CubicShader.setVec3("camPos", camera->Position);
+	CubicShader.setInt("TextureAimIndex", TextureAminationIndex);
 
-	TransparentShader.use();
+	if (time.GetTimePassed_ms() > 100) {
+		time.Set();
+		TextureAminationIndex++;
 
-	TransparentShader.setMat4("view", view);
-	TransparentShader.setMat4("model", model);
-	TransparentShader.setMat4("projection", projection);
-	TransparentShader.setFloat("RenderDistance", (float)(m_HorizontalRenderDistance * 16));
-	TransparentShader.setFloat("VerticalRenderDistance", (float)(m_VerticalRenderDistance * 16));
-	TransparentShader.setVec3("camPos", camera->Position);
-	TransparentShader.setFloat("far", 1000000.0f);
-	TransparentShader.setFloat("near", 0.1f);
+		if (TextureAminationIndex == (1 << 15)) {
+			TextureAminationIndex = 1;
+		}
+	}
+	
 
 }
 
@@ -129,7 +131,7 @@ void TerrainRenderer::setSettings(uint32_t RenderDistance, uint32_t VerticalRend
 }
 
 void TerrainRenderer::LoadAssets() {
-	SolidShader.bindTextureArray2D(0, Blocks.BlockTextureArray.textureID, "BlockTexture");
+	CubicShader.bindTextureArray2D(0, Blocks.BlockTextureArray.textureID, "BlockTexture");
 }
 
 void TerrainRenderer::AddChunk(ChunkID ID, std::vector<uint32_t> data, std::vector<ChunkDrawBatch>* BatchType, std::unordered_map<ChunkID, int>* LookUpMap) {
@@ -238,8 +240,7 @@ void TerrainRenderer::Cleanup() {
 }
 
 void TerrainRenderer::SetupShaders() {
-	SolidShader.init("assets/shaders/vert.glsl", "assets/shaders/frag.glsl");
-	TransparentShader.init("assets/shaders/TransparentChunkVert.glsl", "assets/shaders/TransparentChunkFrag.glsl");
+	CubicShader.init("assets/shaders/vert.glsl", "assets/shaders/frag.glsl");
 }
 
 void TerrainRenderer::CreateNewSolidBatch() {
