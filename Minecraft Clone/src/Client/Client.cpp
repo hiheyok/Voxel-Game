@@ -17,6 +17,7 @@ void Client::Initialize() {
 	EntityList.Initialize();
 	EntityRender.Initialize();
 	EntityRender.SetWindow(getWindow());
+	TextRender.InitializeTextRenderer(getWindow());
 
 	ItemAtlas.Initialize(196*16, 16*8);
 	for (auto& item : Items.ItemContainer) {
@@ -42,6 +43,8 @@ void Client::Initialize() {
 	Logger.LogInfo("World", "Generating World");
 	TerrainRender.Start(getWindow(), server.world);
 	Logger.LogInfo("Client", "Starting Gameloop");
+
+	debugScreen.Initialize(getWindow());
 }
 
 void Client::run() {
@@ -62,22 +65,15 @@ void Client::Cleanup() {
 }
 
 void Client::SetWindowName() {
-	UpdateWindowName(
-		"FPS: " + std::to_string(1.0 / Frametime)
-		+ " | Pos: " + std::to_string(m_MainPlayer.GetEntityProperties().Position.x) + ", "
-		+ std::to_string(m_MainPlayer.GetEntityProperties().Position.y) + ", "
-		+ std::to_string(m_MainPlayer.GetEntityProperties().Position.z)
-		+ ", VRAM Fragmentation Rate: " + std::to_string(TerrainRender.RendererV2.getFragmentationRate() * 100)
-		+ ", VRAM Usage (MB): " + std::to_string((double)TerrainRender.RendererV2.getVRAMUsageFull() / 1000000.0)
-		+ " | Mesh All (ms): " + std::to_string(TerrainRender.buildTime / 1000.f)
-		+ " | S0 (ms): " + std::to_string(TerrainRender.buildstage0 / 1000.f)
-		+ " | S1 (ms): " + std::to_string(TerrainRender.buildstage1 / 1000.f)
-		+ " | S2 (ms): " + std::to_string(TerrainRender.buildstage2 / 1000.f)
-		+ " | Total Mesh: " + std::to_string(TerrainRender.amountOfMeshGenerated)
-		+ ", Entity Count: " + to_string(((World*)Block::WorldPTR)->EntityData.GetEntityCount())
-		+", Event Queue Size: " + to_string(((World*)Block::WorldPTR)->EventManager.getSize())
-		+ ", Server Tick (MSPT): " + to_string(((World*)Block::WorldPTR)->MSPT)
-	);
+	debugScreen.EditText("VRAMUsage", "VRAM Usage: " + std::to_string((double)TerrainRender.RendererV2.getVRAMUsageFull() / 1000000.0) + " MB");
+	debugScreen.EditText("Position", "XYZ: " + std::to_string(m_MainPlayer.GetEntityProperties().Position.x) + "/" + std::to_string(m_MainPlayer.GetEntityProperties().Position.y) + "/" + std::to_string(m_MainPlayer.GetEntityProperties().Position.z));
+	debugScreen.EditText("VRAMFragmentationRate", "VRAM Fragmentation Rate: " + std::to_string(TerrainRender.RendererV2.getFragmentationRate() * 100) + "%");
+	debugScreen.EditText("FPS", "FPS: " + std::to_string(1.0 / Frametime));
+	debugScreen.EditText("MeshStats", "Mesh Stats (ms) Total/S0/S1/S2: " + std::to_string(TerrainRender.buildTime / 1000.f) + "/" + std::to_string(TerrainRender.buildstage0 / 1000.f) + "/" + std::to_string(TerrainRender.buildstage1 / 1000.f) + "/" + std::to_string(TerrainRender.buildstage2 / 1000.f));
+	debugScreen.EditText("EntityCount", "Entity Count: " + to_string(((World*)Block::WorldPTR)->EntityData.GetEntityCount()));
+	debugScreen.EditText("EventQueueSize", "Event Queue Size: " + to_string(((World*)Block::WorldPTR)->EventManager.getSize()));
+	debugScreen.EditText("ServerTick", "Server Tick (MSPT): " + to_string(((World*)Block::WorldPTR)->MSPT));
+	debugScreen.Update();
 }
 
 void Client::Render() {
@@ -101,8 +97,9 @@ void Client::Render() {
 	Framebuffer.unbindFBO();
 
 	Framebuffer.render();
-
+	
 	m_MainPlayer.RenderGUIs();
+	debugScreen.Render();
 }
 
 void Client::GameLoop() {

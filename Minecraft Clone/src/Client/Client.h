@@ -8,6 +8,7 @@
 #include "Player/MainPlayer.h"
 #include "../RenderEngine/GUI/GUI.h"
 #include "../World/Item/ItemTextureAtlas.h"
+#include "Render/DebugScreen/DebugScreen.h"
 
 
 class Client : protected Window {
@@ -30,4 +31,6 @@ private:
 	MultiEntityRenderer EntityRender;
 	EntityRendererUpdater EntityUpdater;
 	TexturedFrameBuffer Framebuffer;
+	TextRenderer TextRender;
+	DebugScreen debugScreen;
 };

@@ -54,7 +54,6 @@ public:
 				for (int y = 15; y >= 0; y--) {
 					BlockID b = TargetChunk->GetBlockUnsafe(x, y, z);
 					if (!Blocks.getBlockType(b)->Properties->transparency) {
-						TargetChunk->Lighting.EditLight(x, y, z, 6);
 						TargetChunkHeightmap[x * 16 + z] = y;
 						break;
 					}
@@ -63,9 +62,6 @@ public:
 
 			}
 		}
-
-		return;
-		uint8_t DarkLightLevel = 8;
 
 		//Update chunk column lighting
 
@@ -84,21 +80,21 @@ public:
 				ChunkColumnHeightMap[x * 16 + z] = ColumnLightHeight;
 
 				//Work on target chunk first
-				for (int y = TargetChunkHeightmap[x * 16 + z]; y >= 0; y--) {
-					LightColumn[Height]->EditLight(x, y, z, DarkLightLevel);
+				for (int y = TargetChunkHeightmap[x * 16 + z] - 1; y >= 0; y--) {
+					LightColumn[Height]->EditLight(x, y, z, 12);
 				}
 
 
-				////Work on rest
-				//for (int cy = Height - 1; cy >= 0; cy--) {
-				//	if (Column[cy] == nullptr) continue;
+				//Work on rest
+				for (int cy = Height - 1; cy >= 0; cy--) {
+					if (Column[cy] == nullptr) continue;
 
-				//	int ChunkBlockHeight = cy * 16;
-				//	
-				//	for (int y = 16; y >= 0; y--) {
-				//		LightColumn[Height]->EditLight(x, y, z, DarkLightLevel);
-				//	}
-				//}
+					int ChunkBlockHeight = cy * 16;
+					
+					for (int y = 15; y >= 0; y--) {
+						LightColumn[Height]->EditLight(x, y, z, 12);
+					}
+				}
 			}
 		}
 
