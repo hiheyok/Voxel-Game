@@ -60,6 +60,43 @@ struct MountainGenerator : WorldGenerator {
 
 		GenerateEnvironment(Position, chunk);
 		GenerateDecor(Position, chunk);
+		if (Position.y == 3) {
+			int NumBlocks = Blocks.BlockTypeData.size();
+
+			int gx = Position.x * 16;
+			int gz = Position.z * 16;
+
+			for (int x = 0; x < 16; x++) {
+				for (int z = 0; z < 16; z++) {
+
+					int px = x + gx;
+					int pz = z + gz;
+
+					if (((px & 0b1) == 1) || ((pz & 0b1) == 1)) {
+						continue;
+					}
+
+					px = px / 2;
+					pz = pz / 2;
+
+					if ((px < 0) || (px >= 20)) {
+						continue;
+					}
+
+					int b = px + pz * 20;
+
+					if ((b < NumBlocks) && (b >= 0)) {
+						chunk->SetBlockUnsafe(b, x, 3, z);
+					}
+
+
+				}
+			}
+		}
+
+		
+
+
 		return chunk;
 	}
 

@@ -140,7 +140,6 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<uint32_t>& Data, int x, int y,
 	if (MemoryPoolBlockData.MemOffset == ULLONG_MAX) {
 		return false;
 	}
-
 	
 	RenderList[MemoryPoolBlockData.MemOffset] = MemoryPoolBlockData;
 	RenderListOffsetLookup[id] = MemoryPoolBlockData.MemOffset;
@@ -149,8 +148,6 @@ bool ChunkDrawBatch::AddChunkVertices(std::vector<uint32_t>& Data, int x, int y,
 //	CommandBuffer.AddDrawCommand(DrawCommandIndirect(MemoryPoolBlockData.MemSize >> 3, 1, MemoryPoolBlockData.MemOffset >> 3, 0),x,y,z);
 	return true;
 }
-
-int i = 0;
 
 void ChunkDrawBatch::DeleteChunkVertices(ChunkID id) {
 	if (MemoryPool.CheckChunk(id)) {

@@ -64,12 +64,12 @@ void Client::Cleanup() {
 	glfwDestroyWindow(getWindow());
 }
 
-void Client::SetWindowName() {
-	debugScreen.EditText("VRAMUsage", "VRAM Usage: " + std::to_string((double)TerrainRender.RendererV2.getVRAMUsageFull() / 1000000.0) + " MB");
-	debugScreen.EditText("Position", "XYZ: " + std::to_string(m_MainPlayer.GetEntityProperties().Position.x) + "/" + std::to_string(m_MainPlayer.GetEntityProperties().Position.y) + "/" + std::to_string(m_MainPlayer.GetEntityProperties().Position.z));
-	debugScreen.EditText("VRAMFragmentationRate", "VRAM Fragmentation Rate: " + std::to_string(TerrainRender.RendererV2.getFragmentationRate() * 100) + "%");
-	debugScreen.EditText("FPS", "FPS: " + std::to_string(1.0 / Frametime));
-	debugScreen.EditText("MeshStats", "Mesh Stats (ms) Total/S0/S1/S2: " + std::to_string(TerrainRender.buildTime / 1000.f) + "/" + std::to_string(TerrainRender.buildstage0 / 1000.f) + "/" + std::to_string(TerrainRender.buildstage1 / 1000.f) + "/" + std::to_string(TerrainRender.buildstage2 / 1000.f));
+void Client::SetDebugScreen() {
+	debugScreen.EditText("VRAMUsage", "VRAM Usage: " + to_string((double)TerrainRender.RendererV2.getVRAMUsageFull() / 1000000.0) + " MB");
+	debugScreen.EditText("Position", "XYZ: " + to_string(m_MainPlayer.GetEntityProperties().Position.x) + "/" + to_string(m_MainPlayer.GetEntityProperties().Position.y) + "/" + std::to_string(m_MainPlayer.GetEntityProperties().Position.z));
+	debugScreen.EditText("VRAMFragmentationRate", "VRAM Fragmentation Rate: " + to_string(TerrainRender.RendererV2.getFragmentationRate() * 100) + "%");
+	debugScreen.EditText("FPS", "FPS: " + to_string(1.0 / Frametime));
+	debugScreen.EditText("MeshStats", "Mesh Stats (ms) Total/S0/S1/S2: " + to_string(TerrainRender.buildTime / 1000.f) + "/" + to_string(TerrainRender.buildstage0 / 1000.f) + "/" + std::to_string(TerrainRender.buildstage1 / 1000.f) + "/" + std::to_string(TerrainRender.buildstage2 / 1000.f));
 	debugScreen.EditText("EntityCount", "Entity Count: " + to_string(((World*)Block::WorldPTR)->EntityData.GetEntityCount()));
 	debugScreen.EditText("EventQueueSize", "Event Queue Size: " + to_string(((World*)Block::WorldPTR)->EventManager.getSize()));
 	debugScreen.EditText("ServerTick", "Server Tick (MSPT): " + to_string(((World*)Block::WorldPTR)->MSPT));
@@ -120,7 +120,7 @@ void Client::GameLoop() {
 		Inputs.delta = Frametime;
 
 		if (time.GetTimePassed_ms() > 250) {
-			SetWindowName();
+			SetDebugScreen();
 			time.Set();
 		}
 		
@@ -141,10 +141,6 @@ void Client::Update() {
 		EntityRender.Reload();
 	}
 
-	if (Inputs.CheckKey(GLFW_KEY_Z)) {
-		Logger.LogInfo("Client", "FPS: " + std::to_string(1.f / (float)Frametime));
-	}
-
 	if (Inputs.CheckKey(GLFW_KEY_ESCAPE)) {
 		glfwSetWindowShouldClose(getWindow(), true);
 	}
@@ -155,8 +151,9 @@ void Client::Update() {
 		Properties.WindowSizeDirty = false;
 
 		Framebuffer.clear();
-		Framebuffer.genBuffer(Properties.WindowSizeX, Properties.WindowSizeY, 2);
+		Framebuffer.genBuffer(Properties.WindowSizeX, Properties.WindowSizeY, (float)AppOptions.GraphicsScale);
 	}
+
 	m_MainPlayer.Update(Inputs);
 
 	server.world->SetPlayerPos(m_MainPlayer.GetEntityProperties().Position);

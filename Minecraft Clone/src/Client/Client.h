@@ -20,7 +20,7 @@ private:
 	void Update();
 	void Cleanup();
 	void Render();
-	void SetWindowName();
+	void SetDebugScreen();
 
 	double Frametime = 0.5;
 

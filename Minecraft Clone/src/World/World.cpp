@@ -157,12 +157,9 @@ void World::Load() {
 		}
 	}
 
-	deque<Chunk*> GenOutput = WorldGenerator.GetOutput();
+	vector<Chunk*> GenOutput = WorldGenerator.GetOutput();
 
-	while (!GenOutput.empty()) {
-		Chunk* chunk = GenOutput.front();
-		GenOutput.pop_front();
-
+	for (auto& chunk : GenOutput) {
 		SetChunk(chunk);
 		ChunksInQueue.erase(chunk->chunkID);
 	}

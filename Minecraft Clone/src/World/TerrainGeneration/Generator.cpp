@@ -6,9 +6,9 @@
 using namespace std;
 using namespace glm;
 
-std::deque<Chunk*> ChunkGeneration::GetOutput() {
+std::vector<Chunk*> ChunkGeneration::GetOutput() {
 	SchedulerLock.lock();
-	std::deque<Chunk*> out = Output;
+	std::vector<Chunk*> out = Output;
 	Output.clear();
 	SchedulerLock.unlock();
 
@@ -69,7 +69,7 @@ void ChunkGeneration::Worker(int id) {
 			//Generate
 			ivec3 pos = ChunkIDToPOS(task);
 
-			Chunk* chunk = Generators.GetGenerator(Generators.DEBUG)->Generate(pos);
+			Chunk* chunk = Generators.GetGenerator(Generators.MOUNTAINS)->Generate(pos);
 
 			chunk->Position = pos;
 			chunk->chunkID = task;
@@ -166,7 +166,11 @@ void ChunkGeneration::TaskScheduler() {
 }
 
 void ChunkGeneration::Generate(int x, int y, int z) {
+	Generate(getChunkID(x, y, z));
+}
+
+void ChunkGeneration::Generate(ChunkID id) {
 	SchedulerLock.lock();
-	TaskList.push_back(getChunkID(x, y, z));
+	TaskList.push_back(id);
 	SchedulerLock.unlock();
 }

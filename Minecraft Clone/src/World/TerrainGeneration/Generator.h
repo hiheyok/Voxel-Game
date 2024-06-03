@@ -16,11 +16,13 @@ public:
 
 	void Generate(int x, int y, int z);
 
-	std::deque<Chunk*> GetOutput();
+	void Generate(ChunkID id);
+
+	std::vector<Chunk*> GetOutput();
 
 private:
 
-	std::deque<Chunk*> Output; //Once a chunk is generated, the chunk is added here
+	std::vector<Chunk*> Output; //Once a chunk is generated, the chunk is added here
 
 	void TaskScheduler(); //Manages how jobs gets distributed between the workers and manages the output of the workers
 

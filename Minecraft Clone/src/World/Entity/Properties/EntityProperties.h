@@ -13,6 +13,8 @@ struct EntityProperty {
 
 	bool onGround = false;
 
+	bool isChunkLoader = false;
+
 	EntityUUID EntityUUID = 0x00000000;
 	EntityTypeID Type = NULL; //State what type of entity is it. Zombie? Human??
 };
