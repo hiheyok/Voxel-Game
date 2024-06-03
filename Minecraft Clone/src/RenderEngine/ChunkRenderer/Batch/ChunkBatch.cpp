@@ -69,8 +69,6 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance, int VerticalRenderDista
 	Frustum.CalculateFrustum(camera);
 
 	ivec3 Position(floor(camera->Position.x / 16.f), floor(camera->Position.y / 16.f), floor(camera->Position.z / 16.f));
-
-	
 	
 	bool UseNew = false;
 
@@ -86,8 +84,11 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance, int VerticalRenderDista
 	else {
 		int Index = 1;
 
+		bool checkExist = false;
 		for (auto& data_ : RenderList) {
 			auto& data = data_.second;
+
+			
 
 			float deltaX = data.x - Position.x;
 			float deltaY = data.y - Position.y;
@@ -99,7 +100,6 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance, int VerticalRenderDista
 
 			if (dx2 + dy2 + dz2 < 1.f) {
 				if (Frustum.SphereInFrustum((float)(data.x << 4), (float)(data.y << 4), (float)(data.z << 4), 32.f)) { // << 4 means multiply by 4
-
 					DrawCommands[Index - 1].set(data.MemSize >> 3, 1, data.MemOffset >> 3, Index);
 					ChunkShaderPos[(Index - 1) * 3 + 0] = data.x;
 					ChunkShaderPos[(Index - 1) * 3 + 1] = data.y;
@@ -110,12 +110,15 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance, int VerticalRenderDista
 			}
 		}
 
+
 		Index--;
+
+		AmountOfChunkBeingRendered = Index;
 
 		SSBO.InsertSubData(0, (AmountOfChunkBeingRendered * 3) * sizeof(int), ChunkShaderPos.data());
 		IBO.InsertSubData(0, AmountOfChunkBeingRendered * sizeof(DrawCommandIndirect), DrawCommands.data());
 
-		AmountOfChunkBeingRendered = Index;
+		
 	}
 	
 
@@ -156,7 +159,6 @@ void ChunkDrawBatch::DeleteChunkVertices(ChunkID id) {
 			Logger.LogError("Chunk Batch", "Failed to delete chunk: " + std::to_string(id));
 			return;
 		}
-
 		RenderList.erase(ChunkMemOffset.MemOffset);
 		MemoryPool.DeleteChunk(id);
 		RenderListOffsetLookup.erase(id);
