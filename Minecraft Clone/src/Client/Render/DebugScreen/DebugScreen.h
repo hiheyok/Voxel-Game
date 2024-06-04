@@ -22,6 +22,10 @@ public:
 		renderer.ConstructBuffer();
 	}
 
+	void EditText(std::string name, const char* c) {
+		EditText(name, std::string(c));
+	}
+
 	void EditText(std::string name, std::string text) {
 		renderer.EditFontText(name, text);
 	}
@@ -32,7 +36,7 @@ public:
 
 		RenderableFont VersionFont;
 		VersionFont.FontSize(0.0625f);
-		VersionFont.SetText(std::string("Version 1.2A"));
+		VersionFont.SetText(std::string("Version 1.2.1A"));
 		VersionFont.SetPosition(glm::vec2(-1.f, 0.9f));
 
 		RenderableFont FPSFont;
@@ -75,15 +79,28 @@ public:
 		ServerTick.SetText(std::string("N/A"));
 		ServerTick.SetPosition(glm::vec2(-1.f, 0.50f));
 
-		renderer.InsertFontObject("Version", VersionFont);
-		renderer.InsertFontObject("FPS", FPSFont);
-		renderer.InsertFontObject("Position", PositionFont);
-		renderer.InsertFontObject("VRAMUsage", VRAMUsage);
-		renderer.InsertFontObject("VRAMFragmentationRate", VRAMFragmentationRate);
-		renderer.InsertFontObject("MeshStats", MeshStats);
-		renderer.InsertFontObject("EntityCount", EntityCount);
-		renderer.InsertFontObject("EventQueueSize", EventQueueSize);
-		renderer.InsertFontObject("ServerTick", ServerTick);
+		RenderableFont Stat9;
+		Stat9.FontSize(0.04f);
+		Stat9.SetText(std::string("N/A"));
+		Stat9.SetPosition(glm::vec2(-1.f, 0.45f));
+
+		RenderableFont Stat10;
+		Stat10.FontSize(0.04f);
+		Stat10.SetText(std::string("N/A"));
+		Stat10.SetPosition(glm::vec2(-1.f, 0.40f));
+
+		renderer.InsertFontObject("Title", VersionFont);
+		renderer.InsertFontObject("Stat1", FPSFont);
+		renderer.InsertFontObject("Stat2", PositionFont);
+		renderer.InsertFontObject("Stat3", VRAMUsage);
+		renderer.InsertFontObject("Stat4", VRAMFragmentationRate);
+		renderer.InsertFontObject("Stat5", MeshStats);
+		renderer.InsertFontObject("Stat6", EntityCount);
+		renderer.InsertFontObject("Stat7", EventQueueSize);
+		renderer.InsertFontObject("Stat8", ServerTick);
+
+		renderer.InsertFontObject("Stat9", Stat9);
+		renderer.InsertFontObject("Stat10", Stat10);
 		Update();
 
 	}

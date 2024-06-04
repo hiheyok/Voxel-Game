@@ -14,11 +14,13 @@ public:
 	Event GetNextEvent() {
 		Event e = EventQueue.front();
 		EventQueue.pop_front();
+		
 		return e;
 	}
 
 	void AddEvent(Event e) {
 		EventQueue.push_back(e);
+
 	}
 
 	size_t getSize() {

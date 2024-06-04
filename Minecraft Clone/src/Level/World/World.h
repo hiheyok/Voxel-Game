@@ -4,10 +4,11 @@
 
 class World : public WorldAccess {
 private:
-	WorldCollusionDetector Collusions;
 public:
+	
+
 	void Initialize() {
-		Collusions.Initialize(this);
+		
 	}
 
 };

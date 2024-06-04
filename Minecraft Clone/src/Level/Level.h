@@ -15,6 +15,7 @@ public:
 		DimensionProperties properties;
 		mainWorld.Initialize(properties);
 		levelLoader.Start(threadCount);
+		Block::DimensionPTR = &mainWorld;
 	} 
 
 	void Stop() {
@@ -22,6 +23,7 @@ public:
 	}
 
 	void updateDimensions() {
+		levelLoader.getRequestedChunks(mainWorld.worldInteractions.worldLoader->getRequestedChunks());
 		std::vector<Chunk*> chunks = levelLoader.getGeneratedChunk();
 
 		mainWorld.worldInteractions.addChunks(chunks);

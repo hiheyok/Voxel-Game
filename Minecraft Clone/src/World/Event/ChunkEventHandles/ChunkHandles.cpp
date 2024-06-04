@@ -1,6 +1,5 @@
 #include "ChunkHandles.h"
 #include "../EventHandler.h"
-#include "../../World.h"
 
 void UpdateLighting(Event::EventDataType::_ChunkEvent ChunkEvent) {
 

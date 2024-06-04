@@ -1,7 +1,7 @@
 #include "MainPlayer.h"
 #include "../../World/Item/ItemTextureAtlas.h"
 
-void MainPlayer::Initialize(GLFWwindow* win) {
+void MainPlayer::Initialize(GLFWwindow* win, InternalServer* server) {
 	PlayerGUI.Initialize(win);
 
 	float ItemViewRelativeSize = 0.85f;
@@ -21,6 +21,7 @@ void MainPlayer::Initialize(GLFWwindow* win) {
 	GUIIndex = PlayerGUI.AddGUI("PlayerGUI", Hotbar);
 
 	ItemGUIIndex = PlayerGUI.AddGUI("Itembar", ItemBar);
+	internalServer = server;
 }
 
 void MainPlayer::RenderGUIs() {
@@ -54,7 +55,7 @@ void MainPlayer::PrepareGUIs() {
 void MainPlayer::Update(UserInputs Inputs) {
 	InventoryUpdate(Inputs);
 	m_Interactions.Interact(&m_Player, Inputs);
-	m_Movement.Update(&m_Player, Inputs, static_cast<World*>(Block::WorldPTR));
+	m_Movement.Update(&m_Player, Inputs, internalServer);
 	PrepareGUIs();
 }
 
@@ -95,8 +96,6 @@ void MainPlayer::InventoryUpdate(UserInputs Inputs) {
 	else {
 		CurrentInventorySlot += Direction;
 	}
-
-	
 
 	if (Inputs.CheckKeyPress(KEY_1))
 		CurrentInventorySlot = 0;

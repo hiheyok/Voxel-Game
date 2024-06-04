@@ -18,6 +18,8 @@ public:
 
 	void Generate(ChunkID id);
 
+	void Generate(std::vector<ChunkID> IDs);
+
 	std::vector<Chunk*> GetOutput();
 
 private:

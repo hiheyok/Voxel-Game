@@ -20,12 +20,18 @@ void WorldRender::Render() {
 }
 
 void WorldRender::LoadChunkToRenderer(ChunkID chunk) {
-	if (!world->GetChunk(chunk)->isEmpty) {
+	if (server->getChunk(chunk) != nullptr) {
 		SchedulerLock.lock();
 		TaskList.push_back(chunk);
 		SchedulerLock.unlock();
 	}
 
+}
+
+void WorldRender::LoadChunkMultiToRenderer(std::vector<ChunkID> chunks) {
+	SchedulerLock.lock();
+	TaskList.insert(TaskList.end(), chunks.begin(), chunks.end());
+	SchedulerLock.unlock();
 }
 
 
@@ -57,7 +63,7 @@ void WorldRender::Worker(int id) {
 			//Generates the meshes
 			auto t0 = std::chrono::high_resolution_clock::now();
 
-			ChunkMeshData* Mesh = new ChunkMeshData(world->GetChunk(pos.x, pos.y, pos.z));
+			ChunkMeshData* Mesh = new ChunkMeshData(server->getChunk(pos.x, pos.y, pos.z));
 
 			amountOfMeshGenerated++;
 
@@ -113,16 +119,7 @@ void WorldRender::Update() {
 		WorkerLocks[WorkerID].unlock();
 	}
 
-	std::unordered_set<ChunkID> ChunksToUpdate;
-
-	world->ChunkUpdateLock.lock();
-	ChunksToUpdate = world->ChunksUpdated;
-	world->ChunksUpdated.clear();
-	world->ChunkUpdateLock.unlock();
-
-	for (ChunkID chunkid : ChunksToUpdate) {
-		LoadChunkToRenderer(chunkid);
-	}
+	LoadChunkMultiToRenderer(server->getUpdatedChunks());
 
 	if (UpdateAmount < ChunkUpdateLimit) {
 		RendererV2.Defrag(ChunkUpdateLimit - UpdateAmount);
@@ -144,7 +141,7 @@ void WorldRender::Stop() {
 
 }
 
-void WorldRender::Start(GLFWwindow* window_, World* world_) {
+void WorldRender::Start(GLFWwindow* window_, InternalServer* server_) {
 	stop = false;
 
 	HorizontalRenderDistance = AppOptions.HorizontalRenderDistance;
@@ -153,7 +150,7 @@ void WorldRender::Start(GLFWwindow* window_, World* world_) {
 	int ThreadCount = AppOptions.MeshThreads;
 
 	window = window_;
-	world = world_;
+	server = server_;
 	WorkerCount = ThreadCount;
 
 	RendererV2.Initialize(window, player.getCamera());

@@ -114,7 +114,8 @@ struct Block {
 		return model;
 	}
 
-	static void* WorldPTR;
+	static void* DimensionPTR;
+	static void* serverPTR;
 
 	BlockID ID = NULL;
 
@@ -125,4 +126,5 @@ struct Block {
 	std::string BlockName = "";
 };
 
-__declspec(selectany) void* Block::WorldPTR = nullptr;
+__declspec(selectany) void* Block::DimensionPTR = nullptr;
+__declspec(selectany) void* Block::serverPTR = nullptr;

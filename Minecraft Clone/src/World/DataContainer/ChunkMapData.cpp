@@ -164,7 +164,10 @@ bool Region::CheckChunk(uint16_t x, uint16_t y, uint16_t z) {
 }
 
 Chunk* Region::GetChunk(uint16_t x, uint16_t y, uint16_t z) {
-	return region[x * 32 + z]->GetChunk(y);
+	if (region[x * 32 + z] != nullptr) {
+		return region[x * 32 + z]->GetChunk(y);
+	}
+	return nullptr;
 }
 
 void Region::AddChunkGlobalPos(Chunk* chunk, int32_t x, int32_t y, int32_t z) {

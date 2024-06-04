@@ -20,10 +20,6 @@ void WorldAccess::setChunk(Chunk* chunk) {
 Chunk* WorldAccess::getChunk(int x, int y, int z) {
 	Chunk* chunk = ChunkContainer.GetChunk(x, y, z);
 
-	if (chunk == nullptr) {
-		throw exception(string("Cannot find chunk at: " + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z)).c_str());
-	}
-
 	return chunk;
 }
 
@@ -33,4 +29,16 @@ Chunk* WorldAccess::getChunk(ivec3 v) {
 
 Chunk* WorldAccess::getChunk(ChunkID ID) {
 	return getChunk(ChunkIDToPOS(ID));
+}
+
+bool WorldAccess::checkChunk(int x, int y, int z) {
+	return ChunkContainer.GetChunk(x, y, z) != nullptr;
+}
+
+bool WorldAccess::checkChunk(glm::ivec3 v) {
+	return checkChunk(v.x, v.y, v.z);
+}
+
+bool WorldAccess::checkChunk(ChunkID id) {
+	return checkChunk(ChunkIDToPOS(id));
 }

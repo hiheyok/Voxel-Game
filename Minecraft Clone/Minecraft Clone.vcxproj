@@ -46,6 +46,7 @@
     <PlatformToolset>Intel C++ Compiler 2023</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <EnableASAN>false</EnableASAN>
+    <EnableFuzzer>false</EnableFuzzer>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -199,7 +200,6 @@
     <ClCompile Include="src\World\Event\ChunkEventHandles\ChunkHandles.cpp" />
     <ClCompile Include="src\World\Event\EntityEventHandles\EntityHandles.cpp" />
     <ClCompile Include="src\World\Item\Items.cpp" />
-    <ClCompile Include="src\World\Server\Server.cpp" />
     <ClCompile Include="src\Utils\Clock.cpp" />
     <ClCompile Include="src\Utils\LogUtils.cpp" />
     <ClCompile Include="src\Utils\MathHelper.cpp" />
@@ -211,7 +211,6 @@
     <ClCompile Include="src\World\Server\Time\Timer.cpp" />
     <ClCompile Include="src\World\TerrainGeneration\Generator.cpp" />
     <ClCompile Include="src\World\TerrainGeneration\Generators\Debug\Debug.h" />
-    <ClCompile Include="src\World\World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Client\Client.h" />
@@ -255,7 +254,6 @@
     <ClInclude Include="src\Utils\Containers\BitStorage.h" />
     <ClInclude Include="src\World\Chunk\ChunkColumn.h" />
     <ClInclude Include="src\World\Chunk\Lighting\ChunkLighting.h" />
-    <ClInclude Include="src\World\Dimensions\Dimension.h" />
     <ClInclude Include="src\World\Entity\Mobs\Player.h" />
     <ClInclude Include="src\World\Event\ChunkEventHandles\ChunkHandles.h" />
     <ClInclude Include="src\World\Item\Inventory\EntityInventory.h" />
@@ -309,7 +307,6 @@
     <ClInclude Include="src\World\Item\ItemTextureAtlas.h" />
     <ClInclude Include="src\World\Item\Type\BlockItem.h" />
     <ClInclude Include="src\World\Level\Level.h" />
-    <ClInclude Include="src\World\Server\Server.h" />
     <ClInclude Include="src\Utils\Clock.h" />
     <ClInclude Include="src\Utils\FastNoiseLite.h" />
     <ClInclude Include="src\Utils\LogUtils.h" />
@@ -358,9 +355,7 @@
     <ClInclude Include="src\World\TerrainGeneration\Random\JavaRandom.h" />
     <ClInclude Include="src\World\TerrainGeneration\Structures\Structure.h" />
     <ClInclude Include="src\World\Typenames.h" />
-    <ClInclude Include="src\World\World.h" />
     <ClInclude Include="src\World\DataContainer\WorldData.h" />
-    <ClInclude Include="src\World\WorldProperties.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

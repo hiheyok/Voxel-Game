@@ -1,6 +1,6 @@
 #include "EntityRenderUpdate.h"
 #include "../../Utils/Clock.h"
-
+#include "../../Level/Dimension/Dimension.h"
 
 void EntityRendererUpdater::SetEntityRenderer(MultiEntityRenderer* render, Timer* time) {
 	renderer = render;
@@ -9,17 +9,13 @@ void EntityRendererUpdater::SetEntityRenderer(MultiEntityRenderer* render, Timer
 
 void EntityRendererUpdater::UpdaterThread() {
 	while (!stop) {
-		World* world = static_cast<World*>(Block::WorldPTR);
+		Dimension* world = static_cast<Dimension*>(Block::DimensionPTR);
 
-		world->EntityUpdateLock.lock();
-		std::unordered_map<EntityUUID, EntityProperty> UpdatedEntities = world->EntityUpdated;
-		std::unordered_set<EntityUUID> RemovedEntities = world->RemovedEntity;
-		world->EntityUpdated.clear();
-		world->RemovedEntity.clear();
-		world->EntityUpdateLock.unlock();
+		std::vector<EntityProperty> UpdatedEntities = world->worldInteractions.getUpdatedEntities();
+		std::vector<EntityUUID> RemovedEntities = world->worldInteractions.getRemovedEntities();
 
 		for (auto& entity : UpdatedEntities) {
-			renderer->AddEntity(entity.second);
+			renderer->AddEntity(entity);
 
 		}
 		for (auto& entity : RemovedEntities) {

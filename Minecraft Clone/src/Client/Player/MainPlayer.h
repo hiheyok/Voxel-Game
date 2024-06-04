@@ -9,7 +9,7 @@
 class MainPlayer {
 public:
 
-	void Initialize(GLFWwindow* win);
+	void Initialize(GLFWwindow* win, InternalServer* server);
 
 	void Update(UserInputs Inputs);
 
@@ -21,6 +21,7 @@ public:
 
 	void RenderGUIs();
 
+	Player m_Player;
 private:
 
 	void PrepareGUIs();
@@ -29,7 +30,7 @@ private:
 
 	PlayerMovement m_Movement;
 	WorldInteraction m_Interactions;
-	Player m_Player;
+	InternalServer* internalServer;
 
 	GUI PlayerGUI;
 

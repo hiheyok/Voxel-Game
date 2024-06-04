@@ -1,12 +1,13 @@
 #pragma once
 #include "../World.h"
 #include "../WorldParameters.h"
+#include <mutex>
 
 class WorldLoader {
 private:
 	WorldParameters settings;
 	World* world = nullptr;
-
+	std::mutex lock;
 	bool isSpawnChunksLoaded = false;
 
 	std::unordered_set<EntityUUID> EntityChunkLoaders; //List of entities that force loads chunks 
@@ -27,8 +28,12 @@ public:
 	std::vector<ChunkID> ChunkRequest;
 
 	std::vector<ChunkID> getRequestedChunks() {
-		std::vector<ChunkID> tmp = ChunkRequest;
+		std::vector<ChunkID> tmp;
+		lock.lock();
+		tmp = ChunkRequest; 
 		ChunkRequest.clear();
+		lock.unlock();
+		
 		return tmp;
 	}
 
@@ -46,6 +51,10 @@ public:
 			throw std::exception(std::string("Could not find entity with UUID " + std::to_string(uuid)).c_str());
 
 		EntityChunkLoaders.erase(uuid);
+	}
+
+	bool checkEntityExistChunkLoader(EntityUUID uuid) {
+		return EntityChunkLoaders.count(uuid);
 	}
 
 	void load() {

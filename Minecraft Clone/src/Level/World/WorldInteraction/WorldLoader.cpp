@@ -16,7 +16,6 @@ void WorldLoader::loadSummonEntitySurrounding(EntityUUID uuid) {
 	deque<ivec3> FIFO;
 
 	FIFO.push_back(InitalPos);
-
 	while (!FIFO.empty()) {
 
 		ivec3 ChunkPos = FIFO.front();
@@ -42,19 +41,11 @@ void WorldLoader::loadSummonEntitySurrounding(EntityUUID uuid) {
 		GeneratingChunk.insert(getChunkID(ChunkPos));
 		ChunkRequest.emplace_back(getChunkID(ChunkPos));
 
-		for (int side = 0; side < 3; side++) {
+		for (int side = 0; side < 6; side++) {
 
 			ivec3 newObj = ChunkPos;
 
-			if (velocity[side] == 0) {
-				continue;
-			}
-			else if (velocity[side] > 0) {
-				newObj[side] += 1;
-			}
-			else {
-				newObj[side] += -1;
-			}
+			newObj[side >> 1] += (side & 0b1) * 2 - 1;
 
 			FIFO.push_back(newObj);
 		}
@@ -66,7 +57,7 @@ void WorldLoader::loadSummonEntitySurrounding(EntityUUID uuid) {
 void WorldLoader::loadSurroundedMovedEntityChunk() {
 	vector<ivec3> centerPositionList = {};
 	vector<vec3> centerVelocityList = {};
-
+	 
 	//Get entity chunk position
 
 	for (const auto& e : EntityChunkLoaders) {
@@ -78,16 +69,24 @@ void WorldLoader::loadSurroundedMovedEntityChunk() {
 		int y = static_cast<int>(entity->Properties.Position.y / 16.f);
 		int z = static_cast<int>(entity->Properties.Position.z / 16.f);
 
+		if ((entity->Properties.Velocity.x == 0.f) && (entity->Properties.Velocity.y == 0.f) && (entity->Properties.Velocity.z == 0.f)) {
+			continue;
+		}
+		
 		centerPositionList.push_back(ivec3(x, y, z));
-		centerPositionList.push_back(entity->Properties.Velocity);
+		centerVelocityList.push_back(entity->Properties.Velocity);
 	}
 
+	if (centerPositionList.empty()) return;
+
 	ivec3 AxisTickingDistance(settings.HorizontalTickingDistance, settings.VerticalTickingDistance, settings.HorizontalTickingDistance);
+
+	int ChunkPadding = 4;
 
 	for (int i = 0; i < centerPositionList.size(); i++) {
 		ivec3 pos = centerPositionList[i];
 		vec3 vel = centerVelocityList[i];
-
+		
 		for (int j = 0; j < 3; j++) {
 			int side = 0;
 
@@ -101,17 +100,17 @@ void WorldLoader::loadSurroundedMovedEntityChunk() {
 
 			if (side == 0) continue;
 
-			int uDistance = AxisTickingDistance[(j + 1) % 3];
-			int vDistance = AxisTickingDistance[(j + 2) % 3];
+			int uDistance = AxisTickingDistance[(j + 1) % 3] + ChunkPadding;
+			int vDistance = AxisTickingDistance[(j + 2) % 3] + ChunkPadding;
 			int SideDistanceOffset = AxisTickingDistance[j] + 1;
 
 			for (int u = -uDistance; u <= uDistance; u++) {
 				for (int v = -vDistance; v <= uDistance; v++) {
 					ivec3 testPosition = pos;
 
-					pos[(j + 1) % 3] += u;
-					pos[(j + 2) % 3] += v;
-					pos[j] += SideDistanceOffset * side;
+					testPosition[(j + 1) % 3] += u;
+					testPosition[(j + 2) % 3] += v;
+					testPosition[j] += SideDistanceOffset * side;
 
 					//Test if it exist of generating
 					if (world->getChunk(testPosition)) continue;
@@ -119,7 +118,6 @@ void WorldLoader::loadSurroundedMovedEntityChunk() {
 
 					GeneratingChunk.insert(getChunkID(testPosition));
 					ChunkRequest.push_back(getChunkID(testPosition));
-
 				}
 			}
 
@@ -132,11 +130,11 @@ void WorldLoader::loadSurroundedMovedEntityChunk() {
 
 void WorldLoader::loadSpawnChunks() {
 	if (world == nullptr) throw exception("World is not initialized. Couldn't set spawn chunks");
-
+	return;
 	for (int x = -settings.SpawnChunkHorizontalRadius; x <= settings.SpawnChunkHorizontalRadius; x++) {
 		for (int z = -settings.SpawnChunkHorizontalRadius; z <= settings.SpawnChunkHorizontalRadius; z++) {
 			for (int y = -settings.SpawnChunkVerticalRadius; y <= settings.SpawnChunkVerticalRadius; y++) {
-				if (world->getChunk(x, y, z) != nullptr) continue;
+				if (world->checkChunk(x, y, z)) continue;
 
 				ChunkID id = getChunkID(x, y, z);
 

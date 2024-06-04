@@ -21,4 +21,10 @@ public:
 	Chunk* getChunk(glm::ivec3 pos);
 
 	Chunk* getChunk(ChunkID ID);
+
+	bool checkChunk(int x, int y, int z);
+
+	bool checkChunk(ChunkID ID);
+	
+	bool checkChunk(glm::ivec3 v);
 };

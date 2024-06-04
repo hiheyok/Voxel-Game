@@ -8,7 +8,7 @@ void WorldInteraction::Interact(Player* player, UserInputs Inputs) {
 		sin(player->Properties.Rotation.y * 0.0174533),
 		sin(player->Properties.Rotation.x * 0.0174533) * cos(player->Properties.Rotation.y * 0.0174533));
 
-	World* world = static_cast<World*>(Block::WorldPTR);
+	Dimension* world = static_cast<Dimension*>(Block::DimensionPTR);
 
 	BlockID block = player->m_EntityInventory.GetItem(player->m_EntityInventory.RightHandSlot).m_item.GetBlock();
 
@@ -28,15 +28,15 @@ void WorldInteraction::Interact(Player* player, UserInputs Inputs) {
 	}
 }
 
-BlockID WorldInteraction::GetBlock(Ray ray, World* world) {
-	if (world->RayIntersection(ray)) {
-		return world->GetBlock((int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z));
+BlockID WorldInteraction::GetBlock(Ray ray, Dimension* dimension) {
+	if (dimension->worldInteractions.Collusions.CheckRayIntersection(ray)) {
+		return dimension->worldInteractions.getBlock((int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z));
 	}
 	return Blocks.AIR;
 }
 
-void WorldInteraction::BreakBlock(Ray ray, World* world) {
-	if (world->RayIntersection(ray)) {
+void WorldInteraction::BreakBlock(Ray ray, Dimension* dimension) {
+	if (dimension->worldInteractions.Collusions.CheckRayIntersection(ray)) {
 		Event placeBlock;
 		placeBlock.Type = BLOCK_EVENT;
 		placeBlock.Data.BlockEvent.block = Blocks.AIR;
@@ -44,13 +44,13 @@ void WorldInteraction::BreakBlock(Ray ray, World* world) {
 		placeBlock.Data.BlockEvent.y = (int)floor(ray.EndPoint.y);
 		placeBlock.Data.BlockEvent.z = (int)floor(ray.EndPoint.z);
 		placeBlock.Data.BlockEvent.id = EventHandler.BlockPlace;
-		world->QueueEvent(placeBlock);
+		dimension->EventManager.AddEvent(placeBlock);
 	}
 }
 
-void WorldInteraction::PlaceBlock(Ray ray, BlockID block, World* world) {
+void WorldInteraction::PlaceBlock(Ray ray, BlockID block, Dimension* dimension) {
 
-	if (world->RayIntersection(ray)) {
+	if (dimension->worldInteractions.Collusions.CheckRayIntersection(ray)) {
 
 		int BounceSurface = ray.bouncesurface;
 
@@ -65,8 +65,8 @@ void WorldInteraction::PlaceBlock(Ray ray, BlockID block, World* world) {
 		placeBlock.Data.BlockEvent.y = PlacePos.y;
 		placeBlock.Data.BlockEvent.z = PlacePos.z;
 		placeBlock.Data.BlockEvent.id = EventHandler.BlockPlace;
+		dimension->EventManager.AddEvent(placeBlock);
 
-		world->QueueEvent(placeBlock);
 	}
 
 }

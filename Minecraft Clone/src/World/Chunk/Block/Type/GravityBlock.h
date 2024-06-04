@@ -1,16 +1,15 @@
 #pragma once
 #pragma once
 #include "../Block.h"
-#include "../../../World.h"
 #include "../../../Event/EventHandler.h"
 #include "../../../Entity/Entities.h"
 
 struct GravityBlock : Block {
 
 	void tick(int x, int y, int z) override {
-		World* CurrentWorld = static_cast<World*>(Block::WorldPTR);
+		Dimension* CurrentWorld = static_cast<Dimension*>(Block::DimensionPTR);
 
-		bool isBlockSupported = Blocks.getBlockType(CurrentWorld->GetBlock(x, y - 1, z))->Properties->isSolid;
+		bool isBlockSupported = Blocks.getBlockType(CurrentWorld->worldInteractions.getBlock(x, y - 1, z))->Properties->isSolid;
 
 		if (!isBlockSupported) {
 			Event destroyBlock;

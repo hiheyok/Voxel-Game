@@ -174,3 +174,9 @@ void ChunkGeneration::Generate(ChunkID id) {
 	TaskList.push_back(id);
 	SchedulerLock.unlock();
 }
+
+void ChunkGeneration::Generate(std::vector<ChunkID> IDs) {
+	SchedulerLock.lock();
+	TaskList.insert(TaskList.end(), IDs.begin(), IDs.end());
+	SchedulerLock.unlock();
+}

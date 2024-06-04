@@ -6,7 +6,7 @@
 #include <concurrent_queue.h>
 #include <thread>
 #include <mutex>
-#include "../../World/World.h"
+#include "../../Level/Server/Communication/InternalServer.h"
 #include "../../RenderEngine/ChunkRenderer/TerrainRenderer.h"
 #include "WorldRenderInfo.h"
 
@@ -21,19 +21,15 @@ public:
 
 	void LoadChunkToRenderer(ChunkID chunk);
 
-	void Start(GLFWwindow* window_, World* world_);
+	void LoadChunkMultiToRenderer(std::vector<ChunkID> chunks);
+
+	void Start(GLFWwindow* window_, InternalServer* world_);
 
 	void Stop();
 
 	void Update();
 
-	
 	TerrainRenderer RendererV2;
-
-
-	//Debugging
-	
-
 private:
 
 	void Worker(int id);
@@ -42,7 +38,7 @@ private:
 
 	PlayerPOV player;
 	GLFWwindow* window;
-	World* world;
+	InternalServer* server;
 
 	int WorkerCount = NULL;
 

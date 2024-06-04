@@ -1,5 +1,7 @@
 #pragma once
 #include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
+#include <cmath>
 
 inline static glm::ivec3 Sign(glm::vec3 vector) {
 	glm::ivec3 signs(0,0,0);

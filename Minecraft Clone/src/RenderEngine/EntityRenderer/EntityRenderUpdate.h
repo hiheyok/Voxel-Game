@@ -1,5 +1,4 @@
 #pragma once
-#include "../../World/World.h"
 #include "MultiEntityRender.h"
 #include "../../World/Server/Time/Timer.h"
 #include <thread>

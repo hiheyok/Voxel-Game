@@ -1,6 +1,5 @@
 #pragma once
 #include "../RenderEngine/Window.h"
-#include "../World/Server/Server.h"
 #include "Render/WorldRender.h"
 #include "../RenderEngine/EntityRenderer/MultiEntityRender.h"
 #include "../RenderEngine/EntityRenderer/EntityRenderUpdate.h"`
@@ -9,7 +8,7 @@
 #include "../RenderEngine/GUI/GUI.h"
 #include "../World/Item/ItemTextureAtlas.h"
 #include "Render/DebugScreen/DebugScreen.h"
-
+#include "../Level/Server/Communication/InternalServer.h"
 
 class Client : protected Window {
 public:
@@ -26,7 +25,7 @@ private:
 
 	MainPlayer m_MainPlayer;
 
-	Server server;
+	InternalServer server;
 	WorldRender TerrainRender;
 	MultiEntityRenderer EntityRender;
 	EntityRendererUpdater EntityUpdater;

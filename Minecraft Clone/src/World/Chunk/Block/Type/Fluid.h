@@ -1,6 +1,6 @@
 #pragma once
 #include "../Block.h"
-#include "../../../World.h"
+#include "../../../../Level/Dimension/Dimension.h"
 
 struct FluidProperties {
 	int SpreadRate = 1; // Ticks for fluid to spread
@@ -12,7 +12,7 @@ struct Fluid : Block {
 
 	void tick(int x, int y, int z) override {
 
-		World* CurrentWorld = static_cast<World*>(Block::WorldPTR);
+		Dimension* CurrentWorld = static_cast<Dimension*>(Block::DimensionPTR);
 
 		//BlockID CurrentBlock = CurrentWorld->GetBlock(x, y, z);
 
@@ -25,7 +25,7 @@ struct Fluid : Block {
 				continue;
 			}
 
-			BlockID block = CurrentWorld->GetBlock(pos[0], pos[1], pos[2]);
+			BlockID block = CurrentWorld->worldInteractions.getBlock(pos[0], pos[1], pos[2]);
 
 			if (block != Blocks.AIR) {
 				continue;
@@ -48,7 +48,7 @@ struct Fluid : Block {
 			event.Data.BlockEvent.y = pos[1];
 			event.Data.BlockEvent.z = pos[2];
 			event.Data.BlockEvent.block = Blocks.WATER;
-			CurrentWorld->QueueEvent(event);
+			CurrentWorld->EventManager.AddEvent(event);
 
 		}
 	}

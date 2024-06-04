@@ -7,9 +7,9 @@
 #include "../IO/IO.h"
 #include "../IO/KEY_CODE.h"
 #include "../../World/Entity/Entity.h"
-#include "../../World/World.h"
 #include "../../World/Entity/Mobs/Player.h"
 #include "../../World/Entity/Properties/EntityProperties.h"
+#include "../../Level/Server/Communication/InternalServer.h"
 
 using namespace glm;
 
@@ -21,10 +21,10 @@ public:
 
 private:
 
-	BlockID GetBlock(Ray ray, World* world);
+	BlockID GetBlock(Ray ray, Dimension* dimension);
 
-	void BreakBlock(Ray ray, World* world);
+	void BreakBlock(Ray ray, Dimension* dimension);
 
-	void PlaceBlock(Ray ray, BlockID block, World* world);
+	void PlaceBlock(Ray ray, BlockID block, Dimension* dimension);
 
 };

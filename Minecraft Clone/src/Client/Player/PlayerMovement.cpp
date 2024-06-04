@@ -1,13 +1,13 @@
 #include "PlayerMovement.h"
 
-void PlayerMovement::Update(Player* player, UserInputs Inputs, World* world) {
+void PlayerMovement::Update(Player* player, UserInputs Inputs, InternalServer* server) {
 
 	if (Inputs.CheckKeyPress(KEY_C)) {
 		m_EnableCollusion = !m_EnableCollusion;
 	}
 
 	RotatePlayer(player, Inputs);
-	MovePlayer(player, Inputs, world);
+	MovePlayer(player, Inputs, server);
 }
 
 float PlayerMovement::velocityMovementCurve(float current, float max, float delta) {
@@ -35,7 +35,7 @@ void PlayerMovement::RotatePlayer(Player* player, UserInputs Inputs) {
 		player->Properties.Rotation.y = -89.9999f;
 }
 
-void PlayerMovement::MovePlayer(Player* player, UserInputs Inputs, World* world) {
+void PlayerMovement::MovePlayer(Player* player, UserInputs Inputs, InternalServer* server) {
 
 	vec3 front(
 		cos(player->Properties.Rotation.x * 0.0174533) * cos(player->Properties.Rotation.y * 0.0174533),
@@ -76,7 +76,7 @@ void PlayerMovement::MovePlayer(Player* player, UserInputs Inputs, World* world)
 	}
 
 
-	if (Inputs.CheckKey(KEY_SPACE) && (world->IsEntityOnGround(player) && m_EnableCollusion)) {
+	if (Inputs.CheckKey(KEY_SPACE) && (server->checkPlayerOnGround() && m_EnableCollusion)) {
 		player->Properties.Velocity.y += velocity * 4000;
 	}
 
@@ -90,7 +90,7 @@ void PlayerMovement::MovePlayer(Player* player, UserInputs Inputs, World* world)
 
 		player->Properties.Velocity.y += gravity;
 
-		vec3 time = world->GetTimeTillCollusion(player);
+		vec3 time = server->getPlayerCollusionTimes();
 
 		if ((time.x != -1.) && (time.x <= Inputs.delta)) {
 			player->Properties.Velocity.x = 0;

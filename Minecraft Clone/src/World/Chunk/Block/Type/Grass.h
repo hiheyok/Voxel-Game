@@ -1,7 +1,6 @@
 #pragma once
 #include "../../../Event/EventSystem.h"
 #include "../Block.h"
-#include "../../../World.h"
 #include "../../../../Utils/Math/Probability/Probability.h"
 #include "../../../Event/EventHandler.h"
 
@@ -18,14 +17,14 @@ struct GrassBlock : Block {
 	//	std::cout << "Tick\n";
 
 
-		World* CurrentWorld = static_cast<World*>(Block::WorldPTR);
+		Dimension* CurrentWorld = static_cast<Dimension*>(Block::DimensionPTR);
 
 		//Checks if ticking block changes 
-		if (CurrentWorld->GetBlock(x, y, z) != Blocks.GRASS) {
+		if (CurrentWorld->worldInteractions.getBlock(x, y, z) != Blocks.GRASS) {
 			return;
 		}
 
-		bool BlockOnTopOfGrass = (CurrentWorld->GetBlock(x, y + 1, z) != Blocks.AIR);
+		bool BlockOnTopOfGrass = (CurrentWorld->worldInteractions.getBlock(x, y + 1, z) != Blocks.AIR);
 
 		bool isGrassDestroyed = false;
 
@@ -51,22 +50,22 @@ struct GrassBlock : Block {
 		event.Data.BlockEvent.y = y;
 		event.Data.BlockEvent.z = z;
 		event.Data.BlockEvent.block = Blocks.GRASS;
-		CurrentWorld->QueueEvent(event);
+		CurrentWorld->EventManager.AddEvent(event);
 	}
 
-	bool GrassDestroyTick(World* CurrentWorld, int x, int y, int z) {
+	bool GrassDestroyTick(Dimension* CurrentWorld, int x, int y, int z) {
 		//Chance it -doesn't break-
 		if (TestProbability(1 - Properties.BreakChance)) {
 			return false;
 		}
 
-		CurrentWorld->SetBlock(Blocks.DIRT, x, y, z);
+		CurrentWorld->worldInteractions.setBlock(Blocks.DIRT, x, y, z);
 
 		return true;
 	}
 
 	//return true if there is no exposed dirt blocks surrounding it
-	bool GrassSpreadTick(World* CurrentWorld, int x, int y, int z) {
+	bool GrassSpreadTick(Dimension* CurrentWorld, int x, int y, int z) {
 		bool DirtExposed = false;
 		
 		for (int x1 = -1; x1 <= 1; x1++) {
@@ -82,12 +81,12 @@ struct GrassBlock : Block {
 					int z2 = z1 + z;
 
 					//Checks if block is dirt
-					if (CurrentWorld->GetBlock(x2, y2, z2) != Blocks.DIRT) {
+					if (CurrentWorld->worldInteractions.getBlock(x2, y2, z2) != Blocks.DIRT) {
 						continue;
 					}
 
 					//Checks if there isnt any block above
-					if (CurrentWorld->GetBlock(x2, y2 + 1, z2) != Blocks.AIR) {
+					if (CurrentWorld->worldInteractions.getBlock(x2, y2 + 1, z2) != Blocks.AIR) {
 						continue;
 					}
 
@@ -101,7 +100,7 @@ struct GrassBlock : Block {
 						event.Data.BlockEvent.y = y2;
 						event.Data.BlockEvent.z = z2;
 						event.Data.BlockEvent.block = Blocks.GRASS;
-						CurrentWorld->QueueEvent(event);
+						CurrentWorld->EventManager.AddEvent(event);
 
 						continue;
 					}

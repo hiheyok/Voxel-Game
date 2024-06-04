@@ -1,29 +1,27 @@
 #pragma once
 #include "EntityType.h"
 #include "../../Chunk/Block/Blocks.h"
-#include "../../World.h"
-#include "../../Server/Server.h"
 #include "../../Event/EventHandler.h"
-
-
-
+#include "../../../Level/Server/Server.h"
+#include "../../../Level/World/WorldInteraction/WorldInteractions.h"
 class FallingBlock : public EntityType {
 	virtual void Tick(Entity* entity) override {
-		World* CurrentWorld = static_cast<World*>(Block::WorldPTR);
+		Dimension* CurrentDimension = static_cast<Dimension*>(Block::DimensionPTR);
+		Server* CurrentServer = static_cast<Server*>(Block::serverPTR);
 	//	std::cout << entity->Properties.Velocity.y << "\n";
-		float MSPT = 1 / TPS;
+		float MSPT = 1.0f / (float)CurrentServer->settings.tickRate;
 
 		//Physics
 
 		//Logger.LogInfo("Sand", std::to_string(entity->Properties.Position.y));
 
-		entity->Properties.Acceleration.y = -CurrentWorld->Properties.Gravity;
+		entity->Properties.Acceleration.y = -CurrentDimension->worldInteractions.settings.Gravity;
 
 		entity->Properties.Velocity += entity->Properties.Acceleration * MSPT;
 
 		int DistanceCheck = (int)ceil(abs(entity->Properties.Velocity.y * MSPT));
 
-		float CollusionDistance = CurrentWorld->GetDistanceUntilCollusionSingleDirection(entity->Properties.Position, NY, DistanceCheck + 1);
+		float CollusionDistance = CurrentDimension->worldInteractions.Collusions.GetDistanceUntilCollusionSingleDirection(entity->Properties.Position, NY, DistanceCheck + 1);
 
 		float TimeTillCollusion = abs(CollusionDistance / entity->Properties.Velocity.y);
 
@@ -49,14 +47,14 @@ class FallingBlock : public EntityType {
 			addBlock.Data.BlockEvent.y = (int)entity->Properties.Position.y;
 			addBlock.Data.BlockEvent.z = (int)entity->Properties.Position.z;
 			addBlock.Data.BlockEvent.block = Blocks.SAND;
-			CurrentWorld->QueueEvent(addBlock);
+			CurrentDimension->EventManager.AddEvent(addBlock);
 
 			Event removeEntity;
 			removeEntity.Type = ENTITY_EVENT;
 			removeEntity.Data.EntityEvent.id = EventHandler.RemoveEntity;
 			removeEntity.Data.EntityEvent.EntityID = entity->Properties.EntityUUID;
 			removeEntity.Data.EntityEvent.UniqueID = 200;
-			CurrentWorld->QueueEvent(removeEntity);
+			CurrentDimension->EventManager.AddEvent(removeEntity);
 		}
 	}
 };

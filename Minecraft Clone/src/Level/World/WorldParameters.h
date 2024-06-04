@@ -6,4 +6,6 @@ struct WorldParameters {
 
 	int SpawnChunkHorizontalRadius = 10;
 	int SpawnChunkVerticalRadius = 10;
+
+	double Gravity = 10.f;
 };
