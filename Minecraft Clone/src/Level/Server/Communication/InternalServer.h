@@ -1,6 +1,6 @@
 #pragma once
 #include "../Server.h"
-#include "../../../World/Entity/Mobs/Player.h"
+#include "../../Entity/Mobs/Player.h"
 
 class InternalServer {
 private:

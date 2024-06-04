@@ -1,11 +1,11 @@
-#include "../World/Chunk/Block/Blocks.h"
-#include "../World/Entity/Entities.h"
-#include "../World/Item/Items.h"
+#include "../Level/Chunk/Block/Blocks.h"
+#include "../Level/Entity/Entities.h"
+#include "../Level/Item/Items.h"
 #include "../Utils/LogUtils.h"
 #include "Initializer.h"
-#include "../World/Item/ItemTextureAtlas.h"
-#include "../World/Entity/Entity.h"
-#include "../World/TerrainGeneration/Generators/GeneratorType.h"
+#include "../Level/Item/ItemTextureAtlas.h"
+#include "../Level/Entity/Entity.h"
+#include "../Level/TerrainGeneration/Generators/GeneratorType.h"
 #include "Options/Option.h"
 
 LogUtils Logger;

@@ -6,7 +6,7 @@
 #include "../RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
 #include "Player/MainPlayer.h"
 #include "../RenderEngine/GUI/GUI.h"
-#include "../World/Item/ItemTextureAtlas.h"
+#include "../Level/Item/ItemTextureAtlas.h"
 #include "Render/DebugScreen/DebugScreen.h"
 #include "../Level/Server/Communication/InternalServer.h"
 

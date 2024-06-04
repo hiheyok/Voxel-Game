@@ -5,7 +5,7 @@
 #include "Batch/ChunkBatch.h"
 #include "../OpenGL/Shader/Shader.h"
 #include "../../Core/Options/Option.h"
-#include "../../World/Server/Time/Timer.h"
+#include "../../Level/Timer/Timer.h"
 
 class TerrainRenderer {
 public:

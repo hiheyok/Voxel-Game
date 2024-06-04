@@ -1,5 +1,5 @@
 #include "MainPlayer.h"
-#include "../../World/Item/ItemTextureAtlas.h"
+#include "../../Level/Item/ItemTextureAtlas.h"
 
 void MainPlayer::Initialize(GLFWwindow* win, InternalServer* server) {
 	PlayerGUI.Initialize(win);

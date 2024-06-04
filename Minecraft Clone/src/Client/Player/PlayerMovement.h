@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../World/Item/Inventory/PlayerInventory.h"
+#include "../../Level/Item/Inventory/PlayerInventory.h"
 #include "../../Level/Server/Communication/InternalServer.h"
 #include "WorldInteraction.h"
 #include "../IO/IO.h"

@@ -7,7 +7,7 @@
 #include "../../Camera/camera.h"
 #include "../../Frustum/frustum.h"
 #include "../../../Utils/MathHelper.h"
-#include "../../../World/Chunk/Chunk.h"
+#include "../../../Level/Chunk/Chunk.h"
 #include "../../OpenGL/Buffers/Buffer.h"
 #include "../MemoryPool/ChunkMemoryPool.h"
 #include <unordered_map>

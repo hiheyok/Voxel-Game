@@ -1,9 +1,9 @@
 ﻿#include "Client.h"
 #include "../Utils/LogUtils.h"
-#include "../World/Chunk/Block/Blocks.h"
-#include "../World/Entity/Entities.h"
+#include "../Level/Chunk/Block/Blocks.h"
+#include "../Level/Entity/Entities.h"
 #include <chrono>
-#include "../World/Server/Time/Timer.h"
+#include "../Level/Timer/Timer.h"
 #include "../Core/Options/Option.h"
 
 using namespace std;

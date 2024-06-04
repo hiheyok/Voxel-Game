@@ -1,9 +1,9 @@
 #pragma once
-#include "../../World/Item/Inventory/PlayerInventory.h"
+#include "../../Level/Item/Inventory/PlayerInventory.h"
 #include "WorldInteraction.h"
 #include "PlayerMovement.h"
 #include "../IO/IO.h"
-#include "../../World/Entity/Mobs/Player.h"
+#include "../../Level/Entity/Mobs/Player.h"
 #include "../../RenderEngine/GUI/GUI.h"
 
 class MainPlayer {

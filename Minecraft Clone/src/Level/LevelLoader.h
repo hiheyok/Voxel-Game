@@ -1,6 +1,6 @@
 #pragma once
 #include "Level.h"
-#include "../World/TerrainGeneration/Generator.h"
+#include "TerrainGeneration/Generator.h"
 
 //Checks if the chunk is stored on disk, if not, asks the world generator to generate the chunks
 class LevelLoader { //need to add save to disk later

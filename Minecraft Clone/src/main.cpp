@@ -4,10 +4,10 @@
 #include "Utils/LogUtils.h"
 
 #include "Client/Client.h"
-#include "World/Chunk/Block/Blocks.h"
+#include "Level/Chunk/Block/Blocks.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "Utils/stb_image.h"
-#include "World/Chunk/Block/Blocks.h"
+#include "Level/Chunk/Block/Blocks.h"
 #include "Core/Initializer.h"
 #include <cstdlib> 
 #include <time.h>

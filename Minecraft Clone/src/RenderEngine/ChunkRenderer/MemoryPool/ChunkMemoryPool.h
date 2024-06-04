@@ -1,7 +1,7 @@
 #pragma once
 #include "../../OpenGL/Buffers/Buffer.h"
-#include "../../../World/Chunk/ChunkID.h"
-#include "../../../World/Typenames.h"
+#include "../../../Level/Chunk/ChunkID.h"
+#include "../../../Level/Typenames.h"
 #include <vector>
 #include <map>
 #include <unordered_map>

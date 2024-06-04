@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 #include "Event.h"
-#include "../../World/Chunk/Block/Block.h"
+#include "../Chunk/Block/Block.h"
 #include "BlockEventHandles/BlockHandles.h"
 #include "EntityEventHandles/EntityHandles.h"
 

@@ -4,8 +4,8 @@
 #include "../OpenGL/Buffers/Buffer.h"
 #include "../OpenGL/Shader/Shader.h"
 #include "../../Client/Render/PlayerPOV.h"
-#include "../../World/Entity/Type/EntityType.h"
-#include "../../World/Entity/Entities.h"
+#include "../../Level/Entity/Type/EntityType.h"
+#include "../../Level/Entity/Entities.h"
 
 class MultiEntityRenderer {
 private:

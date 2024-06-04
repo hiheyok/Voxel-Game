@@ -3,7 +3,7 @@
 
 #include "../WorldDataAccess.h"
 #include "../../../Utils/Math/Ray/Ray.h"
-#include "../../../World/Entity/Entity.h"
+#include "../../Entity/Entity.h"
 
 class WorldCollusionDetector {
 private:

@@ -1,6 +1,6 @@
 #pragma once
 #include "MultiEntityRender.h"
-#include "../../World/Server/Time/Timer.h"
+#include "../../Level/Timer/Timer.h"
 #include <thread>
 
 class EntityRendererUpdater {

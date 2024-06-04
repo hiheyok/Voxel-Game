@@ -1,6 +1,6 @@
 #include "WorldCollusion.h"
 #include "../../../Utils/Math/vectorOperations.h"
-#include "../../../World/Entity/Entities.h"
+#include "../../Entity/Entities.h"
 
 using namespace glm;
 

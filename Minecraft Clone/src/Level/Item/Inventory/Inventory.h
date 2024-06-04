@@ -1,6 +1,6 @@
 #pragma once
-#include "../../../World/Typenames.h"
-#include "../../../World/Chunk/Block/Blocks.h"
+#include "../../Typenames.h"
+#include "../../Chunk/Block/Blocks.h"
 #include "../ItemStack.h"
 #include <unordered_map>
 #include <vector>

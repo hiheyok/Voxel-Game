@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-#include "../../../World/Chunk/Chunk.h"
+#include "../../../Level/Chunk/Chunk.h"
 
 #define L_NN 0b00
 #define L_NP 0b01

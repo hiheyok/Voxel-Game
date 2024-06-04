@@ -1,8 +1,8 @@
 #pragma once
 #include "../OpenGL/Buffers/Buffer.h"
 #include "../OpenGL/Shader/Shader.h"
-#include "../../World/Chunk/Block/Block.h"
-#include "../../World/Item/Item.h"
+#include "../../Level/Chunk/Block/Block.h"
+#include "../../Level/Item/Item.h"
 #include "../Camera/camera.h"
 
 class BlockItemRender {

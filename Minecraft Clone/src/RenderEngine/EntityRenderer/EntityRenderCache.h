@@ -1,7 +1,7 @@
 #pragma once
 
 #include <unordered_map>
-#include "../../World/Entity/Entity.h"
+#include "../../Level/Entity/Entity.h"
 
 struct EntityRenderCache { // stores all entity to be rendered
 

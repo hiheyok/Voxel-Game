@@ -1,6 +1,6 @@
 #pragma once
-#include "../../World/DataContainer/ChunkMapData.h"
-#include "../../World/DataContainer/EntityContainer.h"
+#include "../DataContainer/ChunkMapData.h"
+#include "../DataContainer/EntityContainer.h"
 #include <exception>
 #include <glm/vec3.hpp>
 

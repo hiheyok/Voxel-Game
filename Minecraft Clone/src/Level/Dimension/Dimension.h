@@ -1,10 +1,10 @@
 #pragma once
 #include "../World/World.h"
 #include "DimensionProperties.h"
-#include "../../World/TerrainGeneration/Generator.h"
+#include "../TerrainGeneration/Generator.h"
 #include "../World/WorldInteraction/WorldInteractions.h"
-#include "../../World/Event/EventSystem.h"
-#include "../../World/Event/EventHandler.h"
+#include "../Event/EventSystem.h"
+#include "../Event/EventHandler.h"
 #include "../../Core/Options/Option.h"
 class Dimension {
 private:
