@@ -33,74 +33,27 @@ public:
 	void Initialize(GLFWwindow* w) {
 		window = w;
 		renderer.InitializeTextRenderer(w);
+		glm::vec3 clr = glm::vec3(0.2f, 0.2f, 0.2f);
+		float a = 0.5;
 
 		RenderableFont VersionFont;
-		VersionFont.FontSize(0.0625f);
+		VersionFont.FontSize(0.05f);
 		VersionFont.SetText(std::string("Version 1.2.1A"));
-		VersionFont.SetPosition(glm::vec2(-1.f, 0.9f));
+		VersionFont.SetPosition(glm::vec2(-1.f, 0.95f));
+		VersionFont.AddBackground(clr, a);
 
-		RenderableFont FPSFont;
-		FPSFont.FontSize(0.04f);
-		FPSFont.SetText(std::string("0 FPS"));
-		FPSFont.SetPosition(glm::vec2(-1.f, 0.85f));
-
-		RenderableFont PositionFont;
-		PositionFont.FontSize(0.04f);
-		PositionFont.SetText(std::string("XYZ: " + std::to_string(0.0) + "/" + std::to_string(0.0) + "/" + std::to_string(0.0)));
-		PositionFont.SetPosition(glm::vec2(-1.f, 0.8f));
-
-		RenderableFont VRAMUsage;
-		VRAMUsage.FontSize(0.04f);
-		VRAMUsage.SetText(std::string("VRAM Usage: 0 MB"));
-		VRAMUsage.SetPosition(glm::vec2(-1.f, 0.75f));
-
-		RenderableFont VRAMFragmentationRate;
-		VRAMFragmentationRate.FontSize(0.04f);
-		VRAMFragmentationRate.SetText(std::string("VRAM Fragmentation: 0 %"));
-		VRAMFragmentationRate.SetPosition(glm::vec2(-1.f, 0.7f));
-
-		RenderableFont MeshStats;
-		MeshStats.FontSize(0.04f);
-		MeshStats.SetText(std::string("N/A"));
-		MeshStats.SetPosition(glm::vec2(-1.f, 0.65f));
-
-		RenderableFont EntityCount;
-		EntityCount.FontSize(0.04f);
-		EntityCount.SetText(std::string("N/A"));
-		EntityCount.SetPosition(glm::vec2(-1.f, 0.60f));
-
-		RenderableFont EventQueueSize;
-		EventQueueSize.FontSize(0.04f);
-		EventQueueSize.SetText(std::string("N/A"));
-		EventQueueSize.SetPosition(glm::vec2(-1.f, 0.55f));
-
-		RenderableFont ServerTick;
-		ServerTick.FontSize(0.04f);
-		ServerTick.SetText(std::string("N/A"));
-		ServerTick.SetPosition(glm::vec2(-1.f, 0.50f));
-
-		RenderableFont Stat9;
-		Stat9.FontSize(0.04f);
-		Stat9.SetText(std::string("N/A"));
-		Stat9.SetPosition(glm::vec2(-1.f, 0.45f));
-
-		RenderableFont Stat10;
-		Stat10.FontSize(0.04f);
-		Stat10.SetText(std::string("N/A"));
-		Stat10.SetPosition(glm::vec2(-1.f, 0.40f));
+		for (int i = 1; i <= 10; i++) {
+			RenderableFont Stat;
+			Stat.FontSize(0.04f);
+			Stat.SetText(std::string("N/A"));
+			Stat.SetPosition(glm::vec2(-1.f, 0.95f - 0.05f * i));
+			Stat.AddBackground(clr, a);
+			Stat.setBackgroundPadding(0.005f, 0.0f);
+			renderer.InsertFontObject("Stat"+std::to_string(i), Stat);
+		}
 
 		renderer.InsertFontObject("Title", VersionFont);
-		renderer.InsertFontObject("Stat1", FPSFont);
-		renderer.InsertFontObject("Stat2", PositionFont);
-		renderer.InsertFontObject("Stat3", VRAMUsage);
-		renderer.InsertFontObject("Stat4", VRAMFragmentationRate);
-		renderer.InsertFontObject("Stat5", MeshStats);
-		renderer.InsertFontObject("Stat6", EntityCount);
-		renderer.InsertFontObject("Stat7", EventQueueSize);
-		renderer.InsertFontObject("Stat8", ServerTick);
 
-		renderer.InsertFontObject("Stat9", Stat9);
-		renderer.InsertFontObject("Stat10", Stat10);
 		Update();
 
 	}

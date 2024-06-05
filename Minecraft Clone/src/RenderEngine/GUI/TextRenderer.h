@@ -10,19 +10,25 @@
 class TextRenderer {
 private:
 	std::unordered_map<std::string, RenderableFont> FontMap;
-	Shader FontShader;
-	Buffer VBO;
-	VertexArray VAO;
+	Shader FontShader, backgroundShader;
+	Buffer VBO, backgroundVBO;
+	VertexArray VAO, backgroundVAO;
 	Texture2D FontTexture;
 	GLFWwindow* window = nullptr;
 
 	std::vector<float> Vertices = {};
+	std::vector<float> VerticesBackground = {};
 	
 	int VerticesCount = 0;
+	int BackgroundVertCount = 0;
 
 public:
 	void InitializeTextRenderer(GLFWwindow* w) {
+		//Initialize shaders
 		FontShader.init("assets/shaders/Font/FontVert.glsl", "assets/shaders/Font/FontFrag.glsl");
+		backgroundShader.init("assets/shaders/Font/FontBackgroundVert.glsl", "assets/shaders/Font/FontBackgroundFrag.glsl");
+
+		//Setup buffer for text rendering
 		VBO.GenBuffer();
 		VAO.GenArray();
 
@@ -38,6 +44,23 @@ public:
 		VAO.EnableAttriPTR(4, 3, GL_FLOAT, GL_FALSE, 11, 8);
 		VAO.Unbind();
 		VBO.Unbind();
+
+		//Setup buffer for background rendering
+		backgroundVBO.GenBuffer();
+		backgroundVAO.GenArray();
+
+		backgroundVBO.SetType(GL_ARRAY_BUFFER);
+		backgroundVBO.SetUsage(GL_STATIC_DRAW);
+
+		backgroundVAO.Bind();
+		backgroundVBO.Bind();
+		backgroundVAO.EnableAttriPTR(0, 2, GL_FLOAT, GL_FALSE, 8, 0);
+		backgroundVAO.EnableAttriPTR(1, 2, GL_FLOAT, GL_FALSE, 8, 2);
+		backgroundVAO.EnableAttriPTR(2, 4, GL_FLOAT, GL_FALSE, 8, 4);
+		backgroundVAO.Unbind();
+		backgroundVBO.Unbind();
+
+		//Load textures
 		RawTextureData RawTexture;
 		RawTexture.Load("assets/textures/font/ascii.png");
 		FontTexture.Load(RawTexture);
@@ -67,6 +90,7 @@ public:
 	}
 
 	void ConstructBuffer() {
+		//Fill text buffer
 		Vertices.clear();
 
 		for (auto& Font : FontMap) {
@@ -76,7 +100,21 @@ public:
 		}
 
 		VBO.InsertData(Vertices.size() * sizeof(Vertices[0]), Vertices.data(), GL_STATIC_DRAW);
-		VerticesCount = Vertices.size() / (9);
+		VerticesCount = Vertices.size() / (11);
+
+		//Fill background buffer
+		VerticesBackground.clear();
+
+		for (auto& Font : FontMap) {
+			if (!Font.second.Background) continue;
+
+			std::vector<float> backgroundVertices = Font.second.getBackgroundVertices();
+
+			VerticesBackground.insert(VerticesBackground.end(), backgroundVertices.begin(), backgroundVertices.end());
+		}
+
+		backgroundVBO.InsertData(VerticesBackground.size() * sizeof(VerticesBackground[0]), VerticesBackground.data(), GL_STATIC_DRAW);
+		BackgroundVertCount = VerticesBackground.size() / (8);
 	}
 
 	void Prepare() {
@@ -87,10 +125,17 @@ public:
 		glfwGetWindowSize(window, &Width, &Height);
 
 		FontShader.setFloat("AspectRatio", ((float)Height) / ((float)Width));
+
+		backgroundShader.use();
+		backgroundShader.setFloat("AspectRatio", ((float)Height) / ((float)Width));
 	}
 
 	void RenderFont() {
 		Prepare();
+		backgroundShader.use();
+		backgroundVAO.Bind();
+		glDrawArrays(GL_TRIANGLES, 0, BackgroundVertCount);
+
 		FontShader.use();
 		VAO.Bind();
 		glDrawArrays(GL_TRIANGLES, 0, VerticesCount);

@@ -40,12 +40,12 @@ vector<float> RenderableFont::GetCharactorVertex(char c, float xOffset, float yO
 	float Width = GetCharWidth(c);
 
 	vector<float> out = {
-		0, 0 ,xOffset, yOffset, xOrigin, yOrigin, x0, y1, color.x, color.y, color.z,
-		0 + fontSize * Width, 0 ,xOffset, yOffset, xOrigin, yOrigin, x1, y1, color.x, color.y, color.z,
-		0 + fontSize * Width, 0 + fontSize ,xOffset, yOffset, xOrigin, yOrigin, x1, y0, color.x, color.y, color.z,
-		0 + fontSize * Width, 0 + fontSize ,xOffset, yOffset, xOrigin, yOrigin, x1, y0, color.x, color.y, color.z,
-		0 , 0 + fontSize ,xOffset, yOffset, xOrigin, yOrigin, x0, y0, color.x, color.y, color.z,
-		0 , 0 ,xOffset, yOffset, xOrigin, yOrigin, x0, y1, color.x, color.y, color.z
+		0					, 0				,xOffset, yOffset, xOrigin, yOrigin, x0, y1, color.x, color.y, color.z,
+		0 + fontSize * Width, 0				,xOffset, yOffset, xOrigin, yOrigin, x1, y1, color.x, color.y, color.z,
+		0 + fontSize * Width, 0 + fontSize	,xOffset, yOffset, xOrigin, yOrigin, x1, y0, color.x, color.y, color.z,
+		0 + fontSize * Width, 0 + fontSize	,xOffset, yOffset, xOrigin, yOrigin, x1, y0, color.x, color.y, color.z,
+		0					, 0 + fontSize	,xOffset, yOffset, xOrigin, yOrigin, x0, y0, color.x, color.y, color.z,
+		0					, 0				,xOffset, yOffset, xOrigin, yOrigin, x0, y1, color.x, color.y, color.z
 	};
 
 	return out;
@@ -71,6 +71,32 @@ vector<float> RenderableFont::getVertices() {
 
 		out.insert(out.end(), CharVert.begin(), CharVert.end());
 	}
+
+	textLength = OffsetValue;
+
+	return out;
+}
+
+vector<float> RenderableFont::getBackgroundVertices() {
+	float r = backgroundColor.x;
+	float g = backgroundColor.y;
+	float b = backgroundColor.z;
+	float a = backgroundAlpha;
+
+	float xOrigin = Position.x;
+	float yOrigin = Position.y;
+
+	float W = backgroundWidthPadding;
+	float H = backgroundHeightPadding;
+
+	vector<float> out = {
+		0 - W				, 0	- H				, xOrigin, yOrigin, r, g, b, a,
+		0 + textLength + W	, 0 - H				, xOrigin, yOrigin, r, g, b, a,
+		0 + textLength + W	, 0 + fontSize + H	, xOrigin, yOrigin, r, g, b, a,
+		0 + textLength + W	, 0 + fontSize + H	, xOrigin, yOrigin, r, g, b, a,
+		0 - W				, 0 + fontSize + H	, xOrigin, yOrigin, r, g, b, a,
+		0 - W				, 0 - H				, xOrigin, yOrigin, r, g, b, a,
+	};
 
 	return out;
 }

@@ -10,6 +10,7 @@ struct Entity  {
 	EntityProperty Properties; //Provide properties such as position, acceleration, etc.
 
 	bool isDirty = true;
+	int dimensionID = NULL; //provide dimension location
 
 	void Tick();
 };
