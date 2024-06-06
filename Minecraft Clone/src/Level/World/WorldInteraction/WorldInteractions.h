@@ -242,6 +242,29 @@ public:
 			if (!UpdatedChunk.count(getChunkID(x >> 4, y >> 4, z >> 4)))
 				UpdatedChunk.insert(getChunkID(x >> 4, y >> 4, z >> 4));
 			UpdatedChunkLock.unlock();
+
+			int v[3]{ x % 16, y % 16, z % 16 };
+
+			for (int side = 0; side < 3; side++) {
+				int p[3]{ x >> 4, y >> 4, z >> 4 };
+
+				int direction = 0;
+
+				if (v[side] == 15)
+					direction = 1;
+				if (v[side] == 0)
+					direction = -1;
+
+				if (direction == 0) continue;
+
+				p[side] += direction;
+				UpdatedChunkLock.lock();
+				if (!UpdatedChunk.count(getChunkID(p[0], p[1], p[2])))
+					UpdatedChunk.insert(getChunkID(p[0], p[1], p[2]));
+				UpdatedChunkLock.unlock();
+			}
+
+
 			requestLightUpdate(x >> 4, y >> 4, z >> 4);
 		}
 		catch (std::exception& e) {

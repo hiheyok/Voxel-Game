@@ -208,7 +208,6 @@
     <ClCompile Include="src\Level\Chunk\Chunk.cpp" />
     <ClCompile Include="src\Level\Chunk\ChunkData.cpp" />
     <ClCompile Include="src\Level\DataContainer\ChunkMapData.cpp" />
-    <ClCompile Include="src\Level\DataContainer\WorldData.cpp" />
     <ClCompile Include="src\Level\Timer\Timer.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generator.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\Debug\Debug.h" />
@@ -356,7 +355,6 @@
     <ClInclude Include="src\Level\TerrainGeneration\Random\JavaRandom.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Structures\Structure.h" />
     <ClInclude Include="src\Level\Typenames.h" />
-    <ClInclude Include="src\Level\DataContainer\WorldData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

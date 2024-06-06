@@ -5,11 +5,11 @@
 class BlockContainer {
 public:
 	
-	inline BlockID& GetBlock(unsigned int x, unsigned int y, unsigned int z) {
+	inline const BlockID& GetBlock(unsigned int x, unsigned int y, unsigned int z) {
 		return Data[GetDataIndex(x,y,z)];
 	}
 
-	inline void ChangeBlock(BlockID ID, unsigned int x, unsigned int y, unsigned int z) {
+	inline const void ChangeBlock(BlockID ID, unsigned int x, unsigned int y, unsigned int z) {
 		Data[GetDataIndex(x,y,z)] = ID;
 	}
 
@@ -25,7 +25,7 @@ public:
 
 private:
 
-	inline static unsigned int GetDataIndex(unsigned int x, unsigned int y, unsigned int z) {
+	inline static const unsigned int GetDataIndex(unsigned int x, unsigned int y, unsigned int z) {
 		return (x << 8) | (z << 4) | y;
 	}
 	

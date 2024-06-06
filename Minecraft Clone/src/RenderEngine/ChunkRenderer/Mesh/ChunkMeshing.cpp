@@ -857,7 +857,7 @@ inline bool ChunkMeshData::CompareBlockSideUnsafe(Chunk* chunk, int x, int y, in
 }
 
 inline Quad& ChunkMeshData::GetFace(int x, int y, int z, uint8_t side) {
-	if (x >= 16 || y >= 16 || z >= 16 || x < 0 || y < 0 || z < 0)
+	if ((x | y | z) >> 4)
 		return NullQuad;
 	return GetFaceUnsafe(x, y, z, side);
 }
@@ -867,7 +867,7 @@ inline Quad& ChunkMeshData::GetFaceUnsafe(int x, int y, int z, uint8_t side) {
 }
 
 inline void ChunkMeshData::SetFace(int x, int y, int z, uint8_t side, Quad quad) {
-	if (x >= 16 || y >= 16 || z >= 16 || x < 0 || y < 0 || z < 0)
+	if ((x | y | z) >> 4)
 		return;
 	SetFaceUnsafe(x, y, z, side, quad);
 }
