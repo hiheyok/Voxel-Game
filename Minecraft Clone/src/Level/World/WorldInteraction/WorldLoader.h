@@ -11,7 +11,6 @@ private:
 	bool isSpawnChunksLoaded = false;
 
 	std::unordered_set<EntityUUID> EntityChunkLoaders; //List of entities that force loads chunks 
-
 	std::unordered_set<ChunkID> GeneratingChunk;
 
 	void loadSpawnChunks();
@@ -26,6 +25,17 @@ private:
 
 public:
 	std::vector<ChunkID> ChunkRequest;
+	
+	WorldAccess* getWorld() {
+		return static_cast<WorldAccess*>(world);
+	}
+
+	void replaceLightInfomation(ChunkLightingContainer* lighting) {
+		ChunkColumn* col = world->getColumn(lighting->Position);
+		int y = lighting->Position.y & 0b11111;
+
+		col->replaceLightContainer(y, lighting);
+	}
 
 	std::vector<ChunkID> getRequestedChunks() {
 		std::vector<ChunkID> tmp;

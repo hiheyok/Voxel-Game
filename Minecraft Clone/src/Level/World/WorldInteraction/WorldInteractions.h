@@ -14,9 +14,10 @@ private:
 	World* world = nullptr;
 	std::mutex lock;
 	std::mutex UpdatedChunkLock;
-	//std::unordered_set<ChunkID> UpdatedChunk; 
 	std::unordered_set<ChunkID> UpdatedChunk;
+	std::unordered_set<ChunkColumnID> RequestedLightUpdate;
 public:
+	std::vector<ChunkColumnID> LightUpdateRequest;
 	WorldLoader* worldLoader = nullptr;
 	WorldParameters settings;
 	WorldCollusionDetector Collusions;
@@ -53,6 +54,15 @@ public:
 		return chunkIDs;
 	}
 
+	std::vector<ChunkID> getRequestedLightUpdates() {
+		std::vector<ChunkID> columnIDs = {};
+		UpdatedChunkLock.lock();
+		columnIDs.insert(columnIDs.end(), LightUpdateRequest.begin(), LightUpdateRequest.end());
+		LightUpdateRequest.clear();
+		UpdatedChunkLock.unlock();
+		return columnIDs;
+	}
+
 	std::vector<EntityProperty> getUpdatedEntities() {
 		std::unordered_map<EntityUUID, EntityProperty> m = world->Entities.ClientGetEntityUpdate();
 		std::vector<EntityProperty> properties = {};
@@ -73,6 +83,21 @@ public:
 		return IDs;
 	}
 
+	void requestLightUpdate(int x, int y, int z) {
+		y = y / 32;
+
+		ChunkColumnID id = getChunkID(x, y, z);
+		if (RequestedLightUpdate.count(id)) {
+			return;
+		}
+
+		UpdatedChunkLock.lock();
+		RequestedLightUpdate.emplace(id);
+		LightUpdateRequest.push_back(id);
+		UpdatedChunkLock.unlock();
+
+	}
+
 	void killEntity(EntityUUID id) {
 		world->Entities.RemoveEntity(id);
 		if (worldLoader->checkEntityExistChunkLoader(id)) {
@@ -84,8 +109,46 @@ public:
 		worldLoader->load();
 	}
 
-	void updateLighting(ChunkLightingContainer* ChunkLighting) { //work on this later
+	void updateLighting(ChunkLightingContainer* ChunkLighting) {
+		glm::ivec3 pos = ChunkLighting->Position;
 
+		world->getColumn(pos);
+		worldLoader->replaceLightInfomation(ChunkLighting);
+		ChunkID id = getChunkID(pos);
+
+		UpdatedChunkLock.lock();
+		if (!UpdatedChunk.count(id)) {
+			UpdatedChunk.insert(id);
+		}
+		RequestedLightUpdate.erase(id);
+		UpdatedChunkLock.unlock();
+	}
+
+	void updateLighting(std::vector<ChunkLightingContainer*> ChunkLighting) {
+		std::stack<ChunkID> chunkToUpdate;
+
+		for (const auto& chunk : ChunkLighting) {
+			int x = chunk->Position.x;
+			int y = chunk->Position.y;
+			int z = chunk->Position.z;
+
+			world->getColumn(glm::ivec3(x, y, z));
+			worldLoader->replaceLightInfomation(chunk);
+			chunkToUpdate.push(getChunkID(x, y, z));
+			
+		}
+
+		UpdatedChunkLock.lock();
+		while (!chunkToUpdate.empty()) {
+			ChunkID id = chunkToUpdate.top();
+			chunkToUpdate.pop();
+			if (!UpdatedChunk.count(id)) {
+				UpdatedChunk.insert(id);
+			}
+			RequestedLightUpdate.erase(id);
+
+		}
+		UpdatedChunkLock.unlock();
 	}
 
 	void addChunk(Chunk* chunk) {
@@ -96,6 +159,7 @@ public:
 		int y = chunk->Position.y;
 		int z = chunk->Position.z;
 
+		requestLightUpdate(x, y, z);
 		chunkToUpdate.push(getChunkID(x, y, z));
 
 		//Update neighbor chunks
@@ -118,6 +182,7 @@ public:
 			}
 
 		}
+		
 		UpdatedChunkLock.unlock();
 	}
 
@@ -143,6 +208,7 @@ public:
 					chunkToUpdate.push(getChunkID(pos[0], pos[1], pos[2]));
 				}
 			}
+			requestLightUpdate(x, y, z);
 		}
 
 		UpdatedChunkLock.lock();
@@ -176,6 +242,7 @@ public:
 			if (!UpdatedChunk.count(getChunkID(x >> 4, y >> 4, z >> 4)))
 				UpdatedChunk.insert(getChunkID(x >> 4, y >> 4, z >> 4));
 			UpdatedChunkLock.unlock();
+			requestLightUpdate(x >> 4, y >> 4, z >> 4);
 		}
 		catch (std::exception& e) {
 			Logger.LogError("World", e.what());

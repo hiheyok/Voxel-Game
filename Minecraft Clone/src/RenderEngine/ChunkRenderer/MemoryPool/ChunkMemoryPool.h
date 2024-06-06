@@ -30,8 +30,8 @@ namespace MemoryManagement {
 	class BlockManagement {
 	public:
 		void Add(MemoryBlock block) {
-			std::map<size_t, MemoryBlock>::iterator it = MemBlocks.insert(std::pair<size_t, MemoryBlock>(block.Offset, block)).first;
-			MemBlocksIterators.insert(std::pair<size_t, std::map<size_t, MemoryBlock>::iterator>(block.Offset, it));
+			std::map<size_t, MemoryBlock>::iterator it = MemBlocks.emplace(std::pair<size_t, MemoryBlock>(block.Offset, block)).first;
+			MemBlocksIterators.emplace(std::pair<size_t, std::map<size_t, MemoryBlock>::iterator>(block.Offset, it));
 		}
 
 		void Delete(size_t Offset) {
@@ -122,7 +122,7 @@ namespace MemoryManagement {
 
 			MemoryBlock NewFreeBlock(newFreeSpaceOffset, newFreeSpaceSize);
 			
-			std::multimap<size_t, size_t>::iterator it = SortedMemSizes.insert(std::pair<size_t, size_t>(newFreeSpaceSize, newFreeSpaceOffset)); //use for deletions
+			std::multimap<size_t, size_t>::iterator it = SortedMemSizes.emplace(std::pair<size_t, size_t>(newFreeSpaceSize, newFreeSpaceOffset)); //use for deletions
 			SortedMemSizesIterators[newFreeSpaceOffset] = it;
 
 			FreeMemoryBlocks.Add(NewFreeBlock);
@@ -190,7 +190,7 @@ namespace MemoryManagement {
 			//Add Free Space
 			FreeMemoryBlocks.Add(MemoryBlock(FreeMemoryOffset, FreeMemorySize));
 
-			std::multimap<size_t, size_t>::iterator it = SortedMemSizes.insert(std::pair<size_t, size_t>(FreeMemorySize, FreeMemoryOffset)); //use for deletions
+			std::multimap<size_t, size_t>::iterator it = SortedMemSizes.emplace(std::pair<size_t, size_t>(FreeMemorySize, FreeMemoryOffset)); //use for deletions
 			SortedMemSizesIterators[FreeMemoryOffset] = it;
 
 			//Clear Reserve Space

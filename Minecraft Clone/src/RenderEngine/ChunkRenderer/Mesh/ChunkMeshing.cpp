@@ -2,6 +2,7 @@
 #include <immintrin.h>
 #include "../../../Level/Chunk/Block/Blocks.h"
 #include <unordered_set>
+#include <bit> 
 
 using namespace Meshing;
 using namespace std;
@@ -52,32 +53,6 @@ inline bool ChunkMeshData::compareQuads(const Quad& q0, const Quad& q1) {
 	return q0.Data == q1.Data;
 }
 
-unsigned ChunkMeshData::TrailingZeros(uint32_t n) {
-	unsigned bits = 0;
-	bits |= ((n & 0x0000FFFF) == 0) << 4;
-	n >>= ((n & 0x0000FFFF) == 0) << 4;
-	bits |= ((n & 0x000000FF) == 0) << 3;
-	n >>= ((n & 0x000000FF) == 0) << 3;
-	bits |= ((n & 0x0000000F) == 0) << 2;
-	n >>= ((n & 0x0000000F) == 0) << 2;
-	bits |= ((n & 0x00000003) == 0) << 1;
-	n >>= ((n & 0x00000003) == 0) << 1;
-	bits |= (n & 1) ^ 1;
-	return bits;
-}
-unsigned ChunkMeshData::TrailingZeros(uint16_t n) {
-	unsigned bits = 0;
-	bits |= ((n & 0x0000FFFF) == 0) << 4;
-	n >>= ((n & 0x0000FFFF) == 0) << 4;
-	bits |= ((n & 0x000000FF) == 0) << 3;
-	n >>= ((n & 0x000000FF) == 0) << 3;
-	bits |= ((n & 0x0000000F) == 0) << 2;
-	n >>= ((n & 0x0000000F) == 0) << 2;
-	bits |= ((n & 0x00000003) == 0) << 1;
-	n >>= ((n & 0x00000003) == 0) << 1;
-	bits |= (n & 1) ^ 1;
-	return bits;
-}
 
 //Loops through all the blocks in the chunk and check if each block side is visible. If a block side is visible, it generates the quad and puts it in the cache
 
@@ -292,7 +267,7 @@ void ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
 					uint32_t tOffset = 0;
 
 					while (c != 0) {
-						int TrailingZeroCount = TrailingZeros((uint32_t)c);
+						int TrailingZeroCount = std::countr_zero((uint32_t)c);
 						c = c >> TrailingZeroCount;
 						tOffset += TrailingZeroCount;
 

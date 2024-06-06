@@ -233,6 +233,7 @@
     <ClInclude Include="src\Level\Dimension\Dimensions\Overworld.h" />
     <ClInclude Include="src\Level\Level.h" />
     <ClInclude Include="src\Level\LevelLoader.h" />
+    <ClInclude Include="src\Level\Lighting\LightEngine.h" />
     <ClInclude Include="src\Level\Server\Communication\InternalServer.h" />
     <ClInclude Include="src\Level\Server\Server.h" />
     <ClInclude Include="src\Level\World\Collusion\WorldCollusion.h" />

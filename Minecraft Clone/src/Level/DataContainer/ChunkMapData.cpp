@@ -31,8 +31,16 @@ bool ChunkMap::SetBlockGlobal(BlockID block, int x, int y, int z) {
 			chunk->SetBlockUnsafe(block, LocalBlockPos[0], LocalBlockPos[1], LocalBlockPos[2]);
 			chunk->isEmpty = false;
 			chunk->Unuse();
+
+			//Set lighting update to dirty
+
+			ChunkColumn* col = reg->GetChunkColumn(cx, cz);
+			col->UpdateHeightmap(ChunkPos[1] & 0b11111);
 			return true;
 		}
+
+		
+
 		return false;
 	}
 	return false;
@@ -78,6 +86,15 @@ Chunk* ChunkMap::GetChunk(int x, int y, int z) {
 
 	if (reg != nullptr) {
 		return reg->GetChunkGlobalPos(x, y, z);
+	}
+	return nullptr;
+}
+
+ChunkColumn* ChunkMap::GetColumn(int x, int y, int z) {
+	Region* reg = GetRegion(x, y, z);
+
+	if (reg != nullptr) {
+		return reg->GetChunkColumnGlobalPos(x, z);
 	}
 	return nullptr;
 }

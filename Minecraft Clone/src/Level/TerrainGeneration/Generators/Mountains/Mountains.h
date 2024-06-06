@@ -209,22 +209,22 @@ struct MountainGenerator : WorldGenerator {
 		//}
 
 
-		int radius = 40;
+		//int radius = 40;
 
-		for (int x = 0 + Position.x; x < 16 + Position.x; x++) {
-			for (int z = 0 + Position.z; z < 16 + Position.z; z++) {
-				for (int y = 0 + Position.y; y < 16 + Position.y; y++) {
-					if ((x * x) + (y - 140) * (y - 140) + z * z <= radius * radius) {
-						chunk->SetBlock(Blocks.SAND, x - Position.x, y - Position.y, z - Position.z);
+		//for (int x = 0 + Position.x; x < 16 + Position.x; x++) {
+		//	for (int z = 0 + Position.z; z < 16 + Position.z; z++) {
+		//		for (int y = 0 + Position.y; y < 16 + Position.y; y++) {
+		//			if ((x * x) + (y - 140) * (y - 140) + z * z <= radius * radius) {
+		//				chunk->SetBlock(Blocks.SAND, x - Position.x, y - Position.y, z - Position.z);
 
-					}
+		//			}
 
-					//if (y == 90) {
-					//	SetBlock(Blocks.SAND, x - cx, y - cy, z - cz);
-					//}
-				}
-			}
-		}
+		//			//if (y == 90) {
+		//			//	SetBlock(Blocks.SAND, x - cx, y - cy, z - cz);
+		//			//}
+		//		}
+		//	}
+		//}
 	}
 
 

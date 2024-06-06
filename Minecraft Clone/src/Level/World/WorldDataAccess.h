@@ -27,4 +27,16 @@ public:
 	bool checkChunk(ChunkID ID);
 	
 	bool checkChunk(glm::ivec3 v);
+
+	std::vector<int> getColumnHeightmap(glm::ivec3 v) {
+		ChunkColumn* col = ChunkContainer.GetColumn(v.x, v.y, v.z);
+		if (col == nullptr) {
+			return std::vector<int>(0);
+		}
+		return col->getHeightmap();
+	}
+
+	ChunkColumn* getColumn(glm::ivec3 v) {
+		return ChunkContainer.GetColumn(v.x, v.y, v.z);
+	}
 };

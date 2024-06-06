@@ -170,9 +170,6 @@ namespace Meshing
 		inline bool CompareBlockSide(Chunk* chunk, int x, int y, int z, uint8_t side, BlockID b);
 		inline bool CompareBlockSideUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side, BlockID b);
 
-		inline unsigned TrailingZeros(uint32_t n);
-		inline unsigned TrailingZeros(uint16_t n);
-
 		//Face data
 		Quad* FaceCollectionCache;
 		uint16_t* BitsFaceExistCache;

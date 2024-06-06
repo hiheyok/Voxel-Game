@@ -32,6 +32,8 @@ struct Region { //32x32x32 Chunk Region
 class ChunkMap {
 public:
 
+	ChunkColumn* GetColumn(int x, int y, int z);
+
 	bool CheckChunk(int x, int y, int z);
 
 	BlockID GetBlockGlobal(int x, int y, int z);
