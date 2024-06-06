@@ -13,15 +13,13 @@ public:
 		Data[GetDataIndex(x,y,z)] = ID;
 	}
 
-	void DumpData() {
-		std::ofstream file;
-		file.open("Chunk.dmp");
-		for (int i = 0; i < 4096; i++) {
-			file << Data[i];
-		}
-		file.close();
+	inline const BlockID& GetBlockUnsafe(unsigned int index) const {
+		return Data[index];
 	}
 
+	inline void ChangeBlockUnsafe(BlockID ID, unsigned int index) {
+		Data[index] = ID;
+	}
 
 private:
 

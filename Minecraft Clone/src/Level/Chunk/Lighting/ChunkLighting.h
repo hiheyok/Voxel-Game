@@ -28,7 +28,7 @@ public:
 		data[(x << 4) | (z)] |= ((uint64_t)LightingInfo << (y << 2));
 	}
 
-	unsigned char GetLighting(int x, int y, int z) {
+	uint8_t GetLighting(int x, int y, int z) {
 		return (data[(x << 4) | (z)] >> (y << 2)) & 0b1111;
 	}
 
@@ -36,7 +36,7 @@ public:
 		memset((uint8_t*)data, MaxLightLevel | (MaxLightLevel << 4), 256 * 8); //8 = sizeof uint64_t
 	}
 
-	void ResetLightingCustom(char lvl) {
+	void ResetLightingCustom(uint8_t lvl) {
 		memset((uint8_t*)data, lvl | (lvl << 4), 256 * 8); //8 = sizeof uint64_t
 	}
 

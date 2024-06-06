@@ -4,6 +4,8 @@
 #include <unordered_set>
 #include <thread>
 #include <mutex>
+#include <glm/vec4.hpp>
+#include "../../Utils/Containers/BitStorage.h"
 
 class LightingEngine {
 private:
@@ -24,6 +26,93 @@ private:
 	int threadCount = 0;
 
 	bool stop = true;
+
+	void increaseLightLevel(ChunkLightingContainer* container, uint8_t lvl, int x, int y, int z) {
+		uint8_t curr = container->GetLighting(x, y, z);
+		if (curr < lvl) {
+			container->EditLight(x, y, z, lvl);
+		}
+	}
+
+	void LightSpreadSky(Chunk* chunk, ChunkLightingContainer* container, std::vector<int>& Heightmap, int ChunkHeight, int x, int y, int z) {
+		std::deque<glm::ivec4> BFS;
+
+		BFS.push_back(glm::ivec4(x, y, z, 15));
+
+		if (container->GetLighting(x, y, z) >= 15) {
+			return;
+		}
+
+
+		while (!BFS.empty()) {
+			//Get node
+			glm::ivec4 node = BFS.front();
+			BFS.pop_front();
+
+			int nx = node.x;
+			int ny = node.y + ChunkHeight;
+			int nz = node.z;
+
+			if (Heightmap[nx * 16 + nz] <= ny) {
+				node.w = 15;
+			}
+
+			if (container->GetLighting(node.x, node.y, node.z) >= node.w) {
+				continue;
+			}
+			//Set node light level
+			increaseLightLevel(container, node.w, node.x, node.y, node.z);
+
+			if (chunk->GetBlockUnsafe(node.x, node.y, node.z) != Blocks.AIR) {
+				continue;
+			}
+
+			if (node.w == 0) continue;
+
+			//Spread
+			for (int side = 0; side < 6; side++) {
+				
+				int direction = side >> 1;
+				int face = side & 0b1; //1 = Front 0 = Back
+
+				if ((direction == 1) && (face == 1))
+					continue; //skip Up direction
+
+				glm::ivec4 newNode = node;
+				newNode[direction] += face * 2 - 1;
+				newNode.w -= 1;
+				//Check if it is in the chunk first
+				if (((newNode.x | newNode.y | newNode.z) >> 4))
+					continue;
+
+				//Check if the light level is more or less
+				int currLvl = container->GetLighting(newNode.x, newNode.y, newNode.z);
+
+				if (currLvl + 2 > node.w)
+					continue;
+			
+				BFS.push_back(newNode);
+
+			}
+		}
+	}
+
+	void WorkOnChunkSkylight(Chunk* chunk, ChunkLightingContainer* light,  std::vector<int>& Heightmap,  int ChunkHeight) {
+		for (int x = 0; x < 16; x++) {
+			for (int z = 0; z < 16; z++) {
+
+				int h = Heightmap[x * 16 + z] - ChunkHeight; // it will try to find pivot points
+
+				if (h >= 16) {
+					continue;
+				}
+
+				LightSpreadSky(chunk, light, Heightmap, ChunkHeight, x, 15, z);
+			}
+		}
+
+
+	}
 
 	std::vector<ChunkLightingContainer*> SkyLighting(ChunkColumnID id) {
 		uint8_t DarknessLightLevel = 12;
@@ -46,41 +135,42 @@ private:
 			}
 
 			ChunkLightingContainer* lighting = new ChunkLightingContainer;
-			lighting->ResetLighting();
+			lighting->ResetLightingCustom(4);
 
-			int relativeY = i;
-			
-			col->LightDirty[relativeY] = false;
+			WorkOnChunkSkylight(col->GetChunk(i), lighting, Heightmap, i * 16);
 
-			//Need to account for spread later
-			for (int x = 0; x < 16; x++) {
-				for (int z = 0; z < 16; z++) {
+			//
+			//col->LightDirty[relativeY] = false;
 
-					int HeightmapCol = Heightmap[x * 16 + z];
+			////Need to account for spread later
+			//for (int x = 0; x < 16; x++) {
+			//	for (int z = 0; z < 16; z++) {
 
-					if (HeightmapCol <= relativeY * 16) {
-						continue;
-					}
+			//		int HeightmapCol = Heightmap[x * 16 + z];
 
-					int ChunkHeightStart = 15;
+			//		if (HeightmapCol <= relativeY * 16) {
+			//			continue;
+			//		}
 
-					if ((HeightmapCol >> 4) == relativeY) {
-						ChunkHeightStart = HeightmapCol & 0b1111;
-						for (int y = ChunkHeightStart - 1; y >= 0; y--) {
-							lighting->EditLight(x, y, z, DarknessLightLevel);
-						}
-					}
-					else {
-						for (int y = ChunkHeightStart; y >= 0; y--) {
-							lighting->EditLight(x, y, z, DarknessLightLevel);
-						}
-					}
+			//		int ChunkHeightStart = 15;
 
-					
-				}
-			}
+			//		if ((HeightmapCol >> 4) == relativeY) {
+			//			ChunkHeightStart = HeightmapCol & 0b1111;
+			//			for (int y = ChunkHeightStart - 1; y >= 0; y--) {
+			//				lighting->EditLight(x, y, z, DarknessLightLevel);
+			//			}
+			//		}
+			//		else {
+			//			for (int y = ChunkHeightStart; y >= 0; y--) {
+			//				lighting->EditLight(x, y, z, DarknessLightLevel);
+			//			}
+			//		}
 
-			lighting->Position = glm::ivec3(pos.x, relativeY + pos.y, pos.z);
+			//		
+			//	}
+			//}
+
+			lighting->Position = glm::ivec3(pos.x, i + pos.y, pos.z);
 			out.emplace_back(lighting);
 		}
 		

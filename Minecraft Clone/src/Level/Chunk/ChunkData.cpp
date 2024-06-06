@@ -1,6 +1,6 @@
 #include "ChunkData.h"
 
-static int NeighborOffset[2] = {
+static const int NeighborOffset[2] = {
 	  -16, 16
 };
 
@@ -9,14 +9,14 @@ BlockID ChunkContainer::GetBlock(int x, int y, int z) {
 		return BlockStorage.GetBlock(x, y, z);
 	}
 
-	int dx = (((x >> 31) & 0b1) + 1) * ((bool)(x >> 4));
-	int dy = (((y >> 31) & 0b1) + 2) * ((bool)(y >> 4));
-	int dz = (((z >> 31) & 0b1) + 4) * ((bool)(z >> 4));
+	int dx = (((x >> 31) & 0b1) + 1) & -(!!(x >> 4));
+	int dy = (((y >> 31) & 0b1) + 2) & -(!!(y >> 4));
+	int dz = (((z >> 31) & 0b1) + 4) & -(!!(z >> 4));
 
 	//Set to 0 if neighbor is null
-	dx *= (bool)(Neighbors[dx - 1]);
-	dy *= (bool)(Neighbors[dy]);
-	dz *= (bool)(Neighbors[dz]);
+	dx &= -!!(Neighbors[dx - 1]);
+	dy &= -!!(Neighbors[dy]);
+	dz &= -!!(Neighbors[dz]);
 
 	if (dx != 0) return Neighbors[dx - 1]->GetBlock(x + NeighborOffset[(dx - 1) & 1], y, z);
 	if (dy != 0) return Neighbors[dy]->GetBlock(x, y + NeighborOffset[dy & 0b1 ], z);
@@ -35,9 +35,9 @@ void ChunkContainer::SetBlock(BlockID block, int x, int y, int z) {
 		return;
 	}
 
-	int dx = (((x >> 31) & 0b1) + 1) * (!!(x >> 4));
-	int dy = (((y >> 31) & 0b1) + 2) * (!!(y >> 4));
-	int dz = (((z >> 31) & 0b1) + 4) * (!!(z >> 4));
+	int dx = (((x >> 31) & 0b1) + 1) & -(!!(x >> 4));
+	int dy = (((y >> 31) & 0b1) + 2) & -(!!(y >> 4));
+	int dz = (((z >> 31) & 0b1) + 4) & -(!!(z >> 4));
 
 	if (dx) {
 		OutsideBlockToPlace[dx - 1].emplace_back(block, x + NeighborOffset[(dx - 1) & 1], y, z);
@@ -57,7 +57,6 @@ void ChunkContainer::SetBlockUnsafe(BlockID block, int x, int y, int z) {
 	BlockStorage.ChangeBlock(block, (uint32_t)x, (uint32_t)y, (uint32_t)z);
 
 	isEmpty = false;
-
 }
 
 void ChunkContainer::SetPosition(int x, int y, int z) {
