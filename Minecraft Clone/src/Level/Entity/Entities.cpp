@@ -125,3 +125,11 @@ void EntitiesList::InitializeModels() {
         }
     }
 }
+
+void EntitiesList::Initialize() {
+	InitializeModels();
+}
+
+EntityType* EntitiesList::GetEntity(EntityTypeID id) {
+	return EntityTypeList[id];
+}

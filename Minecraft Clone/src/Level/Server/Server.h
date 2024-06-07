@@ -7,6 +7,7 @@
 
 struct ServerSettings {
 	int genThreadCount = 8;
+	int lightEngineThreadCount = 2;
 	int tickRate = 20;
 	int HorizontalTickingDistance = 10;
 	int VerticalTickingDistance = 8;
@@ -28,85 +29,34 @@ public:
 
 	}
 
-	int getChunkCount() {
-		return level.levelLoader.getChunkCount();
-	}
+	int getChunkCount();
 
-	double getMSPT() {
-		return MSPT;
-	}
+	double getMSPT();
 
-	Timer* getTimer() {
-		return &time;
-	}
+	Timer* getTimer();
 
-	std::vector<EntityProperty> getUpdatedEntities() {
-		return level.mainWorld.worldInteractions.getUpdatedEntities();
-	}
+	std::vector<EntityProperty> getUpdatedEntities();
 
-	bool checkEntityOnGround(EntityUUID id) {
-		return level.mainWorld.worldInteractions.Collusions.isEntityOnGround(level.mainWorld.worldInteractions.getEntity(id));
-	}
+	bool checkEntityOnGround(EntityUUID id);
 
-	void join(Entity& entity) {
-		level.mainWorld.worldInteractions.summonEntity(entity);
-	}
+	void join(Entity& entity);
 
-	std::vector<ChunkID> getUpdatedChunkIDs() {
-		return level.mainWorld.worldInteractions.getUpdatedChunkIDs();
-	}
+	std::vector<ChunkID> getUpdatedChunkIDs();
 
-	Chunk* getChunk(ChunkID ID) {
-		return level.mainWorld.worldInteractions.getChunk(ID);
-	}
+	Chunk* getChunk(ChunkID ID);
 
-	BlockID getBlock(int x, int y, int z) { //Include dimension in parameter later
-		return level.mainWorld.worldInteractions.getBlock(x, y, z);
-	}
+	BlockID getBlock(int x, int y, int z);
 
-	bool getRayIntersection(Ray& ray) { //Include dimension in paramter later
-		return level.mainWorld.worldInteractions.Collusions.CheckRayIntersection(ray);
-	}
+	bool getRayIntersection(Ray& ray);
 
-	glm::vec3 getEntityCollusionTime(EntityUUID entity) {
-		return level.mainWorld.worldInteractions.Collusions.GetTimeTillCollusion(level.mainWorld.worldInteractions.getEntity(entity));
-	}
+	glm::vec3 getEntityCollusionTime(EntityUUID entity);
 
-	void startServer(ServerSettings serverSettings) {
-		level.Start(serverSettings.genThreadCount);
-		stop = false;
-		settings = serverSettings;
-		mainServerLoop = std::thread(&Server::loop, this);
-	}
+	void startServer(ServerSettings serverSettings);
 
-	void Stop() {
-		stop = true;
-		mainServerLoop.join();
-		level.Stop();
-	}
+	void Stop();
 
-	void loop() {
-		Logger.LogDebug("Server", "Started main server loop");
-		while (!stop) {
-			time.Set();
+	void loop();
 
-			tick();
-
-			MSPT = time.GetTimePassed_ms();
-			double timeLeft = (1000.0 / (double)settings.tickRate) - MSPT;
-
-			if (timeLeft > 0) {
-				timerSleepNotPrecise(timeLeft);
-			}
-		}
-		Logger.LogDebug("Server", "Shutting down main server loop");
-	}
-
-	void tick() {
-		level.mainWorld.Tick();
-		level.mainWorld.EventTick();
-		level.updateDimensions();
-		level.mainWorld.worldInteractions.worldLoader->load();
-	}
+	void tick();
 
 };

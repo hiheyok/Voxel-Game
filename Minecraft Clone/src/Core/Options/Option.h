@@ -1,6 +1,7 @@
 #pragma once
 #include "../../FileManager/Files.h"
 #include "../../Utils/LogUtils.h"
+#include <unordered_map>
 #include <iostream>
 
 class Options {
@@ -12,6 +13,7 @@ public:
 	int GraphicsScale = 2;
 	int TransparentBufferSize = 1000000000;
 	int SolidBufferSize = 2000000000;
+	int LightEngineThreads = 2;
 
 	Options() {
 		SetOptionNameTable();
@@ -30,57 +32,13 @@ public:
 	}
 private:
 
-	bool SetValue(std::string name, std::string value) {
-		int val = stoi(value);
+	bool SetValue(std::string name, std::string value);
 
-		if (!OptionName.count(name)) {
-			Logger.LogError("Option", "Unknown option: " + name);
-			return false;
-		}
+	void ProcessTokens(std::vector<std::string> tokens);
 
-		*OptionName[name] = val;
-		return true;
-	}
+	void SetOptionNameTable();
 
-	void ProcessTokens(std::vector<std::string> tokens) {
-		bool Success = true;
-
-		for (int i = 0; i < (tokens.size() / 2); i++) {
-			std::string name = tokens[2 * i];
-			std::string val = tokens[2 * i + 1];
-			if (!SetValue(name, val)) {
-				Success = false;
-			}
-		}
-		//Regenerate file if it has an error in it
-		if (!Success) {
-			FileManager::DeleteFile("options.txt");
-			GenerateOptionFile();
-		}
-	}
-
-	void SetOptionNameTable() {
-		OptionName.insert(std::pair<std::string, int*>("HorizontalRenderDistance", &HorizontalRenderDistance));
-		OptionName.insert(std::pair<std::string, int*>("VerticalRenderDistance", &VerticalRenderDistance));
-		OptionName.insert(std::pair<std::string, int*>("WorldGenThreads", &WorldGenThreads));
-		OptionName.insert(std::pair<std::string, int*>("MeshThreads", &MeshThreads));
-		OptionName.insert(std::pair<std::string, int*>("GraphicsScale", &GraphicsScale));
-		OptionName.insert(std::pair<std::string, int*>("TransparentBufferSize", &TransparentBufferSize));
-		OptionName.insert(std::pair<std::string, int*>("SolidBufferSize", &SolidBufferSize));
-	}
-
-	void GenerateOptionFile() { //Generate file if deleted
-		FileManager::CreateFile("options.txt");
-
-		std::ofstream file("options.txt");
-
-		for (const auto& Option : OptionName) {
-			std::string str = Option.first + ":" + std::to_string((*Option.second));
-			file << str << "\n";
-		}
-
-		file.close();
-	}
+	void GenerateOptionFile(); //Generate file if deleted
 
 	std::unordered_map<std::string, int*> OptionName; //name -> ptr
 

@@ -13,9 +13,7 @@ public:
 		Initialized = true;
 	}
 
-	bool IsInitialized() {
-		return Initialized;
-	}
+	bool IsInitialized();
 
 	Item m_item;
 	int ItemCount = 1;

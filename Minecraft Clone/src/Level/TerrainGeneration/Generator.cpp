@@ -6,9 +6,9 @@
 using namespace std;
 using namespace glm;
 
-std::vector<Chunk*> ChunkGeneration::GetOutput() {
+vector<Chunk*> ChunkGeneration::GetOutput() {
 	SchedulerLock.lock();
-	std::vector<Chunk*> out = Output;
+	vector<Chunk*> out = Output;
 	Output.clear();
 	SchedulerLock.unlock();
 
@@ -93,20 +93,20 @@ void ChunkGeneration::Worker(int id) {
 	}
 
 	Jobs.clear();
-	Logger.LogInfo("World", "Shutting down world gen worker: " + std::to_string(WorkerID));
+	Logger.LogInfo("World", "Shutting down world gen worker: " + to_string(WorkerID));
 }
 
 void ChunkGeneration::TaskScheduler() {
 
 	int WorkerSelection = 0;
 
-	std::deque<std::deque<ChunkID>> DistributedTasks;
-	std::deque<std::deque<Chunk*>> ChunkOutputs;
+	deque<deque<ChunkID>> DistributedTasks;
+	deque<deque<Chunk*>> ChunkOutputs;
 
 	DistributedTasks.resize(WorkerCount);
 	ChunkOutputs.resize(WorkerCount);
 
-	std::deque<ChunkID> InternalTaskList;
+	deque<ChunkID> InternalTaskList;
 
 	while (!stop) {
 		
@@ -175,7 +175,7 @@ void ChunkGeneration::Generate(ChunkID id) {
 	SchedulerLock.unlock();
 }
 
-void ChunkGeneration::Generate(std::vector<ChunkID> IDs) {
+void ChunkGeneration::Generate(vector<ChunkID> IDs) {
 	SchedulerLock.lock();
 	TaskList.insert(TaskList.end(), IDs.begin(), IDs.end());
 	SchedulerLock.unlock();

@@ -11,21 +11,11 @@ public:
 		NullEvent.Type = NULL_EVENT;
 	}
 	//Gets event; if empty, return null event
-	Event GetNextEvent() {
-		Event e = EventQueue.front();
-		EventQueue.pop_front();
-		
-		return e;
-	}
+	Event GetNextEvent();
 
-	void AddEvent(Event e) {
-		EventQueue.push_back(e);
+	void AddEvent(Event e);
 
-	}
-
-	size_t getSize() {
-		return EventQueue.size();
-	}
+	size_t getSize();
 
 private:
 	std::deque<Event> EventQueue;

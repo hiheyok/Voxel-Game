@@ -1,6 +1,4 @@
 #pragma once
-#ifndef MATH_HELP_H_
-#define MATH_HELP_H_
 #define DEGTORAD 0.017453
 
 #include <glm/vec2.hpp>
@@ -23,5 +21,3 @@ long long unsigned int getChunkID(int x, int y, int z);
 long long unsigned int getChunkID(glm::ivec3 vec);
 
 glm::ivec3 ChunkIDToPOS(long long unsigned int n);
-
-#endif

@@ -149,3 +149,57 @@ void WorldLoader::loadSpawnChunks() {
 
 	isSpawnChunksLoaded = true;
 }
+
+WorldAccess* WorldLoader::getWorld() {
+	return static_cast<WorldAccess*>(world);
+}
+
+void WorldLoader::replaceLightInfomation(ChunkLightingContainer* lighting) {
+	ChunkColumn* col = world->getColumn(lighting->Position);
+	int y = lighting->Position.y & 0b11111;
+
+	col->replaceLightContainer(y, lighting);
+}
+
+vector<ChunkID> WorldLoader::getRequestedChunks() {
+	vector<ChunkID> tmp;
+	lock.lock();
+	tmp = ChunkRequest;
+	ChunkRequest.clear();
+	lock.unlock();
+
+	return tmp;
+}
+
+
+
+void WorldLoader::addEntityChunkLoader(EntityUUID uuid) {
+	EntityChunkLoaders.insert(uuid);
+	loadSummonEntitySurrounding(uuid);
+}
+
+void WorldLoader::deleteEntityChunkLoader(EntityUUID uuid) {
+	if (!EntityChunkLoaders.count(uuid))
+		throw exception(string("Could not find entity with UUID " + to_string(uuid)).c_str());
+
+	EntityChunkLoaders.erase(uuid);
+}
+
+bool WorldLoader::checkEntityExistChunkLoader(EntityUUID uuid) {
+	return EntityChunkLoaders.count(uuid);
+}
+
+void WorldLoader::load() {
+	if (!isSpawnChunksLoaded) loadSpawnChunks();
+
+	loadSurroundedMovedEntityChunk();
+	unloadSurroundedMovedEntityChunk();
+}
+
+void WorldLoader::addChunk(Chunk* chunk) {
+	ChunkID ID = chunk->chunkID;
+
+	if (GeneratingChunk.count(ID)) GeneratingChunk.erase(ID);
+
+	world->setChunk(chunk);
+}

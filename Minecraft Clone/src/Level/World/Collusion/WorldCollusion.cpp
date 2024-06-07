@@ -4,7 +4,7 @@
 
 using namespace glm;
 
-float WorldCollusionDetector::GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int direction, int distanceTest) {
+float WorldCollusionDetector::GetDistanceUntilCollusionSingleDirection(vec3 Origin, int direction, int distanceTest) {
 	float displacement = 0;
 
 	ivec3 FlooredPos(floor(Origin.x), floor(Origin.y), floor(Origin.z));
@@ -35,7 +35,7 @@ float WorldCollusionDetector::GetDistanceUntilCollusionSingleDirection(glm::vec3
 	return -1.f;
 }
 
-glm::dvec3 WorldCollusionDetector::GetTimeTillCollusion(Entity* entity) {
+dvec3 WorldCollusionDetector::GetTimeTillCollusion(Entity* entity) {
 	AABB Hitbox = EntityList.GetEntity(entity->Properties.Type)->GetHitbox();
 
 	vec3 HitboxStart = entity->Properties.Position - (Hitbox.size / 2.f);

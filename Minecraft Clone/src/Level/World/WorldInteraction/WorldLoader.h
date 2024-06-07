@@ -25,61 +25,25 @@ private:
 
 public:
 	std::vector<ChunkID> ChunkRequest;
-	
-	WorldAccess* getWorld() {
-		return static_cast<WorldAccess*>(world);
-	}
-
-	void replaceLightInfomation(ChunkLightingContainer* lighting) {
-		ChunkColumn* col = world->getColumn(lighting->Position);
-		int y = lighting->Position.y & 0b11111;
-
-		col->replaceLightContainer(y, lighting);
-	}
-
-	std::vector<ChunkID> getRequestedChunks() {
-		std::vector<ChunkID> tmp;
-		lock.lock();
-		tmp = ChunkRequest; 
-		ChunkRequest.clear();
-		lock.unlock();
-		
-		return tmp;
-	}
 
 	WorldLoader(World* w, WorldParameters p) : world(w), settings(p) {
 
 	}
 
-	void addEntityChunkLoader(EntityUUID uuid) {
-		EntityChunkLoaders.insert(uuid);
-		loadSummonEntitySurrounding(uuid);
-	}
+	WorldAccess* getWorld();
 
-	void deleteEntityChunkLoader(EntityUUID uuid) {
-		if (!EntityChunkLoaders.count(uuid)) 
-			throw std::exception(std::string("Could not find entity with UUID " + std::to_string(uuid)).c_str());
+	void replaceLightInfomation(ChunkLightingContainer* lighting);
 
-		EntityChunkLoaders.erase(uuid);
-	}
+	std::vector<ChunkID> getRequestedChunks();
 
-	bool checkEntityExistChunkLoader(EntityUUID uuid) {
-		return EntityChunkLoaders.count(uuid);
-	}
+	void addEntityChunkLoader(EntityUUID uuid);
 
-	void load() {
-		if (!isSpawnChunksLoaded) loadSpawnChunks();
+	void deleteEntityChunkLoader(EntityUUID uuid);
 
-		loadSurroundedMovedEntityChunk();
-		unloadSurroundedMovedEntityChunk();
-	}
+	bool checkEntityExistChunkLoader(EntityUUID uuid);
 
-	void addChunk(Chunk* chunk) {
-		ChunkID ID = chunk->chunkID;
+	void load();
 
-		if (GeneratingChunk.count(ID)) GeneratingChunk.erase(ID);
-		
-		world->setChunk(chunk);
-	}
+	void addChunk(Chunk* chunk);
 
 };

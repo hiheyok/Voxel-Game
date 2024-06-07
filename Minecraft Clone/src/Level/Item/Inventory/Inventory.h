@@ -16,31 +16,18 @@ public:
 
 	~Inventory() {
 		Storage.clear();
-		
 	}
 
-	ItemStack GetItem(int slot) {
-		return Storage[slot];
-	}
+	ItemStack GetItem(int slot);
 
-	void SetSlot(int slot, ItemStack item) {
-		Storage[slot] = item;
-	}
+	void SetSlot(int slot, ItemStack item);
 	
-	int GetSlotCount() {
-		return NumOfSlots;
-	}
+	int GetSlotCount();
 
-	void ChangeSlotSize(int slotCount) {
-		Storage.resize(slotCount);
-		NumOfSlots = slotCount;
-	}
+	void ChangeSlotSize(int slotCount);
 
 protected:
-	void Initialize(int slotCount) {
-		NumOfSlots = slotCount;
-		Storage.resize(slotCount);
-	}
+	void Initialize(int slotCount);
 
 private:
 	

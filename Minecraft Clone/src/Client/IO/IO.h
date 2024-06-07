@@ -36,67 +36,19 @@ private:
 
 	std::unordered_map<int, KeyStatus> Keys;
 
-
 public:
 
-	void UpdateAllKey() {
-		for (const auto& key : Keys) {
-			Keys[key.first] = HOLD;
-		}
+	void UpdateAllKey();
 
-		Mouse.ScrollDirection = Mouse.SCROLL_NONE;
+	void PressIndividualKey(int key);
 
-		Mouse.Displacement = glm::dvec2(0.0, 0.0);
-
-		if (Mouse.LEFT == Mouse.PRESS) {
-			Mouse.LEFT = Mouse.HOLD;
-		}
-
-		if (Mouse.RIGHT == Mouse.PRESS) {
-			Mouse.RIGHT = Mouse.HOLD;
-		}
-
-		if (Mouse.MIDDLE == Mouse.PRESS) {
-			Mouse.MIDDLE = Mouse.HOLD;
-		}
-	}
-
-	void PressIndividualKey(int key) {
-		if (Keys.count(key)) {
-			Keys[key] = HOLD;
-			return;
-		}
-
-		Keys[key] = PRESS;
-		return;
-	}
-
-	void ReleaseIndividualKey(int key) {
-		if (Keys.count(key)) {
-			Keys.erase(key);
-		}
-	}
+	void ReleaseIndividualKey(int key);
 	
-	bool CheckKey(int key) {
-		if (Keys.count(key)) {
-			return true;
-		}
-		return false;
-	}
+	bool CheckKey(int key);
 
-	bool CheckKeyPress(int key) {
-		if (!CheckKey(key))
-			return false;
+	bool CheckKeyPress(int key);
 
-		return Keys[key] == PRESS;
-	}
-
-	bool CheckKeyHold(int key) {
-		if (!CheckKey(key))
-			return false;
-
-		return Keys[key] == HOLD;
-	}
+	bool CheckKeyHold(int key);
 
 	MouseInputs Mouse;
 	

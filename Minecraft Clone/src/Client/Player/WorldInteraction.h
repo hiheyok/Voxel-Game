@@ -26,5 +26,4 @@ private:
 	void BreakBlock(Ray ray, Dimension* dimension);
 
 	void PlaceBlock(Ray ray, BlockID block, Dimension* dimension);
-
 };

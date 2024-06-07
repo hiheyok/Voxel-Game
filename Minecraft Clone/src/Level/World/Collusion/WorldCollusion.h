@@ -1,6 +1,5 @@
 #pragma once
 #include <glm/vec3.hpp>
-
 #include "../WorldDataAccess.h"
 #include "../../../Utils/Math/Ray/Ray.h"
 #include "../../Entity/Entity.h"

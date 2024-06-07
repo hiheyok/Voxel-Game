@@ -31,13 +31,9 @@ public:
 
 	EntityTypeID RegisterEntity(std::string EntityName, EntityTypeEnums type);
 
-	void Initialize() {
-		InitializeModels();
-	}
+	void Initialize();
 
-	EntityType* GetEntity(EntityTypeID id) {
-		return EntityTypeList[id];
-	}
+	EntityType* GetEntity(EntityTypeID id);
 
 };
 

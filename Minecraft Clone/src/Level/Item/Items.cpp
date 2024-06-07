@@ -22,3 +22,11 @@ Item ItemList::RegisterBlockItem(BlockID block) {
 int ItemList::GetTotalItemCount() {
 	return ItemCount;
 }
+
+Item ItemList::GetItem(ItemID id) {
+	return ItemContainer[id];
+}
+
+ItemID ItemList::GetBlockItem(BlockID block) {
+	return BlockItemIDs[block];
+}

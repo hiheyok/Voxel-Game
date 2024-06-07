@@ -19,11 +19,7 @@ struct SetBlockRelative {
 		m_block = block;
 	}
 
-	void SetPos(char x, char y, char z) {
-		m_x = x;
-		m_y = y;
-		m_z = z;
-	}
+	void SetPos(char x, char y, char z);
 };
 
 struct Structure {

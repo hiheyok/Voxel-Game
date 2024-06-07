@@ -1,5 +1,4 @@
 #pragma once
-#include "Level.h"
 #include "TerrainGeneration/Generator.h"
 #include "Lighting/LightEngine.h"
 
@@ -10,38 +9,17 @@ private:
 	ChunkGeneration worldGenerator; //Change this 
 	LightingEngine lightEngine;
 public:
-	void Start(int threadCount, WorldAccess* world) {
-		worldGenerator.Start(threadCount);
-		lightEngine.Start(1, world);
-	}
+	void Start(int worldGenThreadCount, int lightEngineThreadCount, WorldAccess* world);
 
-	void Stop() {
-		worldGenerator.Stop();
-	}
+	void Stop();
 
-	int getChunkCount() {
-		return count;
-	}
+	int getChunkCount();
 
-	void sendRequestedChunks(std::vector<ChunkID> RequestedChunks) { //Add option for requested chunks dimension type and generator type later
-		//Later this will check on the disk for chunks
-		worldGenerator.Generate(RequestedChunks);
-	}
+	void sendRequestedChunks(std::vector<ChunkID> RequestedChunks);
 
-	std::vector<Chunk*> getGeneratedChunk() {
-		std::vector<Chunk*> out = worldGenerator.GetOutput();
-		count += out.size();
-		return out;
-	}
+	std::vector<Chunk*> getGeneratedChunk();
 
-	void sendRequestedLightUpdates(std::vector<ChunkColumnID> RequestedLight) {
-		//Later this will check on the disk for baked light info
-		lightEngine.Generate(RequestedLight);
-	}
+	void sendRequestedLightUpdates(std::vector<ChunkColumnID> RequestedLight);
 
-	std::vector<ChunkLightingContainer*> getLightingInfomation() {
-		std::vector<ChunkLightingContainer*> out = lightEngine.GetOutput();
-		return out;
-	}
-
+	std::vector<ChunkLightingContainer*> getLightingInfomation();
 };

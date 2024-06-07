@@ -347,13 +347,9 @@ public:
 	Item QUARTZ_PILLAR = RegisterBlockItem(Blocks.QUARTZ_PILLAR);
 	Item SMOOTH_QUARTZ = RegisterBlockItem(Blocks.SMOOTH_QUARTZ);
 
-	Item GetItem(ItemID id) {
-		return ItemContainer[id];
-	}
+	Item GetItem(ItemID id);
 
-	ItemID GetBlockItem(BlockID block) {
-		return BlockItemIDs[block];
-	}
+	ItemID GetBlockItem(BlockID block);
 
 	int GetTotalItemCount();
 };

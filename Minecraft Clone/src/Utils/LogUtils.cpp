@@ -4,7 +4,7 @@
 #include "Clock.h"
 #include <ctime>
 #include "../FileManager/Files.h"
-
+#include <sstream>
 using namespace std;
 
 void LogUtils::MainLogger() {

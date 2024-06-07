@@ -30,267 +30,43 @@ public:
 		init(w, parameters);
 	}
 
-	void init(World* w, WorldParameters parameters) {
-		world = w;
-		settings = parameters;
-		worldLoader = new WorldLoader(w, parameters);
-		Collusions.Initialize(static_cast<WorldAccess*>(w));
-	}
+	void init(World* w, WorldParameters parameters);
 
-	void summonEntity(Entity& entity) {
-		if (world == nullptr) throw std::exception("Cannot summon entity. World is null");
-		world->Entities.AddEntities(entity);
+	void summonEntity(Entity& entity);
 
-		if (entity.Properties.isChunkLoader)
-			worldLoader->addEntityChunkLoader(entity.Properties.EntityUUID);
-	}
+	std::vector<ChunkID> getUpdatedChunkIDs();
 
-	std::vector<ChunkID> getUpdatedChunkIDs() {
-		std::vector<ChunkID> chunkIDs = {};
-		UpdatedChunkLock.lock();
-		chunkIDs.insert(chunkIDs.end(), UpdatedChunk.begin(), UpdatedChunk.end());
-		UpdatedChunk.clear();
-		UpdatedChunkLock.unlock();
-		return chunkIDs;
-	}
+	std::vector<ChunkID> getRequestedLightUpdates();
 
-	std::vector<ChunkID> getRequestedLightUpdates() {
-		std::vector<ChunkID> columnIDs = {};
-		UpdatedChunkLock.lock();
-		columnIDs.insert(columnIDs.end(), LightUpdateRequest.begin(), LightUpdateRequest.end());
-		LightUpdateRequest.clear();
-		UpdatedChunkLock.unlock();
-		return columnIDs;
-	}
+	std::vector<EntityProperty> getUpdatedEntities();
 
-	std::vector<EntityProperty> getUpdatedEntities() {
-		std::unordered_map<EntityUUID, EntityProperty> m = world->Entities.ClientGetEntityUpdate();
-		std::vector<EntityProperty> properties = {};
+	std::vector<EntityUUID> getRemovedEntities();
 
-		for (const auto& e : m) {
-			properties.push_back(e.second);
-		}
+	void requestLightUpdate(int x, int y, int z);
 
-		return properties;
-	}
+	void killEntity(EntityUUID id);
 
-	std::vector<EntityUUID> getRemovedEntities() {
-		std::unordered_set<EntityUUID> m = world->Entities.getRemovedEntities();
-		std::vector<EntityUUID> IDs = {};
+	void update();
 
-		IDs.insert(IDs.end(), m.begin(), m.end());
+	void updateLighting(ChunkLightingContainer* ChunkLighting);
 
-		return IDs;
-	}
+	void updateLighting(std::vector<ChunkLightingContainer*> ChunkLighting);
 
-	void requestLightUpdate(int x, int y, int z) {
-		y = y / 32;
+	void addChunk(Chunk* chunk);
 
-		ChunkColumnID id = getChunkID(x, y, z);
-		if (RequestedLightUpdate.count(id)) {
-			return;
-		}
+	void addChunks(std::vector<Chunk*> chunks);
 
-		UpdatedChunkLock.lock();
-		RequestedLightUpdate.emplace(id);
-		LightUpdateRequest.push_back(id);
-		UpdatedChunkLock.unlock();
+	Chunk* getChunk(int x, int y, int z);
 
-	}
+	Chunk* getChunk(ChunkID ID);
 
-	void killEntity(EntityUUID id) {
-		world->Entities.RemoveEntity(id);
-		if (worldLoader->checkEntityExistChunkLoader(id)) {
-			worldLoader->deleteEntityChunkLoader(id);
-		}
-	}
+	void setBlock(BlockID b, int x, int y, int z);
 
-	void update() {
-		worldLoader->load();
-	}
+	BlockID getBlock(int x, int y, int z);
 
-	void updateLighting(ChunkLightingContainer* ChunkLighting) {
-		glm::ivec3 pos = ChunkLighting->Position;
+	Entity* getEntity(EntityUUID id);
 
-		world->getColumn(pos);
-		worldLoader->replaceLightInfomation(ChunkLighting);
-		ChunkID id = getChunkID(pos);
+	void addEntity(Entity& entity);
 
-		UpdatedChunkLock.lock();
-		if (!UpdatedChunk.count(id)) {
-			UpdatedChunk.insert(id);
-		}
-		RequestedLightUpdate.erase(id);
-		UpdatedChunkLock.unlock();
-	}
-
-	void updateLighting(std::vector<ChunkLightingContainer*> ChunkLighting) {
-		std::stack<ChunkID> chunkToUpdate;
-
-		for (const auto& chunk : ChunkLighting) {
-			int x = chunk->Position.x;
-			int y = chunk->Position.y;
-			int z = chunk->Position.z;
-
-			world->getColumn(glm::ivec3(x, y, z));
-			worldLoader->replaceLightInfomation(chunk);
-			chunkToUpdate.push(getChunkID(x, y, z));
-			
-		}
-
-		UpdatedChunkLock.lock();
-		while (!chunkToUpdate.empty()) {
-			ChunkID id = chunkToUpdate.top();
-			chunkToUpdate.pop();
-			if (!UpdatedChunk.count(id)) {
-				UpdatedChunk.insert(id);
-			}
-			RequestedLightUpdate.erase(id);
-
-		}
-		UpdatedChunkLock.unlock();
-	}
-
-	void addChunk(Chunk* chunk) {
-		world->setChunk(chunk);
-		std::stack<ChunkID> chunkToUpdate;
-
-		int x = chunk->Position.x;
-		int y = chunk->Position.y;
-		int z = chunk->Position.z;
-
-		requestLightUpdate(x, y, z);
-		chunkToUpdate.push(getChunkID(x, y, z));
-
-		//Update neighbor chunks
-
-		for (int side = 0; side < 6; side ++) {
-			int pos[3]{x, y, z};
-			pos[side >> 1] += (side & 0b1) * 2 - 1;
-
-			if (world->checkChunk(pos[0], pos[1], pos[2])) {
-				chunkToUpdate.push(getChunkID(pos[0], pos[1], pos[2]));
-			}
-		}
-
-		UpdatedChunkLock.lock();
-		while (!chunkToUpdate.empty()) {
-			ChunkID id = chunkToUpdate.top();
-			chunkToUpdate.pop();
-			if (!UpdatedChunk.count(id)) {
-				UpdatedChunk.insert(id);
-			}
-
-		}
-		
-		UpdatedChunkLock.unlock();
-	}
-
-	void addChunks(std::vector<Chunk*> chunks) {
-		std::stack<ChunkID> chunkToUpdate;
-
-		for (const auto& chunk : chunks) {
-			world->setChunk(chunk);
-
-			int x = chunk->Position.x;
-			int y = chunk->Position.y;
-			int z = chunk->Position.z;
-
-			chunkToUpdate.push(getChunkID(x, y, z));
-
-			//Update neighbor chunks
-
-			for (int side = 0; side < 6; side++) {
-				int pos[3]{ x, y, z };
-				pos[side >> 1] += (side & 0b1) * 2 - 1;
-
-				if (world->checkChunk(pos[0], pos[1], pos[2])) {
-					chunkToUpdate.push(getChunkID(pos[0], pos[1], pos[2]));
-				}
-			}
-			requestLightUpdate(x, y, z);
-		}
-
-		UpdatedChunkLock.lock();
-		while (!chunkToUpdate.empty()) {
-			ChunkID id = chunkToUpdate.top();
-			chunkToUpdate.pop();
-			if (!UpdatedChunk.count(id)) {
-				UpdatedChunk.insert(id);
-			}
-
-		}
-		UpdatedChunkLock.unlock();
-	}
-
-	Chunk* getChunk(int x, int y, int z) {
-		return getChunk(getChunkID(x, y, z));
-	}
-
-	Chunk* getChunk(ChunkID ID) {
-		if (!world->checkChunk(ID)) {
-			return nullptr;
-		}
-
-		return world->getChunk(ID);
-	}
-
-	void setBlock(BlockID b, int x, int y, int z) {
-		try {
-			world->setBlock(b, x, y, z);
-			UpdatedChunkLock.lock();
-			if (!UpdatedChunk.count(getChunkID(x >> 4, y >> 4, z >> 4)))
-				UpdatedChunk.insert(getChunkID(x >> 4, y >> 4, z >> 4));
-			UpdatedChunkLock.unlock();
-
-			int v[3]{ x % 16, y % 16, z % 16 };
-
-			for (int side = 0; side < 3; side++) {
-				int p[3]{ x >> 4, y >> 4, z >> 4 };
-
-				int direction = 0;
-
-				if (v[side] == 15)
-					direction = 1;
-				if (v[side] == 0)
-					direction = -1;
-
-				if (direction == 0) continue;
-
-				p[side] += direction;
-				UpdatedChunkLock.lock();
-				if (!UpdatedChunk.count(getChunkID(p[0], p[1], p[2])))
-					UpdatedChunk.insert(getChunkID(p[0], p[1], p[2]));
-				UpdatedChunkLock.unlock();
-			}
-
-
-			requestLightUpdate(x >> 4, y >> 4, z >> 4);
-		}
-		catch (std::exception& e) {
-			Logger.LogError("World", e.what());
-		}
-	}
-
-	BlockID getBlock(int x, int y, int z) {
-		try {
-			return world->getBlock(x, y, z);
-		}
-		catch (std::exception& e) {
-			Logger.LogError("World", e.what());
-			return Blocks.AIR;
-		}
-	}
-
-	Entity* getEntity(EntityUUID id) {
-		return world->Entities.getEntity(id);
-	}
-
-	void addEntity(Entity& entity) {
-		world->Entities.AddEntities(entity);
-	}
-
-	void addEntity(Entity* entity) {
-		world->Entities.AddEntities(entity);
-	}
+	void addEntity(Entity* entity);
 };

@@ -1,8 +1,4 @@
-
-
-
 #include "Utils/LogUtils.h"
-
 #include "Client/Client.h"
 #include "Level/Chunk/Block/Blocks.h"
 #define STB_IMAGE_IMPLEMENTATION

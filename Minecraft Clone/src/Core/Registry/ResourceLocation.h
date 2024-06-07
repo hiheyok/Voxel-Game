@@ -8,18 +8,11 @@ struct ResourceLocation {
 	std::string PATH = "";
 	std::string NAMESPACE = "";
 
-	std::string GetPath() {
-		return PATH;
-	}
+	std::string GetPath();
 
-	std::string SetResourceLocation(std::string name) {
-		std::vector<std::string> Tokens = Tokenize(name, ':');
-		
-		if (Tokens.size() != 2) {
-			throw std::exception("Invalid resource location");
-		}
+	std::string SetResourceLocation(std::string name);
 
-		NAMESPACE = Tokens[0];
-		PATH = Tokens[1];
-	}
+	ResourceLocation() {}
+
+	ResourceLocation(std::string name) : PATH(name) {}
 };

@@ -1,11 +1,9 @@
 #pragma once
-
 #include "../Chunk/Chunk.h"
 #include "../../Utils/FastNoiseLite.h"
 
 #include <deque>
 #include <thread>
-
 #include <mutex>
 
 class ChunkGeneration {

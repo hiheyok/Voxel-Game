@@ -1,6 +1,4 @@
 #pragma once
-#ifndef EVENT_HANDLES
-#define EVENT_HANDLES
 #include <unordered_map>
 
 #include "Event.h"
@@ -12,17 +10,9 @@
 class _EventHandler {
 private:
 	int counter = 0;
-	EventID RegisterBlockEvent(void (*func)(BlockID, int, int, int)) {
-		counter++;
-		BlockEventHandles[counter] = func;
-		return counter;
-	}
-	EventID RegisterEntityEvent(void (*func)(Event::EventDataType::_EntityEvent)) {
-		counter++;
-		EntityEventHandles[counter] = func;
-		return counter;
-	}
+	EventID RegisterBlockEvent(void (*func)(BlockID, int, int, int));
 
+	EventID RegisterEntityEvent(void (*func)(Event::EventDataType::_EntityEvent));
 
 	std::unordered_map<EventID, void (*)(BlockID, int, int, int)> BlockEventHandles;
 	std::unordered_map<EventID, void (*)(Event::EventDataType::_EntityEvent)> EntityEventHandles;
@@ -38,21 +28,7 @@ public:
 	EventID EntityTick = RegisterEntityEvent(HandleEntityTick);
 	EventID RemoveEntity = RegisterEntityEvent(HandleRemoveEntity);
 
-	void ExecuteEvent(Event event) {
-		Event::EventDataType data = event.Data;
-
-		switch (event.Type) {
-		case BLOCK_EVENT:
-			(*BlockEventHandles[data.BlockEvent.id])(data.BlockEvent.block, data.BlockEvent.x, data.BlockEvent.y, data.BlockEvent.z);
-			break;
-		case ENTITY_EVENT:
-			(*EntityEventHandles[data.EntityEvent.id])(data.EntityEvent);
-			break;
-
-		}
-	}
+	void ExecuteEvent(Event event);
 
 
 } __declspec(selectany) EventHandler;
-
-#endif // !EVENT_HANDLES

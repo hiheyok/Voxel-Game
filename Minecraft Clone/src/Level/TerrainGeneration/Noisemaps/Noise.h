@@ -7,8 +7,5 @@ private:
 	FastNoiseLite noise;
 
 public:
-	NoiseGenerator(JavaRandom seed) {
-
-		
-	}
+	NoiseGenerator(JavaRandom seed) {}
 };

@@ -10,11 +10,7 @@ private:
 
 	std::vector<WorldGenerator*> GeneratorList = {};
 
-	WorldGeneratorID RegisterWorldGenerator(WorldGenerator* Gen) {
-		GeneratorList.push_back(Gen);
-		Logger.LogInfo("World Generator", "Registered Generator: " + std::to_string(GeneratorList.size() - 1));
-		return GeneratorList.size() - 1;
-	}
+	WorldGeneratorID RegisterWorldGenerator(WorldGenerator* Gen);
 
 public:
 	WorldGeneratorID DEBUG = RegisterWorldGenerator(new DebugWorld());
@@ -25,9 +21,7 @@ public:
 	WorldGeneratorID SUPERFLAT = RegisterWorldGenerator(new SuperflatWorld());
 	WorldGeneratorID MINECRAFT = RegisterWorldGenerator(new MinecraftTerrain());
 
-	WorldGenerator* GetGenerator(WorldGeneratorID ID) {
-		return GeneratorList[ID];
-	}
+	WorldGenerator* GetGenerator(WorldGeneratorID ID);
 };
 
 extern GeneratorType Generators;

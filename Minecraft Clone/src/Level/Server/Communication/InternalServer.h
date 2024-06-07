@@ -7,73 +7,32 @@ private:
 	Server* server;
 	Player* player;
 public:
-	void startInternalServer(Player* p) {
-		server = new Server();
-		player = p;
+	void startInternalServer(Player* p);
 
-		ServerSettings settings;
-		settings.genThreadCount = AppOptions.WorldGenThreads;
-		settings.HorizontalTickingDistance = AppOptions.HorizontalRenderDistance;
-		settings.VerticalTickingDistance = AppOptions.VerticalRenderDistance;
+	void Stop();
 
-		server->startServer(settings);
-		server->join(*p);
-		Block::serverPTR = server;
+	glm::vec3 getPlayerCollusionTimes();
 
-	}
+	Chunk* getChunk(ChunkID chunk);
 
-	void Stop() {
-		server->Stop();
-	}
+	Chunk* getChunk(int x, int y, int z);
 
-	glm::vec3 getPlayerCollusionTimes() {
-		return server->getEntityCollusionTime(player->Properties.EntityUUID);
-	}
+	Timer* getTickClock();
 
-	Chunk* getChunk(ChunkID chunk) {
-		return server->getChunk(chunk);
-	}
+	double getMSPT();
 
-	Chunk* getChunk(int x, int y, int z) {
-		return getChunk(getChunkID(x, y, z));
-	}
+	void setPlayer(Player player);
 
-	Timer* getTickClock() {
-		return server->getTimer();
-	}
+	bool checkPlayerOnGround();
 
-	double getMSPT() {
-		return server->getMSPT();
-	}
+	int getChunkCount();
 
-	void setPlayer(Player player) {
-		server->join(player);
-	}
+	std::vector<ChunkID> getUpdatedChunks();
 
-	bool checkPlayerOnGround() {
-		return server->checkEntityOnGround(player->Properties.EntityUUID);
-	}
+	std::vector<EntityProperty> getUpdatedEntities();
 
-	int getChunkCount() {
-		return server->getChunkCount();
-	}
+	bool checkRayIntersection(Ray& ray);
 
-	std::vector<ChunkID> getUpdatedChunks() {
-		std::vector<ChunkID> updatedChunkIDs = server->getUpdatedChunkIDs();
-
-		return updatedChunkIDs;
-	}
-
-	std::vector<EntityProperty> getUpdatedEntities() {
-		return server->getUpdatedEntities();
-	}
-
-	bool checkRayIntersection(Ray& ray) {
-		return server->getRayIntersection(ray);
-	}
-
-	BlockID getBlock(int x, int y, int z) {
-		return server->getBlock(x, y, z);
-	}
+	BlockID getBlock(int x, int y, int z);
 
 };
