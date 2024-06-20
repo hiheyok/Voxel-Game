@@ -1,8 +1,5 @@
 #pragma once
 
-#define TEXTURE_H
-#ifndef TETXURE_H
-
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 #include "../../../Utils/stb_image.h"
@@ -83,5 +80,3 @@ public:
 private:
 
 };
-
-#endif

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef BLOCK_TEX
-#define BLOCK_TEX
 
 #include "../../../../RenderEngine/OpenGL/Texture/Types/TextureArray.h"
 #include <string>
@@ -84,6 +82,3 @@ private:
     int TextureNumIndex[6]{ NULL };
     int Particle = NULL;
 };
-
-#endif // !BLOCK_TEX
-

@@ -29,7 +29,7 @@ int JavaRandom::nextInt() {
 }
 
 uint64_t JavaRandom::nextLong() {
-	return ((long)next(32) << 32) + next(32);
+	return ((long long)next(32) << 32) + next(32);
 }
 
 bool JavaRandom::nextBoolean() {

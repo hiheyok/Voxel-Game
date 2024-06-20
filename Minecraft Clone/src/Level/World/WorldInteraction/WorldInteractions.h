@@ -30,6 +30,8 @@ public:
 		init(w, parameters);
 	}
 
+	void UseTallGeneration();
+
 	void init(World* w, WorldParameters parameters);
 
 	void summonEntity(Entity& entity);

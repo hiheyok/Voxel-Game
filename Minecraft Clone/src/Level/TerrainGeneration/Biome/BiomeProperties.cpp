@@ -39,3 +39,8 @@ BiomeProperties& BiomeProperties::setWaterColor(int waterColorIn) {
     waterColor = waterColorIn;
     return *this;
 }
+
+BiomeProperties& BiomeProperties::setBaseBiome(std::string baseBiomeIn) {
+    baseBiome = baseBiomeIn;
+    return *this;
+}

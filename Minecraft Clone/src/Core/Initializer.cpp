@@ -7,6 +7,7 @@
 #include "../Level/Entity/Entity.h"
 #include "../Level/TerrainGeneration/Generators/GeneratorType.h"
 #include "Options/Option.h"
+#include "../Level/TerrainGeneration/Biome/BiomeProvider.h"
 
 LogUtils Logger;
 Options AppOptions;

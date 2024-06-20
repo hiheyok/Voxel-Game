@@ -43,11 +43,8 @@ bool WorldAccess::checkChunk(ChunkID id) {
 	return checkChunk(ChunkIDToPOS(id));
 }
 
-vector<int> WorldAccess::getColumnHeightmap(ivec3 v) {
+Heightmap& WorldAccess::getColumnHeightmap(ivec3 v) {
 	ChunkColumn* col = ChunkContainer.GetColumn(v.x, v.y, v.z);
-	if (col == nullptr) {
-		return vector<int>(0);
-	}
 	return col->getHeightmap();
 }
 

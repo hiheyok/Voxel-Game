@@ -6,14 +6,45 @@
 #include "../Event/EventSystem.h"
 #include "../Event/EventHandler.h"
 #include "../../Core/Options/Option.h"
+#include "../TerrainGeneration/Generators/GeneratorType.h"
+
 class Dimension {
 private:
 	World* world;
 	DimensionProperties properties;
 	WorldParameters worldSettings;
-
+	
 	std::unordered_map<int, std::unordered_set<ChunkID>> TickUsage;
+
+protected:
+	WorldGeneratorID generatorType;
+
+	void Start(DimensionProperties p) {
+		world = new World;
+		world->Initialize();
+		properties = p;
+		worldInteractions.init(world, WorldParameters());
+		worldSettings.HorizontalTickingDistance = AppOptions.HorizontalRenderDistance;
+		worldSettings.VerticalTickingDistance = AppOptions.VerticalRenderDistance;
+
+		if (Generators.GetGenerator(generatorType)->useTallChunks) {
+			worldInteractions.UseTallGeneration();
+		}
+		
+	}
 public:
+	WorldInteractions worldInteractions;
+	EventSystem EventManager;
+
+	Dimension(WorldGeneratorID generatorTypeIn = Generators.DEBUG) {
+		generatorType = generatorTypeIn;
+	}
+
+	WorldGeneratorID getGeneratorType() {
+		return generatorType;
+	}
+	
+
 	bool CheckTickUsed(EventID id, int x, int y, int z) {//temp sol
 		return TickUsage[id].contains(getChunkID(x, y, z));
 	}
@@ -22,17 +53,8 @@ public:
 		TickUsage[id].insert(getChunkID(x, y, z));
 	}
 
-
-	WorldInteractions worldInteractions;
-	EventSystem EventManager;
-
 	void Initialize(DimensionProperties p) { //Generate new world
-		world = new World;
-		world->Initialize();
-		properties = p;
-		worldInteractions.init(world, WorldParameters());
-		worldSettings.HorizontalTickingDistance = AppOptions.HorizontalRenderDistance;
-		worldSettings.VerticalTickingDistance = AppOptions.VerticalRenderDistance;
+		Start(p);
 	}
 
 	virtual void Tick() { 

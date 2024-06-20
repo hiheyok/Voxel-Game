@@ -1,7 +1,29 @@
 #include "Overworld.h"
+#include "../../Biome/BiomeProvider.h"
+
+void OverworldGenerator::GenerateChunk(int x, int z, TallChunk* chunk) {
+    rand.setSeed((long long)x * 341873128712LL + (long long)z * 132897987541LL);
+    setBlocksInChunk(x, z, chunk);
+    biomesForGeneration = BiomeProvider::getBiomes(x * 16, z * 16, 16, 16);
+    replaceBiomeBlocks(x, z, chunk, biomesForGeneration);
+}
+
+void OverworldGenerator::replaceBiomeBlocks(int x, int z, TallChunk* chunk, std::vector<Biome*> biomesIn) {
+    double d0 = 0.03125;
+    depthBuffer = surfaceNoise.getRegion(depthBuffer, (double)(x * 16), (double)(z * 16), 16, 16, 0.0625, 0.0625, 1.0);
+
+    for (int i = 0; i < 16; ++i)
+    {
+        for (int j = 0; j < 16; ++j)
+        {
+            Biome* biome = biomesIn[j + i * 16];
+            biome->genTerrainBlocks(rand, chunk, x * 16 + i, z * 16 + j, depthBuffer[j + i * 16], &settings);
+        }
+    }
+}
 
 void OverworldGenerator::generateHeightmap(int x, int y, int z) {
-    depthRegion = depthNoise.generateNoiseOctaves(depthRegion, x, z, 5, 5, settings.depthNoiseScaleX, settings.depthNoiseScaleZ, settings.depthNoiseExponent);
+    depthRegion = depthNoise.generateNoiseOctaves(depthRegion, x, z, 5, 5, settings.depthNoiseScaleX, settings.depthNoiseScaleZ, settings.depthNoiseScaleExponent);
     float f = settings.coordinateScale;
     float f1 = settings.stretchY;
     mainNoiseRegion = mainPerlinNoise.generateNoiseOctaves(mainNoiseRegion, x, y, z, 5, 33, 5, (double)(f / settings.mainNoiseScaleX), (double)(f1 / settings.mainNoiseScaleY), (double)(f / settings.mainNoiseScaleZ));
@@ -14,10 +36,35 @@ void OverworldGenerator::generateHeightmap(int x, int y, int z) {
     {
         for (int l = 0; l < 5; ++l)
         {
-            float f2 = 0.5F;
-            float f3 = 0.2F;
+            float f2 = 0.0F;
+            float f3 = 0.0F;
+            float f4 = 0.0F;
             int i1 = 2;
+            Biome* biome = biomesForGeneration[k + 2 + (l + 2) * 10];
 
+            for (int j1 = -2; j1 <= 2; ++j1)
+            {
+                for (int k1 = -2; k1 <= 2; ++k1)
+                {
+                    Biome* biome1 = biomesForGeneration[k + j1 + 2 + (l + k1 + 2) * 10];
+                    float f5 = settings.biomeDepthOffset + biome1->getBaseHeight() * settings.biomeDepthWeight;
+                    float f6 = settings.biomeScaleOffset + biome1->getHeightVariation() * settings.biomeScaleWeight;
+
+                    float f7 = biomeWeights[j1 + 2 + (k1 + 2) * 5] / (f5 + 2.0F);
+
+                    if (biome1->getBaseHeight() > biome->getBaseHeight())
+                    {
+                        f7 /= 2.0F;
+                    }
+
+                    f2 += f6 * f7;
+                    f3 += f5 * f7;
+                    f4 += f7;
+                }
+            }
+
+            f2 = f2 / f4;
+            f3 = f3 / f4;
             f2 = f2 * 0.9F + 0.1F;
             f3 = (f3 * 4.0F - 1.0F) / 8.0F;
             double d7 = depthRegion[j] / 8000.0;
@@ -85,7 +132,8 @@ void OverworldGenerator::generateHeightmap(int x, int y, int z) {
 }
 
 
-void OverworldGenerator::setBlocksInChunk(int x, int z, Chunk* chunk) {
+void OverworldGenerator::setBlocksInChunk(int x, int z, TallChunk* chunk) {
+    biomesForGeneration = BiomeProvider::getBiomesForGeneration(x * 4 - 2, z * 4 - 2, 10, 10);
     generateHeightmap(x * 4, 0, z * 4);
 
     for (int i = 0; i < 4; ++i)
@@ -130,27 +178,12 @@ void OverworldGenerator::setBlocksInChunk(int x, int z, Chunk* chunk) {
                         {
                             if ((lvt_45_1_ += d16) > 0.0)
                             {
-
-                                int gy = chunk->Position.y * 16;
-
                                 int genHeight = i2 * 8 + j2;
-
-                                if ((genHeight >= gy) && (genHeight < (gy + 16))) {
-                                    chunk->SetBlock(Blocks.STONE, i * 4 + k2, i2 * 8 + j2, l * 4 + l2);
-                                }
-
+                                chunk->SetBlockUnsafe(i * 4 + k2, genHeight, l * 4 + l2, Blocks.STONE);
                             }
-                            else if (i2 * 8 + j2 < settings.seaLevel)
-                            {
-
-                                int gy = chunk->Position.y * 16;
-
+                            else if (i2 * 8 + j2 < settings.seaLevel) {
                                 int genHeight = i2 * 8 + j2;
-
-                                if ((genHeight >= gy) && (genHeight < (gy + 16))) {
-                                    chunk->SetBlock(Blocks.SAND, i * 4 + k2, i2 * 8 + j2, l * 4 + l2);
-                                }
-
+                                chunk->SetBlockUnsafe(i * 4 + k2, genHeight, l * 4 + l2, Blocks.WATER);
                             }
                         }
 
@@ -167,6 +200,8 @@ void OverworldGenerator::setBlocksInChunk(int x, int z, Chunk* chunk) {
         }
     }
 }
+
+
 
 double OverworldGenerator::clampedLerp(double lowerBnd, double upperBnd, double slide) {
     if (slide < 0.0) {

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef IGUI_H
-#define IGUI_H
 
 #include <unordered_map>
 #include "../OpenGL/Shader/Shader.h"
@@ -80,6 +78,3 @@ private:
 
 	bool isDirty = false;
 };
-
-
-#endif

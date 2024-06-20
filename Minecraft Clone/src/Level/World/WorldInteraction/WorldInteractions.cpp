@@ -3,6 +3,10 @@
 using namespace std;
 using namespace glm;
 
+void WorldInteractions::UseTallGeneration() {
+	worldLoader->tallGeneration = true;
+}
+
 void WorldInteractions::init(World* w, WorldParameters parameters) {
 	world = w;
 	settings = parameters;

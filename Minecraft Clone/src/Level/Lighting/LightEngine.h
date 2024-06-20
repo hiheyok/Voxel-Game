@@ -29,9 +29,9 @@ private:
 
 	void increaseLightLevel(ChunkLightingContainer* container, uint8_t lvl, int x, int y, int z);
 
-	void LightSpreadSky(Chunk* chunk, ChunkLightingContainer* container, std::vector<int>& Heightmap, int ChunkHeight, int x, int y, int z);
+	void LightSpreadSky(Chunk* chunk, ChunkLightingContainer* container, std::vector<uint16_t>& heightmap, int ChunkHeight, int x, int y, int z);
 
-	void WorkOnChunkSkylight(Chunk* chunk, ChunkLightingContainer* light, std::vector<int>& Heightmap, int ChunkHeight);
+	void WorkOnChunkSkylight(Chunk* chunk, ChunkLightingContainer* light, std::vector<uint16_t>& heightmap, int ChunkHeight);
 
 	std::vector<ChunkLightingContainer*> SkyLighting(ChunkColumnID id);
 

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef BLOCKS_H
-#define BLOCKS_H
 #include <unordered_map>
 #include "Block.h"
 #include "Material/BlockMaterial.h"
@@ -385,5 +383,3 @@ public:
 } ;
 
 extern BlockList Blocks;
-
-#endif

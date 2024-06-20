@@ -96,7 +96,7 @@ void ChunkDrawBatch::GenDrawCommands(int RenderDistance, int VerticalRenderDista
 			float dz2 = deltaZ * deltaZ / (RenderDistance * RenderDistance);
 
 			if (dx2 + dy2 + dz2 < 1.f) {
-				if (Frustum.SphereInFrustum((float)(data.x << 4), (float)(data.y << 4), (float)(data.z << 4), 22.3f)) { // << 4 means multiply by 4
+				if (Frustum.SphereInFrustum((float)(data.x << 4), (float)(data.y << 4), (float)(data.z << 4), 24.3f)) { // << 4 means multiply by 4
 					DrawCommands[Index - 1].set(data.MemSize >> 3, 1, data.MemOffset >> 3, Index);
 					ChunkShaderPos[(Index - 1) * 3 + 0] = data.x;
 					ChunkShaderPos[(Index - 1) * 3 + 1] = data.y;

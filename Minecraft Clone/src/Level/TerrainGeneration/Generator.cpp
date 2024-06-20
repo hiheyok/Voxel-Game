@@ -2,6 +2,7 @@
 #include "../Chunk/ChunkID.h"
 #include "../../Utils/Clock.h"
 #include "Generators/GeneratorType.h"
+#include <concurrent_unordered_set.h>
 
 using namespace std;
 using namespace glm;
@@ -15,7 +16,10 @@ vector<Chunk*> ChunkGeneration::GetOutput() {
 	return out;
 }
 
-void ChunkGeneration::Start(int ThreadCount) {
+void ChunkGeneration::Start(int ThreadCount, long long int WorldSeedIn) {
+	WorldSeed = WorldSeedIn;
+	WorldGenerator::SetSeed(WorldSeedIn);
+
 	WorkerCount = ThreadCount;
 
 	Workers.resize(ThreadCount);
@@ -44,11 +48,13 @@ void ChunkGeneration::Stop() {
 void ChunkGeneration::Worker(int id) {
 	const int WorkerID = id;
 
-	deque<ChunkID> Jobs;
+	deque<std::pair<ChunkID, WorldGeneratorID>> Jobs;
 
 	deque<Chunk*> FinishedJobs;
 
 	while (!stop) {
+		WorldGeneratorID generaterUse = Generators.DEBUG;
+
 		//Fetches all of the tasks and put it in "Jobs"
 
 		WorkerLocks[WorkerID].lock();
@@ -64,17 +70,36 @@ void ChunkGeneration::Worker(int id) {
 		int BatchSize = 100;
 
 		for (int i = 0; i < NumJobs; i++) {
-			ChunkID task = Jobs.front(); //fetches task
+			std::pair<ChunkID, WorldGeneratorID> task = Jobs.front(); //fetches task
 			Jobs.pop_front();
 			//Generate
-			ivec3 pos = ChunkIDToPOS(task);
+			ivec3 pos = ChunkIDToPOS(task.first);
+			generaterUse = task.second;
 
-			Chunk* chunk = Generators.GetGenerator(Generators.MOUNTAINS)->Generate(pos);
+			if (!Generators.GetGenerator(generaterUse)->useTallChunks) {
+				Chunk* chunk = Generators.GetGenerator(generaterUse)->Generate(pos);
 
-			chunk->Position = pos;
-			chunk->chunkID = task;
+				chunk->Position = pos;
+				chunk->chunkID = task.first;
 
-			FinishedJobs.push_back(chunk);
+				FinishedJobs.push_back(chunk);
+			}
+			else {
+				if (pos.y != 0) {
+					TallChunk* chunk = new TallChunk();
+					std::vector<Chunk*> chunks = chunk->getCubicChunks();
+
+					FinishedJobs.insert(FinishedJobs.end(), chunks.begin(), chunks.end());
+					continue;
+				}
+
+				TallChunk* chunk = Generators.GetGenerator(generaterUse)->GenerateTall(pos);
+				//Decompose
+				std::vector<Chunk*> chunks = chunk->getCubicChunks();
+
+				FinishedJobs.insert(FinishedJobs.end(), chunks.begin(), chunks.end());
+			}
+			
 
 			count++;
 			if (count == BatchSize) {
@@ -100,37 +125,31 @@ void ChunkGeneration::TaskScheduler() {
 
 	int WorkerSelection = 0;
 
-	deque<deque<ChunkID>> DistributedTasks;
+	deque<deque<std::pair<ChunkID, WorldGeneratorID>>> DistributedTasks;
 	deque<deque<Chunk*>> ChunkOutputs;
 
 	DistributedTasks.resize(WorkerCount);
 	ChunkOutputs.resize(WorkerCount);
 
-	deque<ChunkID> InternalTaskList;
+	vector<std::pair<ChunkID, WorldGeneratorID>> InternalTaskList;
 
 	while (!stop) {
 		
 		//Fetch tasks
 
 		SchedulerLock.lock();
-		InternalTaskList = TaskList;
+		InternalTaskList.insert(InternalTaskList.end(), TaskList.begin(), TaskList.end());
 		TaskList.clear();
 		SchedulerLock.unlock();
 
 		//Interally distributes the jobs
 
-		while (!InternalTaskList.empty()) {
+		for (int i = 0; i < InternalTaskList.size(); i++) {
+			std::pair<ChunkID, WorldGeneratorID> task = InternalTaskList[i];
 
-			ChunkID task = InternalTaskList.front();
-			InternalTaskList.pop_front();
-
-			DistributedTasks[WorkerSelection].push_back(task);
-			
-			WorkerSelection++;
-
-			if (WorkerSelection == WorkerCount)
-				WorkerSelection = 0;
+			DistributedTasks[i % WorkerCount].push_back(task);
 		}
+		InternalTaskList.clear();
 
 		//Distributes the tasks
 
@@ -165,18 +184,16 @@ void ChunkGeneration::TaskScheduler() {
 	Logger.LogInfo("World", "Shutting down world gen scheduler");
 }
 
-void ChunkGeneration::Generate(int x, int y, int z) {
-	Generate(getChunkID(x, y, z));
-}
-
-void ChunkGeneration::Generate(ChunkID id) {
+void ChunkGeneration::Generate(ChunkID id, WorldGeneratorID genTypeIn) {
 	SchedulerLock.lock();
-	TaskList.push_back(id);
+	TaskList.emplace_back(std::pair<ChunkID, WorldGeneratorID>(id, genTypeIn));
 	SchedulerLock.unlock();
 }
 
-void ChunkGeneration::Generate(vector<ChunkID> IDs) {
+void ChunkGeneration::Generate(vector<ChunkID> IDs, WorldGeneratorID genTypeIn) {
 	SchedulerLock.lock();
-	TaskList.insert(TaskList.end(), IDs.begin(), IDs.end());
+	for (const auto& chunkID : IDs) {
+		TaskList.emplace_back(std::pair<ChunkID, WorldGeneratorID>(chunkID, genTypeIn));
+	}
 	SchedulerLock.unlock();
 }

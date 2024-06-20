@@ -1,7 +1,8 @@
 #pragma once
 #include "../Generator.h"
 
-struct DebugWorldSecond : WorldGenerator {
+class DebugWorldSecond : public WorldGenerator {
+public:
 	DebugWorldSecond() {
 
 	}

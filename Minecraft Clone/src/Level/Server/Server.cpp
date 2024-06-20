@@ -16,35 +16,35 @@ Timer* Server::getTimer() {
 }
 
 vector<EntityProperty> Server::getUpdatedEntities() {
-	return level.mainWorld.worldInteractions.getUpdatedEntities();
+	return level.mainWorld->worldInteractions.getUpdatedEntities();
 }
 
 bool Server::checkEntityOnGround(EntityUUID id) {
-	return level.mainWorld.worldInteractions.Collusions.isEntityOnGround(level.mainWorld.worldInteractions.getEntity(id));
+	return level.mainWorld->worldInteractions.Collusions.isEntityOnGround(level.mainWorld->worldInteractions.getEntity(id));
 }
 
 void Server::join(Entity& entity) {
-	level.mainWorld.worldInteractions.summonEntity(entity);
+	level.mainWorld->worldInteractions.summonEntity(entity);
 }
 
 vector<ChunkID> Server::getUpdatedChunkIDs() {
-	return level.mainWorld.worldInteractions.getUpdatedChunkIDs();
+	return level.mainWorld->worldInteractions.getUpdatedChunkIDs();
 }
 
 Chunk* Server::getChunk(ChunkID ID) {
-	return level.mainWorld.worldInteractions.getChunk(ID);
+	return level.mainWorld->worldInteractions.getChunk(ID);
 }
 
 BlockID Server::getBlock(int x, int y, int z) { //Include dimension in parameter later
-	return level.mainWorld.worldInteractions.getBlock(x, y, z);
+	return level.mainWorld->worldInteractions.getBlock(x, y, z);
 }
 
 bool Server::getRayIntersection(Ray& ray) { //Include dimension in paramter later
-	return level.mainWorld.worldInteractions.Collusions.CheckRayIntersection(ray);
+	return level.mainWorld->worldInteractions.Collusions.CheckRayIntersection(ray);
 }
 
 vec3 Server::getEntityCollusionTime(EntityUUID entity) {
-	return level.mainWorld.worldInteractions.Collusions.GetTimeTillCollusion(level.mainWorld.worldInteractions.getEntity(entity));
+	return level.mainWorld->worldInteractions.Collusions.GetTimeTillCollusion(level.mainWorld->worldInteractions.getEntity(entity));
 }
 
 void Server::startServer(ServerSettings serverSettings) {
@@ -78,8 +78,8 @@ void Server::loop() {
 }
 
 void Server::tick() {
-	level.mainWorld.Tick();
-	level.mainWorld.EventTick();
+	level.mainWorld->Tick();
+	level.mainWorld->EventTick();
 	level.updateDimensions();
-	level.mainWorld.worldInteractions.worldLoader->load();
+	level.mainWorld->worldInteractions.worldLoader->load();
 }

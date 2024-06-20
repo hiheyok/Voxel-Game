@@ -10,7 +10,7 @@ void LightingEngine::increaseLightLevel(ChunkLightingContainer* container, uint8
 	}
 }
 
-void LightingEngine::LightSpreadSky(Chunk* chunk, ChunkLightingContainer* container, vector<int>& Heightmap, int ChunkHeight, int x, int y, int z) {
+void LightingEngine::LightSpreadSky(Chunk* chunk, ChunkLightingContainer* container, vector<uint16_t>& heightmap, int ChunkHeight, int x, int y, int z) {
 	deque<ivec4> BFS;
 
 	BFS.push_back(ivec4(x, y, z, 15));
@@ -29,7 +29,7 @@ void LightingEngine::LightSpreadSky(Chunk* chunk, ChunkLightingContainer* contai
 		int ny = node.y + ChunkHeight;
 		int nz = node.z;
 
-		if (Heightmap[nx * 16 + nz] <= ny) {
+		if (heightmap[nx * 16 + nz] <= ny) {
 			node.w = 15;
 		}
 
@@ -73,17 +73,17 @@ void LightingEngine::LightSpreadSky(Chunk* chunk, ChunkLightingContainer* contai
 	}
 }
 
-void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, ChunkLightingContainer* light, vector<int>& Heightmap, int ChunkHeight) {
+void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, ChunkLightingContainer* light, vector<uint16_t>& heightmap, int ChunkHeight) {
 	for (int x = 0; x < 16; x++) {
 		for (int z = 0; z < 16; z++) {
 
-			int h = Heightmap[x * 16 + z] - ChunkHeight; // it will try to find pivot points
+			int h = heightmap[x * 16 + z] - ChunkHeight; // it will try to find pivot points
 
 			if (h >= 16) {
 				continue;
 			}
 
-			LightSpreadSky(chunk, light, Heightmap, ChunkHeight, x, 15, z);
+			LightSpreadSky(chunk, light, heightmap, ChunkHeight, x, 15, z);
 		}
 	}
 
@@ -92,18 +92,16 @@ void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, ChunkLightingContainer* l
 
 vector<ChunkLightingContainer*> LightingEngine::SkyLighting(ChunkColumnID id) {
 	uint8_t DarknessLightLevel = 12;
-	vector<ChunkLightingContainer*> out = {};
+	vector<ChunkLightingContainer*> out = vector<ChunkLightingContainer*>(0);
 	ivec3 pos = ChunkIDToPOS(id);
-	vector<int> Heightmap = world->getColumnHeightmap(pos);
+	ChunkColumn* col = world->getColumn(pos);
 
-	if (Heightmap.size() == 0) {
-		return out;
-	}
+	if (col == nullptr) return out;
+	Heightmap heightmap = world->getColumnHeightmap(pos);
 
 	pos.y *= 32;
 
-	ChunkColumn* col = world->getColumn(pos);
-
+	
 
 	for (int i = 0; i < 32; i++) {
 		if (!col->LightDirty[i]) {
@@ -113,7 +111,8 @@ vector<ChunkLightingContainer*> LightingEngine::SkyLighting(ChunkColumnID id) {
 		ChunkLightingContainer* lighting = new ChunkLightingContainer;
 		lighting->ResetLightingCustom(4);
 
-		WorkOnChunkSkylight(col->GetChunk(i), lighting, Heightmap, i * 16);
+		std::vector<uint16_t> h = heightmap.getData();
+		WorkOnChunkSkylight(col->GetChunk(i), lighting, h, i * 16);
 
 		lighting->Position = ivec3(pos.x, i + pos.y, pos.z);
 		out.emplace_back(lighting);

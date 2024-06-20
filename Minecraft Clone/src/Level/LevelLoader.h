@@ -9,13 +9,13 @@ private:
 	ChunkGeneration worldGenerator; //Change this 
 	LightingEngine lightEngine;
 public:
-	void Start(int worldGenThreadCount, int lightEngineThreadCount, WorldAccess* world);
+	void Start(int worldGenThreadCount, int lightEngineThreadCount, WorldAccess* world, long long worldGenSeedIn);
 
 	void Stop();
 
 	int getChunkCount();
 
-	void sendRequestedChunks(std::vector<ChunkID> RequestedChunks);
+	void sendRequestedChunks(std::vector<ChunkID> RequestedChunks, WorldGeneratorID worldGenTypeIn);
 
 	std::vector<Chunk*> getGeneratedChunk();
 

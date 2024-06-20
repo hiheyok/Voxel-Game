@@ -21,9 +21,13 @@ private:
 
 	}
 
+	bool RequestLoad(int x, int y, int z);
+
 	void loadSummonEntitySurrounding(EntityUUID uuid);
 
 public:
+	bool tallGeneration = false;
+
 	std::vector<ChunkID> ChunkRequest;
 
 	WorldLoader(World* w, WorldParameters p) : world(w), settings(p) {

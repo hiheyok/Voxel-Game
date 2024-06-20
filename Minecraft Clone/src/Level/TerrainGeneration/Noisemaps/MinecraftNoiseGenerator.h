@@ -5,13 +5,7 @@
 
 class NoiseGeneratorImproved {
 private:
-    double GRAD_X[16] = { 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, -1.0, 0.0 };
-    double GRAD_Y[16] = { 1.0, 1.0, -1.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0 };
-    double GRAD_Z[16] = { 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 0.0, 1.0, 0.0, -1.0 };
-    double GRAD_2X[16] = { 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, -1.0, 0.0 };
-    double GRAD_2Z[16] = { 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 0.0, 1.0, 0.0, -1.0 };
-
-    int* permutations;
+    std::vector<int> permutations;
 
 public:
     double xCoord;
@@ -19,14 +13,11 @@ public:
     double zCoord;
     
     ~NoiseGeneratorImproved() {
-        if (permutations != nullptr) {
-         //   delete[] permutations;
-        }
     }
 
     NoiseGeneratorImproved(JavaRandom& random) {
 
-        permutations = new int[512] {};
+        permutations.resize(512);
         xCoord = random.nextDouble() * 256.0;
         yCoord = random.nextDouble() * 256.0;
         zCoord = random.nextDouble() * 256.0;

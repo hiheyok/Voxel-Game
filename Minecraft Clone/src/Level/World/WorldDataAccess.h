@@ -28,7 +28,7 @@ public:
 	
 	bool checkChunk(glm::ivec3 v);
 
-	std::vector<int> getColumnHeightmap(glm::ivec3 v);
+	Heightmap& getColumnHeightmap(glm::ivec3 v);
 
 	ChunkColumn* getColumn(glm::ivec3 v);
 };

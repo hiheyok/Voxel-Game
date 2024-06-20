@@ -30,16 +30,8 @@ void WorldLoader::loadSummonEntitySurrounding(EntityUUID uuid) {
 		if (abs(Offset.y) > settings.VerticalTickingDistance)
 			continue;
 
-		//If it is met check if it already exist of in process of generating
-		if (world->getChunk(ChunkPos.x, ChunkPos.y, ChunkPos.z) != nullptr)
-			continue;
-
-		if (GeneratingChunk.count(getChunkID(ChunkPos)))
-			continue;
-
-		//Request chunk
-		GeneratingChunk.insert(getChunkID(ChunkPos));
-		ChunkRequest.emplace_back(getChunkID(ChunkPos));
+		bool isSuccess = RequestLoad(ChunkPos.x, ChunkPos.y, ChunkPos.z);
+		if (!isSuccess) continue;
 
 		for (int side = 0; side < 6; side++) {
 
@@ -51,6 +43,22 @@ void WorldLoader::loadSummonEntitySurrounding(EntityUUID uuid) {
 		}
 	}
 
+}
+
+bool WorldLoader::RequestLoad(int x, int y, int z) {
+	if (world->getChunk(x, y, z) != nullptr)
+		return false;
+
+	if (tallGeneration)
+		y = y / 16;
+
+	if (GeneratingChunk.count(getChunkID(x, y, z)))
+		return false;
+
+	//Request chunk
+	GeneratingChunk.insert(getChunkID(x, y, z));
+	ChunkRequest.emplace_back(getChunkID(x, y, z));
+	return true;
 }
 
 //Only work on loading chunks for not. Unloading for later
@@ -113,11 +121,8 @@ void WorldLoader::loadSurroundedMovedEntityChunk() {
 					testPosition[j] += SideDistanceOffset * side;
 
 					//Test if it exist of generating
-					if (world->getChunk(testPosition)) continue;
-					if (GeneratingChunk.count(getChunkID(testPosition))) continue;
-
-					GeneratingChunk.insert(getChunkID(testPosition));
-					ChunkRequest.push_back(getChunkID(testPosition));
+					bool isSuccess = RequestLoad(testPosition.x, testPosition.y, testPosition.z);
+					if (!isSuccess) continue;	
 				}
 			}
 
@@ -134,14 +139,11 @@ void WorldLoader::loadSpawnChunks() {
 	for (int x = -settings.SpawnChunkHorizontalRadius; x <= settings.SpawnChunkHorizontalRadius; x++) {
 		for (int z = -settings.SpawnChunkHorizontalRadius; z <= settings.SpawnChunkHorizontalRadius; z++) {
 			for (int y = -settings.SpawnChunkVerticalRadius; y <= settings.SpawnChunkVerticalRadius; y++) {
-				if (world->checkChunk(x, y, z)) continue;
+				bool isSuccess = RequestLoad(x, y, z);
 
-				ChunkID id = getChunkID(x, y, z);
-
-				if (GeneratingChunk.count(id)) continue;
-
-				GeneratingChunk.insert(id);
-				ChunkRequest.emplace_back(id);
+				if (!isSuccess) {
+					continue;
+				}
 
 			}
 		}

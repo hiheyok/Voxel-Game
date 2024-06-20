@@ -1,7 +1,8 @@
 #pragma once
 #include "../Generator.h"
 
-struct MathWorld : WorldGenerator {
+class MathWorld : public WorldGenerator {
+public:
 	MathWorld() {
 
 	}

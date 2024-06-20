@@ -113,7 +113,7 @@ void MountainGenerator::GenerateDecor(glm::ivec3 Position, Chunk* chunk) {
 			int gx = Position.x + x;
 			int gz = Position.z + z;
 
-			float TREE_MAP = (float)((double)(Noise.GetNoise((float)gx * 100.f, (float)gz * 100.f, (float)SEED) + 1.f) / 2.f);
+			float TREE_MAP = (float)((double)(Noise.GetNoise((float)gx * 100.f, (float)gz * 100.f, (float)WorldGenerator::worldSeed) + 1.f) / 2.f);
 			for (int y = 0; y < 16; y++) {
 				if (chunk->GetBlock(x, y - 1, z) == Blocks.GRASS) {
 

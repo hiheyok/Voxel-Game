@@ -3,21 +3,30 @@
 #include "../../Noisemaps/Noisemap.h"
 #include "../../Noisemaps/TerrainParameters.h"
 #include "Overworld.h"
-
+#include "../../../Chunk/Heightmap/Heightmap.h"
+#include "../../Biome/BiomeProvider.h"
 
 class MinecraftTerrain : public WorldGenerator {
 public:
 	MinecraftTerrain() {
+		settings = new ChunkGeneratorSettings;
+		useTallChunks = true;
 		
 	}
 
-	Chunk* Generate(glm::ivec3 Position) override;
+	TallChunk* GenerateTall(glm::ivec3 Position) override; 
 
 private:
+	void Init();
+
 	NoiseMaps1122 Noisemaps;
 	TerrainParamters Paramters;
+	ChunkGeneratorSettings* settings = nullptr;
+	
 
 	double* heightMap;
+
+	bool isInitialized = false;
 
 	glm::vec3 VecFloor(glm::vec3 v);
 };

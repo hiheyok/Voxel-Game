@@ -3,7 +3,8 @@
 #include <glm/vec2.hpp>
 #include <vector>
 
-struct MountainGenerator : WorldGenerator {
+class MountainGenerator : public WorldGenerator {
+public:
 	MountainGenerator() {
 		Noise.SetNoiseType(Noise.NoiseType_OpenSimplex2);
 		Noise.SetFrequency(0.005f);

@@ -2,7 +2,7 @@
 #include "Chunk.h"
 #include "Lighting/ChunkLighting.h"
 #include "../../Utils/Containers/BitStorage.h"
-
+#include "Heightmap/Heightmap.h"
 #include <glm/vec2.hpp>
 
 typedef uint64_t ChunkColumnID;
@@ -11,18 +11,20 @@ class ChunkColumn { //Helps with stuff like lighting
 private:
 	std::vector<Chunk*> Column;
 	std::vector<ChunkLightingContainer*> LightColumn;
-	std::vector<int> ChunkColumnHeightMap = std::vector<int>(16 * 16);
+	Heightmap ColumnHeightmap;
 	glm::ivec2 Position;
 public:
 	std::vector<bool> LightDirty;
 
-	std::vector<int> getHeightmap() {
-		return ChunkColumnHeightMap;
+	Heightmap& getHeightmap() {
+		return ColumnHeightmap;
 	}
 
 	void replaceLightContainer(int y, ChunkLightingContainer* c) {
 		if (LightColumn[y] == nullptr) {
-			throw std::exception("Replaced light of a non existant chunk");
+			Logger.LogError("Chunk", "Unable to update lighting!");
+			delete c;
+			return;
 		}
 
 		ChunkLightingContainer* l = LightColumn[y];
@@ -35,7 +37,7 @@ public:
 		Column.resize(32);
 		LightColumn.resize(32);
 		LightDirty.resize(32);
-		memset(ChunkColumnHeightMap.data(), 0, 16 * 16 * 4);
+		ColumnHeightmap.init();
 	}
 
 	static ChunkColumnID getColumnID(int x, int z) {
@@ -109,14 +111,14 @@ public:
 
 				int ColumnLightHeight = TargetChunkHeightmap[x * 16 + z] + TargetChunkHeight;
 
-				if (ChunkColumnHeightMap[x * 16 + z] < ColumnLightHeight) {
-					ChunkColumnHeightMap[x * 16 + z] = ColumnLightHeight;
+				if (ColumnHeightmap.get(x, z) < ColumnLightHeight) {
+					ColumnHeightmap.edit(x, z, ColumnLightHeight);
 				}
 				else {
-					int ChunkHeight = ChunkColumnHeightMap[x * 16 + z] >> 4;
+					int ChunkHeight = ColumnHeightmap.get(x, z) >> 4;
 
 					if (ChunkHeight == Height) {
-						ChunkColumnHeightMap[x * 16 + z] = ColumnLightHeight;
+						ColumnHeightmap.edit(x, z, ColumnLightHeight);
 					}
 				}
 

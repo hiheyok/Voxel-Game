@@ -4,7 +4,7 @@
 
 class Level {
 public:
-	Dimension mainWorld;
+	Dimension* mainWorld;
 	LevelLoader levelLoader;
 
 	Level() {

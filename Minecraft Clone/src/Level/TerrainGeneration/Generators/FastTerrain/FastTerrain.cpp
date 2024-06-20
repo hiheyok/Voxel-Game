@@ -11,6 +11,8 @@ Chunk* FastTerrain::Generate(ivec3 Position) {
 	int cy = Position.y;
 	int cz = Position.z;
 
+	long long SEED = WorldGenerator::worldSeed;
+
 	for (int x = 0 + cx; x < 16 + cx; x++) {
 		for (int z = 0 + cz; z < 16 + cz; z++) {
 

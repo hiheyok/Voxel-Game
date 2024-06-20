@@ -1,22 +1,20 @@
 #pragma once
 #include "../Chunk/Chunk.h"
 #include "../../Utils/FastNoiseLite.h"
-
+#include "../TerrainGeneration/Generators/GeneratorType.h"
 #include <deque>
 #include <thread>
 #include <mutex>
 
 class ChunkGeneration {
 public:
-	void Start(int ThreadCount);
+	void Start(int ThreadCount, long long int WorldSeedIn);
 
 	void Stop(); //Stop the threads and does some clean up
 
-	void Generate(int x, int y, int z);
+	void Generate(ChunkID id, WorldGeneratorID genTypeIn);
 
-	void Generate(ChunkID id);
-
-	void Generate(std::vector<ChunkID> IDs);
+	void Generate(std::vector<ChunkID> IDs, WorldGeneratorID genTypeIn);
 
 	std::vector<Chunk*> GetOutput();
 
@@ -30,15 +28,17 @@ private:
 
 	int WorkerCount = NULL;
 
-	std::deque<ChunkID> TaskList; //All tasks will go in here and they will be distributed to all the workers
+	std::vector<std::pair<ChunkID, WorldGeneratorID>> TaskList; //All tasks will go in here and they will be distributed to all the workers
 
 	std::deque<std::thread> Workers;
-	std::deque<std::deque<ChunkID>> WorkerTask;
+	std::deque<std::deque<std::pair<ChunkID, WorldGeneratorID>>> WorkerTask;
 	std::deque<std::deque<Chunk*>> WorkerOutput;
 	std::deque<std::mutex> WorkerLocks;
 
 	std::thread Scheduler;
 	std::mutex SchedulerLock;
+
+	long long int WorldSeed = 0;
 
 	bool stop = false;
 };

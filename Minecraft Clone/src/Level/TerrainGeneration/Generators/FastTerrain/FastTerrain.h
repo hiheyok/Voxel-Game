@@ -1,7 +1,8 @@
 #pragma once
 #include "../Generator.h"
 
-struct FastTerrain : WorldGenerator {
+class FastTerrain : public WorldGenerator {
+public:
 	FastTerrain() {
 		Noise.SetNoiseType(Noise.NoiseType_OpenSimplex2);
 		Noise.SetFrequency(0.009f);

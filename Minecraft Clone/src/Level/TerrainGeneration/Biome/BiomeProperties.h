@@ -3,7 +3,10 @@
 #include <exception>
 class BiomeProperties {
 private:
-    std::string biomeName;
+    
+public:
+    std::string biomeName = "";
+    std::string baseBiome = "";
     float baseHeight = 0.1F;
     float heightVariation = 0.2F;
     float temperature = 0.5F;
@@ -11,7 +14,11 @@ private:
     int waterColor = 16777215;
     bool enableSnow;
     bool enableRain = true;
-public:
+
+    BiomeProperties(std::string biomeNameIn) : biomeName(biomeNameIn) {}
+
+    BiomeProperties() {}
+
     BiomeProperties& setTemperature(float temperatureIn);
 
     BiomeProperties& setRainfall(float rainfallIn);
@@ -25,4 +32,6 @@ public:
     BiomeProperties& setSnowEnabled();
 
     BiomeProperties& setWaterColor(int waterColorIn);
+
+    BiomeProperties& setBaseBiome(std::string baseBiomeIn);
 };

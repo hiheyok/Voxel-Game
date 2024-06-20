@@ -7,7 +7,7 @@
 
 class NoiseGeneratorSimplex {
 private:
-    int grad3[12][3]{ {1, 1, 0}, { -1, 1, 0}, {1, -1, 0}, { -1, -1, 0}, {1, 0, 1}, { -1, 0, 1}, {1, 0, -1}, { -1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1} };
+    
     std::vector<int> p;
 
     int fastFloor(double value);
@@ -33,7 +33,7 @@ public:
         NoiseGeneratorSimplex(JavaRandom());
     }
 
-    NoiseGeneratorSimplex(JavaRandom seed) {
+    NoiseGeneratorSimplex(JavaRandom& seed) {
         p.resize(512);
         xo = seed.nextDouble() * 256.0;
         yo = seed.nextDouble() * 256.0;
@@ -56,5 +56,5 @@ public:
 
     double getValue(double p_151605_1_, double p_151605_3_);
 
-    void add(std::vector<double> p_151606_1_, double p_151606_2_, double p_151606_4_, int p_151606_6_, int p_151606_7_, double p_151606_8_, double p_151606_10_, double p_151606_12_);
+    void add(std::vector<double>& p_151606_1_, double p_151606_2_, double p_151606_4_, int p_151606_6_, int p_151606_7_, double p_151606_8_, double p_151606_10_, double p_151606_12_);
 };

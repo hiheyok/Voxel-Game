@@ -2,8 +2,10 @@
 
 using namespace std;
 
-void LevelLoader::Start(int worldGenThreadCount, int lightEngineThreadCount, WorldAccess* world) {
-	worldGenerator.Start(worldGenThreadCount);
+void LevelLoader::Start(int worldGenThreadCount, int lightEngineThreadCount, WorldAccess* world, long long worldGenSeedIn) {
+	Biomes::RegisterBiome();
+	BiomeProvider::init(worldGenSeedIn, new ChunkGeneratorSettings);
+	worldGenerator.Start(worldGenThreadCount, worldGenSeedIn);
 	lightEngine.Start(lightEngineThreadCount, world);
 }
 
@@ -15,9 +17,9 @@ int LevelLoader::getChunkCount() {
 	return count;
 }
 
-void LevelLoader::sendRequestedChunks(vector<ChunkID> RequestedChunks) { //Add option for requested chunks dimension type and generator type later
+void LevelLoader::sendRequestedChunks(vector<ChunkID> RequestedChunks, WorldGeneratorID worldGenTypeIn) { //Add option for requested chunks dimension type and generator type later
 	//Later this will check on the disk for chunks
-	worldGenerator.Generate(RequestedChunks);
+	worldGenerator.Generate(RequestedChunks, worldGenTypeIn);
 }
 
 vector<Chunk*> LevelLoader::getGeneratedChunk() {

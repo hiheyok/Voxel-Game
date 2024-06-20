@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #include "../Block.h"
 #include "../../../Event/EventHandler.h"
 #include "../../../Entity/Entities.h"

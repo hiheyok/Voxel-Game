@@ -1,7 +1,8 @@
 #pragma once
 #include "../Generator.h"
 
-struct SuperflatWorld : WorldGenerator {
+class SuperflatWorld : public  WorldGenerator {
+public:
 	SuperflatWorld() {
 
 	}

@@ -200,8 +200,8 @@ void MultiEntityRenderer::Update() {
 	int x = width;
 	int y = height;
 	glm::mat4 projection = glm::perspective(glm::radians(camera->FOV), (float)x / (float)y, 0.1f, 1000000.0f);
-	shader.use();
 
+	shader.use();
 	shader.setMat4("view", view);
 	shader.setMat4("model", model);
 	shader.setMat4("projection", projection);

@@ -1,8 +1,6 @@
 #pragma once
-#ifndef CAMERA_H
-#define CAMERA_H
+
 #include <vector>
-#define _CRTDBG_MAP_ALLOC
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
 enum Camera_Movement {
     CAM_FORWARD,
@@ -142,5 +140,3 @@ public:
 private:
     
 };
-
-#endif

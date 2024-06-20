@@ -1,8 +1,7 @@
 #include "DebugSecond.h"
 
-using namespace glm;
 
-Chunk* DebugWorldSecond::Generate(ivec3 Position) {
+Chunk* DebugWorldSecond::Generate(glm::ivec3 Position) {
 	Chunk* chunk = new Chunk;
 
 	chunk->SetBlock(Blocks.COBBLESTONE, 8, 8, 8);
@@ -36,4 +35,5 @@ Chunk* DebugWorldSecond::Generate(ivec3 Position) {
 			}
 		}
 	}
+	return chunk;
 }
