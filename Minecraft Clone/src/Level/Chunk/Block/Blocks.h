@@ -11,6 +11,7 @@ private:
 
 	void InitializeTextures();
 	void InitializeTextureV2();
+	void InitializeBlockModels();
 public:
 	std::vector<Block*> BlockTypeData;
 
@@ -358,6 +359,7 @@ public:
 		BlockTextureArray.width = 16;
 
 		InitializeTextureV2();
+		InitializeBlockModels();
 
 		BlockTextureArray.UploadToGPU();
 	}

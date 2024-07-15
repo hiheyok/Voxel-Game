@@ -65,6 +65,10 @@ bool FileManager::CheckFile(const char* dir) {
 
 }
 
+bool FileManager::CheckFile(std::string dir) {
+	return CheckFile(dir.c_str());
+}
+
 void FileManager::CreateFile(std::string name, std::string dir) {
 	std::string d = "";
 

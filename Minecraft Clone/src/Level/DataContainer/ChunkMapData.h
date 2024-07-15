@@ -2,6 +2,7 @@
 
 #include "../Chunk/Chunk.h"
 #include "../Chunk/ChunkColumn.h"
+#include "../../Utils/Containers/skaHashmap.h"
 #include <unordered_set>
 #include <unordered_map>
 
@@ -27,6 +28,8 @@ struct Region { //32x32x32 Chunk Region
 
 	bool CheckChunkColumn(uint16_t x, uint16_t z);
 	bool CheckChunkColumnGlobalPos(int32_t x, int32_t z);
+
+	uint64_t AccessCount = 0;
 };
 
 class ChunkMap {
@@ -49,5 +52,5 @@ private:
 	//Input position is the chunk position
 	Region* GetRegion(int x, int y, int z);
 
-	std::unordered_map<RegionID, Region> LiveRegion;
+	ska::flat_hash_map<RegionID, Region*> LiveRegion;
 };

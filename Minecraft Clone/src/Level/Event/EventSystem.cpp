@@ -1,17 +1,16 @@
 #include "EventSystem.h"
 
-Event EventSystem::GetNextEvent() {
-	Event e = EventQueue.front();
-	EventQueue.pop_front();
-
-	return e;
+std::vector<Event>* EventSystem::GetQueue() {
+	return QueueActive;
 }
 
 void EventSystem::AddEvent(Event e) {
-	EventQueue.push_back(e);
-
+	QueueUnactive->emplace_back(e);
 }
 
-size_t EventSystem::getSize() {
-	return EventQueue.size();
+
+void EventSystem::Swap() {
+	std::vector<Event>* tmp = QueueActive;
+	QueueActive = QueueUnactive;
+	QueueUnactive = tmp;
 }

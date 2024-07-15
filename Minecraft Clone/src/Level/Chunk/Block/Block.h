@@ -2,6 +2,7 @@
 #include "Texture/BlockTexture.h"
 #include "../../Typenames.h"
 #include <vector>
+#include "../../../RenderEngine/BlockModel/BlockModels.h"
 
 struct BlockType {
 
@@ -122,6 +123,9 @@ struct Block {
 	BlockType* Properties = nullptr;
 
 	BlockTexture* Texture = nullptr;
+
+	ModelV2::BlockModelV2* BlockModelData = NULL;
+	
 
 	std::string BlockName = "";
 };

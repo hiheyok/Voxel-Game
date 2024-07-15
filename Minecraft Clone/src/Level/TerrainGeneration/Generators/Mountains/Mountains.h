@@ -5,14 +5,16 @@
 
 class MountainGenerator : public WorldGenerator {
 public:
+	FastNoiseLite Noise;
+
+	Chunk* Generate(glm::ivec3 Position) override;
+
 	MountainGenerator() {
 		Noise.SetNoiseType(Noise.NoiseType_OpenSimplex2);
 		Noise.SetFrequency(0.005f);
 	}
 
-	Chunk* Generate(glm::ivec3 Position) override;
-
-	FastNoiseLite Noise;
+	
 
 	void GenerateEnvironment(glm::ivec3 Position, Chunk* chunk);
 

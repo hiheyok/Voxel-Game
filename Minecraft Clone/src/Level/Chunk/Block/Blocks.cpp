@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 #include "../../../FileManager/Files.h"
 #include <fstream>
+#include "../../../RenderEngine/BlockModel/ModelLoader.h"
 
 using namespace std;
 
@@ -176,4 +177,23 @@ void BlockList::InitializeTextureV2() {
 			BlockTypeData[block.second]->Texture->SetFacesCustom(TexID, TextureRepeatCount[TexID], sides[0], sides[1], sides[2], sides[3], sides[4], sides[5]);
 		}
 	}
+}
+
+
+
+void BlockList::InitializeBlockModels() {
+	//It will first go through the block models and create the models without loading the texture
+	for (const auto& [Name, ID] : BlockIDNameData) {
+		ModelV2::BlockModelV2* model = getBlockModel(Name);
+		getBlockType(ID)->BlockModelData = model;
+	}
+
+	//Bake all of the texture variables next
+
+	for (auto& block : BlockTypeData) {
+		if (block->BlockModelData == NULL) continue;
+		block->BlockModelData->flattenVariables();
+	}
+
+
 }

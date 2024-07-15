@@ -7,6 +7,7 @@
 #include "../Event/EventHandler.h"
 #include "../../Core/Options/Option.h"
 #include "../TerrainGeneration/Generators/GeneratorType.h"
+#include "../../Utils/Containers/skaHashmap.h"
 
 class Dimension {
 private:
@@ -14,7 +15,7 @@ private:
 	DimensionProperties properties;
 	WorldParameters worldSettings;
 	
-	std::unordered_map<int, std::unordered_set<ChunkID>> TickUsage;
+	ska::flat_hash_map<int, ska::flat_hash_set<ChunkID>> TickUsage;
 
 protected:
 	WorldGeneratorID generatorType;
@@ -46,7 +47,7 @@ public:
 	
 
 	bool CheckTickUsed(EventID id, int x, int y, int z) {//temp sol
-		return TickUsage[id].contains(getChunkID(x, y, z));
+		return TickUsage[id].count(getChunkID(x, y, z));
 	}
 
 	void TickUsed(EventID id, int x, int y, int z) {//temp solution
@@ -62,29 +63,35 @@ public:
 	}
 
 	void EventTick() {
-		int QueueSize = EventManager.getSize();
 
-		for (int i = 0; i < QueueSize; i++) {
-			Event e = EventManager.GetNextEvent();
-			if (e.Type == NULL_EVENT)
+		std::vector<Event>* EventQueue = EventManager.GetQueue();
+
+		for (int i = 0; i < EventQueue->size(); i++) {
+			Event e = EventQueue->at(i);
+			switch (e.Type) {
+			case NULL_EVENT:
 				break;
-			if (e.Type == BLOCK_EVENT) {
+			case BLOCK_EVENT:
 				if (CheckTickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.x, e.Data.BlockEvent.y, e.Data.BlockEvent.z)) {
 					continue;
 				}
 				TickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.x, e.Data.BlockEvent.y, e.Data.BlockEvent.z);
-			}
-			if (e.Type == ENTITY_EVENT) {
+				break;
+			case ENTITY_EVENT:
 				if ((e.Data.EntityEvent.UniqueID != 0) && CheckTickUsed(e.Data.EntityEvent.UniqueID, e.Data.EntityEvent.x, e.Data.EntityEvent.y, e.Data.EntityEvent.z)) {
 					continue;
 				}
 				if ((e.Data.EntityEvent.UniqueID != 0)) {
 					TickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.x, e.Data.BlockEvent.y, e.Data.BlockEvent.z);
 				}
+				break;
 			}
 
 			EventHandler.ExecuteEvent(e);
 		}
+
+		EventQueue->clear();
+		EventManager.Swap();
 
 		TickUsage.clear();
 

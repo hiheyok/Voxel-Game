@@ -112,9 +112,9 @@ void ChunkMap::InsertChunk(Chunk* chunk) {
 
 	if (reg == nullptr) {
 		Region* newRegion = new Region;
-		LiveRegion[getChunkID(rx, ry, rz)] = *newRegion;
+		LiveRegion[getChunkID(rx, ry, rz)] = newRegion;
 	}
-	reg = &LiveRegion[getChunkID(rx, ry, rz)];
+	reg = LiveRegion[getChunkID(rx, ry, rz)];
 
 	reg->AddChunkGlobalPos(chunk, x, y, z);
 
@@ -145,13 +145,13 @@ Region* ChunkMap::GetRegion(int x, int y, int z) {
 
 	RegionID regID = getChunkID(rx, ry, rz);
 
-	std::unordered_map<RegionID, Region>::iterator it = LiveRegion.find(regID);
+	ska::flat_hash_map<RegionID, Region*>::iterator it = LiveRegion.find(regID);
 
 	if (it == LiveRegion.end()) {
 		return nullptr;
 	}
 
-	return &it->second;
+	return it->second;
 }
 //_____________________________________________________
 

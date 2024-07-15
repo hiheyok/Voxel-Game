@@ -25,6 +25,9 @@ enum DisplayPosition {
 struct BlockFace {
 	glm::ivec3 Normal = glm::ivec3(0, 0, 0);
 	std::string ReferenceTexture = ""; // variables starts with #
+	int CullFace = -1;
+	int TintIndex = -1;
+	unsigned int TextureID = NULL;
 	glm::ivec4 UV = glm::ivec4(0, 0, 16, 16);
 };
 
@@ -35,7 +38,14 @@ struct BlockDisplay { //Positions {thirdperson_righthand, thirdperson_lefthand, 
 	glm::vec3 translation = glm::vec3(0.f, 0.f, 0.f);
 	glm::vec3 scale = glm::vec3(0.f, 0.f, 0.f);
 	bool Initialized = false;
+};
 
+struct CuboidRotationInfo {
+	glm::vec3 origin = glm::vec3(0.f, 0.f, 0.f);
+	int axis = 0;
+	int angle = 0;
+	bool rescale = false;
+	bool Initialized = false;
 };
 
 class Cuboid {
@@ -43,15 +53,16 @@ public:
 	glm::ivec3 From = glm::ivec3(0,0,0);
 	glm::ivec3 To = glm::ivec3(16, 16, 16); //Relative inner block position from -16 to 32
 	BlockFace Faces[6]{};
+	CuboidRotationInfo rotation;
 
 	void EditFace(int location, BlockFace f) {
 		Faces[location - 1] = f;
 	}
 };
 
-namespace Model {
-	struct BlockModel {
-		bool ambientocclusion = true; //default value
+namespace ModelV2 {
+	struct BlockModelV2 {
+		bool AmbientOcclusion = true; //default value
 		std::vector<Cuboid> Elements = {};
 		std::unordered_map <std::string, std::string > TextureVariable;
 		BlockDisplay Display[8]{};
@@ -67,6 +78,8 @@ namespace Model {
 		void AddElement(Cuboid element) {
 			Elements.push_back(element);
 		}
+
+		void flattenVariables();
 	};
 }
 

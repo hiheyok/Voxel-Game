@@ -34,9 +34,9 @@ public:
 	}
 
 	ChunkColumn() {
-		Column.resize(32);
-		LightColumn.resize(32);
-		LightDirty.resize(32);
+		Column.resize(32, nullptr);
+		LightColumn.resize(32, nullptr);
+		LightDirty.resize(32, false);
 		ColumnHeightmap.init();
 	}
 
@@ -59,15 +59,6 @@ public:
 	}
 
 	void UpdateHeightmap(int Height) {
-
-		//if ((Column[Height]->Position.x == -1) && (Column[Height]->Position.z == -1) && (Height == 3)) {
-		//	for (int x = 0; x < 16; x++) {
-		//		for (int z = 0; z < 16; z++) {// Iterate though all area
-		//			std::cout << x << ", " << z << ": " << ChunkColumnHeightMap[x * 16 + z] << "\n";
-		//		}
-		//	}
-		//	std::cout << "UpdateHeight: " << Height << "\n";
-		//}
 
 		unsigned char MaxBrightness = ChunkLightingContainer::MaxLightLevel;
 

@@ -39,6 +39,8 @@ public:
 	//Return true of file exist and false if it doesn't
 	static bool CheckFile(const char* dir);
 
+	static bool CheckFile(std::string dir);
+
 	static void CreateFile(std::string name, std::string dir = "N/A");
 
 	static File GetFile(std::string name, std::string dir = "N/A");

@@ -44,11 +44,16 @@ Chunk* MountainGenerator::Generate(glm::ivec3 Position) {
 
 	GenerateEnvironment(Position, chunk);
 	GenerateDecor(Position, chunk);
+
+	int gx = Position.x * 16;
+	int gz = Position.z * 16;
+	int gy = Position.y * 16;
+
+
 	if (Position.y == 3) {
 		int NumBlocks = Blocks.BlockTypeData.size();
 
-		int gx = Position.x * 16;
-		int gz = Position.z * 16;
+		
 
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
@@ -75,6 +80,10 @@ Chunk* MountainGenerator::Generate(glm::ivec3 Position) {
 			}
 		}
 	}
+
+
+
+
 	return chunk;
 }
 
@@ -104,6 +113,8 @@ void MountainGenerator::GenerateDecor(glm::ivec3 Position, Chunk* chunk) {
 
 	Position *= 16;
 
+	
+
 	const int tree_height = 3;
 
 	for (int x = 0; x < 16; x++) {
@@ -113,19 +124,22 @@ void MountainGenerator::GenerateDecor(glm::ivec3 Position, Chunk* chunk) {
 			int gx = Position.x + x;
 			int gz = Position.z + z;
 
-			float TREE_MAP = (float)((double)(Noise.GetNoise((float)gx * 100.f, (float)gz * 100.f, (float)WorldGenerator::worldSeed) + 1.f) / 2.f);
+			float TREE_MAP = (float)((double)(Noise.GetNoise((float)gx * 100.f, (float)gz * 100.f, 3453454.f) + 1.f) / 2.f);
 			for (int y = 0; y < 16; y++) {
 				if (chunk->GetBlock(x, y - 1, z) == Blocks.GRASS) {
 
 					if (TREE_MAP <= 0.04) {
+						
 						for (int tx = -2; tx <= 2; tx++) {
 							for (int tz = -2; tz <= 2; tz++) {
 								if ((abs(tx) == 2) && (abs(tz) == 2)) {
 									continue;
 								}
 
+								
 								for (int ty = tree_height; ty <= tree_height + 1; ty++) {
 									chunk->SetBlock(Blocks.OAK_LEAF, x + tx, y + ty, z + tz);
+									
 								}
 
 							}
@@ -153,28 +167,28 @@ void MountainGenerator::GenerateDecor(glm::ivec3 Position, Chunk* chunk) {
 
 	//Cube 
 
-	int xSize = 100;
+	int xSize = 316;
 	int ySize = 100;
-	int zSize = 100;
+	int zSize = 316;
 
 	int xOffset = 0;
 	int yOffset = 160;
 	int zOffset = 0;
 
-	//for (int x = 0 + cx; x < 16 + cx; x++) {
-	//	for (int z = 0 + cz; z < 16 + cz; z++) {
-	//		for (int y = 0 + cy; y < 16 + cy; y++) {
-	//			if (((x - xOffset) >= 0) && ((x - xOffset) < xSize) &&
-	//				((y - yOffset) >= 0) && ((y - yOffset) < ySize) &&
-	//				((z - zOffset) >= 0) && ((z - zOffset) < zSize)) {
-	//				SetBlock(Blocks.SAND, x - cx, y - cy, z - cz);
-	//			}
-	//		}
-	//	}
-	//}
+	/*for (int x = 0 + Position.x; x < 16 + Position.x; x++) {
+		for (int z = 0 + Position.z; z < 16 + Position.z; z++) {
+			for (int y = 0 + Position.y; y < 16 + Position.y; y++) {
+				if (((x - xOffset) >= 0) && ((x - xOffset) < xSize) &&
+					((y - yOffset) >= 0) && ((y - yOffset) < ySize) &&
+					((z - zOffset) >= 0) && ((z - zOffset) < zSize)) {
+					chunk->SetBlock(Blocks.SAND, x - Position.x, y - Position.y, z - Position.z);
+				}
+			}
+		}
+	}*/
 
 
-	int radius = 40;
+	int radius = 60;
 
 	for (int x = 0 + Position.x; x < 16 + Position.x; x++) {
 		for (int z = 0 + Position.z; z < 16 + Position.z; z++) {

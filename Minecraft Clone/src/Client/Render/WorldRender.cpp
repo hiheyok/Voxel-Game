@@ -89,7 +89,6 @@ void WorldRender::Worker(int id) {
 			WorkerLocks[WorkerID].unlock();
 		}
 
-
 		timerSleepNotPrecise(1);
 	}
 
@@ -214,7 +213,8 @@ void WorldRender::TaskScheduler() {
 			DistributedTasks[i].clear();
 		}
 
-		timerSleepNotPrecise(1);
+
+
 
 	}
 
