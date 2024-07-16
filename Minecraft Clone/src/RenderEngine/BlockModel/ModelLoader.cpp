@@ -249,15 +249,14 @@ ModelV2::BlockModelV2* recursiveGetBlockModel(string jsonName) {
 	ModelV2::BlockModelV2* model = nullptr;
 
 	string jsonPath = path + jsonName + ".json";
-	//Check if the file exist, if it doesn't thrown an error
-	if (!FileManager::CheckFile(jsonPath.c_str())) {
-		return nullptr;
-	}
 
 	json JSONData;
 
 	try {
 		ifstream file(jsonPath);
+		if (!file.good()) { //checks if  it exist
+			return nullptr;
+		}
 		JSONData = json::parse(file);
 	}
 	catch (exception& e) {

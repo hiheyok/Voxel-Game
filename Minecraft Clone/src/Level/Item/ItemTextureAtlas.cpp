@@ -2,6 +2,7 @@
 
 void ItemTextureAtlas::RenderBlockItem(Item item) {
 	FramebufferSingleBlockRender.bindFBO();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	BlockItemRenderer.RenderBlock(item);
 	FramebufferSingleBlockRender.unbindFBO();
 }
@@ -25,10 +26,10 @@ void ItemTextureAtlas::StitchTexture(int index, int ItemID) {
 
 	//Insert Data
 	float vertices[] = {
-		xCoord - 0.f	,yCoord - 0.f,	0.f, 1.f,
-		xCoord - Size	,yCoord - 0.f,	1.f, 1.f,
-		xCoord - Size	,yCoord - Size,	1.f, 0.f,
-		xCoord - 0.f	,yCoord - Size,	0.f, 0.f,
+		xCoord - 0.f	,yCoord - 0.f,	0.f, 0.f,
+		xCoord - Size	,yCoord - 0.f,	1.f, 0.f,
+		xCoord - Size	,yCoord - Size,	1.f, 1.f,
+		xCoord - 0.f	,yCoord - Size,	0.f, 1.f,
 	};
 
 	uint32_t indices[] = {
@@ -61,9 +62,6 @@ void ItemTextureAtlas::StitchTexture(int index, int ItemID) {
 
 	glDisable(GL_BLEND);
 	AtlasFramebuffer.unbindFBO();
-	//Clear Item FB
-	FramebufferSingleBlockRender.clear();
-	FramebufferSingleBlockRender.genBuffer(FramebufferSingleBlockRender.sx, FramebufferSingleBlockRender.sy, 1.f);
 }
 
 void ItemTextureAtlas::Initialize(int AtlasItemSize, int IndividualItemSize) {

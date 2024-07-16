@@ -1,4 +1,5 @@
 #include "Files.h"
+#include <filesystem>
 
 std::vector<std::string> Tokenize(std::string str, char divider) {
 	std::vector<std::string> Tokens = {};
@@ -55,13 +56,7 @@ bool FileManager::CreateFolder(const char* name) {
 
 //Return true of file exist and false if it doesn't
 bool FileManager::CheckFile(const char* dir) {
-	std::ifstream file;
-	file.open(dir);
-
-	if (file)
-		return true;
-	else
-		return false;
+	return std::filesystem::exists(dir);
 
 }
 
@@ -76,7 +71,6 @@ void FileManager::CreateFile(std::string name, std::string dir) {
 		d = name;
 	else
 		d = (dir + "//" + name);
-
 	std::ofstream file(d.c_str());
 	file.close();
 }

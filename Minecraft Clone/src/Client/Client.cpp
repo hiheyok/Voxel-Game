@@ -37,7 +37,6 @@ void Client::Initialize() {
 	EntityUpdater.SetEntityRenderer(&EntityRender, server.getTickClock());
 
 	EntityUpdater.Start();
-	
 
 	Logger.LogInfo("World", "Generating World");
 	TerrainRender.Start(getWindow(), &server);
@@ -98,7 +97,7 @@ void Client::Render() {
 	Framebuffer.unbindFBO();
 
 	Framebuffer.render();
-	
+
 	m_MainPlayer.RenderGUIs();
 	debugScreen.Render();
 }
