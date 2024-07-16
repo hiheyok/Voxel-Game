@@ -1,5 +1,5 @@
 #pragma once
-
+#include  "Mesh/ChunkMeshingV2.h"
 #include "Mesh/ChunkMeshing.h"
 #include "../Camera/camera.h"
 #include "Batch/ChunkBatch.h"
@@ -33,7 +33,7 @@ public:
 
 	void LoadAssets();
 
-	void AddChunk(Meshing::ChunkMeshData* MeshData);
+	void AddChunk(MeshingV2::ChunkMeshData* MeshData);
 
 	double getDebugTime();
 

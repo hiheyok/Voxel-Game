@@ -24,7 +24,6 @@ private:
 
 	void setDrawCalls() {
 		glEnable(GL_BLEND);
-	//	glDisable(GL_DEPTH_TEST);
 		glDepthMask(GL_TRUE);
 		glDisable(GL_CULL_FACE);
 	}
@@ -68,11 +67,16 @@ public:
 	}
 
 	void RenderBlock(Item item) {
-		BlockModel model = Blocks.getBlockType(item.Properties.block)->GetRenderModel();
+		BlockModel model{};
+		if (Blocks.getBlockType(item.GetBlock())->BlockModelData == NULL) {
+			return;
+		}
+
+		Blocks.getBlockType(item.GetBlock())->BlockModelData->getVertices(model.Vertices, model.Indices);
 
 		VBO.InsertData(model.Vertices.size() * sizeof(float), model.Vertices.data(), GL_STATIC_DRAW);
 		EBO.InsertData(model.Indices.size() * sizeof(float), model.Indices.data(), GL_STATIC_DRAW);
-
+		//std::cout << model.Vertices.size() << '\n';
 		camera.screenRes = glm::vec2(16.f, 16.f);
 
 		shader.use();

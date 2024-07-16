@@ -30,3 +30,11 @@ Item ItemList::GetItem(ItemID id) {
 ItemID ItemList::GetBlockItem(BlockID block) {
 	return BlockItemIDs[block];
 }
+
+void ItemList::REGISTER_ALL() {
+	for (BlockID b = 0; b < Blocks.BlockTypeData.size(); b++) {
+		if (BlockItemIDs.count(b)) continue;
+
+		RegisterBlockItem(b);
+	}
+}

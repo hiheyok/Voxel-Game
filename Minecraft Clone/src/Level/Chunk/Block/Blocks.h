@@ -180,7 +180,6 @@ public:
 	BlockID MUD = RegisterBlock("mud", new MaterialNone(), false, true, false);
 	BlockID CLAY = RegisterBlock("clay", new MaterialNone(), false, true, false);
 	BlockID GRAVEL = RegisterBlock("gravel", new MaterialNone(), false, true, false); //Change to falling block later
-	
 	BlockID RED_SAND = RegisterBlock("red_sand", new MaterialNone(), false, true, false); //Change to falling block later
 	BlockID ICE = RegisterBlock("ice", new MaterialNone(), true, true, false);
 	BlockID BLUE_ICE = RegisterBlock("blue_ice", new MaterialNone(), false, true, false);
@@ -190,7 +189,6 @@ public:
 	BlockID DIORITE = RegisterBlock("diorite", new MaterialNone(), false, true, false);
 	BlockID ANDESITE = RegisterBlock("andesite", new MaterialNone(), false, true, false);
 	BlockID CALCITE = RegisterBlock("calcite", new MaterialNone(), false, true, false);
-	
 	BlockID DRIPSTONE_BLOCK = RegisterBlock("dripstone_block", new MaterialNone(), false, true, false);
 	BlockID PRISMARINE = RegisterBlock("prismarine", new MaterialNone(), false, true, false);
 	BlockID MAGMA = RegisterBlock("magma_block", new MaterialNone(), false, true, false); //special properties
@@ -317,7 +315,6 @@ public:
 	BlockID CRIMSON_HYPHAE = RegisterBlock("crimson_hyphae", new MaterialNone(), false, true, false);
 	BlockID STRIPPED_CRIMSON_HYPHAE = RegisterBlock("stripped_crimson_hyphae", new MaterialNone(), false, true, false);
 	BlockID MOSSY_COBBLESTONE = RegisterBlock("mossy_cobblestone", new MaterialNone(), false, true, false);
-
 	BlockID DEEPSLATE = RegisterBlock("deepslate", new MaterialNone(), false, true, false);
 	BlockID COBBLED_DEEPSLATE = RegisterBlock("cobbled_deepslate", new MaterialNone(), false, true, false);
 	BlockID CHISELED_DEEPSLATE = RegisterBlock("chiseled_deepslate", new MaterialNone(), false, true, false);
@@ -353,12 +350,13 @@ public:
 	BlockID QUARTZ_PILLAR = RegisterBlock("quartz_pillar", new MaterialNone(), false, true, false);
 	BlockID SMOOTH_QUARTZ = RegisterBlock("smooth_quartz", new MaterialNone(), false, true, false);
 
+	BlockID ANVIL = RegisterBlock("anvil", new MaterialNone(), false, true, false);
+
 	void Initialize() {
 		BlockTextureArray.Gen();
 		BlockTextureArray.height = 16;
 		BlockTextureArray.width = 16;
 
-		InitializeTextureV2();
 		InitializeBlockModels();
 
 		BlockTextureArray.UploadToGPU();

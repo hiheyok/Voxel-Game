@@ -1,6 +1,7 @@
 #pragma once
 #include "PlayerPOV.h"
 #include "../../RenderEngine/ChunkRenderer/Mesh/ChunkMeshing.h"
+#include "../../RenderEngine/ChunkRenderer/Mesh/ChunkMeshingV2.h"
 #include <unordered_map>
 #include <concurrent_unordered_map.h>
 #include <concurrent_queue.h>
@@ -48,7 +49,7 @@ private:
 
 	std::deque<std::thread> Workers;
 	std::deque<std::deque<ChunkID>> WorkerTask;
-	std::deque<std::deque<Meshing::ChunkMeshData*>> WorkerOutput;
+	std::deque<std::deque<MeshingV2::ChunkMeshData*>> WorkerOutput;
 	std::deque<std::mutex> WorkerLocks;
 
 	std::thread Scheduler;

@@ -347,11 +347,14 @@ public:
 	Item QUARTZ_PILLAR = RegisterBlockItem(Blocks.QUARTZ_PILLAR);
 	Item SMOOTH_QUARTZ = RegisterBlockItem(Blocks.SMOOTH_QUARTZ);
 
+	Item ANVIL = RegisterBlockItem(Blocks.ANVIL);
 	Item GetItem(ItemID id);
 
 	ItemID GetBlockItem(BlockID block);
 
 	int GetTotalItemCount();
+
+	void REGISTER_ALL();
 };
 
 extern ItemList Items;

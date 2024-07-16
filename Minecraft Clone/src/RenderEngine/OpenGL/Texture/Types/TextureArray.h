@@ -4,6 +4,7 @@
 #include "../ImageLoader.h"
 #include <iostream>
 #include <fstream>
+#include <optional>
 class TextureArray : public Texture {
 public:
 	void UploadToGPU() {
@@ -56,7 +57,7 @@ public:
 		}
 	}
 
-	bool AddTextureToArray(RawTextureData* Data) {
+	bool _AddTextureToArray(RawTextureData* Data) {
 
 
 		Format = GL_RGBA;
@@ -101,14 +102,16 @@ public:
 
 		return true;
 	}
-	bool AddTextureToArray(std::string file) {
+	std::optional<RawTextureData> AddTextureToArray(std::string file) {
+		std::optional<RawTextureData> data;
 		RawTextureData tex = GetImageData(file.c_str());
-		if (AddTextureToArray(&tex)) {
+		if (_AddTextureToArray(&tex)) {
 			Logger.LogInfo("Image Loader", "Loaded: " + file + " | Size: " + std::to_string(tex.height) + ", " + std::to_string(tex.width));
-			return true;
+			data = tex;
+			return data;
 		}
 		Logger.LogError("Image Loader", "Unable to load: " + file);
-		return false;
+		return data;
 	}
 
 	int GetLayers() {

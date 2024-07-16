@@ -48,6 +48,7 @@ void TerrainRenderer::SetupCallTransparent() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
 	glDepthMask(GL_FALSE);
 	glDisable(GL_CULL_FACE);
 }
@@ -57,6 +58,9 @@ void TerrainRenderer::RenderSky() {
 }
 
 void TerrainRenderer::Render() {
+	
+	
+
 	SetupCallSolid();
 
 	for (ChunkDrawBatch& DrawBatch : ChunkSolidBatches) {
@@ -75,7 +79,9 @@ void TerrainRenderer::Render() {
 		DrawBatch.Unbind();
 	}
 
+	
 	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LESS);
 }
 
 void TerrainRenderer::Defrag(int iterations) {
@@ -169,9 +175,9 @@ void TerrainRenderer::AddChunk(ChunkID ID, std::vector<uint32_t> data, std::vect
 	}
 }
 
-void TerrainRenderer::AddChunk(Meshing::ChunkMeshData* MeshData) {
+void TerrainRenderer::AddChunk(MeshingV2::ChunkMeshData* MeshData) {
 	ChunkID ID = getChunkID(MeshData->Position);
-	AddChunk(ID, MeshData->SolidVertices, &ChunkSolidBatches, &ChunkBatchSolidLookup);
+	AddChunk(ID, MeshData->Vertices, &ChunkSolidBatches, &ChunkBatchSolidLookup);
 	AddChunk(ID, MeshData->TransparentVertices, &ChunkTransparentBatches, &ChunkBatchTransparentLookup);
 	delete MeshData;
 }

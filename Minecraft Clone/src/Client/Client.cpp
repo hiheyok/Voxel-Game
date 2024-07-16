@@ -18,8 +18,8 @@ void Client::Initialize() {
 	EntityRender.Initialize();
 	EntityRender.SetWindow(getWindow());
 	TextRender.InitializeTextRenderer(getWindow());
-
-	ItemAtlas.Initialize(196*16, 16*8);
+	Items.REGISTER_ALL();
+	ItemAtlas.Initialize(196*16  * 2, 16*4);
 	for (auto& item : Items.ItemContainer) {
 		ItemAtlas.AddItem(item.second);
 	}
@@ -31,12 +31,13 @@ void Client::Initialize() {
 	server.startInternalServer(&m_MainPlayer.m_Player);
 
 	m_MainPlayer.Initialize(getWindow(), &server);
-	m_MainPlayer.SetPlayerPosition(0., 80., 0.);
+	m_MainPlayer.SetPlayerPosition(0., 10, 0.);
 	m_MainPlayer.SetPlayerRotation(-135.f, -30.);
 
 	EntityUpdater.SetEntityRenderer(&EntityRender, server.getTickClock());
 
 	EntityUpdater.Start();
+	
 
 	Logger.LogInfo("World", "Generating World");
 	TerrainRender.Start(getWindow(), &server);

@@ -4,7 +4,7 @@
 
 using namespace std;
 using namespace glm;
-using namespace Meshing;
+using namespace MeshingV2;
 
 void WorldRender::SetRotation(dvec2 rotation) {
 	player.SetRotation(rotation);

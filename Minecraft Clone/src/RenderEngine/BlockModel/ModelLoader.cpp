@@ -66,6 +66,13 @@ void ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
 
 			if (!strcmp(faceElements.key().c_str(), "uv")) {
 				vector<int> arr = getJSONArrayValues(faceElements.value());
+
+				//flip
+				arr[1] = 16 - arr[1];
+				arr[3] = 16 - arr[3];
+
+				std::swap(arr[1], arr[3]);
+
 				for (int i = 0; i < 4; i++) {
 					bFace.UV[i] = arr[i];
 				}
@@ -74,7 +81,7 @@ void ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
 				bFace.ReferenceTexture = faceElements.value();
 			}
 			else if (!strcmp(faceElements.key().c_str(), "cullface")) {
-				bFace.CullFace = ConvertStringFaceToIndex(faceElements.value());
+				bFace.CullFace = ConvertStringFaceToIndex(faceElements.value()) - 1;
 			}
 			else if (!strcmp(faceElements.key().c_str(), "tintindex")) {
 				bFace.TintIndex = faceElements.value();
@@ -294,7 +301,8 @@ ModelV2::BlockModelV2* recursiveGetBlockModel(string jsonName) {
 
 ModelV2::BlockModelV2* getBlockModel(string blockNameIn) {
 	//This will recursively go into parents files and build on it
-
-	return recursiveGetBlockModel(blockNameIn);
+	ModelV2::BlockModelV2* model = recursiveGetBlockModel(blockNameIn);
+	//std::reverse(model->Elements.begin(), model->Elements.end());
+	return model;
 
 }

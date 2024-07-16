@@ -1,15 +1,16 @@
 #pragma once
+#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <string>
 #include <unordered_map>
 
-#define DOWN 0x01
-#define UP 0x02
-#define NORTH 0x03
-#define SOUTH 0x04
-#define WEST 0x05
-#define EAST 0x06
+#define EAST 0x01
+#define WEST 0x02
+#define UP 0x03
+#define DOWN 0x04
+#define SOUTH 0x05
+#define NORTH 0x06
 
 enum DisplayPosition {
 	thirdperson_righthand = 0,
@@ -28,6 +29,8 @@ struct BlockFace {
 	int CullFace = -1;
 	int TintIndex = -1;
 	unsigned int TextureID = NULL;
+	unsigned int TextureCount = NULL; //For amination purposes.
+	bool hasTransparency = false;
 	glm::ivec4 UV = glm::ivec4(0, 0, 16, 16);
 };
 
@@ -77,6 +80,97 @@ namespace ModelV2 {
 
 		void AddElement(Cuboid element) {
 			Elements.push_back(element);
+		}
+
+		void getVertices(std::vector<float>& Vertices, std::vector<unsigned int>& Indices){
+			for (Cuboid& element : Elements) {
+				glm::vec3 from = element.From;
+				glm::vec3 to = element.To;
+				from = from / 16.f;
+				to = to / 16.f;
+				for (int i = 0; i < 6;  i++) {
+					BlockFace face = element.Faces[i];
+					if (face.ReferenceTexture.length() == 0) continue;
+
+					glm::vec2 uv0{ face.UV.x,  face.UV.y };
+					glm::vec2 uv1{ face.UV.z,  face.UV.w };
+
+					uv0 = uv0 / 16.f;
+					uv1 = uv1 / 16.f;
+
+
+					switch (i  >>  1) {
+					case 0:
+						(i & 1) == 1 ?
+							Vertices.insert(Vertices.end(),
+								{
+									to.x, from.y, from.z,	uv1.x, uv0.y,	(float)face.TextureID,	8.f,
+									to.x, to.y, from.z,	uv1.x, uv1.y,	(float)face.TextureID,	8.f,
+									to.x, to.y, to.z,	uv0.x, uv1.y,	(float)face.TextureID,	8.f,
+									to.x, from.y, to.z,	uv0.x, uv0.y,	(float)face.TextureID,	8.f,
+								}
+								) :
+							Vertices.insert(Vertices.end(),
+								{
+									from.x, from.y, from.z,	uv1.x, uv0.y,	(float)face.TextureID,	8.f,
+									from.x, to.y, from.z,	uv1.x, uv1.y,	(float)face.TextureID,	8.f,
+									from.x, to.y, to.z,	uv0.x, uv1.y,	(float)face.TextureID,	8.f,
+									from.x, from.y, to.z,	uv0.x, uv0.y,	(float)face.TextureID,	8.f,
+								}
+						);
+					case 1:
+						(i & 1) == 1 ?
+							Vertices.insert(Vertices.end(),
+								{
+									from.x, to.y, from.z,	uv1.x, uv0.y,	(float)face.TextureID,	15.f,
+									to.x, to.y, from.z,	uv0.x, uv0.y,	(float)face.TextureID,	15.f,
+									to.x, to.y, to.z,	uv0.x, uv1.y,	(float)face.TextureID,	15.f,
+									from.x, to.y, to.z,	uv1.x, uv1.y,	(float)face.TextureID,	15.f,
+								}
+								) :
+							Vertices.insert(Vertices.end(),
+								{
+									from.x, from.y, from.z,	uv1.x, uv0.y,	(float)face.TextureID,	15.f,
+									to.x, from.y, from.z,	uv0.x, uv0.y,	(float)face.TextureID,	15.f,
+									to.x, from.y, to.z,	uv0.x, uv1.y,	(float)face.TextureID,	15.f,
+									from.x, from.y, to.z,	uv1.x, uv1.y,	(float)face.TextureID,	15.f,
+								}
+						);
+					case 2:
+						(i & 1) == 1 ?
+							Vertices.insert(Vertices.end(),
+								{
+									from.x, from.y, to.z,	uv1.x, uv0.y,	(float)face.TextureID,	12.f,
+									to.x, from.y, to.z,	uv0.x, uv0.y,	(float)face.TextureID,	12.f,
+									to.x, to.y, to.z,	uv0.x, uv1.y,	(float)face.TextureID,	12.f,
+									from.x, to.y, to.z,	uv1.x, uv1.y,	(float)face.TextureID,	12.f,
+								}
+								) :
+							Vertices.insert(Vertices.end(),
+								{
+									from.x, from.y, from.z,	uv1.x, uv0.y,	(float)face.TextureID,	12.f,
+									to.x, from.y, from.z,	uv0.x, uv0.y,	(float)face.TextureID,	12.f,
+									to.x, to.y, from.z,	uv0.x, uv1.y,	(float)face.TextureID,	12.f,
+									from.x, to.y, from.z,	uv1.x, uv1.y,	(float)face.TextureID,	12.f,
+								}
+						);
+
+					}
+
+					unsigned int currIndex = Vertices.size() / 7;
+
+					if ((i & 1) == 1) {
+						Indices.insert(Indices.end(),
+							{
+								0 + currIndex, 1 + currIndex, 2 + currIndex,
+								2 + currIndex, 3 + currIndex, 0 + currIndex
+							}
+						);
+					}
+
+
+				}
+			}
 		}
 
 		void flattenVariables();

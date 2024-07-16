@@ -117,8 +117,10 @@
       <FloatingPointModel>Precise</FloatingPointModel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <UseProcessorExtensions>HOST</UseProcessorExtensions>
+      <UseProcessorExtensions>None</UseProcessorExtensions>
       <AdditionalOptions>-mavx2 %(AdditionalOptions)</AdditionalOptions>
+      <ControlFlowGuard>Guard</ControlFlowGuard>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -174,6 +176,7 @@
     <ClCompile Include="src\Core\Registry\Registry.cpp" />
     <ClCompile Include="src\Core\Registry\ResourceLocation.cpp" />
     <ClCompile Include="src\FileManager\Files.cpp" />
+    <ClCompile Include="src\Level\Chunk\Heightmap\Heightmap.cpp" />
     <ClCompile Include="src\Level\Event\EventHandler.cpp" />
     <ClCompile Include="src\Level\Event\EventSystem.cpp" />
     <ClCompile Include="src\Level\Item\Inventory\Inventory.cpp" />
@@ -209,9 +212,12 @@
     <ClCompile Include="src\Level\World\WorldInteraction\WorldLoader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Math\Matrix.cpp" />
+    <ClCompile Include="src\RenderEngine\BlockModel\BlockModels.cpp" />
+    <ClCompile Include="src\RenderEngine\BlockModel\ModelLoader.cpp" />
     <ClCompile Include="src\RenderEngine\Camera\camera.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRenderer\Batch\ChunkBatch.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshing.cpp" />
+    <ClCompile Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshingV2.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRenderer\TerrainRenderer.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRenderer\EntityRenderCache.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRenderer\Models\EntityModels.cpp" />
@@ -246,7 +252,6 @@
     <ClCompile Include="src\Level\DataContainer\ChunkMapData.cpp" />
     <ClCompile Include="src\Level\Timer\Timer.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generator.cpp" />
-    <ClCompile Include="src\Level\TerrainGeneration\Generators\Debug\Debug.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Client\Client.h" />
@@ -262,6 +267,8 @@
     <ClInclude Include="src\Core\Registry\Registry.h" />
     <ClInclude Include="src\Core\Registry\ResourceLocation.h" />
     <ClInclude Include="src\FileManager\Files.h" />
+    <ClInclude Include="src\Level\Chunk\Heightmap\Heightmap.h" />
+    <ClInclude Include="src\Level\Chunk\TallChunk.h" />
     <ClInclude Include="src\Level\Dimension\Dimension.h" />
     <ClInclude Include="src\Level\Dimension\DimensionProperties.h" />
     <ClInclude Include="src\Level\Dimension\Dimensions\Overworld.h" />
@@ -272,16 +279,65 @@
     <ClInclude Include="src\Level\Server\Server.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\Biome.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeProperties.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeProvider.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\Biomes.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeBeach.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeDesert.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeEnd.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeForest.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeForestMutated.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeHell.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeHills.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeJungle.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeMesa.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeMushroomIsland.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeOcean.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomePlains.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeRiver.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeSavanna.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeSavannaMutated.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeSnow.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeStoneBeach.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeSwamp.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeTaiga.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeVoid.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Generators\Debug\Debug.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\CombineLayers.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayer.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerAddIsland.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerAddMushroomIsland.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerAddSnow.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerBiome.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerBiomeEdge.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerDeepOcean.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerEdge.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerFuzzyZoom.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerHills.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerIsland.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerRareBiome.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerRemoveTooMuchOcean.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerRiver.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerRiverInit.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerRiverMix.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerShore.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerSmooth.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerVoronoiZoom.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerZoom.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\IntCache.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\MapGen\MapGenBase.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\MapGen\MapGenCaves.h" />
     <ClInclude Include="src\Level\World\Collusion\WorldCollusion.h" />
     <ClInclude Include="src\Level\World\World.h" />
     <ClInclude Include="src\Level\World\WorldDataAccess.h" />
     <ClInclude Include="src\Level\World\WorldInteraction\WorldInteractions.h" />
     <ClInclude Include="src\Level\World\WorldInteraction\WorldLoader.h" />
     <ClInclude Include="src\Level\World\WorldParameters.h" />
+    <ClInclude Include="src\RenderEngine\BlockModel\ModelLoader.h" />
     <ClInclude Include="src\RenderEngine\BlockModel\RectangularModel.h" />
     <ClInclude Include="src\RenderEngine\BlockModel\BlockModels.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Batch\RenderCommandBuffer.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\MemoryPool\ChunkMemoryPool.h" />
+    <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshingV2.h" />
     <ClInclude Include="src\RenderEngine\EntityRenderer\EntityRenderUpdate.h" />
     <ClInclude Include="src\RenderEngine\GUI\GUI.h" />
     <ClInclude Include="src\RenderEngine\GUI\GUIObject.h" />
@@ -351,6 +407,7 @@
     <ClInclude Include="src\Level\Chunk\Block\Type\Grass.h" />
     <ClInclude Include="src\Level\Chunk\ChunkID.h" />
     <ClInclude Include="src\Utils\Math\Ray\Ray.h" />
+    <ClInclude Include="src\Utils\Containers\skaHashmap.h" />
     <ClInclude Include="src\Utils\stb_image.h" />
     <ClInclude Include="src\Level\Chunk\Block\Block.h" />
     <ClInclude Include="src\Level\Chunk\Block\Blocks.h" />

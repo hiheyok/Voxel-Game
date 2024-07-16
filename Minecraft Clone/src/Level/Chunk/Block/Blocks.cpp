@@ -4,7 +4,10 @@
 #include "../../../FileManager/Files.h"
 #include <fstream>
 #include "../../../RenderEngine/BlockModel/ModelLoader.h"
-
+#include "../../../Utils/Containers/skaHashmap.h"
+#include <iostream>
+#include <sys/types.h>
+#include <filesystem>
 using namespace std;
 
 using json = nlohmann::json;
@@ -181,7 +184,34 @@ void BlockList::InitializeTextureV2() {
 
 
 
-void BlockList::InitializeBlockModels() {
+void BlockList::InitializeBlockModels()  {
+	//add every single block  in the assets bc why not
+	try {
+		std::vector<std::string> allOtherBlocks{};
+		std::string path = "assets/models/block";
+		for (const auto& entry : std::filesystem::directory_iterator(path)) {
+			std::string name = entry.path().filename().string().substr(0, entry.path().filename().string().length() - 5);//epic one liner
+			if (BlockIDNameData.count(name)) {
+				continue;
+			}
+			allOtherBlocks.push_back(name);
+		}
+
+		for (string& name : allOtherBlocks) {
+			RegisterBlock(name, new MaterialNone(), false, true, false);
+		}
+
+	}
+	catch(std::filesystem::filesystem_error& e) {
+		Logger.LogError("File System", e.what());
+	}
+
+	
+
+	ska::flat_hash_map<std::string, int> TextureIDs;
+	ska::flat_hash_map<int, int> TextureRepeatCount;
+	ska::flat_hash_map<int, bool> TextureTransparency;
+
 	//It will first go through the block models and create the models without loading the texture
 	for (const auto& [Name, ID] : BlockIDNameData) {
 		ModelV2::BlockModelV2* model = getBlockModel(Name);
@@ -195,5 +225,44 @@ void BlockList::InitializeBlockModels() {
 		block->BlockModelData->flattenVariables();
 	}
 
+	//Generate all the textures now
+	for (auto& block  : BlockTypeData) {
+		if (block->BlockModelData == NULL) continue;
 
+		for (auto& element : block->BlockModelData->Elements) {
+			for (int i = 0; i < 6; i++) {
+				std::string path = element.Faces[i].ReferenceTexture;
+				if (path.length() == 0) continue;
+
+				//Check if it is loaded already
+				if (TextureIDs.count(path)) {
+					element.Faces[i].TextureID = TextureIDs[path];
+					element.Faces[i].TextureCount = TextureRepeatCount[element.Faces[i].TextureID];
+					element.Faces[i].hasTransparency = TextureTransparency[element.Faces[i].TextureID];
+					continue; //Exits
+				}
+
+				//Load texture
+				std::string TexFile = "assets/textures/block/" + path + ".png";
+
+				int NumLayersBefore = BlockTextureArray.GetLayers();
+
+				std::optional<RawTextureData> d = BlockTextureArray.AddTextureToArray(TexFile);
+
+				if (!d.has_value())
+					continue;
+
+
+				TextureIDs[path] = NumLayersBefore + 1;
+				TextureRepeatCount[NumLayersBefore + 1] = BlockTextureArray.GetLayers() - NumLayersBefore;
+				TextureTransparency[NumLayersBefore + 1] = d.value().format == GL_RGBA;
+
+				element.Faces[i].TextureID = TextureIDs[path];
+				element.Faces[i].TextureCount = TextureRepeatCount[element.Faces[i].TextureID];
+				element.Faces[i].hasTransparency = d.value().format == GL_RGBA;
+
+			}
+		}
+
+	}
 }

@@ -22,9 +22,8 @@ uniform mat4 view;
 uniform int TextureAimIndex;
 
 int xDataBitOffset = 0;
-int yDataBitOffset = 5;
-int zDataBitOffset = 10;
-int blockShadingBitOffset = 15;
+int yDataBitOffset = 9;
+int zDataBitOffset = 18;
 int textureBitOffset = 10;
 int NumTextureBitOffset = 22;
 
@@ -39,10 +38,10 @@ float tdataToFloat(int index, int size) {
 void main()
 {
     int NumTexture = int(tdataToFloat(NumTextureBitOffset, 12));
-    vec3 pos = vec3(dataToFloat(xDataBitOffset, 5),dataToFloat(yDataBitOffset, 5),dataToFloat(zDataBitOffset, 5));
-    texturePosition = tdataToFloat(textureBitOffset, 12) + (TextureAimIndex % NumTexture);
-    textureSize = vec2(tdataToFloat(0, 5),tdataToFloat(5, 5));
-    float light = dataToFloat(blockShadingBitOffset, 5);
+    vec3 pos = vec3(dataToFloat(xDataBitOffset, 9),dataToFloat(yDataBitOffset, 9),dataToFloat(zDataBitOffset, 9)) * 0.0625f;
+    texturePosition = tdataToFloat(textureBitOffset, 12);
+    textureSize = vec2(tdataToFloat(0, 5),tdataToFloat(5, 5))* 0.0625f;
+    float light = 15.f;
 
     vec3 VerticePos = vec3(pos.x + (ChunkPos[0 + (3 * gl_DrawIDARB)]* 16),pos.y + (ChunkPos[1 + (3 * gl_DrawIDARB)] * 16),pos.z + (ChunkPos[2 + (3 * gl_DrawIDARB)] * 16));
 

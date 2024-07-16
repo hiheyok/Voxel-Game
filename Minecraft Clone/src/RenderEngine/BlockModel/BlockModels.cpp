@@ -1,9 +1,11 @@
 #include "BlockModels.h"
 #include <unordered_set>
+#include "../../Utils/LogUtils.h"
 
 void ModelV2::BlockModelV2::flattenVariables() {
-	std::unordered_map<std::string, std::string> VariableMatcher = {};
-	std::unordered_set<std::string> variableNames;
+	std::unordered_map<std::string, std::string> VariableMatcher{};
+	std::unordered_set<std::string> variableNames{};
+	
 
 	//This will set all of the texture variables
 
@@ -18,15 +20,24 @@ void ModelV2::BlockModelV2::flattenVariables() {
 
 	//Then it will find the absolute value corresponding to those variables
 
+
 	for (const std::string& variable : variableNames) {
 		std::string TextureName = variable;
 		std::vector<std::string> variableCorrspondingToSameTexture = {};
 
+		std::unordered_set<std::string> variableVisitMap{};
+
+
+		int i = 0;
 		while (TextureName[0] == '#') {
 			if (VariableMatcher.count(TextureName)) { //top down memorization
 				TextureName = VariableMatcher[TextureName];
 				break;
 			}
+			if (i > 10000) { //too lazy to fix infinite loop  issues for now
+				break;
+			}
+			i++;
 			variableCorrspondingToSameTexture.push_back(TextureName);
 			TextureName = TextureVariable[TextureName.substr(1, TextureName.length() - 1)];
 		}

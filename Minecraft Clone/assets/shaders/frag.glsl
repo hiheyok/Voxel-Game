@@ -38,6 +38,9 @@ void main()
 
 	vec4 texture_ =  texture(BlockTexture, vec3(textureSize.x,textureSize.y, texturePosition - 1));
 
+	if (texture_.a == 0.0f)
+		discard;
+
 	vec4 color = (texture_ * vec4(lights,lights, lights,1.0f));
 	
 	if (depth < -0.1f) {
