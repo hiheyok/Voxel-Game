@@ -1,15 +1,14 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
-
+#include <iostream>
 #include "ModelLoader.h"
 #include "../../FileManager/Files.h"
 #include "../../Utils/LogUtils.h"
 
+const std::string DEFAULT_NAMESPACE = "minecraft";
+
 using json = nlohmann::json;
 using namespace std;
-
-
-const string path = "assets/models/block/";
 
 
 vector<int> getJSONArrayValues(json JsonData) {
@@ -78,13 +77,32 @@ void ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
 				}
 			}
 			else if (!strcmp(faceElements.key().c_str(), "texture")) {
-				bFace.ReferenceTexture = faceElements.value();
+				auto Tokens = Tokenize(faceElements.value(),  ':');
+
+				string TexName = Tokens.back();
+				string TexNamespace = DEFAULT_NAMESPACE;
+
+				if (Tokens.size() == 2) {
+					TexNamespace = Tokens.front();
+				}
+
+				bool isVariable = TexName[0] == '#';
+
+				if (isVariable) {
+					bFace.ReferenceTexture = TexName;
+				}
+				else {
+					bFace.ReferenceTexture = TexName + ":" + TexNamespace;
+				}
 			}
 			else if (!strcmp(faceElements.key().c_str(), "cullface")) {
 				bFace.CullFace = ConvertStringFaceToIndex(faceElements.value()) - 1;
 			}
 			else if (!strcmp(faceElements.key().c_str(), "tintindex")) {
 				bFace.TintIndex = faceElements.value();
+			}
+			else if (!strcmp(faceElements.key().c_str(), "rotation")) {
+				bFace.rotation = faceElements.value();
 			}
 			else {
 				Logger.LogError("Model Loader", "Unknown face attribute: " + faceElements.key());
@@ -160,9 +178,15 @@ void UpdateModelElements(ModelV2::BlockModelV2* model, json JsonData) {
 			else if (!strcmp(subElements.key().c_str(), "faces")) {
 				ProcessSingleCubeFaces(cuboid, subElements.value());
 			}
-			else if (!strcmp(subElements.key().c_str(), "rotation")) {
+			else if (!strcmp(subElements.key().c_str(), "rotation")) { 
 				CuboidRotationInfo rotation = getRotationalData(subElements.value());
 				cuboid.rotation = rotation;
+			}
+			else if (!strcmp(subElements.key().c_str(), "__comment")) {
+				cuboid.comments = subElements.value();
+			}
+			else if (!strcmp(subElements.key().c_str(), "shade")) {
+				cuboid.shade = static_cast<bool>(subElements.value());
 			}
 			else {
 				Logger.LogError("Model Loader", "Unknown element attribute: " + subElements.key());
@@ -175,10 +199,28 @@ void UpdateModelElements(ModelV2::BlockModelV2* model, json JsonData) {
 
 void ProcessCuboidTexture(ModelV2::BlockModelV2* model, json JsonData) {
 	for (auto& TextureElement : JsonData.items()) {
-		string TextureName = Tokenize(TextureElement.value(), '/').back();
+		auto Tokens = Tokenize(TextureElement.value(), ':');
+
+		string TextureName = Tokens.back();
+		string TextureNamespace = Tokens.front();
+		
+
+		if (Tokens.size() == 1) {
+			TextureNamespace = DEFAULT_NAMESPACE;
+		}
+
 		string TextureVariableName = TextureElement.key();
 
-		model->TextureVariable[TextureVariableName] = TextureName;
+		bool isVariable = TextureName[0] == '#';
+
+		if (isVariable) {
+			model->TextureVariable[TextureVariableName] = TextureName;
+		}
+		else {
+			model->TextureVariable[TextureVariableName] = TextureName + ":" + TextureNamespace;
+		}
+
+		
 	}
 }
 
@@ -237,6 +279,7 @@ void ProcessModelDisplay(ModelV2::BlockModelV2* model, json JsonData) {
 		}
 		else {
 			Logger.LogError("Model Loader", "Unknown display position: " + position);
+			return;
 		}
 
 		display.Initialized = true;
@@ -245,11 +288,11 @@ void ProcessModelDisplay(ModelV2::BlockModelV2* model, json JsonData) {
 	}
 }
 
-ModelV2::BlockModelV2* recursiveGetBlockModel(string jsonName) {
+ModelV2::BlockModelV2* recursiveGetBlockModel(string jsonName, string namespaceIn) {
 	ModelV2::BlockModelV2* model = nullptr;
 
-	string jsonPath = path + jsonName + ".json";
-
+	string jsonPath = "assets/" + namespaceIn + "/models/" + jsonName + ".json";
+	
 	json JSONData;
 
 	try {
@@ -260,6 +303,7 @@ ModelV2::BlockModelV2* recursiveGetBlockModel(string jsonName) {
 		JSONData = json::parse(file);
 	}
 	catch (exception& e) {
+		Logger.LogError("Model Loader", "Path doesn't exist: " + jsonPath);
 		return nullptr;
 	}
 
@@ -270,9 +314,16 @@ ModelV2::BlockModelV2* recursiveGetBlockModel(string jsonName) {
 
 			//Parse for the parent json
 
-			vector<string> Tokens = Tokenize(ParentData, '/'); //This assumes that the parent is always in the same folder
+			vector<string> Tokens = Tokenize(ParentData, ':'); //This assumes that the parent is always in the same folder
 			string ParentJSON = Tokens.back();
-			model = recursiveGetBlockModel(ParentJSON);
+			string ParentNamespace = Tokens.front();
+			
+			if (Tokens.size() == 1) { //default namespace is minecraft
+				ParentNamespace = DEFAULT_NAMESPACE;
+			}
+
+			model = recursiveGetBlockModel(ParentJSON, ParentNamespace);
+
 			break;
 		}
 	}
@@ -301,10 +352,9 @@ ModelV2::BlockModelV2* recursiveGetBlockModel(string jsonName) {
 	return model;
 }
 
-ModelV2::BlockModelV2* getBlockModel(string blockNameIn) {
+ModelV2::BlockModelV2* getBlockModel(string blockNameIn, string namespaceIn) {
 	//This will recursively go into parents files and build on it
-	ModelV2::BlockModelV2* model = recursiveGetBlockModel(blockNameIn);
-	//std::reverse(model->Elements.begin(), model->Elements.end());
+	ModelV2::BlockModelV2* model = recursiveGetBlockModel(blockNameIn, namespaceIn);
 	return model;
 
 }

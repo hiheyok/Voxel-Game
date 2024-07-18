@@ -24,7 +24,7 @@ void DebugScreen::Initialize(GLFWwindow* w) {
 
 	RenderableFont VersionFont;
 	VersionFont.FontSize(0.05f);
-	VersionFont.SetText(std::string("Version 1.2.1A"));
+	VersionFont.SetText(std::string("Version 1.3.0A"));
 	VersionFont.SetPosition(glm::vec2(-1.f, 0.95f));
 	VersionFont.AddBackground(clr, a);
 

@@ -20,7 +20,7 @@
 			}
 
 		],
-		"File": "assets/textures/block/sand.png"
+		"File": "assets/minecraft/textures/block/sand.png"
 	},
 	"human": {
 		"Hitbox": [ 0.8, 0.8, 0.8 ],
@@ -209,7 +209,7 @@
 				]
 			}
 		],
-		"File": "assets/textures/entity/player/wide/steve.png"
+		"File": "assets/minecraft/textures/entity/player/wide/steve.png"
 	},
 	"player": {
 		"Hitbox": [ 0.8, 0.8, 0.8 ],
@@ -398,7 +398,7 @@
 				]
 			}
 		],
-		"File": "assets/textures/entity/zombie/zombie.png"
+		"File": "assets/minecraft/textures/entity/zombie/zombie.png"
 	},
 	"zombie": {
 		"Hitbox": [ 0.8, 0.8, 0.8 ],
@@ -437,7 +437,7 @@
 				"Offset": [ 0.25, 0, 0 ],
 				"TextureUV": [
 					{
-						"Face": [ "FRONT", "BACK", "LEFT", "RIGHT"],
+						"Face": [ "FRONT", "BACK", "LEFT", "RIGHT" ],
 						"UV": [
 							[ 0.0625, 0.3125 ],
 							[ 0.125, 0.5 ]
@@ -587,7 +587,7 @@
 				]
 			}
 		],
-		"File": "assets/textures/entity/zombie/zombie.png"
+		"File": "assets/minecraft/textures/entity/zombie/zombie.png"
 	}
 
 }

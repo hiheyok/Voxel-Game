@@ -62,7 +62,7 @@ public:
 
 		//Load textures
 		RawTextureData RawTexture;
-		RawTexture.Load("assets/textures/font/ascii.png");
+		RawTexture.Load("assets/minecraft/textures/font/ascii.png");
 		FontTexture.Load(RawTexture);
 		FontShader.bindTexture2D(0, FontTexture.get(), "FontTexture");
 		window = w;

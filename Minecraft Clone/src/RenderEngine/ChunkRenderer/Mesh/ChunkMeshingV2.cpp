@@ -119,38 +119,47 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_X(BlockFace& face, uint8_t d
 
 	PP = AO[0], PN = AO[1], NP = AO[2], NN = AO[3];
 
+	glm::ivec2 TexNN = face.UVCoordNN;
+	glm::ivec2 TexPN = face.UVCoordNP;
+	glm::ivec2 TexPP = face.UVCoordPP;
+	glm::ivec2 TexNP = face.UVCoordPN;
+
+	TexNN.y = TexNN.y << 5;
+	TexNP.y = TexNP.y << 5;
+	TexPP.y = TexPP.y << 5;
+	TexPN.y = TexPN.y << 5;
 
 	switch (direction) {
 	case 1:
 		out->insert(out->end(), {
 		0u | P0[0] | P0[1] | P0[2] | Norm | tint
-		,0u | sx0 | sy0 | tex | (NN << blockShadingBitOffset)
+		,0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset)
 		,0u | P0[0] | P1[1] | P0[2] | Norm | tint
-		,0u | sx0 | sy | tex | (PN << blockShadingBitOffset)
+		,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
 		,0u | P0[0] | P0[1] | P1[2] | Norm | tint
-		,0u | sx | sy0 | tex | (NP << blockShadingBitOffset)
+		,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
 		,0u | P0[0] | P0[1] | P1[2] | Norm | tint
-		,0u | sx | sy0 | tex | (NP << blockShadingBitOffset)
+		,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
 		,0u | P0[0] | P1[1] | P0[2] | Norm | tint
-		,0u | sx0 | sy | tex | (PN << blockShadingBitOffset)
+		,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
 		,0u | P0[0] | P1[1] | P1[2] | Norm | tint
-		,0u | sx | sy | tex | (PP << blockShadingBitOffset) 
+		,0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset)
 			});
 		break;
 	case 0:
 		out->insert(out->end(), {
 		0u | P1[0] | P0[1] | P0[2]| Norm | tint
-		,0u | sx0 | sy0 | tex | (NN << blockShadingBitOffset)
+		,0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset)
 		,0u | P1[0] | P0[1] | P1[2] | Norm | tint
-		,0u | sx | sy0 | tex | (NP << blockShadingBitOffset)
+		,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
 		,0u | P1[0] | P1[1] | P0[2] | Norm | tint
-		,0u | sx0 | sy | tex | (PN << blockShadingBitOffset)
+		,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
 		,0u | P1[0] | P0[1] | P1[2]| Norm | tint
-		,0u | sx | sy0 | tex | (NP << blockShadingBitOffset)
+		,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
 		,0u | P1[0] | P1[1] | P1[2] | Norm | tint
-		,0u | sx | sy | tex | (PP << blockShadingBitOffset)
+		,0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset)
 		,0u | P1[0] | P1[1] | P0[2]| Norm | tint
-		,0u | sx0 | sy | tex | (PN << blockShadingBitOffset)
+		,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
 			});
 		break;
 	}
@@ -191,37 +200,47 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Y(BlockFace& face, uint8_t d
 
 	PP = AO[0], PN = AO[1], NP = AO[2], NN = AO[3];
 
+	glm::ivec2 TexNN = face.UVCoordNN;
+	glm::ivec2 TexNP = face.UVCoordNP;
+	glm::ivec2 TexPP = face.UVCoordPP;
+	glm::ivec2 TexPN = face.UVCoordPN;
+
+	TexNN.y = TexNN.y << 5;
+	TexNP.y = TexNP.y << 5;
+	TexPP.y = TexPP.y << 5;
+	TexPN.y = TexPN.y << 5;
+
 	switch (direction) {
 	case 1:
 		out->insert(out->end(), {
 			0u | P0[0] | P0[1] | P0[2] | Norm | tint //0
-			,0u | sx0 | sy0 | tex | (NN << blockShadingBitOffset)
+			,0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset)
 			,0u | P0[0] | P0[1] | P1[2] | Norm | tint//2
-			,0u | sx0 | sy | tex | (PN << blockShadingBitOffset)
+			,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
 			,0u | P1[0] | P0[1] | P0[2] | Norm | tint//1
-			,0u | sx | sy0 | tex | (NP << blockShadingBitOffset)
+			,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
 			,0u | P0[0] | P0[1] | P1[2] | Norm | tint//3
-			,0u | sx0 | sy | tex | (PN << blockShadingBitOffset)
+			,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
 			,0u | P1[0] | P0[1] | P1[2] | Norm | tint//5
-			,0u | sx | sy | tex | (PP << blockShadingBitOffset)
+			,0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset)
 			,0u | P1[0] | P0[1] | P0[2] | Norm | tint//4
-			,0u | sx | sy0 | tex | (NP << blockShadingBitOffset)
+			,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
 			});
 		break;
 	case 0:
 		out->insert(out->end(), {
 			0u | P0[0] | P1[1] | P0[2] | Norm | tint//0
-			,0u | sx0 | sy0 | tex | (NN << blockShadingBitOffset)
+			,0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset)
 			,0u | P1[0] | P1[1] | P0[2] | Norm | tint//1
-			,0u | sx | sy0 | tex | (NP << blockShadingBitOffset)
+			,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
 			,0u | P0[0] | P1[1] | P1[2] | Norm | tint//2
-			,0u | sx0 | sy | tex | (PN << blockShadingBitOffset)
+			,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
 			,0u | P0[0] | P1[1] | P1[2] | Norm | tint//3
-			,0u | sx0 | sy | tex | (PN << blockShadingBitOffset)
+			,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
 			,0u | P1[0] | P1[1] | P0[2] | Norm | tint//4
-			,0u | sx | sy0 | tex | (NP << blockShadingBitOffset)
+			,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
 			,0u | P1[0] | P1[1] | P1[2] | Norm | tint//5
-			,0u | sx | sy | tex | (PP << blockShadingBitOffset)
+			,0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset)
 			});
 		
 		break;
@@ -264,37 +283,47 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Z(BlockFace& face, uint8_t d
 
 	PP = AO[0], PN = AO[1], NP = AO[2], NN = AO[3];
 
+	glm::ivec2 TexNN = face.UVCoordNN;
+	glm::ivec2 TexNP = face.UVCoordNP;
+	glm::ivec2 TexPP = face.UVCoordPP;
+	glm::ivec2 TexPN = face.UVCoordPN;
+
+	TexNN.y = TexNN.y << 5;
+	TexNP.y = TexNP.y << 5;
+	TexPP.y = TexPP.y << 5;
+	TexPN.y = TexPN.y << 5;
+
 	switch (direction) {
 	case 1:
 		out->insert(out->end(), {
 			0u | P0[0] | P0[1] | P0[2] | Norm | tint //0
-			,0u | sx0 | sy0 | tex | (NN << blockShadingBitOffset)
+			,0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset)
 			,0u | P1[0] | P0[1] | P0[2] | Norm | tint //1
-			,0u | sx | sy0 | tex | (PN << blockShadingBitOffset)
+			,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
 			,0u | P0[0] | P1[1] | P0[2] | Norm | tint //2
-			,0u | sx0 | sy | tex | (NP << blockShadingBitOffset)
+			,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
 			,0u | P0[0] | P1[1] | P0[2] | Norm | tint//3
-			,0u | sx0 | sy | tex | (NP << blockShadingBitOffset)
+			,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
 			,0u | P1[0] | P0[1] | P0[2] | Norm | tint//4
-			,0u | sx | sy0 | tex | (PN << blockShadingBitOffset)
+			,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
 			,0u | P1[0] | P1[1] | P0[2] | Norm | tint//5
-			,0u | sx | sy | tex | (PP << blockShadingBitOffset)
+			,0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset)
 			});
 		break;
 	case 0:
 		out->insert(out->end(), {
 			0u | P0[0] | P0[1] | P1[2] | Norm | tint//0
-			,0u | sx0 | sy0 | tex | (NN << blockShadingBitOffset)
+			,0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset)
 			,0u | P0[0] | P1[1] | P1[2] | Norm | tint//2
-			,0u | sx0 | sy | tex | (NP << blockShadingBitOffset)
+			,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
 			,0u | P1[0] | P0[1] | P1[2] | Norm | tint//1
-			,0u | sx | sy0 | tex | (PN << blockShadingBitOffset)
+			,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
 			,0u | P0[0] | P1[1] | P1[2] | Norm | tint//3
-			,0u | sx0 | sy | tex | (NP << blockShadingBitOffset)
+			,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
 			,0u | P1[0] | P1[1] | P1[2] | Norm | tint //5
-			,0u | sx | sy | tex | (PP << blockShadingBitOffset)
+			,0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset)
 			,0u | P1[0] | P0[1] | P1[2] | Norm | tint//4
-			,0u | sx | sy0 | tex | (PN << blockShadingBitOffset)
+			,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
 			});
 		break;
 	}
@@ -403,19 +432,20 @@ inline bool MeshingV2::ChunkMeshData::IsFaceVisible(Cuboid& cube, int x, int y, 
 	//IsFaceVisibleCalls++;
 
 	uint8_t axis = (side >> 1); //Get side
-	uint8_t opposideSide = axis * 2 + static_cast<uint8_t>(!(side  & 0b1));
+	uint8_t oppositeSide = axis * 2 + static_cast<uint8_t>(!(side  & 0b1));
 
 	int p[3]{ x,y,z };
 
 	p[axis] += 1 - 2 * (side & 0b1);
 
 	ModelV2::BlockModelV2* model = Blocks.getBlockType(chunk->GetBlock(p[0], p[1], p[2]))->BlockModelData;
-	ModelV2::BlockModelV2* modelOrigin = Blocks.getBlockType(chunk->GetBlock(x, y, z))->BlockModelData;
 
-	for (Cuboid& element : model->Elements) {
-		if (element.Faces[opposideSide].ReferenceTexture.length() == 0) continue;
+	if (model == NULL) return true;
 
-		if (element.Faces[opposideSide].CullFace == -1)
+	for (const Cuboid& element : model->Elements) {
+		if (element.Faces[oppositeSide].ReferenceTexture.empty()) continue;
+
+		if (element.Faces[oppositeSide].CullFace == -1)
 			continue;
 
 		if (side & 1) //if the  block arent touching

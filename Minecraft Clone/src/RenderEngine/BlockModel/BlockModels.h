@@ -30,8 +30,14 @@ struct BlockFace {
 	int TintIndex = -1;
 	unsigned int TextureID = NULL;
 	unsigned int TextureCount = NULL; //For amination purposes.
+	unsigned int rotation = 0;
 	bool hasTransparency = false;
 	glm::ivec4 UV = glm::ivec4(0, 0, 16, 16);
+
+	glm::ivec2 UVCoordNN{ 0, 0 };
+	glm::ivec2 UVCoordNP{ 0, 0 };
+	glm::ivec2 UVCoordPP{ 0, 0 };
+	glm::ivec2 UVCoordPN{ 0, 0 };
 };
 
 struct BlockDisplay { //Positions {thirdperson_righthand, thirdperson_lefthand, firstperson_righthand, firstperson_lefthand, gui, head, ground, or fixed}
@@ -57,6 +63,8 @@ public:
 	glm::ivec3 To = glm::ivec3(16, 16, 16); //Relative inner block position from -16 to 32
 	BlockFace Faces[6]{};
 	CuboidRotationInfo rotation;
+	std::string comments = "";
+	bool shade = true;
 
 	void EditFace(int location, BlockFace f) {
 		Faces[location - 1] = f;
@@ -66,7 +74,7 @@ public:
 namespace ModelV2 {
 	struct BlockModelV2 {
 		bool AmbientOcclusion = true; //default value
-		std::vector<Cuboid> Elements = {};
+		std::vector<Cuboid> Elements{};
 		std::unordered_map <std::string, std::string > TextureVariable;
 		BlockDisplay Display[8]{};
 
@@ -175,6 +183,8 @@ namespace ModelV2 {
 		}
 
 		void flattenVariables();
+
+		void bakeTextureRotation();
 	};
 }
 

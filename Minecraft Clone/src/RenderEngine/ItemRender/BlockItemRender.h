@@ -63,7 +63,7 @@ public:
 		shader.setMat4("projection", orthoProj);
 
 
-		shader.bindTextureArray2D(0, Blocks.BlockTextureArray.get(), "BlockTexture");
+		shader.bindTexture2D(0, Blocks.BlockTextureAtlas.get(), "BlockTexture");
 	}
 
 	void RenderBlock(Item item) {
@@ -82,6 +82,7 @@ public:
 		camera.screenRes = glm::vec2(16.f, 16.f);
 
 		shader.use();
+		shader.bindTexture2D(0, Blocks.BlockTextureAtlas.get(), "BlockTexture");
 		setDrawCalls();
 		VAO.Bind();
 		EBO.Bind();

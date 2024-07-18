@@ -36,13 +36,13 @@ public:
 		TextureAtlasData[w * colorSpace + h * colorSpace + 3] = a;
 	}
 
-	void AddData(std::vector<uint8_t> Data, int Format) { //assumes that all textures  are 16 x 16
+	void AddData(std::vector<uint8_t> Data, int Format, bool& transparency) { //assumes that all textures  are 16 x 16
 		//Get offset to where to put the texture
 		int WidthTex = width / 16;
 		int heightTex = height / 16;
 
-		int WidthIndex = Layers % WidthTex;
-		int HeightIndex = Layers / WidthTex;
+		int WidthIndex = Count % WidthTex;
+		int HeightIndex = Count / WidthTex;
 
 		int WidthIndexPixel = WidthIndex * 16; //Offset for the width
 		int HeightIndexPixel = width * HeightIndex * 16; //Offset for the height
@@ -51,33 +51,39 @@ public:
 			for (int index = 0; index < 16 * 16; index++) {
 				setPixel(Data[(index * 3)], Data[(index * 3) + 1], Data[(index * 3) + 2], 255, WidthIndexPixel + (index % 16), HeightIndexPixel + width * (index /  16));
 			}
-			Layers++;
+			Count++;
 		}
 		else  if (Format == GL_RG) {
 			for (int index = 0; index < 16 * 16; index++) {
+				if (Data[(index * 2) + 1] != 255) {
+					transparency = true;
+				}
+
 				setPixel(Data[(index * 2)], Data[(index * 2)], Data[(index * 2)], Data[(index * 2) + 1], WidthIndexPixel + (index % 16), HeightIndexPixel + width * (index / 16));
 			}
-			Layers++;
+			Count++;
 		}
 		else  if (Format == GL_RGBA) {
 			for (int index = 0; index < 16 * 16; index++) {
+				if (Data[(index * 4) + 3] != 255) {
+					transparency = true;
+				}
 				setPixel(Data[(index * 4)], Data[(index * 4) + 1], Data[(index * 4) + 2], Data[(index * 4) + 3], WidthIndexPixel + (index % 16), HeightIndexPixel + width * (index / 16));
 			}
-			Layers++;
+			Count++;
 		}
 		else if (Format == GL_RED) {
 			for (int index = 0; index < 16 * 16; index++) {
 				setPixel(Data[index], Data[index], Data[index], 255, WidthIndexPixel + (index % 16), HeightIndexPixel + width * (index / 16));
 			}
-			Layers++;
+			Count++;
 		}
 		else {
 			Logger.LogError("Texture Atlas Stitcher", "Invalid image format!");
-			throw std::exception("Invalid image format");
 		}
 	}
 
-	bool _AddTextureToAtlas(RawTextureData* Data) {
+	bool _AddTextureToAtlas(RawTextureData* Data, bool& transparency) {
 
 		Format = GL_RGBA;
 		if (!Data->data) {
@@ -118,17 +124,17 @@ public:
 					memcpy(buffer.data() + (h * CWidth), Data->data + (h * Data->width * ColorSize + gx + gy), CWidth);
 				}
 
-				AddData(buffer, Data->format);
+				AddData(buffer, Data->format, transparency);
 			}
 		}
 
 		return true;
 	}
 
-	std::optional<RawTextureData> AddTextureToAtlas(std::string file, glm::vec4& uv) {
+	std::optional<RawTextureData> AddTextureToAtlas(std::string file, bool& transparency) {
 		std::optional<RawTextureData> data;
 		RawTextureData tex = GetImageData(file.c_str());
-		if (_AddTextureToAtlas(&tex)) {
+		if (_AddTextureToAtlas(&tex, transparency)) {
 			Logger.LogInfo("Texture Atlas", "Loaded: " + file + " | Size: " + std::to_string(tex.height) + ", " + std::to_string(tex.width));
 			data = tex;
 			return data;
@@ -137,12 +143,13 @@ public:
 		return data;
 	}
 
-	int GetLayers() {
-		return Layers;
+	int GetBlockCount() {
+		return Count;
 	}
 
 	std::vector<unsigned char> TextureAtlasData;
 	const int colorSpace = 4;
-	int Layers = 0;
+	bool isTransparent = false;
+	int Count = 0;
 
 };
