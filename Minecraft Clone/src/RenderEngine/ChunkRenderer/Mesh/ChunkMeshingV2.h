@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <glm/vec2.hpp>
+#include  <glm/vec4.hpp>
 #include "../../../Level/Chunk/Chunk.h"
 
 namespace MeshingV2 {
@@ -96,8 +97,9 @@ namespace MeshingV2 {
 
 		}
 
-		ChunkMeshData(Chunk* chunk) {
-			GenerateMesh(chunk);
+		ChunkMeshData(Chunk* chunkIn) {
+			chunk = chunkIn;
+			GenerateMesh();
 		}
 
 		//Mesh Vertices
@@ -108,9 +110,9 @@ namespace MeshingV2 {
 		glm::ivec3 Position = glm::ivec3(0, 0, 0);
 
 		//Generate the Mesh
-		void GenerateMesh(Chunk* chunk);
+		void GenerateMesh();
 
-		void AddBlock(Chunk* chunk, int x, int y, int z);
+		void AddBlock(int x, int y, int z);
 
 		//Allows you to edit the chunk without remeshing the entire chunk
 		void EditBlock(Block block, int x, int y, int z);
@@ -128,18 +130,18 @@ namespace MeshingV2 {
 
 	private:
 		//Generates all the faces and puts them in the cache
-		void GenerateFaceCollection(Chunk* chunk);
+		void GenerateFaceCollection();
 
 		//Check if the player can see the mesh
-		inline bool IsFaceVisible(Chunk* chunk, int x, int y, int z, uint8_t side);
-		inline bool IsFaceVisibleUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side);
+		inline bool IsFaceVisible(Cuboid& cube, int x, int y, int z, uint8_t side);
+		inline bool IsFaceVisibleUnsafe(Cuboid& cube, int x, int y, int z, uint8_t side);
 
 		//Gets block texture 
-		inline int GetTexture(Chunk* chunk, int x, int y, int z, uint8_t side);
-		inline int GetTextureUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side);
+		inline int GetTexture(int x, int y, int z, uint8_t side);
+		inline int GetTextureUnsafe(int x, int y, int z, uint8_t side);
 
-		inline bool CompareBlockSide(Chunk* chunk, int x, int y, int z, uint8_t side, BlockID b);
-		inline bool CompareBlockSideUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side, BlockID b);
+		inline bool CompareBlockSide(int x, int y, int z, uint8_t side, BlockID b);
+		inline bool CompareBlockSideUnsafe(int x, int y, int z, uint8_t side, BlockID b);
 
 		//Face data
 		Quad* FaceCollectionCache;
@@ -149,16 +151,20 @@ namespace MeshingV2 {
 
 
 		//Add faces to the mesh
-		inline void AddFacetoMesh(BlockFace& face, uint8_t axis, glm::ivec3 From, glm::ivec3 To, int x, int y, int z);
+		inline void AddFacetoMesh(BlockFace& face, uint8_t axis, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z);
 
-		inline void AddFacetoMesh_X(BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, int x, int y, int z);
-		inline void AddFacetoMesh_Y(BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, int x, int y, int z);
-		inline void AddFacetoMesh_Z(BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, int x, int y, int z);
+		inline void AddFacetoMesh_X(BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z);
+		inline void AddFacetoMesh_Y(BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z);
+		inline void AddFacetoMesh_Z(BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z);
+
+		inline glm::ivec4 getAO(uint8_t direction, int x,  int y, int z);
 
 		//To check if a block had been used in the Greedy Meshing Algorithm
 		Quad NullQuad;
 
 		CompactBooleanData booleanMap;
+
+		Chunk* chunk;
 
 	};
 }

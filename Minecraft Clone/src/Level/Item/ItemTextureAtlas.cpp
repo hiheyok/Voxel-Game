@@ -26,10 +26,10 @@ void ItemTextureAtlas::StitchTexture(int index, int ItemID) {
 
 	//Insert Data
 	float vertices[] = {
-		xCoord - 0.f	,yCoord - 0.f,	0.f, 0.f,
-		xCoord - Size	,yCoord - 0.f,	1.f, 0.f,
-		xCoord - Size	,yCoord - Size,	1.f, 1.f,
-		xCoord - 0.f	,yCoord - Size,	0.f, 1.f,
+		xCoord - 0.f	,yCoord - 0.f,	0.f, 1.f,
+		xCoord - Size	,yCoord - 0.f,	1.f, 1.f,
+		xCoord - Size	,yCoord - Size,	1.f, 0.f,
+		xCoord - 0.f	,yCoord - Size,	0.f, 0.f,
 	};
 
 	uint32_t indices[] = {

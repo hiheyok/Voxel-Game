@@ -247,7 +247,10 @@ void BlockList::InitializeBlockModels()  {
 
 				int NumLayersBefore = BlockTextureArray.GetLayers();
 
+				glm::vec4 uv{};
+
 				std::optional<RawTextureData> d = BlockTextureArray.AddTextureToArray(TexFile);
+				BlockTextureAtlas.AddTextureToAtlas(TexFile, uv);
 
 				if (!d.has_value())
 					continue;

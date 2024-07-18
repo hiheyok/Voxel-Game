@@ -7,19 +7,23 @@
 using namespace std;
 using namespace glm;
 
-const int BitShiftAmount = 9;
-const int blockShadingBitOffset = 15;
-const int textureBitOffset = 10;
-const int NumTextureBitOffset = 22;
+constexpr int POSITION_OFFSET = 16;
 
-void MeshingV2::ChunkMeshData::GenerateMesh(Chunk* chunk) {
+constexpr int BitShiftAmount = 9; //27 bits
+constexpr int NormBitOffset = 27; //2 bits
+constexpr int tintBitOffset = 29; // 1 bit
+
+constexpr int textureBitOffset = 10; // 18 bits
+constexpr int blockShadingBitOffset = 28; // 4 bits
+
+void MeshingV2::ChunkMeshData::GenerateMesh() {
 	//Initialize
 	if (chunk == nullptr) {
 		return;
 	}
 	Position = chunk->Position;
 	chunk->Use();
-	GenerateFaceCollection(chunk);
+	GenerateFaceCollection();
 	chunk->Unuse();
 
 }
@@ -28,17 +32,17 @@ void MeshingV2::ChunkMeshData::GenerateMesh(Chunk* chunk) {
 
 //Loops through all the blocks in the chunk and check if each block side is visible. If a block side is visible, it generates the quad and puts it in the cache
 
-void MeshingV2::ChunkMeshData::GenerateFaceCollection(Chunk* chunk) {
+void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 	for (int x = 0; x < 16; x++) {
 		for (int y = 0; y < 16; y++) {
 			for (int z = 0; z < 16; z++) {
-				AddBlock(chunk, x, y, z);
+				AddBlock(x, y, z);
 			}
 		}
 	}
 }
 
-void MeshingV2::ChunkMeshData::AddBlock(Chunk* chunk,int x, int y, int z) {
+void MeshingV2::ChunkMeshData::AddBlock(int x, int y, int z) {
 	BlockID b = chunk->GetBlockUnsafe(x, y, z);
 	if (b == Blocks.AIR) return;
 	Block* block = Blocks.getBlockType(b);
@@ -52,42 +56,42 @@ void MeshingV2::ChunkMeshData::AddBlock(Chunk* chunk,int x, int y, int z) {
 
 			if (element.Faces[direction].CullFace != -1) {
 
-				if (!IsFaceVisible(chunk, x, y, z, element.Faces[direction].CullFace))
+				if (!IsFaceVisible(element, x, y, z, element.Faces[direction].CullFace))
 					continue;
 			}
 
-			AddFacetoMesh(element.Faces[direction], direction, element.From, element.To, x, y, z);
+			AddFacetoMesh(element.Faces[direction], direction, element.From, element.To, model->AmbientOcclusion, x, y, z);
 		}
 	}
 	
 }
 
 
-inline void MeshingV2::ChunkMeshData::AddFacetoMesh(BlockFace& face, uint8_t axis, glm::ivec3 From, glm::ivec3 To, int x, int y, int z) {
+inline void MeshingV2::ChunkMeshData::AddFacetoMesh(BlockFace& face, uint8_t axis, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z) {
 
 	switch (axis >> 1) {
 	case 0:
-		AddFacetoMesh_X(face, axis & 0b1, From, To, x, y, z);
+		AddFacetoMesh_X(face, axis & 0b1, From, To, allowAO, x, y, z);
 		return;
 	case 1:
-		AddFacetoMesh_Y(face, axis & 0b1, From, To, x, y, z);
+		AddFacetoMesh_Y(face, axis & 0b1, From, To, allowAO, x, y, z);
 		return;
 	case 2:
-		AddFacetoMesh_Z(face, axis & 0b1, From, To, x, y, z);
+		AddFacetoMesh_Z(face, axis & 0b1, From, To, allowAO, x, y, z);
 		return;
 	}
 }
 
-inline void MeshingV2::ChunkMeshData::AddFacetoMesh_X(BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, int x, int y, int z) {
+inline void MeshingV2::ChunkMeshData::AddFacetoMesh_X(BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z) {
 	x *= 16;
 	y *= 16;
 	z *= 16;
 
-	glm::ivec3 P0{ x + From[0], y + From[1], z + From[2] };
-	glm::ivec3 P1{ x + To[0], y + To[1], z + To[2] };
+	glm::ivec3 P0{ x + From[0] + POSITION_OFFSET, y + From[1] + POSITION_OFFSET, z + From[2] + POSITION_OFFSET };
+	glm::ivec3 P1{ x + To[0] + POSITION_OFFSET, y + To[1] + POSITION_OFFSET, z + To[2] + POSITION_OFFSET };
 
 
-	char NN = 0, PN = 0, PP = 0, NP = 0;
+	char NN = 15, PN = 15, PP = 15, NP = 15;
 
 	//Bitshift for compression purposes
 	for (int i = 0; i < 3; i++) {
@@ -101,54 +105,66 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_X(BlockFace& face, uint8_t d
 	uint32_t sy = face.UV.w << 5;
 
 	uint32_t tex = face.TextureID << 10;
-	uint32_t NumTex = 0;
+	uint32_t Norm = 0 << NormBitOffset;
+	uint32_t tint = (static_cast<uint32_t>(!!face.TintIndex)) << tintBitOffset;
 
 	vector<uint32_t>* out = face.hasTransparency ? &TransparentVertices : &Vertices;
+
+	//Get AO
+	glm::ivec4 AO{ 15, 15, 15, 15 };
+
+	if (allowAO) {
+		AO = getAO(direction, x / 16, y / 16, z / 16);
+	}
+
+	PP = AO[0], PN = AO[1], NP = AO[2], NN = AO[3];
+
 
 	switch (direction) {
 	case 1:
 		out->insert(out->end(), {
-		0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset)
-		,0u | sx0 | sy0 | tex | NumTex
-		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
-		,0u | sx0 | sy | tex | NumTex
-		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
-		,0u | sx | sy0 | tex | NumTex
-		,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
-		,0u | sx | sy0 | tex | NumTex
-		,0u | P0[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
-		,0u | sx0 | sy | tex | NumTex
-		,0u | P0[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset)
-		,0u | sx | sy | tex | NumTex });
+		0u | P0[0] | P0[1] | P0[2] | Norm | tint
+		,0u | sx0 | sy0 | tex | (NN << blockShadingBitOffset)
+		,0u | P0[0] | P1[1] | P0[2] | Norm | tint
+		,0u | sx0 | sy | tex | (PN << blockShadingBitOffset)
+		,0u | P0[0] | P0[1] | P1[2] | Norm | tint
+		,0u | sx | sy0 | tex | (NP << blockShadingBitOffset)
+		,0u | P0[0] | P0[1] | P1[2] | Norm | tint
+		,0u | sx | sy0 | tex | (NP << blockShadingBitOffset)
+		,0u | P0[0] | P1[1] | P0[2] | Norm | tint
+		,0u | sx0 | sy | tex | (PN << blockShadingBitOffset)
+		,0u | P0[0] | P1[1] | P1[2] | Norm | tint
+		,0u | sx | sy | tex | (PP << blockShadingBitOffset) 
+			});
 		break;
 	case 0:
 		out->insert(out->end(), {
-		0u | P1[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset)
-		,0u | sx0 | sy0 | tex | NumTex
-		,0u | P1[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
-		,0u | sx | sy0 | tex | NumTex
-		,0u | P1[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
-		,0u | sx0 | sy | tex | NumTex
-		,0u | P1[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset)
-		,0u | sx | sy0 | tex | NumTex
-		,0u | P1[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset)
-		,0u | sx | sy | tex | NumTex
-		,0u | P1[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset)
-		,0u | sx0 | sy | tex | NumTex
+		0u | P1[0] | P0[1] | P0[2]| Norm | tint
+		,0u | sx0 | sy0 | tex | (NN << blockShadingBitOffset)
+		,0u | P1[0] | P0[1] | P1[2] | Norm | tint
+		,0u | sx | sy0 | tex | (NP << blockShadingBitOffset)
+		,0u | P1[0] | P1[1] | P0[2] | Norm | tint
+		,0u | sx0 | sy | tex | (PN << blockShadingBitOffset)
+		,0u | P1[0] | P0[1] | P1[2]| Norm | tint
+		,0u | sx | sy0 | tex | (NP << blockShadingBitOffset)
+		,0u | P1[0] | P1[1] | P1[2] | Norm | tint
+		,0u | sx | sy | tex | (PP << blockShadingBitOffset)
+		,0u | P1[0] | P1[1] | P0[2]| Norm | tint
+		,0u | sx0 | sy | tex | (PN << blockShadingBitOffset)
 			});
 		break;
 	}
 }
 
-inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Y(BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, int x, int y, int z) {
+inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Y(BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z) {
 	x *= 16;
 	y *= 16;
 	z *= 16;
 
-	glm::ivec3 P0{ x + From[0], y + From[1], z + From[2] };
-	glm::ivec3 P1{ x + To[0], y + To[1], z + To[2] };
+	glm::ivec3 P0{ x + From[0] + POSITION_OFFSET, y + From[1] + POSITION_OFFSET, z + From[2] + POSITION_OFFSET };
+	glm::ivec3 P1{ x + To[0] + POSITION_OFFSET, y + To[1] + POSITION_OFFSET, z + To[2] + POSITION_OFFSET };
 
-	char NN = 0, PN = 0, PP = 0, NP = 0;
+	char NN = 15, PN = 15, PP = 15, NP = 15;
 
 	//Bitshift for compression purposes
 	for (int i = 0; i < 3; i++) {
@@ -162,57 +178,65 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Y(BlockFace& face, uint8_t d
 	uint32_t sy = face.UV.w << 5;
 
 	uint32_t tex = face.TextureID << 10;
-	uint32_t NumTex = 0;
+	uint32_t Norm = 1 << NormBitOffset;
+	uint32_t tint = (static_cast<uint32_t>(!!face.TintIndex)) << tintBitOffset;
 
 	vector<uint32_t>* out = face.hasTransparency ? &TransparentVertices : &Vertices;
+	//Get AO
+	glm::ivec4 AO{ 15, 15, 15, 15 };
+
+	if (allowAO) {
+		AO = getAO(2 + direction, x / 16, y / 16, z / 16);
+	}
+
+	PP = AO[0], PN = AO[1], NP = AO[2], NN = AO[3];
 
 	switch (direction) {
 	case 1:
 		out->insert(out->end(), {
-			0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset) //0
-			,0u | sx0 | sy0 | tex | NumTex
-			,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset) //2
-			,0u | sx0 | sy | tex | NumTex
-			,0u | P1[0] | P0[1] | P0[2] | (PN << blockShadingBitOffset) //1
-			,0u | sx | sy0 | tex | NumTex
-			,0u | P0[0] | P0[1] | P1[2] | (NP << blockShadingBitOffset) //3
-			,0u | sx0 | sy | tex | NumTex
-			,0u | P1[0] | P0[1] | P1[2] | (PP << blockShadingBitOffset) //5
-			,0u | sx | sy | tex | NumTex
-			,0u | P1[0] | P0[1] | P0[2] | (PN << blockShadingBitOffset) //4
-			,0u | sx | sy0 | tex | NumTex
+			0u | P0[0] | P0[1] | P0[2] | Norm | tint //0
+			,0u | sx0 | sy0 | tex | (NN << blockShadingBitOffset)
+			,0u | P0[0] | P0[1] | P1[2] | Norm | tint//2
+			,0u | sx0 | sy | tex | (PN << blockShadingBitOffset)
+			,0u | P1[0] | P0[1] | P0[2] | Norm | tint//1
+			,0u | sx | sy0 | tex | (NP << blockShadingBitOffset)
+			,0u | P0[0] | P0[1] | P1[2] | Norm | tint//3
+			,0u | sx0 | sy | tex | (PN << blockShadingBitOffset)
+			,0u | P1[0] | P0[1] | P1[2] | Norm | tint//5
+			,0u | sx | sy | tex | (PP << blockShadingBitOffset)
+			,0u | P1[0] | P0[1] | P0[2] | Norm | tint//4
+			,0u | sx | sy0 | tex | (NP << blockShadingBitOffset)
 			});
 		break;
 	case 0:
 		out->insert(out->end(), {
-			0u | P0[0] | P1[1] | P0[2] | (NN << blockShadingBitOffset) //0
-			,0u | sx0 | sy0 | tex | NumTex
-			,0u | P1[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset) //1
-			,0u | sx | sy0 | tex | NumTex
-			,0u | P0[0] | P1[1] | P1[2] | (NP << blockShadingBitOffset) //2
-			,0u | sx0 | sy | tex | NumTex
-			,0u | P0[0] | P1[1] | P1[2] | (NP << blockShadingBitOffset) //3
-			,0u | sx0 | sy | tex | NumTex
-			,0u | P1[0] | P1[1] | P0[2] | (PN << blockShadingBitOffset) //4
-			,0u | sx | sy0 | tex | NumTex
-			,0u | P1[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset) //5
-			,0u | sx | sy | tex | NumTex
+			0u | P0[0] | P1[1] | P0[2] | Norm | tint//0
+			,0u | sx0 | sy0 | tex | (NN << blockShadingBitOffset)
+			,0u | P1[0] | P1[1] | P0[2] | Norm | tint//1
+			,0u | sx | sy0 | tex | (NP << blockShadingBitOffset)
+			,0u | P0[0] | P1[1] | P1[2] | Norm | tint//2
+			,0u | sx0 | sy | tex | (PN << blockShadingBitOffset)
+			,0u | P0[0] | P1[1] | P1[2] | Norm | tint//3
+			,0u | sx0 | sy | tex | (PN << blockShadingBitOffset)
+			,0u | P1[0] | P1[1] | P0[2] | Norm | tint//4
+			,0u | sx | sy0 | tex | (NP << blockShadingBitOffset)
+			,0u | P1[0] | P1[1] | P1[2] | Norm | tint//5
+			,0u | sx | sy | tex | (PP << blockShadingBitOffset)
 			});
 		
 		break;
 	}
 }
 
-inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Z(BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, int x, int y, int z) { //x : x
+inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Z(BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z) { //x : x
 	x *= 16;
 	y *= 16;
 	z *= 16;
 
-	glm::ivec3 P0{ x + From[0], y + From[1], z + From[2] };
-	glm::ivec3 P1{ x + To[0], y + To[1], z + To[2] };
+	glm::ivec3 P0{ x + From[0] + POSITION_OFFSET, y + From[1] + POSITION_OFFSET, z + From[2] + POSITION_OFFSET };
+	glm::ivec3 P1{ x + To[0] + POSITION_OFFSET, y + To[1] + POSITION_OFFSET, z + To[2] + POSITION_OFFSET };
 
-
-	char NN = 0, PN = 0, PP = 0, NP = 0;
+	char NN = 15, PN = 15, PP = 15, NP = 15;
 
 	//Bitshift for compression purposes
 	for (int i = 0; i < 3; i++) {
@@ -226,60 +250,194 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Z(BlockFace& face, uint8_t d
 	uint32_t sy = face.UV.w << 5;
 
 	uint32_t tex = face.TextureID << 10;
-	uint32_t NumTex = 0;
+	uint32_t Norm = 2 << NormBitOffset;
+	uint32_t tint = (static_cast<uint32_t>(!!face.TintIndex)) << tintBitOffset;
 
 	vector<uint32_t>* out = face.hasTransparency ? &TransparentVertices : &Vertices;
+
+	//Get AO
+	glm::ivec4 AO{ 15, 15, 15, 15 };
+
+	if (allowAO) {
+		AO = getAO(4 +  direction, x / 16, y / 16, z / 16);
+	}
+
+	PP = AO[0], PN = AO[1], NP = AO[2], NN = AO[3];
 
 	switch (direction) {
 	case 1:
 		out->insert(out->end(), {
-			0u | P0[0] | P0[1] | P0[2] | (NN << blockShadingBitOffset) //0
-			,0u | sx0 | sy0 | tex | NumTex
-			,0u | P1[0] | P0[1] | P0[2] | (PN << blockShadingBitOffset) //1
-			,0u | sx | sy0 | tex | NumTex
-			,0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset) //2
-			,0u | sx0 | sy | tex | NumTex
-			,0u | P0[0] | P1[1] | P0[2] | (NP << blockShadingBitOffset) //3
-			,0u | sx0 | sy | tex | NumTex
-			,0u | P1[0] | P0[1] | P0[2] | (PN << blockShadingBitOffset) //4
-			,0u | sx | sy0 | tex | NumTex
-			,0u | P1[0] | P1[1] | P0[2] | (PP << blockShadingBitOffset) //5
-			,0u | sx | sy | tex | NumTex
+			0u | P0[0] | P0[1] | P0[2] | Norm | tint //0
+			,0u | sx0 | sy0 | tex | (NN << blockShadingBitOffset)
+			,0u | P1[0] | P0[1] | P0[2] | Norm | tint //1
+			,0u | sx | sy0 | tex | (PN << blockShadingBitOffset)
+			,0u | P0[0] | P1[1] | P0[2] | Norm | tint //2
+			,0u | sx0 | sy | tex | (NP << blockShadingBitOffset)
+			,0u | P0[0] | P1[1] | P0[2] | Norm | tint//3
+			,0u | sx0 | sy | tex | (NP << blockShadingBitOffset)
+			,0u | P1[0] | P0[1] | P0[2] | Norm | tint//4
+			,0u | sx | sy0 | tex | (PN << blockShadingBitOffset)
+			,0u | P1[0] | P1[1] | P0[2] | Norm | tint//5
+			,0u | sx | sy | tex | (PP << blockShadingBitOffset)
 			});
 		break;
 	case 0:
 		out->insert(out->end(), {
-			0u | P0[0] | P0[1] | P1[2] | (NN << blockShadingBitOffset) //0
-			,0u | sx0 | sy0 | tex | NumTex
-			,0u | P0[0] | P1[1] | P1[2] | (NP << blockShadingBitOffset) //2
-			,0u | sx0 | sy | tex | NumTex
-			,0u | P1[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset) //1
-			,0u | sx | sy0 | tex | NumTex
-			,0u | P0[0] | P1[1] | P1[2] | (NP << blockShadingBitOffset) //3
-			,0u | sx0 | sy | tex | NumTex
-			,0u | P1[0] | P1[1] | P1[2] | (PP << blockShadingBitOffset) //5
-			,0u | sx | sy | tex | NumTex
-			,0u | P1[0] | P0[1] | P1[2] | (PN << blockShadingBitOffset) //4
-			,0u | sx | sy0 | tex | NumTex
+			0u | P0[0] | P0[1] | P1[2] | Norm | tint//0
+			,0u | sx0 | sy0 | tex | (NN << blockShadingBitOffset)
+			,0u | P0[0] | P1[1] | P1[2] | Norm | tint//2
+			,0u | sx0 | sy | tex | (NP << blockShadingBitOffset)
+			,0u | P1[0] | P0[1] | P1[2] | Norm | tint//1
+			,0u | sx | sy0 | tex | (PN << blockShadingBitOffset)
+			,0u | P0[0] | P1[1] | P1[2] | Norm | tint//3
+			,0u | sx0 | sy | tex | (NP << blockShadingBitOffset)
+			,0u | P1[0] | P1[1] | P1[2] | Norm | tint //5
+			,0u | sx | sy | tex | (PP << blockShadingBitOffset)
+			,0u | P1[0] | P0[1] | P1[2] | Norm | tint//4
+			,0u | sx | sy0 | tex | (PN << blockShadingBitOffset)
 			});
 		break;
 	}
 }
 
+inline glm::ivec4 MeshingV2::ChunkMeshData::getAO(uint8_t direction, int x, int y, int z) {
+	const uint8_t AMBIENT_OCCLUSION_STRENGTH = 2;
+	glm::ivec3 pos{x, y, z};
+
+	char InitialLighting = chunk->Lighting.GetLighting(x, y, z);
+
+	uint8_t PP{ 15 }, PN{ 15 }, NP{ 15 }, NN{ 15 };
+
+	uint8_t axis = direction >> 1;
+	uint8_t facing = direction & 0b1;
+
+	pos[axis] += 1 - 2 * facing;
+
+	//Check up down left right
+
+	int axis1 = (axis + 1) % 3;
+	int axis2 = (axis + 2) % 3;
+
+
+	//Check up
+	pos[axis1] += 1;
+
+	if (chunk->GetBlock(pos.x, pos.y, pos.z) != Blocks.AIR) {
+		PP = PP >= AMBIENT_OCCLUSION_STRENGTH ? PP - AMBIENT_OCCLUSION_STRENGTH : 0;
+		PN = PN >= AMBIENT_OCCLUSION_STRENGTH ? PN - AMBIENT_OCCLUSION_STRENGTH : 0;
+	}
+
+	pos[axis1] -= 2;
+
+	if (chunk->GetBlock(pos.x, pos.y, pos.z) != Blocks.AIR) {
+		NP = NP >= AMBIENT_OCCLUSION_STRENGTH ? NP - AMBIENT_OCCLUSION_STRENGTH : 0;
+		NN = NN >= AMBIENT_OCCLUSION_STRENGTH ? NN - AMBIENT_OCCLUSION_STRENGTH : 0;
+	}
+
+	pos[axis1] += 1;
+	pos[axis2] += 1;
+
+	if (chunk->GetBlock(pos.x, pos.y, pos.z) != Blocks.AIR) {
+		NP = NP >= AMBIENT_OCCLUSION_STRENGTH ? NP - AMBIENT_OCCLUSION_STRENGTH : 0;
+		PP = PP >= AMBIENT_OCCLUSION_STRENGTH ? PP - AMBIENT_OCCLUSION_STRENGTH : 0;
+	}
+
+	pos[axis2] -= 2;
+
+	if (chunk->GetBlock(pos.x, pos.y, pos.z) != Blocks.AIR) {
+		PN = PN >= AMBIENT_OCCLUSION_STRENGTH ? PN - AMBIENT_OCCLUSION_STRENGTH : 0;
+		NN = NN >= AMBIENT_OCCLUSION_STRENGTH ? NN - AMBIENT_OCCLUSION_STRENGTH : 0;
+	}
+
+	pos[axis2] += 1;
+
+	//Check corners now
+	pos[axis1] += 1;
+	pos[axis2] += 1;
+
+	if (chunk->GetBlock(pos.x, pos.y, pos.z) != Blocks.AIR)
+		PP = PP >= AMBIENT_OCCLUSION_STRENGTH ? PP - AMBIENT_OCCLUSION_STRENGTH : 0;
+
+
+	pos[axis1] -= 2;
+	if (chunk->GetBlock(pos.x, pos.y, pos.z) != Blocks.AIR)
+		NP = NP >= AMBIENT_OCCLUSION_STRENGTH ? NP - AMBIENT_OCCLUSION_STRENGTH : 0;
+
+	pos[axis2] -= 2;
+
+	if (chunk->GetBlock(pos.x, pos.y, pos.z) != Blocks.AIR)
+		NN = NN >= AMBIENT_OCCLUSION_STRENGTH ? NN - AMBIENT_OCCLUSION_STRENGTH : 0;
+
+	pos[axis1] += 2;
+
+	if (chunk->GetBlock(pos.x, pos.y, pos.z) != Blocks.AIR)
+		PN = PN >= AMBIENT_OCCLUSION_STRENGTH ? PN - AMBIENT_OCCLUSION_STRENGTH : 0;
+
+
+	if (PP >= (15 - InitialLighting))
+		PP = PP - (15 - InitialLighting);
+	else
+		PP = 0;
+
+	if (PN >= (15 - InitialLighting))
+		PN = PN - (15 - InitialLighting);
+	else
+		PN = 0;
+
+	if (NN >= (15 - InitialLighting))
+		NN = NN - (15 - InitialLighting);
+	else
+		NN = 0;
+
+	if (NP >= (15 - InitialLighting))
+		NP = NP - (15 - InitialLighting);
+	else
+		NP = 0;
+
+	return glm::ivec4(PP, PN, NP, NN);
+
+}
+
 //Checks if a block side is visible to the player
-inline bool MeshingV2::ChunkMeshData::IsFaceVisible(Chunk* chunk, int x, int y, int z, uint8_t side) {
+inline bool MeshingV2::ChunkMeshData::IsFaceVisible(Cuboid& cube, int x, int y, int z, uint8_t side) {
 	//IsFaceVisibleCalls++;
 
 	uint8_t axis = (side >> 1); //Get side
+	uint8_t opposideSide = axis * 2 + static_cast<uint8_t>(!(side  & 0b1));
 
 	int p[3]{ x,y,z };
 
 	p[axis] += 1 - 2 * (side & 0b1);
 
-	return Blocks.getBlockType(chunk->GetBlock(p[0], p[1], p[2]))->Properties->transparency;
+	ModelV2::BlockModelV2* model = Blocks.getBlockType(chunk->GetBlock(p[0], p[1], p[2]))->BlockModelData;
+	ModelV2::BlockModelV2* modelOrigin = Blocks.getBlockType(chunk->GetBlock(x, y, z))->BlockModelData;
+
+	for (Cuboid& element : model->Elements) {
+		if (element.Faces[opposideSide].ReferenceTexture.length() == 0) continue;
+
+		if (element.Faces[opposideSide].CullFace == -1)
+			continue;
+
+		if (side & 1) //if the  block arent touching
+			if (element.To[axis] < 16) continue;
+		else
+			if (element.From[axis] > 0) continue;
+
+		//Check if the faces overlap
+
+		if (element.From[(axis + 1) % 3] > cube.From[(axis + 1) % 3] || element.To[(axis + 1) % 3] < cube.To[(axis + 1) % 3] ||
+			element.From[(axis + 2) % 3] > cube.From[(axis + 2) % 3] || element.To[(axis + 2) % 3] < cube.To[(axis + 2) % 3]) {
+			continue;
+		}
+
+		return false;
+
+	}
+
+	return true;
 }
 
-inline bool MeshingV2::ChunkMeshData::IsFaceVisibleUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side) {
+inline bool MeshingV2::ChunkMeshData::IsFaceVisibleUnsafe(Cuboid& cube, int x, int y, int z, uint8_t side) {
 	uint8_t axis = (side >> 1); //Get side
 
 	int p[3]{ x,y,z };
@@ -289,7 +447,7 @@ inline bool MeshingV2::ChunkMeshData::IsFaceVisibleUnsafe(Chunk* chunk, int x, i
 	return Blocks.getBlockType(chunk->GetBlockUnsafe(p[0], p[1], p[2]))->Properties->transparency;
 }
 
-inline bool MeshingV2::ChunkMeshData::CompareBlockSide(Chunk* chunk, int x, int y, int z, uint8_t side, BlockID b) {
+inline bool MeshingV2::ChunkMeshData::CompareBlockSide(int x, int y, int z, uint8_t side, BlockID b) {
 	//IsFaceVisibleCalls++;
 
 	uint8_t axis = (side >> 1); //Get side
@@ -301,7 +459,7 @@ inline bool MeshingV2::ChunkMeshData::CompareBlockSide(Chunk* chunk, int x, int 
 	return chunk->GetBlock(p[0], p[1], p[2]) == b;
 }
 
-inline bool MeshingV2::ChunkMeshData::CompareBlockSideUnsafe(Chunk* chunk, int x, int y, int z, uint8_t side, BlockID b) {
+inline bool MeshingV2::ChunkMeshData::CompareBlockSideUnsafe(int x, int y, int z, uint8_t side, BlockID b) {
 	uint8_t axis = (side >> 1); //Get side
 
 	int p[3]{ x,y,z };

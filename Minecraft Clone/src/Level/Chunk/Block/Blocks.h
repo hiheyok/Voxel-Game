@@ -4,6 +4,7 @@
 #include "Material/BlockMaterial.h"
 #include "Texture/BlockTexture.h"
 
+
 class BlockList{
 private:
 	std::unordered_map<std::string, BlockID> BlockIDNameData;
@@ -16,6 +17,8 @@ public:
 	std::vector<Block*> BlockTypeData;
 
 	TextureArray BlockTextureArray;
+	TextureAtlas BlockTextureAtlas;
+
 
 	BlockID AIR = RegisterBlock("air", new MaterialNone(), true, false, false);
 	BlockID NULL_BLOCK = RegisterBlock("null", new MaterialNone(), false, false, false);
@@ -356,10 +359,13 @@ public:
 		BlockTextureArray.Gen();
 		BlockTextureArray.height = 16;
 		BlockTextureArray.width = 16;
+		BlockTextureAtlas.Gen();
+		BlockTextureAtlas.SetSize(16 * 512, 16 * 512);
 
 		InitializeBlockModels();
 
 		BlockTextureArray.UploadToGPU();
+		BlockTextureAtlas.UploadToGPU();
 	}
 
 	~BlockList() {

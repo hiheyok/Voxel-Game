@@ -1,17 +1,22 @@
 #version 450 core
+#define MULTIPLIER 0.001953125
+
+const vec3 skyColor = vec3(0.46274509803f, 0.65882352941f,1.0f);
 
 out vec4 final;
 
 in float lights;
-in float texturePosition;
-in vec3 FragPos;  
+flat in uint texturePosition;
+flat in uint norm;
+flat in uint tintIndex;
 in vec2 textureSize;
 in vec3 poss;
 
 uniform vec3 camPos;
 uniform float RenderDistance;
 uniform float VerticalRenderDistance;
-uniform sampler2DArray BlockTexture;
+uniform sampler2D BlockTexture;
+uniform vec3 tintColor;
 
 float near = 0.25; 
 float far  = RenderDistance; 
@@ -23,20 +28,43 @@ float LinearizeDepth(float depth)
 }
 
 
-void main() 
-{
-	vec3 skyColor = vec3(0.46274509803f, 0.65882352941f,1.0f);
-
+void main() {
 	vec3 posvec = poss - camPos;
 
 	posvec.y *= RenderDistance / VerticalRenderDistance;
 
 	float depth = dot(posvec, posvec) / pow(RenderDistance,2);
-
 	depth = depth * depth;
 	depth = 1 - depth;
 
-	vec4 texture_ =  texture(BlockTexture, vec3(textureSize.x,textureSize.y, texturePosition - 1));
+	int Index = int(floor(texturePosition -  1.f));
+	float xIndex = float(Index & 511) * MULTIPLIER;
+	float yIndex = floor(Index >> 9) * MULTIPLIER;
+
+	vec2 NormalizedTexCoord = textureSize * MULTIPLIER;
+	NormalizedTexCoord += vec2(xIndex,  yIndex);
+
+	vec3 n = vec3(0.f,0.f,0.f);
+
+	if (norm  == 0) {
+		n = vec3(1.f, 0.f, 0.f);
+	} else if (norm == 1) {
+		n = vec3(0.f, 1.f, 0.f);
+	} else if (norm == 2) {
+		n = vec3(0.f, 0.f, 1.f);
+	}
+
+	vec2 tileUV = vec2(dot(n.zxy, poss), dot(n.yzx, poss));
+
+	vec2 texCoord = vec2(xIndex,yIndex) + textureSize  * MULTIPLIER * fract(tileUV);
+
+	vec4 texture_ =  texture(BlockTexture, NormalizedTexCoord);
+
+	if (tintIndex == 0) {
+		texture_.x *=  tintColor.x;
+		texture_.y *=  tintColor.y;
+		texture_.z *=  tintColor.z;
+	}
 
 	if (texture_.a == 0.0f)
 		discard;

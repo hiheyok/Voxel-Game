@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../../RenderEngine/OpenGL/Texture/Types/TextureArray.h"
+#include "../../../../RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
 #include <string>
 #include "../../../Typenames.h"
 

@@ -59,7 +59,7 @@ void TerrainRenderer::RenderSky() {
 
 void TerrainRenderer::Render() {
 	
-	
+	LoadAssets();
 
 	SetupCallSolid();
 
@@ -110,12 +110,15 @@ void TerrainRenderer::Update() {
 	glm::mat4 projection = glm::perspective(glm::radians(camera->FOV), (float)x / (float)y, 0.1f, 1000000.0f);
 	CubicShader.use();
 
+	float clrMultiplier = 1.4f;
+
 	CubicShader.setMat4("view", view);
 	CubicShader.setMat4("model", model);
 	CubicShader.setMat4("projection", projection);
 	CubicShader.setFloat("RenderDistance", (float)(m_HorizontalRenderDistance * 16));
 	CubicShader.setFloat("VerticalRenderDistance", (float)(m_VerticalRenderDistance * 16));
 	CubicShader.setVec3("camPos", camera->Position);
+	CubicShader.setVec3("tintColor",  glm::vec3(0.40828402 * clrMultiplier, 0.5917159 * clrMultiplier, 0.2781065 * clrMultiplier));
 	CubicShader.setInt("TextureAimIndex", TextureAminationIndex);
 
 	if (time.GetTimePassed_ms() > 100) {
@@ -137,7 +140,7 @@ void TerrainRenderer::setSettings(uint32_t RenderDistance, uint32_t VerticalRend
 }
 
 void TerrainRenderer::LoadAssets() {
-	CubicShader.bindTextureArray2D(0, Blocks.BlockTextureArray.textureID, "BlockTexture");
+	CubicShader.bindTexture2D(0, Blocks.BlockTextureAtlas.get(), "BlockTexture");
 }
 
 void TerrainRenderer::AddChunk(ChunkID ID, std::vector<uint32_t> data, std::vector<ChunkDrawBatch>* BatchType, std::unordered_map<ChunkID, int>* LookUpMap) {

@@ -98,68 +98,69 @@ namespace ModelV2 {
 					uv0 = uv0 / 16.f;
 					uv1 = uv1 / 16.f;
 
+					uint8_t axis = i >> 1;
 
-					switch (i  >>  1) {
+					unsigned int currIndex = Vertices.size() / 7;
+
+					switch (axis) {
 					case 0:
 						(i & 1) == 1 ?
 							Vertices.insert(Vertices.end(),
 								{
-									from.x, from.y, from.z,	uv1.x, uv0.y,	(float)face.TextureID,	8.f,
-									from.x, to.y, from.z,	uv1.x, uv1.y,	(float)face.TextureID,	8.f,
-									from.x, to.y, to.z,	uv0.x, uv1.y,	(float)face.TextureID,	8.f,
-									from.x, from.y, to.z,	uv0.x, uv0.y,	(float)face.TextureID,	8.f,
+									from.x,	from.y, from.z,		uv1.x, uv0.y,	(float)face.TextureID,	8.f,
+									from.x, to.y,	from.z,		uv1.x, uv1.y,	(float)face.TextureID,	8.f,
+									from.x, to.y,	to.z,		uv0.x, uv1.y,	(float)face.TextureID,	8.f,
+									from.x, from.y,	to.z,		uv0.x, uv0.y,	(float)face.TextureID,	8.f,
 								}
 								) :
 							Vertices.insert(Vertices.end(),
 								{
-									from.x, from.y, from.z,	uv1.x, uv0.y,	(float)face.TextureID,	8.f,
-									from.x, to.y, from.z,	uv1.x, uv1.y,	(float)face.TextureID,	8.f,
-									from.x, to.y, to.z,	uv0.x, uv1.y,	(float)face.TextureID,	8.f,
-									from.x, from.y, to.z,	uv0.x, uv0.y,	(float)face.TextureID,	8.f,
+									to.x, from.y,   from.z,		uv1.x, uv0.y,	(float)face.TextureID,	8.f,
+									to.x, to.y,		from.z,		uv1.x, uv1.y,	(float)face.TextureID,	8.f,
+									to.x, to.y,		to.z,		uv0.x, uv1.y,	(float)face.TextureID,	8.f,
+									to.x, from.y,	to.z,		uv0.x, uv0.y,	(float)face.TextureID,	8.f,
 								}
 						);
 					case 1:
 						(i & 1) == 1 ?
 							Vertices.insert(Vertices.end(),
 								{
-									from.x, to.y, from.z,	uv1.x, uv0.y,	(float)face.TextureID,	15.f,
-									to.x, to.y, from.z,	uv0.x, uv0.y,	(float)face.TextureID,	15.f,
-									to.x, to.y, to.z,	uv0.x, uv1.y,	(float)face.TextureID,	15.f,
-									from.x, to.y, to.z,	uv1.x, uv1.y,	(float)face.TextureID,	15.f,
+									from.x, from.y, from.z,		uv1.x, uv0.y,	(float)face.TextureID,	15.f,
+									to.x,	from.y, from.z,		uv0.x, uv0.y,	(float)face.TextureID,	15.f,
+									to.x,	from.y, to.z,		uv0.x, uv1.y,	(float)face.TextureID,	15.f,
+									from.x, from.y, to.z,		uv1.x, uv1.y,	(float)face.TextureID,	15.f,
 								}
 								) :
 							Vertices.insert(Vertices.end(),
 								{
-									from.x, from.y, from.z,	uv1.x, uv0.y,	(float)face.TextureID,	15.f,
-									to.x, from.y, from.z,	uv0.x, uv0.y,	(float)face.TextureID,	15.f,
-									to.x, from.y, to.z,	uv0.x, uv1.y,	(float)face.TextureID,	15.f,
-									from.x, from.y, to.z,	uv1.x, uv1.y,	(float)face.TextureID,	15.f,
+									from.x, to.y,	from.z,		uv1.x, uv0.y,	(float)face.TextureID,	15.f,
+									to.x,	to.y,	from.z,		uv0.x, uv0.y,	(float)face.TextureID,	15.f,
+									to.x,	to.y,	to.z,		uv0.x, uv1.y,	(float)face.TextureID,	15.f,
+									from.x, to.y,	to.z,		uv1.x, uv1.y,	(float)face.TextureID,	15.f,
 								}
 						);
 					case 2:
 						(i & 1) == 1 ?
 							Vertices.insert(Vertices.end(),
 								{
-									from.x, from.y, to.z,	uv1.x, uv0.y,	(float)face.TextureID,	12.f,
-									to.x, from.y, to.z,	uv0.x, uv0.y,	(float)face.TextureID,	12.f,
-									to.x, to.y, to.z,	uv0.x, uv1.y,	(float)face.TextureID,	12.f,
-									from.x, to.y, to.z,	uv1.x, uv1.y,	(float)face.TextureID,	12.f,
+									from.x, from.y, from.z,		uv1.x, uv0.y,	(float)face.TextureID,	12.f,
+									to.x,	from.y, from.z,		uv0.x, uv0.y,	(float)face.TextureID,	12.f,
+									to.x,	to.y,	from.z,		uv0.x, uv1.y,	(float)face.TextureID,	12.f,
+									from.x, to.y,	from.z,		uv1.x, uv1.y,	(float)face.TextureID,	12.f,
 								}
 								) :
 							Vertices.insert(Vertices.end(),
 								{
-									from.x, from.y, from.z,	uv1.x, uv0.y,	(float)face.TextureID,	12.f,
-									to.x, from.y, from.z,	uv0.x, uv0.y,	(float)face.TextureID,	12.f,
-									to.x, to.y, from.z,	uv0.x, uv1.y,	(float)face.TextureID,	12.f,
-									from.x, to.y, from.z,	uv1.x, uv1.y,	(float)face.TextureID,	12.f,
+									from.x, from.y, to.z,		uv1.x, uv0.y,	(float)face.TextureID,	12.f,
+									to.x,	from.y, to.z,		uv0.x, uv0.y,	(float)face.TextureID,	12.f,
+									to.x,	to.y,	to.z,		uv0.x, uv1.y,	(float)face.TextureID,	12.f,
+									from.x, to.y,	to.z,		uv1.x, uv1.y,	(float)face.TextureID,	12.f,
 								}
 						);
 
 					}
 
-					unsigned int currIndex = Vertices.size() / 7;
-
-					if ((i == 0) || (i & 1) == 1) {
+					if ((i & 1) == 0) {
 						Indices.insert(Indices.end(),
 							{
 								0 + currIndex, 1 + currIndex, 2 + currIndex,

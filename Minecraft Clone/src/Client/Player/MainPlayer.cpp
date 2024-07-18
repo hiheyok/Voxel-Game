@@ -10,7 +10,6 @@ void MainPlayer::Initialize(GLFWwindow* win, InternalServer* server) {
 	Hotbar.SetGUITexture("assets/textures/gui/widgets.png");
 	Hotbar.AddGUIElement("Hotbar", "", vec2(9.f * HotbarSize * 1.0055555555f, HotbarSize * 1.05f), vec2(0.f, -1.f + HotbarSize * 0.5f), vec2(0.5f, 0.5f), vec2(181.5f, 21.5f));
 	Hotbar.AddGUIElement("Select", "", vec2(HotbarSize * 1.1f,  HotbarSize * 1.1f), vec2(-HotbarSize * 4.f, -1.f + HotbarSize * 0.5f), vec2(0.5f, 22.5f), vec2(22.5f, 44.5f));
-
 	GUISet ItemBar;
 	ItemBar.SetGUITexture(ItemAtlas.Atlas.textureID, ItemAtlas.Atlas.width, ItemAtlas.Atlas.height);
 
@@ -19,7 +18,6 @@ void MainPlayer::Initialize(GLFWwindow* win, InternalServer* server) {
 	}
 
 	GUIIndex = PlayerGUI.AddGUI("PlayerGUI", Hotbar);
-
 	ItemGUIIndex = PlayerGUI.AddGUI("Itembar", ItemBar);
 	internalServer = server;
 }

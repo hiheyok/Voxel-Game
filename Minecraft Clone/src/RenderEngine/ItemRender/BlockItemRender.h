@@ -67,15 +67,17 @@ public:
 	}
 
 	void RenderBlock(Item item) {
-		BlockModel model{};
 		if (Blocks.getBlockType(item.GetBlock())->BlockModelData == NULL) {
 			return;
 		}
 
-		Blocks.getBlockType(item.GetBlock())->BlockModelData->getVertices(model.Vertices, model.Indices);
+		std::vector<float> vertices{};
+		std::vector<uint32_t> indices{};
 
-		VBO.InsertData(model.Vertices.size() * sizeof(float), model.Vertices.data(), GL_STATIC_DRAW);
-		EBO.InsertData(model.Indices.size() * sizeof(float), model.Indices.data(), GL_STATIC_DRAW);
+		Blocks.getBlockType(item.GetBlock())->BlockModelData->getVertices(vertices, indices);
+
+		VBO.InsertData(vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+		EBO.InsertData(indices.size() * sizeof(uint32_t), indices.data(), GL_STATIC_DRAW);
 		//std::cout << model.Vertices.size() << '\n';
 		camera.screenRes = glm::vec2(16.f, 16.f);
 
@@ -84,7 +86,7 @@ public:
 		VAO.Bind();
 		EBO.Bind();
 		VBO.Bind();
-		glDrawElements(GL_TRIANGLES, model.Indices.size(), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 		VAO.Unbind();
 		EBO.Unbind();
 		VBO.Unbind();

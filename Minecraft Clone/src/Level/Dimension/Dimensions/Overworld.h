@@ -3,7 +3,7 @@
 
 class OverworldDimension : public Dimension {
 public:
-	OverworldDimension() : Dimension(Generators.DEBUG) {}
+	OverworldDimension() : Dimension(Generators.MOUNTAINS) {}
 
 	void Tick() override {
 

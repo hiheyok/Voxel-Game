@@ -293,6 +293,9 @@ ModelV2::BlockModelV2* recursiveGetBlockModel(string jsonName) {
 		else if (!strcmp(item.key().c_str(), "display")) {
 			ProcessModelDisplay(model, item.value());
 		}
+		else if (!strcmp(item.key().c_str(), "ambientocclusion")) {
+			model->AmbientOcclusion = static_cast<bool>(item.value());
+		}
 	}
 
 	return model;

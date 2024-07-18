@@ -43,6 +43,15 @@ public:
 			}
 			Layers++;
 		}
+		else  if (Format == GL_RG) {
+			for (int index = 0; index < Width * Height; index++) {
+				ArrayData.push_back(Data[(index * 2)]);
+				ArrayData.push_back(Data[(index * 2)]);
+				ArrayData.push_back(Data[(index * 2)]);
+				ArrayData.push_back(Data[(index * 2) + 1]);
+			}
+			Layers++;
+		}
 		else if (Format = GL_RED) {
 			for (int index = 0; index < Width * Height; index++) {
 				ArrayData.push_back(Data[index]);
@@ -78,6 +87,9 @@ public:
 
 		if (Data->format == GL_RGBA) {
 			ColorSize = 4;
+		}
+		if (Data->format == GL_RG) {
+			ColorSize = 2;
 		}
 		else if (Data->format == GL_RED) {
 			ColorSize = 1;
