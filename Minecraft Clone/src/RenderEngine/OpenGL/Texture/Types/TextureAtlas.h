@@ -55,7 +55,7 @@ public:
 		}
 		else  if (Format == GL_RG) {
 			for (int index = 0; index < 16 * 16; index++) {
-				if (Data[(index * 2) + 1] != 255) {
+				if ((Data[(index * 2) + 1] != 255) && (Data[(index * 2) + 1] != 0)) {
 					transparency = true;
 				}
 
@@ -65,7 +65,7 @@ public:
 		}
 		else  if (Format == GL_RGBA) {
 			for (int index = 0; index < 16 * 16; index++) {
-				if (Data[(index * 4) + 3] != 255) {
+				if ((Data[(index * 4) + 3] != 255) && (Data[(index * 4) + 3] != 0)) {
 					transparency = true;
 				}
 				setPixel(Data[(index * 4)], Data[(index * 4) + 1], Data[(index * 4) + 2], Data[(index * 4) + 3], WidthIndexPixel + (index % 16), HeightIndexPixel + width * (index / 16));

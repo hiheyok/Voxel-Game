@@ -19,7 +19,7 @@ void Client::Initialize() {
 	EntityRender.SetWindow(getWindow());
 	TextRender.InitializeTextRenderer(getWindow());
 	Items.REGISTER_ALL();
-	ItemAtlas.Initialize(512*16, 16*4);
+	ItemAtlas.Initialize(512*16 * 2, 16*2*8);
 
 	for (auto& item : Items.ItemContainer) {
 		ItemAtlas.AddItem(item.second);
@@ -73,7 +73,7 @@ void Client::SetDebugScreen() {
 	debugScreen.EditText("Stat7", "Entity Count: N/A");
 	debugScreen.EditText("Stat8", "Event Queue Size: N/A");
 	debugScreen.EditText("Stat9", "Server Tick (MSPT): " + to_string(server.getMSPT()));
-	debugScreen.EditText("Stat10", "Chunk Count: " + std::to_string(server.getChunkCount()));
+	debugScreen.EditText("Stat10","Chunk Count: " + std::to_string(server.getChunkCount()));
 	debugScreen.Update();
 }
 

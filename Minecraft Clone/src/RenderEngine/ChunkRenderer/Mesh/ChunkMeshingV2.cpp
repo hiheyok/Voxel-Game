@@ -94,10 +94,12 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_X(BlockFace& face, uint8_t d
 	char NN = 15, PN = 15, PP = 15, NP = 15;
 
 	//Bitshift for compression purposes
-	for (int i = 0; i < 3; i++) {
-		P0[i] = P0[i] << (i * BitShiftAmount);
-		P1[i] = P1[i] << (i * BitShiftAmount);
-	}
+	P0.x <<= 0;
+	P1.x <<= 0;
+	P0.y <<= 9;
+	P1.y <<= 9;
+	P0.z <<= 18;
+	P1.z <<= 18;
 
 	uint32_t sx0 = face.UV.x << 0;
 	uint32_t sy0 = face.UV.y << 5;
@@ -176,10 +178,12 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Y(BlockFace& face, uint8_t d
 	char NN = 15, PN = 15, PP = 15, NP = 15;
 
 	//Bitshift for compression purposes
-	for (int i = 0; i < 3; i++) {
-		P0[i] = P0[i] << (i * BitShiftAmount);
-		P1[i] = P1[i] << (i * BitShiftAmount);
-	}
+	P0.x <<= 0;
+	P1.x <<= 0;
+	P0.y <<= 9;
+	P1.y <<= 9;
+	P0.z <<= 18;
+	P1.z <<= 18;
 
 	uint32_t sx0 = face.UV.x << 0;
 	uint32_t sy0 = face.UV.y << 5;
@@ -201,9 +205,9 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Y(BlockFace& face, uint8_t d
 	PP = AO[0], PN = AO[1], NP = AO[2], NN = AO[3];
 
 	glm::ivec2 TexNN = face.UVCoordNN;
-	glm::ivec2 TexNP = face.UVCoordNP;
+	glm::ivec2 TexPN = face.UVCoordNP;
 	glm::ivec2 TexPP = face.UVCoordPP;
-	glm::ivec2 TexPN = face.UVCoordPN;
+	glm::ivec2 TexNP = face.UVCoordPN;
 
 	TexNN.y = TexNN.y << 5;
 	TexNP.y = TexNP.y << 5;
@@ -258,10 +262,12 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Z(BlockFace& face, uint8_t d
 	char NN = 15, PN = 15, PP = 15, NP = 15;
 
 	//Bitshift for compression purposes
-	for (int i = 0; i < 3; i++) {
-		P0[i] = P0[i] << (i * BitShiftAmount);
-		P1[i] = P1[i] << (i * BitShiftAmount);
-	}
+	P0.x <<= 0;
+	P1.x <<= 0;
+	P0.y <<= 9;
+	P1.y <<= 9;
+	P0.z <<= 18;
+	P1.z <<= 18;
 
 	uint32_t sx0 = face.UV.x << 0;
 	uint32_t sy0 = face.UV.y << 5;
@@ -432,9 +438,9 @@ inline bool MeshingV2::ChunkMeshData::IsFaceVisible(Cuboid& cube, int x, int y, 
 	//IsFaceVisibleCalls++;
 
 	uint8_t axis = (side >> 1); //Get side
-	uint8_t oppositeSide = axis * 2 + static_cast<uint8_t>(!(side  & 0b1));
+	uint8_t oppositeSide = axis * 2 + static_cast<uint8_t>(!(side & 0b1));
 
-	int p[3]{ x,y,z };
+	int p[3]{ x, y, z };
 
 	p[axis] += 1 - 2 * (side & 0b1);
 
@@ -445,7 +451,7 @@ inline bool MeshingV2::ChunkMeshData::IsFaceVisible(Cuboid& cube, int x, int y, 
 	for (const Cuboid& element : model->Elements) {
 		if (element.Faces[oppositeSide].ReferenceTexture.empty()) continue;
 
-		if (element.Faces[oppositeSide].CullFace == -1)
+		if (element.Faces[oppositeSide].CullFace != oppositeSide)
 			continue;
 
 		if (side & 1) //if the  block arent touching

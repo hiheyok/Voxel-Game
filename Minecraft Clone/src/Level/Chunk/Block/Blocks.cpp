@@ -128,11 +128,10 @@ void BlockList::InitializeBlockModels()  {
 
 				glm::vec4 uv{};
 
-				bool  transparency = false;
+				bool transparency = false;
 
 				std::optional<RawTextureData> d = BlockTextureAtlas.AddTextureToAtlas(TexFile, transparency);
 				
-
 				if (!d.has_value()) {
 					Logger.LogError("Texture Loading", "Unable to load texture");
 					continue;

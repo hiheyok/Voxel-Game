@@ -1,6 +1,6 @@
 #pragma once
 typedef unsigned int EventID;
-typedef unsigned short BlockID;
+typedef unsigned int BlockID;
 typedef unsigned long long int EntityUUID; //UUID
 typedef unsigned short EntityTypeID;
 typedef unsigned long long int ChunkID;
