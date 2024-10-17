@@ -15,8 +15,10 @@ void WorldRender::SetPosition(dvec3 position) {
 }
 
 void WorldRender::Render() {
+	mProfiler->ProfileStart("root/render/level");
 	RendererV2.RenderSky();
 	RendererV2.Render();
+	mProfiler->ProfileStop("root/render/level");
 }
 
 void WorldRender::LoadChunkToRenderer(ChunkID chunk) {
@@ -96,11 +98,11 @@ void WorldRender::Worker(int id) {
 }
 
 void WorldRender::Update() {
-
+	
 	int ChunkUpdateLimit = 4000;
 
 	int UpdateAmount = 0;
-
+	mProfiler->ProfileStart("root/update/level/loadMesh");
 	for (int WorkerID = 0; WorkerID < WorkerCount; WorkerID++) {
 
 		WorkerLocks[WorkerID].lock();
@@ -109,7 +111,7 @@ void WorldRender::Update() {
 			if (ChunkUpdateLimit < UpdateAmount) {
 				break;
 			}
-
+			mProfiler->CombineCache(WorkerOutput[(uint64_t)WorkerID].front()->profiler);
 			RendererV2.AddChunk(WorkerOutput[(uint64_t)WorkerID].front());
 			WorkerOutput[WorkerID].pop_front();
 			UpdateAmount++;
@@ -117,16 +119,22 @@ void WorldRender::Update() {
 
 		WorkerLocks[WorkerID].unlock();
 	}
+	mProfiler->ProfileStop("root/update/level/loadMesh");
 
+	mProfiler->ProfileStart("root/update/level/loadChunkForRender");
 	LoadChunkMultiToRenderer(server->getUpdatedChunks());
+	mProfiler->ProfileStop("root/update/level/loadChunkForRender");
 
+	mProfiler->ProfileStart("root/update/level/defrag");
 	if (UpdateAmount < ChunkUpdateLimit) {
 		RendererV2.Defrag(ChunkUpdateLimit - UpdateAmount);
 	}
-	
+	mProfiler->ProfileStop("root/update/level/defrag");
+
+	mProfiler->ProfileStart("root/update/level/prepareRender");
 	RendererV2.Update();
 	RendererV2.PrepareRenderer();
-
+	mProfiler->ProfileStop("root/update/level/prepareRender");
 }
 
 void WorldRender::Stop() {
@@ -140,7 +148,7 @@ void WorldRender::Stop() {
 
 }
 
-void WorldRender::Start(GLFWwindow* window_, InternalServer* server_) {
+void WorldRender::Start(GLFWwindow* window_, InternalServer* server_, PerformanceProfiler* pProfilerIn) {
 	stop = false;
 
 	HorizontalRenderDistance = AppOptions.HorizontalRenderDistance;
@@ -167,6 +175,8 @@ void WorldRender::Start(GLFWwindow* window_, InternalServer* server_) {
 		Workers[i] = std::thread(&WorldRender::Worker, this, i);
 	}
 	Scheduler = std::thread(&WorldRender::TaskScheduler, this);
+
+	mProfiler = pProfilerIn;
 }
 
 void WorldRender::TaskScheduler() {

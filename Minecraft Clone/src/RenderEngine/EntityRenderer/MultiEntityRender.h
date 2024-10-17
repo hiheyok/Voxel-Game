@@ -6,6 +6,7 @@
 #include "../../Client/Render/PlayerPOV.h"
 #include "../../Level/Entity/Type/EntityType.h"
 #include "../../Level/Entity/Entities.h"
+#include "../../Client/Profiler/PerformanceProfiler.h"
 
 class MultiEntityRenderer {
 private:
@@ -35,6 +36,8 @@ private:
 	std::vector<float> VelocityArr;
 	std::vector<float> AccelerationArr;
 
+	PerformanceProfiler* mProfiler;
+
 	bool isDirty = true;
 
 	int NumEntityRendered = 0;
@@ -53,7 +56,7 @@ public:
 
 	void RemoveEntity(EntityUUID EntityUUID);
 
-	void Initialize();
+	void Initialize(PerformanceProfiler* pProfilerIn);
 
 	void SetTimePastTick(double t);
 

@@ -15,7 +15,7 @@ void Client::Initialize() {
 
 	Blocks.Initialize();
 	EntityList.Initialize();
-	EntityRender.Initialize();
+	EntityRender.Initialize(&profiler);
 	EntityRender.SetWindow(getWindow());
 	TextRender.InitializeTextRenderer(getWindow());
 	Items.REGISTER_ALL();
@@ -40,7 +40,7 @@ void Client::Initialize() {
 	EntityUpdater.Start();
 
 	Logger.LogInfo("World", "Generating World");
-	TerrainRender.Start(getWindow(), &server);
+	TerrainRender.Start(getWindow(), &server, &profiler);
 	Logger.LogInfo("Client", "Starting Gameloop");
 
 	debugScreen.Initialize(getWindow());
@@ -113,9 +113,9 @@ void Client::GameLoop() {
 		Update();
 
 		Render();
-
+		profiler.ProfileStart("root/refresh");
 		Refresh();
-
+		profiler.ProfileStop("root/refresh");
 		Frametime = FrametimeTracker.GetTimePassed_s();
 
 		Inputs.delta = Frametime;
@@ -140,6 +140,11 @@ void Client::Update() {
 
 	if (Inputs.CheckKeyPress(GLFW_KEY_R)) {
 		EntityRender.Reload();
+	}
+
+	if (Inputs.CheckKeyPress(GLFW_KEY_P)) {
+		profiler.LoadCache();
+		profiler.print();
 	}
 
 	if (Inputs.CheckKey(GLFW_KEY_ESCAPE)) {

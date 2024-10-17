@@ -35,6 +35,28 @@ void PlayerMovement::RotatePlayer(Player* player, UserInputs Inputs) {
 		player->Properties.Rotation.y = -89.9999f;
 }
 
+void PlayerMovement::MoveRelative(Player* player, float strafe, float up, float forward,  float friction) {
+	float f = strafe * strafe + up * up + forward * forward;
+
+	if (f >= 1.0e-4f) {
+		f = sqrtf(f);
+
+		f = f < 1.f ? 1.0 : f;
+		
+		f = friction / f;
+		strafe = strafe * f;
+		up = up * f;
+		forward = forward * f;
+
+		float zCoord = sin(player->Properties.Rotation.y * 0.017453292f);
+		float xCoord = cos(player->Properties.Rotation.y * 0.017453292f);
+
+		player->Properties.Velocity.x += strafe * xCoord - forward * zCoord;
+		player->Properties.Velocity.y += up;
+		player->Properties.Velocity.z += forward * xCoord + strafe * zCoord;
+	}
+}
+
 void PlayerMovement::MovePlayer(Player* player, UserInputs Inputs, InternalServer* server) {
 
 	vec3 front(
@@ -109,5 +131,50 @@ void PlayerMovement::MovePlayer(Player* player, UserInputs Inputs, InternalServe
 
 	player->Properties.Position += player->Properties.Velocity * Inputs.delta / 2.f;
 	player->Properties.Velocity = player->Properties.Velocity * powf(3.f / 25.f, Inputs.delta);
+	/*float jumpMovementFactor = 0.02F;
+	float f = 0.91;
+
+	float blockSlipperiness = 0.6;
+
+	if (server->checkPlayerOnGround() && m_EnableCollusion) {
+		f = blockSlipperiness * 0.91;
+	}
+
+	float f2 = 0.16277136F / (f * f * f);
+	float friction = 0.f;
+
+	if (server->checkPlayerOnGround() && m_EnableCollusion) {
+		friction = f2 * 0.08;
+	}
+	else {
+		friction = jumpMovementFactor;
+	}
+
+	float baseAcceleration = 0.1f;
+	if (Inputs.CheckKey(KEY_LEFT_SHIFT)) {
+		baseAcceleration = 0.13f;
+	}
+	
+	float strafe = 0.f, forward = 0.f, up = 0.f;
+
+	if (Inputs.CheckKey(KEY_W)) {
+		forward += baseAcceleration;
+	}
+	if (Inputs.CheckKey(KEY_A)) {
+		strafe -= baseAcceleration;
+	}
+	if (Inputs.CheckKey(KEY_S)) {
+		forward -= baseAcceleration;
+	}
+	if (Inputs.CheckKey(KEY_D)) {
+		strafe += baseAcceleration;
+	}
+
+	if (Inputs.CheckKey(KEY_SPACE)) {
+		up += baseAcceleration;
+	}
+
+	MoveRelative(player , strafe, up, forward, friction);*/
+
 
 }

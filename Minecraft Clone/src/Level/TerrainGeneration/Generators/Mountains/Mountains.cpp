@@ -97,7 +97,7 @@ void MountainGenerator::GenerateEnvironment(glm::ivec3 Position, Chunk* chunk) {
 
 				if (y + Position.y < 34) {
 					if ((chunk->GetBlockUnsafe(x, y, z) == Blocks.AIR)) {
-						chunk->SetBlockUnsafe(Blocks.WATER, x, y, z);
+						chunk->SetBlockUnsafe(Blocks.BLUE_CONCRETE, x, y, z);
 					}
 
 					if ((chunk->GetBlockUnsafe(x, y, z) == Blocks.GRASS)) {
@@ -188,7 +188,7 @@ void MountainGenerator::GenerateDecor(glm::ivec3 Position, Chunk* chunk) {
 	}*/
 
 
-	int radius = 60;
+	int radius = 40;
 
 	for (int x = 0 + Position.x; x < 16 + Position.x; x++) {
 		for (int z = 0 + Position.z; z < 16 + Position.z; z++) {

@@ -13,7 +13,8 @@ private:
 	void InitializeBlockModels();
 	void AddAssets(std::string namespaceIn);
 public:
-	std::vector<Block*> BlockTypeData;
+	std::vector<Block*> BlockTypeData = {};
+	std::vector<ModelV2::BlockModelV2> BlockModelData = {};
 
 	TextureAtlas BlockTextureAtlas;
 
@@ -374,8 +375,12 @@ public:
 		BlockTypeData.clear();
 	}
 
-	Block* getBlockType(BlockID id) {
+	inline Block* getBlockType(BlockID id) {
 		return BlockTypeData[id];
+	}
+
+	const inline ModelV2::BlockModelV2& getBlockModelDereferenced(BlockID id) {
+		return BlockModelData[id];
 	}
 
 	BlockID RegisterBlock(std::string BlockName, Material* material, bool transparency, bool solid, bool isFluid);

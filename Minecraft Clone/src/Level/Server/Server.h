@@ -37,6 +37,8 @@ public:
 
 	std::vector<EntityProperty> getUpdatedEntities();
 
+	std::vector<EntityUUID> getRemovedEntities();
+
 	bool checkEntityOnGround(EntityUUID id);
 
 	void join(Entity& entity);
@@ -59,4 +61,5 @@ public:
 
 	void tick();
 
+	void sendEvent(Event pEventIn);
 };

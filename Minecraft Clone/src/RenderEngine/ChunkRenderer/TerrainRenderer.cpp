@@ -23,6 +23,8 @@ void TerrainRenderer::Initialize(GLFWwindow* window_, Camera* camera_) {
 
 	CreateNewSolidBatch();
 	CreateNewTransparentBatch();
+
+	mGarbageCollectorThread = std::thread(&TerrainRenderer::GarbageCollectorThread, this);
 }
 
 void TerrainRenderer::PrepareRenderer() {
@@ -143,6 +145,20 @@ void TerrainRenderer::LoadAssets() {
 	CubicShader.bindTexture2D(0, Blocks.BlockTextureAtlas.get(), "BlockTexture");
 }
 
+void TerrainRenderer::GarbageCollectorThread() {
+	while (!stop) {
+		std::vector<void*> ptrQueue(mGarbagePointers.begin(), mGarbagePointers.end());
+		mGarbagePointers.clear();
+
+		for (const void* p : ptrQueue) {
+			delete p;
+		}
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+	}
+}
+
 void TerrainRenderer::AddChunk(ChunkID ID, std::vector<uint32_t> data, std::vector<ChunkDrawBatch>* BatchType, std::unordered_map<ChunkID, int>* LookUpMap) {
 	if (LookUpMap->count(ID)) {
 		size_t BatchIndex = LookUpMap->at(ID);
@@ -182,7 +198,7 @@ void TerrainRenderer::AddChunk(MeshingV2::ChunkMeshData* MeshData) {
 	ChunkID ID = getChunkID(MeshData->Position);
 	AddChunk(ID, MeshData->Vertices, &ChunkSolidBatches, &ChunkBatchSolidLookup);
 	AddChunk(ID, MeshData->TransparentVertices, &ChunkTransparentBatches, &ChunkBatchTransparentLookup);
-	delete MeshData;
+	mGarbagePointers.push_back((void*)MeshData);
 }
 
 
@@ -246,6 +262,9 @@ void TerrainRenderer::Cleanup() {
 
 	ChunkTransparentBatches.clear();
 	ChunkBatchTransparentLookup.clear();
+
+	stop = true;
+	mGarbageCollectorThread.join();
 }
 
 void TerrainRenderer::SetupShaders() {

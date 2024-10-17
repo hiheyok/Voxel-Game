@@ -41,7 +41,7 @@ vector<ChunkID> WorldInteractions::getRequestedLightUpdates() {
 }
 
 vector<EntityProperty> WorldInteractions::getUpdatedEntities() {
-	unordered_map<EntityUUID, EntityProperty> m = world->Entities.ClientGetEntityUpdate();
+	ska::flat_hash_map<EntityUUID, EntityProperty> m = world->Entities.ClientGetEntityUpdate();
 	vector<EntityProperty> properties = {};
 
 	for (const auto& e : m) {
@@ -52,7 +52,7 @@ vector<EntityProperty> WorldInteractions::getUpdatedEntities() {
 }
 
 vector<EntityUUID> WorldInteractions::getRemovedEntities() {
-	unordered_set<EntityUUID> m = world->Entities.getRemovedEntities();
+	ska::flat_hash_set<EntityUUID> m = world->Entities.getRemovedEntities();
 	vector<EntityUUID> IDs = {};
 
 	IDs.insert(IDs.end(), m.begin(), m.end());

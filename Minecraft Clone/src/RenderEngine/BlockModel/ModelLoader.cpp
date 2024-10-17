@@ -355,6 +355,7 @@ ModelV2::BlockModelV2* recursiveGetBlockModel(string jsonName, string namespaceI
 ModelV2::BlockModelV2* getBlockModel(string blockNameIn, string namespaceIn) {
 	//This will recursively go into parents files and build on it
 	ModelV2::BlockModelV2* model = recursiveGetBlockModel(blockNameIn, namespaceIn);
+	std::reverse(model->Elements.begin(), model->Elements.end());
 	return model;
 
 }

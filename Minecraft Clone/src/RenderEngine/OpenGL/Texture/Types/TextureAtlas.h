@@ -36,7 +36,7 @@ public:
 		TextureAtlasData[w * colorSpace + h * colorSpace + 3] = a;
 	}
 
-	void AddData(std::vector<uint8_t> Data, int Format, bool& transparency) { //assumes that all textures  are 16 x 16
+	void AddData(std::vector<uint8_t> Data, int Format, bool& transparency, bool& isSeeThrough) { //assumes that all textures  are 16 x 16
 		//Get offset to where to put the texture
 		int WidthTex = width / 16;
 		int heightTex = height / 16;
@@ -57,6 +57,11 @@ public:
 			for (int index = 0; index < 16 * 16; index++) {
 				if ((Data[(index * 2) + 1] != 255) && (Data[(index * 2) + 1] != 0)) {
 					transparency = true;
+					isSeeThrough = true;
+				}
+
+				if (Data[(index * 2) + 1] != 255) {
+					isSeeThrough = true;
 				}
 
 				setPixel(Data[(index * 2)], Data[(index * 2)], Data[(index * 2)], Data[(index * 2) + 1], WidthIndexPixel + (index % 16), HeightIndexPixel + width * (index / 16));
@@ -67,6 +72,11 @@ public:
 			for (int index = 0; index < 16 * 16; index++) {
 				if ((Data[(index * 4) + 3] != 255) && (Data[(index * 4) + 3] != 0)) {
 					transparency = true;
+					isSeeThrough = true;
+				}
+
+				if (Data[(index * 4) + 3] != 255) {
+					isSeeThrough = true;
 				}
 				setPixel(Data[(index * 4)], Data[(index * 4) + 1], Data[(index * 4) + 2], Data[(index * 4) + 3], WidthIndexPixel + (index % 16), HeightIndexPixel + width * (index / 16));
 			}
@@ -83,7 +93,7 @@ public:
 		}
 	}
 
-	bool _AddTextureToAtlas(RawTextureData* Data, bool& transparency) {
+	bool _AddTextureToAtlas(RawTextureData* Data, bool& transparency, bool& isSeeThrough) {
 
 		Format = GL_RGBA;
 		if (!Data->data) {
@@ -124,17 +134,17 @@ public:
 					memcpy(buffer.data() + (h * CWidth), Data->data + (h * Data->width * ColorSize + gx + gy), CWidth);
 				}
 
-				AddData(buffer, Data->format, transparency);
+				AddData(buffer, Data->format, transparency, isSeeThrough);
 			}
 		}
 
 		return true;
 	}
 
-	std::optional<RawTextureData> AddTextureToAtlas(std::string file, bool& transparency) {
+	std::optional<RawTextureData> AddTextureToAtlas(std::string file, bool& transparency, bool& isSeeThrough) {
 		std::optional<RawTextureData> data;
 		RawTextureData tex = GetImageData(file.c_str());
-		if (_AddTextureToAtlas(&tex, transparency)) {
+		if (_AddTextureToAtlas(&tex, transparency, isSeeThrough)) {
 			Logger.LogInfo("Texture Atlas", "Loaded: " + file + " | Size: " + std::to_string(tex.height) + ", " + std::to_string(tex.width));
 			data = tex;
 			return data;

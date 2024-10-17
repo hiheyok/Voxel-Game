@@ -23,10 +23,12 @@ void MultiEntityRenderer::clean() {
 	VAO.Delete();
 }
 
-void MultiEntityRenderer::Initialize() {
+void MultiEntityRenderer::Initialize(PerformanceProfiler* pProfilerIn) {
 	for (int i = 0; i < EntityList.EntityTypeList.size(); i++) {
 		EntityModel model = EntityList.EntityTypeList[i]->RenderModel;
 		EntityCachedModels[i] = model;
+		mProfiler = pProfilerIn;
+
 	}
 
 	shader.init("assets/shaders/Entity/MultiEntityVert.glsl", "assets/shaders/Entity/MultiEntityFrag.glsl");
@@ -106,7 +108,7 @@ void MultiEntityRenderer::SetupCall() {
 }
 
 void MultiEntityRenderer::Render() {
-
+	mProfiler->ProfileStart("root/render/entity");
 	SetupCall();
 
 	int n = 0;
@@ -170,7 +172,7 @@ void MultiEntityRenderer::Render() {
 		VAO.Unbind();
 	}
 	NumEntityRendered = n;
-
+	mProfiler->ProfileStop("root/render/entity");
 
 }
 
@@ -188,6 +190,7 @@ void MultiEntityRenderer::SetWindow(GLFWwindow* win) {
 
 
 void MultiEntityRenderer::Update() {
+	mProfiler->ProfileStart("root/update/entity");
 	int width, height;
 
 	glfwGetWindowSize(window, &width, &height);
@@ -209,6 +212,7 @@ void MultiEntityRenderer::Update() {
 	shader.setFloat("VerticalRenderDistance", (float)(VerticalRenderDistance * 16));
 	shader.setVec3("camPos", camera->Position);
 	shader.setFloat("TimeDelta", TimePastTick);
+	mProfiler->ProfileStop("root/update/entity");
 }
 
 void MultiEntityRenderer::Reload() {
@@ -225,5 +229,5 @@ void MultiEntityRenderer::Reload() {
 
 	EntityList.Initialize();
 
-	Initialize();
+	Initialize(mProfiler);
 }

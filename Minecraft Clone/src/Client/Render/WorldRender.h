@@ -10,6 +10,7 @@
 #include "../../Level/Server/Communication/InternalServer.h"
 #include "../../RenderEngine/ChunkRenderer/TerrainRenderer.h"
 #include "WorldRenderInfo.h"
+#include "../Profiler/PerformanceProfiler.h"
 
 class WorldRender : public WorldRenderInfo{
 public:
@@ -24,13 +25,14 @@ public:
 
 	void LoadChunkMultiToRenderer(std::vector<ChunkID> chunks);
 
-	void Start(GLFWwindow* window_, InternalServer* world_);
+	void Start(GLFWwindow* window_, InternalServer* world_, PerformanceProfiler* pProfilerIn);
 
 	void Stop();
 
 	void Update();
 
 	TerrainRenderer RendererV2;
+	PerformanceProfiler* mProfiler;
 private:
 
 	void Worker(int id);

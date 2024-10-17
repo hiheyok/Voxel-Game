@@ -14,6 +14,6 @@ void EntityRenderCache::RemoveEntity(EntityUUID EntityUUID) {
 	EntityContainer.erase(EntityUUID);
 }
 
-std::unordered_map<EntityTypeID, std::unordered_map<EntityUUID, EntityProperty>>& EntityRenderCache::GetEntitiesTypeSeparated() {
+ska::flat_hash_map<EntityTypeID, ska::flat_hash_map<EntityUUID, EntityProperty>>& EntityRenderCache::GetEntitiesTypeSeparated() {
 	return EntitySeparated;
 }

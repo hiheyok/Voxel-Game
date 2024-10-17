@@ -7,6 +7,9 @@
 #include "../../Core/Options/Option.h"
 #include "../../Level/Timer/Timer.h"
 
+#include <concurrent_vector.h>
+#include <mutex>
+
 class TerrainRenderer {
 public:
 	TerrainRenderer() {
@@ -46,6 +49,8 @@ public:
 	size_t amountOfMeshGenerated = 1;
 
 private:
+	void GarbageCollectorThread();
+
 	void AddChunk(ChunkID ID, std::vector<uint32_t> data, std::vector<ChunkDrawBatch>* BatchType, std::unordered_map<ChunkID, int>* LookUpMap);
 
 	void SetupShaders();
@@ -54,6 +59,7 @@ private:
 
 	void CreateNewTransparentBatch();
 
+	Concurrency::concurrent_vector<void*> mGarbagePointers{};
 	int m_HorizontalRenderDistance = 16;
 	int m_VerticalRenderDistance = 16;
 	float m_FOV = 80.f;
@@ -66,9 +72,12 @@ private:
 	std::unordered_map<ChunkID, int> ChunkBatchTransparentLookup; //f: ChunkID -> TransparentBatchIndex
 
 	GLFWwindow* window = nullptr;
+	bool stop = false;
+	std::thread mGarbageCollectorThread;
 
 	Shader CubicShader;
 	Camera* camera;
 	Timer time;
+	std::mutex mLock;
 };
 

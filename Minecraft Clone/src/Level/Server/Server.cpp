@@ -19,6 +19,10 @@ vector<EntityProperty> Server::getUpdatedEntities() {
 	return level.mainWorld->worldInteractions.getUpdatedEntities();
 }
 
+vector<EntityUUID> Server::getRemovedEntities() {
+	return level.mainWorld->worldInteractions.getRemovedEntities();
+}
+
 bool Server::checkEntityOnGround(EntityUUID id) {
 	return level.mainWorld->worldInteractions.Collusions.isEntityOnGround(level.mainWorld->worldInteractions.getEntity(id));
 }
@@ -82,4 +86,8 @@ void Server::tick() {
 	level.mainWorld->EventTick();
 	level.updateDimensions();
 	level.mainWorld->worldInteractions.worldLoader->load();
+}
+
+void Server::sendEvent(Event pEventIn) {
+	level.mainWorld->EventManager.AddEvent(pEventIn);
 }

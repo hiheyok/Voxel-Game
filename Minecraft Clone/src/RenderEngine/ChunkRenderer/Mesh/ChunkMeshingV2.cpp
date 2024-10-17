@@ -16,23 +16,208 @@ constexpr int tintBitOffset = 29; // 1 bit
 constexpr int textureBitOffset = 10; // 18 bits
 constexpr int blockShadingBitOffset = 28; // 4 bits
 
+constexpr int SHUFFLE =  _MM_SHUFFLE(2, 3, 0, 1);
+
+#define PROFILE_DEBUG
+
+void MeshingV2::ChunkMeshData::GenerateCache() {
+#ifndef PROFILE_DEBUG
+	profiler.ProfileStart(profiler.hasher("root/cacheGen/center"));
+#endif
+	for (int x = 0; x < 16; x++) {
+		for (int y = 0; y < 16; y++) {
+			for (int z = 0; z < 16; z++) {
+				setCachedBlockID(chunk->GetBlockUnsafe(x, y, z), x, y, z);
+			}
+		}
+	}
+#ifndef PROFILE_DEBUG
+	profiler.ProfileStop(profiler.hasher("root/cacheGen/center"));
+	profiler.ProfileStart(profiler.hasher("root/cacheGen/side"));
+#endif
+	for (int side = 0; side < 6; side++) {
+		int axis = side >> 1;
+		int direction = side & 0b1;
+
+		if (chunk->Neighbors[side] == NULL) {
+			continue;
+		}
+
+		for (int u = 0; u < 16; u++) {
+			for (int v = 0; v < 16; v++) {
+				int pos[3]{0, 0, 0};
+
+				pos[axis] = direction * 15;
+				pos[(axis + 1) % 3] = u;
+				pos[(axis + 2) % 3] = v;
+
+				int localPos[3]{ 0, 0, 0 };
+				localPos[axis] = 17 - 17 * direction;
+				localPos[(axis + 1) % 3] = u + 1;
+				localPos[(axis + 2) % 3] = v + 1;
+
+				ChunkCache[localPos[0] * 18 * 18 + localPos[2] * 18 + localPos[1]] = chunk->Neighbors[side]->GetBlockUnsafe(pos[0], pos[1], pos[2]);
+			}
+		}
+	}
+#ifndef PROFILE_DEBUG
+	profiler.ProfileStop(profiler.hasher("root/cacheGen/side"));
+#endif
+}
+
 void MeshingV2::ChunkMeshData::GenerateMesh() {
 	//Initialize
 	if (chunk == nullptr) {
 		return;
 	}
+	//	Vertices.reserve(6 * 128);
+	//	TransparentVertices.reserve(6 * 128);
 	Position = chunk->Position;
 	chunk->Use();
-	GenerateFaceCollection();
+	GenerateCache();
 	chunk->Unuse();
-
+	GenerateFaceCollection();
+	
+#ifndef PROFILE_DEBUG
+	profiler.RegisterPaths("root/mesh/addbock/getModel");
+	profiler.RegisterPaths("root/mesh/addbock/checkVisibility");
+	profiler.RegisterPaths("root/mesh/addbock/addFace");
+	profiler.RegisterPaths("root/cacheGen/side");
+	profiler.RegisterPaths("root/cacheGen/center");
+	profiler.RegisterPaths("root/mesh/addbock/checkVisibility/getmodel");
+	profiler.RegisterPaths("root/mesh/addbock/checkVisibility/actualTest");
+#endif
 }
 
 //Checks if there are anything different between q0 and q1
 
 //Loops through all the blocks in the chunk and check if each block side is visible. If a block side is visible, it generates the quad and puts it in the cache
+ 
+//#define USE_OLD_MESH
 
 void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
+#ifndef USE_OLD_MESH
+	std::vector<uint8_t> FaceVisibility(8192, 0b00);
+	std::vector<uint8_t> usedBlock(16 * 16 * 16, 0b00);
+
+	for (int side = 0; side < 2; side++) {
+
+		int8_t offset = 1 - side * 2;
+
+		for (int Axis = 0; Axis < 3; Axis++) {
+			int AxisU = (Axis + 1) % 3;
+			int AxisV = (Axis + 2) % 3;
+
+			int pos[3]{ 0,0,0 };
+
+			memset(usedBlock.data(), 0x00, 16 * 16 * 16);
+
+			for (pos[Axis] = 0; pos[Axis] < 16; ++pos[Axis]) {//Slice
+				for (pos[AxisU] = 0; pos[AxisU] < 16; ++pos[AxisU]) {
+					for (pos[AxisV] = 0; pos[AxisV] < 16; ++pos[AxisV]) {
+
+						if (usedBlock[pos[0] * 256 + pos[1] * 16 + pos[2]] == 0xFFU) {
+							continue;
+						}
+
+						BlockID currBlock = getCachedBlockID(pos[0], pos[1], pos[2]);
+
+
+						const ModelV2::BlockModelV2& model = Blocks.getBlockModelDereferenced(currBlock);
+
+						usedBlock[pos[0] * 256 + pos[1] * 16 + pos[2]] = 0xFFU;
+
+						if (!model.isInitialized) continue;
+
+						pos[Axis] += offset;
+						BlockID frontBlock = getCachedBlockID(pos[0], pos[1], pos[2]);
+						pos[Axis] -= offset;
+
+						//Check if it is visible from the back and front
+						for (int i = 0; i < model.Elements.size(); ++i) {
+							FaceVisibility[i] = 0;
+							const Cuboid& element = model.Elements[i];
+
+							if (element.Faces[Axis * 2 + side].ReferenceTexture.length() == 0)
+								continue;
+
+							if (element.Faces[Axis * 2 + side].CullFace != -1) {
+								if (!IsFaceVisible(element, pos[0], pos[1], pos[2], element.Faces[Axis * 2 + side].CullFace)) continue;
+							}
+
+							FaceVisibility[i] |= 0b1;
+						}
+
+						//Spread
+
+						int uLength = 1;
+						int vLength = 1;
+						int qPos[3]{ pos[0], pos[1], pos[2] };
+
+						for (qPos[AxisV] = pos[AxisV] + 1; qPos[AxisV] < 16; ++qPos[AxisV]) {
+							//Check if they are the same
+							BlockID currBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
+							qPos[Axis] += offset;
+							BlockID frontBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
+							qPos[Axis] -= offset;
+
+							if (currBlock2 != currBlock || frontBlock2 != frontBlock) {
+								break;
+							}
+							usedBlock[qPos[0] * 256 + qPos[1] * 16 + qPos[2]] = 0xFFU;
+							vLength++;
+						}
+
+						qPos[0] = pos[0];
+						qPos[1] = pos[1];
+						qPos[2] = pos[2];
+
+						for (qPos[AxisU] = pos[AxisU] + 1; qPos[AxisU] < 16; ++qPos[AxisU]) {
+							bool isValid = true;
+
+							for (qPos[AxisV] = pos[AxisV]; qPos[AxisV] < pos[AxisV] + vLength; ++qPos[AxisV]) {
+								BlockID currBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
+								qPos[Axis] += offset;
+								BlockID frontBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
+								qPos[Axis] -= offset;
+
+								if (currBlock2 != currBlock || frontBlock2 != frontBlock) {
+									isValid = false;
+									break;
+								}
+							}
+
+							if (!isValid) {
+								break;
+							}
+
+							for (qPos[AxisV] = pos[AxisV]; qPos[AxisV] < pos[AxisV] + vLength; ++qPos[AxisV]) {
+								usedBlock[qPos[0] * 256 + qPos[1] * 16 + qPos[2]] = 0xFFU;
+							}
+
+							++uLength;
+						}
+
+						qPos[0] = pos[0];
+						qPos[1] = pos[1];
+						qPos[2] = pos[2];
+						//Memorize & Add Faces
+						for (int i = 0; i < model.Elements.size(); i++) {
+							if (FaceVisibility[i] != 1) continue;
+							const Cuboid& element = model.Elements[i];
+							for (qPos[AxisU] = pos[AxisU]; qPos[AxisU] < pos[AxisU] + uLength; ++qPos[AxisU]) {
+								for (qPos[AxisV] = pos[AxisV]; qPos[AxisV] < pos[AxisV] + vLength; ++qPos[AxisV]) {
+									AddFacetoMesh(element.Faces[Axis * 2], Axis * 2 + side, element.From, element.To, model.AmbientOcclusion, qPos[0], qPos[1], qPos[2]);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+#else
 	for (int x = 0; x < 16; x++) {
 		for (int y = 0; y < 16; y++) {
 			for (int z = 0; z < 16; z++) {
@@ -40,34 +225,57 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 			}
 		}
 	}
+#endif
 }
 
 void MeshingV2::ChunkMeshData::AddBlock(int x, int y, int z) {
-	BlockID b = chunk->GetBlockUnsafe(x, y, z);
-	if (b == Blocks.AIR) return;
+#ifndef PROFILE_DEBUG
+	profiler.ProfileStart(profiler.hasher("root/mesh/addbock/getModel"));
+#endif
+	BlockID b = getCachedBlockID(x, y, z);
+	if (b == Blocks.AIR) {
+#ifndef PROFILE_DEBUG
+		profiler.ProfileStop(profiler.hasher("root/mesh/addbock/getModel"));
+#endif
+		return;
+	}
 	Block* block = Blocks.getBlockType(b);
 	ModelV2::BlockModelV2* model = block->BlockModelData;
+#ifndef PROFILE_DEBUG
+	profiler.ProfileStop(profiler.hasher("root/mesh/addbock/getModel"));
+#endif
 	if (model == NULL) return;
-
-	for (Cuboid& element : model->Elements) {
-
+	
+	for (int i = 0; i < model->Elements.size(); i++) {
+		const Cuboid& element = model->Elements[i];
 		for (int direction = 0; direction < 6; direction++) {
-			if (element.Faces[direction].ReferenceTexture.length() == 0) continue;// means that there isnt a face here
-
-			if (element.Faces[direction].CullFace != -1) {
-
-				if (!IsFaceVisible(element, x, y, z, element.Faces[direction].CullFace))
-					continue;
+			
+			if (element.Faces[direction].ReferenceTexture.length() == 0) {
+			//	profiler.ProfileStop(profiler.hasher("root/mesh/addbock/checkVisibility"));
+				continue;
 			}
 
+			if (element.Faces[direction].CullFace != -1) {
+				
+				if (!IsFaceVisible(element, x, y, z, element.Faces[direction].CullFace)) {
+					continue;
+				}
+			}
+		//	profiler.ProfileStop(profiler.hasher("root/mesh/addbock/checkVisibility"));
+#ifndef PROFILE_DEBUG
+			profiler.ProfileStart(profiler.hasher("root/mesh/addbock/addFace"));
+#endif
 			AddFacetoMesh(element.Faces[direction], direction, element.From, element.To, model->AmbientOcclusion, x, y, z);
+#ifndef PROFILE_DEBUG
+			profiler.ProfileStop(profiler.hasher("root/mesh/addbock/addFace"));
+#endif
 		}
 	}
 	
 }
 
 
-inline void MeshingV2::ChunkMeshData::AddFacetoMesh(BlockFace& face, uint8_t axis, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z) {
+inline void MeshingV2::ChunkMeshData::AddFacetoMesh(const BlockFace& face, uint8_t axis, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z) {
 
 	switch (axis >> 1) {
 	case 0:
@@ -82,7 +290,7 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh(BlockFace& face, uint8_t axi
 	}
 }
 
-inline void MeshingV2::ChunkMeshData::AddFacetoMesh_X(BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z) {
+inline void MeshingV2::ChunkMeshData::AddFacetoMesh_X(const BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z) {
 	x *= 16;
 	y *= 16;
 	z *= 16;
@@ -167,7 +375,7 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_X(BlockFace& face, uint8_t d
 	}
 }
 
-inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Y(BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z) {
+inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Y(const BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z) {
 	x *= 16;
 	y *= 16;
 	z *= 16;
@@ -246,12 +454,12 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Y(BlockFace& face, uint8_t d
 			,0u | P1[0] | P1[1] | P1[2] | Norm | tint//5
 			,0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset)
 			});
-		
+
 		break;
 	}
 }
 
-inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Z(BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z) { //x : x
+inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Z(const BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z) { //x : x
 	x *= 16;
 	y *= 16;
 	z *= 16;
@@ -335,6 +543,18 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Z(BlockFace& face, uint8_t d
 	}
 }
 
+inline BlockID& MeshingV2::ChunkMeshData::getCachedBlockID(int x, int y, int z) {
+	return ChunkCache[(x + 1) * 18 * 18 + (z + 1) * 18 + (y + 1)];
+}
+
+inline BlockID& MeshingV2::ChunkMeshData::getCachedBlockID(int* pos) {
+	return getCachedBlockID(pos[0], pos[1], pos[2]);
+}
+
+inline void MeshingV2::ChunkMeshData::setCachedBlockID(BlockID b, int x, int y, int z) {
+	ChunkCache[(x + 1) * 18 * 18 + (z + 1) * 18 + (y + 1)] = b;
+}
+
 inline glm::ivec4 MeshingV2::ChunkMeshData::getAO(uint8_t direction, int x, int y, int z) {
 	const uint8_t AMBIENT_OCCLUSION_STRENGTH = 2;
 	glm::ivec3 pos{x, y, z};
@@ -357,56 +577,57 @@ inline glm::ivec4 MeshingV2::ChunkMeshData::getAO(uint8_t direction, int x, int 
 	//Check up
 	pos[axis1] += 1;
 
-	if (chunk->GetBlock(pos.x, pos.y, pos.z) != Blocks.AIR) {
-		PP = PP >= AMBIENT_OCCLUSION_STRENGTH ? PP - AMBIENT_OCCLUSION_STRENGTH : 0;
-		PN = PN >= AMBIENT_OCCLUSION_STRENGTH ? PN - AMBIENT_OCCLUSION_STRENGTH : 0;
+	if (getCachedBlockID(pos.x, pos.y, pos.z) != Blocks.AIR) {
+		PP -= AMBIENT_OCCLUSION_STRENGTH;
+		PN -= AMBIENT_OCCLUSION_STRENGTH;
 	}
 
 	pos[axis1] -= 2;
 
-	if (chunk->GetBlock(pos.x, pos.y, pos.z) != Blocks.AIR) {
-		NP = NP >= AMBIENT_OCCLUSION_STRENGTH ? NP - AMBIENT_OCCLUSION_STRENGTH : 0;
-		NN = NN >= AMBIENT_OCCLUSION_STRENGTH ? NN - AMBIENT_OCCLUSION_STRENGTH : 0;
+	if (getCachedBlockID(pos.x, pos.y, pos.z) != Blocks.AIR) {
+		NP -= AMBIENT_OCCLUSION_STRENGTH;
+		NN -= AMBIENT_OCCLUSION_STRENGTH;
 	}
 
 	pos[axis1] += 1;
 	pos[axis2] += 1;
 
-	if (chunk->GetBlock(pos.x, pos.y, pos.z) != Blocks.AIR) {
-		NP = NP >= AMBIENT_OCCLUSION_STRENGTH ? NP - AMBIENT_OCCLUSION_STRENGTH : 0;
-		PP = PP >= AMBIENT_OCCLUSION_STRENGTH ? PP - AMBIENT_OCCLUSION_STRENGTH : 0;
+	if (getCachedBlockID(pos.x, pos.y, pos.z) != Blocks.AIR) {
+		NP -= AMBIENT_OCCLUSION_STRENGTH;
+		PP -= AMBIENT_OCCLUSION_STRENGTH;
 	}
 
 	pos[axis2] -= 2;
 
-	if (chunk->GetBlock(pos.x, pos.y, pos.z) != Blocks.AIR) {
-		PN = PN >= AMBIENT_OCCLUSION_STRENGTH ? PN - AMBIENT_OCCLUSION_STRENGTH : 0;
-		NN = NN >= AMBIENT_OCCLUSION_STRENGTH ? NN - AMBIENT_OCCLUSION_STRENGTH : 0;
+	if (getCachedBlockID(pos.x, pos.y, pos.z) != Blocks.AIR) {
+		PN -= AMBIENT_OCCLUSION_STRENGTH;
+		NN -= AMBIENT_OCCLUSION_STRENGTH;
 	}
 
 	pos[axis2] += 1;
+
 
 	//Check corners now
 	pos[axis1] += 1;
 	pos[axis2] += 1;
 
-	if (chunk->GetBlock(pos.x, pos.y, pos.z) != Blocks.AIR)
-		PP = PP >= AMBIENT_OCCLUSION_STRENGTH ? PP - AMBIENT_OCCLUSION_STRENGTH : 0;
+	if (getCachedBlockID(pos.x, pos.y, pos.z) != Blocks.AIR)
+		PP -= AMBIENT_OCCLUSION_STRENGTH;
 
 
 	pos[axis1] -= 2;
-	if (chunk->GetBlock(pos.x, pos.y, pos.z) != Blocks.AIR)
-		NP = NP >= AMBIENT_OCCLUSION_STRENGTH ? NP - AMBIENT_OCCLUSION_STRENGTH : 0;
+	if (getCachedBlockID(pos.x, pos.y, pos.z) != Blocks.AIR)
+		NP -= AMBIENT_OCCLUSION_STRENGTH;
 
 	pos[axis2] -= 2;
 
-	if (chunk->GetBlock(pos.x, pos.y, pos.z) != Blocks.AIR)
-		NN = NN >= AMBIENT_OCCLUSION_STRENGTH ? NN - AMBIENT_OCCLUSION_STRENGTH : 0;
+	if (getCachedBlockID(pos.x, pos.y, pos.z) != Blocks.AIR)
+		NN -= AMBIENT_OCCLUSION_STRENGTH;
 
 	pos[axis1] += 2;
 
-	if (chunk->GetBlock(pos.x, pos.y, pos.z) != Blocks.AIR)
-		PN = PN >= AMBIENT_OCCLUSION_STRENGTH ? PN - AMBIENT_OCCLUSION_STRENGTH : 0;
+	if (getCachedBlockID(pos.x, pos.y, pos.z) != Blocks.AIR)
+		PN -= AMBIENT_OCCLUSION_STRENGTH;
 
 
 	if (PP >= (15 - InitialLighting))
@@ -432,26 +653,48 @@ inline glm::ivec4 MeshingV2::ChunkMeshData::getAO(uint8_t direction, int x, int 
 	return glm::ivec4(PP, PN, NP, NN);
 
 }
+inline static bool checkOverlap(const Cuboid& element, const __m128& cubeData, uint8_t& axis1, uint8_t& axis2) {
+	__m128 elementData = _mm_set_ps(element.To[axis2], element.From[axis2], element.To[axis1], element.From[axis1]);
+	__m128 cmp = _mm_cmplt_ps(elementData, cubeData);
+	return !_mm_movemask_ps(cmp);
+}
 
 //Checks if a block side is visible to the player
-inline bool MeshingV2::ChunkMeshData::IsFaceVisible(Cuboid& cube, int x, int y, int z, uint8_t side) {
+inline bool MeshingV2::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int x, int y, int z, uint8_t side) {
 	//IsFaceVisibleCalls++;
-
-	uint8_t axis = (side >> 1); //Get side
-	uint8_t oppositeSide = axis * 2 + static_cast<uint8_t>(!(side & 0b1));
+	const uint8_t axis = (side >> 1); //Get side
+	const uint8_t axis1 = (axis + 1) % 3;
+	const uint8_t axis2 = (axis + 2) % 3;
+	const uint8_t oppositeSide = axis * 2 + static_cast<uint8_t>(!(side & 0b1));
 
 	int p[3]{ x, y, z };
 
 	p[axis] += 1 - 2 * (side & 0b1);
+//	return getCachedBlockID(p[0], p[1], p[2]) == Blocks.AIR;
 
-	ModelV2::BlockModelV2* model = Blocks.getBlockType(chunk->GetBlock(p[0], p[1], p[2]))->BlockModelData;
+#ifndef PROFILE_DEBUG
+	profiler.ProfileStart(profiler.hasher("root/mesh/addbock/checkVisibility/getmodel"));
+#endif
+	const ModelV2::BlockModelV2& model = Blocks.getBlockModelDereferenced(getCachedBlockID(p[0], p[1], p[2]));
+#ifndef PROFILE_DEBUG
+	profiler.ProfileStop(profiler.hasher("root/mesh/addbock/checkVisibility/getmodel"));
+#endif
+	if (!model.isInitialized) return true;
+#ifndef PROFILE_DEBUG
+	profiler.ProfileStart(profiler.hasher("root/mesh/addbock/checkVisibility/actualTest"));
+#endif
 
-	if (model == NULL) return true;
+	__m128i cubeData = _mm_set_epi32(cube.To[axis2], cube.From[axis2], cube.To[axis1], cube.From[axis1]);
 
-	for (const Cuboid& element : model->Elements) {
-		if (element.Faces[oppositeSide].ReferenceTexture.empty()) continue;
+	//swap the order of cube's From and To for the comparison
+	cubeData = _mm_shuffle_epi32(cubeData, SHUFFLE);
 
-		if (element.Faces[oppositeSide].CullFace != oppositeSide)
+	for (int i = 0; i < model.Elements.size(); i++) {
+		const Cuboid& element = model.Elements[i];
+		if (element.Faces[oppositeSide].CullFace != oppositeSide ||
+			element.Faces[oppositeSide].isSeeThrough ||
+			element.Faces[oppositeSide].hasTransparency ||
+			element.Faces[oppositeSide].ReferenceTexture.empty())
 			continue;
 
 		if (side & 1) //if the  block arent touching
@@ -460,27 +703,30 @@ inline bool MeshingV2::ChunkMeshData::IsFaceVisible(Cuboid& cube, int x, int y, 
 			if (element.From[axis] > 0) continue;
 
 		//Check if the faces overlap
+		__m128i elementData = _mm_set_epi32(element.To[axis2], element.From[axis2], element.To[axis1], element.From[axis1]);
+		__m128i cmp = _mm_cmplt_epi32(elementData, cubeData);
+		if (!_mm_movemask_ps(_mm_castsi128_ps(cmp))) continue;
 
-		if (element.From[(axis + 1) % 3] > cube.From[(axis + 1) % 3] || element.To[(axis + 1) % 3] < cube.To[(axis + 1) % 3] ||
-			element.From[(axis + 2) % 3] > cube.From[(axis + 2) % 3] || element.To[(axis + 2) % 3] < cube.To[(axis + 2) % 3]) {
-			continue;
-		}
-
+#ifndef PROFILE_DEBUG
+		profiler.ProfileStop(profiler.hasher("root/mesh/addbock/checkVisibility/actualTest"));
+#endif
 		return false;
-
 	}
+#ifndef PROFILE_DEBUG
+	profiler.ProfileStop(profiler.hasher("root/mesh/addbock/checkVisibility/actualTest"));
+#endif
 
 	return true;
 }
 
-inline bool MeshingV2::ChunkMeshData::IsFaceVisibleUnsafe(Cuboid& cube, int x, int y, int z, uint8_t side) {
+inline bool MeshingV2::ChunkMeshData::IsFaceVisibleUnsafe(const Cuboid& cube, int x, int y, int z, uint8_t side) {
 	uint8_t axis = (side >> 1); //Get side
 
 	int p[3]{ x,y,z };
 
 	p[axis] += 1 - 2 * (side & 0b1);
 
-	return Blocks.getBlockType(chunk->GetBlockUnsafe(p[0], p[1], p[2]))->Properties->transparency;
+	return Blocks.getBlockType(getCachedBlockID(p[0], p[1], p[2]))->Properties->transparency;
 }
 
 inline bool MeshingV2::ChunkMeshData::CompareBlockSide(int x, int y, int z, uint8_t side, BlockID b) {
@@ -492,7 +738,7 @@ inline bool MeshingV2::ChunkMeshData::CompareBlockSide(int x, int y, int z, uint
 
 	p[axis] += 1 - 2 * (side & 0b1);
 
-	return chunk->GetBlock(p[0], p[1], p[2]) == b;
+	return getCachedBlockID(p[0], p[1], p[2]) == b;
 }
 
 inline bool MeshingV2::ChunkMeshData::CompareBlockSideUnsafe(int x, int y, int z, uint8_t side, BlockID b) {
@@ -502,5 +748,5 @@ inline bool MeshingV2::ChunkMeshData::CompareBlockSideUnsafe(int x, int y, int z
 
 	p[axis] += 1 - 2 * (side & 0b1);
 
-	return chunk->GetBlockUnsafe(p[0], p[1], p[2]) == b;
+	return getCachedBlockID(p[0], p[1], p[2]) == b;
 }

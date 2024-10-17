@@ -9,6 +9,7 @@
 #include "../Level/Item/ItemTextureAtlas.h"
 #include "Render/DebugScreen/DebugScreen.h"
 #include "../Level/Server/Communication/InternalServer.h"
+#include "Profiler/PerformanceProfiler.h"
 
 class Client : protected Window {
 public:
@@ -32,4 +33,5 @@ private:
 	TexturedFrameBuffer Framebuffer;
 	TextRenderer TextRender;
 	DebugScreen debugScreen;
+	PerformanceProfiler profiler;
 };

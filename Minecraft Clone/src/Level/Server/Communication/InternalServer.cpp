@@ -65,10 +65,18 @@ vector<EntityProperty> InternalServer::getUpdatedEntities() {
 	return server->getUpdatedEntities();
 }
 
+vector<EntityUUID>  InternalServer::getRemovedEntities() {
+	return server->getRemovedEntities();
+}
+
 bool InternalServer::checkRayIntersection(Ray& ray) {
 	return server->getRayIntersection(ray);
 }
 
 BlockID InternalServer::getBlock(int x, int y, int z) {
 	return server->getBlock(x, y, z);
+}
+
+void InternalServer::sendEvent(Event pEventIn) {
+	server->sendEvent(pEventIn);
 }

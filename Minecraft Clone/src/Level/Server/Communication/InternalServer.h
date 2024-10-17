@@ -31,8 +31,12 @@ public:
 
 	std::vector<EntityProperty> getUpdatedEntities();
 
+	std::vector<EntityUUID> getRemovedEntities();
+
 	bool checkRayIntersection(Ray& ray);
 
 	BlockID getBlock(int x, int y, int z);
+
+	void sendEvent(Event pEventIn);
 
 };

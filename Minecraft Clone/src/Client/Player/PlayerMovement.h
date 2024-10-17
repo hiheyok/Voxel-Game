@@ -18,6 +18,8 @@ private:
 
 	void MovePlayer(Player* player, UserInputs Inputs, InternalServer* server);
 
+	void MoveRelative(Player* player, float strafe, float up, float forward, float friction);
+
 	bool m_EnableCollusion = false;
 
 };

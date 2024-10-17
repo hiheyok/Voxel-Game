@@ -32,6 +32,7 @@ struct BlockFace {
 	unsigned int TextureCount = NULL; //For amination purposes.
 	unsigned int rotation = 0;
 	bool hasTransparency = false;
+	bool isSeeThrough = false;
 	glm::ivec4 UV = glm::ivec4(0, 0, 16, 16);
 
 	glm::ivec2 UVCoordNN{ 0, 0 };
@@ -73,8 +74,9 @@ public:
 
 namespace ModelV2 {
 	struct BlockModelV2 {
-		bool AmbientOcclusion = true; //default value
 		std::vector<Cuboid> Elements{};
+		bool AmbientOcclusion = true; //default value
+		bool isInitialized = false;
 		std::unordered_map <std::string, std::string > TextureVariable;
 		BlockDisplay Display[8]{};
 

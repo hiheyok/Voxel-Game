@@ -80,12 +80,14 @@ void BlockList::InitializeBlockModels()  {
 	ska::flat_hash_map<std::string, int> TextureIDs;
 	ska::flat_hash_map<int, int> TextureRepeatCount;
 	ska::flat_hash_map<int, bool> TextureTransparency;
-
+	ska::flat_hash_map<int, bool> TextureSeeThrough;
+ 
 	//It will first go through the block models and create the models without loading the texture
 	for (const auto& [Name, ID] : BlockIDNameData) {
 		auto Tokens = Tokenize(Name, ':');
 
 		ModelV2::BlockModelV2* model = getBlockModel("block/" + Tokens.back(), Tokens.front());
+		model->isInitialized = true;
 		getBlockType(ID)->BlockModelData = model;
 	}
 
@@ -116,6 +118,7 @@ void BlockList::InitializeBlockModels()  {
 					element.Faces[i].TextureID = TextureIDs[path];
 					element.Faces[i].TextureCount = TextureRepeatCount[element.Faces[i].TextureID];
 					element.Faces[i].hasTransparency = TextureTransparency[element.Faces[i].TextureID];
+					element.Faces[i].isSeeThrough = TextureSeeThrough[element.Faces[i].TextureID];
 					continue; //Exits
 				}
 
@@ -129,24 +132,37 @@ void BlockList::InitializeBlockModels()  {
 				glm::vec4 uv{};
 
 				bool transparency = false;
+				bool isSeeThrough = false;
 
-				std::optional<RawTextureData> d = BlockTextureAtlas.AddTextureToAtlas(TexFile, transparency);
-				
+				std::optional<RawTextureData> d = BlockTextureAtlas.AddTextureToAtlas(TexFile, transparency, isSeeThrough);
+
 				if (!d.has_value()) {
 					Logger.LogError("Texture Loading", "Unable to load texture");
 					continue;
 				}
-					
+
 				TextureIDs[path] = NumLayersBefore + 1;
 				TextureRepeatCount[NumLayersBefore + 1] = BlockTextureAtlas.GetBlockCount() - NumLayersBefore;
 				TextureTransparency[NumLayersBefore + 1] = transparency;
+				TextureSeeThrough[NumLayersBefore + 1] = isSeeThrough;
+
 
 				element.Faces[i].TextureID = TextureIDs[path];
 				element.Faces[i].TextureCount = TextureRepeatCount[element.Faces[i].TextureID];
-				element.Faces[i].hasTransparency = d.value().format == transparency;
-
+				element.Faces[i].hasTransparency = transparency;
+				element.Faces[i].isSeeThrough = isSeeThrough;
 			}
 		}
+	}
 
+
+	for (int i = 0; i < BlockTypeData.size(); i++) {
+		ModelV2::BlockModelV2 model;
+
+		if (BlockTypeData[i]->BlockModelData != NULL) {
+			model = *BlockTypeData[i]->BlockModelData;
+		}
+		model.TextureVariable.clear();
+		BlockModelData.emplace_back(model);
 	}
 }
