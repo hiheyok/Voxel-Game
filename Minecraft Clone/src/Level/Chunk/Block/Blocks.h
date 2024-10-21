@@ -1,5 +1,4 @@
 #pragma once
-#include <unordered_map>
 #include "Block.h"
 #include "Material/BlockMaterial.h"
 #include "Texture/BlockTexture.h"
@@ -7,7 +6,7 @@
 
 class BlockList{
 private:
-	std::unordered_map<std::string, BlockID> BlockIDNameData;
+	FastHashMap<std::string, BlockID> BlockIDNameData;
 	int BlockTypeCount = 0;
 
 	void InitializeBlockModels();

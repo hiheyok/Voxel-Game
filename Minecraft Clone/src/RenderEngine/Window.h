@@ -5,7 +5,6 @@
 #include <glm/vec2.hpp>
 #include "../Utils/LogUtils.h"
 #include "../Client/IO/IO.h"
-#include <unordered_set>
 #include <vector>
 
 #include "../Client/IO/IO.h"

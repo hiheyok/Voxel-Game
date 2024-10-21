@@ -10,10 +10,10 @@ private:
 
 	int ItemCount = 0;
 	
-	std::unordered_map<BlockID, ItemID> BlockItemIDs;
+	FastHashMap<BlockID, ItemID> BlockItemIDs;
 
 public:
-	std::unordered_map<ItemID, Item> ItemContainer;
+	FastHashMap<ItemID, Item> ItemContainer;
 
 	Item AIR = RegisterBlockItem(Blocks.AIR);
 	Item STONE = RegisterBlockItem(Blocks.STONE);

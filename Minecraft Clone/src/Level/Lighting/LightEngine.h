@@ -1,7 +1,6 @@
 #pragma once
 #include "../World/WorldDataAccess.h"
 #include "../../Utils/Clock.h"
-#include <unordered_set>
 #include <thread>
 #include <mutex>
 #include <glm/vec4.hpp>

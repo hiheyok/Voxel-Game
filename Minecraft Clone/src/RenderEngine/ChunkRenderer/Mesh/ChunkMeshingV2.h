@@ -180,6 +180,6 @@ namespace MeshingV2 {
 
 		Chunk* chunk;
 
-		BlockID ChunkCache[18 * 18 * 18]{0x00000000};
+		BlockID ChunkCache[18 * 18 * 18]{NULL};
 	};
 }

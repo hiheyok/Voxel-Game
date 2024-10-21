@@ -159,7 +159,7 @@ void TerrainRenderer::GarbageCollectorThread() {
 	}
 }
 
-void TerrainRenderer::AddChunk(ChunkID ID, std::vector<uint32_t> data, std::vector<ChunkDrawBatch>* BatchType, std::unordered_map<ChunkID, int>* LookUpMap) {
+void TerrainRenderer::AddChunk(ChunkID ID, std::vector<uint32_t> data, std::vector<ChunkDrawBatch>* BatchType, FastHashMap<ChunkID, int>* LookUpMap) {
 	if (LookUpMap->count(ID)) {
 		size_t BatchIndex = LookUpMap->at(ID);
 		BatchType->at(BatchIndex).DeleteChunkVertices(ID);

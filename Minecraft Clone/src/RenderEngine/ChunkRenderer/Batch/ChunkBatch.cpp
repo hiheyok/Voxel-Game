@@ -2,7 +2,6 @@
 
 #include <iterator>
 #include "../../../Level/Timer/Timer.h"
-#include <unordered_set>
 using namespace glm;
 using namespace std;
 
@@ -233,7 +232,7 @@ void ChunkDrawBatch::Defrager(int Cycles) {
 
 
 void ChunkDrawBatch::ErrorCheck() {
-	std::unordered_set<ChunkID> UsedChunk;
+	FastHashSet<ChunkID> UsedChunk;
 	std::string Logs = "";
 
 	for (const auto& c : RenderList) {

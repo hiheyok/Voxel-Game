@@ -1,7 +1,6 @@
 #include "ChunkMeshing.h"
 #include <immintrin.h>
 #include "../../../Level/Chunk/Block/Blocks.h"
-#include <unordered_set>
 #include <bit> 
 
 using namespace Meshing;

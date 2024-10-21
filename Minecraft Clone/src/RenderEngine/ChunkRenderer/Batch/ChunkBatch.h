@@ -10,7 +10,6 @@
 #include "../../../Level/Chunk/Chunk.h"
 #include "../../OpenGL/Buffers/Buffer.h"
 #include "../MemoryPool/ChunkMemoryPool.h"
-#include <unordered_map>
 #include <list>
 #include <map>
 #include <array>
@@ -60,7 +59,7 @@ private:
 
 	bool UpdateCommands = false;
 
-	std::unordered_map<ChunkID, size_t> RenderListOffsetLookup; //f: ChunkID  -> Offset
+	FastHashMap<ChunkID, size_t> RenderListOffsetLookup; //f: ChunkID  -> Offset
 	std::vector<GLint> ChunkShaderPos;
 
 	std::vector<DrawCommandIndirect> DrawCommands;

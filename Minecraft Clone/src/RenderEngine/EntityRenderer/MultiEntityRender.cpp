@@ -1,5 +1,6 @@
 #include "MultiEntityRender.h"
 
+
 int MultiEntityRenderer::getNumEntityRendered() {
 	return NumEntityRendered;
 }

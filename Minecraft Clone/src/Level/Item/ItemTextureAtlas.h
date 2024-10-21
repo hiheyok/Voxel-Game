@@ -34,11 +34,11 @@ class ItemTextureAtlas {
 
 	
 public:
-	std::unordered_map<int, ItemUVMapping> ItemsUVMap;
+	FastHashMap<int, ItemUVMapping> ItemsUVMap;
 	
 	Texture2D Atlas;
 
-	std::unordered_map<int, int> Offsets;
+	FastHashMap<int, int> Offsets;
 	
 	void Initialize(int AtlasItemSize, int IndividualItemSize);
 

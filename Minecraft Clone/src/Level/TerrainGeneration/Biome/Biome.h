@@ -1,5 +1,4 @@
 #pragma once
-#include <unordered_map>
 #include "../../../Core/Registry/Registry.h"
 #include "../../../Core/Registry/ResourceLocation.h"
 #include "BiomeProperties.h"
@@ -19,8 +18,8 @@ public:
 	BiomeProperties biomeProperties;
 
 	static Registry<std::string, Biome*> REGISTRY;
-	static std::unordered_map<Biome*, int> BiomeIDs;
-	static std::unordered_map<int, Biome*> MUTATION_TO_BASE_ID_MAP;
+	static FastHashMap<Biome*, int> BiomeIDs;
+	static FastHashMap<int, Biome*> MUTATION_TO_BASE_ID_MAP;
 	static NoiseGeneratorPerlin TEMPERATURE_NOISE;
 	static NoiseGeneratorPerlin GRASS_COLOR_NOISE;
 
@@ -152,11 +151,13 @@ public:
 	}
 
 	void SetBlockChunkSafe(TallChunk* chunk, BlockID block, int x, int y, int z) {
+		if ((x | (y >> 4) | z) >> 4) return;
 		chunk->SetBlockUnsafe(x, y, z, block);
 	}
 
 	BlockID GetBlockChunkSafe(TallChunk* chunk, int x, int y, int z) {
-		chunk->GetBlockUnsafe( x, y, z);
+		if ((x | (y >> 4) | z) >> 4) return Blocks.AIR;
+		return chunk->GetBlockUnsafe( x, y, z);
 	}
 
 	void generateBiomeTerrain(JavaRandom& rand, TallChunk* chunk, int x, int z, double noiseVal, ChunkGeneratorSettings* settings) {
@@ -246,8 +247,8 @@ public:
 };
 
 _declspec(selectany) Registry<std::string, Biome*> Biome::REGISTRY = Registry<std::string, Biome*>();
-_declspec(selectany) std::unordered_map<Biome*, int> Biome::BiomeIDs = std::unordered_map<Biome*, int>();
-_declspec(selectany) std::unordered_map<int, Biome*> Biome::MUTATION_TO_BASE_ID_MAP = std::unordered_map<int, Biome*>();
+_declspec(selectany) FastHashMap<Biome*, int> Biome::BiomeIDs = FastHashMap<Biome*, int>();
+_declspec(selectany) FastHashMap<int, Biome*> Biome::MUTATION_TO_BASE_ID_MAP = FastHashMap<int, Biome*>();
 
 _declspec(selectany) NoiseGeneratorPerlin Biome::TEMPERATURE_NOISE = NoiseGeneratorPerlin(JavaRandom(1234L), 1);
 _declspec(selectany) NoiseGeneratorPerlin Biome::GRASS_COLOR_NOISE = NoiseGeneratorPerlin(JavaRandom(2345L), 1);

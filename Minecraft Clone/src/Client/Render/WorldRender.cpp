@@ -63,15 +63,16 @@ void WorldRender::Worker(int id) {
 			ivec3 pos = ChunkIDToPOS(task);
 
 			//Generates the meshes
+			
+			Chunk* c = server->getChunk(pos.x, pos.y, pos.z);
+			
 			auto t0 = std::chrono::high_resolution_clock::now();
-
-			ChunkMeshData* Mesh = new ChunkMeshData(server->getChunk(pos.x, pos.y, pos.z));
-
+			ChunkMeshData* Mesh = new ChunkMeshData(c);
+			auto t1 = std::chrono::high_resolution_clock::now();
 			amountOfMeshGenerated++;
-
 			FinishedJobs.push_back(Mesh);
 
-			auto t1 = std::chrono::high_resolution_clock::now();
+			
 
 			buildTime += (double)(t1 - t0).count() / 1000.0;
 			buildstage0 += Mesh->stage0;
@@ -111,7 +112,7 @@ void WorldRender::Update() {
 			if (ChunkUpdateLimit < UpdateAmount) {
 				break;
 			}
-			mProfiler->CombineCache(WorkerOutput[(uint64_t)WorkerID].front()->profiler);
+			//mProfiler->CombineCache(WorkerOutput[(uint64_t)WorkerID].front()->profiler);
 			RendererV2.AddChunk(WorkerOutput[(uint64_t)WorkerID].front());
 			WorkerOutput[WorkerID].pop_front();
 			UpdateAmount++;

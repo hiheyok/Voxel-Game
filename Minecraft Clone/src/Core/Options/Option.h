@@ -1,8 +1,8 @@
 #pragma once
 #include "../../FileManager/Files.h"
 #include "../../Utils/LogUtils.h"
-#include <unordered_map>
 #include <iostream>
+#include "../../Level/Typenames.h"
 
 class Options {
 public:
@@ -40,6 +40,6 @@ private:
 
 	void GenerateOptionFile(); //Generate file if deleted
 
-	std::unordered_map<std::string, int*> OptionName; //name -> ptr
+	FastHashMap<std::string, int*> OptionName; //name -> ptr
 
 } extern AppOptions;

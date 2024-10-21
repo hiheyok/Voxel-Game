@@ -2,7 +2,7 @@
 #include "../EventHandler.h"
 #include "../../Chunk/Block/Type/Dirt.h"
 #include "../../../Level/Dimension/Dimension.h"
-
+#include <intrin.h>
 
 
 void UpdateSurrounding(int x, int y, int z) {
@@ -38,9 +38,14 @@ void UpdateSurrounding(int x, int y, int z) {
 }
 
 void HandlePlaceBlock(BlockID block, int x, int y, int z) {
+	
 	Dimension* CurrentWorld = (Dimension*)Block::DimensionPTR;
+//	uint64_t tmp = __rdtsc();
 	CurrentWorld->worldInteractions.setBlock(block, x, y, z);
+//	tmp = __rdtsc() - tmp;
+//	printf("Clock Cycles: %d\n", tmp);
 	UpdateSurrounding(x, y, z);
+	
 }
 
 void HandleDirtTick(BlockID block, int x, int y, int z) {

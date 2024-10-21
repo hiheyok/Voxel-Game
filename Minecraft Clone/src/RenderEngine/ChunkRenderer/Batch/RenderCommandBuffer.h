@@ -5,7 +5,7 @@
 #include <stack>
 #include "../../../Level/Chunk/ChunkID.h"
 #include <iostream>
-#include <unordered_set>
+#include "../../../Level/Typenames.h"
 struct DrawCommandIndirect {
 	unsigned int  count = 0;
 	unsigned int  instanceCount = 0;
@@ -483,7 +483,7 @@ private:
 	glm::vec3 CurrentPosition = glm::vec3(0.f,0.f,0.f);
 
 	CMDGraph::CommandPtr* root = nullptr;
-	std::unordered_map<uint64_t, CMDGraph::CommandPtr*> CommandMap;
+	FastHashMap<uint64_t, CMDGraph::CommandPtr*> CommandMap;
 };
 
 

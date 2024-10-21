@@ -5,7 +5,7 @@ const BlockID Item::GetBlock() {
 }
 
 RawTextureData Item::GetTexture() {
-
+	return RawTextureData();
 }
 
 bool Item::CheckIsBlockItem() {

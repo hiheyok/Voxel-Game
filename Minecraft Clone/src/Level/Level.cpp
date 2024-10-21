@@ -7,7 +7,7 @@ void Level::Start(int worldGenThreadCount, int lightEngineThreadCount) {
 	mainWorld = new OverworldDimension();
 	mainWorld->Initialize(properties);
 	
-	long long Seed = -501575345763903LL;//-1587754402LL
+	long long Seed = -501575345763903LL;//-501575345763903LL;//-1587754402LL
 
 	levelLoader.Start(worldGenThreadCount, lightEngineThreadCount, mainWorld->worldInteractions.worldLoader->getWorld(), Seed);
 	Block::DimensionPTR = mainWorld;

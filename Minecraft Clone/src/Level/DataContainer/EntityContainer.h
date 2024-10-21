@@ -1,13 +1,12 @@
 #pragma once
 #include "../Entity/Entity.h"
 #include "../../Utils/Containers/skaHashmap.h"
-#include <unordered_map>
 #include <mutex>
 
 class EntityContainer { //Manages all entities in world
 private:
-	ska::flat_hash_map<EntityUUID, Entity*> Entities;
-	ska::flat_hash_set<EntityUUID> RemovedEntity;
+	FastHashMap<EntityUUID, Entity*> Entities;
+	FastHashSet<EntityUUID> RemovedEntity;
 	std::mutex EntityLock;
 	EntityUUID UniqueID = 0;
 	int EntityCount = 0;
@@ -30,8 +29,8 @@ public:
 		return EntityCount;
 	}
 
-	ska::flat_hash_map<EntityUUID, EntityProperty> ClientGetEntityUpdate() { //change this to past on a vector later
-		ska::flat_hash_map<EntityUUID, EntityProperty> UpdatedData;
+	FastHashMap<EntityUUID, EntityProperty> ClientGetEntityUpdate() { //change this to past on a vector later
+		FastHashMap<EntityUUID, EntityProperty> UpdatedData;
 
 		for (auto& entity : Entities) {
 			if (entity.second->isDirty)  {
@@ -52,8 +51,8 @@ public:
 		EntityCount--;
 	}
 
-	ska::flat_hash_set<EntityUUID> getRemovedEntities() {
-		ska::flat_hash_set<EntityUUID> a;
+	FastHashSet<EntityUUID> getRemovedEntities() {
+		FastHashSet<EntityUUID> a;
 		EntityLock.lock();
 		a = RemovedEntity;
 		RemovedEntity.clear();

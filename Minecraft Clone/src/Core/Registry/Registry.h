@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <string>
 #include <exception>
+#include "../../Level/Typenames.h"
 
 template <class K, class V> class Registry {
 public:
@@ -33,7 +34,7 @@ public:
 	}
 
 private:
-	std::unordered_map<K, V> Hashmap;
-	std::unordered_map<K, int> getIDbyKey;
-	std::unordered_map<int, K> getKeybyID;
+	FastHashMap<K, V> Hashmap;
+	FastHashMap<K, int> getIDbyKey;
+	FastHashMap<int, K> getKeybyID;
 };

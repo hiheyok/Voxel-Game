@@ -5,6 +5,7 @@
 #include <vector>
 #include "GUIObject.h"
 #include "../OpenGL/Texture/Types/Texture2D.h"
+#include "../../Level/Typenames.h"
 
 class GUISet {
 private:
@@ -162,7 +163,7 @@ public:
 	int NumOfRenderableObjects = 0;
 
 	
-	std::unordered_map<std::string, int> GUIElementIndex;
+	FastHashMap<std::string, int> GUIElementIndex;
 	bool isDirty = true;
 
 	Texture2D GUITexture;

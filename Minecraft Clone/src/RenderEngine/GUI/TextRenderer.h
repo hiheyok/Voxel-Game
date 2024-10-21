@@ -9,7 +9,7 @@
 
 class TextRenderer {
 private:
-	std::unordered_map<std::string, RenderableFont> FontMap;
+	FastHashMap<std::string, RenderableFont> FontMap;
 	Shader FontShader, backgroundShader;
 	Buffer VBO, backgroundVBO;
 	VertexArray VAO, backgroundVAO;

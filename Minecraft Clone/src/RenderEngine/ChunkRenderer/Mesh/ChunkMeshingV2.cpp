@@ -1,11 +1,18 @@
 #include "ChunkMeshingV2.h"
 #include <immintrin.h>
 #include "../../../Level/Chunk/Block/Blocks.h"
-#include <unordered_set>
 #include <bit> 
-
+#include <cstdint>
+#include <intrin.h>
 using namespace std;
 using namespace glm;
+
+uint64_t cacheTime = 0;
+uint64_t cacheUsed = 0;
+uint64_t preciseTime = 0;
+
+uint64_t debug0 = 0;
+uint64_t debug1 = 0;
 
 constexpr int POSITION_OFFSET = 16;
 
@@ -21,6 +28,9 @@ constexpr int SHUFFLE =  _MM_SHUFFLE(2, 3, 0, 1);
 #define PROFILE_DEBUG
 
 void MeshingV2::ChunkMeshData::GenerateCache() {
+	int pos[3]{ 0, 0, 0 };
+	int localPos[3]{ 0, 0, 0 };
+
 #ifndef PROFILE_DEBUG
 	profiler.ProfileStart(profiler.hasher("root/cacheGen/center"));
 #endif
@@ -45,13 +55,11 @@ void MeshingV2::ChunkMeshData::GenerateCache() {
 
 		for (int u = 0; u < 16; u++) {
 			for (int v = 0; v < 16; v++) {
-				int pos[3]{0, 0, 0};
 
 				pos[axis] = direction * 15;
 				pos[(axis + 1) % 3] = u;
 				pos[(axis + 2) % 3] = v;
-
-				int localPos[3]{ 0, 0, 0 };
+				
 				localPos[axis] = 17 - 17 * direction;
 				localPos[(axis + 1) % 3] = u + 1;
 				localPos[(axis + 2) % 3] = v + 1;
@@ -65,18 +73,23 @@ void MeshingV2::ChunkMeshData::GenerateCache() {
 #endif
 }
 
+
 void MeshingV2::ChunkMeshData::GenerateMesh() {
 	//Initialize
 	if (chunk == nullptr) {
 		return;
 	}
-	//	Vertices.reserve(6 * 128);
-	//	TransparentVertices.reserve(6 * 128);
+
 	Position = chunk->Position;
+
 	chunk->Use();
 	GenerateCache();
 	chunk->Unuse();
+	
+
+
 	GenerateFaceCollection();
+	//printf("Time Used; %d, Avg Clock: %f, Time: %f\n", cacheUsed, (double)cacheTime / cacheUsed, 0.0);
 	
 #ifndef PROFILE_DEBUG
 	profiler.RegisterPaths("root/mesh/addbock/getModel");
@@ -85,8 +98,10 @@ void MeshingV2::ChunkMeshData::GenerateMesh() {
 	profiler.RegisterPaths("root/cacheGen/side");
 	profiler.RegisterPaths("root/cacheGen/center");
 	profiler.RegisterPaths("root/mesh/addbock/checkVisibility/getmodel");
-	profiler.RegisterPaths("root/mesh/addbock/checkVisibility/actualTest");
+	profiler.RegisterPaths("root/mesh/addbock/checkVisibility/actualTest")
+	profiler.CondenseCache();
 #endif
+
 }
 
 //Checks if there are anything different between q0 and q1
@@ -95,10 +110,14 @@ void MeshingV2::ChunkMeshData::GenerateMesh() {
  
 //#define USE_OLD_MESH
 
+
+
 void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 #ifndef USE_OLD_MESH
-	std::vector<uint8_t> FaceVisibility(8192, 0b00);
+	std::vector<uint8_t> FaceVisibility(4096, 0b00);
 	std::vector<uint8_t> usedBlock(16 * 16 * 16, 0b00);
+
+	uint64_t tmp = 0;
 
 	for (int side = 0; side < 2; side++) {
 
@@ -109,62 +128,75 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 			int AxisV = (Axis + 2) % 3;
 
 			int pos[3]{ 0,0,0 };
-
 			memset(usedBlock.data(), 0x00, 16 * 16 * 16);
+			
 
 			for (pos[Axis] = 0; pos[Axis] < 16; ++pos[Axis]) {//Slice
 				for (pos[AxisU] = 0; pos[AxisU] < 16; ++pos[AxisU]) {
 					for (pos[AxisV] = 0; pos[AxisV] < 16; ++pos[AxisV]) {
 
-						if (usedBlock[pos[0] * 256 + pos[1] * 16 + pos[2]] == 0xFFU) {
+						if (usedBlock[(pos[0] << 8) + (pos[1] << 4) + pos[2]] == 0xFFU) {
 							continue;
 						}
 
 						BlockID currBlock = getCachedBlockID(pos[0], pos[1], pos[2]);
 
-
 						const ModelV2::BlockModelV2& model = Blocks.getBlockModelDereferenced(currBlock);
 
-						usedBlock[pos[0] * 256 + pos[1] * 16 + pos[2]] = 0xFFU;
+						usedBlock[(pos[0] << 8) + (pos[1] << 4) + pos[2]] = 0xFFU;
 
-						if (!model.isInitialized) continue;
+						bool blankModel = false;
+
+						if (!model.isInitialized) {
+							blankModel = true;
+						}
 
 						pos[Axis] += offset;
-						BlockID frontBlock = getCachedBlockID(pos[0], pos[1], pos[2]);
+
+						//tmp = __rdtsc();
+						BlockID sideBlock = getCachedBlockID(pos[0], pos[1], pos[2]);
+						//cacheTime += __rdtsc() - tmp;
+						//cacheUsed++;
+
 						pos[Axis] -= offset;
 
 						//Check if it is visible from the back and front
-						for (int i = 0; i < model.Elements.size(); ++i) {
-							FaceVisibility[i] = 0;
-							const Cuboid& element = model.Elements[i];
+						if (!blankModel) {
+							for (int i = 0; i < model.Elements.size(); ++i) {
+								FaceVisibility[i] = 0;
+								const Cuboid& element = model.Elements[i];
 
-							if (element.Faces[Axis * 2 + side].ReferenceTexture.length() == 0)
-								continue;
+								if (element.Faces[Axis * 2 + side].ReferenceTexture.length() == 0)
+									continue;
 
-							if (element.Faces[Axis * 2 + side].CullFace != -1) {
-								if (!IsFaceVisible(element, pos[0], pos[1], pos[2], element.Faces[Axis * 2 + side].CullFace)) continue;
+								if (element.Faces[Axis * 2 + side].CullFace != -1) {
+									if (!IsFaceVisible(element, pos[0], pos[1], pos[2], element.Faces[Axis * 2 + side].CullFace)) continue;
+								}
+
+								FaceVisibility[i] |= 0b1;
 							}
-
-							FaceVisibility[i] |= 0b1;
+							
 						}
 
 						//Spread
 
 						int uLength = 1;
 						int vLength = 1;
+
 						int qPos[3]{ pos[0], pos[1], pos[2] };
 
 						for (qPos[AxisV] = pos[AxisV] + 1; qPos[AxisV] < 16; ++qPos[AxisV]) {
 							//Check if they are the same
 							BlockID currBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
+
 							qPos[Axis] += offset;
-							BlockID frontBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
+							BlockID sideBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
 							qPos[Axis] -= offset;
 
-							if (currBlock2 != currBlock || frontBlock2 != frontBlock) {
+							if (currBlock2 != currBlock || sideBlock2 != sideBlock)
 								break;
-							}
-							usedBlock[qPos[0] * 256 + qPos[1] * 16 + qPos[2]] = 0xFFU;
+
+							usedBlock[(qPos[0] << 8) + (qPos[1] << 4) + qPos[2]] = 0xFFU;
 							vLength++;
 						}
 
@@ -178,21 +210,22 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 							for (qPos[AxisV] = pos[AxisV]; qPos[AxisV] < pos[AxisV] + vLength; ++qPos[AxisV]) {
 								BlockID currBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
 								qPos[Axis] += offset;
-								BlockID frontBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
+								BlockID sideBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
 								qPos[Axis] -= offset;
 
-								if (currBlock2 != currBlock || frontBlock2 != frontBlock) {
+								if (currBlock2 != currBlock || sideBlock2 != sideBlock) {
 									isValid = false;
 									break;
 								}
+
+								usedBlock[(qPos[0] << 8) + (qPos[1] << 4) + qPos[2]] = 0xFFU;
 							}
 
 							if (!isValid) {
+								for (qPos[AxisV] = pos[AxisV]; qPos[AxisV] < pos[AxisV] + vLength; ++qPos[AxisV]) {
+									usedBlock[(qPos[0] << 8) + (qPos[1] << 4) + qPos[2]] = 0x00U;
+								}
 								break;
-							}
-
-							for (qPos[AxisV] = pos[AxisV]; qPos[AxisV] < pos[AxisV] + vLength; ++qPos[AxisV]) {
-								usedBlock[qPos[0] * 256 + qPos[1] * 16 + qPos[2]] = 0xFFU;
 							}
 
 							++uLength;
@@ -202,20 +235,35 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 						qPos[1] = pos[1];
 						qPos[2] = pos[2];
 						//Memorize & Add Faces
-						for (int i = 0; i < model.Elements.size(); i++) {
-							if (FaceVisibility[i] != 1) continue;
-							const Cuboid& element = model.Elements[i];
-							for (qPos[AxisU] = pos[AxisU]; qPos[AxisU] < pos[AxisU] + uLength; ++qPos[AxisU]) {
-								for (qPos[AxisV] = pos[AxisV]; qPos[AxisV] < pos[AxisV] + vLength; ++qPos[AxisV]) {
-									AddFacetoMesh(element.Faces[Axis * 2], Axis * 2 + side, element.From, element.To, model.AmbientOcclusion, qPos[0], qPos[1], qPos[2]);
+						if (!blankModel) {
+							for (int i = 0; i < model.Elements.size(); i++) {
+								if (FaceVisibility[i] != 1) continue;
+								const Cuboid& element = model.Elements[i];
+								for (qPos[AxisU] = pos[AxisU]; qPos[AxisU] < pos[AxisU] + uLength; ++qPos[AxisU]) {
+									for (qPos[AxisV] = pos[AxisV]; qPos[AxisV] < pos[AxisV] + vLength; ++qPos[AxisV]) {
+										AddFacetoMesh(element.Faces[Axis * 2 + side], Axis * 2 + side, element.From, element.To, model.AmbientOcclusion, qPos[0], qPos[1], qPos[2]);
+									}
 								}
 							}
 						}
+
+						if (vLength == 16 && uLength == 16) { //Skip entire layer
+							pos[AxisV] = 15;
+							pos[AxisU] = 15;
+						}
+						else {
+							pos[AxisV] += vLength - 1;
+						}
+						//Skip
+						
 					}
 				}
 			}
+			
 		}
 	}
+
+	
 	
 #else
 	for (int x = 0; x < 16; x++) {
@@ -573,7 +621,6 @@ inline glm::ivec4 MeshingV2::ChunkMeshData::getAO(uint8_t direction, int x, int 
 	int axis1 = (axis + 1) % 3;
 	int axis2 = (axis + 2) % 3;
 
-
 	//Check up
 	pos[axis1] += 1;
 
@@ -613,7 +660,6 @@ inline glm::ivec4 MeshingV2::ChunkMeshData::getAO(uint8_t direction, int x, int 
 
 	if (getCachedBlockID(pos.x, pos.y, pos.z) != Blocks.AIR)
 		PP -= AMBIENT_OCCLUSION_STRENGTH;
-
 
 	pos[axis1] -= 2;
 	if (getCachedBlockID(pos.x, pos.y, pos.z) != Blocks.AIR)
@@ -683,7 +729,6 @@ inline bool MeshingV2::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int x, i
 #ifndef PROFILE_DEBUG
 	profiler.ProfileStart(profiler.hasher("root/mesh/addbock/checkVisibility/actualTest"));
 #endif
-
 	__m128i cubeData = _mm_set_epi32(cube.To[axis2], cube.From[axis2], cube.To[axis1], cube.From[axis1]);
 
 	//swap the order of cube's From and To for the comparison
@@ -715,7 +760,6 @@ inline bool MeshingV2::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int x, i
 #ifndef PROFILE_DEBUG
 	profiler.ProfileStop(profiler.hasher("root/mesh/addbock/checkVisibility/actualTest"));
 #endif
-
 	return true;
 }
 

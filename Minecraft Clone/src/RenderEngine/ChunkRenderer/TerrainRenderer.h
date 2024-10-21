@@ -51,7 +51,7 @@ public:
 private:
 	void GarbageCollectorThread();
 
-	void AddChunk(ChunkID ID, std::vector<uint32_t> data, std::vector<ChunkDrawBatch>* BatchType, std::unordered_map<ChunkID, int>* LookUpMap);
+	void AddChunk(ChunkID ID, std::vector<uint32_t> data, std::vector<ChunkDrawBatch>* BatchType, FastHashMap<ChunkID, int>* LookUpMap);
 
 	void SetupShaders();
 
@@ -66,10 +66,10 @@ private:
 	int TextureAminationIndex = 0;
 
 	std::vector<ChunkDrawBatch> ChunkSolidBatches;
-	std::unordered_map<ChunkID, int> ChunkBatchSolidLookup; //f: ChunkID -> SolidBatchIndex
+	FastHashMap<ChunkID, int> ChunkBatchSolidLookup; //f: ChunkID -> SolidBatchIndex
 
 	std::vector<ChunkDrawBatch> ChunkTransparentBatches;
-	std::unordered_map<ChunkID, int> ChunkBatchTransparentLookup; //f: ChunkID -> TransparentBatchIndex
+	FastHashMap<ChunkID, int> ChunkBatchTransparentLookup; //f: ChunkID -> TransparentBatchIndex
 
 	GLFWwindow* window = nullptr;
 	bool stop = false;

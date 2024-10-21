@@ -12,9 +12,8 @@ Chunk* MathWorld::Generate(glm::ivec3 Position) {
 		for (int y = 0; y < 16; y++) {
 			for (int z = 0; z < 16; z++) {
 
-				if ((chunk->GetBlock(x, y, z) == Blocks.RED_STAINED_GLASS) || (chunk->GetBlock(x, y, z) == Blocks.BLACK_STAINED_GLASS)) {
+				if ((chunk->GetBlock(x, y, z) == Blocks.RED_STAINED_GLASS) || (chunk->GetBlock(x, y, z) == Blocks.BLACK_STAINED_GLASS))
 					continue;
-				}
 
 				glm::vec3 globalPos(cx + x, cy + y, cz + z);
 

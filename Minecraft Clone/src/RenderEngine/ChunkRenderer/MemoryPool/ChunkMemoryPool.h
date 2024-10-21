@@ -4,7 +4,6 @@
 #include "../../../Level/Typenames.h"
 #include <vector>
 #include <map>
-#include <unordered_map>
 
 struct ChunkMemoryPoolOffset {
 	size_t MemOffset = NULL;
@@ -89,7 +88,7 @@ namespace MemoryManagement {
 
 	private:
 		std::map<size_t, MemoryBlock> MemBlocks;
-		std::unordered_map<size_t, std::map<size_t, MemoryBlock>::iterator> MemBlocksIterators;
+		FastHashMap<size_t, std::map<size_t, MemoryBlock>::iterator> MemBlocksIterators;
 	};
 
 	class MemoryPoolManager {
@@ -220,7 +219,7 @@ namespace MemoryManagement {
 		size_t PoolSize = 0;
 		
 		std::multimap<size_t, size_t> SortedMemSizes; // BlockSize, BlockOffset
-		std::unordered_map<size_t, std::multimap<size_t, size_t>::iterator> SortedMemSizesIterators; // Offset, iterator
+		FastHashMap<size_t, std::multimap<size_t, size_t>::iterator> SortedMemSizesIterators; // Offset, iterator
 	};
 
 	struct MemoryPoolStatistics {
@@ -352,8 +351,8 @@ public:
 	BufferStorage buffer;
 
 	MemoryManagement::MemoryPoolManager MemoryPool;
-	std::unordered_map<ChunkID, ChunkMemoryPoolOffset> ChunkMemoryOffsets;
-	std::unordered_map<size_t, ChunkID> MemoryChunkOffset;
+	FastHashMap<ChunkID, ChunkMemoryPoolOffset> ChunkMemoryOffsets;
+	FastHashMap<size_t, ChunkID> MemoryChunkOffset;
 
 	int MEMORY_POOL_SIZE = 0;
 

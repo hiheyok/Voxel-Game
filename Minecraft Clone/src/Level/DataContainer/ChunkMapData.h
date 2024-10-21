@@ -3,8 +3,6 @@
 #include "../Chunk/Chunk.h"
 #include "../Chunk/ChunkColumn.h"
 #include "../../Utils/Containers/skaHashmap.h"
-#include <unordered_set>
-#include <unordered_map>
 
 typedef unsigned long long int RegionID;
 

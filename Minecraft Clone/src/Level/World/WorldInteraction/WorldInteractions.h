@@ -2,8 +2,6 @@
 #include "../World.h"
 #include "../WorldParameters.h"
 #include "WorldLoader.h"
-#include <unordered_map>
-#include <unordered_set>
 #include <concurrent_unordered_set.h>
 #include <exception>
 #include <mutex>
@@ -14,8 +12,8 @@ private:
 	World* world = nullptr;
 	std::mutex lock;
 	std::mutex UpdatedChunkLock;
-	std::unordered_set<ChunkID> UpdatedChunk;
-	std::unordered_set<ChunkColumnID> RequestedLightUpdate;
+	FastHashSet<ChunkID> UpdatedChunk;
+	FastHashSet<ChunkColumnID> RequestedLightUpdate;
 public:
 	std::vector<ChunkColumnID> LightUpdateRequest;
 	WorldLoader* worldLoader = nullptr;

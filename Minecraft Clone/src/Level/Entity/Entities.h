@@ -2,7 +2,6 @@
 
 #include "Type/EntityType.h"
 
-#include <unordered_map>
 #include <deque>
 
 
@@ -14,7 +13,7 @@ class EntitiesList {
 private:
 	int EntityTypeCount = 0;
 
-	std::unordered_map<std::string, EntityTypeID> EntityNameID;
+	FastHashMap<std::string, EntityTypeID> EntityNameID;
 public:
 	std::vector<EntityType*> EntityTypeList;
 

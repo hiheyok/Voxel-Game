@@ -1,5 +1,7 @@
 #include "WorldInteractions.h"
 
+#include <intrin.h>
+
 using namespace std;
 using namespace glm;
 
@@ -213,13 +215,16 @@ Chunk* WorldInteractions::getChunk(ChunkID ID) {
 }
 
 void WorldInteractions::setBlock(BlockID b, int x, int y, int z) {
-	try {
-		world->setBlock(b, x, y, z);
-		UpdatedChunkLock.lock();
-		if (!UpdatedChunk.count(getChunkID(x >> 4, y >> 4, z >> 4)))
-			UpdatedChunk.insert(getChunkID(x >> 4, y >> 4, z >> 4));
-		UpdatedChunkLock.unlock();
+	uint64_t tmp = 0;
 
+	try {
+		
+		world->setBlock(b, x, y, z);
+		if (!UpdatedChunk.count(getChunkID(x >> 4, y >> 4, z >> 4))) {
+			UpdatedChunk.insert(getChunkID(x >> 4, y >> 4, z >> 4));
+		}
+			
+		
 		int v[3]{ x % 16, y % 16, z % 16 };
 
 		for (int side = 0; side < 3; side++) {
@@ -235,10 +240,8 @@ void WorldInteractions::setBlock(BlockID b, int x, int y, int z) {
 			if (direction == 0) continue;
 
 			p[side] += direction;
-			UpdatedChunkLock.lock();
 			if (!UpdatedChunk.count(getChunkID(p[0], p[1], p[2])))
 				UpdatedChunk.insert(getChunkID(p[0], p[1], p[2]));
-			UpdatedChunkLock.unlock();
 		}
 
 

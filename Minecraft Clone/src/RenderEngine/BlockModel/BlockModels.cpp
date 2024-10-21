@@ -1,5 +1,5 @@
 #include "BlockModels.h"
-#include <unordered_set>
+#include "../../Level/typenames.h"
 #include "../../Utils/LogUtils.h"
 
 void  ModelV2::BlockModelV2::bakeTextureRotation() {
@@ -24,8 +24,8 @@ void  ModelV2::BlockModelV2::bakeTextureRotation() {
 }
 
 void ModelV2::BlockModelV2::flattenVariables() {
-	std::unordered_map<std::string, std::string> VariableMatcher{};
-	std::unordered_set<std::string> variableNames{};
+	FastHashMap<std::string, std::string> VariableMatcher{};
+	FastHashSet<std::string> variableNames{};
 	
 
 	//This will set all of the texture variables
@@ -47,7 +47,7 @@ void ModelV2::BlockModelV2::flattenVariables() {
 		std::string TextureName = variable;
 		std::vector<std::string> variableCorrspondingToSameTexture = {};
 
-		std::unordered_set<std::string> variableVisitMap{};
+		FastHashSet<std::string> variableVisitMap{};
 
 		
 

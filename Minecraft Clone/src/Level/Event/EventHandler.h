@@ -1,5 +1,6 @@
 #pragma once
-#include <unordered_map>
+#include <stdarg.h>
+#include <variant>
 
 #include "Event.h"
 #include "../Chunk/Block/Block.h"
@@ -9,15 +10,19 @@
 
 class _EventHandler {
 private:
+	using EventFunctionTypes = std::variant<
+		void (*)(BlockID, int, int, int),
+		void (*)(Event::EventDataType::_EntityEvent)
+	>;
+
 	int counter = 0;
 	EventID RegisterBlockEvent(void (*func)(BlockID, int, int, int));
 
 	EventID RegisterEntityEvent(void (*func)(Event::EventDataType::_EntityEvent));
 
-	std::unordered_map<EventID, void (*)(BlockID, int, int, int)> BlockEventHandles;
-	std::unordered_map<EventID, void (*)(Event::EventDataType::_EntityEvent)> EntityEventHandles;
+	FastHashMap<EventID, void (*)(BlockID, int, int, int)> BlockEventHandles;
+	FastHashMap<EventID, void (*)(Event::EventDataType::_EntityEvent)> EntityEventHandles;
 
-	
 
 public:
 	EventID BlockPlace = RegisterBlockEvent(HandlePlaceBlock);

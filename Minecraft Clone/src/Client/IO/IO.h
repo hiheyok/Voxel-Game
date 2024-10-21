@@ -1,10 +1,8 @@
 #pragma once
-#include <unordered_set>
-#include <unordered_map>
 #include <GLFW/glfw3.h>
 #include <glm/vec2.hpp>
 #include "KEY_CODE.h"
-
+#include "../../Level/Typenames.h"
 
 struct MouseInputs {
 	enum ButtonState {
@@ -34,7 +32,7 @@ private:
 		PRESS, HOLD
 	};
 
-	std::unordered_map<int, KeyStatus> Keys;
+	FastHashMap<int, KeyStatus> Keys;
 
 public:
 

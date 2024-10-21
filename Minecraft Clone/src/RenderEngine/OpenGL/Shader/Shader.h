@@ -13,7 +13,7 @@
 #include <unordered_map>
 #include <string>
 #include "../../../Utils/LogUtils.h"
-#define _CRTDBG_MAP_ALLOC
+#include "../../../Level/Typenames.h"
 
 class Shader
 {
@@ -139,7 +139,7 @@ private:
         }
     }
 
-    std::unordered_map<std::string, int> cache;
+    FastHashMap<std::string, int> cache;
 
     void checkCompileErrors(GLuint shader, std::string type)
     {

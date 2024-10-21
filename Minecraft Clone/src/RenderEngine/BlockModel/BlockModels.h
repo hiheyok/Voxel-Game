@@ -3,7 +3,7 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <string>
-#include <unordered_map>
+#include "../../Level/Typenames.h"
 
 #define EAST 0x01
 #define WEST 0x02
@@ -77,7 +77,7 @@ namespace ModelV2 {
 		std::vector<Cuboid> Elements{};
 		bool AmbientOcclusion = true; //default value
 		bool isInitialized = false;
-		std::unordered_map <std::string, std::string > TextureVariable;
+		FastHashMap<std::string, std::string > TextureVariable;
 		BlockDisplay Display[8]{};
 
 		void AddDisplay(BlockDisplay display, DisplayPosition position) {

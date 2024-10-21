@@ -54,7 +54,6 @@ void ChunkGeneration::Worker(int id) {
 
 	while (!stop) {
 		WorldGeneratorID generaterUse = Generators.DEBUG;
-
 		//Fetches all of the tasks and put it in "Jobs"
 
 		WorkerLocks[WorkerID].lock();

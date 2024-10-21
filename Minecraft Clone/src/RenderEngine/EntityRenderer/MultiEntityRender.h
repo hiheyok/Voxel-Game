@@ -14,10 +14,10 @@ private:
 	std::vector<float> EntityVertices;
 	std::vector<int> EntityIndices;
 
-	std::unordered_map<EntityTypeID, EntityModel> EntityCachedModels;
+	FastHashMap<EntityTypeID, EntityModel> EntityCachedModels;
 
-	std::unordered_map<EntityTypeID, size_t> EntityElementIndex;
-	std::unordered_map<EntityTypeID, size_t> EntityElementSize;
+	FastHashMap<EntityTypeID, size_t> EntityElementIndex;
+	FastHashMap<EntityTypeID, size_t> EntityElementSize;
 
 	EntityRenderCache RenderableEntities;
 

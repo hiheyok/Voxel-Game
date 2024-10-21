@@ -10,8 +10,8 @@ private:
 	std::mutex lock;
 	bool isSpawnChunksLoaded = false;
 
-	std::unordered_set<EntityUUID> EntityChunkLoaders; //List of entities that force loads chunks 
-	std::unordered_set<ChunkID> GeneratingChunk;
+	FastHashSet<EntityUUID> EntityChunkLoaders; //List of entities that force loads chunks 
+	FastHashSet<ChunkID> GeneratingChunk;
 
 	void loadSpawnChunks();
 
