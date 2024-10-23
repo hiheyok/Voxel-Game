@@ -78,7 +78,7 @@ public:
 	}
 
 	void CondenseCache() {
-		ska::flat_hash_map<uint64_t, uint64_t> CondensedCache = {};
+		FastHashMap<uint64_t, uint64_t> CondensedCache = {};
 
 		for (const auto& [hash, time] : TimePassCache) {
 			if (CondensedCache.count(hash)) {
@@ -106,8 +106,8 @@ public:
 
 	std::vector<std::pair<uint64_t, uint64_t>> TimePassCache{};
 
-	ska::flat_hash_map<uint64_t, std::string> StringHashContainer;
-	ska::flat_hash_map<uint64_t, std::vector<std::string>> StringTokenizedHashContainer;
+	FastHashMap<uint64_t, std::string> StringHashContainer;
+	FastHashMap<uint64_t, std::vector<std::string>> StringTokenizedHashContainer;
 private:
 	std::stack<std::pair<uint64_t, uint64_t>> TimerStack;
 	

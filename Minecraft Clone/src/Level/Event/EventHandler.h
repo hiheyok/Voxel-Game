@@ -15,7 +15,7 @@ private:
 		void (*)(Event::EventDataType::_EntityEvent)
 	>;
 
-	int counter = 0;
+	int m_eventCount = 0;
 	EventID RegisterBlockEvent(void (*func)(BlockID, int, int, int));
 
 	EventID RegisterEntityEvent(void (*func)(Event::EventDataType::_EntityEvent));
@@ -23,10 +23,8 @@ private:
 	FastHashMap<EventID, void (*)(BlockID, int, int, int)> BlockEventHandles;
 	FastHashMap<EventID, void (*)(Event::EventDataType::_EntityEvent)> EntityEventHandles;
 
-
 public:
 	EventID BlockPlace = RegisterBlockEvent(HandlePlaceBlock);
-	EventID DirtTick = RegisterBlockEvent(HandleDirtTick);
 	EventID BlockTick = RegisterBlockEvent(HandleBlockTick);
 
 	EventID SummonEntity = RegisterEntityEvent(HandleEntitySummon);

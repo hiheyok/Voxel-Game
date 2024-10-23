@@ -15,7 +15,7 @@ private:
 	DimensionProperties properties;
 	WorldParameters worldSettings;
 	
-	ska::flat_hash_map<int, ska::flat_hash_set<ChunkID>> TickUsage;
+	FastHashMap<int, ska::flat_hash_set<ChunkID>> TickUsage;
 
 protected:
 	WorldGeneratorID generatorType;

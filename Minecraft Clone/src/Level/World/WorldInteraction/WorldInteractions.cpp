@@ -5,6 +5,9 @@
 using namespace std;
 using namespace glm;
 
+uint64_t ClockCounter = 0;
+uint64_t ClockTimes = 0;
+
 void WorldInteractions::UseTallGeneration() {
 	worldLoader->tallGeneration = true;
 }
@@ -43,7 +46,7 @@ vector<ChunkID> WorldInteractions::getRequestedLightUpdates() {
 }
 
 vector<EntityProperty> WorldInteractions::getUpdatedEntities() {
-	ska::flat_hash_map<EntityUUID, EntityProperty> m = world->Entities.ClientGetEntityUpdate();
+	FastHashMap<EntityUUID, EntityProperty> m = world->Entities.ClientGetEntityUpdate();
 	vector<EntityProperty> properties = {};
 
 	for (const auto& e : m) {
@@ -54,7 +57,7 @@ vector<EntityProperty> WorldInteractions::getUpdatedEntities() {
 }
 
 vector<EntityUUID> WorldInteractions::getRemovedEntities() {
-	ska::flat_hash_set<EntityUUID> m = world->Entities.getRemovedEntities();
+	FastHashSet<EntityUUID> m = world->Entities.getRemovedEntities();
 	vector<EntityUUID> IDs = {};
 
 	IDs.insert(IDs.end(), m.begin(), m.end());
@@ -218,12 +221,10 @@ void WorldInteractions::setBlock(BlockID b, int x, int y, int z) {
 	uint64_t tmp = 0;
 
 	try {
-		
 		world->setBlock(b, x, y, z);
 		if (!UpdatedChunk.count(getChunkID(x >> 4, y >> 4, z >> 4))) {
 			UpdatedChunk.insert(getChunkID(x >> 4, y >> 4, z >> 4));
 		}
-			
 		
 		int v[3]{ x % 16, y % 16, z % 16 };
 

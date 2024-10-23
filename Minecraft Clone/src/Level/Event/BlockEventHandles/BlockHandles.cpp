@@ -2,11 +2,8 @@
 #include "../EventHandler.h"
 #include "../../Chunk/Block/Type/Dirt.h"
 #include "../../../Level/Dimension/Dimension.h"
-#include <intrin.h>
-
 
 void UpdateSurrounding(int x, int y, int z) {
-
 	Dimension* CurrentWorld = (Dimension*)Block::DimensionPTR;
 
 	for (int side = 0; side < 6;  side++) {
@@ -24,7 +21,6 @@ void UpdateSurrounding(int x, int y, int z) {
 		event.Data.BlockEvent.z = pos[2];
 		event.Data.BlockEvent.block = block;
 		CurrentWorld->EventManager.AddEvent(event);
-
 	}
 
 	Event event;
@@ -38,26 +34,12 @@ void UpdateSurrounding(int x, int y, int z) {
 }
 
 void HandlePlaceBlock(BlockID block, int x, int y, int z) {
-	
 	Dimension* CurrentWorld = (Dimension*)Block::DimensionPTR;
-//	uint64_t tmp = __rdtsc();
 	CurrentWorld->worldInteractions.setBlock(block, x, y, z);
-//	tmp = __rdtsc() - tmp;
-//	printf("Clock Cycles: %d\n", tmp);
 	UpdateSurrounding(x, y, z);
-	
-}
-
-void HandleDirtTick(BlockID block, int x, int y, int z) {
-	//World* CurrentWorld = (World*)Block::WorldPTR;
-
-
-	Block* b = Blocks.getBlockType(block);
-	b->tick(x, y, z);
 }
 
 void HandleBlockTick(BlockID block, int x, int y, int z) {
-	//World* CurrentWorld = (World*)Block::WorldPTR;
 	Block* b = Blocks.getBlockType(block);
 	b->tick(x, y, z);
 }

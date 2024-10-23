@@ -1,6 +1,5 @@
 #pragma once
 #include "../Chunk/Block/Blocks.h"
-#include <glm/vec3.hpp>
 
 class BlockContainer {
 public:
@@ -13,7 +12,7 @@ public:
 		Data[GetDataIndex(x,y,z)] = ID;
 	}
 
-	inline const BlockID& GetBlockUnsafe(unsigned int index) const {
+	inline const BlockID& GetBlockUnsafe(unsigned int index) {
 		return Data[index];
 	}
 
@@ -23,7 +22,7 @@ public:
 
 private:
 
-	inline static const unsigned int GetDataIndex(unsigned int x, unsigned int y, unsigned int z) {
+	constexpr inline const static uint16_t GetDataIndex(unsigned int x, unsigned int y, unsigned int z) {
 		return (x << 8) | (z << 4) | y;
 	}
 	

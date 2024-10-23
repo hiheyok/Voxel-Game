@@ -77,10 +77,10 @@ void BlockList::InitializeBlockModels()  {
 		Logger.LogError("File System", e.what());
 	}
 
-	ska::flat_hash_map<std::string, int> TextureIDs;
-	ska::flat_hash_map<int, int> TextureRepeatCount;
-	ska::flat_hash_map<int, bool> TextureTransparency;
-	ska::flat_hash_map<int, bool> TextureSeeThrough;
+	FastHashMap<std::string, int> TextureIDs;
+	FastHashMap<int, int> TextureRepeatCount;
+	FastHashMap<int, bool> TextureTransparency;
+	FastHashMap<int, bool> TextureSeeThrough;
  
 	//It will first go through the block models and create the models without loading the texture
 	for (const auto& [Name, ID] : BlockIDNameData) {

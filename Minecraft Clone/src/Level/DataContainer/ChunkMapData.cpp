@@ -33,13 +33,15 @@ bool ChunkMap::SetBlockGlobal(BlockID block, int x, int y, int z) {
 			chunk->Unuse();
 
 			//Set lighting update to dirty
-
+			
 			ChunkColumn* col = reg->GetChunkColumn(cx, cz);
-			col->UpdateHeightmap(ChunkPos[1] & 0b11111);
+		//	uint64_t t0 = __rdtsc();
+			col->UpdateHeightmapSingleBlock(ChunkPos[1] & 0b11111, block, LocalBlockPos[0], LocalBlockPos[1], LocalBlockPos[2]);
+		//	uint64_t t1 = __rdtsc();
+
+		//	printf("%d\n", t1 - t0);
 			return true;
 		}
-
-		
 
 		return false;
 	}
@@ -145,7 +147,7 @@ Region* ChunkMap::GetRegion(int x, int y, int z) {
 
 	RegionID regID = getChunkID(rx, ry, rz);
 
-	ska::flat_hash_map<RegionID, Region*>::iterator it = LiveRegion.find(regID);
+	FastHashMap<RegionID, Region*>::iterator it = LiveRegion.find(regID);
 
 	if (it == LiveRegion.end()) {
 		return nullptr;

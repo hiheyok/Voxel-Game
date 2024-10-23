@@ -21,7 +21,6 @@ void EntityRendererUpdater::UpdaterThread() {
 		for (auto& entity : RemovedEntities) {
 			renderer->RemoveEntity(entity);
 		}
-
 		
 		
 		timerSleep(0.05);

@@ -86,10 +86,7 @@ void MeshingV2::ChunkMeshData::GenerateMesh() {
 	GenerateCache();
 	chunk->Unuse();
 	
-
-
 	GenerateFaceCollection();
-	//printf("Time Used; %d, Avg Clock: %f, Time: %f\n", cacheUsed, (double)cacheTime / cacheUsed, 0.0);
 	
 #ifndef PROFILE_DEBUG
 	profiler.RegisterPaths("root/mesh/addbock/getModel");
@@ -104,168 +101,9 @@ void MeshingV2::ChunkMeshData::GenerateMesh() {
 
 }
 
-//Checks if there are anything different between q0 and q1
-
 //Loops through all the blocks in the chunk and check if each block side is visible. If a block side is visible, it generates the quad and puts it in the cache
  
-//#define USE_OLD_MESH
-
-
-
-void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
-#ifndef USE_OLD_MESH
-	std::vector<uint8_t> FaceVisibility(4096, 0b00);
-	std::vector<uint8_t> usedBlock(16 * 16 * 16, 0b00);
-
-	uint64_t tmp = 0;
-
-	for (int side = 0; side < 2; side++) {
-
-		int8_t offset = 1 - side * 2;
-
-		for (int Axis = 0; Axis < 3; Axis++) {
-			int AxisU = (Axis + 1) % 3;
-			int AxisV = (Axis + 2) % 3;
-
-			int pos[3]{ 0,0,0 };
-			memset(usedBlock.data(), 0x00, 16 * 16 * 16);
-			
-
-			for (pos[Axis] = 0; pos[Axis] < 16; ++pos[Axis]) {//Slice
-				for (pos[AxisU] = 0; pos[AxisU] < 16; ++pos[AxisU]) {
-					for (pos[AxisV] = 0; pos[AxisV] < 16; ++pos[AxisV]) {
-
-						if (usedBlock[(pos[0] << 8) + (pos[1] << 4) + pos[2]] == 0xFFU) {
-							continue;
-						}
-
-						BlockID currBlock = getCachedBlockID(pos[0], pos[1], pos[2]);
-
-						const ModelV2::BlockModelV2& model = Blocks.getBlockModelDereferenced(currBlock);
-
-						usedBlock[(pos[0] << 8) + (pos[1] << 4) + pos[2]] = 0xFFU;
-
-						bool blankModel = false;
-
-						if (!model.isInitialized) {
-							blankModel = true;
-						}
-
-						pos[Axis] += offset;
-
-						//tmp = __rdtsc();
-						BlockID sideBlock = getCachedBlockID(pos[0], pos[1], pos[2]);
-						//cacheTime += __rdtsc() - tmp;
-						//cacheUsed++;
-
-						pos[Axis] -= offset;
-
-						//Check if it is visible from the back and front
-						if (!blankModel) {
-							for (int i = 0; i < model.Elements.size(); ++i) {
-								FaceVisibility[i] = 0;
-								const Cuboid& element = model.Elements[i];
-
-								if (element.Faces[Axis * 2 + side].ReferenceTexture.length() == 0)
-									continue;
-
-								if (element.Faces[Axis * 2 + side].CullFace != -1) {
-									if (!IsFaceVisible(element, pos[0], pos[1], pos[2], element.Faces[Axis * 2 + side].CullFace)) continue;
-								}
-
-								FaceVisibility[i] |= 0b1;
-							}
-							
-						}
-
-						//Spread
-
-						int uLength = 1;
-						int vLength = 1;
-
-						int qPos[3]{ pos[0], pos[1], pos[2] };
-
-						for (qPos[AxisV] = pos[AxisV] + 1; qPos[AxisV] < 16; ++qPos[AxisV]) {
-							//Check if they are the same
-							BlockID currBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
-
-							qPos[Axis] += offset;
-							BlockID sideBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
-							qPos[Axis] -= offset;
-
-							if (currBlock2 != currBlock || sideBlock2 != sideBlock)
-								break;
-
-							usedBlock[(qPos[0] << 8) + (qPos[1] << 4) + qPos[2]] = 0xFFU;
-							vLength++;
-						}
-
-						qPos[0] = pos[0];
-						qPos[1] = pos[1];
-						qPos[2] = pos[2];
-
-						for (qPos[AxisU] = pos[AxisU] + 1; qPos[AxisU] < 16; ++qPos[AxisU]) {
-							bool isValid = true;
-
-							for (qPos[AxisV] = pos[AxisV]; qPos[AxisV] < pos[AxisV] + vLength; ++qPos[AxisV]) {
-								BlockID currBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
-								qPos[Axis] += offset;
-								BlockID sideBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
-								qPos[Axis] -= offset;
-
-								if (currBlock2 != currBlock || sideBlock2 != sideBlock) {
-									isValid = false;
-									break;
-								}
-
-								usedBlock[(qPos[0] << 8) + (qPos[1] << 4) + qPos[2]] = 0xFFU;
-							}
-
-							if (!isValid) {
-								for (qPos[AxisV] = pos[AxisV]; qPos[AxisV] < pos[AxisV] + vLength; ++qPos[AxisV]) {
-									usedBlock[(qPos[0] << 8) + (qPos[1] << 4) + qPos[2]] = 0x00U;
-								}
-								break;
-							}
-
-							++uLength;
-						}
-
-						qPos[0] = pos[0];
-						qPos[1] = pos[1];
-						qPos[2] = pos[2];
-						//Memorize & Add Faces
-						if (!blankModel) {
-							for (int i = 0; i < model.Elements.size(); i++) {
-								if (FaceVisibility[i] != 1) continue;
-								const Cuboid& element = model.Elements[i];
-								for (qPos[AxisU] = pos[AxisU]; qPos[AxisU] < pos[AxisU] + uLength; ++qPos[AxisU]) {
-									for (qPos[AxisV] = pos[AxisV]; qPos[AxisV] < pos[AxisV] + vLength; ++qPos[AxisV]) {
-										AddFacetoMesh(element.Faces[Axis * 2 + side], Axis * 2 + side, element.From, element.To, model.AmbientOcclusion, qPos[0], qPos[1], qPos[2]);
-									}
-								}
-							}
-						}
-
-						if (vLength == 16 && uLength == 16) { //Skip entire layer
-							pos[AxisV] = 15;
-							pos[AxisU] = 15;
-						}
-						else {
-							pos[AxisV] += vLength - 1;
-						}
-						//Skip
-						
-					}
-				}
-			}
-			
-		}
-	}
-
-	
-	
-#else
+void MeshingV2::ChunkMeshData::GenerateFaceCollectionOld() {
 	for (int x = 0; x < 16; x++) {
 		for (int y = 0; y < 16; y++) {
 			for (int z = 0; z < 16; z++) {
@@ -273,7 +111,173 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 			}
 		}
 	}
-#endif
+}
+
+void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
+	std::vector<uint8_t> FaceVisibilityBack(4096, 0b00);
+	std::vector<uint8_t> FaceVisibility(4096, 0b00);
+
+	std::vector<uint8_t> usedBlock(16 * 16, 0b00);
+
+	for (int Axis = 0; Axis < 3; Axis++) {
+		int AxisU = (Axis + 1) % 3;
+		int AxisV = (Axis + 2) % 3;
+
+		int pos[3]{ 0,0,0 };
+		
+
+		for (pos[Axis] = 0; pos[Axis] < 17; ++pos[Axis]) {//Slice
+			memset(usedBlock.data(), 0x00, 16 * 16);
+			for (pos[AxisU] = 0; pos[AxisU] < 16; ++pos[AxisU]) {
+				for (pos[AxisV] = 0; pos[AxisV] < 16; ++pos[AxisV]) {
+
+					if (usedBlock[(pos[AxisU] << 4) + pos[AxisV]] == 0xFFU) {
+						continue;
+					}
+
+					usedBlock[(pos[AxisU] << 4) + pos[AxisV]] = 0xFFU;
+
+					BlockID currBlock = getCachedBlockID(pos[0], pos[1], pos[2]);
+					--pos[Axis];
+					BlockID backBlock = getCachedBlockID(pos[0], pos[1], pos[2]);
+					++pos[Axis];
+
+					const ModelV2::BlockModelV2& currModel = Blocks.getBlockModelDereferenced(currBlock);
+					const ModelV2::BlockModelV2& backModel = Blocks.getBlockModelDereferenced(backBlock);
+
+					bool blankCurrModel = !currModel.isInitialized || pos[Axis] == 16;
+					bool blankBackModel = !backModel.isInitialized || pos[Axis] == 0;
+
+					//Check if it is visible from the back and front
+					if (!blankCurrModel) {
+						for (int i = 0; i < currModel.Elements.size(); ++i) {
+							FaceVisibility[i] = 0;
+							const Cuboid& element = currModel.Elements[i];
+
+							if (element.Faces[Axis * 2 + 1].ReferenceTexture.length() == 0)
+								continue;
+
+							if (element.Faces[Axis * 2 + 1].CullFace != -1) {
+								if (!IsFaceVisible(element, pos[0], pos[1], pos[2], element.Faces[Axis * 2 + 1].CullFace)) continue;
+							}
+
+							FaceVisibility[i] |= 0b1;
+						}
+							
+					}
+					//Check if it is visible from the back and front
+					--pos[Axis];
+					if (!blankBackModel) {
+						for (int i = 0; i < backModel.Elements.size(); ++i) {
+							FaceVisibilityBack[i] = 0;
+							const Cuboid& element = backModel.Elements[i];
+
+							if (element.Faces[Axis * 2].ReferenceTexture.length() == 0)
+								continue;
+
+							if (element.Faces[Axis * 2].CullFace != -1) {
+								if (!IsFaceVisible(element, pos[0], pos[1], pos[2], element.Faces[Axis * 2].CullFace)) continue;
+							}
+
+							FaceVisibilityBack[i] |= 0b1;
+						}
+					}
+					++pos[Axis];
+
+					//Spread
+
+					int uLength = 1;
+					int vLength = 1;
+
+					int qPos[3]{ pos[0], pos[1], pos[2] };
+
+					for (qPos[AxisV] = pos[AxisV] + 1; qPos[AxisV] < 16; ++qPos[AxisV]) {
+						//Check if they are the same
+						BlockID currBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
+						--qPos[Axis];
+						BlockID backBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
+						++qPos[Axis];
+
+						if (currBlock2 != currBlock || backBlock2 != backBlock)
+							break;
+
+						usedBlock[(qPos[AxisU] << 4) + qPos[AxisV]] = 0xFFU;
+						vLength++;
+					}
+
+					qPos[0] = pos[0];
+					qPos[1] = pos[1];
+					qPos[2] = pos[2];
+
+					for (qPos[AxisU] = pos[AxisU] + 1; qPos[AxisU] < 16; ++qPos[AxisU]) {
+						bool isValid = true;
+
+						for (qPos[AxisV] = pos[AxisV]; qPos[AxisV] < pos[AxisV] + vLength; ++qPos[AxisV]) {
+							BlockID currBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
+							--qPos[Axis];
+							BlockID backBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
+							++qPos[Axis];
+
+							if (currBlock2 != currBlock || backBlock2 != backBlock) {
+								isValid = false;
+								break;
+							}
+							usedBlock[(qPos[AxisU] << 4) + qPos[AxisV]] = 0xFFU;
+						}
+
+						if (!isValid) {
+							for (qPos[AxisV] = pos[AxisV]; qPos[AxisV] < pos[AxisV] + vLength; ++qPos[AxisV]) {
+								usedBlock[(qPos[AxisU] << 4) + qPos[AxisV]] = 0x00U;
+							}
+							break;
+						}
+
+						++uLength;
+					}
+
+					qPos[0] = pos[0];
+					qPos[1] = pos[1];
+					qPos[2] = pos[2];
+					//Memorize & Add Faces
+					if (!blankCurrModel) {
+						for (int i = 0; i < currModel.Elements.size(); i++) {
+							if (FaceVisibility[i] != 1) continue;
+							const Cuboid& element = currModel.Elements[i];
+							for (qPos[AxisU] = pos[AxisU]; qPos[AxisU] < pos[AxisU] + uLength; ++qPos[AxisU]) {
+								for (qPos[AxisV] = pos[AxisV]; qPos[AxisV] < pos[AxisV] + vLength; ++qPos[AxisV]) {
+									AddFacetoMesh(element.Faces[Axis * 2 + 1], Axis * 2 + 1, element.From, element.To, currModel.AmbientOcclusion, qPos[0], qPos[1], qPos[2]);
+								}
+							}
+						}
+					}
+					--qPos[Axis];
+					if (!blankBackModel) {
+						for (int i = 0; i < backModel.Elements.size(); i++) {
+							if (FaceVisibilityBack[i] != 1) continue;
+							const Cuboid& element = backModel.Elements[i];
+							for (qPos[AxisU] = pos[AxisU]; qPos[AxisU] < pos[AxisU] + uLength; ++qPos[AxisU]) {
+								for (qPos[AxisV] = pos[AxisV]; qPos[AxisV] < pos[AxisV] + vLength; ++qPos[AxisV]) {
+									AddFacetoMesh(element.Faces[Axis * 2], Axis * 2, element.From, element.To, backModel.AmbientOcclusion, qPos[0], qPos[1], qPos[2]);
+								}
+							}
+						}
+					}
+					++qPos[Axis];
+
+					if (vLength == 16 && uLength == 16) { //Skip entire layer
+						pos[AxisV] = 15;
+						pos[AxisU] = 15;
+					}
+					else {
+						pos[AxisV] += vLength - 1;
+					}
+					//Skip
+						
+				}
+			}
+		}
+			
+	}
 }
 
 void MeshingV2::ChunkMeshData::AddBlock(int x, int y, int z) {

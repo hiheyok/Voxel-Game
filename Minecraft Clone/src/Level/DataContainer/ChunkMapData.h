@@ -50,5 +50,5 @@ private:
 	//Input position is the chunk position
 	Region* GetRegion(int x, int y, int z);
 
-	ska::flat_hash_map<RegionID, Region*> LiveRegion;
+	FastHashMap<RegionID, Region*> LiveRegion;
 };

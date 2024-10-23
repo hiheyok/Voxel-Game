@@ -21,10 +21,10 @@ void _EventHandler::ExecuteEvent(Event event) {
 }
 
 EventID _EventHandler::RegisterBlockEvent(void (*func)(BlockID, int, int, int)) {
-	BlockEventHandles[counter] = func;
-	return counter++;
+	BlockEventHandles[m_eventCount] = func;
+	return m_eventCount++;
 }
 EventID _EventHandler::RegisterEntityEvent(void (*func)(Event::EventDataType::_EntityEvent)) {
-	EntityEventHandles[counter] = func;
-	return counter++;
+	EntityEventHandles[m_eventCount] = func;
+	return m_eventCount++;
 }

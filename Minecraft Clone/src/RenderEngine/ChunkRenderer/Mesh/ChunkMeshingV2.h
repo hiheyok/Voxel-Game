@@ -140,6 +140,7 @@ namespace MeshingV2 {
 
 		//Generates all the faces and puts them in the cache
 		void GenerateFaceCollection();
+		void GenerateFaceCollectionOld();
 
 		//Check if the player can see the mesh
 		inline bool IsFaceVisible(const Cuboid& cube, int x, int y, int z, uint8_t side);

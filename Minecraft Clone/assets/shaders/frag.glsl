@@ -53,10 +53,11 @@ void main() {
 	} else if (norm == 2) {
 		n = vec3(0.f, 0.f, 1.f);
 	}
+//
+//	vec2 tileUV = vec2(dot(n.zxy, poss), dot(n.yzx, poss));
+//
+//	vec2 texCoord = vec2(xIndex,yIndex) + textureSize  * MULTIPLIER * fract(tileUV);
 
-	vec2 tileUV = vec2(dot(n.zxy, poss), dot(n.yzx, poss));
-
-	vec2 texCoord = vec2(xIndex,yIndex) + textureSize  * MULTIPLIER * fract(tileUV);
 
 	vec4 texture_ =  texture(BlockTexture, NormalizedTexCoord);
 

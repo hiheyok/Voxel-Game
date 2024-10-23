@@ -4,6 +4,10 @@
 #include "../../Utils/Containers/BitStorage.h"
 #include "Heightmap/Heightmap.h"
 #include <glm/vec2.hpp>
+#include <intrin.h>
+
+
+
 
 typedef uint64_t ChunkColumnID;
 
@@ -13,6 +17,9 @@ private:
 	std::vector<ChunkLightingContainer*> LightColumn;
 	Heightmap ColumnHeightmap;
 	glm::ivec2 Position;
+
+	static uint64_t ClockCount;
+	static uint64_t EventCount;
 public:
 	std::vector<bool> LightDirty;
 
@@ -58,75 +65,74 @@ public:
 		return Column[HeightLevel];
 	}
 
-	void UpdateHeightmap(int Height) {
+	inline int16_t findSurfaceHeight(uint8_t x, uint8_t z, uint8_t StartingChunk = 31) {
+		for (int currChunk = StartingChunk;  currChunk >= 0; --currChunk) {
+			Chunk* curr = Column[currChunk];
+			
+			if (curr == nullptr) continue;
 
-		unsigned char MaxBrightness = ChunkLightingContainer::MaxLightLevel;
+			for (int y = 15; y >= 0; y--) {
+				if (curr->GetBlockUnsafe(x, y, z) != Blocks.AIR) {
+					return currChunk * 16 + y;
+				}
+			}
+		}
+		return -1;
+	}
 
-		int TargetChunkHeightmap[16 * 16]{}; //Heightmap for chunk; 17 == no blocks found
+	inline int16_t findSurfaceHeightSingleChunk(uint8_t p_height, uint8_t x, uint8_t z) {
+		Chunk* currChunk = Column[p_height];
+		if (currChunk) return -1;
+		for (int y = 15; y >= 0; y--) {
+			if (currChunk->GetBlockUnsafe(x, y, z) != Blocks.AIR) return y;
+		}
+		return -1;
+	}
 
-		for (int i = 0; i < 256; i++) {
-			TargetChunkHeightmap[i] = 17;
+	inline void UpdateHeightmapSingleBlock(int p_height,BlockID p_block, uint8_t x, uint8_t y, uint8_t z) {
+		int currHeight = ColumnHeightmap.get(z, y);
+
+		//tmp
+		for (int i = 0; i <= p_height; i++) {
+			if (Column[i] != nullptr) {
+				LightDirty[i] = true;
+			}
 		}
 
-		Chunk* TargetChunk = Column[Height];
-		int TargetChunkHeight = Height * 16;
+		if (p_height * 16 + y < currHeight) {
+			return;
+		}
+		
+		if (p_block == Blocks.AIR) {
+			if (currHeight == p_height) {
+				uint16_t surfaceLevel = findSurfaceHeight(x, z, p_height);
+				if (surfaceLevel == -1) {
+					surfaceLevel = 0;
+				}
+				ColumnHeightmap.edit(x, z, surfaceLevel);
+			}
+		} else {
+			ColumnHeightmap.edit(x, z, p_height * 16 + y);
+		}
+	}
 
-		if (TargetChunk == nullptr) return;
-
-		//Get target chunk heightmap
+	void UpdateHeightmap(uint16_t Height) {
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
-				//For each area go
-				for (int y = 15; y >= 0; y--) {
-					BlockID b = TargetChunk->GetBlockUnsafe(x, y, z);
-					if (b != Blocks.AIR) {
-						TargetChunkHeightmap[x * 16 + z] = y;
-						break;
-					}
-				}
-
-
+				int16_t surfaceLevel = findSurfaceHeight(x, z, Height);
+				surfaceLevel = (surfaceLevel != -1) * surfaceLevel;
+				ColumnHeightmap.edit(x, z, surfaceLevel);
 			}
 		}
-		
-
-		for (int x = 0; x < 16; x++) {
-			for (int z = 0; z < 16; z++) {// Iterate though all area
-				//Check heightmap if there is any changes
-
-				if (TargetChunkHeightmap[x * 16 + z] == 17) {
-					continue;
-
-				}
-
-
-				int ColumnLightHeight = TargetChunkHeightmap[x * 16 + z] + TargetChunkHeight;
-
-				if (ColumnHeightmap.get(x, z) < ColumnLightHeight) {
-					ColumnHeightmap.edit(x, z, ColumnLightHeight);
-				}
-				else {
-					int ChunkHeight = ColumnHeightmap.get(x, z) >> 4;
-
-					if (ChunkHeight == Height) {
-						ColumnHeightmap.edit(x, z, ColumnLightHeight);
-					}
-				}
-
-				
-			}
-		}
-
-		
 
 		for (int i = 0; i <= Height; i++) {
 			if (Column[i] != nullptr) {
 				LightDirty[i] = true;
 			}
 		} 
-
-		
-
+//		printf("Avg Clock: %f\n", (double)ClockCount / EventCount);
 	}
-
 }; 
+
+__declspec(selectany) uint64_t ChunkColumn::ClockCount = 0;
+__declspec(selectany) uint64_t ChunkColumn::EventCount = 0;
