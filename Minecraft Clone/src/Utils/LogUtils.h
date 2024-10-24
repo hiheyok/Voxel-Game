@@ -6,6 +6,7 @@
 #include <chrono>
 #include <mutex>
 #include <fstream>
+#include <cstdarg>
 
 #define LOG_TYPE_DEBUG 0x00;
 #define LOG_TYPE_INFO 0x01;
@@ -25,11 +26,13 @@ class LogUtils {
 public:
 
 	LogUtils() {
+		m_buffer = new char[BUFFER_SIZE];
 		Start();
 	}
 
 	~LogUtils() {
 		Stop();
+		delete[] m_buffer;
 	}
 
 
@@ -47,6 +50,7 @@ public:
 
 	std::thread LoggingThread;
 
+
 private:
 
 	std::mutex Mutex;
@@ -57,12 +61,33 @@ private:
 
 	void MainLogger();
 
+	std::string formatString(std::string in,  ... ) {
+		va_list args;
+		va_start(args, in);
+
+		vsnprintf(m_buffer, BUFFER_SIZE, in.c_str(), args);
+	
+		va_end(args);
+
+		std::string out(m_buffer);
+		memset(m_buffer, NULL, out.size());
+		return out;
+	}
+
+	std::string formatMessage(std::string pSeverity, long long pTime, std::string pTimestamp, std::string pSubtype, std::string pMessage) {
+		return formatString("[ %lld NS ] [ %s ] [ %s / %s ]: %s", pTime, pTimestamp.c_str(), pSeverity.c_str(), pSubtype.c_str(), pMessage.c_str());
+	}
+
 	std::chrono::high_resolution_clock::time_point InitTime = std::chrono::high_resolution_clock::now();
 	
 	std::deque<LogData> Logs;
 	std::deque<LogData> LogsCache;
 
 	std::ofstream file;
+
+	char* m_buffer;
+	const uint64_t BUFFER_SIZE = 32768;
+
 };
 
 extern LogUtils Logger;

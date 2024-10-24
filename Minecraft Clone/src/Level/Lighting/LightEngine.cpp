@@ -1,5 +1,5 @@
 #include "LightEngine.h"
-
+#include "../../Utils/Containers/FIFOQueue.h"
 using namespace std;
 using namespace glm;
 
@@ -10,40 +10,51 @@ void LightingEngine::increaseLightLevel(ChunkLightingContainer* container, uint8
 	}
 }
 
-void LightingEngine::LightSpreadSky(Chunk* chunk, ChunkLightingContainer* container, vector<uint16_t>& heightmap, int ChunkHeight, int x, int y, int z) {
-	deque<ivec4> BFS;
+inline uint16_t convertData(int x, int y, int z, int w) {
+	return x | (y << 4) | (z << 8) | (w << 12);
+}
 
-	BFS.push_back(ivec4(x, y, z, 15));
+void LightingEngine::LightSpreadSky(Chunk* chunk, ChunkLightingContainer* container, vector<uint16_t>& heightmap, int ChunkHeight, int x, int y, int z, int workerID) {
+	FIFOQueues[workerID].resetData();
+
+	FIFOQueues[workerID].push(convertData(x, y, z, 15));
 
 	if (container->GetLighting(x, y, z) >= 15) {
 		return;
 	}
 
 
-	while (!BFS.empty()) {
-		//Get node
-		ivec4 node = BFS.front();
-		BFS.pop_front();
+	int i = 0;
 
-		int nx = node.x;
-		int ny = node.y + ChunkHeight;
-		int nz = node.z;
+	while (!FIFOQueues[workerID].isEmpty()) {
+		//Get node
+		uint16_t node = FIFOQueues[workerID].get();
+		int nodeX = node & 0b1111;
+		int nodeY = (node >> 4) & 0b1111;
+		int nodeZ = (node >> 8) & 0b1111;
+		int nodeLight = (node >> 12) & 0b1111;
+
+
+		i++;
+		int nx = nodeX;
+		int ny = nodeY + ChunkHeight;
+		int nz = nodeZ;
 
 		if (heightmap[nx * 16 + nz] <= ny) {
-			node.w = 15;
+			nodeLight = 15;
 		}
 
-		if (container->GetLighting(node.x, node.y, node.z) >= node.w) {
+		if (container->GetLighting(nodeX, nodeY, nodeZ) >= nodeLight) {
 			continue;
 		}
 		//Set node light level
-		increaseLightLevel(container, node.w, node.x, node.y, node.z);
+		increaseLightLevel(container, nodeLight, nodeX, nodeY, nodeZ);
 
-		if (chunk->GetBlockUnsafe(node.x, node.y, node.z) != Blocks.AIR) {
+		if (chunk->GetBlockUnsafe(nodeX, nodeY, nodeZ) != Blocks.AIR) {
 			continue;
 		}
 
-		if (node.w == 0) continue;
+		if (nodeLight == 0) continue;
 
 		//Spread
 		for (int side = 0; side < 6; side++) {
@@ -54,26 +65,28 @@ void LightingEngine::LightSpreadSky(Chunk* chunk, ChunkLightingContainer* contai
 			if ((direction == 1) && (face == 1))
 				continue; //skip Up direction
 
-			ivec4 newNode = node;
-			newNode[direction] += face * 2 - 1;
-			newNode.w -= 1;
+			uint8_t pos[3]{nodeX, nodeY, nodeZ};
+			pos[direction] += face * 2 - 1;
+			int8_t newLight = nodeLight - 1;
 			//Check if it is in the chunk first
-			if (((newNode.x | newNode.y | newNode.z) >> 4))
+			if (((pos[0] | pos[1] | pos[2]) >> 4))
 				continue;
 
 			//Check if the light level is more or less
-			int currLvl = container->GetLighting(newNode.x, newNode.y, newNode.z);
+			int currLvl = container->GetLighting(pos[0], pos[1], pos[2]);
 
-			if (currLvl + 2 > node.w)
+			if (currLvl + 2 > newLight)
 				continue;
 
-			BFS.push_back(newNode);
+			FIFOQueues[workerID].push(convertData(pos[0], pos[1], pos[2], newLight));
 
 		}
 	}
+
+	//std::cout << i << '\n';
 }
 
-void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, ChunkLightingContainer* light, vector<uint16_t>& heightmap, int ChunkHeight) {
+void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, ChunkLightingContainer* light, vector<uint16_t>& heightmap, int ChunkHeight, int workerID) {
 	for (int x = 0; x < 16; x++) {
 		for (int z = 0; z < 16; z++) {
 
@@ -83,14 +96,14 @@ void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, ChunkLightingContainer* l
 				continue;
 			}
 
-			LightSpreadSky(chunk, light, heightmap, ChunkHeight, x, 15, z);
+			LightSpreadSky(chunk, light, heightmap, ChunkHeight, x, 15, z, workerID);
 		}
 	}
 
 
 }
 
-vector<ChunkLightingContainer*> LightingEngine::SkyLighting(ChunkColumnID id) {
+vector<ChunkLightingContainer*> LightingEngine::SkyLighting(ChunkColumnID id, int workerID) {
 	uint8_t DarknessLightLevel = 12;
 	vector<ChunkLightingContainer*> out = vector<ChunkLightingContainer*>(0);
 	ivec3 pos = ChunkIDToPOS(id);
@@ -112,7 +125,7 @@ vector<ChunkLightingContainer*> LightingEngine::SkyLighting(ChunkColumnID id) {
 		lighting->ResetLightingCustom(4);
 
 		std::vector<uint16_t> h = heightmap.getData();
-		WorkOnChunkSkylight(col->GetChunk(i), lighting, h, i * 16);
+		WorkOnChunkSkylight(col->GetChunk(i), lighting, h, i * 16, workerID);
 
 		lighting->Position = ivec3(pos.x, i + pos.y, pos.z);
 		out.emplace_back(lighting);
@@ -156,6 +169,7 @@ void LightingEngine::Start(int lightEngineThreadsCount, WorldAccess* w) {
 	WorkerOutput.resize(threadCount);
 
 	schedulerThread = thread(&LightingEngine::scheduler, this);
+	FIFOQueues.resize(lightEngineThreadsCount);
 
 	for (int i = 0; i < threadCount; i++) {
 		Workers[i] = thread(&LightingEngine::worker, this, i);
@@ -173,8 +187,9 @@ void LightingEngine::worker(int id) {
 	const int WorkerID = id;
 
 	deque<ChunkColumnID> Jobs;
-
 	deque<ChunkLightingContainer*> FinishedJobs;
+
+	FIFOQueues[id].setSize(DEFAULT_FIFO_QUEUE_SIZE);
 
 	while (!stop) {
 		//Fetches all of the tasks and put it in "Jobs"
@@ -197,8 +212,8 @@ void LightingEngine::worker(int id) {
 			//Generate
 			ivec3 ColPos = ChunkIDToPOS(task);
 
-			vector<ChunkLightingContainer*> chunks = SkyLighting(task);
-
+			
+			vector<ChunkLightingContainer*> chunks = SkyLighting(task, id);
 			FinishedJobs.insert(FinishedJobs.end(), chunks.begin(), chunks.end());
 
 			count++;
@@ -213,9 +228,9 @@ void LightingEngine::worker(int id) {
 			FinishedJobs.clear();
 			WorkerLocks[WorkerID].unlock();
 		}
-
 		timerSleepNotPrecise(1);
 	}
+	FIFOQueues[id].clear();
 
 	Jobs.clear();
 	Logger.LogInfo("Light Engine", "Shutting down light engine worker: " + to_string(WorkerID));

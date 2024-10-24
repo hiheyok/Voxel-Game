@@ -156,9 +156,11 @@ WorldAccess* WorldLoader::getWorld() {
 	return static_cast<WorldAccess*>(world);
 }
 
+//TODO: Fix me
 void WorldLoader::replaceLightInfomation(ChunkLightingContainer* lighting) {
 	ChunkColumn* col = world->getColumn(lighting->Position);
 	int y = lighting->Position.y & 0b11111;
+	if (col == nullptr) return; //fix this nullptr
 
 	col->replaceLightContainer(y, lighting);
 }

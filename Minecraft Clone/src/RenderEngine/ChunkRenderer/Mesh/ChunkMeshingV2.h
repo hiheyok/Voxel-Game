@@ -43,57 +43,6 @@ namespace MeshingV2 {
 		uint64_t data[4 * 16]{};
 	};
 
-	struct Quad {
-		uint32_t Data = 0xFFFFFFFF; //Contain Light and Texture
-		//Light: first 16 bit
-		//Texture:: last 16 bit
-
-		inline char getLight(uint8_t Location) {
-			return 0b1111 & (Data >> (Location << 2));
-		}
-
-		inline void setLight(uint8_t Location, uint8_t Val) {
-			Data &= (~(0b1111 << (Location << 2))); // Clears light value for that location
-			Data |= (Val << (Location << 2)); //Inserts light value
-		}
-
-		inline uint16_t getTexture() {
-			return Data >> 16;
-		}
-
-		inline void setTexture(uint32_t tex) {
-			Data = (Data & 0xFFFF) | (tex << 16);
-		}
-
-		/*
-		Relative to x-axis
-			L_NP = Negative Y , Positive Z
-		Relative to y-axis
-			L_NP = Negative Z , Positive X
-		Relative to z-axis
-			L_NP = Negative X , Positive Y
-		*/
-
-	};
-
-	struct QuadWPos : Quad {
-		//Position in the slice 
-		int8_t x = 0, y = 0;
-		//Size
-		int8_t w = 0, h = 0;
-
-		BlockID block;
-
-		/*
-		Relative to x-axis
-			L_NP = Negative Y , Positive Z
-		Relative to y-axis
-			L_NP = Negative Z , Positive X
-		Relative to z-axis
-			L_NP = Negative X , Positive Y
-		*/
-
-	};
 
 	class ChunkMeshData {
 	public:
@@ -140,7 +89,6 @@ namespace MeshingV2 {
 
 		//Generates all the faces and puts them in the cache
 		void GenerateFaceCollection();
-		void GenerateFaceCollectionOld();
 
 		//Check if the player can see the mesh
 		inline bool IsFaceVisible(const Cuboid& cube, int x, int y, int z, uint8_t side);
@@ -154,7 +102,6 @@ namespace MeshingV2 {
 		inline bool CompareBlockSideUnsafe(int x, int y, int z, uint8_t side, BlockID b);
 
 		//Face data
-		Quad* FaceCollectionCache;
 		uint16_t* BitsFaceExistCache;
 		uint32_t* BitsSolidBlockCache;
 		uint32_t* TextureCache;
@@ -175,8 +122,6 @@ namespace MeshingV2 {
 		inline glm::ivec4 getAO(uint8_t direction, int x, int y, int z);
 
 		//To check if a block had been used in the Greedy Meshing Algorithm
-		Quad NullQuad;
-
 		CompactBooleanData booleanMap;
 
 		Chunk* chunk;

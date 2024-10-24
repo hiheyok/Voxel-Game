@@ -8,6 +8,11 @@
 using namespace std;
 
 void LogUtils::MainLogger() {
+
+	const uint64_t printLimit = 8192;
+
+	string printOutput = "";
+
 	while (!stop) {
 		if (!LogsCache.empty()) {
 
@@ -16,34 +21,37 @@ void LogUtils::MainLogger() {
 
 			time_t timept = std::chrono::system_clock::to_time_t(log.time);
 
-			const char* timestamp = strtok(ctime(&timept), "\n");
+			string timestamp = string(strtok(ctime(&timept), "\n"));
 
-
-			std::string str;
+			std::string str = "";
+			std::string messageSeverity = "";
 
 			if (log.type == 0x01) {
-				printf("[ %s NS ] [ %s ] [ INFO / %s ]: %s\n",to_string(log.RTime).c_str(), timestamp, log.Subtype.c_str(), log.message.c_str());
-				str = "[ " + to_string(log.RTime) + " ] [ " + string(timestamp) + " ] [ INFO / " + log.Subtype + " ]: " + log.message;
-			}
-			if (log.type == 0x03) {
-				printf("[ %s NS ] [ %s ] [ WARN / %s ]: %s\n",to_string(log.RTime).c_str(),  timestamp, log.Subtype.c_str(), log.message.c_str());
-				str = "[ " + to_string(log.RTime) + " ] [ " + string(timestamp) + " ] [ WARN / " + log.Subtype + " ]: " + log.message;
-			}
-			if (log.type == 0x02) {
-				printf("[ %s NS ] [ %s ] [ ERROR / %s ]: %s\n", to_string(log.RTime).c_str(), timestamp, log.Subtype.c_str(), log.message.c_str());
-				str = "[ " + to_string(log.RTime) + " ] [ " + string(timestamp) + " ] [ ERROR / " + log.Subtype + " ]: " + log.message;
-			}
-			if (log.type == 0x00) {
-				printf("[ %s NS ] [ %s ] [ DEBUG / %s ]: %s\n", to_string(log.RTime).c_str(), timestamp, log.Subtype.c_str(), log.message.c_str());
-				str = "[ " + to_string(log.RTime) + " ] [ " + string(timestamp) + " ] [ DEBUG / " + log.Subtype + " ]: " + log.message;
+				messageSeverity = "INFO";
+			} else if (log.type == 0x03) {
+				messageSeverity = "WARNING";
+			} else if (log.type == 0x02) {
+				messageSeverity = "ERROR";
+			} else if (log.type == 0x00) {
+				messageSeverity = "DEBUG";
 			}
 
+			str = formatMessage(messageSeverity, log.RTime, timestamp, log.Subtype, log.message);
+			printOutput += str + "\n";
 
-			file << str << "\n";
-
-			
+			if (printOutput.size() > printLimit) {
+				printf("%s", printOutput.c_str());
+				file << printOutput;
+				printOutput.clear();
+			}
 		}
 		else {
+			if (printOutput.size() != 0) {
+				printf("%s", printOutput.c_str());
+				file << printOutput;
+				printOutput.clear();
+			}
+
 			if (!Logs.empty()) {
 				Mutex.lock();
 				LogsCache = Logs;
@@ -55,7 +63,6 @@ void LogUtils::MainLogger() {
 			}
 		}
 	}
-	printf("[ 9999999999 ] [ Logging ] [ INFO ]: Shutting down logging thread\n");
 }
 
 void LogUtils::Start() {

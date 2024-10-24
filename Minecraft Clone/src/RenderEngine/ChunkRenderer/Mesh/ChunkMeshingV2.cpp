@@ -98,21 +98,9 @@ void MeshingV2::ChunkMeshData::GenerateMesh() {
 	profiler.RegisterPaths("root/mesh/addbock/checkVisibility/actualTest")
 	profiler.CondenseCache();
 #endif
-
 }
 
 //Loops through all the blocks in the chunk and check if each block side is visible. If a block side is visible, it generates the quad and puts it in the cache
- 
-void MeshingV2::ChunkMeshData::GenerateFaceCollectionOld() {
-	for (int x = 0; x < 16; x++) {
-		for (int y = 0; y < 16; y++) {
-			for (int z = 0; z < 16; z++) {
-				AddBlock(x, y, z);
-			}
-		}
-	}
-}
-
 void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 	std::vector<uint8_t> FaceVisibilityBack(4096, 0b00);
 	std::vector<uint8_t> FaceVisibility(4096, 0b00);
@@ -124,7 +112,6 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 		int AxisV = (Axis + 2) % 3;
 
 		int pos[3]{ 0,0,0 };
-		
 
 		for (pos[Axis] = 0; pos[Axis] < 17; ++pos[Axis]) {//Slice
 			memset(usedBlock.data(), 0x00, 16 * 16);
@@ -238,6 +225,7 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 					qPos[0] = pos[0];
 					qPos[1] = pos[1];
 					qPos[2] = pos[2];
+
 					//Memorize & Add Faces
 					if (!blankCurrModel) {
 						for (int i = 0; i < currModel.Elements.size(); i++) {
@@ -271,8 +259,6 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 					else {
 						pos[AxisV] += vLength - 1;
 					}
-					//Skip
-						
 				}
 			}
 		}
@@ -303,7 +289,6 @@ void MeshingV2::ChunkMeshData::AddBlock(int x, int y, int z) {
 		for (int direction = 0; direction < 6; direction++) {
 			
 			if (element.Faces[direction].ReferenceTexture.length() == 0) {
-			//	profiler.ProfileStop(profiler.hasher("root/mesh/addbock/checkVisibility"));
 				continue;
 			}
 
@@ -313,7 +298,6 @@ void MeshingV2::ChunkMeshData::AddBlock(int x, int y, int z) {
 					continue;
 				}
 			}
-		//	profiler.ProfileStop(profiler.hasher("root/mesh/addbock/checkVisibility"));
 #ifndef PROFILE_DEBUG
 			profiler.ProfileStart(profiler.hasher("root/mesh/addbock/addFace"));
 #endif

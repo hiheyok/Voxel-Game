@@ -31,7 +31,6 @@ public:
 	std::vector<ChunkID> ChunkRequest;
 
 	WorldLoader(World* w, WorldParameters p) : world(w), settings(p) {
-
 	}
 
 	WorldAccess* getWorld();

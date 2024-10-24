@@ -24,9 +24,11 @@ protected:
 		world = new World;
 		world->Initialize();
 		properties = p;
-		worldInteractions.init(world, WorldParameters());
 		worldSettings.HorizontalTickingDistance = AppOptions.HorizontalRenderDistance;
 		worldSettings.VerticalTickingDistance = AppOptions.VerticalRenderDistance;
+
+		worldInteractions.init(world, worldSettings);
+
 
 		if (Generators.GetGenerator(generatorType)->useTallChunks) {
 			worldInteractions.UseTallGeneration();
