@@ -99,19 +99,11 @@ namespace MeshingV2 {
 		inline bool IsFaceVisible(const Cuboid& cube, int x, int y, int z, uint8_t side);
 		inline bool IsFaceVisibleUnsafe(const Cuboid& cube, int x, int y, int z, uint8_t side);
 
-		//Gets block texture 
-		inline int GetTexture(int x, int y, int z, uint8_t side);
-		inline int GetTextureUnsafe(int x, int y, int z, uint8_t side);
-
 		inline bool CompareBlockSide(int x, int y, int z, uint8_t side, BlockID b);
 		inline bool CompareBlockSideUnsafe(int x, int y, int z, uint8_t side, BlockID b);
 
 		//Add faces to the mesh
 		inline void AddFacetoMesh(const BlockFace& face, uint8_t axis, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z);
-
-		inline void AddFacetoMesh_X(const BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z);
-		inline void AddFacetoMesh_Y(const BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z);
-		inline void AddFacetoMesh_Z(const BlockFace& face, uint8_t direction, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z);
 
 		inline BlockID& getCachedBlockID(int x, int y, int z);
 		inline BlockID& getCachedBlockID(int* pos);
