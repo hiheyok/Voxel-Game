@@ -43,6 +43,21 @@ namespace MeshingV2 {
 		uint64_t data[4 * 16]{};
 	};
 
+	struct ChunkVertexData {
+		ChunkVertexData() {
+
+		}
+
+		~ChunkVertexData() {
+			solidVertices.clear();
+			transparentVertices.clear();
+		}
+
+		std::vector<uint32_t> solidVertices;
+		std::vector<uint32_t> transparentVertices;
+		glm::ivec3 Position = glm::ivec3(0, 0, 0);
+	};
+
 
 	class ChunkMeshData {
 	public:
@@ -50,14 +65,16 @@ namespace MeshingV2 {
 
 		}
 
-		ChunkMeshData(Chunk* chunkIn) {
-			chunk = chunkIn;
-			GenerateMesh();
-		}
+		void setChunk(Chunk* pChunk);
+
+		void reset();
 
 		//Mesh Vertices
-		std::vector<unsigned int> Vertices;
-		std::vector<unsigned int> TransparentVertices;
+		std::vector<unsigned int> VerticesBuffer;
+		std::vector<unsigned int> TransparentVerticesBuffer;
+
+		uint64_t transparentFaceCount = 0;
+		uint64_t solidFaceCount = 0;
 
 		//Position of the mesh in the world
 		glm::ivec3 Position = glm::ivec3(0, 0, 0);
@@ -72,18 +89,6 @@ namespace MeshingV2 {
 		//Allows you to edit the chunk without remeshing the entire chunk
 		void EditBlock(Block block, int x, int y, int z);
 
-		//Debug timing and stuff
-		double stage0 = 0.0;
-		double stage1 = 0.0;
-		double stage2 = 0.0;
-
-		size_t IsFaceVisibleCalls = 0;
-		size_t GetFaceCalls = 0;
-		size_t SetFaceCalls = 0;
-		size_t GetTextureCalls = 0;
-		size_t CompareQuadCalls = 0;
-		PerformanceProfiler profiler;
-		
 	private:
 		
 
@@ -101,12 +106,6 @@ namespace MeshingV2 {
 		inline bool CompareBlockSide(int x, int y, int z, uint8_t side, BlockID b);
 		inline bool CompareBlockSideUnsafe(int x, int y, int z, uint8_t side, BlockID b);
 
-		//Face data
-		uint16_t* BitsFaceExistCache;
-		uint32_t* BitsSolidBlockCache;
-		uint32_t* TextureCache;
-
-
 		//Add faces to the mesh
 		inline void AddFacetoMesh(const BlockFace& face, uint8_t axis, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z);
 
@@ -123,6 +122,8 @@ namespace MeshingV2 {
 
 		//To check if a block had been used in the Greedy Meshing Algorithm
 		CompactBooleanData booleanMap;
+
+		const uint64_t BUFFER_SIZE_STEP = 262144;
 
 		Chunk* chunk;
 

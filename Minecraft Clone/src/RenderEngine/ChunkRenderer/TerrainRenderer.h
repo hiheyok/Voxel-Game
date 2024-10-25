@@ -36,7 +36,7 @@ public:
 
 	void LoadAssets();
 
-	void AddChunk(MeshingV2::ChunkMeshData* MeshData);
+	void AddChunk(MeshingV2::ChunkVertexData* MeshData);
 
 	double getDebugTime();
 

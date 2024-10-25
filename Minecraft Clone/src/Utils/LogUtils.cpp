@@ -140,6 +140,25 @@ void LogUtils::LogDebug(std::string Subtype, std::string Message) {
 	Mutex.unlock();
 }
 
+void LogUtils::LogDebugf(std::string Subtype, std::string Message, ...) {
+	va_list args;
+	va_start(args, Message);
+
+	std::string formatedString = formatString(Message, args);
+
+	va_end(args);
+
+	LogData log;
+	log.type = LOG_TYPE_DEBUG;
+	log.message = formatedString;
+	log.time = chrono::system_clock::now();
+	log.Subtype = Subtype;
+	log.RTime = (std::chrono::high_resolution_clock::now() - InitTime).count();
+	Mutex.lock();
+	Logs.emplace_back(log);
+	Mutex.unlock();
+}
+
 void LogUtils::Stop() {
 	stop = true;
 	

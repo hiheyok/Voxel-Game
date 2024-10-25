@@ -15,10 +15,8 @@ void WorldRender::SetPosition(dvec3 position) {
 }
 
 void WorldRender::Render() {
-	mProfiler->ProfileStart("root/render/level");
 	RendererV2.RenderSky();
 	RendererV2.Render();
-	mProfiler->ProfileStop("root/render/level");
 }
 
 void WorldRender::LoadChunkToRenderer(ChunkID chunk) {
@@ -42,8 +40,9 @@ void WorldRender::Worker(int id) {
 	const int WorkerID = id;
 
 	deque<ChunkID> Jobs;
+	ChunkMeshData ChunkMesher;
 
-	deque<ChunkMeshData*> FinishedJobs;
+	deque<ChunkVertexData*> FinishedJobs;
 
 	while (!stop) {
 		//Fetches all of the tasks and put it in "Jobs"
@@ -67,17 +66,25 @@ void WorldRender::Worker(int id) {
 			Chunk* c = server->getChunk(pos.x, pos.y, pos.z);
 			
 			auto t0 = std::chrono::high_resolution_clock::now();
-			ChunkMeshData* Mesh = new ChunkMeshData(c);
+			ChunkMesher.reset();
+			ChunkMesher.setChunk(c);
+			ChunkMesher.GenerateMesh();
+
+			//Transfer Infomation
+			ChunkVertexData* data = new ChunkVertexData();
+			data->solidVertices.resize(ChunkMesher.solidFaceCount * 12);
+			data->transparentVertices.resize(ChunkMesher.transparentFaceCount * 12);
+			data->Position = ChunkMesher.Position;
+
+			memcpy(data->solidVertices.data(), ChunkMesher.VerticesBuffer.data(), ChunkMesher.solidFaceCount * 12 * sizeof(uint32_t));
+			memcpy(data->transparentVertices.data(), ChunkMesher.TransparentVerticesBuffer.data(), ChunkMesher.transparentFaceCount * 12 * sizeof(uint32_t));
+
 			auto t1 = std::chrono::high_resolution_clock::now();
 			amountOfMeshGenerated++;
-			FinishedJobs.push_back(Mesh);
 
-			
+			FinishedJobs.push_back(data);
 
 			buildTime += (double)(t1 - t0).count() / 1000.0;
-			buildstage0 += Mesh->stage0;
-			buildstage1 += Mesh->stage1;
-			buildstage2 += Mesh->stage2;
 			count++;
 
 			if ((count % BatchSize) == 0) {
@@ -103,7 +110,6 @@ void WorldRender::Update() {
 	int ChunkUpdateLimit = 4000;
 
 	int UpdateAmount = 0;
-	mProfiler->ProfileStart("root/update/level/loadMesh");
 	for (int WorkerID = 0; WorkerID < WorkerCount; WorkerID++) {
 
 		WorkerLocks[WorkerID].lock();
@@ -120,22 +126,16 @@ void WorldRender::Update() {
 
 		WorkerLocks[WorkerID].unlock();
 	}
-	mProfiler->ProfileStop("root/update/level/loadMesh");
 
-	mProfiler->ProfileStart("root/update/level/loadChunkForRender");
 	LoadChunkMultiToRenderer(server->getUpdatedChunks());
-	mProfiler->ProfileStop("root/update/level/loadChunkForRender");
 
-	mProfiler->ProfileStart("root/update/level/defrag");
 	if (UpdateAmount < ChunkUpdateLimit) {
 		RendererV2.Defrag(ChunkUpdateLimit - UpdateAmount);
 	}
-	mProfiler->ProfileStop("root/update/level/defrag");
 
-	mProfiler->ProfileStart("root/update/level/prepareRender");
 	RendererV2.Update();
 	RendererV2.PrepareRenderer();
-	mProfiler->ProfileStop("root/update/level/prepareRender");
+
 }
 
 void WorldRender::Stop() {

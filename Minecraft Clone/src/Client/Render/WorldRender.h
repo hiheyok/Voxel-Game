@@ -50,7 +50,7 @@ private:
 
 	std::deque<std::thread> Workers;
 	std::deque<std::deque<ChunkID>> WorkerTask;
-	std::deque<std::deque<MeshingV2::ChunkMeshData*>> WorkerOutput;
+	std::deque<std::deque<MeshingV2::ChunkVertexData*>> WorkerOutput;
 	std::deque<std::mutex> WorkerLocks;
 
 	std::thread Scheduler;

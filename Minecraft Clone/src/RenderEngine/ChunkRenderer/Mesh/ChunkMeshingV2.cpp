@@ -27,24 +27,31 @@ constexpr int SHUFFLE =  _MM_SHUFFLE(2, 3, 0, 1);
 
 #define PROFILE_DEBUG
 
+void MeshingV2::ChunkMeshData::reset() {
+	if (VerticesBuffer.size() != BUFFER_SIZE_STEP) {
+		VerticesBuffer.resize(BUFFER_SIZE_STEP, 0);
+	}
+
+	if (TransparentVerticesBuffer.size() != BUFFER_SIZE_STEP) {
+		TransparentVerticesBuffer.resize(BUFFER_SIZE_STEP, 0);
+	}
+
+	transparentFaceCount = 0;
+	solidFaceCount = 0;
+
+	memset(ChunkCache, NULL, 18 * 18 * 18 * sizeof(BlockID));
+}
+
 void MeshingV2::ChunkMeshData::GenerateCache() {
 	int pos[3]{ 0, 0, 0 };
 	int localPos[3]{ 0, 0, 0 };
 
-#ifndef PROFILE_DEBUG
-	profiler.ProfileStart(profiler.hasher("root/cacheGen/center"));
-#endif
+	const BlockID* container = chunk->BlockStorage.getContainerData();
 	for (int x = 0; x < 16; x++) {
-		for (int y = 0; y < 16; y++) {
-			for (int z = 0; z < 16; z++) {
-				setCachedBlockID(chunk->GetBlockUnsafe(x, y, z), x, y, z);
-			}
+		for (int z = 0; z < 16; z++) {
+			memcpy(ChunkCache + (x + 1) * 18 * 18 + (z + 1) * 18 + (1), container + (x << 8) + (z << 4), 16 * sizeof(BlockID));
 		}
 	}
-#ifndef PROFILE_DEBUG
-	profiler.ProfileStop(profiler.hasher("root/cacheGen/center"));
-	profiler.ProfileStart(profiler.hasher("root/cacheGen/side"));
-#endif
 	for (int side = 0; side < 6; side++) {
 		int axis = side >> 1;
 		int direction = side & 0b1;
@@ -68,9 +75,10 @@ void MeshingV2::ChunkMeshData::GenerateCache() {
 			}
 		}
 	}
-#ifndef PROFILE_DEBUG
-	profiler.ProfileStop(profiler.hasher("root/cacheGen/side"));
-#endif
+}
+
+void MeshingV2::ChunkMeshData::setChunk(Chunk* pChunk) {
+	chunk = pChunk;
 }
 
 
@@ -124,9 +132,9 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 
 					usedBlock[(pos[AxisU] << 4) + pos[AxisV]] = 0xFFU;
 
-					BlockID currBlock = getCachedBlockID(pos[0], pos[1], pos[2]);
+					const BlockID& currBlock = getCachedBlockID(pos[0], pos[1], pos[2]);
 					--pos[Axis];
-					BlockID backBlock = getCachedBlockID(pos[0], pos[1], pos[2]);
+					const BlockID& backBlock = getCachedBlockID(pos[0], pos[1], pos[2]);
 					++pos[Axis];
 
 					const ModelV2::BlockModelV2& currModel = Blocks.getBlockModelDereferenced(currBlock);
@@ -180,9 +188,9 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 
 					for (qPos[AxisV] = pos[AxisV] + 1; qPos[AxisV] < 16; ++qPos[AxisV]) {
 						//Check if they are the same
-						BlockID currBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
+						const BlockID& currBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
 						--qPos[Axis];
-						BlockID backBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
+						const BlockID& backBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
 						++qPos[Axis];
 
 						if (currBlock2 != currBlock || backBlock2 != backBlock)
@@ -200,9 +208,9 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 						bool isValid = true;
 
 						for (qPos[AxisV] = pos[AxisV]; qPos[AxisV] < pos[AxisV] + vLength; ++qPos[AxisV]) {
-							BlockID currBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
+							const BlockID& currBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
 							--qPos[Axis];
-							BlockID backBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
+							const BlockID& backBlock2 = getCachedBlockID(qPos[0], qPos[1], qPos[2]);
 							++qPos[Axis];
 
 							if (currBlock2 != currBlock || backBlock2 != backBlock) {
@@ -213,9 +221,7 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 						}
 
 						if (!isValid) {
-							for (qPos[AxisV] = pos[AxisV]; qPos[AxisV] < pos[AxisV] + vLength; ++qPos[AxisV]) {
-								usedBlock[(qPos[AxisU] << 4) + qPos[AxisV]] = 0x00U;
-							}
+							memset(usedBlock.data() + (qPos[AxisU] << 4) + pos[AxisV], 0x00U, vLength);
 							break;
 						}
 
@@ -267,21 +273,12 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 }
 
 void MeshingV2::ChunkMeshData::AddBlock(int x, int y, int z) {
-#ifndef PROFILE_DEBUG
-	profiler.ProfileStart(profiler.hasher("root/mesh/addbock/getModel"));
-#endif
 	BlockID b = getCachedBlockID(x, y, z);
 	if (b == Blocks.AIR) {
-#ifndef PROFILE_DEBUG
-		profiler.ProfileStop(profiler.hasher("root/mesh/addbock/getModel"));
-#endif
 		return;
 	}
 	Block* block = Blocks.getBlockType(b);
 	ModelV2::BlockModelV2* model = block->BlockModelData;
-#ifndef PROFILE_DEBUG
-	profiler.ProfileStop(profiler.hasher("root/mesh/addbock/getModel"));
-#endif
 	if (model == NULL) return;
 	
 	for (int i = 0; i < model->Elements.size(); i++) {
@@ -298,13 +295,7 @@ void MeshingV2::ChunkMeshData::AddBlock(int x, int y, int z) {
 					continue;
 				}
 			}
-#ifndef PROFILE_DEBUG
-			profiler.ProfileStart(profiler.hasher("root/mesh/addbock/addFace"));
-#endif
 			AddFacetoMesh(element.Faces[direction], direction, element.From, element.To, model->AmbientOcclusion, x, y, z);
-#ifndef PROFILE_DEBUG
-			profiler.ProfileStop(profiler.hasher("root/mesh/addbock/addFace"));
-#endif
 		}
 	}
 	
@@ -354,7 +345,20 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_X(const BlockFace& face, uin
 	uint32_t Norm = 0 << NormBitOffset;
 	uint32_t tint = (static_cast<uint32_t>(!!face.TintIndex)) << tintBitOffset;
 
-	vector<uint32_t>* out = face.hasTransparency ? &TransparentVertices : &Vertices;
+	vector<uint32_t>& out = face.hasTransparency ? TransparentVerticesBuffer : VerticesBuffer;
+
+	uint64_t currIndex = 0;
+
+	if (face.hasTransparency) {
+		currIndex = transparentFaceCount++;
+	}
+	else {
+		currIndex = solidFaceCount++;
+	}
+
+	if (out.size() <= (currIndex + 1) * 12) {
+		out.resize(out.size() + BUFFER_SIZE_STEP);
+	}
 
 	//Get AO
 	glm::ivec4 AO{ 15, 15, 15, 15 };
@@ -377,36 +381,32 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_X(const BlockFace& face, uin
 
 	switch (direction) {
 	case 1:
-		out->insert(out->end(), {
-		0u | P0[0] | P0[1] | P0[2] | Norm | tint
-		,0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset)
-		,0u | P0[0] | P1[1] | P0[2] | Norm | tint
-		,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
-		,0u | P0[0] | P0[1] | P1[2] | Norm | tint
-		,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
-		,0u | P0[0] | P0[1] | P1[2] | Norm | tint
-		,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
-		,0u | P0[0] | P1[1] | P0[2] | Norm | tint
-		,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
-		,0u | P0[0] | P1[1] | P1[2] | Norm | tint
-		,0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset)
-			});
+		out[currIndex * 12 + 0] = 0u | P0[0] | P0[1] | P0[2] | Norm | tint;
+		out[currIndex * 12 + 1] = 0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset);
+		out[currIndex * 12 + 2] = 0u | P0[0] | P1[1] | P0[2] | Norm | tint;
+		out[currIndex * 12 + 3] = 0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset);
+		out[currIndex * 12 + 4] = 0u | P0[0] | P0[1] | P1[2] | Norm | tint;
+		out[currIndex * 12 + 5] = 0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset);
+		out[currIndex * 12 + 6] = 0u | P0[0] | P0[1] | P1[2] | Norm | tint;
+		out[currIndex * 12 + 7] = 0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset);
+		out[currIndex * 12 + 8] = 0u | P0[0] | P1[1] | P0[2] | Norm | tint;
+		out[currIndex * 12 + 9] = 0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset);
+		out[currIndex * 12 + 10] = 0u | P0[0] | P1[1] | P1[2] | Norm | tint;
+		out[currIndex * 12 + 11] = 0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset);
 		break;
 	case 0:
-		out->insert(out->end(), {
-		0u | P1[0] | P0[1] | P0[2]| Norm | tint
-		,0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset)
-		,0u | P1[0] | P0[1] | P1[2] | Norm | tint
-		,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
-		,0u | P1[0] | P1[1] | P0[2] | Norm | tint
-		,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
-		,0u | P1[0] | P0[1] | P1[2]| Norm | tint
-		,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
-		,0u | P1[0] | P1[1] | P1[2] | Norm | tint
-		,0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset)
-		,0u | P1[0] | P1[1] | P0[2]| Norm | tint
-		,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
-			});
+		out[currIndex * 12 + 0] = 0u | P1[0] | P0[1] | P0[2] | Norm | tint;
+		out[currIndex * 12 + 1] = 0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset);
+		out[currIndex * 12 + 2] = 0u | P1[0] | P0[1] | P1[2] | Norm | tint;
+		out[currIndex * 12 + 3] = 0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset);
+		out[currIndex * 12 + 4] = 0u | P1[0] | P1[1] | P0[2] | Norm | tint;
+		out[currIndex * 12 + 5] = 0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset);
+		out[currIndex * 12 + 6] = 0u | P1[0] | P0[1] | P1[2] | Norm | tint;
+		out[currIndex * 12 + 7] = 0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset);
+		out[currIndex * 12 + 8] = 0u | P1[0] | P1[1] | P1[2] | Norm | tint;
+		out[currIndex * 12 + 9] = 0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset);
+		out[currIndex * 12 + 10] = 0u | P1[0] | P1[1] | P0[2] | Norm | tint;
+		out[currIndex * 12 + 11] = 0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset);
 		break;
 	}
 }
@@ -438,7 +438,21 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Y(const BlockFace& face, uin
 	uint32_t Norm = 1 << NormBitOffset;
 	uint32_t tint = (static_cast<uint32_t>(!!face.TintIndex)) << tintBitOffset;
 
-	vector<uint32_t>* out = face.hasTransparency ? &TransparentVertices : &Vertices;
+	vector<uint32_t>& out = face.hasTransparency ? TransparentVerticesBuffer : VerticesBuffer;
+
+	uint64_t currIndex = 0;
+
+	if (face.hasTransparency) {
+		currIndex = transparentFaceCount++;
+	}
+	else {
+		currIndex = solidFaceCount++;
+	}
+
+	if (out.size() <= (currIndex + 1) * 12) {
+		out.resize(out.size() + BUFFER_SIZE_STEP);
+	}
+
 	//Get AO
 	glm::ivec4 AO{ 15, 15, 15, 15 };
 
@@ -460,37 +474,32 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Y(const BlockFace& face, uin
 
 	switch (direction) {
 	case 1:
-		out->insert(out->end(), {
-			0u | P0[0] | P0[1] | P0[2] | Norm | tint //0
-			,0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset)
-			,0u | P0[0] | P0[1] | P1[2] | Norm | tint//2
-			,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
-			,0u | P1[0] | P0[1] | P0[2] | Norm | tint//1
-			,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
-			,0u | P0[0] | P0[1] | P1[2] | Norm | tint//3
-			,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
-			,0u | P1[0] | P0[1] | P1[2] | Norm | tint//5
-			,0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset)
-			,0u | P1[0] | P0[1] | P0[2] | Norm | tint//4
-			,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
-			});
+		out[currIndex * 12 + 0] = 0u | P0[0] | P0[1] | P0[2] | Norm | tint;
+		out[currIndex * 12 + 1] = 0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset);
+		out[currIndex * 12 + 2] = 0u | P0[0] | P0[1] | P1[2] | Norm | tint;
+		out[currIndex * 12 + 3] = 0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset);
+		out[currIndex * 12 + 4] = 0u | P1[0] | P0[1] | P0[2] | Norm | tint;
+		out[currIndex * 12 + 5] = 0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset);
+		out[currIndex * 12 + 6] = 0u | P0[0] | P0[1] | P1[2] | Norm | tint;
+		out[currIndex * 12 + 7] = 0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset);
+		out[currIndex * 12 + 8] = 0u | P1[0] | P0[1] | P1[2] | Norm | tint;
+		out[currIndex * 12 + 9] = 0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset);
+		out[currIndex * 12 + 10] = 0u | P1[0] | P0[1] | P0[2] | Norm | tint;
+		out[currIndex * 12 + 11] = 0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset);
 		break;
 	case 0:
-		out->insert(out->end(), {
-			0u | P0[0] | P1[1] | P0[2] | Norm | tint//0
-			,0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset)
-			,0u | P1[0] | P1[1] | P0[2] | Norm | tint//1
-			,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
-			,0u | P0[0] | P1[1] | P1[2] | Norm | tint//2
-			,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
-			,0u | P0[0] | P1[1] | P1[2] | Norm | tint//3
-			,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
-			,0u | P1[0] | P1[1] | P0[2] | Norm | tint//4
-			,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
-			,0u | P1[0] | P1[1] | P1[2] | Norm | tint//5
-			,0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset)
-			});
-
+		out[currIndex * 12 + 0] = 0u | P0[0] | P1[1] | P0[2] | Norm | tint;
+		out[currIndex * 12 + 1] = 0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset);
+		out[currIndex * 12 + 2] = 0u | P1[0] | P1[1] | P0[2] | Norm | tint;
+		out[currIndex * 12 + 3] = 0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset);
+		out[currIndex * 12 + 4] = 0u | P0[0] | P1[1] | P1[2] | Norm | tint;
+		out[currIndex * 12 + 5] = 0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset);
+		out[currIndex * 12 + 6] = 0u | P0[0] | P1[1] | P1[2] | Norm | tint;
+		out[currIndex * 12 + 7] = 0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset);
+		out[currIndex * 12 + 8] = 0u | P1[0] | P1[1] | P0[2] | Norm | tint;
+		out[currIndex * 12 + 9] = 0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset);
+		out[currIndex * 12 + 10] = 0u | P1[0] | P1[1] | P1[2] | Norm | tint;
+		out[currIndex * 12 + 11] = 0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset);
 		break;
 	}
 }
@@ -522,7 +531,20 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Z(const BlockFace& face, uin
 	uint32_t Norm = 2 << NormBitOffset;
 	uint32_t tint = (static_cast<uint32_t>(!!face.TintIndex)) << tintBitOffset;
 
-	vector<uint32_t>* out = face.hasTransparency ? &TransparentVertices : &Vertices;
+	vector<uint32_t>& out = face.hasTransparency ? TransparentVerticesBuffer : VerticesBuffer;
+
+	uint64_t currIndex = 0;
+
+	if (face.hasTransparency) {
+		currIndex = transparentFaceCount++;
+	}
+	else {
+		currIndex = solidFaceCount++;
+	}
+
+	if (out.size() <= (currIndex + 1) * 12) {
+		out.resize(out.size() + BUFFER_SIZE_STEP);
+	}
 
 	//Get AO
 	glm::ivec4 AO{ 15, 15, 15, 15 };
@@ -545,36 +567,32 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh_Z(const BlockFace& face, uin
 
 	switch (direction) {
 	case 1:
-		out->insert(out->end(), {
-			0u | P0[0] | P0[1] | P0[2] | Norm | tint //0
-			,0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset)
-			,0u | P1[0] | P0[1] | P0[2] | Norm | tint //1
-			,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
-			,0u | P0[0] | P1[1] | P0[2] | Norm | tint //2
-			,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
-			,0u | P0[0] | P1[1] | P0[2] | Norm | tint//3
-			,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
-			,0u | P1[0] | P0[1] | P0[2] | Norm | tint//4
-			,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
-			,0u | P1[0] | P1[1] | P0[2] | Norm | tint//5
-			,0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset)
-			});
+		out[currIndex * 12 + 0] = 0u | P0[0] | P0[1] | P0[2] | Norm | tint;
+		out[currIndex * 12 + 1] = 0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset);
+		out[currIndex * 12 + 2] = 0u | P1[0] | P0[1] | P0[2] | Norm | tint;
+		out[currIndex * 12 + 3] = 0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset);
+		out[currIndex * 12 + 4] = 0u | P0[0] | P1[1] | P0[2] | Norm | tint;
+		out[currIndex * 12 + 5] = 0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset);
+		out[currIndex * 12 + 6] = 0u | P0[0] | P1[1] | P0[2] | Norm | tint;
+		out[currIndex * 12 + 7] = 0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset);
+		out[currIndex * 12 + 8] = 0u | 0u | P1[0] | P0[1] | P0[2] | Norm | tint;
+		out[currIndex * 12 + 9] = 0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset);
+		out[currIndex * 12 + 10] = 0u | P1[0] | P1[1] | P0[2] | Norm | tint;
+		out[currIndex * 12 + 11] = 0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset);
 		break;
 	case 0:
-		out->insert(out->end(), {
-			0u | P0[0] | P0[1] | P1[2] | Norm | tint//0
-			,0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset)
-			,0u | P0[0] | P1[1] | P1[2] | Norm | tint//2
-			,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
-			,0u | P1[0] | P0[1] | P1[2] | Norm | tint//1
-			,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
-			,0u | P0[0] | P1[1] | P1[2] | Norm | tint//3
-			,0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset)
-			,0u | P1[0] | P1[1] | P1[2] | Norm | tint //5
-			,0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset)
-			,0u | P1[0] | P0[1] | P1[2] | Norm | tint//4
-			,0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset)
-			});
+		out[currIndex * 12 + 0] = 0u | P0[0] | P0[1] | P1[2] | Norm | tint;
+		out[currIndex * 12 + 1] = 0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset);
+		out[currIndex * 12 + 2] = 0u | P0[0] | P1[1] | P1[2] | Norm | tint;
+		out[currIndex * 12 + 3] = 0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset);
+		out[currIndex * 12 + 4] = 0u | P1[0] | P0[1] | P1[2] | Norm | tint;
+		out[currIndex * 12 + 5] = 0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset);
+		out[currIndex * 12 + 6] = 0u | P0[0] | P1[1] | P1[2] | Norm | tint;
+		out[currIndex * 12 + 7] = 0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset);
+		out[currIndex * 12 + 8] = 0u | P1[0] | P1[1] | P1[2] | Norm | tint;
+		out[currIndex * 12 + 9] = 0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset);
+		out[currIndex * 12 + 10] = 0u | 0u | P1[0] | P0[1] | P1[2] | Norm | tint;
+		out[currIndex * 12 + 11] = 0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset);
 		break;
 	}
 }

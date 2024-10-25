@@ -17,9 +17,6 @@ private:
 	std::vector<ChunkLightingContainer*> LightColumn;
 	Heightmap ColumnHeightmap;
 	glm::ivec2 Position;
-
-	static uint64_t ClockCount;
-	static uint64_t EventCount;
 public:
 	std::vector<bool> LightDirty;
 
@@ -37,7 +34,6 @@ public:
 		ChunkLightingContainer* l = LightColumn[y];
 		l->ReplaceData(c->getData());
 		delete c;
-		
 	}
 
 	ChunkColumn() {
@@ -133,6 +129,3 @@ public:
 //		printf("Avg Clock: %f\n", (double)ClockCount / EventCount);
 	}
 }; 
-
-__declspec(selectany) uint64_t ChunkColumn::ClockCount = 0;
-__declspec(selectany) uint64_t ChunkColumn::EventCount = 0;

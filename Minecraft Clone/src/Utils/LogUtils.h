@@ -47,6 +47,7 @@ public:
 	void LogInfo(std::string Subtype, std::string Message);
 
 	void LogDebug(std::string Subtype, std::string Message);
+	void LogDebugf(std::string Subtype, std::string Message,...);
 
 	std::thread LoggingThread;
 
@@ -86,7 +87,7 @@ private:
 	std::ofstream file;
 
 	char* m_buffer;
-	const uint64_t BUFFER_SIZE = 32768;
+	const uint64_t BUFFER_SIZE = 4096;
 
 };
 

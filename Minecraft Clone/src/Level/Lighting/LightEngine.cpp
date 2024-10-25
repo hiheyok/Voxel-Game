@@ -34,7 +34,6 @@ void LightingEngine::LightSpreadSky(Chunk* chunk, ChunkLightingContainer* contai
 		int nodeZ = (node >> 8) & 0b1111;
 		int nodeLight = (node >> 12) & 0b1111;
 
-
 		i++;
 		int nx = nodeX;
 		int ny = nodeY + ChunkHeight;

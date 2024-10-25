@@ -194,10 +194,10 @@ void TerrainRenderer::AddChunk(ChunkID ID, std::vector<uint32_t> data, std::vect
 	}
 }
 
-void TerrainRenderer::AddChunk(MeshingV2::ChunkMeshData* MeshData) {
+void TerrainRenderer::AddChunk(MeshingV2::ChunkVertexData* MeshData) {
 	ChunkID ID = getChunkID(MeshData->Position);
-	AddChunk(ID, MeshData->Vertices, &ChunkSolidBatches, &ChunkBatchSolidLookup);
-	AddChunk(ID, MeshData->TransparentVertices, &ChunkTransparentBatches, &ChunkBatchTransparentLookup);
+	AddChunk(ID, MeshData->solidVertices, &ChunkSolidBatches, &ChunkBatchSolidLookup);
+	AddChunk(ID, MeshData->transparentVertices, &ChunkTransparentBatches, &ChunkBatchTransparentLookup);
 	mGarbagePointers.push_back((void*)MeshData);
 }
 

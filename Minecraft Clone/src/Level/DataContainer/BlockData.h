@@ -20,6 +20,10 @@ public:
 		Data[index] = ID;
 	}
 
+	inline const BlockID* getContainerData() {
+		return Data;
+	}
+
 private:
 
 	constexpr inline const static uint16_t GetDataIndex(unsigned int x, unsigned int y, unsigned int z) {
