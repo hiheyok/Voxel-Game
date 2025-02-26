@@ -15,7 +15,7 @@ private:
 	DimensionProperties properties;
 	WorldParameters worldSettings;
 	
-	FastHashMap<int, ska::flat_hash_set<ChunkID>> TickUsage;
+	FastHashMap<int, ska::flat_hash_set<ChunkPos>> TickUsage;
 
 protected:
 	WorldGeneratorID generatorType;
@@ -47,13 +47,14 @@ public:
 		return generatorType;
 	}
 	
+	// TODO: Use custom block classd
 
-	bool CheckTickUsed(EventID id, int x, int y, int z) {//temp sol
-		return TickUsage[id].count(getChunkID(x, y, z));
+	bool CheckTickUsed(EventID id, const BlockPos& pos) {//temp sol
+		return TickUsage[id].count(pos);
 	}
 
-	void TickUsed(EventID id, int x, int y, int z) {//temp solution
-		TickUsage[id].insert(getChunkID(x, y, z));
+	void TickUsed(EventID id, const BlockPos& pos) {//temp solution
+		TickUsage[id].insert(pos);
 	}
 
 	void Initialize(DimensionProperties p) { //Generate new world
@@ -74,19 +75,21 @@ public:
 			case NULL_EVENT:
 				break;
 			case BLOCK_EVENT:
-				if (CheckTickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.x, e.Data.BlockEvent.y, e.Data.BlockEvent.z)) {
+				if (CheckTickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.pos)) {
 					continue;
 				}
-				TickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.x, e.Data.BlockEvent.y, e.Data.BlockEvent.z);
+				TickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.pos);
 				break;
 			case ENTITY_EVENT:
-				if ((e.Data.EntityEvent.UniqueID != 0) && CheckTickUsed(e.Data.EntityEvent.UniqueID, e.Data.EntityEvent.x, e.Data.EntityEvent.y, e.Data.EntityEvent.z)) {
+				if ((e.Data.EntityEvent.UniqueID != 0) && CheckTickUsed(e.Data.EntityEvent.UniqueID, e.Data.EntityEvent.pos)) {
 					continue;
 				}
 				if ((e.Data.EntityEvent.UniqueID != 0)) {
-					TickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.x, e.Data.BlockEvent.y, e.Data.BlockEvent.z);
+					TickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.pos);
 				}
 				break;
+			default:
+				throw std::exception("Not handled yet!");
 			}
 
 			EventHandler.ExecuteEvent(e);

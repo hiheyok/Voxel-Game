@@ -17,7 +17,7 @@ int LevelLoader::getChunkCount() {
 	return count;
 }
 
-void LevelLoader::sendRequestedChunks(vector<ChunkID> RequestedChunks, WorldGeneratorID worldGenTypeIn) { //Add option for requested chunks dimension type and generator type later
+void LevelLoader::sendRequestedChunks(vector<ChunkPos> RequestedChunks, WorldGeneratorID worldGenTypeIn) { //Add option for requested chunks dimension type and generator type later
 	//Later this will check on the disk for chunks
 	worldGenerator.Generate(RequestedChunks, worldGenTypeIn);
 }
@@ -28,7 +28,7 @@ vector<Chunk*> LevelLoader::getGeneratedChunk() {
 	return out;
 }
 
-void LevelLoader::sendRequestedLightUpdates(vector<ChunkColumnID> RequestedLight) {
+void LevelLoader::sendRequestedLightUpdates(vector<ChunkColumnPos> RequestedLight) {
 	//Later this will check on the disk for baked light info
 	lightEngine.Generate(RequestedLight);
 }

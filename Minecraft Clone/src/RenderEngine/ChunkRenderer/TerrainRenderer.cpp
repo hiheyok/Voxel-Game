@@ -150,7 +150,7 @@ void TerrainRenderer::GarbageCollectorThread() {
 		std::vector<void*> ptrQueue(mGarbagePointers.begin(), mGarbagePointers.end());
 		mGarbagePointers.clear();
 
-		for (const void* p : ptrQueue) {
+		for (void* p : ptrQueue) {
 			delete p;
 		}
 
@@ -159,17 +159,15 @@ void TerrainRenderer::GarbageCollectorThread() {
 	}
 }
 
-void TerrainRenderer::AddChunk(ChunkID ID, std::vector<uint32_t> data, std::vector<ChunkDrawBatch>* BatchType, FastHashMap<ChunkID, int>* LookUpMap) {
-	if (LookUpMap->count(ID)) {
-		size_t BatchIndex = LookUpMap->at(ID);
-		BatchType->at(BatchIndex).DeleteChunkVertices(ID);
-		LookUpMap->erase(ID);
+void TerrainRenderer::AddChunk(const ChunkPos& pos, std::vector<uint32_t> data, std::vector<ChunkDrawBatch>* BatchType, FastHashMap<ChunkPos, int>* LookUpMap) {
+	if (LookUpMap->count(pos)) {
+		size_t BatchIndex = LookUpMap->at(pos);
+		BatchType->at(BatchIndex).DeleteChunkVertices(pos);
+		LookUpMap->erase(pos);
 	}
 
 	if (data.size() == 0)
 		return;
-
-	glm::ivec3 ChunkPos = ChunkIDToPOS(ID);
 
 	bool Success = false;
 
@@ -179,11 +177,11 @@ void TerrainRenderer::AddChunk(ChunkID ID, std::vector<uint32_t> data, std::vect
 		if (BatchType->at(batchIndex).MemoryPool.MemoryPool.FindFreeSpace(MeshDataSize) == ULLONG_MAX)
 			continue;
 
-		bool InsertSuccess = BatchType->at(batchIndex).AddChunkVertices(data, ChunkPos.x, ChunkPos.y, ChunkPos.z);
+		bool InsertSuccess = BatchType->at(batchIndex).AddChunkVertices(data, pos);
 
 		if (!InsertSuccess) continue;
 
-		LookUpMap->emplace(std::pair<ChunkID, int>(ID, batchIndex));
+		LookUpMap->emplace(std::pair<ChunkPos, int>(pos, batchIndex));
 		Success = true;
 		break;
 		
@@ -195,9 +193,8 @@ void TerrainRenderer::AddChunk(ChunkID ID, std::vector<uint32_t> data, std::vect
 }
 
 void TerrainRenderer::AddChunk(MeshingV2::ChunkVertexData* MeshData) {
-	ChunkID ID = getChunkID(MeshData->Position);
-	AddChunk(ID, MeshData->solidVertices, &ChunkSolidBatches, &ChunkBatchSolidLookup);
-	AddChunk(ID, MeshData->transparentVertices, &ChunkTransparentBatches, &ChunkBatchTransparentLookup);
+	AddChunk(MeshData->position_, MeshData->solidVertices, &ChunkSolidBatches, &ChunkBatchSolidLookup);
+	AddChunk(MeshData->position_, MeshData->transparentVertices, &ChunkTransparentBatches, &ChunkBatchTransparentLookup);
 	mGarbagePointers.push_back((void*)MeshData);
 }
 

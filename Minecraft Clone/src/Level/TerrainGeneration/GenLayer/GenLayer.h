@@ -94,7 +94,7 @@ public:
     }
 
     int selectRandom(std::vector<int> rngNum) {
-        return rngNum[nextInt(rngNum.size())];
+        return rngNum[nextInt(static_cast<int>(rngNum.size()))];
     }
 
     int selectModeOrRandom(int p_151617_1_, int p_151617_2_, int p_151617_3_, int p_151617_4_) {

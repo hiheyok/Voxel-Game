@@ -1,6 +1,6 @@
 #pragma once
 #include "../../OpenGL/Buffers/Buffer.h"
-#include "../../../Level/Chunk/ChunkID.h"
+#include "../../../Level/Chunk/ChunkPos/ChunkPos.h"
 #include "../../../Level/Typenames.h"
 #include <vector>
 #include <map>
@@ -8,11 +8,11 @@
 struct ChunkMemoryPoolOffset {
 	size_t MemOffset = NULL;
 	size_t MemSize = NULL;
-	int x = 0, y = 0, z = 0;
+	ChunkPos position_;
 
 	ChunkMemoryPoolOffset() {};
 	ChunkMemoryPoolOffset(size_t Offset, size_t Size) : MemOffset(Offset), MemSize(Size) {};
-	ChunkMemoryPoolOffset(size_t Offset, size_t Size, int X, int Y, int Z) : MemOffset(Offset), MemSize(Size), x(X), y(Y), z(Z) {};
+	ChunkMemoryPoolOffset(size_t Offset, size_t Size, ChunkPos position) : MemOffset(Offset), MemSize(Size), position_(position) {};
 };
 
 
@@ -246,11 +246,7 @@ public:
 		MemoryPool.Initialize(MEMORY_POOL_SIZE);
 	}
 
-	void DeleteChunk(int x, int y, int z) {
-		DeleteChunk(getChunkID(x, y, z));
-	}
-
-	void DeleteChunk(ChunkID id) {
+	void DeleteChunk(ChunkPos id) {
 		if (!ChunkMemoryOffsets.count(id)) {
 			Logger.LogDebug("GPU Memory Pool","Attempted to delete non-existant chunk with ID " + std::to_string(id));
 			return;
@@ -266,11 +262,9 @@ public:
 		Update();
 	}
 
-	ChunkMemoryPoolOffset AddChunk(std::vector<uint32_t>& vertices, int x, int y, int z, int side) { //assumes vertices.size() != 0
+	ChunkMemoryPoolOffset AddChunk(std::vector<uint32_t>& vertices, ChunkPos pos, int side) { //assumes vertices.size() != 0
 		size_t BlockSize = vertices.size() * sizeof(uint32_t);
 		size_t BlockOffset = MemoryPool.FindFreeSpace(BlockSize);
-
-		ChunkID ID = getChunkID(x, y, z);
 
 		if (BlockOffset == ULLONG_MAX) { //Check if it is out of space
 			Logger.LogError("GPU Memory Pool", "Out of space!");
@@ -280,9 +274,7 @@ public:
 		ChunkMemoryPoolOffset ChunkMemoryBlock;
 		ChunkMemoryBlock.MemOffset = BlockOffset;
 		ChunkMemoryBlock.MemSize = BlockSize;
-		ChunkMemoryBlock.x = x;
-		ChunkMemoryBlock.y = y;
-		ChunkMemoryBlock.z = z;
+		ChunkMemoryBlock.position_ = pos;
 
 		MemoryPool.AllocateSpace(BlockOffset, BlockSize);
 
@@ -290,45 +282,37 @@ public:
 		buffer.InsertData(BlockOffset, BlockSize, vertices.data());
 
 		//Store Memory Offset
-		ChunkMemoryOffsets[ID] = ChunkMemoryBlock;
-		MemoryChunkOffset[BlockOffset] = ID;
+		ChunkMemoryOffsets[pos] = ChunkMemoryBlock;
+		MemoryChunkOffset[BlockOffset] = pos;
 
 		Statistics.MemoryUsage += BlockSize;
 		Update();
 		return ChunkMemoryBlock;
 	}
 
-	ChunkMemoryPoolOffset GetChunkMemoryPoolOffset(int x, int y, int z) {
-		return GetChunkMemoryPoolOffset(getChunkID(x, y, z));
-	}
-
-	ChunkMemoryPoolOffset GetChunkMemoryPoolOffset(ChunkID ID) {
+	ChunkMemoryPoolOffset GetChunkMemoryPoolOffset(ChunkPos ID) {
 		if (ChunkMemoryOffsets.count(ID)) {
 			return ChunkMemoryOffsets[ID];
 		}	
-		return ChunkMemoryPoolOffset(ULLONG_MAX, ULLONG_MAX, 666, 666, 666);
+		return ChunkMemoryPoolOffset(ULLONG_MAX, ULLONG_MAX, ID);
 	}
 
-	bool CheckChunk(ChunkID ID) {
+	bool CheckChunk(ChunkPos ID) {
 		return ChunkMemoryOffsets.count(ID);
 	}
 
-	ChunkMemoryPoolOffset AddChunkStaggingBuffer(ChunkID ID, int side, uint64_t BlockOffset, uint64_t BlockSize) { //assumes vertices.size() != 0
-		glm::ivec3 pos = ChunkIDToPOS(ID);
-		
+	ChunkMemoryPoolOffset AddChunkStaggingBuffer(ChunkPos pos, int side, uint64_t BlockOffset, uint64_t BlockSize) { //assumes vertices.size() != 0
 		ChunkMemoryPoolOffset ChunkMemoryBlock;
 		ChunkMemoryBlock.MemOffset = BlockOffset;
 		ChunkMemoryBlock.MemSize = BlockSize;
-		ChunkMemoryBlock.x = pos.x;
-		ChunkMemoryBlock.y = pos.y;
-		ChunkMemoryBlock.z = pos.z;
+		ChunkMemoryBlock.position_ = pos;
 
 		MemoryPool.AllocateSpace(BlockOffset, BlockSize);
 
 		buffer.CopyFrom(StaggingBuffer, 0, BlockOffset, BlockSize);
 
-		ChunkMemoryOffsets[ID] = ChunkMemoryBlock;
-		MemoryChunkOffset[BlockOffset] = ID;
+		ChunkMemoryOffsets[pos] = ChunkMemoryBlock;
+		MemoryChunkOffset[BlockOffset] = pos;
 
 		Statistics.MemoryUsage += BlockSize;
 		Update();
@@ -351,8 +335,8 @@ public:
 	BufferStorage buffer;
 
 	MemoryManagement::MemoryPoolManager MemoryPool;
-	FastHashMap<ChunkID, ChunkMemoryPoolOffset> ChunkMemoryOffsets;
-	FastHashMap<size_t, ChunkID> MemoryChunkOffset;
+	FastHashMap<ChunkPos, ChunkMemoryPoolOffset> ChunkMemoryOffsets;
+	FastHashMap<size_t, ChunkPos> MemoryChunkOffset;
 
 	int MEMORY_POOL_SIZE = 0;
 

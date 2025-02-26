@@ -9,20 +9,21 @@ void WorldLoader::loadSummonEntitySurrounding(EntityUUID uuid) {
 	if (e == nullptr) throw exception(std::string("Entity with UUID " + to_string(uuid) + " not found").c_str());
 
 	vec3 pos = e->Properties.Position / 16.f;
-	vec3 velocity = e->Properties.Velocity;
+	// vec3 velocity = e->Properties.Velocity;
 
 	ivec3 InitalPos((int)pos.x, (int)pos.y, (int)pos.z);
 
+	// TODO: Use light engine FIFO 
 	deque<ivec3> FIFO;
 
 	FIFO.push_back(InitalPos);
 	while (!FIFO.empty()) {
 
-		ivec3 ChunkPos = FIFO.front();
+		ivec3 chunkPos = FIFO.front();
 		FIFO.pop_front();
 
 		//Gets relative position from the entity
-		ivec3 Offset = InitalPos - ChunkPos;
+		ivec3 Offset = InitalPos - chunkPos;
 
 		//Checks if it is in range
 		if ((abs(Offset.x) > settings.HorizontalTickingDistance) || (abs(Offset.z) > settings.HorizontalTickingDistance))
@@ -30,12 +31,12 @@ void WorldLoader::loadSummonEntitySurrounding(EntityUUID uuid) {
 		if (abs(Offset.y) > settings.VerticalTickingDistance)
 			continue;
 
-		bool isSuccess = RequestLoad(ChunkPos.x, ChunkPos.y, ChunkPos.z);
+		bool isSuccess = RequestLoad(ChunkPos{ chunkPos.x, chunkPos.y, chunkPos.z });
 		if (!isSuccess) continue;
 
 		for (int side = 0; side < 6; side++) {
 
-			ivec3 newObj = ChunkPos;
+			ivec3 newObj = chunkPos;
 
 			newObj[side >> 1] += (side & 0b1) * 2 - 1;
 
@@ -45,19 +46,20 @@ void WorldLoader::loadSummonEntitySurrounding(EntityUUID uuid) {
 
 }
 
-bool WorldLoader::RequestLoad(int x, int y, int z) {
-	if (world->getChunk(x, y, z) != nullptr)
+bool WorldLoader::RequestLoad(const ChunkPos& pos) {
+	ChunkPos p = pos;
+	if (world->getChunk(p) != nullptr)
 		return false;
 
 	if (tallGeneration)
-		y = y / 16;
+		p.y /= 16;
 
-	if (GeneratingChunk.count(getChunkID(x, y, z)))
+	if (GeneratingChunk.count(p))
 		return false;
 
 	//Request chunk
-	GeneratingChunk.insert(getChunkID(x, y, z));
-	ChunkRequest.emplace_back(getChunkID(x, y, z));
+	GeneratingChunk.insert(p);
+	ChunkRequest.emplace_back(p);
 	return true;
 }
 
@@ -121,7 +123,7 @@ void WorldLoader::loadSurroundedMovedEntityChunk() {
 					testPosition[j] += SideDistanceOffset * side;
 
 					//Test if it exist of generating
-					bool isSuccess = RequestLoad(testPosition.x, testPosition.y, testPosition.z);
+					bool isSuccess = RequestLoad(ChunkPos{ testPosition.x, testPosition.y, testPosition.z });
 					if (!isSuccess) continue;	
 				}
 			}
@@ -139,7 +141,7 @@ void WorldLoader::loadSpawnChunks() {
 	for (int x = -settings.SpawnChunkHorizontalRadius; x <= settings.SpawnChunkHorizontalRadius; x++) {
 		for (int z = -settings.SpawnChunkHorizontalRadius; z <= settings.SpawnChunkHorizontalRadius; z++) {
 			for (int y = -settings.SpawnChunkVerticalRadius; y <= settings.SpawnChunkVerticalRadius; y++) {
-				bool isSuccess = RequestLoad(x, y, z);
+				bool isSuccess = RequestLoad(ChunkPos{ x, y, z });
 
 				if (!isSuccess) {
 					continue;
@@ -158,15 +160,15 @@ WorldAccess* WorldLoader::getWorld() {
 
 //TODO: Fix me
 void WorldLoader::replaceLightInfomation(ChunkLightingContainer* lighting) {
-	ChunkColumn* col = world->getColumn(lighting->Position);
-	int y = lighting->Position.y & 0b11111;
+	ChunkColumn* col = world->getColumn(lighting->position_);
+	int y = lighting->position_.y & 0b11111;
 	if (col == nullptr) return; //fix this nullptr
 
 	col->replaceLightContainer(y, lighting);
 }
 
-vector<ChunkID> WorldLoader::getRequestedChunks() {
-	vector<ChunkID> tmp;
+vector<ChunkPos> WorldLoader::getRequestedChunks() {
+	vector<ChunkPos> tmp;
 	lock.lock();
 	tmp = ChunkRequest;
 	ChunkRequest.clear();
@@ -201,9 +203,9 @@ void WorldLoader::load() {
 }
 
 void WorldLoader::addChunk(Chunk* chunk) {
-	ChunkID ID = chunk->chunkID;
+	ChunkPos pos = chunk->position_;
 
-	if (GeneratingChunk.count(ID)) GeneratingChunk.erase(ID);
+	if (GeneratingChunk.count(pos)) GeneratingChunk.erase(pos);
 
 	world->setChunk(chunk);
 }

@@ -1,6 +1,5 @@
 #pragma once
 #include  "Mesh/ChunkMeshingV2.h"
-#include "Mesh/ChunkMeshing.h"
 #include "../Camera/camera.h"
 #include "Batch/ChunkBatch.h"
 #include "../OpenGL/Shader/Shader.h"
@@ -51,7 +50,7 @@ public:
 private:
 	void GarbageCollectorThread();
 
-	void AddChunk(ChunkID ID, std::vector<uint32_t> data, std::vector<ChunkDrawBatch>* BatchType, FastHashMap<ChunkID, int>* LookUpMap);
+	void AddChunk(const ChunkPos& pos, std::vector<uint32_t> data, std::vector<ChunkDrawBatch>* BatchType, FastHashMap<ChunkPos, int>* LookUpMap);
 
 	void SetupShaders();
 
@@ -66,10 +65,10 @@ private:
 	int TextureAminationIndex = 0;
 
 	std::vector<ChunkDrawBatch> ChunkSolidBatches;
-	FastHashMap<ChunkID, int> ChunkBatchSolidLookup; //f: ChunkID -> SolidBatchIndex
+	FastHashMap<ChunkPos, int> ChunkBatchSolidLookup; //f: ChunkPos -> SolidBatchIndex
 
 	std::vector<ChunkDrawBatch> ChunkTransparentBatches;
-	FastHashMap<ChunkID, int> ChunkBatchTransparentLookup; //f: ChunkID -> TransparentBatchIndex
+	FastHashMap<ChunkPos, int> ChunkBatchTransparentLookup; //f: ChunkPos -> TransparentBatchIndex
 
 	GLFWwindow* window = nullptr;
 	bool stop = false;

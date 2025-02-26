@@ -1,9 +1,9 @@
 #pragma once
 #include <vector>
-#include <GL/glew.h>
-#include <glfw/glfw3.h>
+#include <gl/glew.h>
+#include <GLFW/glfw3.h>
 #include <unordered_map>
-#include "../shader/shader.h"
+#include "../Shader/Shader.h"
 #include "../../../Utils/LogUtils.h"
 
 class TexturedFrameBuffer {

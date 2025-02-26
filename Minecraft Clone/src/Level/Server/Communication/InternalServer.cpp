@@ -27,12 +27,8 @@ vec3 InternalServer::getPlayerCollusionTimes() {
 	return server->getEntityCollusionTime(player->Properties.EntityUUID);
 }
 
-Chunk* InternalServer::getChunk(ChunkID chunk) {
+Chunk* InternalServer::getChunk(const ChunkPos& chunk) {
 	return server->getChunk(chunk);
-}
-
-Chunk* InternalServer::getChunk(int x, int y, int z) {
-	return getChunk(getChunkID(x, y, z));
 }
 
 Timer* InternalServer::getTickClock() {
@@ -55,10 +51,10 @@ int InternalServer::getChunkCount() {
 	return server->getChunkCount();
 }
 
-vector<ChunkID> InternalServer::getUpdatedChunks() {
-	vector<ChunkID> updatedChunkIDs = server->getUpdatedChunkIDs();
+vector<ChunkPos> InternalServer::getUpdatedChunks() {
+	vector<ChunkPos> updatedChunkPoss = server->getUpdatedChunkPoss();
 
-	return updatedChunkIDs;
+	return updatedChunkPoss;
 }
 
 vector<EntityProperty> InternalServer::getUpdatedEntities() {
@@ -73,8 +69,8 @@ bool InternalServer::checkRayIntersection(Ray& ray) {
 	return server->getRayIntersection(ray);
 }
 
-BlockID InternalServer::getBlock(int x, int y, int z) {
-	return server->getBlock(x, y, z);
+BlockID InternalServer::getBlock(const BlockPos& pos) {
+	return server->getBlock(pos);
 }
 
 void InternalServer::sendEvent(Event pEventIn) {

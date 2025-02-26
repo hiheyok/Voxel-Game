@@ -13,9 +13,7 @@ public:
 
 	glm::vec3 getPlayerCollusionTimes();
 
-	Chunk* getChunk(ChunkID chunk);
-
-	Chunk* getChunk(int x, int y, int z);
+	Chunk* getChunk(const ChunkPos& chunk);
 
 	Timer* getTickClock();
 
@@ -27,7 +25,7 @@ public:
 
 	int getChunkCount();
 
-	std::vector<ChunkID> getUpdatedChunks();
+	std::vector<ChunkPos> getUpdatedChunks();
 
 	std::vector<EntityProperty> getUpdatedEntities();
 
@@ -35,7 +33,7 @@ public:
 
 	bool checkRayIntersection(Ray& ray);
 
-	BlockID getBlock(int x, int y, int z);
+	BlockID getBlock(const BlockPos& pos);
 
 	void sendEvent(Event pEventIn);
 

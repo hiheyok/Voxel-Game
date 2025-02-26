@@ -23,9 +23,9 @@ public:
 
 	void GenDrawCommands(int RenderDistance, int VerticalRenderDistance);
 
-	bool AddChunkVertices(std::vector<uint32_t>& Data, int x, int y, int z);
+	bool AddChunkVertices(std::vector<uint32_t>& Data, const ChunkPos& pos);
 
-	void DeleteChunkVertices(ChunkID ID);
+	void DeleteChunkVertices(const ChunkPos& ID);
 
 	void SetMaxSize(size_t size);
 
@@ -59,7 +59,7 @@ private:
 
 	bool UpdateCommands = false;
 
-	FastHashMap<ChunkID, size_t> RenderListOffsetLookup; //f: ChunkID  -> Offset
+	FastHashMap<ChunkPos, size_t> RenderListOffsetLookup; //f: ChunkPos  -> Offset
 	std::vector<GLint> ChunkShaderPos;
 
 	std::vector<DrawCommandIndirect> DrawCommands;

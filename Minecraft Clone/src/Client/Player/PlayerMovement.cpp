@@ -12,7 +12,7 @@ void PlayerMovement::Update(Player* player, UserInputs Inputs, InternalServer* s
 
 float PlayerMovement::velocityMovementCurve(float current, float max, float delta) {
 
-	int currentTime = -log(max - current) + log(max);
+	int currentTime = static_cast<int>(-log(max - current) + log(max));
 
 	int x = delta - log(max) - currentTime;
 
@@ -109,6 +109,7 @@ void PlayerMovement::MovePlayer(Player* player, UserInputs Inputs, InternalServe
 
 	if (m_EnableCollusion) {
 		float gravity = -80;
+		gravity = 0;
 
 		player->Properties.Velocity.y += gravity;
 

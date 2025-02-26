@@ -7,13 +7,6 @@
 using namespace std;
 using namespace glm;
 
-uint64_t cacheTime = 0;
-uint64_t cacheUsed = 0;
-uint64_t preciseTime = 0;
-
-uint64_t debug0 = 0;
-uint64_t debug1 = 0;
-
 constexpr int POSITION_OFFSET = 16;
 
 constexpr int BitShiftAmount = 9; //27 bits
@@ -22,8 +15,6 @@ constexpr int tintBitOffset = 29; // 1 bit
 
 constexpr int textureBitOffset = 10; // 18 bits
 constexpr int blockShadingBitOffset = 28; // 4 bits
-
-constexpr int SHUFFLE =  _MM_SHUFFLE(2, 3, 0, 1);
 
 #define PROFILE_DEBUG
 
@@ -52,6 +43,7 @@ void MeshingV2::ChunkMeshData::GenerateCache() {
 			memcpy(ChunkCache + (x + 1) * 18 * 18 + (z + 1) * 18 + (1), container + (x << 8) + (z << 4), 16 * sizeof(BlockID));
 		}
 	}
+
 	for (int side = 0; side < 6; side++) {
 		int axis = side >> 1;
 		int direction = side & 0b1;
@@ -81,44 +73,28 @@ void MeshingV2::ChunkMeshData::setChunk(Chunk* pChunk) {
 	chunk = pChunk;
 }
 
-
 void MeshingV2::ChunkMeshData::GenerateMesh() {
 	//Initialize
 	if (chunk == nullptr) {
 		return;
 	}
 
-	Position = chunk->Position;
-
 	chunk->Use();
 	GenerateCache();
 	chunk->Unuse();
 	
 	GenerateFaceCollection();
-	
-#ifndef PROFILE_DEBUG
-	profiler.RegisterPaths("root/mesh/addbock/getModel");
-	profiler.RegisterPaths("root/mesh/addbock/checkVisibility");
-	profiler.RegisterPaths("root/mesh/addbock/addFace");
-	profiler.RegisterPaths("root/cacheGen/side");
-	profiler.RegisterPaths("root/cacheGen/center");
-	profiler.RegisterPaths("root/mesh/addbock/checkVisibility/getmodel");
-	profiler.RegisterPaths("root/mesh/addbock/checkVisibility/actualTest")
-	profiler.CondenseCache();
-#endif
 }
 
 //Loops through all the blocks in the chunk and check if each block side is visible. If a block side is visible, it generates the quad and puts it in the cache
 void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 	std::vector<uint8_t> FaceVisibilityBack(4096, 0b00);
 	std::vector<uint8_t> FaceVisibility(4096, 0b00);
-
 	std::vector<uint8_t> usedBlock(16 * 16, 0b00);
 
 	for (int Axis = 0; Axis < 3; Axis++) {
-		int AxisU = (Axis + 1) % 3;
-		int AxisV = (Axis + 2) % 3;
-
+		int AxisU = (Axis + 2) % 3;
+		int AxisV = (Axis + 1) % 3;
 		int pos[3]{ 0,0,0 };
 
 		for (pos[Axis] = 0; pos[Axis] < 17; ++pos[Axis]) {//Slice
@@ -126,11 +102,12 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 			for (pos[AxisU] = 0; pos[AxisU] < 16; ++pos[AxisU]) {
 				for (pos[AxisV] = 0; pos[AxisV] < 16; ++pos[AxisV]) {
 
-					if (usedBlock[(pos[AxisU] << 4) + pos[AxisV]] == 0xFFU) {
+					if (usedBlock[(pos[AxisU] << 4) + pos[AxisV]] != 0x00) {
+						pos[AxisV] += usedBlock[(pos[AxisU] << 4) + pos[AxisV]] - 1; 
 						continue;
 					}
 
-					usedBlock[(pos[AxisU] << 4) + pos[AxisV]] = 0xFFU;
+					usedBlock[(pos[AxisU] << 4) + pos[AxisV]] = 0xFF;
 
 					const BlockID& currBlock = getCachedBlockID(pos[0], pos[1], pos[2]);
 					--pos[Axis];
@@ -158,7 +135,7 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 
 							FaceVisibility[i] |= 0b1;
 						}
-							
+
 					}
 					//Check if it is visible from the back and front
 					--pos[Axis];
@@ -200,6 +177,8 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 						vLength++;
 					}
 
+					//memset(usedBlock.data() + (pos[AxisU] << 4) + pos[AxisV], vLength, vLength);
+
 					qPos[0] = pos[0];
 					qPos[1] = pos[1];
 					qPos[2] = pos[2];
@@ -217,13 +196,13 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 								isValid = false;
 								break;
 							}
-							usedBlock[(qPos[AxisU] << 4) + qPos[AxisV]] = 0xFFU;
 						}
 
 						if (!isValid) {
-							memset(usedBlock.data() + (qPos[AxisU] << 4) + pos[AxisV], 0x00U, vLength);
 							break;
 						}
+
+						memset(usedBlock.data() + (qPos[AxisU] << 4) + pos[AxisV], vLength, vLength);
 
 						++uLength;
 					}
@@ -256,7 +235,10 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 							}
 						}
 					}
-					++qPos[Axis];
+
+					qPos[0] = pos[0];
+					qPos[1] = pos[1];
+					qPos[2] = pos[2];
 
 					if (vLength == 16 && uLength == 16) { //Skip entire layer
 						pos[AxisV] = 15;
@@ -268,39 +250,8 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 				}
 			}
 		}
-			
 	}
 }
-
-void MeshingV2::ChunkMeshData::AddBlock(int x, int y, int z) {
-	BlockID b = getCachedBlockID(x, y, z);
-	if (b == Blocks.AIR) {
-		return;
-	}
-	Block* block = Blocks.getBlockType(b);
-	ModelV2::BlockModelV2* model = block->BlockModelData;
-	if (model == NULL) return;
-	
-	for (int i = 0; i < model->Elements.size(); i++) {
-		const Cuboid& element = model->Elements[i];
-		for (int direction = 0; direction < 6; direction++) {
-			
-			if (element.Faces[direction].ReferenceTexture.length() == 0) {
-				continue;
-			}
-
-			if (element.Faces[direction].CullFace != -1) {
-				
-				if (!IsFaceVisible(element, x, y, z, element.Faces[direction].CullFace)) {
-					continue;
-				}
-			}
-			AddFacetoMesh(element.Faces[direction], direction, element.From, element.To, model->AmbientOcclusion, x, y, z);
-		}
-	}
-	
-}
-
 
 inline void MeshingV2::ChunkMeshData::AddFacetoMesh(const BlockFace& face, uint8_t axis, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z) {
 	uint8_t NN = 15, PN = 15, PP = 15, NP = 15;
@@ -319,12 +270,17 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh(const BlockFace& face, uint8
 	glm::ivec2 TexPP = face.UVCoordPP;
 	glm::ivec2 TexNP = face.UVCoordPN;
 
+	TexNN.y <<= 5;
+	TexNP.y <<= 5;
+	TexPP.y <<= 5;
+	TexPN.y <<= 5;
+
 	P0.x <<= 0;
 	P1.x <<= 0;
-	P0.y <<= 9;
-	P1.y <<= 9;
-	P0.z <<= 18;
-	P1.z <<= 18;
+	P0.y <<= BitShiftAmount;
+	P1.y <<= BitShiftAmount;
+	P0.z <<= BitShiftAmount * 2;
+	P1.z <<= BitShiftAmount * 2;
 
 	glm::ivec3 tP0 = P0;
 	glm::ivec3 tP1 = P1;
@@ -341,7 +297,7 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh(const BlockFace& face, uint8
 	if (facing == 2)
 		swap(TexPN, TexNP);
 
-	uint32_t tex = face.TextureID << 10;
+	uint32_t tex = face.TextureID << textureBitOffset;
 	uint32_t Norm = facing << NormBitOffset;
 	uint32_t tint = (static_cast<uint32_t>(!!face.TintIndex)) << tintBitOffset;
 
@@ -353,29 +309,20 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh(const BlockFace& face, uint8
 		out.resize(out.size() + BUFFER_SIZE_STEP);
 
 	//Get AO
-	glm::ivec4 AO{ 15, 15, 15, 15 };
-
-	if (allowAO) {
-		AO = getAO(axis, x / 16, y / 16, z / 16);
-	}
+	glm::ivec4 AO = allowAO ? getAO(axis, x / 16, y / 16, z / 16) : glm::ivec4{ 15, 15, 15, 15 };
 
 	PP = AO[0], PN = AO[1], NP = AO[2], NN = AO[3];
 
-	TexNN.y <<= 5;
-	TexNP.y <<= 5;
-	TexPP.y <<= 5;
-	TexPN.y <<= 5;
-
-	out[currIndex * 12 + 0] = 0u | P0[0] | P0[1] | P0[2] | Norm | tint;
-	out[currIndex * 12 + 1] = 0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset);
-	out[currIndex * 12 + 2] = 0u | P0[0] | P1[1] | P0[2] | Norm | tint;
-	out[currIndex * 12 + 3] = 0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset);
-	out[currIndex * 12 + 4] = 0u | P0[0] | P0[1] | P1[2] | Norm | tint;
-	out[currIndex * 12 + 5] = 0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset);
-	out[currIndex * 12 + 6] = 0u | P0[0] | P0[1] | P1[2] | Norm | tint;
-	out[currIndex * 12 + 7] = 0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset);
-	out[currIndex * 12 + 8] = 0u | P0[0] | P1[1] | P0[2] | Norm | tint;
-	out[currIndex * 12 + 9] = 0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset);
+	out[currIndex * 12 + 0]  = 0u | P0[0] | P0[1] | P0[2] | Norm | tint;
+	out[currIndex * 12 + 1]  = 0u | TexNN.x | TexNN.y | tex | (NN << blockShadingBitOffset);
+	out[currIndex * 12 + 2]  = 0u | P0[0] | P1[1] | P0[2] | Norm | tint;
+	out[currIndex * 12 + 3]  = 0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset);
+	out[currIndex * 12 + 4]  = 0u | P0[0] | P0[1] | P1[2] | Norm | tint;
+	out[currIndex * 12 + 5]  = 0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset);
+	out[currIndex * 12 + 6]  = 0u | P0[0] | P0[1] | P1[2] | Norm | tint;
+	out[currIndex * 12 + 7]  = 0u | TexNP.x | TexNP.y | tex | (NP << blockShadingBitOffset);
+	out[currIndex * 12 + 8]  = 0u | P0[0] | P1[1] | P0[2] | Norm | tint;
+	out[currIndex * 12 + 9]  = 0u | TexPN.x | TexPN.y | tex | (PN << blockShadingBitOffset);
 	out[currIndex * 12 + 10] = 0u | P0[0] | P1[1] | P1[2] | Norm | tint;
 	out[currIndex * 12 + 11] = 0u | TexPP.x | TexPP.y | tex | (PP << blockShadingBitOffset);
 
@@ -388,11 +335,11 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh(const BlockFace& face, uint8
 	}
 }
 
-inline BlockID& MeshingV2::ChunkMeshData::getCachedBlockID(int x, int y, int z) {
+inline const BlockID& MeshingV2::ChunkMeshData::getCachedBlockID(int x, int y, int z) const {
 	return ChunkCache[(x + 1) * 18 * 18 + (z + 1) * 18 + (y + 1)];
 }
 
-inline BlockID& MeshingV2::ChunkMeshData::getCachedBlockID(int* pos) {
+inline const BlockID& MeshingV2::ChunkMeshData::getCachedBlockID(int* pos) const {
 	return getCachedBlockID(pos[0], pos[1], pos[2]);
 }
 
@@ -496,15 +443,9 @@ inline glm::ivec4 MeshingV2::ChunkMeshData::getAO(uint8_t direction, int x, int 
 	return glm::ivec4(PP, PN, NP, NN);
 
 }
-inline static bool checkOverlap(const Cuboid& element, const __m128& cubeData, uint8_t& axis1, uint8_t& axis2) {
-	__m128 elementData = _mm_set_ps(element.To[axis2], element.From[axis2], element.To[axis1], element.From[axis1]);
-	__m128 cmp = _mm_cmplt_ps(elementData, cubeData);
-	return !_mm_movemask_ps(cmp);
-}
 
 //Checks if a block side is visible to the player
 inline bool MeshingV2::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int x, int y, int z, uint8_t side) {
-	//IsFaceVisibleCalls++;
 	const uint8_t axis = (side >> 1); //Get side
 	const uint8_t axis1 = (axis + 1) % 3;
 	const uint8_t axis2 = (axis + 2) % 3;
@@ -515,48 +456,30 @@ inline bool MeshingV2::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int x, i
 	p[axis] += 1 - 2 * (side & 0b1);
 //	return getCachedBlockID(p[0], p[1], p[2]) == Blocks.AIR;
 
-#ifndef PROFILE_DEBUG
-	profiler.ProfileStart(profiler.hasher("root/mesh/addbock/checkVisibility/getmodel"));
-#endif
 	const ModelV2::BlockModelV2& model = Blocks.getBlockModelDereferenced(getCachedBlockID(p[0], p[1], p[2]));
-#ifndef PROFILE_DEBUG
-	profiler.ProfileStop(profiler.hasher("root/mesh/addbock/checkVisibility/getmodel"));
-#endif
+
 	if (!model.isInitialized) return true;
-#ifndef PROFILE_DEBUG
-	profiler.ProfileStart(profiler.hasher("root/mesh/addbock/checkVisibility/actualTest"));
-#endif
-	__m128i cubeData = _mm_set_epi32(cube.To[axis2], cube.From[axis2], cube.To[axis1], cube.From[axis1]);
 
-	//swap the order of cube's From and To for the comparison
-	cubeData = _mm_shuffle_epi32(cubeData, SHUFFLE);
-
-	for (int i = 0; i < model.Elements.size(); i++) {
+	for (int i = 0; i < model.Elements.size(); ++i) {
 		const Cuboid& element = model.Elements[i];
 		if (element.Faces[oppositeSide].CullFace != oppositeSide ||
 			element.Faces[oppositeSide].isSeeThrough ||
 			element.Faces[oppositeSide].hasTransparency ||
 			element.Faces[oppositeSide].ReferenceTexture.empty())
-			continue;
+			continue; 
 
 		if (side & 1) //if the  block arent touching
 			if (element.To[axis] < 16) continue;
 		else
 			if (element.From[axis] > 0) continue;
+		
+		//Check if the faces aren't overlapping
 
-		//Check if the faces overlap
-		__m128i elementData = _mm_set_epi32(element.To[axis2], element.From[axis2], element.To[axis1], element.From[axis1]);
-		__m128i cmp = _mm_cmplt_epi32(elementData, cubeData);
-		if (!_mm_movemask_ps(_mm_castsi128_ps(cmp))) continue;
+		if (element.From[axis1] <= cube.From[axis1] && element.To[axis1] >= cube.To[axis1] &&
+			element.From[axis2] <= cube.From[axis2] && element.To[axis2] >= cube.To[axis2])
+			return false;
 
-#ifndef PROFILE_DEBUG
-		profiler.ProfileStop(profiler.hasher("root/mesh/addbock/checkVisibility/actualTest"));
-#endif
-		return false;
 	}
-#ifndef PROFILE_DEBUG
-	profiler.ProfileStop(profiler.hasher("root/mesh/addbock/checkVisibility/actualTest"));
-#endif
 	return true;
 }
 

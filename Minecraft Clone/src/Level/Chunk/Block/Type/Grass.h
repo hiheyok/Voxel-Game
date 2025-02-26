@@ -1,8 +1,9 @@
 #pragma once
 #include "../../../Event/EventSystem.h"
-#include "../Block.h"
 #include "../../../../Utils/Math/Probability/Probability.h"
 #include "../../../Event/EventHandler.h"
+
+class Block;
 
 struct GrassProperties {
 	double SpreadChance = 0.001;
@@ -13,23 +14,26 @@ struct GrassBlock : Block {
 
 	GrassProperties Properties;
 
-	void tick(int x, int y, int z) override {
+	void tick(const BlockPos& pos) override {
 	//	std::cout << "Tick\n";
 
 
 		Dimension* CurrentWorld = static_cast<Dimension*>(Block::DimensionPTR);
 
 		//Checks if ticking block changes 
-		if (CurrentWorld->worldInteractions.getBlock(x, y, z) != Blocks.GRASS) {
+		if (CurrentWorld->worldInteractions.getBlock(pos) != Blocks.GRASS) {
 			return;
 		}
 
-		bool BlockOnTopOfGrass = (CurrentWorld->worldInteractions.getBlock(x, y + 1, z) != Blocks.AIR);
+		BlockPos newPos = pos;
+		newPos.y += 1;
+
+		bool BlockOnTopOfGrass = (CurrentWorld->worldInteractions.getBlock(newPos) != Blocks.AIR);
 
 		bool isGrassDestroyed = false;
 
 		if (BlockOnTopOfGrass) {
-			isGrassDestroyed = GrassDestroyTick(CurrentWorld, x, y, z);
+			isGrassDestroyed = GrassDestroyTick(CurrentWorld, pos);
 		}
 
 		//If grass destroyed tick ends
@@ -37,7 +41,7 @@ struct GrassBlock : Block {
 			return;
 		}
 
-		bool OnlySurroundedByGrass = GrassSpreadTick(CurrentWorld, x, y, z);
+		bool OnlySurroundedByGrass = GrassSpreadTick(CurrentWorld, pos);
 
 		if (OnlySurroundedByGrass && (!BlockOnTopOfGrass)) {
 			return;
@@ -46,28 +50,27 @@ struct GrassBlock : Block {
 		Event event;
 		event.Type = BLOCK_EVENT;
 		event.Data.BlockEvent.id = EventHandler.BlockTick;
-		event.Data.BlockEvent.x = x;
-		event.Data.BlockEvent.y = y;
-		event.Data.BlockEvent.z = z;
+		event.Data.BlockEvent.pos = pos;
 		event.Data.BlockEvent.block = Blocks.GRASS;
 		CurrentWorld->EventManager.AddEvent(event);
 	}
 
-	bool GrassDestroyTick(Dimension* CurrentWorld, int x, int y, int z) {
+	bool GrassDestroyTick(Dimension* CurrentWorld, const BlockPos& pos) {
 		//Chance it -doesn't break-
 		if (TestProbability(1 - Properties.BreakChance)) {
 			return false;
 		}
 
-		CurrentWorld->worldInteractions.setBlock(Blocks.DIRT, x, y, z);
+		CurrentWorld->worldInteractions.setBlock(Blocks.DIRT, pos);
 
 		return true;
 	}
 
 	//return true if there is no exposed dirt blocks surrounding it
-	bool GrassSpreadTick(Dimension* CurrentWorld, int x, int y, int z) {
+	// TODO: refactor code
+	bool GrassSpreadTick(Dimension* CurrentWorld, const BlockPos& pos) {
 		bool DirtExposed = false;
-		
+
 		for (int x1 = -1; x1 <= 1; x1++) {
 			for (int z1 = -1; z1 <= 1; z1++) {
 				if (x1 == 0 && z1 == 0) {
@@ -76,19 +79,22 @@ struct GrassBlock : Block {
 
 				for (int y1 = -1; y1 <= 1; y1++) {
 
-					int x2 = x1 + x;
-					int y2 = y1 + y;
-					int z2 = z1 + z;
+					BlockPos newPos = pos;
+					newPos.x += x1;
+					newPos.y += y1;
+					newPos.z += z1;
 
 					//Checks if block is dirt
-					if (CurrentWorld->worldInteractions.getBlock(x2, y2, z2) != Blocks.DIRT) {
+					if (CurrentWorld->worldInteractions.getBlock(newPos) != Blocks.DIRT) {
 						continue;
 					}
 
 					//Checks if there isnt any block above
-					if (CurrentWorld->worldInteractions.getBlock(x2, y2 + 1, z2) != Blocks.AIR) {
+					newPos.y += 1;
+					if (CurrentWorld->worldInteractions.getBlock(newPos) != Blocks.AIR) {
 						continue;
 					}
+					newPos.y -= 1;
 
 					//Chance it spread
 					if (TestProbability(Properties.SpreadChance)) {
@@ -96,9 +102,7 @@ struct GrassBlock : Block {
 						Event event;
 						event.Type = BLOCK_EVENT;
 						event.Data.BlockEvent.id = EventHandler.BlockPlace;
-						event.Data.BlockEvent.x = x2;
-						event.Data.BlockEvent.y = y2;
-						event.Data.BlockEvent.z = z2;
+						event.Data.BlockEvent.pos = newPos;
 						event.Data.BlockEvent.block = Blocks.GRASS;
 						CurrentWorld->EventManager.AddEvent(event);
 

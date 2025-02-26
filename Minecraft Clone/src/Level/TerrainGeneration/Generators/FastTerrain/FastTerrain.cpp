@@ -2,14 +2,12 @@
 
 using namespace glm;
 
-Chunk* FastTerrain::Generate(ivec3 Position) {
+Chunk* FastTerrain::Generate(const ChunkPos& pos) {
 	Chunk* chunk = new Chunk;
 
-	Position *= 16;
-
-	int cx = Position.x;
-	int cy = Position.y;
-	int cz = Position.z;
+	int cx = pos.x * 16;
+	int cy = pos.y * 16;
+	int cz = pos.z * 16;
 
 	long long SEED = WorldGenerator::worldSeed;
 

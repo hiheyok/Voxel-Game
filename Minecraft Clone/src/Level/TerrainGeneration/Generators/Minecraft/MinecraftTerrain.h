@@ -14,7 +14,7 @@ public:
 		
 	}
 
-	TallChunk* GenerateTall(glm::ivec3 Position) override; 
+	TallChunk* GenerateTall(const ChunkPos& pos) override;
 
 private:
 	void Init();
@@ -24,9 +24,9 @@ private:
 	ChunkGeneratorSettings* settings = nullptr;
 	
 
-	double* heightMap;
+	//double* heightMap;
 
-	bool isInitialized = false;
+	//bool isInitialized = false;
 
 	glm::vec3 VecFloor(glm::vec3 v);
 };

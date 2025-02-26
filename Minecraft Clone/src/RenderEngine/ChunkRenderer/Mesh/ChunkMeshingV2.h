@@ -55,7 +55,7 @@ namespace MeshingV2 {
 
 		std::vector<uint32_t> solidVertices;
 		std::vector<uint32_t> transparentVertices;
-		glm::ivec3 Position = glm::ivec3(0, 0, 0);
+		ChunkPos position_;
 	};
 
 
@@ -76,18 +76,10 @@ namespace MeshingV2 {
 		uint64_t transparentFaceCount = 0;
 		uint64_t solidFaceCount = 0;
 
-		//Position of the mesh in the world
-		glm::ivec3 Position = glm::ivec3(0, 0, 0);
-
 		//Generate the Mesh
 		void GenerateMesh();
 
-		void AddBlock(int x, int y, int z);
-
 		void GenerateCache();
-
-		//Allows you to edit the chunk without remeshing the entire chunk
-		void EditBlock(Block block, int x, int y, int z);
 
 	private:
 		
@@ -105,8 +97,8 @@ namespace MeshingV2 {
 		//Add faces to the mesh
 		inline void AddFacetoMesh(const BlockFace& face, uint8_t axis, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z);
 
-		inline BlockID& getCachedBlockID(int x, int y, int z);
-		inline BlockID& getCachedBlockID(int* pos);
+		inline const BlockID& getCachedBlockID(int x, int y, int z) const;
+		inline const BlockID& getCachedBlockID(int* pos) const;
 		inline void setCachedBlockID(BlockID b, int x, int y, int z);
 
 
@@ -119,6 +111,6 @@ namespace MeshingV2 {
 
 		Chunk* chunk;
 
-		BlockID ChunkCache[18 * 18 * 18]{NULL};
+		BlockID ChunkCache[18 * 18 * 18 * 3]{NULL}; // Use multiple copies of chunk in different ordering to optimize cache hits
 	};
 }

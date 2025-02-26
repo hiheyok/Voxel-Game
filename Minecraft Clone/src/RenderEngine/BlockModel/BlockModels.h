@@ -110,7 +110,7 @@ namespace ModelV2 {
 
 					uint8_t axis = i >> 1;
 
-					unsigned int currIndex = Vertices.size() / 7;
+					uint32_t currIndex = static_cast<uint32_t>(Vertices.size()) / 7;
 
 					switch (axis) {
 					case 0:

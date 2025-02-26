@@ -84,7 +84,7 @@ void MainPlayer::InventoryUpdate(UserInputs Inputs) {
 	}
 
 	int CurrentInventorySlot = m_Player.m_EntityInventory.RightHandSlot;
-	int MaxInventorySize = m_Player.m_EntityInventory.GetSlotCount();
+	// int MaxInventorySize = m_Player.m_EntityInventory.GetSlotCount();
 
 	if (CurrentInventorySlot + Direction == 9) {
 		CurrentInventorySlot = 0;

@@ -11,9 +11,9 @@ void HandleEntityTick(Event::EventDataType::_EntityEvent e) { //prob useless
 void HandleEntitySummon(Event::EventDataType::_EntityEvent e) {
 	Dimension* dimension = static_cast<Dimension*>(Block::DimensionPTR);
 	Entity* entity = new Entity;
-	entity->Properties.Position.x = e.x;
-	entity->Properties.Position.y = e.y;
-	entity->Properties.Position.z = e.z;
+	entity->Properties.Position.x = e.pos.x;
+	entity->Properties.Position.y = e.pos.y;
+	entity->Properties.Position.z = e.pos.z;
 	entity->Properties.Type = e.entityType;
 	dimension->worldInteractions.addEntity(entity);
 }

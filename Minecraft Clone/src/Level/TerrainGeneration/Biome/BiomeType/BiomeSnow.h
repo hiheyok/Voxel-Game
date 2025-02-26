@@ -5,7 +5,7 @@ class BiomeSnow : public Biome {
 public:
 	bool superIcy = false;
 
-	BiomeSnow(bool superIcyIn, BiomeProperties properties) : superIcy(superIcyIn), Biome(properties) {
+	BiomeSnow(bool superIcyIn, BiomeProperties properties) : Biome(properties), superIcy(superIcyIn) {
 		if (superIcyIn) {
 			topBlock = Blocks.SNOW_BLOCK;
 		}

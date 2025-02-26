@@ -12,28 +12,32 @@ using namespace glm;
 using json = nlohmann::json;
 
 EntityTypeID EntitiesList::RegisterEntity(std::string EntityName, EntityTypeEnums type) {
-	EntityTypeID ID = EntityTypeList.size();
-	EntityType* NewEntity;
+	EntityTypeID ID = static_cast<EntityTypeID>(EntityTypeList.size());
+	EntityType* newEntity;
 
 	switch (type) {
 	case ENTITY_PASSIVE:
-		NewEntity = static_cast<EntityType*>(new Passive());
+		newEntity = static_cast<EntityType*>(new Passive());
 		break;
 	case ENTITY_FALLING_BLOCK:
-		NewEntity = static_cast<EntityType*>(new FallingBlock());
+		newEntity = static_cast<EntityType*>(new FallingBlock());
 		break;
 	case ENTITY_HOSTILE:
-		NewEntity = static_cast<EntityType*>(new Hostile());
+		newEntity = static_cast<EntityType*>(new Hostile());
 		break;
 	}
 
-	NewEntity->EntityName = EntityName;
+	if (newEntity == nullptr) {
+		throw std::exception("Error!");
+	}
+
+	newEntity->EntityName = EntityName;
 
 	Logger.LogInfo("Entity Register", "Registered new entity: " + EntityName + " | EntityID: " + std::to_string(ID));
 
-	NewEntity->ID = ID;
+	newEntity->ID = ID;
 
-	EntityTypeList.emplace_back(NewEntity);
+	EntityTypeList.emplace_back(newEntity);
     EntityNameID[EntityName] = ID;
 
 	return ID;

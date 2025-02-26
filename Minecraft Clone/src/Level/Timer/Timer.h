@@ -25,5 +25,3 @@ private:
 	std::chrono::steady_clock::time_point First;
 
 };
-
-void PrecisionSleep();

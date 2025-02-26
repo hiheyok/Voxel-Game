@@ -10,7 +10,7 @@ public:
 		for (int i = 0; i < 16; i++) ChunkSubColumn[i] = new Chunk;
 	}
 
-	void SetPosition(int x, int y, int z) {
+	void SetPosition(int x, int y, int z) { // confusing y -> tall chunk pos
 		y = y * 16;
 		for (int i = 0; i < 16; i++) {
 			ChunkSubColumn[i]->SetPosition(x, y + i, z);
@@ -18,15 +18,15 @@ public:
 	}
 
 	int GetYPosition() {
-		return ChunkSubColumn[0]->Position.y;
+		return ChunkSubColumn[0]->position_.y;
 	}
 
 	int GetXPosition() {
-		return ChunkSubColumn[0]->Position.x;
+		return ChunkSubColumn[0]->position_.x;
 	}
 
 	int GetZPosition() {
-		return ChunkSubColumn[0]->Position.z;
+		return ChunkSubColumn[0]->position_.z;
 	}
 
 	void SetBlockUnsafe(int x, int y, int z, BlockID block) {

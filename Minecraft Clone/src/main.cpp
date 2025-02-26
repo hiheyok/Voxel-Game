@@ -9,6 +9,8 @@
 #include <time.h>
 #include "Core/Options/Option.h"
 
+#include <mimalloc-new-delete.h>
+
 int main() {
 	
 	stbi_set_flip_vertically_on_load(true);

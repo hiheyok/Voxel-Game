@@ -25,7 +25,7 @@ float WorldCollusionDetector::GetDistanceUntilCollusionSingleDirection(vec3 Orig
 
 		FlooredPos[axis] += Move * (int)(i != 0);
 
-		BlockID b = world->getBlock(FlooredPos.x, FlooredPos.y, FlooredPos.z);
+		BlockID b = world->getBlock(BlockPos{ FlooredPos.x, FlooredPos.y, FlooredPos.z });
 
 		if (Blocks.getBlockType(b)->Properties->isSolid) {
 			return (float)i + displacement - 1.f;
@@ -127,7 +127,7 @@ bool WorldCollusionDetector::CheckRayIntersection(Ray& ray) {
 	ivec3 Direction = Sign(Delta);
 
 	//Location in grid
-	ivec3 BlockPos = ivec3(floor(ray.Origin.x), floor(ray.Origin.y), floor(ray.Origin.z));
+	ivec3 blockPos = ivec3(floor(ray.Origin.x), floor(ray.Origin.y), floor(ray.Origin.z));
 
 	//To keep track of point location
 	vec3 EndPoint = ray.Origin;
@@ -138,9 +138,9 @@ bool WorldCollusionDetector::CheckRayIntersection(Ray& ray) {
 
 	//Stepping Variable
 	vec3 sideDist(
-		((float)Direction[0] * ((float)BlockPos[0] - EndPoint[0]) + ((float)Direction[0] * 0.5f) + 0.5f) * DeltaDist[0],
-		((float)Direction[1] * ((float)BlockPos[1] - EndPoint[1]) + ((float)Direction[1] * 0.5f) + 0.5f) * DeltaDist[1],
-		((float)Direction[2] * ((float)BlockPos[2] - EndPoint[2]) + ((float)Direction[2] * 0.5f) + 0.5f) * DeltaDist[2]
+		((float)Direction[0] * ((float)blockPos[0] - EndPoint[0]) + ((float)Direction[0] * 0.5f) + 0.5f) * DeltaDist[0],
+		((float)Direction[1] * ((float)blockPos[1] - EndPoint[1]) + ((float)Direction[1] * 0.5f) + 0.5f) * DeltaDist[1],
+		((float)Direction[2] * ((float)blockPos[2] - EndPoint[2]) + ((float)Direction[2] * 0.5f) + 0.5f) * DeltaDist[2]
 	);
 
 	//Max Iterations
@@ -152,11 +152,11 @@ bool WorldCollusionDetector::CheckRayIntersection(Ray& ray) {
 	while (iterations < max_iterations) {
 		iterations++;
 		
-		BlockID b = world->getBlock(BlockPos.x, BlockPos.y, BlockPos.z);
+		BlockID b = world->getBlock(BlockPos{ blockPos.x, blockPos.y, blockPos.z });
 
 		if (Blocks.getBlockType(b)->Properties->isSolid) {
 
-			ray.EndPoint = (vec3)BlockPos;
+			ray.EndPoint = (vec3)blockPos;
 
 			ray.Length = sqrtf(powf(ray.EndPoint.x - ray.Origin.x, 2) + powf(ray.EndPoint.y - ray.Origin.y, 2) + powf(ray.EndPoint.z - ray.Origin.z, 2));
 
@@ -180,9 +180,9 @@ bool WorldCollusionDetector::CheckRayIntersection(Ray& ray) {
 		sideDist[1] += (float)mask[1] * DeltaDist[1];
 		sideDist[2] += (float)mask[2] * DeltaDist[2];
 
-		BlockPos[0] += ((int)mask[0]) * Direction[0];
-		BlockPos[1] += ((int)mask[1]) * Direction[1];
-		BlockPos[2] += ((int)mask[2]) * Direction[2];
+		blockPos[0] += ((int)mask[0]) * Direction[0];
+		blockPos[1] += ((int)mask[1]) * Direction[1];
+		blockPos[2] += ((int)mask[2]) * Direction[2];
 	}
 
 	return false;

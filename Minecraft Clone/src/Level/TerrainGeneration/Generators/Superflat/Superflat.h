@@ -7,5 +7,5 @@ public:
 
 	}
 
-	Chunk* Generate(glm::ivec3 Position) override;
+	Chunk* Generate(const ChunkPos& pos) override;
 };

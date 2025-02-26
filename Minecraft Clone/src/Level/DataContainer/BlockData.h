@@ -1,10 +1,11 @@
 #pragma once
 #include "../Chunk/Block/Blocks.h"
+#include <cctype>
 
 class BlockContainer {
 public:
 	
-	inline const BlockID& GetBlock(unsigned int x, unsigned int y, unsigned int z) {
+	inline const BlockID& GetBlock(unsigned int x, unsigned int y, unsigned int z) const {
 		return Data[GetDataIndex(x,y,z)];
 	}
 
@@ -12,7 +13,7 @@ public:
 		Data[GetDataIndex(x,y,z)] = ID;
 	}
 
-	inline const BlockID& GetBlockUnsafe(unsigned int index) {
+	inline const BlockID& GetBlockUnsafe(unsigned int index) const {
 		return Data[index];
 	}
 
@@ -20,7 +21,7 @@ public:
 		Data[index] = ID;
 	}
 
-	inline const BlockID* getContainerData() {
+	inline const BlockID* getContainerData() const {
 		return Data;
 	}
 

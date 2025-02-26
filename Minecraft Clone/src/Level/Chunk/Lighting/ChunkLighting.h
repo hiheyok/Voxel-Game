@@ -8,7 +8,7 @@ private:
 public:
 
 	static const unsigned char MaxLightLevel = 15;
-	glm::ivec3 Position;
+	ChunkPos position_;
 
 	ChunkLightingContainer() {
 		ResetLighting();
@@ -28,7 +28,7 @@ public:
 		data[(x << 4) | (z)] |= ((uint64_t)LightingInfo << (y << 2));
 	}
 
-	inline uint8_t GetLighting(int x, int y, int z) {
+	inline uint8_t GetLighting(int x, int y, int z) const {
 		return (data[(x << 4) | (z)] >> (y << 2)) & 0b1111;
 	}
 

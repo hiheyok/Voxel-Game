@@ -1,9 +1,9 @@
 #pragma once
 #include "../Generator.h"
 
-class MathWorld : public WorldGenerator {
+class DebugPositioning : public WorldGenerator {
 public:
-	MathWorld() {
+	DebugPositioning() {
 
 	}
 

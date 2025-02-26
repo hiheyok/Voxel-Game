@@ -1,23 +1,25 @@
 #include "ChunkMapData.h"
 
 
-bool ChunkMap::EraseChunk(int x, int y, int z) { 
-	Region* reg = GetRegion(x, y, z);
+bool ChunkMap::EraseChunk(const ChunkPos& pos) { 
+	Region* reg = GetRegion(pos);
+
+	// TODO: Fix me
 
 	if (reg != nullptr) {
-		reg->EraseChunkGlobalPos(x, y, z);
+		reg->EraseChunkGlobalPos(pos.x, pos.y, pos.z);
 		return true;
 	}
 	return false;
 }
 
 
-bool ChunkMap::SetBlockGlobal(BlockID block, int x, int y, int z) {
+bool ChunkMap::SetBlockGlobal(BlockID block, const BlockPos& pos) {
+	// TODO: Make it so BlockPos has a method to convert to chunk position location
+	ChunkPos ChunkPos( pos.x >> 4, pos.y >> 4, pos.z >> 4);
+	int LocalBlockPos[3]{ pos.x & 0b1111, pos.y & 0b1111, pos.z & 0b1111};
 
-	int ChunkPos[3]{ x >> 4 ,y >> 4 ,z >> 4 };
-	int LocalBlockPos[3]{ x & 0b1111, y & 0b1111, z & 0b1111 };
-
-	Region* reg = GetRegion(ChunkPos[0], ChunkPos[1], ChunkPos[2]);
+	Region* reg = GetRegion(ChunkPos);
 
 	if (reg != nullptr) {
 		uint16_t cx = ChunkPos[0] & 0b11111;
@@ -35,11 +37,8 @@ bool ChunkMap::SetBlockGlobal(BlockID block, int x, int y, int z) {
 			//Set lighting update to dirty
 			
 			ChunkColumn* col = reg->GetChunkColumn(cx, cz);
-		//	uint64_t t0 = __rdtsc();
 			col->UpdateHeightmapSingleBlock(ChunkPos[1] & 0b11111, block, LocalBlockPos[0], LocalBlockPos[1], LocalBlockPos[2]);
-		//	uint64_t t1 = __rdtsc();
 
-		//	printf("%d\n", t1 - t0);
 			return true;
 		}
 
@@ -48,30 +47,36 @@ bool ChunkMap::SetBlockGlobal(BlockID block, int x, int y, int z) {
 	return false;
 }
 
-bool ChunkMap::CheckChunk(int x, int y, int z) {
-	Region* reg = GetRegion(x, y, z);
+bool ChunkMap::CheckChunk(const ChunkPos& pos) const {
+	Region* reg = GetRegion(pos);
+
+	// TODO: Fix me
 
 	if (reg != nullptr) {
-		return reg->CheckChunkGlobalPos(x, y, z);
+		return reg->CheckChunkGlobalPos(pos.x, pos.y, pos.z);
 	}
 	return false;
 }
 
-BlockID ChunkMap::GetBlockGlobal(int x, int y, int z) {
+BlockID ChunkMap::GetBlockGlobal(const BlockPos& pos) {
 	//c[3] is the position of the chunk
 	//l[3] is the local position of a block inside a chunk
 
-	int c[3]{ x >> 4 ,y >> 4 ,z >> 4 };
+	int x = pos.x;
+	int y = pos.y;
+	int z = pos.z;
+
+	ChunkPos c{ x >> 4 ,y >> 4 ,z >> 4 };
 
 	int l[3]{ x & 0b1111 ,y & 0b1111,z & 0b1111 };
 
-	int r[3]{ x >> 9 ,y >> 9 ,z >> 9 }; // region 
+	ChunkPos r{ x >> 9 ,y >> 9 ,z >> 9 }; // region 
 
-	Region* reg = GetRegion(c[0], c[1], c[2]);
+	Region* reg = GetRegion(c);
 	if (reg == nullptr) {
 		return Blocks.AIR;
 	}
-
+	// TODO: Fix me
 	Chunk* chunk = reg->GetChunkGlobalPos(c[0], c[1], c[2]);
 
 	if (chunk == nullptr) {
@@ -83,55 +88,57 @@ BlockID ChunkMap::GetBlockGlobal(int x, int y, int z) {
 	return block;
 }
 
-Chunk* ChunkMap::GetChunk(int x, int y, int z) {
-	Region* reg = GetRegion(x, y, z);
+Chunk* ChunkMap::GetChunk(const ChunkPos& pos) const {
+	Region* reg = GetRegion(pos);
 
+	// TODO: Fix me
 	if (reg != nullptr) {
-		return reg->GetChunkGlobalPos(x, y, z);
+		return reg->GetChunkGlobalPos(pos.x, pos.y, pos.z);
 	}
 	return nullptr;
 }
 
-ChunkColumn* ChunkMap::GetColumn(int x, int y, int z) {
-	Region* reg = GetRegion(x, y, z);
+ChunkColumn* ChunkMap::GetColumn(const ChunkColumnPos& pos) const {
+	Region* reg = GetRegion(pos);
 
 	if (reg != nullptr) {
-		return reg->GetChunkColumnGlobalPos(x, z);
+		return reg->GetChunkColumnGlobalPos(pos.x, pos.z);
 	}
 	return nullptr;
 }
 
 void ChunkMap::InsertChunk(Chunk* chunk) {
-	int x = chunk->Position.x;
-	int y = chunk->Position.y;
-	int z = chunk->Position.z;
+	const ChunkPos& pos = chunk->position_;
+	
+	int x = pos.x;
+	int y = pos.y;
+	int z = pos.z;
 
-	Region* reg = GetRegion(x, y, z);
+	Region* reg = GetRegion(pos);
 
 	int rx = x >> 5;
 	int ry = y >> 5;
 	int rz = z >> 5;
 
 	if (reg == nullptr) {
-		Region* newRegion = new Region;
-		LiveRegion[getChunkID(rx, ry, rz)] = newRegion;
+		Logger.LogDebug("ChunkMap", "Created new region");
+		reg = new Region;
+		LiveRegion[RegionPos{rx, ry, rz}] = reg;
 	}
-	reg = LiveRegion[getChunkID(rx, ry, rz)];
-
+	
 	reg->AddChunkGlobalPos(chunk, x, y, z);
 
 	for (int axis = 0; axis < 3; axis++) {
 		for (int face = 0; face < 2; face++) {
-			int p[3]{ x, y, z}; // p[3] is just the position of the neighboring chunk
-
-			p[axis] += (-2 * face) + 1;
-
-			if (CheckChunk(p[0], p[1], p[2])) {
-				GetChunk(x, y, z)->SetNeighbor((ChunkContainer*)GetChunk(p[0], p[1], p[2]), axis * 2 + face);
-				GetChunk(p[0], p[1], p[2])->SetNeighbor((ChunkContainer*)GetChunk(x, y, z), axis * 2 - face + 1);
-				GetChunk(p[0], p[1], p[2])->Use();
-				GetChunk(p[0], p[1], p[2])->UpdateGen();
-				GetChunk(p[0], p[1], p[2])->Unuse();
+			ChunkPos posNeighbor = chunk->position_;
+			posNeighbor.incrementSide(axis * 2 + face, 1);
+			
+			if (CheckChunk(posNeighbor)) {
+				chunk->SetNeighbor(static_cast<ChunkContainer*>(GetChunk(posNeighbor)), axis * 2 + face);
+				GetChunk(posNeighbor)->SetNeighbor(static_cast<ChunkContainer*>(chunk), axis * 2 - face + 1);
+				GetChunk(posNeighbor)->Use();
+				GetChunk(posNeighbor)->UpdateGen();
+				GetChunk(posNeighbor)->Unuse();
 			}
 		}
 	}
@@ -140,14 +147,19 @@ void ChunkMap::InsertChunk(Chunk* chunk) {
 	chunk->Unuse();
 }
 
-Region* ChunkMap::GetRegion(int x, int y, int z) {
+Region* ChunkMap::GetRegion(const ChunkPos& pos) const {
+	int x = pos.x;
+	int y = pos.y;
+	int z = pos.z;
+
 	int rx = x >> 5;
 	int ry = y >> 5;
 	int rz = z >> 5;
 
-	RegionID regID = getChunkID(rx, ry, rz);
+	// TODO: Use a different class for region pos 
+	RegionPos regPos{ rx, ry, rz };
 
-	FastHashMap<RegionID, Region*>::iterator it = LiveRegion.find(regID);
+	FastHashMap<RegionPos, Region*>::const_iterator it = LiveRegion.find(regPos);
 
 	if (it == LiveRegion.end()) {
 		return nullptr;
@@ -175,14 +187,14 @@ void Region::EraseChunk(uint16_t x, uint16_t y, uint16_t z) {
 	region[x * 32 + z] = nullptr;
 }
 
-bool Region::CheckChunk(uint16_t x, uint16_t y, uint16_t z) {
+bool Region::CheckChunk(uint16_t x, uint16_t y, uint16_t z) const {
 	if (!CheckChunkColumn(x, z)) {
 		return false;
 	}
 	return region[x * 32 + z]->GetChunk(y) != nullptr;
 }
 
-Chunk* Region::GetChunk(uint16_t x, uint16_t y, uint16_t z) {
+Chunk* Region::GetChunk(uint16_t x, uint16_t y, uint16_t z) const {
 	if (region[x * 32 + z] != nullptr) {
 		return region[x * 32 + z]->GetChunk(y);
 	}
@@ -205,7 +217,7 @@ void Region::EraseChunkGlobalPos(int32_t x, int32_t y, int32_t z) {
 	EraseChunk(RegCX, RegCY, RegCZ);
 }
 
-bool Region::CheckChunkGlobalPos(int32_t x, int32_t y, int32_t z) {
+bool Region::CheckChunkGlobalPos(int32_t x, int32_t y, int32_t z) const {
 	uint16_t RegCX = x & 0b11111;
 	uint16_t RegCY = y & 0b11111;
 	uint16_t RegCZ = z & 0b11111;
@@ -213,7 +225,7 @@ bool Region::CheckChunkGlobalPos(int32_t x, int32_t y, int32_t z) {
 	return CheckChunk(RegCX, RegCY, RegCZ);
 }
 
-Chunk* Region::GetChunkGlobalPos(int32_t x, int32_t y, int32_t z) {
+Chunk* Region::GetChunkGlobalPos(int32_t x, int32_t y, int32_t z) const {
 	uint16_t RegCX = x & 0b11111;
 	uint16_t RegCY = y & 0b11111;
 	uint16_t RegCZ = z & 0b11111;
@@ -221,21 +233,21 @@ Chunk* Region::GetChunkGlobalPos(int32_t x, int32_t y, int32_t z) {
 	return GetChunk(RegCX, RegCY, RegCZ);
 }
 
-ChunkColumn* Region::GetChunkColumn(uint16_t x, uint16_t z) {
+ChunkColumn* Region::GetChunkColumn(uint16_t x, uint16_t z) const {
 	return region[x * 32 + z];
 }
 
-ChunkColumn* Region::GetChunkColumnGlobalPos(int32_t x, int32_t z) {
+ChunkColumn* Region::GetChunkColumnGlobalPos(int32_t x, int32_t z) const {
 	uint16_t RegCX = x & 0b11111;
 	uint16_t RegCZ = z & 0b11111;
 
 	return GetChunkColumn(RegCX, RegCZ);
 }
 
-bool Region::CheckChunkColumn(uint16_t x, uint16_t z) {
+bool Region::CheckChunkColumn(uint16_t x, uint16_t z) const {
 	return region[x * 32 + z] != nullptr;
 }
-bool Region::CheckChunkColumnGlobalPos(int32_t x, int32_t z) {
+bool Region::CheckChunkColumnGlobalPos(int32_t x, int32_t z) const {
 	uint16_t RegCX = x & 0b11111;
 	uint16_t RegCZ = z & 0b11111;
 

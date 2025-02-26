@@ -15,17 +15,17 @@ struct Region { //32x32x32 Chunk Region
 	void EraseChunk(uint16_t x, uint16_t y, uint16_t z);
 	void EraseChunkGlobalPos(int32_t x, int32_t y, int32_t z);
 
-	bool CheckChunk(uint16_t x, uint16_t y, uint16_t z);
-	bool CheckChunkGlobalPos(int32_t x, int32_t y, int32_t z);
+	bool CheckChunk(uint16_t x, uint16_t y, uint16_t z) const;
+	bool CheckChunkGlobalPos(int32_t x, int32_t y, int32_t z) const;
 
-	Chunk* GetChunk(uint16_t x, uint16_t y, uint16_t z);
-	Chunk* GetChunkGlobalPos(int32_t x, int32_t y, int32_t z);
+	Chunk* GetChunk(uint16_t x, uint16_t y, uint16_t z) const;
+	Chunk* GetChunkGlobalPos(int32_t x, int32_t y, int32_t z) const;
 
-	ChunkColumn* GetChunkColumn(uint16_t x, uint16_t z);
-	ChunkColumn* GetChunkColumnGlobalPos(int32_t x, int32_t z);
+	ChunkColumn* GetChunkColumn(uint16_t x, uint16_t z) const;
+	ChunkColumn* GetChunkColumnGlobalPos(int32_t x, int32_t z) const;
 
-	bool CheckChunkColumn(uint16_t x, uint16_t z);
-	bool CheckChunkColumnGlobalPos(int32_t x, int32_t z);
+	bool CheckChunkColumn(uint16_t x, uint16_t z) const;
+	bool CheckChunkColumnGlobalPos(int32_t x, int32_t z) const;
 
 	uint64_t AccessCount = 0;
 };
@@ -33,22 +33,22 @@ struct Region { //32x32x32 Chunk Region
 class ChunkMap {
 public:
 
-	ChunkColumn* GetColumn(int x, int y, int z);
+	ChunkColumn* GetColumn(const ChunkPos& pos) const;
 
-	bool CheckChunk(int x, int y, int z);
+	bool CheckChunk(const ChunkPos& pos) const;
 
-	BlockID GetBlockGlobal(int x, int y, int z);
+	BlockID GetBlockGlobal(const BlockPos& pos);
 
-	bool SetBlockGlobal(BlockID block, int x, int y, int z);
+	bool SetBlockGlobal(BlockID block, const BlockPos& pos);
 
 	void InsertChunk(Chunk* chunk);
 
-	bool EraseChunk(int x, int y, int z);
+	bool EraseChunk(const ChunkPos& pos);
 
-	Chunk* GetChunk(int x, int y, int z);
+	Chunk* GetChunk(const ChunkPos& pos) const;
 private:
 	//Input position is the chunk position
-	Region* GetRegion(int x, int y, int z);
+	Region* GetRegion(const ChunkPos& pos) const;
 
-	FastHashMap<RegionID, Region*> LiveRegion;
+	FastHashMap<RegionPos, Region*> LiveRegion;
 };

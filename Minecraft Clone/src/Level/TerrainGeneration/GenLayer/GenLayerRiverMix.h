@@ -1,5 +1,5 @@
 #pragma once
-#include "Genlayer.h"
+#include "GenLayer.h"
 #include "IntCache.h"
 #include "../Biome/Biomes.h"
 

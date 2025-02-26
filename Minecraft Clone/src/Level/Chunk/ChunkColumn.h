@@ -6,17 +6,13 @@
 #include <glm/vec2.hpp>
 #include <intrin.h>
 
-
-
-
-typedef uint64_t ChunkColumnID;
-
+// TODO: Rework this refactor ChunkColumnPos system
 class ChunkColumn { //Helps with stuff like lighting
 private:
 	std::vector<Chunk*> Column;
 	std::vector<ChunkLightingContainer*> LightColumn;
 	Heightmap ColumnHeightmap;
-	glm::ivec2 Position;
+	// glm::ivec2 Position;
 public:
 	std::vector<bool> LightDirty;
 
@@ -41,10 +37,6 @@ public:
 		LightColumn.resize(32, nullptr);
 		LightDirty.resize(32, false);
 		ColumnHeightmap.init();
-	}
-
-	static ChunkColumnID getColumnID(int x, int z) {
-		
 	}
 
 	void AddChunk(Chunk* chunk, int RelativeHeightLevel) {
@@ -76,6 +68,10 @@ public:
 		return -1;
 	}
 
+	/*
+	Input is the y axis where the chunk is located at and the x and z block position relative to the chunk
+	*/
+
 	inline int16_t findSurfaceHeightSingleChunk(uint8_t p_height, uint8_t x, uint8_t z) {
 		Chunk* currChunk = Column[p_height];
 		if (currChunk) return -1;
@@ -101,7 +97,7 @@ public:
 		
 		if (p_block == Blocks.AIR) {
 			if (currHeight == p_height) {
-				uint16_t surfaceLevel = findSurfaceHeight(x, z, p_height);
+				int16_t surfaceLevel = findSurfaceHeight(x, z, p_height);
 				if (surfaceLevel == -1) {
 					surfaceLevel = 0;
 				}

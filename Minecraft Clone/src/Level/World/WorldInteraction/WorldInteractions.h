@@ -7,15 +7,17 @@
 #include <mutex>
 #include <stack>
 //Provides a way for the world to be interacted like summoning entities and what chunks are updated and what chunks needs updates
+// TODO: IMPORTANT FIX LIGHT UPDATE 
+
 class WorldInteractions {
 private:
 	World* world = nullptr;
 	std::mutex lock;
 	std::mutex UpdatedChunkLock;
-	FastHashSet<ChunkID> UpdatedChunk;
-	FastHashSet<ChunkColumnID> RequestedLightUpdate;
+	FastHashSet<ChunkPos> UpdatedChunk;
+	FastHashSet<ChunkPos> RequestedLightUpdate;
 public:
-	std::vector<ChunkColumnID> LightUpdateRequest;
+	std::vector<ChunkPos> LightUpdateRequest;
 	WorldLoader* worldLoader = nullptr;
 	WorldParameters settings;
 	WorldCollusionDetector Collusions;
@@ -34,15 +36,15 @@ public:
 
 	void summonEntity(Entity& entity);
 
-	std::vector<ChunkID> getUpdatedChunkIDs();
+	std::vector<ChunkPos> getUpdatedChunkPoss();
 
-	std::vector<ChunkID> getRequestedLightUpdates();
+	std::vector<ChunkPos> getRequestedLightUpdates();
 
 	std::vector<EntityProperty> getUpdatedEntities();
 
 	std::vector<EntityUUID> getRemovedEntities();
 
-	void requestLightUpdate(int x, int y, int z);
+	void requestLightUpdate(const ChunkPos& pos);
 
 	void killEntity(EntityUUID id);
 
@@ -56,13 +58,11 @@ public:
 
 	void addChunks(std::vector<Chunk*> chunks);
 
-	Chunk* getChunk(int x, int y, int z);
+	Chunk* getChunk(const ChunkPos& pos) const;
 
-	Chunk* getChunk(ChunkID ID);
+	void setBlock(BlockID b, const BlockPos& pos);
 
-	void setBlock(BlockID b, int x, int y, int z);
-
-	BlockID getBlock(int x, int y, int z);
+	BlockID getBlock(const BlockPos& pos);
 
 	Entity* getEntity(EntityUUID id);
 

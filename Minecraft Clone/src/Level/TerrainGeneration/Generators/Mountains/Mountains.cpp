@@ -1,9 +1,10 @@
 #include "Mountains.h"
 
-Chunk* MountainGenerator::Generate(glm::ivec3 Position) {
+Chunk* MountainGenerator::Generate(const ChunkPos& pos) {
 	Chunk* chunk = new Chunk;
 
-	glm::ivec3 ChunkPos = Position * 16;
+	ChunkPos scaledPos = pos;
+	scaledPos *= 16;
 
 	float heightBias = 50;
 	float noiseOffset = 0.3;
@@ -11,15 +12,15 @@ Chunk* MountainGenerator::Generate(glm::ivec3 Position) {
 	for (int x = 0; x < 16; x++) {
 		for (int z = 0; z < 16; z++) {
 
-			float continental = continentialNoise(getNoise2D(glm::ivec2(Position.x, Position.z), glm::ivec2(x, z), 3, 0.3f));
-			float erosion = erosionNoise(getNoise2D(glm::ivec2(Position.x, Position.z), glm::ivec2(x + 4345, z + 6443), 3, 1.f)) / 2.f;
-			float pv = peaksandvalley(getNoise2D(glm::ivec2(Position.x, Position.z), glm::ivec2(x + 65345, z + 12323), 3, 4.f)) / 8;
+			float continental = continentialNoise(getNoise2D(glm::ivec2(pos.x, pos.z), glm::ivec2(x, z), 3, 0.3f));
+			float erosion = erosionNoise(getNoise2D(glm::ivec2(pos.x, pos.z), glm::ivec2(x + 4345, z + 6443), 3, 1.f)) / 2.f;
+			float pv = peaksandvalley(getNoise2D(glm::ivec2(pos.x, pos.z), glm::ivec2(x + 65345, z + 12323), 3, 4.f)) / 8;
 
 			for (int y = 0; y < 16; y++) {
 
-				float gy = (float)(y + ChunkPos.y);
+				float gy = (float)(y + scaledPos.y);
 
-				float n = getNoise3D(Position, glm::ivec3(x, y, z), 4, 1.f);
+				float n = getNoise3D(glm::ivec3{ pos.x,pos.y ,pos.z }, glm::ivec3(x, y, z), 4, 1.f);
 
 				n = n + noiseOffset;
 
@@ -42,18 +43,16 @@ Chunk* MountainGenerator::Generate(glm::ivec3 Position) {
 		}
 	}
 
-	GenerateEnvironment(Position, chunk);
-	GenerateDecor(Position, chunk);
+	GenerateEnvironment(scaledPos, chunk);
+	GenerateDecor(scaledPos, chunk);
 
-	int gx = Position.x * 16;
-	int gz = Position.z * 16;
-	int gy = Position.y * 16;
+	int gx = scaledPos.x;
+	int gz = scaledPos.y;
+	int gy = scaledPos.z;
 
 
-	if (Position.y == 3) {
-		int NumBlocks = Blocks.BlockTypeData.size();
-
-		
+	if (pos.y == 3) {
+		int numBlocks = static_cast<int>(Blocks.BlockTypeData.size());
 
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
@@ -74,7 +73,7 @@ Chunk* MountainGenerator::Generate(glm::ivec3 Position) {
 
 				int b = px + pz * 20;
 
-				if ((b < NumBlocks) && (b >= 0)) {
+				if ((b < numBlocks) && (b >= 0)) {
 					chunk->SetBlockUnsafe(b, x, 3, z);
 				}
 			}
@@ -87,15 +86,13 @@ Chunk* MountainGenerator::Generate(glm::ivec3 Position) {
 	return chunk;
 }
 
-void MountainGenerator::GenerateEnvironment(glm::ivec3 Position, Chunk* chunk) {
-
-	Position *= 16;
+void MountainGenerator::GenerateEnvironment(const ChunkPos& pos, Chunk* chunk) {
 
 	for (int x = 0; x < 16; x++) {
 		for (int z = 0; z < 16; z++) {
 			for (int y = 0; y < 16; y++) {
 
-				if (y + Position.y < 34) {
+				if (y + pos.y < 34) {
 					if ((chunk->GetBlockUnsafe(x, y, z) == Blocks.AIR)) {
 						chunk->SetBlockUnsafe(Blocks.BLUE_CONCRETE, x, y, z);
 					}
@@ -109,20 +106,15 @@ void MountainGenerator::GenerateEnvironment(glm::ivec3 Position, Chunk* chunk) {
 	}
 }
 
-void MountainGenerator::GenerateDecor(glm::ivec3 Position, Chunk* chunk) {
-
-	Position *= 16;
-
-	
-
+void MountainGenerator::GenerateDecor(const ChunkPos& pos, Chunk* chunk) {
 	const int tree_height = 3;
 
 	for (int x = 0; x < 16; x++) {
 		for (int z = 0; z < 16; z++) {
 
 			//Global Pos
-			int gx = Position.x + x;
-			int gz = Position.z + z;
+			int gx = pos.x + x;
+			int gz = pos.z + z;
 
 			float TREE_MAP = (float)((double)(Noise.GetNoise((float)gx * 100.f, (float)gz * 100.f, 3453454.f) + 1.f) / 2.f);
 			for (int y = 0; y < 16; y++) {
@@ -132,15 +124,11 @@ void MountainGenerator::GenerateDecor(glm::ivec3 Position, Chunk* chunk) {
 						
 						for (int tx = -2; tx <= 2; tx++) {
 							for (int tz = -2; tz <= 2; tz++) {
-								if ((abs(tx) == 2) && (abs(tz) == 2)) {
+								if ((abs(tx) == 2) && (abs(tz) == 2))
 									continue;
-								}
-
 								
-								for (int ty = tree_height; ty <= tree_height + 1; ty++) {
+								for (int ty = tree_height; ty <= tree_height + 1; ty++)
 									chunk->SetBlock(Blocks.OAK_LEAF, x + tx, y + ty, z + tz);
-									
-								}
 
 							}
 						}
@@ -190,11 +178,11 @@ void MountainGenerator::GenerateDecor(glm::ivec3 Position, Chunk* chunk) {
 
 	int radius = 40;
 
-	for (int x = 0 + Position.x; x < 16 + Position.x; x++) {
-		for (int z = 0 + Position.z; z < 16 + Position.z; z++) {
-			for (int y = 0 + Position.y; y < 16 + Position.y; y++) {
+	for (int x = 0 + pos.x; x < 16 + pos.x; x++) {
+		for (int z = 0 + pos.z; z < 16 + pos.z; z++) {
+			for (int y = 0 + pos.y; y < 16 + pos.y; y++) {
 				if ((x * x) + (y - 140) * (y - 140) + z * z <= radius * radius) {
-					chunk->SetBlock(Blocks.SAND, x - Position.x, y - Position.y, z - Position.z);
+					chunk->SetBlock(Blocks.SAND, x - pos.x, y - pos.y, z - pos.z);
 				}
 
 				//if (y == 90) {

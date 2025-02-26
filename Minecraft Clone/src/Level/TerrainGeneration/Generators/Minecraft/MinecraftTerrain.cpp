@@ -8,13 +8,13 @@ vec3 MinecraftTerrain::VecFloor(vec3 v) {
 	return vec3(floor(v.x), floor(v.y), floor(v.z));
 }
 
-TallChunk* MinecraftTerrain::GenerateTall(ivec3 Position) {
+TallChunk* MinecraftTerrain::GenerateTall(const ChunkPos& pos) {
 	OverworldGenerator overworldGenerator = OverworldGenerator(WorldGenerator::worldSeed, *settings);
 
 	TallChunk* chunk = new TallChunk();
-	chunk->SetPosition(Position.x, Position.y, Position.z);
+	chunk->SetPosition(pos.x, pos.y, pos.z);
 	
-	overworldGenerator.GenerateChunk(Position.x, Position.z, chunk);
+	overworldGenerator.GenerateChunk(pos.x, pos.z, chunk);
 
 	return chunk;
 }

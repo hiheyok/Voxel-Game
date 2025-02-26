@@ -8,7 +8,7 @@ public:
 		Noise.SetFrequency(0.009f);
 	}
 
-	Chunk* Generate(glm::ivec3 Position) override;
+	Chunk* Generate(const ChunkPos& pos) override;
 
 	FastNoiseLite Noise;
 

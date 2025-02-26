@@ -14,13 +14,12 @@ private:
 
     double dot(int p_151604_0_[], double p_151604_1_, double p_151604_3_);
 
+    double SQRT_3 = sqrt(3.0);
+
     double F2 = 0.5 * (SQRT_3 - 1.0);
     double G2 = (3.0 - SQRT_3) / 6.0;
 
 public:
-
-
-    double SQRT_3 = sqrt(3.0);
 
     double xo;
     double yo;

@@ -13,11 +13,11 @@ public:
 		WorldGenerator::worldSeed = worldSeedIn;
 	}
 
-	virtual Chunk* Generate(glm::ivec3 Position) {
+	virtual Chunk* Generate(const ChunkPos& pos) {
 		return nullptr;
 	}
-
-	virtual TallChunk* GenerateTall(glm::ivec3 Position) {
+	// TODO: Use custom tall chunk positioning
+	virtual TallChunk* GenerateTall(const ChunkPos& pos) {
 		return nullptr;
 	}
 

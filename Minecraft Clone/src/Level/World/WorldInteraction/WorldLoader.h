@@ -11,7 +11,7 @@ private:
 	bool isSpawnChunksLoaded = false;
 
 	FastHashSet<EntityUUID> EntityChunkLoaders; //List of entities that force loads chunks 
-	FastHashSet<ChunkID> GeneratingChunk;
+	FastHashSet<ChunkPos> GeneratingChunk;
 
 	void loadSpawnChunks();
 
@@ -21,23 +21,23 @@ private:
 
 	}
 
-	bool RequestLoad(int x, int y, int z);
+	bool RequestLoad(const ChunkPos& pos);
 
 	void loadSummonEntitySurrounding(EntityUUID uuid);
 
 public:
 	bool tallGeneration = false;
 
-	std::vector<ChunkID> ChunkRequest;
+	std::vector<ChunkPos> ChunkRequest;
 
-	WorldLoader(World* w, WorldParameters p) : world(w), settings(p) {
+	WorldLoader(World* w, WorldParameters p) : settings(p), world(w) {
 	}
 
 	WorldAccess* getWorld();
 
 	void replaceLightInfomation(ChunkLightingContainer* lighting);
 
-	std::vector<ChunkID> getRequestedChunks();
+	std::vector<ChunkPos> getRequestedChunks();
 
 	void addEntityChunkLoader(EntityUUID uuid);
 

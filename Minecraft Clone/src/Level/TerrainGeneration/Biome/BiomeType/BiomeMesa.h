@@ -14,7 +14,7 @@ private:
 public:
 	bool hasForest = false;
 
-	BiomeMesa(bool brycePillarsIn, bool hasForestIn, BiomeProperties properties) : brycePillars(brycePillarsIn), hasForest(hasForestIn), Biome(properties) {
+	BiomeMesa(bool brycePillarsIn, bool hasForestIn, BiomeProperties properties) : Biome(properties), brycePillars(brycePillarsIn), hasForest(hasForestIn)  {
 		topBlock = Blocks.RED_SAND;
 		fillerBlock = Blocks.TERRACOTTA; //STAINED_HARDEN_CLAY
 	
@@ -85,7 +85,7 @@ public:
 
         for (int l4 = 0; l4 < k3; ++l4)
         {
-            int i5 = 1;
+            //int i5 = 1;
             j4 += random.nextInt(16) + 4;
 
             for (int k1 = 0; j4 + k1 < 64 && k1 < 1; ++k1)
@@ -135,7 +135,7 @@ public:
 
             if (d0 > 0.0)
             {
-                double d1 = 0.001953125;
+                // double d1 = 0.001953125;
                 double d2 = std::abs(pillarRoofNoise->getValue((double)i * 0.001953125, (double)j * 0.001953125));
                 d4 = d0 * d0 * 2.5;
                 double d3 = ceil(d2 * 50.0) + 14.0;

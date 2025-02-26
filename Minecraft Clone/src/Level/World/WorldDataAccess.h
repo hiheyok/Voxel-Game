@@ -10,25 +10,17 @@ private:
 public:
 	EntityContainer Entities; //Remove tick later, this is going to be specific to dimension stuff
 
-	BlockID getBlock(int x, int y, int z);
+	BlockID getBlock(const BlockPos& pos);
 	
-	void setBlock(BlockID block, int x, int y, int z);
+	void setBlock(BlockID block, const BlockPos& pos);
 
 	void setChunk(Chunk* chunk);
 
-	Chunk* getChunk(int x, int y, int z);
+	Chunk* getChunk(const ChunkPos& ID) const;
 
-	Chunk* getChunk(glm::ivec3 pos);
-
-	Chunk* getChunk(ChunkID ID);
-
-	bool checkChunk(int x, int y, int z);
-
-	bool checkChunk(ChunkID ID);
+	bool checkChunk(const ChunkPos& ID) const;
 	
-	bool checkChunk(glm::ivec3 v);
+	Heightmap& getColumnHeightmap(const ChunkColumnPos& v) const;
 
-	Heightmap& getColumnHeightmap(glm::ivec3 v);
-
-	ChunkColumn* getColumn(glm::ivec3 v);
+	ChunkColumn* getColumn(const ChunkPos& v) const;
 };

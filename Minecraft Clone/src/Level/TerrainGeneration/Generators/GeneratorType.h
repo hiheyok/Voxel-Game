@@ -15,6 +15,7 @@ private:
 public:
 	WorldGeneratorID DEBUG = RegisterWorldGenerator(new DebugWorld());
 	WorldGeneratorID DEBUG_2 = RegisterWorldGenerator(new DebugWorldSecond());
+	WorldGeneratorID DEBUG_POSITIONING = RegisterWorldGenerator(new DebugPositioning());
 	WorldGeneratorID FAST_TERRAIN = RegisterWorldGenerator(new FastTerrain());
 	WorldGeneratorID MATH_WORLD = RegisterWorldGenerator(new MathWorld());
 	WorldGeneratorID MOUNTAINS = RegisterWorldGenerator(new MountainGenerator());

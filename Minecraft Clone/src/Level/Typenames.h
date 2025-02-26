@@ -1,11 +1,12 @@
 #pragma once
+#include <mimalloc.h>
+#include <vector>
 #include "../Utils/Containers/skaHashmap.h"
 
 typedef unsigned int EventID;
 typedef unsigned short int BlockID;
 typedef unsigned long long int EntityUUID; //UUID
 typedef unsigned short EntityTypeID;
-typedef unsigned long long int ChunkID;
 typedef unsigned int ItemID;
 
  
@@ -14,6 +15,10 @@ using FastHashMap = ska::flat_hash_map<K, V>;
 
 template <class V>
 using FastHashSet = ska::flat_hash_set<V>;
+
+template <class T>
+using FastVector = std::vector<T, mi_stl_allocator<T>>;
+
 
 constexpr int FRONT = 0x00;
 constexpr int BACK = 0x01;

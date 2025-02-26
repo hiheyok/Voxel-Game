@@ -31,16 +31,16 @@ void Server::join(Entity& entity) {
 	level.mainWorld->worldInteractions.summonEntity(entity);
 }
 
-vector<ChunkID> Server::getUpdatedChunkIDs() {
-	return level.mainWorld->worldInteractions.getUpdatedChunkIDs();
+vector<ChunkPos> Server::getUpdatedChunkPoss() {
+	return level.mainWorld->worldInteractions.getUpdatedChunkPoss();
 }
 
-Chunk* Server::getChunk(ChunkID ID) {
-	return level.mainWorld->worldInteractions.getChunk(ID);
+Chunk* Server::getChunk(const ChunkPos& pos) {
+	return level.mainWorld->worldInteractions.getChunk(pos);
 }
 
-BlockID Server::getBlock(int x, int y, int z) { //Include dimension in parameter later
-	return level.mainWorld->worldInteractions.getBlock(x, y, z);
+BlockID Server::getBlock(const BlockPos& pos) { //Include dimension in parameter later
+	return level.mainWorld->worldInteractions.getBlock(pos);
 }
 
 bool Server::getRayIntersection(Ray& ray) { //Include dimension in paramter later

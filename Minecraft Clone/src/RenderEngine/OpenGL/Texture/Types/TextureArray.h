@@ -52,7 +52,7 @@ public:
 			}
 			Layers++;
 		}
-		else if (Format = GL_RED) {
+		else if (Format == GL_RED) {
 			for (int index = 0; index < Width * Height; index++) {
 				ArrayData.push_back(Data[index]);
 				ArrayData.push_back(Data[index]);

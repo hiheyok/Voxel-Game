@@ -3,7 +3,7 @@
 #include <vector>
 #include <glm/vec3.hpp>
 #include <stack>
-#include "../../../Level/Chunk/ChunkID.h"
+#include "../../../Level/Chunk/ChunkPos/ChunkPos.h"
 #include <iostream>
 #include "../../../Level/Typenames.h"
 struct DrawCommandIndirect {
@@ -44,7 +44,7 @@ namespace CMDGraph {
 	struct CommandPtr {
 		CommandPtr* neighbor[6]{ nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
 		DrawCommandIndirect cmd;
-		glm::ivec3 position;
+		ChunkPos position_;
 		int visitID = 0;
 
 		CommandPtr() {
@@ -59,7 +59,7 @@ namespace CMDGraph {
 			}
 		}
 
-		CommandPtr(DrawCommandIndirect cmd_, glm::ivec3 pos) : cmd(cmd_), position(pos) {
+		CommandPtr(DrawCommandIndirect cmd_, ChunkPos pos) : cmd(cmd_), position_(pos) {
 			for (int i = 0; i < 6; i++) {
 				neighbor[i] = nullptr;
 			}
@@ -89,12 +89,18 @@ namespace CMDGraph {
 			}
 		}
 
-		float GetSquareDistance(glm::vec3 v) {
-			return GetSquareDistance(v.x, v.y, v.z);
+		float GetSquareDistance(float px, float py, float pz) {
+			return (px - (float)position_.x) * (px - (float)position_.x) +
+				(py - (float)position_.y) * (py - (float)position_.y) +
+				(pz - (float)position_.z) * (pz - (float)position_.z);
 		}
 
-		float GetSquareDistance(float px, float py, float pz) {
-			return (px - (float)position.x) * (px - (float)position.x) + (py - (float)position.y) * (py - (float)position.y) + (pz - (float)position.z) * (pz - (float)position.z);
+		float GetSquareDistance(const ChunkPos& other) {
+			return GetSquareDistance(static_cast<float>(other.x), static_cast<float>(other.y), static_cast<float>(other.z));
+		}
+
+		float GetSquareDistance(const glm::vec3& other) {
+			return GetSquareDistance(other.x, other.y, other.z);
 		}
 
 		void SetNeighbor(CommandPtr* node, int side, int depth = 0) {
@@ -116,7 +122,7 @@ namespace CMDGraph {
 			//Temp set to null
 			neighbor[side] = nullptr;
 			if (p3 != nullptr) {
-				p3->neighbor[GetOppositeSide(side)] == nullptr;
+				p3->neighbor[GetOppositeSide(side)] = nullptr;
 			}
 			node->neighbor[GetOppositeSide(side)] = nullptr;
 			if (p4 != nullptr) {
@@ -124,7 +130,7 @@ namespace CMDGraph {
 			}
 
 			if ((p4 != nullptr) && (p3 == nullptr)) {
-				int side_p4 = p1->GetSideLocation(p4->position);
+				int side_p4 = p1->GetSideLocation(p4->position_);
 
 				if (side_p4 == side) { //OK
 					p1->SetNeighbor(p4, side, depth + 1);
@@ -141,13 +147,11 @@ namespace CMDGraph {
 				return;
 			}
 
-			
-
 			if ((p4 == nullptr) && (p3 != nullptr)) {
 				//first check if p4 or p3 is closer to p1
 
-				float p1_distance_p3 = p1->GetSquareDistance(p3->position);
-				float p1_distance_p2 = p1->GetSquareDistance(p2->position);
+				float p1_distance_p3 = p1->GetSquareDistance(p3->position_);
+				float p1_distance_p2 = p1->GetSquareDistance(p2->position_);
 
 				if (p1_distance_p3 <= p1_distance_p2) { //this implies that p3 is the closest is is kept the same
 					
@@ -155,7 +159,7 @@ namespace CMDGraph {
 					p1->neighbor[side] = p3;
 					p3->neighbor[GetOppositeSide(side)] = p1;
 
-					int side_p2 = p3->GetSideLocation(p2->position);
+					int side_p2 = p3->GetSideLocation(p2->position_);
 					p3->SetNeighbor(p2, side_p2, depth + 1);
 
 				}
@@ -163,7 +167,7 @@ namespace CMDGraph {
 					p1->neighbor[side] = p2; //no data lost occur here since if p4 is null, it implies p2 neighbor is null
 					p2->neighbor[GetOppositeSide(side)] = p1;
 
-					int side_p3 = p2->GetSideLocation(p3->position);
+					int side_p3 = p2->GetSideLocation(p3->position_);
 					p2->SetNeighbor(p3, side_p3, depth + 1);
 				}
 				return;
@@ -172,9 +176,9 @@ namespace CMDGraph {
 			//return;
 			//last case (p4 != nullptr) && (p3 != nullptr)
 				
-			float p1_distance_p3 = p1->GetSquareDistance(p3->position);
-			float p1_distance_p2 = p1->GetSquareDistance(p2->position);
-			float p1_distance_p4 = p1->GetSquareDistance(p4->position);
+			float p1_distance_p3 = p1->GetSquareDistance(p3->position_);
+			float p1_distance_p2 = p1->GetSquareDistance(p2->position_);
+			float p1_distance_p4 = p1->GetSquareDistance(p4->position_);
 
 			if ((p1_distance_p3 <= p1_distance_p2) && (p1_distance_p3 <= p1_distance_p4)) {  // p3 is closest to p1 //OK
 				//reconnects p3 and p1
@@ -182,7 +186,7 @@ namespace CMDGraph {
 				p3->neighbor[GetOppositeSide(side)] = p1;
 
 				//connect p4 to p3 at side p3_side_p4
-				int p3_side_p4 = p3->GetSideLocation(p4->position);
+				int p3_side_p4 = p3->GetSideLocation(p4->position_);
 				p3->SetNeighbor(p4, p3_side_p4, depth + 1);
 				
 				p4->neighbor[side] = p2;
@@ -199,25 +203,24 @@ namespace CMDGraph {
 				p1->SetNeighbor(p4, side, depth + 1);
 
 				if (p1_distance_p3 >= p1_distance_p2) {
-					int p4_side_p2 = p4->GetSideLocation(p2->position);
+					int p4_side_p2 = p4->GetSideLocation(p2->position_);
 
 					if (p4_side_p2 == side) {
 						p4->SetNeighbor(p2, p4_side_p2, depth + 1);
 
-						int p2_side_p3 = p2->GetSideLocation(p3->position);
+						int p2_side_p3 = p2->GetSideLocation(p3->position_);
 						p2->SetNeighbor(p3, p2_side_p3, depth + 1);
 
 					}
 					else {
 						p4->SetNeighbor(p2, p4_side_p2, depth + 1);
-						int p4_side_p3 = p4->GetSideLocation(p3->position);
+						int p4_side_p3 = p4->GetSideLocation(p3->position_);
 						p4->SetNeighbor(p3, p4_side_p3, depth + 1);
 					}
 				}
 				else {
 					std::cout << "test\n";
 				}
-
 				
 				return;
 				
@@ -226,20 +229,20 @@ namespace CMDGraph {
 			if ((p1_distance_p2 <= p1_distance_p3) && (p1_distance_p2 <= p1_distance_p4)) { //if p2 is closer, it implies p4 is behind p1
 
 				//connect p4 and p1
-				int p1_side_p4 = p1->GetSideLocation(p4->position);
+				int p1_side_p4 = p1->GetSideLocation(p4->position_);
 				p1->SetNeighbor(p4, p1_side_p4, depth + 1);
 
 				//connect p2 to p1
 				p1->SetNeighbor(p2, side, depth + 1);
 
 				//connect p3 to p2
-				int p2_side_p3 = p2->GetSideLocation(p3->position);
+				int p2_side_p3 = p2->GetSideLocation(p3->position_);
 				p2->SetNeighbor(p3, p2_side_p3, depth + 1);
 			}
 		}
 
-		const int GetSideLocation(glm::ivec3 p2) {
-			glm::ivec3 relativePosition = p2 - position;
+		const int GetSideLocation(const ChunkPos& p2) const {
+			ChunkPos relativePosition = p2 - position_;
 
 			int x = relativePosition.x;
 			int y = relativePosition.y;
@@ -269,7 +272,7 @@ namespace CMDGraph {
 					return NY;
 				}
 			}
-			
+			throw std::exception("Error");
 		}
 	};
 }
@@ -280,9 +283,9 @@ public:
 
 	}
 
-	void AddDrawCommand(DrawCommandIndirect cmd, int x, int y, int z) {
-		CMDGraph::CommandPtr* ptr = new CMDGraph::CommandPtr(cmd, glm::ivec3(x, y, z));
-		CommandMap[getChunkID(x, y, z)] = ptr;
+	void AddDrawCommand(DrawCommandIndirect cmd, const ChunkPos& pos) {
+		CMDGraph::CommandPtr* ptr = new CMDGraph::CommandPtr(cmd, pos);
+		CommandMap[pos] = ptr;
 		AddToGraph(ptr);
 	}
 
@@ -324,10 +327,9 @@ public:
 		return size;
 	}
 
-	void DeleteDrawCommand(glm::ivec3 pos) {
-		uint64_t ID = getChunkID(pos);
-		CMDGraph::CommandPtr* node = CommandMap[ID];
-		CommandMap.erase(ID);
+	void DeleteDrawCommand(const ChunkPos& pos) {
+		CMDGraph::CommandPtr* node = CommandMap[pos];
+		CommandMap.erase(pos);
 
 		if (node != root) {
 			node->PrepareDelete();
@@ -397,9 +399,9 @@ public:
 		}
 
 		Commands[depth].push_back(node->cmd);
-		CommandsPosition[depth].push_back(node->position.x);
-		CommandsPosition[depth].push_back(node->position.y);
-		CommandsPosition[depth].push_back(node->position.z);
+		CommandsPosition[depth].push_back(node->position_.x);
+		CommandsPosition[depth].push_back(node->position_.y);
+		CommandsPosition[depth].push_back(node->position_.z);
 	//	CommandsLayer[depth].push_back(depth);
 		count++;
 		for (int side = 0; side < 6; side++) {
@@ -453,7 +455,7 @@ private:
 		//If root exist, check if the chunk is closer to the actual root if so change the root
 
 		if (root->GetSquareDistance(CurrentPosition) > node->GetSquareDistance(CurrentPosition)) {
-			int loc = node->GetSideLocation(root->position);
+			int loc = node->GetSideLocation(root->position_);
 
 			CMDGraph::CommandPtr* tmp = root;
 			root = node;
@@ -464,14 +466,14 @@ private:
 		CMDGraph::CommandPtr* curr = root;
 
 		while (true) {
-			int side = curr->GetSideLocation(node->position);
+			int side = curr->GetSideLocation(node->position_);
 
 			if (curr->neighbor[side] == nullptr) {
 				curr->SetNeighbor(node, side);
 				return;
 			}
 
-			if (curr->neighbor[side]->GetSquareDistance(node->position) >= curr->GetSquareDistance(node->position)) {
+			if (curr->neighbor[side]->GetSquareDistance(node->position_) >= curr->GetSquareDistance(node->position_)) {
 				curr->SetNeighbor(node, side);
 				return;
 			}
@@ -483,7 +485,7 @@ private:
 	glm::vec3 CurrentPosition = glm::vec3(0.f,0.f,0.f);
 
 	CMDGraph::CommandPtr* root = nullptr;
-	FastHashMap<uint64_t, CMDGraph::CommandPtr*> CommandMap;
+	FastHashMap<ChunkPos, CMDGraph::CommandPtr*> CommandMap;
 };
 
 

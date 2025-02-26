@@ -30,7 +30,7 @@ void WorldInteraction::Interact(Player* player, UserInputs Inputs) {
 
 BlockID WorldInteraction::GetBlock(Ray ray, Dimension* dimension) {
 	if (dimension->worldInteractions.Collusions.CheckRayIntersection(ray)) {
-		return dimension->worldInteractions.getBlock((int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z));
+		return dimension->worldInteractions.getBlock(BlockPos{ (int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z) });
 	}
 	return Blocks.AIR;
 }
@@ -40,9 +40,9 @@ void WorldInteraction::BreakBlock(Ray ray, Dimension* dimension) {
 		Event placeBlock;
 		placeBlock.Type = BLOCK_EVENT;
 		placeBlock.Data.BlockEvent.block = Blocks.AIR;
-		placeBlock.Data.BlockEvent.x = (int)floor(ray.EndPoint.x);
-		placeBlock.Data.BlockEvent.y = (int)floor(ray.EndPoint.y);
-		placeBlock.Data.BlockEvent.z = (int)floor(ray.EndPoint.z);
+		placeBlock.Data.BlockEvent.pos = BlockPos{ (int)floor(ray.EndPoint.x),
+												   (int)floor(ray.EndPoint.y),
+												   (int)floor(ray.EndPoint.z) };
 		placeBlock.Data.BlockEvent.id = EventHandler.BlockPlace;
 		dimension->EventManager.AddEvent(placeBlock);
 	}
@@ -61,9 +61,7 @@ void WorldInteraction::PlaceBlock(Ray ray, BlockID block, Dimension* dimension) 
 		Event placeBlock;
 		placeBlock.Type = BLOCK_EVENT;
 		placeBlock.Data.BlockEvent.block = block;
-		placeBlock.Data.BlockEvent.x = PlacePos.x;
-		placeBlock.Data.BlockEvent.y = PlacePos.y;
-		placeBlock.Data.BlockEvent.z = PlacePos.z;
+		placeBlock.Data.BlockEvent.pos = BlockPos{ PlacePos.x, PlacePos.y, PlacePos.z };
 		placeBlock.Data.BlockEvent.id = EventHandler.BlockPlace;
 		dimension->EventManager.AddEvent(placeBlock);
 

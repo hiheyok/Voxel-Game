@@ -1,19 +1,23 @@
 #pragma once
+
+#ifndef CHUNKDATA_H
+#define CHUNKDATA_H
+
+#include <glm/vec3.hpp>
+
 #include "../DataContainer/BlockData.h"
 #include "../TerrainGeneration/Structures/Structure.h"
 #include "Lighting/ChunkLighting.h"
 #include "../Typenames.h"
-#include <glm/vec3.hpp>
-#include "ChunkID.h"
+#include "ChunkPos/ChunkPos.h"
 
-#ifndef CHUNKDATA_H
-#define CHUNKDATA_H
+
 
 class ChunkContainer {
 	
 public:
 	
-	void SetNeighbor(ChunkContainer* Neighbor, unsigned int Side);
+	void SetNeighbor(ChunkContainer* neighbor, unsigned int side);
 
 	void ClearNeighbors();
 
@@ -30,12 +34,11 @@ public:
 
 	void Unuse();
 
-	ChunkContainer* GetNeighbor(unsigned int Side);
+	ChunkContainer* GetNeighbor(unsigned int side) const;
 	
 	void SetPosition(int x, int y, int z);
 
-	glm::ivec3 Position;
-	ChunkID chunkID;
+	ChunkPos position_;
 
 	bool isEmpty = true;
 

@@ -39,7 +39,7 @@ void OverworldGenerator::generateHeightmap(int x, int y, int z) {
             float f2 = 0.0F;
             float f3 = 0.0F;
             float f4 = 0.0F;
-            int i1 = 2;
+            //int i1 = 2;
             Biome* biome = biomesForGeneration[k + 2 + (l + 2) * 10];
 
             for (int j1 = -2; j1 <= 2; ++j1)
@@ -150,7 +150,7 @@ void OverworldGenerator::setBlocksInChunk(int x, int z, TallChunk* chunk) {
 
             for (int i2 = 0; i2 < 32; ++i2)
             {
-                double d0 = 0.125;
+                //double d0 = 0.125;
                 double d1 = heightMap[i1 + i2];
                 double d2 = heightMap[j1 + i2];
                 double d3 = heightMap[k1 + i2];
@@ -162,7 +162,7 @@ void OverworldGenerator::setBlocksInChunk(int x, int z, TallChunk* chunk) {
 
                 for (int j2 = 0; j2 < 8; ++j2)
                 {
-                    double d9 = 0.25;
+                    //double d9 = 0.25;
                     double d10 = d1;
                     double d11 = d2;
                     double d12 = (d3 - d1) * 0.25;
@@ -170,7 +170,7 @@ void OverworldGenerator::setBlocksInChunk(int x, int z, TallChunk* chunk) {
 
                     for (int k2 = 0; k2 < 4; ++k2)
                     {
-                        double d14 = 0.25;
+                        //double d14 = 0.25;
                         double d16 = (d11 - d10) * 0.25;
                         double lvt_45_1_ = d10 - d16;
 

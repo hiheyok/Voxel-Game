@@ -5,8 +5,6 @@
 using namespace std;
 using namespace glm;
 
-uint64_t ClockCounter = 0;
-uint64_t ClockTimes = 0;
 
 void WorldInteractions::UseTallGeneration() {
 	worldLoader->tallGeneration = true;
@@ -27,8 +25,8 @@ void WorldInteractions::summonEntity(Entity& entity) {
 		worldLoader->addEntityChunkLoader(entity.Properties.EntityUUID);
 }
 
-vector<ChunkID> WorldInteractions::getUpdatedChunkIDs() {
-	vector<ChunkID> chunkIDs = {};
+vector<ChunkPos> WorldInteractions::getUpdatedChunkPoss() {
+	vector<ChunkPos> chunkIDs = {};
 	UpdatedChunkLock.lock();
 	chunkIDs.insert(chunkIDs.end(), UpdatedChunk.begin(), UpdatedChunk.end());
 	UpdatedChunk.clear();
@@ -36,8 +34,8 @@ vector<ChunkID> WorldInteractions::getUpdatedChunkIDs() {
 	return chunkIDs;
 }
 
-vector<ChunkID> WorldInteractions::getRequestedLightUpdates() {
-	vector<ChunkID> columnIDs = {};
+vector<ChunkPos> WorldInteractions::getRequestedLightUpdates() {
+	vector<ChunkPos> columnIDs = {};
 	UpdatedChunkLock.lock();
 	columnIDs.insert(columnIDs.end(), LightUpdateRequest.begin(), LightUpdateRequest.end());
 	LightUpdateRequest.clear();
@@ -65,17 +63,22 @@ vector<EntityUUID> WorldInteractions::getRemovedEntities() {
 	return IDs;
 }
 
-void WorldInteractions::requestLightUpdate(int x, int y, int z) {
+void WorldInteractions::requestLightUpdate(const ChunkPos& pos) {
+	int x = pos.x;
+	int y = pos.y;
+	int z = pos.z;
+
 	y = y / 32;
 
-	ChunkColumnID id = getChunkID(x, y, z);
-	if (RequestedLightUpdate.count(id)) {
+	ChunkColumnPos colPos = ChunkColumnPos{x, y, z};
+
+	if (RequestedLightUpdate.count(colPos)) {
 		return;
 	}
 
 	UpdatedChunkLock.lock();
-	RequestedLightUpdate.emplace(id);
-	LightUpdateRequest.push_back(id);
+	RequestedLightUpdate.emplace(colPos);
+	LightUpdateRequest.push_back(colPos);
 	UpdatedChunkLock.unlock();
 
 }
@@ -92,41 +95,37 @@ void WorldInteractions::update() {
 }
 
 void WorldInteractions::updateLighting(ChunkLightingContainer* ChunkLighting) {
-	ivec3 pos = ChunkLighting->Position;
+	const ChunkPos& pos = ChunkLighting->position_;
 
-	world->getColumn(pos);
+	world->getColumn(ChunkLighting->position_);
 	worldLoader->replaceLightInfomation(ChunkLighting);
-	ChunkID id = getChunkID(pos);
 
 	UpdatedChunkLock.lock();
-	if (!UpdatedChunk.count(id)) {
-		UpdatedChunk.insert(id);
+	if (!UpdatedChunk.count(pos)) {
+		UpdatedChunk.insert(pos);
 	}
-	RequestedLightUpdate.erase(id);
+
+	RequestedLightUpdate.erase(pos);
 	UpdatedChunkLock.unlock();
 }
 
 void WorldInteractions::updateLighting(vector<ChunkLightingContainer*> ChunkLighting) {
-	stack<ChunkID> chunkToUpdate;
+	stack<ChunkPos> chunkToUpdate;
 
 	for (const auto& chunk : ChunkLighting) {
-		int x = chunk->Position.x;
-		int y = chunk->Position.y;
-		int z = chunk->Position.z;
-
-		world->getColumn(ivec3(x, y, z));
+		world->getColumn(chunk->position_);
 		worldLoader->replaceLightInfomation(chunk);
-		chunkToUpdate.push(getChunkID(x, y, z));
-
+		chunkToUpdate.push(chunk->position_);
 	}
 
 	UpdatedChunkLock.lock();
 	while (!chunkToUpdate.empty()) {
-		ChunkID id = chunkToUpdate.top();
+		ChunkPos id = chunkToUpdate.top();
 		chunkToUpdate.pop();
 		if (!UpdatedChunk.count(id)) {
 			UpdatedChunk.insert(id);
 		}
+		// TODO: Fix this with Chunk Column ID
 		RequestedLightUpdate.erase(id);
 
 	}
@@ -135,29 +134,27 @@ void WorldInteractions::updateLighting(vector<ChunkLightingContainer*> ChunkLigh
 
 void WorldInteractions::addChunk(Chunk* chunk) {
 	world->setChunk(chunk);
-	stack<ChunkID> chunkToUpdate;
+	stack<ChunkPos> chunkToUpdate;
 
-	int x = chunk->Position.x;
-	int y = chunk->Position.y;
-	int z = chunk->Position.z;
+	const ChunkPos& position = chunk->position_;
 
-	requestLightUpdate(x, y, z);
-	chunkToUpdate.push(getChunkID(x, y, z));
+	requestLightUpdate(position);
+	chunkToUpdate.push(position);
 
 	//Update neighbor chunks
 
 	for (int side = 0; side < 6; side++) {
-		int pos[3]{ x, y, z };
+		int pos[3]{ position.x, position.y, position.z};
 		pos[side >> 1] += (side & 0b1) * 2 - 1;
 
-		if (world->checkChunk(pos[0], pos[1], pos[2])) {
-			chunkToUpdate.push(getChunkID(pos[0], pos[1], pos[2]));
+		if (world->checkChunk(position)) {
+			chunkToUpdate.push(position);
 		}
 	}
 
 	UpdatedChunkLock.lock();
 	while (!chunkToUpdate.empty()) {
-		ChunkID id = chunkToUpdate.top();
+		ChunkPos id = chunkToUpdate.top();
 		chunkToUpdate.pop();
 		if (!UpdatedChunk.count(id)) {
 			UpdatedChunk.insert(id);
@@ -169,67 +166,66 @@ void WorldInteractions::addChunk(Chunk* chunk) {
 }
 
 void WorldInteractions::addChunks(vector<Chunk*> chunks) {
-	stack<ChunkID> chunkToUpdate;
+	vector<ChunkPos> chunkToUpdate;
+	FastHashSet<ChunkPos> duplicatedInputs;
 
 	for (const auto& chunk : chunks) {
 		world->setChunk(chunk);
 
-		int x = chunk->Position.x;
-		int y = chunk->Position.y;
-		int z = chunk->Position.z;
+		const ChunkPos& position = chunk->position_;
 
-		chunkToUpdate.push(getChunkID(x, y, z));
+		chunkToUpdate.push_back(position);
 
 		//Update neighbor chunks
 
 		for (int side = 0; side < 6; side++) {
-			int pos[3]{ x, y, z };
-			pos[side >> 1] += (side & 0b1) * 2 - 1;
-
-			if (world->checkChunk(pos[0], pos[1], pos[2])) {
-				chunkToUpdate.push(getChunkID(pos[0], pos[1], pos[2]));
+			ChunkPos neighborPos = position;
+			neighborPos.incrementSide(side, 1);
+			
+			if (!duplicatedInputs.count(neighborPos) && world->checkChunk(neighborPos)) {
+				chunkToUpdate.push_back(neighborPos);
+				duplicatedInputs.insert(neighborPos);
 			}
 		}
-		requestLightUpdate(x, y, z);
+		requestLightUpdate(position);
 	}
 
 	UpdatedChunkLock.lock();
-	while (!chunkToUpdate.empty()) {
-		ChunkID id = chunkToUpdate.top();
-		chunkToUpdate.pop();
+	for (const ChunkPos& id : chunkToUpdate) {
 		if (!UpdatedChunk.count(id)) {
 			UpdatedChunk.insert(id);
 		}
 
 	}
 	UpdatedChunkLock.unlock();
+	chunkToUpdate.clear();
 }
 
-Chunk* WorldInteractions::getChunk(int x, int y, int z) {
-	return getChunk(getChunkID(x, y, z));
-}
-
-Chunk* WorldInteractions::getChunk(ChunkID ID) {
-	if (!world->checkChunk(ID)) {
+Chunk* WorldInteractions::getChunk(const ChunkPos& pos) const {
+	if (!world->checkChunk(pos)) {
 		return nullptr;
 	}
 
-	return world->getChunk(ID);
+	return world->getChunk(pos);
 }
 
-void WorldInteractions::setBlock(BlockID b, int x, int y, int z) {
-	uint64_t tmp = 0;
-
+void WorldInteractions::setBlock(BlockID b, const BlockPos& bpos) {
 	try {
-		world->setBlock(b, x, y, z);
-		if (!UpdatedChunk.count(getChunkID(x >> 4, y >> 4, z >> 4))) {
-			UpdatedChunk.insert(getChunkID(x >> 4, y >> 4, z >> 4));
+		int x = bpos.x;
+		int y = bpos.y;
+		int z = bpos.z;
+
+		ChunkPos pos = ChunkPos{ x >> 4, y >> 4, z >> 4 };
+
+		world->setBlock(b, bpos);
+		if (!UpdatedChunk.count(pos)) {
+			UpdatedChunk.insert(pos);
 		}
 		
 		int v[3]{ x % 16, y % 16, z % 16 };
 
 		for (int side = 0; side < 3; side++) {
-			int p[3]{ x >> 4, y >> 4, z >> 4 };
+			ChunkPos p = pos;
 
 			int direction = 0;
 
@@ -241,21 +237,21 @@ void WorldInteractions::setBlock(BlockID b, int x, int y, int z) {
 			if (direction == 0) continue;
 
 			p[side] += direction;
-			if (!UpdatedChunk.count(getChunkID(p[0], p[1], p[2])))
-				UpdatedChunk.insert(getChunkID(p[0], p[1], p[2]));
+			if (!UpdatedChunk.count(p))
+				UpdatedChunk.insert(p);
 		}
 
 
-		requestLightUpdate(x >> 4, y >> 4, z >> 4);
+		requestLightUpdate(pos);
 	}
 	catch (exception& e) {
 		Logger.LogError("World", e.what());
 	}
 }
 
-BlockID WorldInteractions::getBlock(int x, int y, int z) {
+BlockID WorldInteractions::getBlock(const BlockPos& pos) {
 	try {
-		return world->getBlock(x, y, z);
+		return world->getBlock(pos);
 	}
 	catch (exception& e) {
 		Logger.LogError("World", e.what());

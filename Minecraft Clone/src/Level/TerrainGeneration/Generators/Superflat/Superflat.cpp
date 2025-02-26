@@ -1,8 +1,8 @@
 #include "Superflat.h"
 
-Chunk* SuperflatWorld::Generate(glm::ivec3 Position) {
+Chunk* SuperflatWorld::Generate(const ChunkPos& pos) {
 	Chunk* chunk = new Chunk;
-	int cy = Position.y * 16;
+	int cy = pos.y * 16;
 
 	for (int x = 0; x < 16; x++) {
 		for (int z = 0; z < 16; z++) {

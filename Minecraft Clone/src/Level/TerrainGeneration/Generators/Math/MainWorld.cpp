@@ -1,11 +1,11 @@
 #include "MathWorld.h"
 
-Chunk* MathWorld::Generate(glm::ivec3 Position) {
+Chunk* MathWorld::Generate(const ChunkPos& pos) {
 	Chunk* chunk = new Chunk;
 
-	int cx = Position.x * 16;
-	int cy = Position.y * 16;
-	int cz = Position.z * 16;
+	int cx = pos.x * 16;
+	int cy = pos.y * 16;
+	int cz = pos.z * 16;
 	float zoom = 20.f;
 
 	for (int x = 0; x < 16; x++) {

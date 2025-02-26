@@ -19,7 +19,7 @@ void WorldRender::Render() {
 	RendererV2.Render();
 }
 
-void WorldRender::LoadChunkToRenderer(ChunkID chunk) {
+void WorldRender::LoadChunkToRenderer(ChunkPos chunk) {
 	if (server->getChunk(chunk) != nullptr) {
 		SchedulerLock.lock();
 		TaskList.push_back(chunk);
@@ -28,7 +28,7 @@ void WorldRender::LoadChunkToRenderer(ChunkID chunk) {
 
 }
 
-void WorldRender::LoadChunkMultiToRenderer(std::vector<ChunkID> chunks) {
+void WorldRender::LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks) {
 	SchedulerLock.lock();
 	TaskList.insert(TaskList.end(), chunks.begin(), chunks.end());
 	SchedulerLock.unlock();
@@ -39,7 +39,7 @@ void WorldRender::Worker(int id) {
 
 	const int WorkerID = id;
 
-	deque<ChunkID> Jobs;
+	deque<ChunkPos> Jobs;
 	ChunkMeshData ChunkMesher;
 
 	deque<ChunkVertexData*> FinishedJobs;
@@ -57,13 +57,12 @@ void WorldRender::Worker(int id) {
 		int BatchSize = 500;
 
 		while (!Jobs.empty()) {
-			ChunkID task = Jobs.front(); //fetches task
+			ChunkPos pos = Jobs.front(); //fetches task
 			Jobs.pop_front();
-			ivec3 pos = ChunkIDToPOS(task);
 
 			//Generates the meshes
 			
-			Chunk* c = server->getChunk(pos.x, pos.y, pos.z);
+			Chunk* c = server->getChunk(pos);
 			
 			auto t0 = std::chrono::high_resolution_clock::now();
 			ChunkMesher.reset();
@@ -74,7 +73,7 @@ void WorldRender::Worker(int id) {
 			ChunkVertexData* data = new ChunkVertexData();
 			data->solidVertices.resize(ChunkMesher.solidFaceCount * 12);
 			data->transparentVertices.resize(ChunkMesher.transparentFaceCount * 12);
-			data->Position = ChunkMesher.Position;
+			data->position_ = pos;
 
 			memcpy(data->solidVertices.data(), ChunkMesher.VerticesBuffer.data(), ChunkMesher.solidFaceCount * 12 * sizeof(uint32_t));
 			memcpy(data->transparentVertices.data(), ChunkMesher.TransparentVerticesBuffer.data(), ChunkMesher.transparentFaceCount * 12 * sizeof(uint32_t));
@@ -184,11 +183,11 @@ void WorldRender::TaskScheduler() {
 
 	int WorkerSelection = 0;
 
-	std::deque<std::deque<ChunkID>> DistributedTasks;
+	std::deque<std::deque<ChunkPos>> DistributedTasks;
 
 	DistributedTasks.resize(WorkerCount);
 
-	std::deque<ChunkID> InternalTaskList;
+	std::deque<ChunkPos> InternalTaskList;
 
 	while (!stop) {
 
@@ -203,7 +202,7 @@ void WorldRender::TaskScheduler() {
 
 		while (!InternalTaskList.empty()) {
 
-			ChunkID task = InternalTaskList.front();
+			ChunkPos task = InternalTaskList.front();
 			InternalTaskList.pop_front();
 
 			DistributedTasks[WorkerSelection].push_back(task);

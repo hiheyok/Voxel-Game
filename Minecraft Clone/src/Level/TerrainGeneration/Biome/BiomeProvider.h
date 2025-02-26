@@ -38,7 +38,7 @@ public:
 			init(biomeProviderSeed, settings);
 		}
 
-		int threadIndex = BiomeProvider::ThreadGenIndex[threadHash];
+		size_t threadIndex = BiomeProvider::ThreadGenIndex[threadHash];
 
 		std::vector<int> aint = BiomeProvider::genBiomes[threadIndex]->getInts(x, z, width, length);
 
@@ -58,7 +58,7 @@ public:
 			init(biomeProviderSeed, settings);
 		}
 
-		int threadIndex = BiomeProvider::ThreadGenIndex[threadHash];
+		size_t threadIndex = BiomeProvider::ThreadGenIndex[threadHash];
 
 		std::vector<int> aint = biomeIndexLayer[threadIndex]->getInts(x, z, width, length);
 		std::vector<Biome*> out(width * length);

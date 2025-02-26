@@ -43,11 +43,11 @@ public:
 
 	void join(Entity& entity);
 
-	std::vector<ChunkID> getUpdatedChunkIDs();
+	std::vector<ChunkPos> getUpdatedChunkPoss();
 
-	Chunk* getChunk(ChunkID ID);
+	Chunk* getChunk(const ChunkPos& ID);
 
-	BlockID getBlock(int x, int y, int z);
+	BlockID getBlock(const BlockPos& pos);
 
 	bool getRayIntersection(Ray& ray);
 

@@ -11,16 +11,16 @@
 class _EventHandler {
 private:
 	using EventFunctionTypes = std::variant<
-		void (*)(BlockID, int, int, int),
+		void (*)(BlockID, const BlockPos&),
 		void (*)(Event::EventDataType::_EntityEvent)
 	>;
 
 	int m_eventCount = 0;
-	EventID RegisterBlockEvent(void (*func)(BlockID, int, int, int));
+	EventID RegisterBlockEvent(void (*func)(BlockID, const BlockPos&));
 
 	EventID RegisterEntityEvent(void (*func)(Event::EventDataType::_EntityEvent));
 
-	FastHashMap<EventID, void (*)(BlockID, int, int, int)> BlockEventHandles;
+	FastHashMap<EventID, void (*)(BlockID, const BlockPos&)> BlockEventHandles;
 	FastHashMap<EventID, void (*)(Event::EventDataType::_EntityEvent)> EntityEventHandles;
 
 public:

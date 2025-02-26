@@ -12,7 +12,7 @@ public:
 
 	BiomeHills::Type type;
 
-	BiomeHills(BiomeHills::Type biomeType, BiomeProperties properties) : type(biomeType), Biome(properties) {}
+	BiomeHills(BiomeHills::Type biomeType, BiomeProperties properties) : Biome(properties), type(biomeType) {}
 
 	const std::type_info& getBiomeClass() const override {
 		return typeid(*this);

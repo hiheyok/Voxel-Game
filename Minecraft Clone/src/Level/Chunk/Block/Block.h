@@ -3,6 +3,7 @@
 #include "../../Typenames.h"
 #include <vector>
 #include "../../../RenderEngine/BlockModel/BlockModels.h"
+#include "../../Chunk/ChunkPos/ChunkPos.h"
 
 struct BlockType {
 
@@ -36,7 +37,7 @@ struct Block {
 		}
 	}
 
-	virtual void tick(int x, int y, int z) {
+	virtual void tick(const BlockPos& pos) {
 
 	}
 

@@ -76,5 +76,5 @@ private:
 	Shader shader;
 	GLFWwindow* window;
 
-	bool isDirty = false;
+	//bool isDirty = false;
 };

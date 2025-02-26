@@ -68,14 +68,11 @@ void ChunkContainer::SetBlockUnsafe(BlockID block, int x, int y, int z) {
 }
 
 void ChunkContainer::SetPosition(int x, int y, int z) {
-	Position.x = x;
-	Position.y = y;
-	Position.z = z;
-	chunkID = getChunkID(x, y, z);
+	position_.set(x, y, z);
 }
 
-ChunkContainer* ChunkContainer::GetNeighbor(unsigned int Side) {
-	return Neighbors[Side];
+ChunkContainer* ChunkContainer::GetNeighbor(unsigned int side) const {
+	return Neighbors[side];
 }
 
 void ChunkContainer::SetNeighbor(ChunkContainer* Neighbor, unsigned int Side) {

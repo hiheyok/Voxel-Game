@@ -1,12 +1,14 @@
 #include "DebugSecond.h"
 
 
-Chunk* DebugWorldSecond::Generate(glm::ivec3 Position) {
+Chunk* DebugWorldSecond::Generate(const ChunkPos& pos) {
 	Chunk* chunk = new Chunk;
 
 	chunk->SetBlock(Blocks.COBBLESTONE, 8, 8, 8);
 
-	Position *= 16;
+	ChunkPos scaledPos = pos;
+
+	scaledPos.set(pos.x * 16, pos.y * 16, pos.z * 16);
 
 	for (int gx = 0; gx < 16; gx++) {
 		for (int gy = 0; gy < 16; gy++) {
@@ -19,9 +21,9 @@ Chunk* DebugWorldSecond::Generate(glm::ivec3 Position) {
 					continue;
 				}
 
-				int x = gx + Position.x;
-				int y = gy + Position.y;
-				int z = gz + Position.z;
+				int x = gx + scaledPos.x;
+				int y = gy + scaledPos.y;
+				int z = gz + scaledPos.z;
 
 				if ((abs(x) >= abs(z)) && (abs(x) >= abs(y))) {
 					chunk->SetBlock(Blocks.BLUE_STAINED_GLASS, gx, gy, gz);

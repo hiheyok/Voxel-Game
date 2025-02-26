@@ -43,9 +43,10 @@ class FallingBlock : public EntityType {
 			Event addBlock;
 			addBlock.Type = BLOCK_EVENT;
 			addBlock.Data.BlockEvent.id = EventHandler.BlockPlace;
-			addBlock.Data.BlockEvent.x = (int)entity->Properties.Position.x;
-			addBlock.Data.BlockEvent.y = (int)entity->Properties.Position.y;
-			addBlock.Data.BlockEvent.z = (int)entity->Properties.Position.z;
+			addBlock.Data.BlockEvent.pos = BlockPos{
+											(int)entity->Properties.Position.x,
+											(int)entity->Properties.Position.y,
+											(int)entity->Properties.Position.z}; 
 			addBlock.Data.BlockEvent.block = Blocks.SAND;
 			CurrentDimension->EventManager.AddEvent(addBlock);
 

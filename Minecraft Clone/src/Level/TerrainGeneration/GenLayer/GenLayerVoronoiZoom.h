@@ -28,7 +28,7 @@ public:
 
             for (int j2 = aint[l1 + 0 + (k1 + 1) * k]; l1 < k - 1; ++l1)
             {
-                double d0 = 3.6;
+                // double d0 = 3.6;
                 initChunkSeed((long long)(l1 + i << 2), (long long)(k1 + j << 2));
                 double d1 = ((double)nextInt(1024) / 1024.0 - 0.5) * 3.6;
                 double d2 = ((double)nextInt(1024) / 1024.0 - 0.5) * 3.6;

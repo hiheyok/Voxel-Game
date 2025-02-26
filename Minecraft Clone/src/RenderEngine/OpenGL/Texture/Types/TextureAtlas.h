@@ -9,7 +9,7 @@
 class TextureAtlas : public Texture {
 public:
 	void UploadToGPU() {
-		GLsizei mipLevelCount = 4;
+		// GLsizei mipLevelCount = 4;
 
 		glBindTexture(GL_TEXTURE_2D, textureID);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, TextureAtlasData.data());
@@ -39,7 +39,7 @@ public:
 	void AddData(std::vector<uint8_t> Data, int Format, bool& transparency, bool& isSeeThrough) { //assumes that all textures  are 16 x 16
 		//Get offset to where to put the texture
 		int WidthTex = width / 16;
-		int heightTex = height / 16;
+		//int heightTex = height / 16;
 
 		int WidthIndex = Count % WidthTex;
 		int HeightIndex = Count / WidthTex;

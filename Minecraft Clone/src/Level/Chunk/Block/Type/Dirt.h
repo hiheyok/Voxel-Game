@@ -1,11 +1,12 @@
 #pragma once
-#include "../Block.h"
 #include "../../../../Utils/Math/Probability/Probability.h"
 #include "../../../Event/EventHandler.h"
 
+class Block;
+
 struct DirtBlock : Block {
 
-	void tick(int x, int y, int z) override {
+	void tick(const BlockPos& pos) override {
 
 	}
 };

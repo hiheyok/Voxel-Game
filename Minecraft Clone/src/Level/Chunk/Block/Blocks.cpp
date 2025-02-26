@@ -13,12 +13,12 @@ using namespace std;
 using json = nlohmann::json;
 
 BlockID BlockList::RegisterBlock(std::string BlockName, Material* material, bool transparency, bool solid, bool isFluid) {
-	BlockID ID = BlockTypeData.size();
+	BlockID ID = static_cast<BlockID>(BlockTypeData.size());
 	BlockType* NewBlock = new BlockType(transparency, solid, isFluid);
 
 	Block* block = material->BuildNewBlockType();
 
-	MaterialType Type = material->type;
+	// MaterialType Type = material->type;
 
 	block->ID = ID;
 	block->Properties = NewBlock;
@@ -129,7 +129,7 @@ void BlockList::InitializeBlockModels()  {
 
 				int NumLayersBefore = BlockTextureAtlas.GetBlockCount();
 
-				glm::vec4 uv{};
+				// glm::vec4 uv{};
 
 				bool transparency = false;
 				bool isSeeThrough = false;

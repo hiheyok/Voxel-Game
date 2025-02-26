@@ -25,7 +25,7 @@ public:
 		EntityCount++;
 	}
 
-	int GetEntityCount() {
+	int GetEntityCount() const {
 		return EntityCount;
 	}
 
@@ -59,8 +59,6 @@ public:
 		EntityLock.unlock();
 		return a;
 	}
-
-
 
 	Entity* getEntity(EntityUUID EntityID) {
 		if (Entities.count(EntityID))

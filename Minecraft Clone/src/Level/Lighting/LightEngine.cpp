@@ -3,6 +3,8 @@
 using namespace std;
 using namespace glm;
 
+__declspec(selectany) thread_local FixedFIFOQueue<uint16_t> FIFOQueues;
+
 void LightingEngine::increaseLightLevel(ChunkLightingContainer* container, uint8_t lvl, int x, int y, int z) {
 	uint8_t curr = container->GetLighting(x, y, z);
 	if (curr < lvl) {
@@ -15,9 +17,9 @@ inline uint16_t convertData(int x, int y, int z, int w) {
 }
 
 void LightingEngine::LightSpreadSky(Chunk* chunk, ChunkLightingContainer* container, vector<uint16_t>& heightmap, int ChunkHeight, int x, int y, int z, int workerID) {
-	FIFOQueues[workerID].resetData();
+	FIFOQueues.resetData();
 
-	FIFOQueues[workerID].push(convertData(x, y, z, 15));
+	FIFOQueues.push(convertData(x, y, z, 15));
 
 	if (container->GetLighting(x, y, z) >= 15) {
 		return;
@@ -26,13 +28,13 @@ void LightingEngine::LightSpreadSky(Chunk* chunk, ChunkLightingContainer* contai
 
 	int i = 0;
 
-	while (!FIFOQueues[workerID].isEmpty()) {
+	while (!FIFOQueues.isEmpty()) {
 		//Get node
-		uint16_t node = FIFOQueues[workerID].get();
-		int nodeX = node & 0b1111;
-		int nodeY = (node >> 4) & 0b1111;
-		int nodeZ = (node >> 8) & 0b1111;
-		int nodeLight = (node >> 12) & 0b1111;
+		uint16_t node = FIFOQueues.get();
+		uint8_t nodeX = node & 0b1111;
+		uint8_t nodeY = (node >> 4) & 0b1111;
+		uint8_t nodeZ = (node >> 8) & 0b1111;
+		uint8_t nodeLight = (node >> 12) & 0b1111;
 
 		i++;
 		int nx = nodeX;
@@ -77,7 +79,7 @@ void LightingEngine::LightSpreadSky(Chunk* chunk, ChunkLightingContainer* contai
 			if (currLvl + 2 > newLight)
 				continue;
 
-			FIFOQueues[workerID].push(convertData(pos[0], pos[1], pos[2], newLight));
+			FIFOQueues.push(convertData(pos[0], pos[1], pos[2], newLight));
 
 		}
 	}
@@ -102,18 +104,16 @@ void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, ChunkLightingContainer* l
 
 }
 
-vector<ChunkLightingContainer*> LightingEngine::SkyLighting(ChunkColumnID id, int workerID) {
+vector<ChunkLightingContainer*> LightingEngine::SkyLighting(const ChunkColumnPos& pos, int workerID) {
 	uint8_t DarknessLightLevel = 12;
 	vector<ChunkLightingContainer*> out = vector<ChunkLightingContainer*>(0);
-	ivec3 pos = ChunkIDToPOS(id);
 	ChunkColumn* col = world->getColumn(pos);
 
 	if (col == nullptr) return out;
 	Heightmap heightmap = world->getColumnHeightmap(pos);
 
-	pos.y *= 32;
-
-	
+	ChunkColumnPos newPos = pos;
+	newPos.y *= 32;
 
 	for (int i = 0; i < 32; i++) {
 		if (!col->LightDirty[i]) {
@@ -126,7 +126,9 @@ vector<ChunkLightingContainer*> LightingEngine::SkyLighting(ChunkColumnID id, in
 		std::vector<uint16_t> h = heightmap.getData();
 		WorkOnChunkSkylight(col->GetChunk(i), lighting, h, i * 16, workerID);
 
-		lighting->Position = ivec3(pos.x, i + pos.y, pos.z);
+		ChunkColumnPos newPos2 = newPos;
+		newPos2.y += i;
+		lighting->position_ = newPos2;
 		out.emplace_back(lighting);
 	}
 
@@ -134,7 +136,7 @@ vector<ChunkLightingContainer*> LightingEngine::SkyLighting(ChunkColumnID id, in
 	return out;
 }
 
-void LightingEngine::Generate(vector<ChunkColumnID> IDs) {
+void LightingEngine::Generate(vector<ChunkColumnPos> IDs) {
 	SchedulerLock.lock();
 	TaskQueue.insert(TaskQueue.end(), IDs.begin(), IDs.end());
 	SchedulerLock.unlock();
@@ -168,14 +170,13 @@ void LightingEngine::Start(int lightEngineThreadsCount, WorldAccess* w) {
 	WorkerOutput.resize(threadCount);
 
 	schedulerThread = thread(&LightingEngine::scheduler, this);
-	FIFOQueues.resize(lightEngineThreadsCount);
 
 	for (int i = 0; i < threadCount; i++) {
 		Workers[i] = thread(&LightingEngine::worker, this, i);
 	}
 }
 
-void LightingEngine::queueChunk(ChunkColumnID columnID) {
+void LightingEngine::queueChunk(const ChunkColumnPos& columnID) {
 	//queue chunk
 	SchedulerLock.lock();
 	TaskQueue.emplace_back(columnID);
@@ -185,10 +186,10 @@ void LightingEngine::queueChunk(ChunkColumnID columnID) {
 void LightingEngine::worker(int id) {
 	const int WorkerID = id;
 
-	deque<ChunkColumnID> Jobs;
+	deque<ChunkColumnPos> Jobs;
 	deque<ChunkLightingContainer*> FinishedJobs;
 
-	FIFOQueues[id].setSize(DEFAULT_FIFO_QUEUE_SIZE);
+	FIFOQueues.setSize(DEFAULT_FIFO_QUEUE_SIZE);
 
 	while (!stop) {
 		//Fetches all of the tasks and put it in "Jobs"
@@ -200,17 +201,15 @@ void LightingEngine::worker(int id) {
 
 		//Generates the chunks
 
-		const int NumJobs = Jobs.size();
+		const size_t numJobs = Jobs.size();
 
 		int count = 0;
 		int BatchSize = 100;
 
-		for (int i = 0; i < NumJobs; i++) {
-			ChunkColumnID task = Jobs.front(); //fetches task
+		for (size_t i = 0; i < numJobs; i++) {
+			ChunkColumnPos task = Jobs.front(); //fetches task
 			Jobs.pop_front();
 			//Generate
-			ivec3 ColPos = ChunkIDToPOS(task);
-
 			
 			vector<ChunkLightingContainer*> chunks = SkyLighting(task, id);
 			FinishedJobs.insert(FinishedJobs.end(), chunks.begin(), chunks.end());
@@ -229,7 +228,7 @@ void LightingEngine::worker(int id) {
 		}
 		timerSleepNotPrecise(1);
 	}
-	FIFOQueues[id].clear();
+	FIFOQueues.clear();
 
 	Jobs.clear();
 	Logger.LogInfo("Light Engine", "Shutting down light engine worker: " + to_string(WorkerID));
@@ -238,13 +237,13 @@ void LightingEngine::worker(int id) {
 void LightingEngine::scheduler() {
 	int WorkerSelection = 0;
 
-	deque<deque<ChunkColumnID>> DistributedTasks;
+	deque<deque<ChunkColumnPos>> DistributedTasks;
 	deque<deque<ChunkLightingContainer*>> ChunkOutputs;
 
 	DistributedTasks.resize(threadCount);
 	ChunkOutputs.resize(threadCount);
 
-	deque<ChunkColumnID> InternalTaskList;
+	deque<ChunkColumnPos> InternalTaskList;
 
 	while (!stop) {
 
@@ -259,7 +258,7 @@ void LightingEngine::scheduler() {
 
 		while (!InternalTaskList.empty()) {
 
-			ChunkColumnID task = InternalTaskList.front();
+			ChunkColumnPos task = InternalTaskList.front();
 			InternalTaskList.pop_front();
 
 			DistributedTasks[WorkerSelection].push_back(task);
