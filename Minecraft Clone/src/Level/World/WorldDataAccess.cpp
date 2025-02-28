@@ -17,14 +17,14 @@ void WorldAccess::setChunk(Chunk* chunk) {
 	ChunkContainer.InsertChunk(chunk);
 }
 
-Chunk* WorldAccess::getChunk(const ChunkPos& pos)  const {
+Chunk* WorldAccess::getChunk(const ChunkPos& pos) const {
 	Chunk* chunk = ChunkContainer.GetChunk(pos);
 
 	return chunk;
 }
 
-bool WorldAccess::checkChunk(const ChunkPos& id)  const {
-	return  ChunkContainer.GetChunk(id) != nullptr;
+bool WorldAccess::checkChunk(const ChunkPos& id) const {
+	return ChunkContainer.GetChunk(id) != nullptr;
 }
 
 Heightmap& WorldAccess::getColumnHeightmap(const ChunkColumnPos& v) const {

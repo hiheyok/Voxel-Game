@@ -25,11 +25,9 @@ void UserInputs::UpdateAllKey() {
 void UserInputs::PressIndividualKey(int key) {
 	if (Keys.count(key)) {
 		Keys[key] = HOLD;
-		return;
+	} else {
+		Keys[key] = PRESS;
 	}
-
-	Keys[key] = PRESS;
-	return;
 }
 
 void UserInputs::ReleaseIndividualKey(int key) {
@@ -46,15 +44,15 @@ bool UserInputs::CheckKey(int key) {
 }
 
 bool UserInputs::CheckKeyPress(int key) {
-	if (!CheckKey(key))
+	if (!CheckKey(key)) {
 		return false;
-
+	}
 	return Keys[key] == PRESS;
 }
 
 bool UserInputs::CheckKeyHold(int key) {
-	if (!CheckKey(key))
+	if (!CheckKey(key)) {
 		return false;
-
+	}
 	return Keys[key] == HOLD;
 }

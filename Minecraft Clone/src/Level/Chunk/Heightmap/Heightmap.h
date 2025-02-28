@@ -17,10 +17,10 @@ public:
 
 	void edit(int x, int z, int height);
 
-	uint16_t get(int x, int z);
+	uint16_t get(int x, int z) const;
 
 	void init();
 	void Clear();
 
-	std::vector<uint16_t> getData();
+	std::vector<uint16_t> getData() const;
 };

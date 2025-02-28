@@ -7,15 +7,14 @@
 #include "../../Utils/Containers/BitStorage.h"
 #include "../../Utils/Containers/FIFOQueue.h"
 
-
 class LightingEngine {
 private:
-	std::deque<ChunkColumnPos> TaskQueue;
+	std::deque<ChunkPos> TaskQueue;
 
 	std::mutex SchedulerLock;
 
 	std::deque<std::thread> Workers;
-	std::deque<std::deque<ChunkColumnPos>> WorkerTask;
+	std::deque<std::deque<ChunkPos>> WorkerTask;
 	std::deque<std::deque<ChunkLightingContainer*>> WorkerOutput;
 	std::deque<std::mutex> WorkerLocks;
 
@@ -32,14 +31,14 @@ private:
 
 	void increaseLightLevel(ChunkLightingContainer* container, uint8_t lvl, int x, int y, int z);
 
-	void LightSpreadSky(Chunk* chunk, ChunkLightingContainer* container, std::vector<uint16_t>& heightmap, int ChunkHeight, int x, int y, int z, int workerID);
+	void LightSpreadSky(Chunk* chunk, ChunkLightingContainer* container, const Heightmap& heightmap, int ChunkHeight, int x, int y, int z);
 
-	void WorkOnChunkSkylight(Chunk* chunk, ChunkLightingContainer* light, std::vector<uint16_t>& heightmap, int ChunkHeight, int workerID);
+	void WorkOnChunkSkylight(Chunk* chunk, ChunkLightingContainer* light, const Heightmap& heightmap, int ChunkHeight);
 
-	std::vector<ChunkLightingContainer*> SkyLighting(const ChunkColumnPos& id, int workerID);
+	std::vector<ChunkLightingContainer*> SkyLighting(const ChunkPos& id, int workerID);
 
 public:
-	void Generate(std::vector<ChunkColumnPos> IDs);
+	void Generate(std::vector<ChunkPos> IDs);
 
 	std::vector<ChunkLightingContainer*> GetOutput();
 
@@ -47,7 +46,7 @@ public:
 
 	void Start(int lightEngineThreadsCount, WorldAccess* w);
 
-	void queueChunk(const ChunkColumnPos& columnID);
+	void queueChunk(const ChunkPos& columnID);
 
 	void worker(int id);
 

@@ -14,18 +14,12 @@ struct GravityBlock : Block {
 		bool isBlockSupported = Blocks.getBlockType(CurrentWorld->worldInteractions.getBlock(belowPos))->Properties->isSolid;
 
 		if (!isBlockSupported) {
-			Event destroyBlock;
-			destroyBlock.Type = BLOCK_EVENT;
-			destroyBlock.Data.BlockEvent.id = EventHandler.BlockPlace;
-			destroyBlock.Data.BlockEvent.pos = pos;
-			destroyBlock.Data.BlockEvent.block = Blocks.AIR;
-			//destroyBlock.Data.BlockEvent.BypassLimit = 1;
+			Event::BlockEvent destroyBlock{pos, Blocks.AIR, EventHandler.BlockPlace};
+			Event::EntityEvent summonSand;
 
-			Event summonSand;
-			summonSand.Type = ENTITY_EVENT;
-			summonSand.Data.EntityEvent.id = EventHandler.SummonEntity;
-			summonSand.Data.EntityEvent.pos = pos;
-			summonSand.Data.EntityEvent.entityType = EntityList.SAND_GRAVITY_BLOCK; 
+			summonSand.id_ = EventHandler.SummonEntity;
+			summonSand.pos_ = pos;
+			summonSand.entity_type_ = EntityList.SAND_GRAVITY_BLOCK;
 
 			CurrentWorld->EventManager.AddEvent(destroyBlock);
 			CurrentWorld->EventManager.AddEvent(summonSand);

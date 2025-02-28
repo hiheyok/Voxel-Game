@@ -52,9 +52,9 @@ int InternalServer::getChunkCount() {
 }
 
 vector<ChunkPos> InternalServer::getUpdatedChunks() {
-	vector<ChunkPos> updatedChunkPoss = server->getUpdatedChunkPoss();
+	vector<ChunkPos> updatedChunkPos = server->getUpdatedChunkPos();
 
-	return updatedChunkPoss;
+	return updatedChunkPos;
 }
 
 vector<EntityProperty> InternalServer::getUpdatedEntities() {
@@ -73,6 +73,6 @@ BlockID InternalServer::getBlock(const BlockPos& pos) {
 	return server->getBlock(pos);
 }
 
-void InternalServer::sendEvent(Event pEventIn) {
+void InternalServer::sendEvent(Event::Event pEventIn) {
 	server->sendEvent(pEventIn);
 }

@@ -121,7 +121,6 @@ void ChunkMap::InsertChunk(Chunk* chunk) {
 	int rz = z >> 5;
 
 	if (reg == nullptr) {
-		Logger.LogDebug("ChunkMap", "Created new region");
 		reg = new Region;
 		LiveRegion[RegionPos{rx, ry, rz}] = reg;
 	}

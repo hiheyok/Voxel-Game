@@ -177,8 +177,6 @@ vector<ChunkPos> WorldLoader::getRequestedChunks() {
 	return tmp;
 }
 
-
-
 void WorldLoader::addEntityChunkLoader(EntityUUID uuid) {
 	EntityChunkLoaders.insert(uuid);
 	loadSummonEntitySurrounding(uuid);

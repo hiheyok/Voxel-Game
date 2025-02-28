@@ -21,11 +21,11 @@ public:
 
 	void ClearNeighbors();
 
-	BlockID GetBlock(glm::ivec3 posIn);
-	BlockID GetBlockUnsafe(glm::ivec3 posIn);
+	BlockID GetBlock(glm::ivec3 posIn) const;
+	BlockID GetBlockUnsafe(glm::ivec3 posIn) const;
 
-	BlockID GetBlock(int x, int y, int z);
-	BlockID GetBlockUnsafe(int x, int y, int z);
+	BlockID GetBlock(int x, int y, int z) const;
+	BlockID GetBlockUnsafe(int x, int y, int z) const;
 
 	void SetBlock(BlockID block, int x, int y, int z);
 	void SetBlockUnsafe(BlockID block, int x, int y, int z);

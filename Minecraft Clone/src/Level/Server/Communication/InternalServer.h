@@ -35,6 +35,6 @@ public:
 
 	BlockID getBlock(const BlockPos& pos);
 
-	void sendEvent(Event pEventIn);
+	void sendEvent(Event::Event pEventIn);
 
 };

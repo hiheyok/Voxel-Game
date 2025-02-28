@@ -49,11 +49,11 @@ public:
 		UpdateHeightmap(RelativeHeightLevel);
 	}
 
-	Chunk* GetChunk(int HeightLevel) {
+	Chunk* GetChunk(int HeightLevel) const {
 		return Column[HeightLevel];
 	}
 
-	inline int16_t findSurfaceHeight(uint8_t x, uint8_t z, uint8_t StartingChunk = 31) {
+	inline int16_t findSurfaceHeight(uint8_t x, uint8_t z, uint8_t StartingChunk = 31) const {
 		for (int currChunk = StartingChunk;  currChunk >= 0; --currChunk) {
 			Chunk* curr = Column[currChunk];
 			
@@ -72,7 +72,7 @@ public:
 	Input is the y axis where the chunk is located at and the x and z block position relative to the chunk
 	*/
 
-	inline int16_t findSurfaceHeightSingleChunk(uint8_t p_height, uint8_t x, uint8_t z) {
+	inline int16_t findSurfaceHeightSingleChunk(uint8_t p_height, uint8_t x, uint8_t z) const {
 		Chunk* currChunk = Column[p_height];
 		if (currChunk) return -1;
 		for (int y = 15; y >= 0; y--) {

@@ -6,11 +6,11 @@ void Heightmap::edit(int x, int z, int height) {
 	data[x * 16 + z] = height;
 }
 
-uint16_t Heightmap::get(int x, int z) {
+uint16_t Heightmap::get(int x, int z) const {
 	return data[x * 16 + z];
 }
 
-std::vector<uint16_t> Heightmap::getData() {
+std::vector<uint16_t> Heightmap::getData() const {
 	return data;
 }
 

@@ -47,8 +47,8 @@ Chunk* MountainGenerator::Generate(const ChunkPos& pos) {
 	GenerateDecor(scaledPos, chunk);
 
 	int gx = scaledPos.x;
-	int gz = scaledPos.y;
-	int gy = scaledPos.z;
+	int gz = scaledPos.z;
+	int gy = scaledPos.y;
 
 
 	if (pos.y == 3) {

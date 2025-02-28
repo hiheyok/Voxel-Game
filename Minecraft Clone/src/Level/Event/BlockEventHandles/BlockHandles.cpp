@@ -12,20 +12,12 @@ void UpdateSurrounding(const BlockPos& pos) {
 
 		BlockID block = CurrentWorld->worldInteractions.getBlock(newPos);
 
-		Event event;
-		event.Type = BLOCK_EVENT;
-		event.Data.BlockEvent.id = EventHandler.BlockTick;
-		event.Data.BlockEvent.pos = newPos;
-		event.Data.BlockEvent.block = block;
-		CurrentWorld->EventManager.AddEvent(event);
+		Event::BlockEvent tickNeighbor{newPos, block, EventHandler.BlockTick};
+		CurrentWorld->EventManager.AddEvent(tickNeighbor);
 	}
 
-	Event event;
-	event.Type = BLOCK_EVENT;
-	event.Data.BlockEvent.id = EventHandler.BlockTick;
-	event.Data.BlockEvent.pos = pos;
-	event.Data.BlockEvent.block = CurrentWorld->worldInteractions.getBlock(pos);
-	CurrentWorld->EventManager.AddEvent(event);
+	Event::BlockEvent tickMain{pos, CurrentWorld->worldInteractions.getBlock(pos), EventHandler.BlockTick};
+	CurrentWorld->EventManager.AddEvent(tickMain);
 }
 
 void HandlePlaceBlock(BlockID block, const BlockPos& pos) {

@@ -43,12 +43,8 @@ struct Fluid : Block {
 
 			CurrentWorld->TickUsed(EventHandler.BlockPlace, pos);
 
-			Event event;
-			event.Type = BLOCK_EVENT;
-			event.Data.BlockEvent.id = EventHandler.BlockPlace;
-			event.Data.BlockEvent.pos = newPos;
-			event.Data.BlockEvent.block = Blocks.WATER;
-			CurrentWorld->EventManager.AddEvent(event);
+			Event::BlockEvent blockEvent{newPos, Blocks.WATER, EventHandler.BlockPlace};
+			CurrentWorld->EventManager.AddEvent(blockEvent);
 
 		}
 	}

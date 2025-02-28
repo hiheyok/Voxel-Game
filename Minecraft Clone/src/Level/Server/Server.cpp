@@ -31,8 +31,8 @@ void Server::join(Entity& entity) {
 	level.mainWorld->worldInteractions.summonEntity(entity);
 }
 
-vector<ChunkPos> Server::getUpdatedChunkPoss() {
-	return level.mainWorld->worldInteractions.getUpdatedChunkPoss();
+vector<ChunkPos> Server::getUpdatedChunkPos() {
+	return level.mainWorld->worldInteractions.getUpdatedChunkPos();
 }
 
 Chunk* Server::getChunk(const ChunkPos& pos) {
@@ -88,6 +88,6 @@ void Server::tick() {
 	level.mainWorld->worldInteractions.worldLoader->load();
 }
 
-void Server::sendEvent(Event pEventIn) {
+void Server::sendEvent(const Event::Event& pEventIn) {
 	level.mainWorld->EventManager.AddEvent(pEventIn);
 }

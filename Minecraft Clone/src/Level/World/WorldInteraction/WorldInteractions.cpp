@@ -25,8 +25,9 @@ void WorldInteractions::summonEntity(Entity& entity) {
 		worldLoader->addEntityChunkLoader(entity.Properties.EntityUUID);
 }
 
-vector<ChunkPos> WorldInteractions::getUpdatedChunkPoss() {
+vector<ChunkPos> WorldInteractions::getUpdatedChunkPos() {
 	vector<ChunkPos> chunkIDs = {};
+	
 	UpdatedChunkLock.lock();
 	chunkIDs.insert(chunkIDs.end(), UpdatedChunk.begin(), UpdatedChunk.end());
 	UpdatedChunk.clear();
@@ -64,21 +65,13 @@ vector<EntityUUID> WorldInteractions::getRemovedEntities() {
 }
 
 void WorldInteractions::requestLightUpdate(const ChunkPos& pos) {
-	int x = pos.x;
-	int y = pos.y;
-	int z = pos.z;
-
-	y = y / 32;
-
-	ChunkColumnPos colPos = ChunkColumnPos{x, y, z};
-
-	if (RequestedLightUpdate.count(colPos)) {
+	if (RequestedLightUpdate.count(pos)) {
 		return;
 	}
 
 	UpdatedChunkLock.lock();
-	RequestedLightUpdate.emplace(colPos);
-	LightUpdateRequest.push_back(colPos);
+	RequestedLightUpdate.emplace(pos);
+	LightUpdateRequest.push_back(pos);
 	UpdatedChunkLock.unlock();
 
 }
@@ -210,6 +203,7 @@ Chunk* WorldInteractions::getChunk(const ChunkPos& pos) const {
 }
 
 void WorldInteractions::setBlock(BlockID b, const BlockPos& bpos) {
+	//UpdatedChunkLock.lock();
 	try {
 		int x = bpos.x;
 		int y = bpos.y;
@@ -245,8 +239,10 @@ void WorldInteractions::setBlock(BlockID b, const BlockPos& bpos) {
 		requestLightUpdate(pos);
 	}
 	catch (exception& e) {
-		Logger.LogError("World", e.what());
+		//UpdatedChunkLock.unlock();
+		Logger.LogError("World Exception", e.what());
 	}
+	//UpdatedChunkLock.unlock();
 }
 
 BlockID WorldInteractions::getBlock(const BlockPos& pos) {

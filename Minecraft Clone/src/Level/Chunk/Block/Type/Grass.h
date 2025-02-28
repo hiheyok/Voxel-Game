@@ -15,9 +15,6 @@ struct GrassBlock : Block {
 	GrassProperties Properties;
 
 	void tick(const BlockPos& pos) override {
-	//	std::cout << "Tick\n";
-
-
 		Dimension* CurrentWorld = static_cast<Dimension*>(Block::DimensionPTR);
 
 		//Checks if ticking block changes 
@@ -47,12 +44,8 @@ struct GrassBlock : Block {
 			return;
 		}
 
-		Event event;
-		event.Type = BLOCK_EVENT;
-		event.Data.BlockEvent.id = EventHandler.BlockTick;
-		event.Data.BlockEvent.pos = pos;
-		event.Data.BlockEvent.block = Blocks.GRASS;
-		CurrentWorld->EventManager.AddEvent(event);
+		Event::BlockEvent grassSpread{pos, Blocks.GRASS, EventHandler.BlockTick};
+		CurrentWorld->EventManager.AddEvent(grassSpread);
 	}
 
 	bool GrassDestroyTick(Dimension* CurrentWorld, const BlockPos& pos) {
@@ -99,12 +92,8 @@ struct GrassBlock : Block {
 					//Chance it spread
 					if (TestProbability(Properties.SpreadChance)) {
 
-						Event event;
-						event.Type = BLOCK_EVENT;
-						event.Data.BlockEvent.id = EventHandler.BlockPlace;
-						event.Data.BlockEvent.pos = newPos;
-						event.Data.BlockEvent.block = Blocks.GRASS;
-						CurrentWorld->EventManager.AddEvent(event);
+						Event::BlockEvent blockEvent{newPos,Blocks.GRASS, EventHandler.BlockPlace};
+						CurrentWorld->EventManager.AddEvent(blockEvent);
 
 						continue;
 					}

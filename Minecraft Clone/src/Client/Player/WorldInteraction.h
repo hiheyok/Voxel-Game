@@ -17,7 +17,7 @@ class WorldInteraction {
 
 public:
 
-	void Interact(Player* player, UserInputs Inputs);
+	void Interact(Player* player, const UserInputs& Inputs);
 
 private:
 

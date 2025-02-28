@@ -12,6 +12,6 @@ public:
 
 	FastNoiseLite Noise;
 
-	double TREE_RAND_VAL = 0.5;
-	double TREE_RAND_VAL_RANGE = .01f;
+	static constexpr double TREE_RAND_VAL = 0.5;
+	static constexpr double TREE_RAND_VAL_RANGE = .01f;
 };

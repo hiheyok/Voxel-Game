@@ -1,15 +1,15 @@
 #include "ChunkHandles.h"
 #include "../EventHandler.h"
 
-void UpdateLighting(Event::EventDataType::_ChunkEvent ChunkEvent) {
+void UpdateLighting(const Event::ChunkEvent& ChunkEvent) {
 
 }
 
-void ChunkUpdate(Event::EventDataType::_ChunkEvent ChunkEvent) {
+void ChunkUpdate(const Event::ChunkEvent& ChunkEvent) {
 
 }
 
-void GenerateChunk(Event::EventDataType::_ChunkEvent ChunkEvent) {
+void GenerateChunk(const Event::ChunkEvent& ChunkEvent) {
 
 }
 

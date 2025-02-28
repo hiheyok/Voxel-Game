@@ -48,7 +48,7 @@ void MeshingV2::ChunkMeshData::GenerateCache() {
 		int axis = side >> 1;
 		int direction = side & 0b1;
 
-		if (chunk->Neighbors[side] == NULL) {
+		if (chunk->Neighbors[side] == nullptr) {
 			continue;
 		}
 

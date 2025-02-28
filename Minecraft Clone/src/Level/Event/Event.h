@@ -1,4 +1,6 @@
 #pragma once
+#include <variant>
+
 #include "../Entity/Entity.h"
 #include "../Typenames.h"
 #include "../Chunk/ChunkPos/ChunkPos.h"
@@ -6,95 +8,73 @@
 
 constexpr size_t MAX_EVENT_SIZE = 32;
 
-enum EventType {
-	NULL_EVENT,
-	BLOCK_EVENT,
-	ENTITY_EVENT,
-	CHUNK_LOAD_EVENT,
-	CHUNK_UNLOAD_EVENT
-};
 
-struct Event
-{
-	EventType Type = NULL_EVENT;
+namespace Event {
 
-	int TickTime = 0;
+	struct BlockEvent {
+		BlockEvent(BlockPos pos, BlockID block, EventID id, char unique_id = 0) : pos_{ pos }, block_{ block }, id_{ id }, unique_id_{ unique_id } {}
+		BlockEvent() {}
 
-	Event() {
+		BlockPos pos_; // 12 - 8
+		BlockID block_; //1
+		EventID id_ = 0; //8
+		char unique_id_ = 0;
+	};
 
-	} 
+	struct ChunkEvent {
+		ChunkPos pos_;
+		EventID id_ = 0;
+		char unique_id_ = 0;
+	};
 
-	// TODO: Add chunk events
+	struct EntityEvent {
+		BlockPos pos_;
+		EntityTypeID entity_type_;
+		EntityUUID entity_uuid_;
+		EventID id_ = 0;
+		char unique_id_ = 0;
+	};
 
-	Event(const Event& other)
-		: Type(other.Type), TickTime(other.TickTime) // Copy primitive members
-	{
-		// Use placement new to copy the correct union member
-		switch (other.Type) {
-		case BLOCK_EVENT:
-			new (&Data.BlockEvent) EventDataType::_BlockEvent(other.Data.BlockEvent);
-			break;
-		case ENTITY_EVENT:
-			new (&Data.EntityEvent) EventDataType::_EntityEvent(other.Data.EntityEvent);
-			break;
-		default:
-			new (&Data.__Data) EventDataType::_Data(other.Data.__Data);
-			break;
+	enum EventType {
+		NULL_EVENT,
+		BLOCK_EVENT,
+		ENTITY_EVENT,
+		CHUNK_LOAD_EVENT,
+		CHUNK_UNLOAD_EVENT
+	};
+
+	struct Event {
+		EventType type_ = NULL_EVENT;
+		int tick_time_ = 0;
+
+		Event(const Event& other) : type_{ other.type_ },
+			tick_time_{ other.tick_time_ },
+			event_data_{ other.event_data_ } {}
+
+		Event() {};
+
+		template <typename EventType> Event(const EventType& newEvent) {
+			if constexpr (std::is_same_v<EventType, EntityEvent>) {
+				type_ = ENTITY_EVENT;
+			}
+			else if constexpr (std::is_same_v<EventType, ChunkEvent>) {
+				type_ = CHUNK_LOAD_EVENT;
+			}
+			else if constexpr (std::is_same_v<EventType, BlockEvent>) {
+				type_ = BLOCK_EVENT;
+			}
+			else {
+				throw std::runtime_error("Invalid event type!");
+			}
+
+			event_data_ = newEvent;
 		}
-	}
 
-	~Event() {
-		// Manually destroy the union's active member
-		switch (Type) {
-		case BLOCK_EVENT:
-			Data.BlockEvent.~_BlockEvent();
-			break;
-		case ENTITY_EVENT:
-			Data.EntityEvent.~_EntityEvent();
-			break;
-		default:
-			break;
-		}
-	}
-
-	union EventDataType {
-		EventDataType() {
-
+		~Event() {
+			// Manually destroy the union's active member
 		}
 
-		EventDataType(const EventDataType& other) {
-			std::memcpy(this, &other, sizeof(EventDataType));
-		}
+		std::variant<BlockEvent, ChunkEvent, EntityEvent, std::monostate> event_data_;
+	};
 
-		// TODO: Use custom block pos class to store pos
-
-		struct _BlockEvent { //32 Bytes
-			BlockPos pos; // 12 - 8
-			BlockID block; //1
-			EventID id = 0; //8
-			char UniqueID = 0;
-
-		} BlockEvent;
-
-
-		// TODO: Use custom entity pos class
-		struct _EntityEvent { //32 byte
-			BlockPos pos;
-			EntityTypeID entityType;
-			EntityUUID EntityID;
-			EventID id = 0;
-			char UniqueID = 0;
-		} EntityEvent;
-
-		struct _ChunkEvent { //24 byte
-			ChunkPos pos;
-			EventID id = 0;
-			char UniqueID = 0;
-		} ChunkEvent;
-
-		struct _Data {
-			char d[MAX_EVENT_SIZE]{};
-		} __Data;
-	} Data;
-	
-};
+}

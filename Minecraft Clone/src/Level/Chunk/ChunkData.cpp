@@ -4,15 +4,15 @@ static const int NeighborOffset[2] = {
 	  -16, 16
 };
 
-BlockID ChunkContainer::GetBlock(glm::ivec3 posIn) {
+BlockID ChunkContainer::GetBlock(glm::ivec3 posIn) const {
 	return GetBlock(posIn.x, posIn.y, posIn.z);
 }
 
-BlockID ChunkContainer::GetBlockUnsafe(glm::ivec3 posIn) {
+BlockID ChunkContainer::GetBlockUnsafe(glm::ivec3 posIn) const {
 	return GetBlockUnsafe(posIn.x, posIn.y, posIn.z);
 }
 
-BlockID ChunkContainer::GetBlock(int x, int y, int z) {
+BlockID ChunkContainer::GetBlock(int x, int y, int z) const {
 	if (!((x | y | z) >> 4)) { //check if it is in the chunk
 		return BlockStorage.GetBlock(x, y, z);
 	}
@@ -33,7 +33,7 @@ BlockID ChunkContainer::GetBlock(int x, int y, int z) {
 	return Blocks.AIR;
 }
 
-BlockID ChunkContainer::GetBlockUnsafe(int x, int y, int z) {
+BlockID ChunkContainer::GetBlockUnsafe(int x, int y, int z) const {
 	return BlockStorage.GetBlock(x, y, z);
 }
 

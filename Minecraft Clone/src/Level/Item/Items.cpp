@@ -3,7 +3,7 @@
 #include "../../Utils/LogUtils.h"
 
 Item ItemList::RegisterBlockItem(BlockID block) {
-	BlockItem item(block);
+	BlockItem item{ block };
 	item.Properties.IsBlockItem = true;
 	item.Properties.block = block;
 	item.Properties.ID = ItemCount;

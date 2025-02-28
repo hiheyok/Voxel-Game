@@ -36,7 +36,7 @@ public:
 
 	void summonEntity(Entity& entity);
 
-	std::vector<ChunkPos> getUpdatedChunkPoss();
+	std::vector<ChunkPos> getUpdatedChunkPos();
 
 	std::vector<ChunkPos> getRequestedLightUpdates();
 

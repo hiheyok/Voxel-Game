@@ -66,28 +66,34 @@ public:
 	}
 
 	void EventTick() {
-
-		std::vector<Event>* EventQueue = EventManager.GetQueue();
+		std::vector<Event::Event>* EventQueue = EventManager.GetQueue();
 
 		for (int i = 0; i < EventQueue->size(); i++) {
-			Event e = EventQueue->at(i);
-			switch (e.Type) {
-			case NULL_EVENT:
+			const Event::Event& e = EventQueue->at(i);
+			switch (e.type_) {
+			case Event::NULL_EVENT:
 				break;
-			case BLOCK_EVENT:
-				if (CheckTickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.pos)) {
+			case Event::BLOCK_EVENT:
+			{
+				const Event::BlockEvent& blockEvent = std::get<Event::BlockEvent>(e.event_data_);
+				if (CheckTickUsed(blockEvent.id_, blockEvent.pos_)) {
 					continue;
 				}
-				TickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.pos);
+				TickUsed(blockEvent.id_, blockEvent.pos_);
 				break;
-			case ENTITY_EVENT:
-				if ((e.Data.EntityEvent.UniqueID != 0) && CheckTickUsed(e.Data.EntityEvent.UniqueID, e.Data.EntityEvent.pos)) {
+			}
+			case Event::ENTITY_EVENT:
+			{
+				const Event::EntityEvent& entityEvent = std::get<Event::EntityEvent>(e.event_data_);
+				if ((entityEvent.unique_id_ != 0) && CheckTickUsed(entityEvent.unique_id_, entityEvent.pos_)) {
 					continue;
 				}
-				if ((e.Data.EntityEvent.UniqueID != 0)) {
-					TickUsed(e.Data.BlockEvent.id, e.Data.BlockEvent.pos);
+				// TODO: tmp fix rework this later
+				if ((entityEvent.unique_id_ != 0)) {
+					TickUsed(entityEvent.entity_uuid_, entityEvent.pos_);
 				}
 				break;
+			}
 			default:
 				throw std::exception("Not handled yet!");
 			}

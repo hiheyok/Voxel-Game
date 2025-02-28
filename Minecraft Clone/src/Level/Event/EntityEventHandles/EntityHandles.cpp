@@ -2,23 +2,23 @@
 #include "../../Entity/Entities.h"
 #include "../../Chunk/Block/Block.h"
 #include "../../../Level/Dimension/Dimension.h"
-void HandleEntityTick(Event::EventDataType::_EntityEvent e) { //prob useless
+void HandleEntityTick(Event::EntityEvent e) { //prob useless
 	Dimension* dimension = static_cast<Dimension*>(Block::DimensionPTR);
-	Entity* entity = dimension->worldInteractions.getEntity(e.EntityID);
+	Entity* entity = dimension->worldInteractions.getEntity(e.entity_type_);
 	entity->Tick();
 }
 
-void HandleEntitySummon(Event::EventDataType::_EntityEvent e) {
+void HandleEntitySummon(Event::EntityEvent e) {
 	Dimension* dimension = static_cast<Dimension*>(Block::DimensionPTR);
 	Entity* entity = new Entity;
-	entity->Properties.Position.x = e.pos.x;
-	entity->Properties.Position.y = e.pos.y;
-	entity->Properties.Position.z = e.pos.z;
-	entity->Properties.Type = e.entityType;
+	entity->Properties.Position.x = e.pos_.x;
+	entity->Properties.Position.y = e.pos_.y;
+	entity->Properties.Position.z = e.pos_.z;
+	entity->Properties.Type = e.entity_type_;
 	dimension->worldInteractions.addEntity(entity);
 }
 
-void HandleRemoveEntity(Event::EventDataType::_EntityEvent e) {
+void HandleRemoveEntity(Event::EntityEvent e) {
 	Dimension* dimension = static_cast<Dimension*>(Block::DimensionPTR);
-	dimension->worldInteractions.killEntity(e.EntityID);
+	dimension->worldInteractions.killEntity(e.entity_uuid_);
 }

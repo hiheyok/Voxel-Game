@@ -43,7 +43,7 @@ public:
 
 	void join(Entity& entity);
 
-	std::vector<ChunkPos> getUpdatedChunkPoss();
+	std::vector<ChunkPos> getUpdatedChunkPos();
 
 	Chunk* getChunk(const ChunkPos& ID);
 
@@ -61,5 +61,5 @@ public:
 
 	void tick();
 
-	void sendEvent(Event pEventIn);
+	void sendEvent(const Event::Event& pEventIn);
 };

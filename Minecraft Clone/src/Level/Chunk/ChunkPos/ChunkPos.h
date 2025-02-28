@@ -12,13 +12,8 @@
 #include "../../../Utils/LogUtils.h"
 
 class ChunkPos {
-	
-	int data[3]{};
-
 public:
-	int& x = data[0];
-	int& y = data[1];
-	int& z = data[2];
+	int x, y, z;
 
 	ChunkPos(int px, int py, int pz) {
 		set(px, py, pz);
@@ -31,7 +26,9 @@ public:
 	}
 
 	ChunkPos() {
-
+		x = 0;
+		y = 0;
+		z = 0;
 	}
 
 	inline void set(int px, int py, int pz) {
@@ -41,15 +38,18 @@ public:
 	}
 
 	inline void incrementSide(int side, int val) {
-		data[side >> 1] +=  (1 - (side & 0b1) * 2) * val;
+		reinterpret_cast<int*>(this)[side >> 1] += val - 2 * (side & 1);
 	}
 
 	inline int& operator[](int i) {
-		return data[i];
+		return reinterpret_cast<int*>(this)[i];
 	}
 
 	inline void operator=(const ChunkPos& other) {
-		memcpy(data, other.data, sizeof(int) * 3);
+		x = other.x;
+		y = other.y;
+		z = other.z;
+		memcpy(this, &other, sizeof(ChunkPos));
 	}
 
 	inline ChunkPos operator-(const ChunkPos& other) const {
@@ -90,13 +90,14 @@ public:
 	}
 
 	inline size_t hash() const {
-		constexpr uint64_t prime1 = 0x9e3779b97f4a7c15; // Large prime (Golden ratio scaled)
-		constexpr uint64_t prime2 = 0xc6a4a7935bd1e995; // Another large prime
-
-		size_t seed = std::hash<uint64_t>{}(x);
-		seed ^= std::hash<uint64_t>{}(y)+prime1 + (seed << 6) + (seed >> 2);
-		seed ^= std::hash<uint64_t>{}(z)+prime2 + (seed << 6) + (seed >> 2);
-		return seed;
+		size_t h = 2166136261u;  // FNV offset basis
+		h ^= static_cast<size_t>(x);
+		h *= 16777619u;  // FNV prime
+		h ^= static_cast<size_t>(y);
+		h *= 16777619u;
+		h ^= static_cast<size_t>(z);
+		h *= 16777619u;
+		return h;
 	}
 };
 

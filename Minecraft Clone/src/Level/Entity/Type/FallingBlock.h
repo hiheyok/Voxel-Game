@@ -40,21 +40,18 @@ class FallingBlock : public EntityType {
 		entity->isDirty = true;
 
 		if (CollideWithGround) {
-			Event addBlock;
-			addBlock.Type = BLOCK_EVENT;
-			addBlock.Data.BlockEvent.id = EventHandler.BlockPlace;
-			addBlock.Data.BlockEvent.pos = BlockPos{
+			Event::BlockEvent addBlock{ BlockPos{
 											(int)entity->Properties.Position.x,
 											(int)entity->Properties.Position.y,
-											(int)entity->Properties.Position.z}; 
-			addBlock.Data.BlockEvent.block = Blocks.SAND;
+											(int)entity->Properties.Position.z},
+										Blocks.SAND, EventHandler.BlockPlace };
 			CurrentDimension->EventManager.AddEvent(addBlock);
 
-			Event removeEntity;
-			removeEntity.Type = ENTITY_EVENT;
-			removeEntity.Data.EntityEvent.id = EventHandler.RemoveEntity;
-			removeEntity.Data.EntityEvent.EntityID = entity->Properties.EntityUUID;
-			removeEntity.Data.EntityEvent.UniqueID = 200;
+			Event::EntityEvent removeEntity;
+			removeEntity.id_ = EventHandler.RemoveEntity;
+			removeEntity.entity_uuid_= entity->Properties.EntityUUID;
+			removeEntity.unique_id_ = 200;
+			
 			CurrentDimension->EventManager.AddEvent(removeEntity);
 		}
 	}
