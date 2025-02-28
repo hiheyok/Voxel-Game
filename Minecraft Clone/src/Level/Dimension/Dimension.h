@@ -90,7 +90,7 @@ public:
 				}
 				// TODO: tmp fix rework this later
 				if ((entityEvent.unique_id_ != 0)) {
-					TickUsed(entityEvent.entity_uuid_, entityEvent.pos_);
+					TickUsed(static_cast<EventID>(entityEvent.entity_uuid_), entityEvent.pos_);
 				}
 				break;
 			}

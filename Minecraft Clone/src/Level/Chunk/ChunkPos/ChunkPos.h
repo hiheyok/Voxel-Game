@@ -38,7 +38,7 @@ public:
 	}
 
 	inline void incrementSide(int side, int val) {
-		reinterpret_cast<int*>(this)[side >> 1] += val - 2 * (side & 1);
+		reinterpret_cast<int*>(this)[side >> 1] += (1 - 2 * (side & 1)) * val;
 	}
 
 	inline int& operator[](int i) {
@@ -49,7 +49,6 @@ public:
 		x = other.x;
 		y = other.y;
 		z = other.z;
-		memcpy(this, &other, sizeof(ChunkPos));
 	}
 
 	inline ChunkPos operator-(const ChunkPos& other) const {
@@ -60,15 +59,18 @@ public:
 		return ChunkPos{ x + other.x, y + other.y, z + other.z };
 	}
 
-	template <typename T> inline ChunkPos operator*(const T& other) const {
+	template <typename T> 
+	inline ChunkPos operator*(const T& other) const {
 		return ChunkPos{ x * other, y * other, z * other };
 	}
 
-	template <typename T> inline ChunkPos operator/(const T& other) const {
+	template <typename T> 
+	inline ChunkPos operator/(const T& other) const {
 		return ChunkPos{ x / other, y / other, z / other };
 	}
 
-	template <typename T> void operator*=(const T& other) {
+	template <typename T> 
+	void operator*=(const T& other) {
 		x *= other;
 		y *= other;
 		z *= other;
@@ -79,7 +81,7 @@ public:
 	}
 
 	inline friend std::string operator+(const char* str, const ChunkPos& m) {
-		std::string s = std::string(str) + "[" + std::to_string(m.x) + "," + std::to_string(m.y) + "," + std::to_string(m.z) + "]";;
+		std::string s = std::string(str) + "[" + std::to_string(m.x) + "," + std::to_string(m.y) + "," + std::to_string(m.z) + "]";
 		return s;
 	}
 

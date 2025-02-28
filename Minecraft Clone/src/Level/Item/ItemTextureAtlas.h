@@ -30,7 +30,7 @@ class ItemTextureAtlas {
 
 	void RenderBlockItem(Item item);
 
-	void StitchTexture(int index, int ItemID);
+	void StitchTexture(size_t index, ItemID ItemID);
 
 	
 public:

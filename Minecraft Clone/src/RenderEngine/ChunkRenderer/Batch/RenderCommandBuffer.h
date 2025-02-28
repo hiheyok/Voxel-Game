@@ -303,7 +303,7 @@ public:
 			arr.clear();
 		}
 		count = 0;
-		int size = 0;
+		size_t size = 0;
 		TraverseTree(root, 0);
 
 		CurrentNodeVisitID++;

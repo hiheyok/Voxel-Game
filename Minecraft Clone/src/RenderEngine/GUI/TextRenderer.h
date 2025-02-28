@@ -19,8 +19,8 @@ private:
 	std::vector<float> Vertices = {};
 	std::vector<float> VerticesBackground = {};
 	
-	int VerticesCount = 0;
-	int BackgroundVertCount = 0;
+	size_t VerticesCount = 0;
+	size_t BackgroundVertCount = 0;
 
 public:
 	void InitializeTextRenderer(GLFWwindow* w) {
@@ -100,7 +100,7 @@ public:
 		}
 
 		VBO.InsertData(Vertices.size() * sizeof(Vertices[0]), Vertices.data(), GL_STATIC_DRAW);
-		VerticesCount = Vertices.size() / (11);
+		VerticesCount = Vertices.size() / 11;
 
 		//Fill background buffer
 		VerticesBackground.clear();
@@ -114,7 +114,7 @@ public:
 		}
 
 		backgroundVBO.InsertData(VerticesBackground.size() * sizeof(VerticesBackground[0]), VerticesBackground.data(), GL_STATIC_DRAW);
-		BackgroundVertCount = VerticesBackground.size() / (8);
+		BackgroundVertCount = VerticesBackground.size() / 8;
 	}
 
 	void Prepare() {

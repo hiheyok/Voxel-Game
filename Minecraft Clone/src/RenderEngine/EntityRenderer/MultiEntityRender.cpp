@@ -112,13 +112,13 @@ void MultiEntityRenderer::Render() {
 	mProfiler->ProfileStart("root/render/entity");
 	SetupCall();
 
-	int n = 0;
+	size_t n = 0;
 
 	for (auto& entityarr : RenderableEntities.EntitySeparated) {
 
 		//Fill SSBO POS data
 
-		int i = 0;
+		size_t i = 0;
 		//if (isDirty) {
 			for (auto& e : entityarr.second) {
 				EntityProperty properties = e.second;
@@ -160,7 +160,7 @@ void MultiEntityRenderer::Render() {
 		SSBO_Acc.Bind();
 		SSBO_Acc.BindBase(3);
 
-		glDrawElementsInstanced(GL_TRIANGLES, EntityElementSize[entityarr.first], GL_UNSIGNED_INT, (void*)(EntityElementIndex[entityarr.first] * sizeof(unsigned int)), i);
+		glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(EntityElementSize[entityarr.first]), GL_UNSIGNED_INT, (void*)(EntityElementIndex[entityarr.first] * sizeof(unsigned int)), i);
 
 		SSBO_Acc.UnbindBase(3);
 		SSBO_Acc.Unbind();
@@ -212,7 +212,7 @@ void MultiEntityRenderer::Update() {
 	shader.setFloat("RenderDistance", (float)(HorizontalRenderDistance * 16));
 	shader.setFloat("VerticalRenderDistance", (float)(VerticalRenderDistance * 16));
 	shader.setVec3("camPos", camera->Position);
-	shader.setFloat("TimeDelta", TimePastTick);
+	shader.setFloat("TimeDelta", static_cast<float>(TimePastTick));
 	mProfiler->ProfileStop("root/update/entity");
 }
 

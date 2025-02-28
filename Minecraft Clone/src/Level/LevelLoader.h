@@ -5,7 +5,7 @@
 //Checks if the chunk is stored on disk, if not, asks the world generator to generate the chunks
 class LevelLoader { //need to add save to disk later
 private:
-	int count = 0;
+	size_t count = 0;
 	ChunkGeneration worldGenerator; //Change this 
 	LightingEngine lightEngine;
 public:

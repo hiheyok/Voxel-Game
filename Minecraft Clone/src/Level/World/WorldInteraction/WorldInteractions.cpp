@@ -113,13 +113,13 @@ void WorldInteractions::updateLighting(vector<ChunkLightingContainer*> ChunkLigh
 
 	UpdatedChunkLock.lock();
 	while (!chunkToUpdate.empty()) {
-		ChunkPos id = chunkToUpdate.top();
+		ChunkPos pos = chunkToUpdate.top();
 		chunkToUpdate.pop();
-		if (!UpdatedChunk.count(id)) {
-			UpdatedChunk.insert(id);
+		if (!UpdatedChunk.count(pos)) {
+			UpdatedChunk.insert(pos);
 		}
 		// TODO: Fix this with Chunk Column ID
-		RequestedLightUpdate.erase(id);
+		RequestedLightUpdate.erase(pos);
 
 	}
 	UpdatedChunkLock.unlock();
@@ -137,20 +137,20 @@ void WorldInteractions::addChunk(Chunk* chunk) {
 	//Update neighbor chunks
 
 	for (int side = 0; side < 6; side++) {
-		int pos[3]{ position.x, position.y, position.z};
-		pos[side >> 1] += (side & 0b1) * 2 - 1;
+		ChunkPos neighborPos = position;
+		neighborPos.incrementSide(side, 1);
 
-		if (world->checkChunk(position)) {
-			chunkToUpdate.push(position);
+		if (world->checkChunk(neighborPos)) {
+			chunkToUpdate.push(neighborPos);
 		}
 	}
 
 	UpdatedChunkLock.lock();
 	while (!chunkToUpdate.empty()) {
-		ChunkPos id = chunkToUpdate.top();
+		ChunkPos pos = chunkToUpdate.top();
 		chunkToUpdate.pop();
-		if (!UpdatedChunk.count(id)) {
-			UpdatedChunk.insert(id);
+		if (!UpdatedChunk.count(pos)) {
+			UpdatedChunk.insert(pos);
 		}
 
 	}
@@ -218,19 +218,19 @@ void WorldInteractions::setBlock(BlockID b, const BlockPos& bpos) {
 		
 		int v[3]{ x % 16, y % 16, z % 16 };
 
-		for (int side = 0; side < 3; side++) {
+		for (int axis = 0; axis < 3; axis++) {
 			ChunkPos p = pos;
 
 			int direction = 0;
 
-			if (v[side] == 15)
+			if (v[axis] == 15)
 				direction = 1;
-			if (v[side] == 0)
+			if (v[axis] == 0)
 				direction = -1;
 
 			if (direction == 0) continue;
 
-			p[side] += direction;
+			p[axis] += direction;
 			if (!UpdatedChunk.count(p))
 				UpdatedChunk.insert(p);
 		}

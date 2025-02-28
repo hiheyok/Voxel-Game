@@ -87,7 +87,7 @@ public:
 		VAO.Bind();
 		EBO.Bind();
 		VBO.Bind();
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
 		VAO.Unbind();
 		EBO.Unbind();
 		VBO.Unbind();

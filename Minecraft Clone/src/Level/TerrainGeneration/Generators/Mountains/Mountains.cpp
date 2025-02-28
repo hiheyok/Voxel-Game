@@ -202,7 +202,12 @@ float MountainGenerator::getNoise3D(glm::ivec3 ChunkCoordinate, glm::ivec3 Relat
 	float out = 0.0f;
 
 	for (int i = 0; i < samples; i++) {
-		float n = (Noise.GetNoise(GlobalBlockPosition.x * powf(2, i), GlobalBlockPosition.y * powf(2, i), GlobalBlockPosition.z * powf(2, i)) + 1) * 0.5f;
+		float n = Noise.GetNoise(
+			GlobalBlockPosition.x * powf(2.0, static_cast<float>(i)),
+			GlobalBlockPosition.y * powf(2.0, static_cast<float>(i)),
+			GlobalBlockPosition.z * powf(2.0, static_cast<float>(i))) + 1;
+
+		n *= 0.5f;
 		out += n * powf(0.5f, i);
 	}
 
@@ -219,7 +224,9 @@ float MountainGenerator::getNoise2D(glm::ivec2 ChunkCoordinate, glm::ivec2 Relat
 	float out = 0.0f;
 
 	for (int i = 0; i < samples; i++) {
-		float n = (Noise.GetNoise(GlobalBlockPosition.x * powf(2, i), GlobalBlockPosition.y * powf(2, i)) + 1) * 0.5f;
+		float n = Noise.GetNoise(GlobalBlockPosition.x * powf(2.0, static_cast<float>(i)),
+			GlobalBlockPosition.y * powf(2.0, static_cast<float>(i))) + 1;
+		n *= 0.5f;
 		out += n * powf(0.5f, i);
 	}
 

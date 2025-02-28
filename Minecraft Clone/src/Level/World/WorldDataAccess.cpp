@@ -23,8 +23,8 @@ Chunk* WorldAccess::getChunk(const ChunkPos& pos) const {
 	return chunk;
 }
 
-bool WorldAccess::checkChunk(const ChunkPos& id) const {
-	return ChunkContainer.GetChunk(id) != nullptr;
+bool WorldAccess::checkChunk(const ChunkPos& pos) const {
+	return ChunkContainer.GetChunk(pos) != nullptr;
 }
 
 Heightmap& WorldAccess::getColumnHeightmap(const ChunkColumnPos& v) const {

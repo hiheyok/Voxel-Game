@@ -77,8 +77,8 @@ public:
 
     GLuint textureID = NULL;
 
-    int width = NULL;
-    int height = NULL;
+    size_t width = NULL;
+    size_t height = NULL;
     int Format = NULL;
 private:
 

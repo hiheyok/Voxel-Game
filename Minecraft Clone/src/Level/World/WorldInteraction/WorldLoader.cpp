@@ -170,7 +170,7 @@ void WorldLoader::replaceLightInfomation(ChunkLightingContainer* lighting) {
 vector<ChunkPos> WorldLoader::getRequestedChunks() {
 	vector<ChunkPos> tmp;
 	lock.lock();
-	tmp = ChunkRequest;
+	tmp.insert(tmp.end(), ChunkRequest.begin(), ChunkRequest.end());
 	ChunkRequest.clear();
 	lock.unlock();
 
@@ -201,7 +201,7 @@ void WorldLoader::load() {
 }
 
 void WorldLoader::addChunk(Chunk* chunk) {
-	ChunkPos pos = chunk->position_;
+	const ChunkPos& pos = chunk->position_;
 
 	if (GeneratingChunk.count(pos)) GeneratingChunk.erase(pos);
 

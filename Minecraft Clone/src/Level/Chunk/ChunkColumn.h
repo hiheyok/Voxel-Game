@@ -74,7 +74,7 @@ public:
 
 	inline int16_t findSurfaceHeightSingleChunk(uint8_t p_height, uint8_t x, uint8_t z) const {
 		Chunk* currChunk = Column[p_height];
-		if (currChunk) return -1;
+		if (currChunk == nullptr) return -1;
 		for (int y = 15; y >= 0; y--) {
 			if (currChunk->GetBlockUnsafe(x, y, z) != Blocks.AIR) return y;
 		}
@@ -111,7 +111,7 @@ public:
 	void UpdateHeightmap(uint16_t Height) {
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
-				int16_t surfaceLevel = findSurfaceHeight(x, z, Height);
+				int16_t surfaceLevel = findSurfaceHeight(x, z, static_cast<uint8_t>(Height));
 				surfaceLevel = (surfaceLevel != -1) * surfaceLevel;
 				ColumnHeightmap.edit(x, z, surfaceLevel);
 			}

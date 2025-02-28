@@ -26,8 +26,8 @@ float PlayerMovement::velocityMovementCurve(float current, float max, float delt
 void PlayerMovement::RotatePlayer(Player* player, UserInputs Inputs) {
 	float CamSensitivity = 0.1f;
 
-	player->Properties.Rotation.x += Inputs.Mouse.Displacement.x * CamSensitivity;
-	player->Properties.Rotation.y -= Inputs.Mouse.Displacement.y * CamSensitivity;
+	player->Properties.Rotation.x += static_cast<float>(Inputs.Mouse.Displacement.x * CamSensitivity);
+	player->Properties.Rotation.y -= static_cast<float>(Inputs.Mouse.Displacement.y * CamSensitivity);
 
 	if (player->Properties.Rotation.y > 89.9999f)
 		player->Properties.Rotation.y = 89.9999f;

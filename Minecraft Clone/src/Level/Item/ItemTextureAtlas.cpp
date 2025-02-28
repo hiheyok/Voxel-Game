@@ -7,7 +7,7 @@ void ItemTextureAtlas::RenderBlockItem(Item item) {
 	FramebufferSingleBlockRender.unbindFBO();
 }
 
-void ItemTextureAtlas::StitchTexture(int index, int ItemID) {
+void ItemTextureAtlas::StitchTexture(size_t index, ItemID ItemID) {
 	int ratio = AtlasSize / IndividualSize;
 	float xCoord = (index % ratio);
 	float yCoord = floor((float)index / (float)ratio);

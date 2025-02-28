@@ -79,8 +79,8 @@ public:
     }
 
     void UpdateResolution(GLint x, GLint y, float muti = 1.f) {
-        sx = x * muti;
-        sy = y * muti;
+        sx = static_cast<GLint>(muti * x);
+        sy = static_cast<GLint>(muti * y);
     }
 
     void bindRBO() {
