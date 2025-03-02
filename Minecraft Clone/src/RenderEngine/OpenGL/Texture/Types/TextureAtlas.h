@@ -6,13 +6,14 @@
 #include <fstream>
 #include <glm/vec4.hpp>
 #include <optional>
+#include <cctype>
 class TextureAtlas : public Texture {
 public:
 	void UploadToGPU() {
-		// GLsizei mipLevelCount = 4;
+		// GLsizei mipLevelcount_ = 4;
 
 		glBindTexture(GL_TEXTURE_2D, textureID);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, TextureAtlasData.data());
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_atlas_data_.data());
 		glGenerateMipmap(GL_TEXTURE_2D);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -22,80 +23,82 @@ public:
 
 		Logger.LogDebug("Texture Loader", "Loaded 2D Texture: " + std::to_string(textureID));
 	}
-	void SetSize(int width_, int height_) {
-		width = width_;
-		height = height_;
+	void SetSize(int width, int height) {
+		width_ = width;
+		height_ = height;
 
-		TextureAtlasData.resize(width * height * colorSpace, NULL);
+		texture_atlas_data_.resize(width_ * height_ * color_space_, NULL);
 	}
 
-	inline void setPixel(uint8_t r, uint8_t  g, uint8_t b, uint8_t a, int w, int h) {
-		TextureAtlasData[w * colorSpace + h * colorSpace + 0] = r;
-		TextureAtlasData[w * colorSpace + h * colorSpace + 1] = g;
-		TextureAtlasData[w * colorSpace + h * colorSpace + 2] = b;
-		TextureAtlasData[w * colorSpace + h * colorSpace + 3] = a;
+	inline void setPixel(uint8_t r, uint8_t  g, uint8_t b, uint8_t a, size_t w, size_t h) {
+		texture_atlas_data_[w * color_space_ + h * color_space_ + 0] = r;
+		texture_atlas_data_[w * color_space_ + h * color_space_ + 1] = g;
+		texture_atlas_data_[w * color_space_ + h * color_space_ + 2] = b;
+		texture_atlas_data_[w * color_space_ + h * color_space_ + 3] = a;
 	}
 
-	void AddData(std::vector<uint8_t> Data, int Format, bool& transparency, bool& isSeeThrough) { //assumes that all textures  are 16 x 16
+	void AddData(std::vector<uint8_t> Data, int Format, bool& transparency, bool& is_see_through_) { //assumes that all textures  are 16 x 16
 		//Get offset to where to put the texture
-		int WidthTex = width / 16;
+		size_t WidthTex = width_ / 16;
 		//int heightTex = height / 16;
 
-		int WidthIndex = Count % WidthTex;
-		int HeightIndex = Count / WidthTex;
+		size_t WidthIndex = count_ % WidthTex;
+		size_t HeightIndex = count_ / WidthTex;
 
-		int WidthIndexPixel = WidthIndex * 16; //Offset for the width
-		int HeightIndexPixel = width * HeightIndex * 16; //Offset for the height
+		size_t WidthIndexPixel = WidthIndex * 16; //Offset for the width
+		size_t HeightIndexPixel = width_ * HeightIndex * 16; //Offset for the height
 
-		if (Format == GL_RGB) {
+		switch (Format) {
+		case GL_RGB:
 			for (int index = 0; index < 16 * 16; index++) {
-				setPixel(Data[(index * 3)], Data[(index * 3) + 1], Data[(index * 3) + 2], 255, WidthIndexPixel + (index % 16), HeightIndexPixel + width * (index /  16));
+				setPixel(Data[(index * 3)], Data[(index * 3) + 1], Data[(index * 3) + 2], 255, WidthIndexPixel + (index % 16), HeightIndexPixel + width_ * (index / 16));
 			}
-			Count++;
-		}
-		else  if (Format == GL_RG) {
+			count_++;
+			break;
+		case GL_RG:
 			for (int index = 0; index < 16 * 16; index++) {
 				if ((Data[(index * 2) + 1] != 255) && (Data[(index * 2) + 1] != 0)) {
 					transparency = true;
-					isSeeThrough = true;
+					is_see_through_ = true;
 				}
 
 				if (Data[(index * 2) + 1] != 255) {
-					isSeeThrough = true;
+					is_see_through_ = true;
 				}
 
-				setPixel(Data[(index * 2)], Data[(index * 2)], Data[(index * 2)], Data[(index * 2) + 1], WidthIndexPixel + (index % 16), HeightIndexPixel + width * (index / 16));
+				setPixel(Data[(index * 2)], Data[(index * 2)], Data[(index * 2)], Data[(index * 2) + 1], WidthIndexPixel + (index % 16), HeightIndexPixel + width_ * (index / 16));
 			}
-			Count++;
-		}
-		else  if (Format == GL_RGBA) {
+			count_++;
+			break;
+		case GL_RGBA:
 			for (int index = 0; index < 16 * 16; index++) {
 				if ((Data[(index * 4) + 3] != 255) && (Data[(index * 4) + 3] != 0)) {
 					transparency = true;
-					isSeeThrough = true;
+					is_see_through_ = true;
 				}
 
 				if (Data[(index * 4) + 3] != 255) {
-					isSeeThrough = true;
+					is_see_through_ = true;
 				}
-				setPixel(Data[(index * 4)], Data[(index * 4) + 1], Data[(index * 4) + 2], Data[(index * 4) + 3], WidthIndexPixel + (index % 16), HeightIndexPixel + width * (index / 16));
+				setPixel(Data[(index * 4)], Data[(index * 4) + 1], Data[(index * 4) + 2], Data[(index * 4) + 3], WidthIndexPixel + (index % 16), HeightIndexPixel + width_ * (index / 16));
 			}
-			Count++;
-		}
-		else if (Format == GL_RED) {
+			count_++;
+			break;
+		case GL_RED:
 			for (int index = 0; index < 16 * 16; index++) {
-				setPixel(Data[index], Data[index], Data[index], 255, WidthIndexPixel + (index % 16), HeightIndexPixel + width * (index / 16));
+				setPixel(Data[index], Data[index], Data[index], 255, WidthIndexPixel + (index % 16), HeightIndexPixel + width_ * (index / 16));
 			}
-			Count++;
-		}
-		else {
+			count_++;
+			break;
+		default:
 			Logger.LogError("Texture Atlas Stitcher", "Invalid image format!");
+			break;
 		}
 	}
 
-	bool _AddTextureToAtlas(RawTextureData* Data, bool& transparency, bool& isSeeThrough) {
+	bool _AddTextureToAtlas(RawTextureData* Data, bool& transparency, bool& is_see_through_) {
 
-		Format = GL_RGBA;
+		format_ = GL_RGBA;
 		if (!Data->data) {
 			Logger.LogError("Texture Atlas", "No texture");
 			return false;
@@ -109,42 +112,42 @@ public:
 		int ImgsX = Data->width / 16;
 		int ImgsY = Data->height / 16;
 
-		int ColorSize = 3;
+		int colorSize = 3;
 
 		if (Data->format == GL_RGBA) {
-			ColorSize = 4;
+			colorSize = 4;
 		}
 		if (Data->format ==  GL_RG) {
-			ColorSize = 2;
+			colorSize = 2;
 		}
 		else if (Data->format == GL_RED) {
-			ColorSize = 1;
+			colorSize = 1;
 		}
 
-		int CWidth = 16 * ColorSize;
+		int cWidth = 16 * colorSize;
 
 		for (int x = 0; x < ImgsX; x++) {
 			for (int y = 0; y < ImgsY; y++) {
-				int gx = x * 16 * ColorSize;
-				int gy = y * 16 * Data->width * ColorSize;
+				int gx = x * 16 * colorSize;
+				int gy = y * 16 * Data->width * colorSize;
 
-				std::vector<uint8_t> buffer(16 * 16 * ColorSize);
+				std::vector<uint8_t> buffer(16 * 16 * colorSize);
 
 				for (int h = 0; h < 16; h++) {
-					memcpy(buffer.data() + (h * CWidth), Data->data + (h * Data->width * ColorSize + gx + gy), CWidth);
+					memcpy(buffer.data() + (h * cWidth), Data->data + (h * Data->width * colorSize + gx + gy), cWidth);
 				}
 
-				AddData(buffer, Data->format, transparency, isSeeThrough);
+				AddData(buffer, Data->format, transparency, is_see_through_);
 			}
 		}
 
 		return true;
 	}
 
-	std::optional<RawTextureData> AddTextureToAtlas(std::string file, bool& transparency, bool& isSeeThrough) {
+	std::optional<RawTextureData> AddTextureToAtlas(std::string file, bool& transparency, bool& is_see_through_) {
 		std::optional<RawTextureData> data;
 		RawTextureData tex = GetImageData(file.c_str());
-		if (_AddTextureToAtlas(&tex, transparency, isSeeThrough)) {
+		if (_AddTextureToAtlas(&tex, transparency, is_see_through_)) {
 			Logger.LogInfo("Texture Atlas", "Loaded: " + file + " | Size: " + std::to_string(tex.height) + ", " + std::to_string(tex.width));
 			data = tex;
 			return data;
@@ -153,13 +156,13 @@ public:
 		return data;
 	}
 
-	int GetBlockCount() {
-		return Count;
+	size_t GetBlockCount() {
+		return count_;
 	}
 
-	std::vector<unsigned char> TextureAtlasData;
-	const int colorSpace = 4;
-	bool isTransparent = false;
-	int Count = 0;
+	std::vector<uint8_t> texture_atlas_data_;
+	const int color_space_ = 4;
+	bool is_transparent_ = false;
+	size_t count_ = 0;
 
 };

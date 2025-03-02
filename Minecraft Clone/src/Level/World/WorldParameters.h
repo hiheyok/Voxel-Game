@@ -1,11 +1,11 @@
 #pragma once
 
 struct WorldParameters {
-	int HorizontalTickingDistance = 16;
-	int VerticalTickingDistance = 8;
+	int horizontal_ticking_distance_ = 16;
+	int vertical_ticking_distance_ = 8;
 
-	int SpawnChunkHorizontalRadius = 10;
-	int SpawnChunkVerticalRadius = 10;
+	int spawn_chunk_horizontal_radius_ = 10;
+	int spawn_chunk_vertical_radius_ = 10;
 
-	double Gravity = 10.f;
+	double gravity_ = 10.f;
 };

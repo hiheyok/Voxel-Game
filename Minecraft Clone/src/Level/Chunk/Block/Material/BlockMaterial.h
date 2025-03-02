@@ -6,7 +6,7 @@ enum MaterialType {
 };
 
 struct Material {
-	MaterialType type = MATERIAL_NONE;
+	MaterialType type_ = MATERIAL_NONE;
 
 	virtual ~Material() {
 
@@ -19,19 +19,19 @@ struct Material {
 
 struct MaterialNone : Material {
 	MaterialNone() {
-		type = MATERIAL_NONE;
+		type_ = MATERIAL_NONE;
 	}
 
 	Block* BuildNewBlockType() override;
 };
 
 struct MaterialFluid : Material {
-	int Spread = 1;
+	int spread_ = 1;
 
-	MaterialFluid(int SpreadRate) { //Spreadrate in ticks
-		type = MATERIAL_FLUID;
+	MaterialFluid(int spreadRate) { //Spreadrate in ticks
+		type_ = MATERIAL_FLUID;
 
-		Spread = SpreadRate;
+		spread_ = spreadRate;
 	}
 
 	Block* BuildNewBlockType() override;
@@ -39,20 +39,20 @@ struct MaterialFluid : Material {
 
 struct MaterialDirt : Material {
 	MaterialDirt() {
-		type = MATERIAL_DIRT;
+		type_ = MATERIAL_DIRT;
 	}
 
 	Block* BuildNewBlockType() override;
 };
 
 struct MaterialGrass : Material {
-	double SpreadChance = 0.001;
-	double BreakChance = 0.001;
+	double spread_chance_ = 0.001;
+	double break_chance_ = 0.001;
 
-	MaterialGrass(double _SpreadChance, double _BreakChance) {
-		type = MATERIAL_GRASS;
-		SpreadChance = _SpreadChance;
-		BreakChance = _BreakChance;
+	MaterialGrass(double spreadChance, double breakChance) {
+		type_ = MATERIAL_GRASS;
+		spread_chance_ = spreadChance;
+		break_chance_ = breakChance;
 	}
 
 	Block* BuildNewBlockType() override;
@@ -60,7 +60,7 @@ struct MaterialGrass : Material {
 
 struct MaterialGravity : Material {
 	MaterialGravity() {
-		type = MATERIAL_GRAVITY;
+		type_ = MATERIAL_GRAVITY;
 	}
 
 	Block* BuildNewBlockType() override;

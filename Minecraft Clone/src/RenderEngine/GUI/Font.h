@@ -29,51 +29,51 @@ const float CharWidth[256]{
 class RenderableFont {
 private:
 
-	std::string RenderText = "";
-	float fontSize = 0.0625f;
-	float spacing = 0.125f;
+	std::string render_text_ = "";
+	float font_size_ = 0.0625f;
+	float spacing_ = 0.125f;
 
 	glm::vec4 GetCharUV(char c);
-	glm::vec3 color = glm::vec3(1.f, 1.f, 1.f);
-	glm::vec2 Position = glm::vec2(-1.f,-1.f);
-	glm::vec3 backgroundColor = glm::vec3(1.f,1.f,1.f);
-	float backgroundAlpha = 1.f;
-	float textLength = 0.f;
-	float backgroundHeightPadding = 0.f;
-	float backgroundWidthPadding = 0.f;
+	glm::vec3 color_ = glm::vec3(1.f, 1.f, 1.f);
+	glm::vec2 position_ = glm::vec2(-1.f,-1.f);
+	glm::vec3 background_color_ = glm::vec3(1.f,1.f,1.f);
+	float background_alpha_ = 1.f;
+	float text_length_ = 0.f;
+	float background_height_padding_ = 0.f;
+	float background_width_padding_ = 0.f;
 
 	std::vector<float> GetCharactorVertex(char c, float xOffset, float yOffset, float xOrigin, float yOrigin);
 	float GetCharWidth(char c);
 public:
-	bool Background = false;
+	bool background_ = false;
 
 	void setBackgroundPadding(float H, float W) {
-		backgroundHeightPadding = H;
-		backgroundWidthPadding = W;
+		background_height_padding_ = H;
+		background_width_padding_ = W;
 	}
 
 	void SetText(std::string str) {
-		RenderText = str;
+		render_text_ = str;
 	}
 
 	void AddBackground(glm::vec3 color, float alpha) { //add background
-		Background = true;
-		backgroundColor = color;
-		backgroundAlpha = alpha;
+		background_ = true;
+		background_color_ = color;
+		background_alpha_ = alpha;
 	}
 
 	void FontSize(float size) {
-		fontSize = size;
+		font_size_ = size;
 	}
 
 	void SetColor(glm::vec3 clr) {
-		color = clr;
+		color_ = clr;
 	}
 
 	void SetPosition(glm::vec2 pos) {
-		Position = pos;
+		position_ = pos;
 	}
 
-	std::vector<float> getVertices(); //-1 - 1 coords
-	std::vector<float> getBackgroundVertices();
+	std::vector<float> GetVertices(); //-1 - 1 coords
+	std::vector<float> GetBackgroundVertices();
 };

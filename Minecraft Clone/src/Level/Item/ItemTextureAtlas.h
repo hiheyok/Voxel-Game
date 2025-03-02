@@ -10,23 +10,23 @@
 #include <glm/vec2.hpp>
 
 struct ItemUVMapping {
-	glm::vec2 UV_1;
-	glm::vec2 UV_2;
+	glm::vec2 uv_1_;
+	glm::vec2 uv_2_;
 };
 
 class ItemTextureAtlas {
-	Texture2D IndividualItem;
+	Texture2D individual_item_;
 
-	VertexArray VAO;
-	Buffer EBO;
-	Buffer VBO;
+	VertexArray vao_;
+	Buffer ebo_;
+	Buffer vbo_;
 
-	BlockItemRender BlockItemRenderer;
-	Shader StitchingShader;
-	int IndividualSize = 0;
-	int AtlasSize = 0;
-	TexturedFrameBuffer AtlasFramebuffer;
-	TexturedFrameBuffer FramebufferSingleBlockRender;
+	BlockItemRender block_item_renderer_;
+	Shader stitching_shader_;
+	int individual_size_ = 0;
+	int atlas_size_ = 0;
+	TexturedFrameBuffer atlas_framebuffer_;
+	TexturedFrameBuffer framebuffer_single_block_render_;
 
 	void RenderBlockItem(Item item);
 
@@ -34,15 +34,15 @@ class ItemTextureAtlas {
 
 	
 public:
-	FastHashMap<int, ItemUVMapping> ItemsUVMap;
+	FastHashMap<int, ItemUVMapping> items_uv_map_;
 	
-	Texture2D Atlas;
+	Texture2D atlas_;
 
-	FastHashMap<int, int> Offsets;
+	FastHashMap<int, int> offsets_;
 	
-	void Initialize(int AtlasItemSize, int IndividualItemSize);
+	void Initialize(int atlasItemSize, int individualItemSize);
 
 	void AddItem(Item item);
 };
 
-extern ItemTextureAtlas ItemAtlas;
+extern ItemTextureAtlas g_item_atlas;

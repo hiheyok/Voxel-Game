@@ -12,15 +12,14 @@
 class WorldInteractions {
 private:
 	World* world = nullptr;
-	std::mutex lock;
-	std::mutex UpdatedChunkLock;
-	FastHashSet<ChunkPos> UpdatedChunk;
-	FastHashSet<ChunkPos> RequestedLightUpdate;
+	std::mutex updated_chunk_lock_;
+	FastHashSet<ChunkPos> updated_chunk_;
+	FastHashSet<ChunkPos> requested_light_update_;
 public:
-	std::vector<ChunkPos> LightUpdateRequest;
-	WorldLoader* worldLoader = nullptr;
-	WorldParameters settings;
-	WorldCollusionDetector Collusions;
+	std::vector<ChunkPos> light_update_request_;
+	WorldLoader* worldLoader_ = nullptr;
+	WorldParameters settings_;
+	WorldCollusionDetector collusions_;
 
 	WorldInteractions() {
 
@@ -36,37 +35,37 @@ public:
 
 	void summonEntity(Entity& entity);
 
-	std::vector<ChunkPos> getUpdatedChunkPos();
+	std::vector<ChunkPos> GetUpdatedChunkPos();
 
-	std::vector<ChunkPos> getRequestedLightUpdates();
+	std::vector<ChunkPos> GetRequestedLightUpdates();
 
-	std::vector<EntityProperty> getUpdatedEntities();
+	std::vector<EntityProperty> getUpdatedEntities(); // TODO: Rename
 
-	std::vector<EntityUUID> getRemovedEntities();
+	std::vector<EntityUUID> getRemovedEntities(); // TODO: Rename
 
-	void requestLightUpdate(const ChunkPos& pos);
+	void RequestLightUpdate(const ChunkPos& pos);
 
-	void killEntity(EntityUUID id);
+	void KillEntity(EntityUUID id);
 
-	void update();
+	void Update();
 
-	void updateLighting(ChunkLightingContainer* ChunkLighting);
+	void UpdateLighting(std::shared_ptr<ChunkLightingContainer> chunkLighting);
 
-	void updateLighting(std::vector<ChunkLightingContainer*> ChunkLighting);
+	void UpdateLighting(std::vector<std::shared_ptr<ChunkLightingContainer>> chunkLighting);
 
-	void addChunk(Chunk* chunk);
+	void AddChunk(Chunk* chunk);
 
-	void addChunks(std::vector<Chunk*> chunks);
+	void AddChunks(std::vector<Chunk*> chunks);
 
-	Chunk* getChunk(const ChunkPos& pos) const;
+	Chunk* GetChunk(const ChunkPos& pos) const;
 
-	void setBlock(BlockID b, const BlockPos& pos);
+	void SetBlock(BlockID b, const BlockPos& pos);
 
-	BlockID getBlock(const BlockPos& pos);
+	BlockID GetBlock(const BlockPos& pos);
 
-	Entity* getEntity(EntityUUID id);
+	Entity* GetEntity(EntityUUID id);
 
-	void addEntity(Entity& entity);
+	void AddEntity(Entity& entity);
 
-	void addEntity(Entity* entity);
+	void AddEntity(Entity* entity);
 };

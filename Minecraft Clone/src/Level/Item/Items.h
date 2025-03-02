@@ -8,12 +8,12 @@ private:
 
 	Item RegisterBlockItem(BlockID block);
 
-	int ItemCount = 0;
+	int item_count_ = 0;
 	
-	FastHashMap<BlockID, ItemID> BlockItemIDs;
+	FastHashMap<BlockID, ItemID> block_item_ids_;
 
 public:
-	FastHashMap<ItemID, Item> ItemContainer;
+	FastHashMap<ItemID, Item> item_container_;
 
 	Item AIR = RegisterBlockItem(Blocks.AIR);
 	Item STONE = RegisterBlockItem(Blocks.STONE);
@@ -354,7 +354,7 @@ public:
 
 	int GetTotalItemCount();
 
-	void REGISTER_ALL();
+	void RegisterAll();
 };
 
-extern ItemList Items;
+extern ItemList g_items;

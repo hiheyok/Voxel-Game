@@ -6,10 +6,6 @@
 class PlayerInventory : public Inventory {
 public:
 	PlayerInventory() {
-		Inventory(Items.GetTotalItemCount()); 
+		Inventory(g_items.GetTotalItemCount()); 
 	}
-
-
-
-private:
 };

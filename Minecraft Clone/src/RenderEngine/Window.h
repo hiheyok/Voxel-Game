@@ -14,7 +14,7 @@ struct WindowProperties {
 	int WindowSizeY = 720;
 
 	bool WindowSizeDirty = false;
-	bool Initialized = false;
+	bool initialized_ = false;
 
 	bool DrawSolid = true;
 
@@ -49,7 +49,7 @@ protected:
 	WindowProperties Properties;
 
 private:
-	static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam);
+	static void APIENTRY glDebugOutput(GLenum source, GLenum type_, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam);
 
 	
 	GLFWwindow* window = nullptr;

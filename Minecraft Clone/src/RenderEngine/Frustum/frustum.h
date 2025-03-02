@@ -20,5 +20,5 @@ public:
 private:
 
 	// This holds the A B C and D values for each side of our frustum.
-	float m_Frustum[6][4];
+	float frustum_[6][4];
 };

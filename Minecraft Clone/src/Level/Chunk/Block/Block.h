@@ -8,53 +8,48 @@
 struct BlockType {
 
 	BlockType(bool transparent, bool solid, bool fluid) {
-		transparency = transparent;
-		isSolid = solid;
-		isFluid = fluid;
+		transparency_ = transparent;
+		is_solid_ = solid;
+		is_fluid_ = fluid;
 	}
 
 	BlockType() {
 
 	}
 
-	bool isFluid = NULL;
-	bool transparency = NULL;
-	bool isSolid = NULL;
+	bool is_fluid_ = NULL;
+	bool transparency_ = NULL;
+	bool is_solid_ = NULL;
 };
 
 struct Block {
-
 	virtual ~Block() {
 		Clean();
 	}
 
 	void Clean() {
-		if (Properties != nullptr) {
-			delete Properties;
+		if (properties_ != nullptr) {
+			delete properties_;
 		}
-		if (Texture != nullptr) {
-			delete Texture;
+		if (texture_ != nullptr) {
+			delete texture_;
 		}
 	}
 
-	virtual void tick(const BlockPos& pos) {
+	virtual void Tick(const BlockPos& pos) {
 
 	}
 
-	static void* DimensionPTR;
-	static void* serverPTR;
+	static void* dimension_ptr_;
+	static void* server_ptr_;
 
-	BlockID ID = NULL;
+	BlockID id_ = NULL;
+	BlockType* properties_ = nullptr;
+	BlockTexture* texture_ = nullptr;
 
-	BlockType* Properties = nullptr;
-
-	BlockTexture* Texture = nullptr;
-
-	ModelV2::BlockModelV2* BlockModelData = NULL;
-	
-
-	std::string BlockName = "";
+	ModelV2::BlockModelV2* block_model_data_ = NULL;
+	std::string block_name_ = "";
 };
 
-__declspec(selectany) void* Block::DimensionPTR = nullptr;
-__declspec(selectany) void* Block::serverPTR = nullptr;
+__declspec(selectany) void* Block::dimension_ptr_ = nullptr;
+__declspec(selectany) void* Block::server_ptr_ = nullptr;

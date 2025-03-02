@@ -7,79 +7,79 @@
 
 class BlockTexture {
 public:
-    void SetFaceFront(int TexID) {
-        TextureIndex[FRONT] = TexID;
+    void SetFaceFront(int texId) {
+        texture_index_[FRONT] = texId;
     }
-    void SetFaceBack(int TexID) {
-        TextureIndex[BACK] = TexID;
+    void SetFaceBack(int texId) {
+        texture_index_[BACK] = texId;
     }
-    void SetFaceWest(int TexID) {
-        TextureIndex[RIGHT] = TexID;
+    void SetFaceWest(int texId) {
+        texture_index_[RIGHT] = texId;
     }
-    void SetFaceEast(int TexID) {
-        TextureIndex[LEFT] = TexID;
+    void SetFaceEast(int texId) {
+        texture_index_[LEFT] = texId;
     }
-    void SetFaceTop(int TexID) {
-        TextureIndex[TOP] = TexID;
+    void SetFaceTop(int texId) {
+        texture_index_[TOP] = texId;
     }
-    void SetFaceBottom(int TexID) {
-        TextureIndex[BOTTOM] = TexID;
+    void SetFaceBottom(int texId) {
+        texture_index_[BOTTOM] = texId;
     }
-    void SetFacesCustom(int TexID, int TexNum, int side0 = 0xFF, int side1 = 0xFF, int side2 = 0xFF, int side3 = 0xFF, int side4 = 0xFF, int side5 = 0xFF) {
+    void SetFacesCustom(int texId, int TexNum, int side0 = 0xFF, int side1 = 0xFF, int side2 = 0xFF, int side3 = 0xFF, int side4 = 0xFF, int side5 = 0xFF) {
 
         if (side0 != 0xFF) {
-            TextureIndex[side0] = TexID;
-            TextureNumIndex[side0] = TexNum;
+            texture_index_[side0] = texId;
+            texture_num_index_[side0] = TexNum;
         }
 
         if (side1 != 0xFF) {
-            TextureIndex[side1] = TexID;
-            TextureNumIndex[side1] = TexNum;
+            texture_index_[side1] = texId;
+            texture_num_index_[side1] = TexNum;
         }
 
         if (side2 != 0xFF) {
-            TextureIndex[side2] = TexID;
-            TextureNumIndex[side2] = TexNum;
+            texture_index_[side2] = texId;
+            texture_num_index_[side2] = TexNum;
         }
 
         if (side3 != 0xFF) {
-            TextureIndex[side3] = TexID;
-            TextureNumIndex[side3] = TexNum;
+            texture_index_[side3] = texId;
+            texture_num_index_[side3] = TexNum;
         }
 
         if (side4 != 0xFF) {
-            TextureIndex[side4] = TexID;
-            TextureNumIndex[side4] = TexNum;
+            texture_index_[side4] = texId;
+            texture_num_index_[side4] = TexNum;
         }
 
         if (side5 != 0xFF) {
-            TextureIndex[side5] = TexID;
-            TextureNumIndex[side5] = TexNum;
+            texture_index_[side5] = texId;
+            texture_num_index_[side5] = TexNum;
         }
     }
 
     void SetParticle(int tex) {
-        Particle = tex;
+        particle_ = tex;
     }
 
     int GetParticle() {
-        return Particle;
+        return particle_;
     }
 
     int GetFace(int side) {
-        return TextureIndex[side];
+        return texture_index_[side];
     }
 
     int& operator[](int i){
-        return TextureIndex[i];
+        return texture_index_[i];
     }
 
     int GetNumTextures(int side) {
-        return TextureNumIndex[side];
+        return texture_num_index_[side];
     }
 
 private:
-    int TextureIndex[6]{ NULL };
-    int TextureNumIndex[6]{ NULL };
-    int Particle = NULL;
+    int texture_index_[6]{ NULL };
+    int texture_num_index_[6]{ NULL };
+    int particle_ = NULL;
 };

@@ -53,7 +53,8 @@ namespace Event {
 
 		Event() {};
 
-		template <typename EventType> Event(const EventType& newEvent) {
+		template <typename EventType> 
+		Event(const EventType& newEvent) {
 			if constexpr (std::is_same_v<EventType, EntityEvent>) {
 				type_ = ENTITY_EVENT;
 			}
@@ -68,10 +69,6 @@ namespace Event {
 			}
 
 			event_data_ = newEvent;
-		}
-
-		~Event() {
-			// Manually destroy the union's active member
 		}
 
 		std::variant<BlockEvent, ChunkEvent, EntityEvent, std::monostate> event_data_;

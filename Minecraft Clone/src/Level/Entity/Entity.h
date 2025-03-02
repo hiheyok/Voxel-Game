@@ -7,10 +7,10 @@ extern int AmountEntityDestroy;
 
 struct Entity  {
 	
-	EntityProperty Properties; //Provide properties such as position, acceleration, etc.
+	EntityProperty properties_; //Provide properties such as position, acceleration, etc.
 
-	bool isDirty = true;
-	int dimensionID = NULL; //provide dimension location
+	bool is_dirty_ = true;
+	int dimension_id_ = NULL; //provide dimension location
 
 	void Tick();
 };

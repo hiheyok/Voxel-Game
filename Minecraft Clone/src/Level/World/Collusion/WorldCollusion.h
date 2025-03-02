@@ -6,11 +6,11 @@
 
 class WorldCollusionDetector {
 private:
-	WorldAccess* world;
+	WorldAccess* world_;
 
 public:
 	void Initialize(WorldAccess* w) {
-		world = w;
+		world_ = w;
 	}
 
 	bool CheckRayIntersection(Ray& ray);

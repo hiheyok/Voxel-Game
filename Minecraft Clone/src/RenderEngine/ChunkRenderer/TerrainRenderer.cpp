@@ -23,17 +23,15 @@ void TerrainRenderer::Initialize(GLFWwindow* window_, Camera* camera_) {
 
 	CreateNewSolidBatch();
 	CreateNewTransparentBatch();
-
-	mGarbageCollectorThread = std::thread(&TerrainRenderer::GarbageCollectorThread, this);
 }
 
 void TerrainRenderer::PrepareRenderer() {
-	for (ChunkDrawBatch& DrawBatch : ChunkSolidBatches) {
-		DrawBatch.GenDrawCommands(m_HorizontalRenderDistance, m_VerticalRenderDistance);
+	for (ChunkDrawBatch& DrawBatch : chunk_solid_batches_) {
+		DrawBatch.GenDrawCommands(horizontal_render_distance_, vertical_render_distance_);
 	}
 
-	for (ChunkDrawBatch& DrawBatch : ChunkTransparentBatches) {
-		DrawBatch.GenDrawCommands(m_HorizontalRenderDistance, m_VerticalRenderDistance);
+	for (ChunkDrawBatch& DrawBatch : chunk_transparent_batches_) {
+		DrawBatch.GenDrawCommands(horizontal_render_distance_, vertical_render_distance_);
 	}
 }
 
@@ -65,7 +63,7 @@ void TerrainRenderer::Render() {
 
 	SetupCallSolid();
 
-	for (ChunkDrawBatch& DrawBatch : ChunkSolidBatches) {
+	for (ChunkDrawBatch& DrawBatch : chunk_solid_batches_) {
 		DrawBatch.Bind();
 		CubicShader.use();
 		DrawBatch.Draw();
@@ -74,7 +72,7 @@ void TerrainRenderer::Render() {
 
 	SetupCallTransparent();
 
-	for (ChunkDrawBatch& DrawBatch : ChunkTransparentBatches) {
+	for (ChunkDrawBatch& DrawBatch : chunk_transparent_batches_) {
 		DrawBatch.Bind();
 		CubicShader.use();
 		DrawBatch.Draw();
@@ -87,11 +85,11 @@ void TerrainRenderer::Render() {
 }
 
 void TerrainRenderer::Defrag(int iterations) {
-	for (auto& DrawBatch : ChunkSolidBatches) {
+	for (auto& DrawBatch : chunk_solid_batches_) {
 		DrawBatch.Defrager(iterations);
 	}
 
-	for (auto& DrawBatch : ChunkSolidBatches) {
+	for (auto& DrawBatch : chunk_solid_batches_) {
 		DrawBatch.Defrager(iterations);
 	}
 }
@@ -103,13 +101,13 @@ void TerrainRenderer::Update() {
 	glfwGetWindowSize(window, &width, &height);
 	glm::mat4 model = glm::mat4(1.f);
 
-	camera->screenRes = glm::vec2(width, height);
+	camera->screen_res_ = glm::vec2(width, height);
 
 	glm::mat4 view = camera->GetViewMatrix();
 
 	int x = width;
 	int y = height;
-	glm::mat4 projection = glm::perspective(glm::radians(camera->FOV), (float)x / (float)y, 0.1f, 1000000.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(camera->fov_), (float)x / (float)y, 0.1f, 1000000.0f);
 	CubicShader.use();
 
 	float clrMultiplier = 1.4f;
@@ -117,9 +115,9 @@ void TerrainRenderer::Update() {
 	CubicShader.setMat4("view", view);
 	CubicShader.setMat4("model", model);
 	CubicShader.setMat4("projection", projection);
-	CubicShader.setFloat("RenderDistance", (float)(m_HorizontalRenderDistance * 16));
-	CubicShader.setFloat("VerticalRenderDistance", (float)(m_VerticalRenderDistance * 16));
-	CubicShader.setVec3("camPos", camera->Position);
+	CubicShader.setFloat("RenderDistance", (float)(horizontal_render_distance_ * 16));
+	CubicShader.setFloat("VerticalRenderDistance", (float)(vertical_render_distance_ * 16));
+	CubicShader.setVec3("camPos", camera->position_);
 	CubicShader.setVec3("tintColor",  glm::vec3(0.40828402 * clrMultiplier, 0.5917159 * clrMultiplier, 0.2781065 * clrMultiplier));
 	CubicShader.setInt("TextureAimIndex", TextureAminationIndex);
 
@@ -135,93 +133,77 @@ void TerrainRenderer::Update() {
 
 }
 
-void TerrainRenderer::setSettings(uint32_t RenderDistance, uint32_t VerticalRenderDistance, float FOV) {
-	m_HorizontalRenderDistance = RenderDistance;
-	m_VerticalRenderDistance = VerticalRenderDistance;
-	m_FOV = FOV;
+void TerrainRenderer::setSettings(uint32_t renderDistance, uint32_t verticalRenderDistance, float fov) {
+	horizontal_render_distance_ = renderDistance;
+	vertical_render_distance_ = verticalRenderDistance;
+	fov_ = fov;
 }
 
 void TerrainRenderer::LoadAssets() {
-	CubicShader.bindTexture2D(0, Blocks.BlockTextureAtlas.get(), "BlockTexture");
+	CubicShader.bindTexture2D(0, Blocks.block_texture_atlas_.get(), "BlockTexture");
 }
 
-void TerrainRenderer::GarbageCollectorThread() {
-	while (!stop) {
-		std::vector<void*> ptrQueue(mGarbagePointers.begin(), mGarbagePointers.end());
-		mGarbagePointers.clear();
-
-		for (void* p : ptrQueue) {
-			delete p;
-		}
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-	}
-}
-
-void TerrainRenderer::AddChunk(const ChunkPos& pos, std::vector<uint32_t> data, std::vector<ChunkDrawBatch>* BatchType, FastHashMap<ChunkPos, int>* LookUpMap) {
-	if (LookUpMap->count(pos)) {
-		size_t BatchIndex = LookUpMap->at(pos);
-		BatchType->at(BatchIndex).DeleteChunkVertices(pos);
-		LookUpMap->erase(pos);
+void TerrainRenderer::AddChunk(const ChunkPos& pos, const std::vector<uint32_t>& data, std::vector<ChunkDrawBatch>& batchType, FastHashMap<ChunkPos, int>& lookUpMap) {
+	if (lookUpMap.count(pos)) {
+		size_t BatchIndex = lookUpMap[pos];
+		batchType[BatchIndex].DeleteChunkVertices(pos);
+		lookUpMap.erase(pos);
 	}
 
 	if (data.size() == 0)
 		return;
 
-	bool Success = false;
+	bool success = false;
 
-	for (int batchIndex = 0; batchIndex < BatchType->size(); batchIndex++) {
-		size_t MeshDataSize = data.size() * sizeof(uint32_t);
+	for (int batchIndex = 0; batchIndex < batchType.size(); batchIndex++) {
+		size_t meshDataSize = data.size() * sizeof(uint32_t);
 
-		if (BatchType->at(batchIndex).MemoryPool.MemoryPool.FindFreeSpace(MeshDataSize) == ULLONG_MAX)
+		if (batchType[batchIndex].memory_pool_.memory_pool_.FindFreeSpace(meshDataSize) == ULLONG_MAX)
 			continue;
 
-		bool InsertSuccess = BatchType->at(batchIndex).AddChunkVertices(data, pos);
+		bool InsertSuccess = batchType[batchIndex].AddChunkVertices(data, pos);
 
 		if (!InsertSuccess) continue;
 
-		LookUpMap->emplace(std::pair<ChunkPos, int>(pos, batchIndex));
-		Success = true;
+		lookUpMap.emplace(pos, batchIndex);
+		success = true;
 		break;
-		
 	}
 
-	if (!Success) {
+	if (!success) {
 		Logger.LogInfo("Terrain Renderer", "Unable to add chunk. Solid buffers are full!");
 	}
 }
 
-void TerrainRenderer::AddChunk(MeshingV2::ChunkVertexData* MeshData) {
-	AddChunk(MeshData->position_, MeshData->solidVertices, &ChunkSolidBatches, &ChunkBatchSolidLookup);
-	AddChunk(MeshData->position_, MeshData->transparentVertices, &ChunkTransparentBatches, &ChunkBatchTransparentLookup);
-	mGarbagePointers.push_back((void*)MeshData);
+void TerrainRenderer::AddChunk(std::unique_ptr<MeshingV2::ChunkVertexData> MeshData) {
+	AddChunk(MeshData->position_, MeshData->solidVertices, chunk_solid_batches_, chunk_batch_solid_lookup_);
+	AddChunk(MeshData->position_, MeshData->transparentVertices, chunk_transparent_batches_, chunk_batch_transparent_lookup_);
 }
 
 
 double TerrainRenderer::getDebugTime() {
 	double t = 0.0;
 
-	for (int batchIndex = 0; batchIndex < ChunkSolidBatches.size(); batchIndex++) {
+	for (int batchIndex = 0; batchIndex < chunk_solid_batches_.size(); batchIndex++) {
 
-		t += ChunkSolidBatches[batchIndex].debugTime;
+		t += chunk_solid_batches_[batchIndex].debug_time_;
 	}
 
 	return t;
 }
 
 double TerrainRenderer::getFragmentationRate() {
-	int n = ChunkSolidBatches.size();
+	int n = chunk_solid_batches_.size();
 
 	double fragRate = 0;
 
 	for (int batchIndex = 0; batchIndex < n; batchIndex++) {
 
-		auto& batch = ChunkSolidBatches[batchIndex];
+		auto& batch = chunk_solid_batches_[batchIndex];
 
-		if (batch.RenderList.size() != 0) {
+		if (batch.render_list_.size() != 0) {
 
-			fragRate += (batch.MemoryPool.Statistics.FragmentationRate / (double)n);
+			fragRate += (batch.memory_pool_.statistics_.fragmentation_rate_ / (double)n);
 		}
 
 
@@ -233,35 +215,34 @@ double TerrainRenderer::getFragmentationRate() {
 size_t TerrainRenderer::getVRAMUsageFull() {
 	size_t memUsage = 0;
 
-	for (int batchIndex = 0; batchIndex < ChunkSolidBatches.size(); batchIndex++) {
+	for (int batchIndex = 0; batchIndex < chunk_solid_batches_.size(); batchIndex++) {
 
-		if (ChunkSolidBatches[batchIndex].RenderList.size() == 0) {
+		if (chunk_solid_batches_[batchIndex].render_list_.size() == 0) {
 			continue;
 		}
 
-		memUsage += ChunkSolidBatches[batchIndex].MemoryPool.Statistics.FullMemoryUsage;
+		memUsage += chunk_solid_batches_[batchIndex].memory_pool_.statistics_.full_memory_usage_;
 	}
 
 	return memUsage;
 }
 
 void TerrainRenderer::Cleanup() {
-	for (ChunkDrawBatch& batch : ChunkSolidBatches) {
+	for (ChunkDrawBatch& batch : chunk_solid_batches_) {
 		batch.Cleanup();
 	}
 
-	for (ChunkDrawBatch& batch : ChunkTransparentBatches) {
+	for (ChunkDrawBatch& batch : chunk_transparent_batches_) {
 		batch.Cleanup();
 	}
 
-	ChunkSolidBatches.clear();
-	ChunkBatchSolidLookup.clear();
+	chunk_solid_batches_.clear();
+	chunk_batch_solid_lookup_.clear();
 
-	ChunkTransparentBatches.clear();
-	ChunkBatchTransparentLookup.clear();
+	chunk_transparent_batches_.clear();
+	chunk_batch_transparent_lookup_.clear();
 
 	stop = true;
-	mGarbageCollectorThread.join();
 }
 
 void TerrainRenderer::SetupShaders() {
@@ -269,17 +250,17 @@ void TerrainRenderer::SetupShaders() {
 }
 
 void TerrainRenderer::CreateNewSolidBatch() {
-	ChunkSolidBatches.emplace_back();
-	size_t i = ChunkSolidBatches.size() - 1;
-	ChunkSolidBatches[i].SetMaxSize(AppOptions.SolidBufferSize);
-	ChunkSolidBatches[i].SetupBuffers();
-	ChunkSolidBatches[i].camera = camera;
+	chunk_solid_batches_.emplace_back();
+	size_t i = chunk_solid_batches_.size() - 1;
+	chunk_solid_batches_[i].SetMaxSize(AppOptions.SolidBufferSize);
+	chunk_solid_batches_[i].SetupBuffers();
+	chunk_solid_batches_[i].camera = camera;
 }
 
 void TerrainRenderer::CreateNewTransparentBatch() {
-	ChunkTransparentBatches.emplace_back();
-	size_t i = ChunkTransparentBatches.size() - 1;
-	ChunkTransparentBatches[i].SetMaxSize(AppOptions.TransparentBufferSize);
-	ChunkTransparentBatches[i].SetupBuffers();
-	ChunkTransparentBatches[i].camera = camera;
+	chunk_transparent_batches_.emplace_back();
+	size_t i = chunk_transparent_batches_.size() - 1;
+	chunk_transparent_batches_[i].SetMaxSize(AppOptions.TransparentBufferSize);
+	chunk_transparent_batches_[i].SetupBuffers();
+	chunk_transparent_batches_[i].camera = camera;
 }

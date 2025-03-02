@@ -5,13 +5,13 @@
 
 class WorldLoader {
 private:
-	WorldParameters settings;
+	WorldParameters settings_;
 	World* world = nullptr;
-	std::mutex lock;
-	bool isSpawnChunksLoaded = false;
+	std::mutex lock_;
+	bool is_spawn_chunks_loaded_ = false;
 
-	FastHashSet<EntityUUID> EntityChunkLoaders; //List of entities that force loads chunks 
-	FastHashSet<ChunkPos> GeneratingChunk;
+	FastHashSet<EntityUUID> entity_chunk_loaders_; //List of entities that force loads chunks 
+	FastHashSet<ChunkPos> generating_chunk_;
 
 	void loadSpawnChunks();
 
@@ -26,27 +26,26 @@ private:
 	void loadSummonEntitySurrounding(EntityUUID uuid);
 
 public:
-	bool tallGeneration = false;
+	bool tall_generation_ = false;
 
-	std::vector<ChunkPos> ChunkRequest;
+	std::vector<ChunkPos> chunk_request_;
 
-	WorldLoader(World* w, WorldParameters p) : settings(p), world(w) {
-	}
+	WorldLoader(World* w, WorldParameters p) : settings_(p), world(w) {}
 
-	WorldAccess* getWorld();
+	WorldAccess* GetWorld();
 
-	void replaceLightInfomation(ChunkLightingContainer* lighting);
+	void ReplaceLightInfomation(std::shared_ptr<ChunkLightingContainer> lighting);
 
-	std::vector<ChunkPos> getRequestedChunks();
+	std::vector<ChunkPos> GetRequestedChunks();
 
-	void addEntityChunkLoader(EntityUUID uuid);
+	void AddEntityChunkLoader(EntityUUID uuid);
 
-	void deleteEntityChunkLoader(EntityUUID uuid);
+	void DeleteEntityChunkLoader(EntityUUID uuid);
 
-	bool checkEntityExistChunkLoader(EntityUUID uuid);
+	bool CheckEntityExistChunkLoader(EntityUUID uuid);
 
-	void load();
+	void Load();
 
-	void addChunk(Chunk* chunk);
+	void AddChunk(Chunk* chunk);
 
 };

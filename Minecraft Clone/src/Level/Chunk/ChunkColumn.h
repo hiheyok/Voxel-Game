@@ -9,39 +9,36 @@
 // TODO: Rework this refactor ChunkColumnPos system
 class ChunkColumn { //Helps with stuff like lighting
 private:
-	std::vector<Chunk*> Column;
-	std::vector<ChunkLightingContainer*> LightColumn;
-	Heightmap ColumnHeightmap;
+	std::vector<Chunk*> column_;
+	std::vector<std::shared_ptr<ChunkLightingContainer>> light_column_;
+	Heightmap column_heightmap_;
 	// glm::ivec2 Position;
 public:
-	std::vector<bool> LightDirty;
+	std::vector<bool> light_dirty_;
 
-	Heightmap& getHeightmap() {
-		return ColumnHeightmap;
+	Heightmap& GetHeightmap() {
+		return column_heightmap_;
 	}
 
-	void replaceLightContainer(int y, ChunkLightingContainer* c) {
-		if (LightColumn[y] == nullptr) {
-			Logger.LogError("Chunk", "Unable to update lighting!");
-			delete c;
+	void ReplaceLightContainer(int y, std::shared_ptr<ChunkLightingContainer> c) {
+		if (light_column_[y] == nullptr) {
+			light_column_[y] = std::move(c);
 			return;
 		}
 
-		ChunkLightingContainer* l = LightColumn[y];
-		l->ReplaceData(c->getData());
-		delete c;
+		light_column_[y]->ReplaceData(c->getData());
 	}
 
 	ChunkColumn() {
-		Column.resize(32, nullptr);
-		LightColumn.resize(32, nullptr);
-		LightDirty.resize(32, false);
-		ColumnHeightmap.init();
+		column_.resize(32, nullptr);
+		light_column_.resize(32, nullptr);
+		light_dirty_.resize(32, false);
+		column_heightmap_.Init();
 	}
 
 	void AddChunk(Chunk* chunk, int RelativeHeightLevel) {
-		Column[RelativeHeightLevel] = chunk;
-		LightColumn[RelativeHeightLevel] = &chunk->Lighting;
+		column_[RelativeHeightLevel] = chunk;
+		light_column_[RelativeHeightLevel] = chunk->lighting_;
 		UpdateHeightmap(RelativeHeightLevel);
 	}
 
@@ -50,12 +47,12 @@ public:
 	}
 
 	Chunk* GetChunk(int HeightLevel) const {
-		return Column[HeightLevel];
+		return column_[HeightLevel];
 	}
 
-	inline int16_t findSurfaceHeight(uint8_t x, uint8_t z, uint8_t StartingChunk = 31) const {
+	inline int16_t FindSurfaceHeight(uint8_t x, uint8_t z, uint8_t StartingChunk = 31) const {
 		for (int currChunk = StartingChunk;  currChunk >= 0; --currChunk) {
-			Chunk* curr = Column[currChunk];
+			Chunk* curr = column_[currChunk];
 			
 			if (curr == nullptr) continue;
 
@@ -72,8 +69,8 @@ public:
 	Input is the y axis where the chunk is located at and the x and z block position relative to the chunk
 	*/
 
-	inline int16_t findSurfaceHeightSingleChunk(uint8_t p_height, uint8_t x, uint8_t z) const {
-		Chunk* currChunk = Column[p_height];
+	inline int16_t FindSurfaceHeightSingleChunk(uint8_t p_height, uint8_t x, uint8_t z) const {
+		Chunk* currChunk = column_[p_height];
 		if (currChunk == nullptr) return -1;
 		for (int y = 15; y >= 0; y--) {
 			if (currChunk->GetBlockUnsafe(x, y, z) != Blocks.AIR) return y;
@@ -82,12 +79,12 @@ public:
 	}
 
 	inline void UpdateHeightmapSingleBlock(int p_height,BlockID p_block, uint8_t x, uint8_t y, uint8_t z) {
-		int currHeight = ColumnHeightmap.get(z, y);
+		int currHeight = column_heightmap_.Get(z, y);
 
 		//tmp
 		for (int i = 0; i <= p_height; i++) {
-			if (Column[i] != nullptr) {
-				LightDirty[i] = true;
+			if (column_[i] != nullptr) {
+				light_dirty_[i] = true;
 			}
 		}
 
@@ -97,29 +94,29 @@ public:
 		
 		if (p_block == Blocks.AIR) {
 			if (currHeight == p_height) {
-				int16_t surfaceLevel = findSurfaceHeight(x, z, p_height);
+				int16_t surfaceLevel = FindSurfaceHeight(x, z, p_height);
 				if (surfaceLevel == -1) {
 					surfaceLevel = 0;
 				}
-				ColumnHeightmap.edit(x, z, surfaceLevel);
+				column_heightmap_.Edit(x, z, surfaceLevel);
 			}
 		} else {
-			ColumnHeightmap.edit(x, z, p_height * 16 + y);
+			column_heightmap_.Edit(x, z, p_height * 16 + y);
 		}
 	}
 
-	void UpdateHeightmap(uint16_t Height) {
+	void UpdateHeightmap(uint16_t height) {
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
-				int16_t surfaceLevel = findSurfaceHeight(x, z, static_cast<uint8_t>(Height));
+				int16_t surfaceLevel = FindSurfaceHeight(x, z, static_cast<uint8_t>(height));
 				surfaceLevel = (surfaceLevel != -1) * surfaceLevel;
-				ColumnHeightmap.edit(x, z, surfaceLevel);
+				column_heightmap_.Edit(x, z, surfaceLevel);
 			}
 		}
 
-		for (int i = 0; i <= Height; i++) {
-			if (Column[i] != nullptr) {
-				LightDirty[i] = true;
+		for (int i = 0; i <= height; i++) {
+			if (column_[i] != nullptr) {
+				light_dirty_[i] = true;
 			}
 		} 
 //		printf("Avg Clock: %f\n", (double)ClockCount / EventCount);

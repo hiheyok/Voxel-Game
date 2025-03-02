@@ -5,11 +5,11 @@
 #include <string>
 
 struct ItemProperties {
-	int MAX_STACK = 64;
-	bool IsBlockItem = false;
-	BlockID block = NULL;
-	ItemID ID = NULL;
-	std::string Name = "";
+	int max_stack_ = 64;
+	bool is_block_item_ = false;
+	BlockID block_ = NULL;
+	ItemID id_ = NULL;
+	std::string name_ = "";
 };
 
 class Item {
@@ -24,7 +24,7 @@ public:
 
 	bool CheckIsBlockItem();
 
-	ItemProperties Properties;
+	ItemProperties properties_;
 	
 private:
 

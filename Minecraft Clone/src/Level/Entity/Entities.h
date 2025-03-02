@@ -11,11 +11,11 @@ enum EntityTypeEnums {
 
 class EntitiesList {
 private:
-	int EntityTypeCount = 0;
+	int entity_type_count_ = 0;
 
 	FastHashMap<std::string, EntityTypeID> EntityNameID;
 public:
-	std::vector<EntityType*> EntityTypeList;
+	std::vector<EntityType*> entity_type_list_;
 
 	EntityTypeID HUMAN = RegisterEntity("human", ENTITY_PASSIVE);
 	EntityTypeID PLAYER = RegisterEntity("player", ENTITY_PASSIVE);
@@ -28,7 +28,7 @@ public:
 
 	void InitializeModels();
 
-	EntityTypeID RegisterEntity(std::string EntityName, EntityTypeEnums type);
+	EntityTypeID RegisterEntity(std::string entityName, EntityTypeEnums type_);
 
 	void Initialize();
 
@@ -36,6 +36,6 @@ public:
 
 };
 
-extern EntitiesList EntityList;
+extern EntitiesList g_entity_list;
 
 

@@ -9,15 +9,15 @@ public:
 	}
 
 	ItemStack(Item item) {
-		m_item = item;
-		Initialized = true;
+		item_ = item;
+		initialized_ = true;
 	}
 
 	bool IsInitialized();
 
-	Item m_item;
-	int ItemCount = 1;
+	Item item_;
+	int item_count_ = 1;
 private:
-	bool Initialized = false;
+	bool initialized_ = false;
 
 };

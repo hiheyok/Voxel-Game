@@ -11,46 +11,46 @@
 class MultiEntityRenderer {
 private:
 
-	std::vector<float> EntityVertices;
-	std::vector<int> EntityIndices;
+	std::vector<float> entity_vertices_;
+	std::vector<int> entity_indices_;
 
-	FastHashMap<EntityTypeID, EntityModel> EntityCachedModels;
+	FastHashMap<EntityTypeID, EntityModel> entity_cached_models_;
 
-	FastHashMap<EntityTypeID, size_t> EntityElementIndex;
-	FastHashMap<EntityTypeID, size_t> EntityElementSize;
+	FastHashMap<EntityTypeID, size_t> entity_element_index_;
+	FastHashMap<EntityTypeID, size_t> entity_element_size_;
 
-	EntityRenderCache RenderableEntities;
+	EntityRenderCache renderable_entities_;
 
-	Shader shader;
+	Shader shader_;
 
-	PlayerPOV player;
-	Camera* camera;
-	GLFWwindow* window;
+	PlayerPOV player_;
+	Camera* camera_;
+	GLFWwindow* window_;
 
-	Buffer VBO;
-	Buffer EBO;
-	Buffer SSBO_Pos, SSBO_Vel, SSBO_Acc;
-	VertexArray VAO;
+	Buffer vbo_;
+	Buffer ebo_;
+	Buffer ssbo_pos_, ssbo_vel_, ssbo_acc_;
+	VertexArray vao_;
 
-	std::vector<float> PositionArr;
-	std::vector<float> VelocityArr;
-	std::vector<float> AccelerationArr;
+	std::vector<float> position_arr_;
+	std::vector<float> velocity_arr_;
+	std::vector<float> acceleration_arr_;
 
-	PerformanceProfiler* mProfiler;
+	PerformanceProfiler* profiler_;
 
-	bool isDirty = true;
+	bool is_dirty_ = true;
 
-	int NumEntityRendered = 0;
+	int num_entity_rendered_ = 0;
 
-	double TimePastTick = 0.0;
+	double time_past_tick_ = 0.0;
 public:
 
-	int VerticalRenderDistance = 16;
-	int HorizontalRenderDistance = 16;
+	int vertical_render_distance_ = 16;
+	int horizontal_render_distance_ = 16;
 
-	void clean();
+	void Clean();
 
-	int getNumEntityRendered();
+	int GetNumEntityRendered();
 
 	void AddEntity(EntityProperty& entity);
 
@@ -64,7 +64,7 @@ public:
 
 	void Render();
 
-	void SetRotation(glm::dvec2 rotation);
+	void SetRotation(glm::dvec2 rotation_);
 
 	void SetPosition(glm::dvec3 position);
 
@@ -73,8 +73,4 @@ public:
 	void Update();
 
 	void Reload();
-
-
-
-
 };

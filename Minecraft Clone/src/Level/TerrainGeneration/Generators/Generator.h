@@ -10,7 +10,7 @@ public:
 	}
 
 	static void SetSeed(long long worldSeedIn) {
-		WorldGenerator::worldSeed = worldSeedIn;
+		WorldGenerator::world_seed_ = worldSeedIn;
 	}
 
 	virtual Chunk* Generate(const ChunkPos& pos) {
@@ -21,9 +21,9 @@ public:
 		return nullptr;
 	}
 
-	bool useTallChunks = false;
+	bool use_tall_chunks_ = false;
 
-	static long long worldSeed;
+	static long long world_seed_;
 };
 
-_declspec(selectany) long long WorldGenerator::worldSeed = -1587754402;
+_declspec(selectany) long long WorldGenerator::world_seed_ = -1587754402;

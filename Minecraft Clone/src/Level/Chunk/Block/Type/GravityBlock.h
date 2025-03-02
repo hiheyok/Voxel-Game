@@ -6,12 +6,12 @@ class Block;
 
 struct GravityBlock : Block {
 
-	void tick(const BlockPos& pos) override {
-		Dimension* CurrentWorld = static_cast<Dimension*>(Block::DimensionPTR);
+	void Tick(const BlockPos& pos) override {
+		Dimension* currentWorld = static_cast<Dimension*>(Block::dimension_ptr_);
 
 		BlockPos belowPos = pos;
 		belowPos.y -= 1;
-		bool isBlockSupported = Blocks.getBlockType(CurrentWorld->worldInteractions.getBlock(belowPos))->Properties->isSolid;
+		bool isBlockSupported = Blocks.GetBlockType(currentWorld->world_interactions_.GetBlock(belowPos))->properties_->is_solid_;
 
 		if (!isBlockSupported) {
 			Event::BlockEvent destroyBlock{pos, Blocks.AIR, EventHandler.BlockPlace};
@@ -19,10 +19,10 @@ struct GravityBlock : Block {
 
 			summonSand.id_ = EventHandler.SummonEntity;
 			summonSand.pos_ = pos;
-			summonSand.entity_type_ = EntityList.SAND_GRAVITY_BLOCK;
+			summonSand.entity_type_ = g_entity_list.SAND_GRAVITY_BLOCK;
 
-			CurrentWorld->EventManager.AddEvent(destroyBlock);
-			CurrentWorld->EventManager.AddEvent(summonSand);
+			currentWorld->event_manager_.AddEvent(destroyBlock);
+			currentWorld->event_manager_.AddEvent(summonSand);
 		}
 	}
 };

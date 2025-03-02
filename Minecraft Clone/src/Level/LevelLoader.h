@@ -5,21 +5,21 @@
 //Checks if the chunk is stored on disk, if not, asks the world generator to generate the chunks
 class LevelLoader { //need to add save to disk later
 private:
-	size_t count = 0;
-	ChunkGeneration worldGenerator; //Change this 
-	LightingEngine lightEngine;
+	size_t count = 0; // TODO: Rename
+	ChunkGeneration world_generator_; //Change this 
+	LightingEngine light_engine_;
 public:
-	void Start(int worldGenThreadCount, int lightEngineThreadCount, WorldAccess* world, long long worldGenSeedIn);
+	void Start(int worldGenThreadCount, int light_engine_thread_count_, WorldAccess* world, long long worldGenSeedIn);
 
 	void Stop();
 
-	int getChunkCount();
+	int getChunkCount(); // TODO: Rename
 
-	void sendRequestedChunks(std::vector<ChunkPos> RequestedChunks, WorldGeneratorID worldGenTypeIn);
+	void SendRequestedChunks(std::vector<ChunkPos> requestedChunks, WorldGeneratorID worldGenTypeIn);
 
-	std::vector<Chunk*> getGeneratedChunk();
+	std::vector<Chunk*> GetGeneratedChunk();
 
-	void sendRequestedLightUpdates(std::vector<ChunkColumnPos> RequestedLight);
+	void SendRequestedLightUpdates(std::vector<ChunkColumnPos> requestedLight);
 
-	std::vector<ChunkLightingContainer*> getLightingInfomation();
+	std::vector<std::shared_ptr<ChunkLightingContainer>> GetLightingInfomation();
 };

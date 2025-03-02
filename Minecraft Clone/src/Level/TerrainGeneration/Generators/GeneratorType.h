@@ -8,7 +8,7 @@ typedef uint64_t WorldGeneratorID;
 class GeneratorType {
 private:
 
-	std::vector<WorldGenerator*> GeneratorList = {};
+	std::vector<WorldGenerator*> generator_list_ = {};
 
 	WorldGeneratorID RegisterWorldGenerator(WorldGenerator* Gen);
 
@@ -25,4 +25,4 @@ public:
 	WorldGenerator* GetGenerator(WorldGeneratorID ID);
 };
 
-extern GeneratorType Generators;
+extern GeneratorType g_generators;

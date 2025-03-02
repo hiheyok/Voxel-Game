@@ -4,30 +4,30 @@
 
 using namespace glm;
 
-float WorldCollusionDetector::GetDistanceUntilCollusionSingleDirection(vec3 Origin, int direction, int distanceTest) {
+float WorldCollusionDetector::GetDistanceUntilCollusionSingleDirection(vec3 origin_, int direction, int distanceTest) {
 	float displacement = 0;
 
-	ivec3 FlooredPos(floor(Origin.x), floor(Origin.y), floor(Origin.z));
-	int Move = 0;
+	ivec3 flooredPos(floor(origin_.x), floor(origin_.y), floor(origin_.z));
+	int move = 0;
 
-	int axis = direction >> 1;
+	int axis_ = direction >> 1;
 
 	if (direction & 0b1) {
-		displacement = Origin[axis] - (float)FlooredPos[axis];
-		Move = -1;
+		displacement = origin_[axis_] - (float)flooredPos[axis_];
+		move = -1;
 	}
 	else {
-		displacement = 1 - (Origin[axis] - (float)FlooredPos[axis]);
-		Move = 1;
+		displacement = 1 - (origin_[axis_] - (float)flooredPos[axis_]);
+		move = 1;
 	}
 
 	for (int i = 0; i < distanceTest; i++) {
 
-		FlooredPos[axis] += Move * (int)(i != 0);
+		flooredPos[axis_] += move * (int)(i != 0);
 
-		BlockID b = world->getBlock(BlockPos{ FlooredPos.x, FlooredPos.y, FlooredPos.z });
+		BlockID b = world_->GetBlock(BlockPos{ flooredPos.x, flooredPos.y, flooredPos.z });
 
-		if (Blocks.getBlockType(b)->Properties->isSolid) {
+		if (Blocks.GetBlockType(b)->properties_->is_solid_) {
 			return (float)i + displacement - 1.f;
 		}
 	}
@@ -36,133 +36,132 @@ float WorldCollusionDetector::GetDistanceUntilCollusionSingleDirection(vec3 Orig
 }
 
 dvec3 WorldCollusionDetector::GetTimeTillCollusion(Entity* entity) {
-	AABB Hitbox = EntityList.GetEntity(entity->Properties.Type)->GetHitbox();
+	AABB hitbox = g_entity_list.GetEntity(entity->properties_.type_)->GetHitbox();
 
-	vec3 HitboxStart = entity->Properties.Position - (Hitbox.size / 2.f);
-	vec3 HitboxEnd = entity->Properties.Position + (Hitbox.size / 2.f);
+	vec3 hitboxStart = entity->properties_.position_ - (hitbox.size_ / 2.f);
+	vec3 hitboxEnd = entity->properties_.position_ + (hitbox.size_ / 2.f);
 
-	int ix = (int)floor(Hitbox.size.x) + 1;
-	int iy = (int)floor(Hitbox.size.y) + 1;
-	int iz = (int)floor(Hitbox.size.z) + 1;
+	int ix = (int)floor(hitbox.size_.x) + 1;
+	int iy = (int)floor(hitbox.size_.y) + 1;
+	int iz = (int)floor(hitbox.size_.z) + 1;
 
 	ivec3 i_bound = ivec3(ix, iy, iz);
 
-	vec3 leasttime(-1.f, -1.f, -1.f);
+	vec3 leastTime(-1.f, -1.f, -1.f);
 
-	int SearchDistance = 5;
+	int searchDistance = 5;
 
+	float leastDistance = (float)searchDistance;
 
-	float LeastDistance = (float)SearchDistance;
-
-	for (int axis = 0; axis < 3; axis++) {
+	for (int axis_ = 0; axis_ < 3; axis_++) {
 
 		//0 = x; 1 = y; 2 = z
 
-		int u_axis = (axis + 1) % 3;
-		int v_axis = (axis + 2) % 3;
+		int u_axis = (axis_ + 1) % 3;
+		int v_axis = (axis_ + 2) % 3;
 
 		for (int u = 0; u <= i_bound[u_axis]; u++) {
 			for (int v = 0; v <= i_bound[v_axis]; v++) {
 				ivec3 offset(0, 0, 0);
 
-				offset[axis] = i_bound[axis] * (entity->Properties.Velocity[axis] >= 0);
+				offset[axis_] = i_bound[axis_] * (entity->properties_.velocity_[axis_] >= 0);
 				offset[u_axis] = u;
 				offset[v_axis] = v;
 
-				vec3 origin = HitboxStart + (vec3)offset;
+				vec3 origin_ = hitboxStart + (vec3)offset;
 
-				if (origin.x > HitboxEnd.x)
-					origin.x = HitboxEnd.x;
-				if (origin.y > HitboxEnd.y)
-					origin.y = HitboxEnd.y;
-				if (origin.z > HitboxEnd.z)
-					origin.z = HitboxEnd.z;
+				if (origin_.x > hitboxEnd.x)
+					origin_.x = hitboxEnd.x;
+				if (origin_.y > hitboxEnd.y)
+					origin_.y = hitboxEnd.y;
+				if (origin_.z > hitboxEnd.z)
+					origin_.z = hitboxEnd.z;
 
 				bool IsPointOnHitboxSurface =
-					(origin.x == HitboxStart.x) ||
-					(origin.x == HitboxEnd.x) ||
-					(origin.y == HitboxStart.y) ||
-					(origin.y == HitboxEnd.y) ||
-					(origin.z == HitboxStart.z) ||
-					(origin.z == HitboxEnd.z);
+					(origin_.x == hitboxStart.x) ||
+					(origin_.x == hitboxEnd.x) ||
+					(origin_.y == hitboxStart.y) ||
+					(origin_.y == hitboxEnd.y) ||
+					(origin_.z == hitboxStart.z) ||
+					(origin_.z == hitboxEnd.z);
 
 				if (!IsPointOnHitboxSurface) //Checks if the origin is on the surface to optimize stuff
 					continue;
 
-				if (entity->Properties.Velocity[axis] == 0.f) //First checks if the velocity isn't 0 because if it is 0, it's not moving in that axis so it's not going to collide in that direction
+				if (entity->properties_.velocity_[axis_] == 0.f) //First checks if the velocity isn't 0 because if it is 0, it's not moving in that axis so it's not going to collide in that direction
 					continue;
 
-				int direction = axis * 2 + (entity->Properties.Velocity[axis] < 0); // The "+1" indicates that the direction is negative 
+				int direction = axis_ * 2 + (entity->properties_.velocity_[axis_] < 0); // The "+1" indicates that the direction is negative 
 
-				float distance = GetDistanceUntilCollusionSingleDirection(origin, direction, (int)floor(LeastDistance) + 2);
+				float distance = GetDistanceUntilCollusionSingleDirection(origin_, direction, (int)floor(leastDistance) + 2);
 
-				if ((distance < LeastDistance) && (distance != -1.f))
-					LeastDistance = distance;
+				if ((distance < leastDistance) && (distance != -1.f))
+					leastDistance = distance;
 
 				if (distance == -1.f) // -1.f means that it cannot find any blocks that could collide in that range (5)
 					continue;
 
-				float time = abs(distance / entity->Properties.Velocity[axis]);// This gets the time it takes for the entity to travel that distance
+				float time = abs(distance / entity->properties_.velocity_[axis_]);// This gets the time it takes for the entity to travel that distance
 
-				if (time < leasttime[axis]) {
-					leasttime[axis] = time;
+				if (time < leastTime[axis_]) {
+					leastTime[axis_] = time;
 					continue;
 				}
 
-				if (leasttime[axis] == -1.f) //leasttime[axis] == -1.f means that a "time" value haven't been inputted yet
-					leasttime[axis] = time;
+				if (leastTime[axis_] == -1.f) //leasttime[axis] == -1.f means that a "time" value haven't been inputted yet
+					leastTime[axis_] = time;
 			}
 		}
 	}
 
-	return leasttime;
+	return leastTime;
 }
 
 bool WorldCollusionDetector::CheckRayIntersection(Ray& ray) {
 
 	//Direction with magnitude
-	vec3 Delta = ray.Direction;
+	vec3 delta = ray.Direction;
 
 	//Direction to Step
-	ivec3 Direction = Sign(Delta);
+	ivec3 direction = Sign(delta);
 
 	//Location in grid
 	ivec3 blockPos = ivec3(floor(ray.Origin.x), floor(ray.Origin.y), floor(ray.Origin.z));
 
 	//To keep track of point location
-	vec3 EndPoint = ray.Origin;
+	vec3 endPoint = ray.Origin;
 
-	vec3 DeltaDist(
-		abs(1 / Delta[0]), abs(1 / Delta[1]), abs(1 / Delta[2])
+	vec3 deltaDist(
+		abs(1 / delta[0]), abs(1 / delta[1]), abs(1 / delta[2])
 	);
 
 	//Stepping Variable
 	vec3 sideDist(
-		((float)Direction[0] * ((float)blockPos[0] - EndPoint[0]) + ((float)Direction[0] * 0.5f) + 0.5f) * DeltaDist[0],
-		((float)Direction[1] * ((float)blockPos[1] - EndPoint[1]) + ((float)Direction[1] * 0.5f) + 0.5f) * DeltaDist[1],
-		((float)Direction[2] * ((float)blockPos[2] - EndPoint[2]) + ((float)Direction[2] * 0.5f) + 0.5f) * DeltaDist[2]
+		((float)direction[0] * ((float)blockPos[0] - endPoint[0]) + ((float)direction[0] * 0.5f) + 0.5f) * deltaDist[0],
+		((float)direction[1] * ((float)blockPos[1] - endPoint[1]) + ((float)direction[1] * 0.5f) + 0.5f) * deltaDist[1],
+		((float)direction[2] * ((float)blockPos[2] - endPoint[2]) + ((float)direction[2] * 0.5f) + 0.5f) * deltaDist[2]
 	);
 
 	//Max Iterations
-	const uint32_t max_iterations = 50;
+	const uint32_t maxIterations = 50;
 	uint32_t iterations = 0;
 
 	bvec3 mask(false, false, false);
 
-	while (iterations < max_iterations) {
+	while (iterations < maxIterations) {
 		iterations++;
 		
-		BlockID b = world->getBlock(BlockPos{ blockPos.x, blockPos.y, blockPos.z });
+		BlockID b = world_->GetBlock(BlockPos{ blockPos.x, blockPos.y, blockPos.z });
 
-		if (Blocks.getBlockType(b)->Properties->isSolid) {
+		if (Blocks.GetBlockType(b)->properties_->is_solid_) {
 
 			ray.EndPoint = (vec3)blockPos;
 
 			ray.Length = sqrtf(powf(ray.EndPoint.x - ray.Origin.x, 2) + powf(ray.EndPoint.y - ray.Origin.y, 2) + powf(ray.EndPoint.z - ray.Origin.z, 2));
 
-			for (int axis = 0; axis < 3; axis++) {
-				if (mask[axis]) {
-					ray.bouncesurface = Delta[axis] < 0 ? axis * 2 + 1 : axis * 2; //Set the surface it bounces off. + 1 means that the surface is behind, bottom, etc
+			for (int axis_ = 0; axis_ < 3; axis_++) {
+				if (mask[axis_]) {
+					ray.bouncesurface = delta[axis_] < 0 ? axis_ * 2 + 1 : axis_ * 2; //Set the surface it bounces off. + 1 means that the surface is behind, bottom, etc
 					return true;
 				}
 			}
@@ -176,56 +175,56 @@ bool WorldCollusionDetector::CheckRayIntersection(Ray& ray) {
 		mask[1] = l1[1] && l2[1];
 		mask[2] = l1[2] && l2[2];
 
-		sideDist[0] += (float)mask[0] * DeltaDist[0];
-		sideDist[1] += (float)mask[1] * DeltaDist[1];
-		sideDist[2] += (float)mask[2] * DeltaDist[2];
+		sideDist[0] += (float)mask[0] * deltaDist[0];
+		sideDist[1] += (float)mask[1] * deltaDist[1];
+		sideDist[2] += (float)mask[2] * deltaDist[2];
 
-		blockPos[0] += ((int)mask[0]) * Direction[0];
-		blockPos[1] += ((int)mask[1]) * Direction[1];
-		blockPos[2] += ((int)mask[2]) * Direction[2];
+		blockPos[0] += ((int)mask[0]) * direction[0];
+		blockPos[1] += ((int)mask[1]) * direction[1];
+		blockPos[2] += ((int)mask[2]) * direction[2];
 	}
 
 	return false;
 }
 
 bool WorldCollusionDetector::isEntityOnGround(Entity* entity) {
-	AABB Hitbox = EntityList.GetEntity(entity->Properties.Type)->GetHitbox();
+	AABB hitbox = g_entity_list.GetEntity(entity->properties_.type_)->GetHitbox();
 
-	vec3 HitboxStart = entity->Properties.Position - (Hitbox.size / 2.f);
-	vec3 HitboxEnd = entity->Properties.Position + (Hitbox.size / 2.f);
+	vec3 hitboxStart = entity->properties_.position_ - (hitbox.size_ / 2.f);
+	vec3 hitboxEnd = entity->properties_.position_ + (hitbox.size_ / 2.f);
 
-	int ix = (int)floor(Hitbox.size.x) + 1;
-	int iz = (int)floor(Hitbox.size.z) + 1;
+	int ix = (int)floor(hitbox.size_.x) + 1;
+	int iz = (int)floor(hitbox.size_.z) + 1;
 
-	int SearchDistance = 5;
+	int searchDistance = 5;
 
-	float LeastLength = (float)SearchDistance;
+	float leastLength = (float)searchDistance;
 
-	float OnGroundError = 0.001f;
+	float onGroundError = 0.001f;
 
-	if (entity->Properties.Velocity.y > 0.f) {
+	if (entity->properties_.velocity_.y > 0.f) {
 		return false;
 	}
 
 	for (int x = 0; x <= ix; x++) {
 		for (int z = 0; z <= iz; z++) {
-			vec3 origin = HitboxStart + vec3(x, 0, z);
+			vec3 origin_ = hitboxStart + vec3(x, 0, z);
 
-			if (origin.x > HitboxEnd.x)
-				origin.x = HitboxEnd.x;
-			if (origin.z > HitboxEnd.z)
-				origin.z = HitboxEnd.z;
+			if (origin_.x > hitboxEnd.x)
+				origin_.x = hitboxEnd.x;
+			if (origin_.z > hitboxEnd.z)
+				origin_.z = hitboxEnd.z;
 
-			float Distance = 0.f;
+			float distance = 0.f;
 
 			//Set the distance to check to the previose least length from collusion to optimize searching
-			Distance = GetDistanceUntilCollusionSingleDirection(origin, NY, (int)floor(LeastLength) + 2);
+			distance = GetDistanceUntilCollusionSingleDirection(origin_, NY, (int)floor(leastLength) + 2);
 
-			if (Distance < LeastLength) {
-				LeastLength = Distance;
+			if (distance < leastLength) {
+				leastLength = distance;
 			}
 
-			if ((Distance != -1) && (Distance < OnGroundError)) {
+			if ((distance != -1) && (distance < onGroundError)) {
 				return true;
 			}
 

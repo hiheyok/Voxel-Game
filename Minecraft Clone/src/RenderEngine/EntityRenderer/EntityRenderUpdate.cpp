@@ -3,23 +3,23 @@
 #include "../../Level/Dimension/Dimension.h"
 
 void EntityRendererUpdater::SetEntityRenderer(MultiEntityRenderer* render, Timer* time) {
-	renderer = render;
-	ServerTime = time;
+	renderer_ = render;
+	server_time_ = time;
 }
 
 void EntityRendererUpdater::UpdaterThread() {
 	while (!stop) {
-		Dimension* world = static_cast<Dimension*>(Block::DimensionPTR);
+		Dimension* world = static_cast<Dimension*>(Block::dimension_ptr_);
 
-		std::vector<EntityProperty> UpdatedEntities = world->worldInteractions.getUpdatedEntities();
-		std::vector<EntityUUID> RemovedEntities = world->worldInteractions.getRemovedEntities();
+		std::vector<EntityProperty> UpdatedEntities = world->world_interactions_.getUpdatedEntities();
+		std::vector<EntityUUID> RemovedEntities = world->world_interactions_.getRemovedEntities();
 
 		for (auto& entity : UpdatedEntities) {
-			renderer->AddEntity(entity);
+			renderer_->AddEntity(entity);
 
 		}
 		for (auto& entity : RemovedEntities) {
-			renderer->RemoveEntity(entity);
+			renderer_->RemoveEntity(entity);
 		}
 		
 		
@@ -29,11 +29,11 @@ void EntityRendererUpdater::UpdaterThread() {
 
 void EntityRendererUpdater::Start() {
 	stop = false;
-	UpdateThread = std::thread(&EntityRendererUpdater::UpdaterThread, this);
+	update_thread_ = std::thread(&EntityRendererUpdater::UpdaterThread, this);
 }
 
 void EntityRendererUpdater::Stop() {
 	stop = true;
-	UpdateThread.join();
+	update_thread_.join();
 }
 

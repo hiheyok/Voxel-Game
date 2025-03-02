@@ -14,26 +14,26 @@ void Client::Initialize() {
 	Start();
 
 	Blocks.Initialize();
-	EntityList.Initialize();
+	g_entity_list.Initialize();
 	EntityRender.Initialize(&profiler);
 	EntityRender.SetWindow(getWindow());
 	TextRender.InitializeTextRenderer(getWindow());
-	Items.REGISTER_ALL();
-	ItemAtlas.Initialize(512*16 * 2, 16*2*8);
+	g_items.RegisterAll();
+	g_item_atlas.Initialize(512*16 * 2, 16*2*8);
 
-	for (auto& item : Items.ItemContainer) {
-		ItemAtlas.AddItem(item.second);
+	for (auto& item : g_items.item_container_) {
+		g_item_atlas.AddItem(item.second);
 	}
 
 	Framebuffer.genBuffer(Properties.WindowSizeX, Properties.WindowSizeY, (float)AppOptions.GraphicsScale, GL_RGB);
 
 	DisableCursor();
 
-	server.startInternalServer(&m_MainPlayer.m_Player);
+	server.startInternalServer(&main_player_.m_Player);
 
-	m_MainPlayer.Initialize(getWindow(), &server);
-	m_MainPlayer.SetPlayerPosition(0., 50, 0.);
-	m_MainPlayer.SetPlayerRotation(-135.f, -30.);
+	main_player_.Initialize(getWindow(), &server);
+	main_player_.SetPlayerPosition(0., 50, 0.);
+	main_player_.SetPlayerRotation(-135.f, -30.);
 
 	EntityUpdater.SetEntityRenderer(&EntityRender, server.getTickClock());
 
@@ -53,7 +53,7 @@ void Client::run() {
 }
 
 void Client::Cleanup() {
-	EntityRender.clean();
+	EntityRender.Clean();
 	TerrainRender.Stop();
 	server.Stop();
 	Logger.Stop();
@@ -64,10 +64,10 @@ void Client::Cleanup() {
 }
 
 void Client::SetDebugScreen() {
-	debugScreen.EditText("Stat1", "VRAM Usage: " + to_string((double)TerrainRender.RendererV2.getVRAMUsageFull() / 1000000.0) + " MB");
-	debugScreen.EditText("Stat2", "XYZ: " + to_string(m_MainPlayer.GetEntityProperties().Position.x) + "/" + to_string(m_MainPlayer.GetEntityProperties().Position.y) + "/" + std::to_string(m_MainPlayer.GetEntityProperties().Position.z));
-	debugScreen.EditText("Stat3", "Velocity XYZ: " + to_string(m_MainPlayer.GetEntityProperties().Velocity.x) + "/" + to_string(m_MainPlayer.GetEntityProperties().Velocity.y) + "/" + std::to_string(m_MainPlayer.GetEntityProperties().Velocity.z));
-	debugScreen.EditText("Stat4", "VRAM Fragmentation Rate: " + to_string(TerrainRender.RendererV2.getFragmentationRate() * 100) + "%");
+	debugScreen.EditText("Stat1", "VRAM Usage: " + to_string((double)TerrainRender.renderer_v2_.getVRAMUsageFull() / 1000000.0) + " MB");
+	debugScreen.EditText("Stat2", "XYZ: " + to_string(main_player_.GetEntityProperties().position_.x) + "/" + to_string(main_player_.GetEntityProperties().position_.y) + "/" + std::to_string(main_player_.GetEntityProperties().position_.z));
+	debugScreen.EditText("Stat3", "Velocity XYZ: " + to_string(main_player_.GetEntityProperties().velocity_.x) + "/" + to_string(main_player_.GetEntityProperties().velocity_.y) + "/" + std::to_string(main_player_.GetEntityProperties().velocity_.z));
+	debugScreen.EditText("Stat4", "VRAM Fragmentation Rate: " + to_string(TerrainRender.renderer_v2_.getFragmentationRate() * 100) + "%");
 	debugScreen.EditText("Stat5", "FPS: " + to_string(1.0 / Frametime));
 	debugScreen.EditText("Stat6", "Mesh Stats (ms) Total/S0/S1/S2: " + to_string(TerrainRender.buildTime / 1000.f) + "/" + to_string(TerrainRender.buildstage0 / 1000.f) + "/" + std::to_string(TerrainRender.buildstage1 / 1000.f) + "/" + std::to_string(TerrainRender.buildstage2 / 1000.f));
 	debugScreen.EditText("Stat7", "Entity Count: N/A");
@@ -99,7 +99,7 @@ void Client::Render() {
 
 	Framebuffer.render();
 
-	m_MainPlayer.RenderGUIs();
+	main_player_.RenderGUIs();
 	debugScreen.Render();
 }
 
@@ -160,13 +160,13 @@ void Client::Update() {
 		Framebuffer.genBuffer(Properties.WindowSizeX, Properties.WindowSizeY, (float)AppOptions.GraphicsScale);
 	}
 
-	m_MainPlayer.Update(Inputs);
+	main_player_.Update(Inputs);
 
-	TerrainRender.SetPosition(m_MainPlayer.GetEntityProperties().Position);
-	TerrainRender.SetRotation(m_MainPlayer.GetEntityProperties().Rotation);
+	TerrainRender.SetPosition(main_player_.GetEntityProperties().position_);
+	TerrainRender.SetRotation(main_player_.GetEntityProperties().rotation_);
 
-	EntityRender.SetPosition(m_MainPlayer.GetEntityProperties().Position);
-	EntityRender.SetRotation(m_MainPlayer.GetEntityProperties().Rotation);
+	EntityRender.SetPosition(main_player_.GetEntityProperties().position_);
+	EntityRender.SetRotation(main_player_.GetEntityProperties().rotation_);
 
 	EntityRender.SetTimePastTick(server.getTickClock()->GetTimePassed_s());
 	EntityRender.Update();

@@ -20,10 +20,12 @@ private:
 
 	EventID RegisterEntityEvent(void (*func)(Event::EntityEvent));
 
-	FastHashMap<EventID, void (*)(BlockID, const BlockPos&)> BlockEventHandles;
-	FastHashMap<EventID, void (*)(Event::EntityEvent)> EntityEventHandles;
+	FastHashMap<EventID, void (*)(BlockID, const BlockPos&)> block_event_handles_;
+	FastHashMap<EventID, void (*)(Event::EntityEvent)> entity_event_handles_;
 
 public:
+
+	// TODO: Naming scheme exception?
 	EventID BlockPlace = RegisterBlockEvent(HandlePlaceBlock);
 	EventID BlockTick = RegisterBlockEvent(HandleBlockTick);
 

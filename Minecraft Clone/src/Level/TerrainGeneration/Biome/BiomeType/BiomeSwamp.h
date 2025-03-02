@@ -9,7 +9,7 @@ public:
 		return typeid(*this);
 	}
 
-    void genTerrainBlocks(JavaRandom& rand, TallChunk* chunk, int x, int z, double noiseVal, ChunkGeneratorSettings* settings) override
+    void GenTerrainBlocks(JavaRandom& rand, TallChunk* chunk, int x, int z, double noiseVal, ChunkGeneratorSettings* settings_) override
     {
         double d0 = GRASS_COLOR_NOISE.getValue((double)x * 0.25, (double)z * 0.25);
 
@@ -37,6 +37,6 @@ public:
             }
         }
 
-        generateBiomeTerrain(rand, chunk, x, z, noiseVal, settings);
+        generateBiomeTerrain(rand, chunk, x, z, noiseVal, settings_);
     }
 };

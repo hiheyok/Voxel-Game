@@ -28,7 +28,7 @@ public:
                 aint1[j1 + i1 * areaWidth] = k2;
                 initChunkSeed((long long)(j1 + areaX), (long long)(i1 + areaY));
 
-                if (k2 == 0 && k1 == 0 && l1 == 0 && i2 == 0 && j2 == 0 && nextInt(2) == 0)
+                if (k2 == 0 && k1 == 0 && l1 == 0 && i2 == 0 && j2 == 0 && NextInt(2) == 0)
                 {
                     aint1[j1 + i1 * areaWidth] = 1;
                 }

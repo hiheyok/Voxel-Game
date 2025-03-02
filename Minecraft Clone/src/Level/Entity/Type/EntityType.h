@@ -13,32 +13,32 @@ public:
 	}
 	
 	void ChangeHitboxSize(glm::vec3 size) {
-		Hitbox.size = size;
+		hitbox_.size_ = size;
 	}
 
 	void ChangeHitboxSize(float x, float y, float z) {
-		Hitbox.size = glm::vec3(x, y, z);
+		hitbox_.size_ = glm::vec3(x, y, z);
 	}
 
 	AABB& GetHitbox() {
-		return Hitbox;
+		return hitbox_;
 	}
 
 	virtual void Tick(Entity* entity) {
 		
 	}
 
-	EntityTypeID ID = NULL;
+	EntityTypeID id_ = NULL;
 
-	EntityModel RenderModel;
+	EntityModel render_model_;
 
-	Texture2D texture;
+	Texture2D texture_;
 
-	std::string EntityName;
+	std::string entity_name_;
 
 private:
 	
-	AABB Hitbox;
+	AABB hitbox_;
 };
 
 

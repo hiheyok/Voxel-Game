@@ -463,12 +463,12 @@ extern "C" {
 
 #ifndef STBI_NO_HDR
     STBIDEF void   stbi_hdr_to_ldr_gamma(float gamma);
-    STBIDEF void   stbi_hdr_to_ldr_scale(float scale);
+    STBIDEF void   stbi_hdr_to_ldr_scale(float scale_);
 #endif // STBI_NO_HDR
 
 #ifndef STBI_NO_LINEAR
     STBIDEF void   stbi_ldr_to_hdr_gamma(float gamma);
-    STBIDEF void   stbi_ldr_to_hdr_scale(float scale);
+    STBIDEF void   stbi_ldr_to_hdr_scale(float scale_);
 #endif // STBI_NO_LINEAR
 
     // stbi_is_hdr is always defined, but always returns false if STBI_NO_HDR

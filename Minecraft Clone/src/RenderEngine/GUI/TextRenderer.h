@@ -6,7 +6,7 @@
 #include "../OpenGL/Texture/Types/Texture2D.h"
 #include <exception>
 #include "../../Utils/LogUtils.h"
-
+// TODO: Rename
 class TextRenderer {
 private:
 	FastHashMap<std::string, RenderableFont> FontMap;
@@ -94,7 +94,7 @@ public:
 		Vertices.clear();
 
 		for (auto& Font : FontMap) {
-			std::vector<float> fontVertices = Font.second.getVertices();
+			std::vector<float> fontVertices = Font.second.GetVertices();
 
 			Vertices.insert(Vertices.end(), fontVertices.begin(), fontVertices.end());
 		}
@@ -106,9 +106,9 @@ public:
 		VerticesBackground.clear();
 
 		for (auto& Font : FontMap) {
-			if (!Font.second.Background) continue;
+			if (!Font.second.background_) continue;
 
-			std::vector<float> backgroundVertices = Font.second.getBackgroundVertices();
+			std::vector<float> backgroundVertices = Font.second.GetBackgroundVertices();
 
 			VerticesBackground.insert(VerticesBackground.end(), backgroundVertices.begin(), backgroundVertices.end());
 		}

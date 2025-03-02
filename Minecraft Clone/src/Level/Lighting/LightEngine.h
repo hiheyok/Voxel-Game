@@ -9,47 +9,47 @@
 
 class LightingEngine {
 private:
-	std::deque<ChunkPos> TaskQueue;
+	std::deque<ChunkPos> task_queue_;
 
-	std::mutex SchedulerLock;
+	std::mutex scheduler_lock_;
 
-	std::deque<std::thread> Workers;
-	std::deque<std::deque<ChunkPos>> WorkerTask;
-	std::deque<std::deque<ChunkLightingContainer*>> WorkerOutput;
-	std::deque<std::mutex> WorkerLocks;
+	std::deque<std::thread> workers_;
+	std::deque<std::deque<ChunkPos>> worker_task_;
+	std::deque<std::deque<std::shared_ptr<ChunkLightingContainer>>> worker_output_;
+	std::deque<std::mutex> worker_locks_;
 
 
-	std::vector<ChunkLightingContainer*> Output;
-	WorldAccess* world;
+	std::vector<std::shared_ptr<ChunkLightingContainer>> output_;
+	WorldAccess* world_;
 
-	std::thread schedulerThread;
+	std::thread scheduler_thread_;
 
-	int threadCount = 0;
+	int thread_count_ = 0;
 	const size_t DEFAULT_FIFO_QUEUE_SIZE = 32768;
 
-	bool stop = true;
+	bool stop_ = true;
 
-	void increaseLightLevel(ChunkLightingContainer* container, uint8_t lvl, int x, int y, int z);
+	void IncreaseLightLevel(std::shared_ptr<ChunkLightingContainer>& container, uint8_t lvl, int x, int y, int z);
 
-	void LightSpreadSky(Chunk* chunk, ChunkLightingContainer* container, const Heightmap& heightmap, int ChunkHeight, int x, int y, int z);
+	void LightSpreadSky(Chunk* chunk, std::shared_ptr<ChunkLightingContainer>& container, const Heightmap& heightmap, int chunkHeight, int x, int y, int z);
 
-	void WorkOnChunkSkylight(Chunk* chunk, ChunkLightingContainer* light, const Heightmap& heightmap, int ChunkHeight);
+	void WorkOnChunkSkylight(Chunk* chunk, std::shared_ptr<ChunkLightingContainer>& light, const Heightmap& heightmap, int chunkHeight);
 
-	std::vector<ChunkLightingContainer*> SkyLighting(const ChunkPos& id, int workerID);
+	std::vector<std::shared_ptr<ChunkLightingContainer>> SkyLighting(const ChunkPos& id);
 
 public:
 	void Generate(std::vector<ChunkPos> IDs);
 
-	std::vector<ChunkLightingContainer*> GetOutput();
+	std::vector<std::shared_ptr<ChunkLightingContainer>> GetOutput();
 
 	void Stop();
 
 	void Start(int lightEngineThreadsCount, WorldAccess* w);
 
-	void queueChunk(const ChunkPos& columnID);
+	void QueueChunk(const ChunkPos& columnID);
 
-	void worker(int id);
+	void Worker(int id);
 
-	void scheduler();
+	void Scheduler();
 
 };

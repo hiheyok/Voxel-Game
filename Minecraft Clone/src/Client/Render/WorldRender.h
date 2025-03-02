@@ -13,7 +13,7 @@
 class WorldRender : public WorldRenderInfo{
 public:
 
-	void SetRotation(glm::dvec2 rotation);
+	void SetRotation(glm::dvec2 rotation_);
 
 	void SetPosition(glm::dvec3 position);
 
@@ -29,29 +29,29 @@ public:
 
 	void Update();
 
-	TerrainRenderer RendererV2;
-	PerformanceProfiler* mProfiler;
+	TerrainRenderer renderer_v2_;
+	PerformanceProfiler* profiler_;
 private:
 
 	void Worker(int id);
 
 	void TaskScheduler();
 
-	PlayerPOV player;
-	GLFWwindow* window;
-	InternalServer* server;
+	PlayerPOV player_;
+	GLFWwindow* window_;
+	InternalServer* server_;
 
-	int WorkerCount = NULL;
+	int worker_count_ = NULL;
 
 	bool stop = false;
 
-	std::deque<ChunkPos> TaskList; //All tasks will go in here and they will be distributed to all the workers
+	std::deque<ChunkPos> task_list_; //All tasks will go in here and they will be distributed to all the workers
 
-	std::deque<std::thread> Workers;
-	std::deque<std::deque<ChunkPos>> WorkerTask;
-	std::deque<std::deque<MeshingV2::ChunkVertexData*>> WorkerOutput;
-	std::deque<std::mutex> WorkerLocks;
+	std::deque<std::thread> workers_;
+	std::deque<std::deque<ChunkPos>> worker_task_;
+	std::deque<std::deque<std::unique_ptr<MeshingV2::ChunkVertexData>>> worker_output_;
+	std::deque<std::mutex> worker_locks_;
 
 	std::thread Scheduler;
-	std::mutex SchedulerLock;
+	std::mutex scheduler_lock_;
 };

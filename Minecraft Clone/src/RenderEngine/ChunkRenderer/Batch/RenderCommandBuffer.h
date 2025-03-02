@@ -7,24 +7,24 @@
 #include <iostream>
 #include "../../../Level/Typenames.h"
 struct DrawCommandIndirect {
-	unsigned int  count = 0;
-	unsigned int  instanceCount = 0;
-	unsigned int  first = 0;
-	unsigned int  baseInstance = 0;
+	unsigned int  count_ = 0;
+	unsigned int  instance_count_ = 0;
+	unsigned int  first_ = 0;
+	unsigned int  base_instance_ = 0;
 
 	DrawCommandIndirect() {
 
 	}
 
-	DrawCommandIndirect(uint32_t count_, uint32_t instanceCount_, uint32_t first_, uint32_t baseInstance_) : count(count_), instanceCount(instanceCount_), first(first_), baseInstance(baseInstance_) {
+	DrawCommandIndirect(uint32_t count, uint32_t instanceCount, uint32_t first, uint32_t baseInstance) : count_(count_), instance_count_(instanceCount), first_(first), base_instance_(baseInstance) {
 
 	}
 
-	void set(uint32_t count_, uint32_t instanceCount_, uint32_t first_, uint32_t baseInstance_) {
-		count = count_;
-		instanceCount = instanceCount_;
-		first = first_;
-		baseInstance = baseInstance_;
+	void set(uint32_t count, uint32_t instanceCount, uint32_t first, uint32_t baseInstance) {
+		count_ = count;
+		instance_count_ = instanceCount;
+		first_ = first;
+		base_instance_ = baseInstance;
 	}
 };
 
@@ -42,26 +42,26 @@ namespace CMDGraph {
 	const int PZ = 0x05;
 
 	struct CommandPtr {
-		CommandPtr* neighbor[6]{ nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
-		DrawCommandIndirect cmd;
+		CommandPtr* neighbor_[6]{ nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
+		DrawCommandIndirect cmd_;
 		ChunkPos position_;
-		int visitID = 0;
+		int visit_id_ = 0;
 
 		CommandPtr() {
 			for (int i = 0; i < 6; i++) {
-				neighbor[i] = nullptr;
+				neighbor_[i] = nullptr;
 			}
 		}
 
-		CommandPtr(DrawCommandIndirect cmd_) : cmd(cmd_) {
+		CommandPtr(DrawCommandIndirect cmd_) : cmd_(cmd_) {
 			for (int i = 0; i < 6; i++) {
-				neighbor[i] = nullptr;
+				neighbor_[i] = nullptr;
 			}
 		}
 
-		CommandPtr(DrawCommandIndirect cmd_, ChunkPos pos) : cmd(cmd_), position_(pos) {
+		CommandPtr(DrawCommandIndirect cmd_, ChunkPos pos) : cmd_(cmd_), position_(pos) {
 			for (int i = 0; i < 6; i++) {
-				neighbor[i] = nullptr;
+				neighbor_[i] = nullptr;
 			}
 		}
 
@@ -74,16 +74,16 @@ namespace CMDGraph {
 				int index1 = i * 2;
 				int index2 = i * 2 + 1;
 
-				if ((neighbor[index1] != nullptr) && (neighbor[index2] != nullptr)) {
-					neighbor[index1]->neighbor[index2] = neighbor[index2];
-					neighbor[index2]->neighbor[index1] = neighbor[index1];
+				if ((neighbor_[index1] != nullptr) && (neighbor_[index2] != nullptr)) {
+					neighbor_[index1]->neighbor_[index2] = neighbor_[index2];
+					neighbor_[index2]->neighbor_[index1] = neighbor_[index1];
 				}
 				else {
-					if ((neighbor[index1] != nullptr)) {
-						neighbor[index1]->neighbor[index2] = nullptr;
+					if ((neighbor_[index1] != nullptr)) {
+						neighbor_[index1]->neighbor_[index2] = nullptr;
 					}
-					if ((neighbor[index2] != nullptr)) {
-						neighbor[index2]->neighbor[index1] = nullptr;
+					if ((neighbor_[index2] != nullptr)) {
+						neighbor_[index2]->neighbor_[index1] = nullptr;
 					}
 				}
 			}
@@ -108,25 +108,25 @@ namespace CMDGraph {
 			// Early exit if trying to set a neighbor to itself
 			if (node == this) return;
 
-			if ((neighbor[side] == nullptr) && (node->neighbor[GetOppositeSide(side)] == nullptr)) {
-				neighbor[side] = node;
-				node->neighbor[GetOppositeSide(side)] = this;
+			if ((neighbor_[side] == nullptr) && (node->neighbor_[GetOppositeSide(side)] == nullptr)) {
+				neighbor_[side] = node;
+				node->neighbor_[GetOppositeSide(side)] = this;
 				return;
 			}
 
 			CommandPtr* p1 = this;
 			CommandPtr* p2 = node;
-			CommandPtr* p3 = neighbor[side];
-			CommandPtr* p4 = node->neighbor[GetOppositeSide(side)];
+			CommandPtr* p3 = neighbor_[side];
+			CommandPtr* p4 = node->neighbor_[GetOppositeSide(side)];
 
 			//Temp set to null
-			neighbor[side] = nullptr;
+			neighbor_[side] = nullptr;
 			if (p3 != nullptr) {
-				p3->neighbor[GetOppositeSide(side)] = nullptr;
+				p3->neighbor_[GetOppositeSide(side)] = nullptr;
 			}
-			node->neighbor[GetOppositeSide(side)] = nullptr;
+			node->neighbor_[GetOppositeSide(side)] = nullptr;
 			if (p4 != nullptr) {
-				p4->neighbor[side] = nullptr;
+				p4->neighbor_[side] = nullptr;
 			}
 
 			if ((p4 != nullptr) && (p3 == nullptr)) {
@@ -135,14 +135,14 @@ namespace CMDGraph {
 				if (side_p4 == side) { //OK
 					p1->SetNeighbor(p4, side, depth + 1);
 
-					p4->neighbor[side] = p2;
-					p2->neighbor[GetOppositeSide(side)] = p4;
+					p4->neighbor_[side] = p2;
+					p2->neighbor_[GetOppositeSide(side)] = p4;
 				}
 				else {
 					p1->SetNeighbor(p4, side_p4, depth + 1);
 
-					p1->neighbor[side] = p2;
-					p2->neighbor[GetOppositeSide(side)] = p1;
+					p1->neighbor_[side] = p2;
+					p2->neighbor_[GetOppositeSide(side)] = p1;
 				}
 				return;
 			}
@@ -156,16 +156,16 @@ namespace CMDGraph {
 				if (p1_distance_p3 <= p1_distance_p2) { //this implies that p3 is the closest is is kept the same
 					
 					//reconnects p3 and p1
-					p1->neighbor[side] = p3;
-					p3->neighbor[GetOppositeSide(side)] = p1;
+					p1->neighbor_[side] = p3;
+					p3->neighbor_[GetOppositeSide(side)] = p1;
 
 					int side_p2 = p3->GetSideLocation(p2->position_);
 					p3->SetNeighbor(p2, side_p2, depth + 1);
 
 				}
 				else {
-					p1->neighbor[side] = p2; //no data lost occur here since if p4 is null, it implies p2 neighbor is null
-					p2->neighbor[GetOppositeSide(side)] = p1;
+					p1->neighbor_[side] = p2; //no data lost occur here since if p4 is null, it implies p2 neighbor is null
+					p2->neighbor_[GetOppositeSide(side)] = p1;
 
 					int side_p3 = p2->GetSideLocation(p3->position_);
 					p2->SetNeighbor(p3, side_p3, depth + 1);
@@ -182,15 +182,15 @@ namespace CMDGraph {
 
 			if ((p1_distance_p3 <= p1_distance_p2) && (p1_distance_p3 <= p1_distance_p4)) {  // p3 is closest to p1 //OK
 				//reconnects p3 and p1
-				p1->neighbor[side] = p3;
-				p3->neighbor[GetOppositeSide(side)] = p1;
+				p1->neighbor_[side] = p3;
+				p3->neighbor_[GetOppositeSide(side)] = p1;
 
 				//connect p4 to p3 at side p3_side_p4
 				int p3_side_p4 = p3->GetSideLocation(p4->position_);
 				p3->SetNeighbor(p4, p3_side_p4, depth + 1);
 				
-				p4->neighbor[side] = p2;
-				p2->neighbor[GetOppositeSide(side)] = p4;
+				p4->neighbor_[side] = p2;
+				p2->neighbor_[GetOppositeSide(side)] = p4;
 				
 
 				return;
@@ -285,41 +285,41 @@ public:
 
 	void AddDrawCommand(DrawCommandIndirect cmd, const ChunkPos& pos) {
 		CMDGraph::CommandPtr* ptr = new CMDGraph::CommandPtr(cmd, pos);
-		CommandMap[pos] = ptr;
+		command_map_[pos] = ptr;
 		AddToGraph(ptr);
 	}
 
 	void UpdateCurrentPosition(glm::vec3 NewPosition) {
-		CurrentPosition = NewPosition;
+		current_position_ = NewPosition;
 	}
 
-	int getDrawCommandsSorted(std::vector<DrawCommandIndirect>* cmds, std::vector<int>* cmdPos) {
+	size_t GetDrawCommandsSorted(std::vector<DrawCommandIndirect>& cmds, std::vector<int>& cmdPos) {
 		
-		for (auto& arr : Commands) {
+		for (auto& arr : commands_) {
 			arr.clear();
 		}
 
-		for (auto& arr : CommandsPosition) {
+		for (auto& arr : commands_position_) {
 			arr.clear();
 		}
 		count = 0;
 		size_t size = 0;
-		TraverseTree(root, 0);
+		TraverseTree(root_, 0);
 
-		CurrentNodeVisitID++;
+		current_node_visit_id_++;
 
-		if (CurrentNodeVisitID == 16) {
-			CurrentNodeVisitID = 0;
+		if (current_node_visit_id_ == 16) {
+			current_node_visit_id_ = 0;
 		}
 
-		for (int i = Commands.size() - 1; i >= 0; i--) {
-			size += Commands[i].size();
-			cmds->insert(cmds->end(), Commands[i].begin(), Commands[i].end());
-			cmdPos->insert(cmdPos->end(), CommandsPosition[i].begin(), CommandsPosition[i].end());
+		for (int i = commands_.size() - 1; i >= 0; i--) {
+			size += commands_[i].size();
+			cmds.insert(cmds.end(), commands_[i].begin(), commands_[i].end());
+			cmdPos.insert(cmdPos.end(), commands_position_[i].begin(), commands_position_[i].end());
 		}
 
 		for (int i = 0; i < size; i++) {
-			cmds->at(i).baseInstance = i + 1;
+			cmds.at(i).base_instance_ = i + 1;
 		}
 
 		//std::cout << count << ", " << CommandMap.size() << "\n";
@@ -328,51 +328,51 @@ public:
 	}
 
 	void DeleteDrawCommand(const ChunkPos& pos) {
-		CMDGraph::CommandPtr* node = CommandMap[pos];
-		CommandMap.erase(pos);
+		CMDGraph::CommandPtr* node = command_map_[pos];
+		command_map_.erase(pos);
 
-		if (node != root) {
+		if (node != root_) {
 			node->PrepareDelete();
 			delete node;
 			return;
 		}
 
-		float Distances[6]{0.f,0.f,0.f,0.f,0.f,0.f};
+		float distances[6]{0.f,0.f,0.f,0.f,0.f,0.f};
 
-		CMDGraph::CommandPtr* RootNeighbors[6]{nullptr};
+		CMDGraph::CommandPtr* rootNeighbors[6]{nullptr};
 
 		for (int i = 0; i < 6; i++) {
-			RootNeighbors[i] = node->neighbor[i];
+			rootNeighbors[i] = node->neighbor_[i];
 		}
 		node->PrepareDelete();
 		delete node;
 
 		for (int i = 0; i < 6; i++) {
-			if (RootNeighbors[i] == nullptr) {
+			if (rootNeighbors[i] == nullptr) {
 				continue;
 			}
 
-			Distances[i] = RootNeighbors[i]->GetSquareDistance(CurrentPosition);
+			distances[i] = rootNeighbors[i]->GetSquareDistance(current_position_);
 		}
 
 		float min = FLT_MAX;
 
 		for (int i = 0; i < 6; i++) {
-			if (Distances[i] == 0.f) {
+			if (distances[i] == 0.f) {
 				continue;
 			}
 
-			min = std::min(min, Distances[i]);
+			min = std::min(min, distances[i]);
 		}
 
 		if (min == FLT_MAX) {
-			root = nullptr;
+			root_ = nullptr;
 			return;
 		}
 
 		for (int i = 0; i < 6; i++) {
-			if (Distances[i] == min) {
-				root = RootNeighbors[i];
+			if (distances[i] == min) {
+				root_ = rootNeighbors[i];
 				break;
 			}
 		}
@@ -386,106 +386,106 @@ public:
 			return;
 		}
 
-		if (node->visitID == CurrentNodeVisitID) {
+		if (node->visit_id_ == current_node_visit_id_) {
 			return;
 		}
 
-		node->visitID = CurrentNodeVisitID;
+		node->visit_id_ = current_node_visit_id_;
 
-		if (Commands.size() <= depth) {
-			Commands.emplace_back();
-			CommandsPosition.emplace_back();
-			CommandsLayer.emplace_back();
+		if (commands_.size() <= depth) {
+			commands_.emplace_back();
+			commands_position_.emplace_back();
+			commands_layer_.emplace_back();
 		}
 
-		Commands[depth].push_back(node->cmd);
-		CommandsPosition[depth].push_back(node->position_.x);
-		CommandsPosition[depth].push_back(node->position_.y);
-		CommandsPosition[depth].push_back(node->position_.z);
+		commands_[depth].push_back(node->cmd_);
+		commands_position_[depth].push_back(node->position_.x);
+		commands_position_[depth].push_back(node->position_.y);
+		commands_position_[depth].push_back(node->position_.z);
 	//	CommandsLayer[depth].push_back(depth);
 		count++;
 		for (int side = 0; side < 6; side++) {
- 			TraverseTree(node->neighbor[side], depth + 1);
+ 			TraverseTree(node->neighbor_[side], depth + 1);
 		}
 	}
 
 	
 private:
-	bool verifyTree(CMDGraph::CommandPtr* node) { //debug
+	bool VerifyTree(CMDGraph::CommandPtr* node) { //debug
 		bool isCorrect = true;
 
-		if (node->visitID == CurrentNodeVisitID) {
+		if (node->visit_id_ == current_node_visit_id_) {
 			return isCorrect;
 		}
 
 		for (int i = 0; i < 6; i++) {
-			if (node->neighbor[i] == nullptr) {
+			if (node->neighbor_[i] == nullptr) {
 				continue;
 			}
 
-			if (node->neighbor[i]->neighbor[CMDGraph::GetOppositeSide(i)] != node) {
+			if (node->neighbor_[i]->neighbor_[CMDGraph::GetOppositeSide(i)] != node) {
 				return false;
 			}
 			else {
-				if (node->neighbor[i]->visitID != CurrentNodeVisitID) {
-					isCorrect = verifyTree(node->neighbor[i]);
+				if (node->neighbor_[i]->visit_id_ != current_node_visit_id_) {
+					isCorrect = VerifyTree(node->neighbor_[i]);
 				}
 				
 			}
 		}
 
-		node->visitID = CurrentNodeVisitID;
+		node->visit_id_ = current_node_visit_id_;
 
 		return isCorrect;
 	}
 
-	std::vector<std::vector<DrawCommandIndirect>> Commands; //[Tree Depth][Draw Commands]
-	std::vector<std::vector<int>> CommandsPosition; //[Tree Depth][Draw Commands Position]
-	std::vector<std::vector<int>> CommandsLayer; //[Tree Depth][Layer]
+	std::vector<std::vector<DrawCommandIndirect>> commands_; //[Tree Depth][Draw Commands]
+	std::vector<std::vector<int>> commands_position_; //[Tree Depth][Draw Commands Position]
+	std::vector<std::vector<int>> commands_layer_; //[Tree Depth][Layer]
 
-	int CurrentNodeVisitID = 1;
+	int current_node_visit_id_ = 1;
 
 	void AddToGraph(CMDGraph::CommandPtr* node) {
 		//If root doesn't exist add to root
-		if (root == nullptr) {
-			root = node;
+		if (root_ == nullptr) {
+			root_ = node;
 			return;
 		}
 
 		//If root exist, check if the chunk is closer to the actual root if so change the root
 
-		if (root->GetSquareDistance(CurrentPosition) > node->GetSquareDistance(CurrentPosition)) {
-			int loc = node->GetSideLocation(root->position_);
+		if (root_->GetSquareDistance(current_position_) > node->GetSquareDistance(current_position_)) {
+			int loc = node->GetSideLocation(root_->position_);
 
-			CMDGraph::CommandPtr* tmp = root;
-			root = node;
+			CMDGraph::CommandPtr* tmp = root_;
+			root_ = node;
 			node->SetNeighbor(tmp, loc);
 			return;
 		}
 
-		CMDGraph::CommandPtr* curr = root;
+		CMDGraph::CommandPtr* curr = root_;
 
 		while (true) {
 			int side = curr->GetSideLocation(node->position_);
 
-			if (curr->neighbor[side] == nullptr) {
+			if (curr->neighbor_[side] == nullptr) {
 				curr->SetNeighbor(node, side);
 				return;
 			}
 
-			if (curr->neighbor[side]->GetSquareDistance(node->position_) >= curr->GetSquareDistance(node->position_)) {
+			if (curr->neighbor_[side]->GetSquareDistance(node->position_) >= curr->GetSquareDistance(node->position_)) {
 				curr->SetNeighbor(node, side);
 				return;
 			}
 
-			curr = curr->neighbor[side];
+			curr = curr->neighbor_[side];
 		}
 	}
 
-	glm::vec3 CurrentPosition = glm::vec3(0.f,0.f,0.f);
+	glm::vec3 current_position_ = glm::vec3(0.f,0.f,0.f);
 
-	CMDGraph::CommandPtr* root = nullptr;
-	FastHashMap<ChunkPos, CMDGraph::CommandPtr*> CommandMap;
+	CMDGraph::CommandPtr* root_ = nullptr;
+	FastHashMap<ChunkPos, CMDGraph::CommandPtr*> command_map_;
 };
 
 

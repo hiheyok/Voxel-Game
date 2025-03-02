@@ -10,7 +10,7 @@
 
 using namespace std;
 
-void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam) {
+void APIENTRY Window::glDebugOutput(GLenum source, GLenum type_, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam) {
 
     std::stringstream str;
 
@@ -28,7 +28,7 @@ void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, unsigned int id,
     case GL_DEBUG_SOURCE_OTHER:           str << "Source: Other"; break;
     } str << " | ";
 
-    switch (type)
+    switch (type_)
     {
     case GL_DEBUG_TYPE_ERROR:               str << "Type: Error"; break;
     case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: str << "Type: Deprecated Behaviour"; break;
@@ -67,7 +67,7 @@ bool Window::WindowCloseCheck() {
 
 void Window::Start() {
 
-    if (Properties.Initialized) {
+    if (Properties.initialized_) {
         Logger.LogError("OpenGL","Already initialized");
         return;
     }
@@ -128,8 +128,8 @@ void Window::Start() {
 }
 
 void Window::MousePositionCallback(double xpos, double ypos) {
-    Inputs.Mouse.Displacement = glm::dvec2(xpos, ypos) - Inputs.Mouse.Position;
-    Inputs.Mouse.Position = glm::dvec2(xpos, ypos);
+    Inputs.Mouse.Displacement = glm::dvec2(xpos, ypos) - Inputs.Mouse.position_;
+    Inputs.Mouse.position_ = glm::dvec2(xpos, ypos);
 }
 
 void Window::UpdateWindowName(std::string name) {

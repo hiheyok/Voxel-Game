@@ -13,11 +13,15 @@
 
 
 
-class ChunkContainer {
+class chunk_container_ {
 	
 public:
+
+	chunk_container_() {
+		lighting_ = std::make_shared<ChunkLightingContainer>();
+	}
 	
-	void SetNeighbor(ChunkContainer* neighbor, unsigned int side);
+	void SetNeighbor(chunk_container_* neighbor, unsigned int side);
 
 	void ClearNeighbors();
 
@@ -31,24 +35,23 @@ public:
 	void SetBlockUnsafe(BlockID block, int x, int y, int z);
 
 	void Use();
-
 	void Unuse();
 
-	ChunkContainer* GetNeighbor(unsigned int side) const;
+	chunk_container_* GetNeighbor(unsigned int side) const;
 	
 	void SetPosition(int x, int y, int z);
 
 	ChunkPos position_;
 
-	bool isEmpty = true;
+	bool is_empty_ = true;
 
-	ChunkContainer* Neighbors[6]{nullptr};
-	std::vector<SetBlockRelative> OutsideBlockToPlace[6]{};
-	ChunkLightingContainer Lighting;
+	chunk_container_* neighbors_[6]{nullptr};
+	std::vector<SetBlockRelative> outside_block_to_place_[6]{};
+	std::shared_ptr<ChunkLightingContainer> lighting_;
 
-	BlockContainer BlockStorage;
+	BlockContainer block_storage_;
 private:
-	bool InUse = false;
+	bool in_use_ = false;
 	
 };
 

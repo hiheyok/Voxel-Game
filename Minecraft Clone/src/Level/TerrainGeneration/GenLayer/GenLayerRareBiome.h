@@ -19,7 +19,7 @@ public:
                 initChunkSeed((long long)(j + areaX), (long long)(i + areaY));
                 int k = aint[j + 1 + (i + 1) * (areaWidth + 2)];
 
-                if (nextInt(57) == 0)
+                if (NextInt(57) == 0)
                 {
                     if (k == Biome::getIdForBiome(Biomes::PLAINS))
                     {

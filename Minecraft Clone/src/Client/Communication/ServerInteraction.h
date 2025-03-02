@@ -10,14 +10,14 @@ public:
 	}
 
 	bool checkCollusion(Ray& ray) {
-		return server->checkRayIntersection(ray);
+		return server->CheckRayIntersection(ray);
 	}
-	void sendEvent(Event pEventIn) {
-		server->sendEvent(pEventIn);
+	void SendEvent(Event pEventIn) {
+		server->SendEvent(pEventIn);
 	}
 
-	BlockID getBlock(int x, int y, int z) {
-		return server->getBlock(x, y, z);
+	BlockID GetBlock(int x, int y, int z) {
+		return server->GetBlock(x, y, z);
 	}
 
 	std::vector<EntityUUID> getRemovedEntities() {

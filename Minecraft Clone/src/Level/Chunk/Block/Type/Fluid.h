@@ -4,19 +4,18 @@
 class Block;
 
 struct FluidProperties {
-	int SpreadRate = 1; // Ticks for fluid to spread
+	int spread_rate_ = 1; // Ticks for fluid to spread
 };
-
 
 struct Fluid : Block {
 
-	FluidProperties Properties;
+	FluidProperties properties_;
 
-	void tick(const BlockPos& pos) override {
+	void Tick(const BlockPos& pos) override {
 
-		Dimension* CurrentWorld = static_cast<Dimension*>(Block::DimensionPTR);
+		Dimension* currentWorld = static_cast<Dimension*>(Block::dimension_ptr_);
 
-		//BlockID CurrentBlock = CurrentWorld->GetBlock(x, y, z);
+		//BlockID CurrentBlock = currentWorld->GetBlock(x, y, z);
 
 		for (int side = 0; side < 6; side++) {
 			BlockPos newPos = pos;
@@ -27,7 +26,7 @@ struct Fluid : Block {
 				continue;
 			}
 
-			BlockID block = CurrentWorld->worldInteractions.getBlock(pos);
+			BlockID block = currentWorld->world_interactions_.GetBlock(pos);
 
 			if (block != Blocks.AIR) {
 				continue;
@@ -37,14 +36,14 @@ struct Fluid : Block {
 				continue;
 			}
 
-			if (CurrentWorld->CheckTickUsed(EventHandler.BlockPlace, pos)) {
+			if (currentWorld->CheckTickUsed(EventHandler.BlockPlace, pos)) {
 				return;
 			}
 
-			CurrentWorld->TickUsed(EventHandler.BlockPlace, pos);
+			currentWorld->TickUsed(EventHandler.BlockPlace, pos);
 
 			Event::BlockEvent blockEvent{newPos, Blocks.WATER, EventHandler.BlockPlace};
-			CurrentWorld->EventManager.AddEvent(blockEvent);
+			currentWorld->event_manager_.AddEvent(blockEvent);
 
 		}
 	}

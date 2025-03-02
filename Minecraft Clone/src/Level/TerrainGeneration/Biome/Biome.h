@@ -146,8 +146,8 @@ public:
 		return typeid(*this);
 	}
 
-	virtual void genTerrainBlocks(JavaRandom& rand, TallChunk* chunk, int x, int z, double noiseVal, ChunkGeneratorSettings* settings) {
-		generateBiomeTerrain(rand, chunk, x, z, noiseVal, settings);
+	virtual void GenTerrainBlocks(JavaRandom& rand, TallChunk* chunk, int x, int z, double noiseVal, ChunkGeneratorSettings* settings_) {
+		generateBiomeTerrain(rand, chunk, x, z, noiseVal, settings_);
 	}
 
 	void SetBlockChunkSafe(TallChunk* chunk, BlockID block, int x, int y, int z) {
@@ -160,19 +160,19 @@ public:
 		return chunk->GetBlockUnsafe( x, y, z);
 	}
 
-	void generateBiomeTerrain(JavaRandom& rand, TallChunk* chunk, int x, int z, double noiseVal, ChunkGeneratorSettings* settings) {
+	void generateBiomeTerrain(JavaRandom& rand, TallChunk* chunk, int x, int z, double noiseVal, ChunkGeneratorSettings* settings_) {
 
-		int i = settings->seaLevel;
+		int i = settings_->seaLevel;
 		BlockID iblockstate = topBlock;
 		BlockID iblockstate1 = fillerBlock;
 		int j = -1;
-		int k = (int)(noiseVal / 3.0 + 3.0 + rand.nextDouble() * 0.25);
+		int k = (int)(noiseVal / 3.0 + 3.0 + rand.NextDouble() * 0.25);
 		int l = x & 15;
 		int i1 = z & 15;
 
 		for (int j1 = 255; j1 >= 0; --j1)
 		{
-			if (j1 <= rand.nextInt(5))
+			if (j1 <= rand.NextInt(5))
 			{
 				chunk->SetBlockUnsafe(i1, j1, l, Blocks.BEDROCK);
 			}
@@ -235,7 +235,7 @@ public:
 
 						if (j == 0 && iblockstate1 == Blocks.SAND && k > 1)
 						{
-							j = rand.nextInt(4) + std::max(0, j1 - 63);
+							j = rand.NextInt(4) + std::max(0, j1 - 63);
 							iblockstate1 = Blocks.RED_SAND;
 						}
 					}

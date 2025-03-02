@@ -11,11 +11,11 @@ using namespace glm;
 
 using json = nlohmann::json;
 
-EntityTypeID EntitiesList::RegisterEntity(std::string EntityName, EntityTypeEnums type) {
-	EntityTypeID ID = static_cast<EntityTypeID>(EntityTypeList.size());
-	EntityType* newEntity;
+EntityTypeID EntitiesList::RegisterEntity(std::string EntityName, EntityTypeEnums type_) {
+	EntityTypeID ID = static_cast<EntityTypeID>(entity_type_list_.size());
+	EntityType* newEntity = nullptr;
 
-	switch (type) {
+	switch (type_) {
 	case ENTITY_PASSIVE:
 		newEntity = static_cast<EntityType*>(new Passive());
 		break;
@@ -31,13 +31,13 @@ EntityTypeID EntitiesList::RegisterEntity(std::string EntityName, EntityTypeEnum
 		throw std::exception("Error!");
 	}
 
-	newEntity->EntityName = EntityName;
+	newEntity->entity_name_ = EntityName;
 
 	Logger.LogInfo("Entity Register", "Registered new entity: " + EntityName + " | EntityID: " + std::to_string(ID));
 
-	newEntity->ID = ID;
+	newEntity->id_ = ID;
 
-	EntityTypeList.emplace_back(newEntity);
+	entity_type_list_.emplace_back(newEntity);
     EntityNameID[EntityName] = ID;
 
 	return ID;
@@ -59,40 +59,40 @@ void EntitiesList::InitializeModels() {
 			Logger.LogInfo("Entity Texture", "Entity: " + b.key() + " | Texture Loading: " + (string)d.value());
 			RawTextureData TexData;
 			TexData.Load(((string)d.value()).c_str());
-			EntityTypeList[entityType]->texture.Gen();
-			EntityTypeList[entityType]->texture.Load(TexData);
+			entity_type_list_[entityType]->texture_.Gen();
+			entity_type_list_[entityType]->texture_.Load(TexData);
 		}
 
 		d++;
 
         vec3 hitboxSize(d.value().at(0), d.value().at(1), d.value().at(2));
 
-        EntityTypeList[entityType]->ChangeHitboxSize(hitboxSize);
+        entity_type_list_[entityType]->ChangeHitboxSize(hitboxSize);
 		
         d++; 
 
         for (auto& SubData : d.value().items()) {
             json::iterator it = SubData.value().begin();
 
-            vec3 Offset(it.value().at(0), it.value().at(1), it.value().at(2));
+            vec3 offset(it.value().at(0), it.value().at(1), it.value().at(2));
 
             it++;
 
-            vec3 ShapeSize(it.value().at(0), it.value().at(1), it.value().at(2));
+            vec3 shapeSize(it.value().at(0), it.value().at(1), it.value().at(2));
 
 			it++;
 
-			Model::RectangularPrism* model = EntityTypeList[entityType]->RenderModel.AddRectangle(ShapeSize, Offset);
+			Model::RectangularPrism* model = entity_type_list_[entityType]->render_model_.AddRectangle(shapeSize, offset);
 
 			for (auto& ShapeUV : it.value().items()) {
 				json::iterator uv_iterator = ShapeUV.value().begin();
 
-				vector<int> UV_Faces = {};
+				vector<int> uvFaces = {};
 
-				for (auto& UV_Face : uv_iterator.value().items()) {
+				for (auto& uvFace : uv_iterator.value().items()) {
 					int s = 0xFF;
 
-					string texSide = UV_Face.value();
+					string texSide = uvFace.value();
 
 					if (!strcmp(texSide.c_str(), "FRONT"))
 						s = FRONT;
@@ -107,7 +107,7 @@ void EntitiesList::InitializeModels() {
 					if (!strcmp(texSide.c_str(), "BOTTOM"))
 						s = BOTTOM;
 
-					UV_Faces.push_back(s);
+					uvFaces.push_back(s);
 				}
 
 				uv_iterator++;
@@ -121,9 +121,9 @@ void EntitiesList::InitializeModels() {
 					index++;
 				}
 
-				for (int& face : UV_Faces) {
-					model->UV_MAP[face].p0 = pts[0];
-					model->UV_MAP[face].p1 = pts[1];
+				for (int& face : uvFaces) {
+					model->uv_map_[face].p0_ = pts[0];
+					model->uv_map_[face].p1_ = pts[1];
 				}
 			}
         }
@@ -135,5 +135,5 @@ void EntitiesList::Initialize() {
 }
 
 EntityType* EntitiesList::GetEntity(EntityTypeID id) {
-	return EntityTypeList[id];
+	return entity_type_list_[id];
 }

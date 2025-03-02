@@ -14,7 +14,7 @@
 #define LOG_TYPE_WARN 0x03;
 
 struct LogData {
-	int type = NULL;
+	int type_ = NULL;
 	int thread = NULL;
 	std::string message;
 	std::string Subtype;

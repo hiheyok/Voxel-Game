@@ -3,10 +3,10 @@
 
 class Player : public Entity {
 public:
-	EntityInventory m_EntityInventory;
+	EntityInventory entity_inventory_;
 
 	Player() {
-		Properties.isChunkLoader = true;
+		properties_.is_chunk_loader_ = true;
 	}
 
 private:

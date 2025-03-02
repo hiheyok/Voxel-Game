@@ -4,33 +4,32 @@
 
 class JavaRandom {
 private:
-	bool haveNextNextGaussian;
-	double nextNextGaussian;
-	int64_t rseed;
-	int64_t serialVersionUID = 3905348978240129619L;
+	bool have_next_next_gaussian_;
+	double next_next_gaussian;
+	int64_t rseed_;
+	int64_t serial_version_uid_ = 3905348978240129619L;
 
 public:
-	JavaRandom() {
-		JavaRandom(time(NULL));
+	JavaRandom() : JavaRandom{time(NULL)} {
 	}
 
 	JavaRandom(uint64_t seed) {
-		setSeed(seed);
+		SetSeed(seed);
 	}
 
-	void setSeed(int64_t seed);
+	void SetSeed(int64_t seed);
 
-	int next(int bits);
+	int Next(int bits);
 
-	int nextInt(int n);
+	int NextInt(int n);
 
-	int nextInt();
+	int NextInt();
 
-	uint64_t nextLong();
+	uint64_t NextLong();
 
-	bool nextBoolean();
+	bool NextBoolean();
 
-	float nextFloat();
+	float NextFloat();
 
-	double nextDouble();
+	double NextDouble();
 };

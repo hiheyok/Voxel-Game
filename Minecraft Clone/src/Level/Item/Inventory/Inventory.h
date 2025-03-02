@@ -8,14 +8,14 @@
 class Inventory {
 public:
 
-	Inventory(int InventorySize = 0xFFFFFFFF) {
-		if (InventorySize == 0xFFFFFFFF)
+	Inventory(int inventorySize = 0xFFFFFFFF) {
+		if (inventorySize == 0xFFFFFFFF)
 			return;
-		Initialize(InventorySize);
+		Initialize(inventorySize);
 	}
 
 	~Inventory() {
-		Storage.clear();
+		storage_.clear();
 	}
 
 	ItemStack GetItem(int slot);
@@ -31,7 +31,7 @@ protected:
 
 private:
 	
-	int NumOfSlots = 64;
-	std::vector<ItemStack> Storage;
+	int num_slots_ = 64;
+	std::vector<ItemStack> storage_;
 
 };

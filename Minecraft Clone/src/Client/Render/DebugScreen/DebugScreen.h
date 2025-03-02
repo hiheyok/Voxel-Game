@@ -8,7 +8,7 @@ private:
 	TextRenderer renderer;
 	float fps;
 	int VRAMUsageMB = 0;
-	glm::vec3 Position = glm::vec3(0.f, 0.f, 0.f);
+	glm::vec3 position_ = glm::vec3(0.f, 0.f, 0.f);
 
 public:
 	void Render();

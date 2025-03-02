@@ -6,8 +6,8 @@
 class BlockItem : public Item {
 public:
 	BlockItem(BlockID block_) {
-		Properties.block = block_;
-		Properties.IsBlockItem = true;
+		properties_.block_ = block_;
+		properties_.is_block_item_ = true;
 	}
 
 private:

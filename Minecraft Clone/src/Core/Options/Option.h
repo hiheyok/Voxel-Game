@@ -6,8 +6,8 @@
 
 class Options {
 public:
-	int VerticalRenderDistance = 8;
-	int HorizontalRenderDistance = 16;
+	int vertical_render_distance_ = 8;
+	int horizontal_render_distance_ = 16;
 	int WorldGenThreads = 6;
 	int MeshThreads = 6;
 	int GraphicsScale = 2;

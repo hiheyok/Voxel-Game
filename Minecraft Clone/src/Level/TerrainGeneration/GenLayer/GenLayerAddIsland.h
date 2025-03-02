@@ -33,7 +33,7 @@ public:
                 {
                     if (k2 > 0 && (k1 == 0 || l1 == 0 || i2 == 0 || j2 == 0))
                     {
-                        if (nextInt(5) == 0)
+                        if (NextInt(5) == 0)
                         {
                             if (k2 == 4)
                             {
@@ -59,27 +59,27 @@ public:
                     int l2 = 1;
                     int i3 = 1;
 
-                    if (k1 != 0 && nextInt(l2++) == 0)
+                    if (k1 != 0 && NextInt(l2++) == 0)
                     {
                         i3 = k1;
                     }
 
-                    if (l1 != 0 && nextInt(l2++) == 0)
+                    if (l1 != 0 && NextInt(l2++) == 0)
                     {
                         i3 = l1;
                     }
 
-                    if (i2 != 0 && nextInt(l2++) == 0)
+                    if (i2 != 0 && NextInt(l2++) == 0)
                     {
                         i3 = i2;
                     }
 
-                    if (j2 != 0 && nextInt(l2++) == 0)
+                    if (j2 != 0 && NextInt(l2++) == 0)
                     {
                         i3 = j2;
                     }
 
-                    if (nextInt(3) == 0)
+                    if (NextInt(3) == 0)
                     {
                         aint1[j1 + i1 * areaWidth] = i3;
                     }

@@ -30,7 +30,7 @@ public:
                 {
                     initChunkSeed((long long)(j1 + areaX), (long long)(i1 + areaY));
 
-                    if (nextInt(2) == 0)
+                    if (NextInt(2) == 0)
                     {
                         k2 = k1;
                     }

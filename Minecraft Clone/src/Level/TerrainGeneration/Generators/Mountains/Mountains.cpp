@@ -12,15 +12,15 @@ Chunk* MountainGenerator::Generate(const ChunkPos& pos) {
 	for (int x = 0; x < 16; x++) {
 		for (int z = 0; z < 16; z++) {
 
-			float continental = continentialNoise(getNoise2D(glm::ivec2(pos.x, pos.z), glm::ivec2(x, z), 3, 0.3f));
-			float erosion = erosionNoise(getNoise2D(glm::ivec2(pos.x, pos.z), glm::ivec2(x + 4345, z + 6443), 3, 1.f)) / 2.f;
-			float pv = peaksandvalley(getNoise2D(glm::ivec2(pos.x, pos.z), glm::ivec2(x + 65345, z + 12323), 3, 4.f)) / 8;
+			float continental = ContinentialNoise(GetNoise2D(glm::ivec2(pos.x, pos.z), glm::ivec2(x, z), 3, 0.3f));
+			float erosion = ErosionNoise(GetNoise2D(glm::ivec2(pos.x, pos.z), glm::ivec2(x + 4345, z + 6443), 3, 1.f)) / 2.f;
+			float pv = PeaksAndValley(GetNoise2D(glm::ivec2(pos.x, pos.z), glm::ivec2(x + 65345, z + 12323), 3, 4.f)) / 8;
 
 			for (int y = 0; y < 16; y++) {
 
 				float gy = (float)(y + scaledPos.y);
 
-				float n = getNoise3D(glm::ivec3{ pos.x,pos.y ,pos.z }, glm::ivec3(x, y, z), 4, 1.f);
+				float n = GetNoise3D(glm::ivec3{ pos.x,pos.y ,pos.z }, glm::ivec3(x, y, z), 4, 1.f);
 
 				n = n + noiseOffset;
 
@@ -52,7 +52,7 @@ Chunk* MountainGenerator::Generate(const ChunkPos& pos) {
 
 
 	if (pos.y == 3) {
-		int numBlocks = static_cast<int>(Blocks.BlockTypeData.size());
+		int numBlocks = static_cast<int>(Blocks.block_type_data_.size());
 
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
@@ -79,9 +79,6 @@ Chunk* MountainGenerator::Generate(const ChunkPos& pos) {
 			}
 		}
 	}
-
-
-
 
 	return chunk;
 }
@@ -116,7 +113,7 @@ void MountainGenerator::GenerateDecor(const ChunkPos& pos, Chunk* chunk) {
 			int gx = pos.x + x;
 			int gz = pos.z + z;
 
-			float TREE_MAP = (float)((double)(Noise.GetNoise((float)gx * 100.f, (float)gz * 100.f, 3453454.f) + 1.f) / 2.f);
+			float TREE_MAP = (float)((double)(noise_.GetNoise((float)gx * 100.f, (float)gz * 100.f, 3453454.f) + 1.f) / 2.f);
 			for (int y = 0; y < 16; y++) {
 				if (chunk->GetBlock(x, y - 1, z) == Blocks.GRASS) {
 
@@ -194,7 +191,7 @@ void MountainGenerator::GenerateDecor(const ChunkPos& pos, Chunk* chunk) {
 }
 
 
-float MountainGenerator::getNoise3D(glm::ivec3 ChunkCoordinate, glm::ivec3 RelativeBlockCoords, int samples, float frequency) {
+float MountainGenerator::GetNoise3D(glm::ivec3 ChunkCoordinate, glm::ivec3 RelativeBlockCoords, int samples, float frequency) {
 	glm::vec3 GlobalBlockPosition = glm::vec3(ChunkCoordinate * 16 + RelativeBlockCoords);
 
 	GlobalBlockPosition *= frequency;
@@ -202,7 +199,7 @@ float MountainGenerator::getNoise3D(glm::ivec3 ChunkCoordinate, glm::ivec3 Relat
 	float out = 0.0f;
 
 	for (int i = 0; i < samples; i++) {
-		float n = Noise.GetNoise(
+		float n = noise_.GetNoise(
 			GlobalBlockPosition.x * powf(2.0, static_cast<float>(i)),
 			GlobalBlockPosition.y * powf(2.0, static_cast<float>(i)),
 			GlobalBlockPosition.z * powf(2.0, static_cast<float>(i))) + 1;
@@ -216,7 +213,7 @@ float MountainGenerator::getNoise3D(glm::ivec3 ChunkCoordinate, glm::ivec3 Relat
 	return out;
 
 }
-float MountainGenerator::getNoise2D(glm::ivec2 ChunkCoordinate, glm::ivec2 RelativeBlockCoords, int samples, float frequency) {
+float MountainGenerator::GetNoise2D(glm::ivec2 ChunkCoordinate, glm::ivec2 RelativeBlockCoords, int samples, float frequency) {
 	glm::vec2 GlobalBlockPosition = glm::vec2(ChunkCoordinate * 16 + RelativeBlockCoords);
 
 	GlobalBlockPosition *= frequency;
@@ -224,7 +221,7 @@ float MountainGenerator::getNoise2D(glm::ivec2 ChunkCoordinate, glm::ivec2 Relat
 	float out = 0.0f;
 
 	for (int i = 0; i < samples; i++) {
-		float n = Noise.GetNoise(GlobalBlockPosition.x * powf(2.0, static_cast<float>(i)),
+		float n = noise_.GetNoise(GlobalBlockPosition.x * powf(2.0, static_cast<float>(i)),
 			GlobalBlockPosition.y * powf(2.0, static_cast<float>(i))) + 1;
 		n *= 0.5f;
 		out += n * powf(0.5f, i);
@@ -236,16 +233,16 @@ float MountainGenerator::getNoise2D(glm::ivec2 ChunkCoordinate, glm::ivec2 Relat
 }
 
 
-float MountainGenerator::continentialNoise(float n) {
-	int index = getIndex(ContinentalnessInterpolation, n);
+float MountainGenerator::ContinentialNoise(float n) {
+	int index = GetIndex(continentalness_interpolation_, n);
 
-	float x1 = ContinentalnessInterpolation[index].x;
-	float y1 = ContinentalnessInterpolation[index].y;
+	float x1 = continentalness_interpolation_[index].x;
+	float y1 = continentalness_interpolation_[index].y;
 
 	index++;
 
-	float x2 = ContinentalnessInterpolation[index].x;
-	float y2 = ContinentalnessInterpolation[index].y;
+	float x2 = continentalness_interpolation_[index].x;
+	float y2 = continentalness_interpolation_[index].y;
 
 	float m = (y1 - y2) / (x1 - x2);
 
@@ -254,16 +251,16 @@ float MountainGenerator::continentialNoise(float n) {
 	return out;
 }
 
-float MountainGenerator::erosionNoise(float n) {
-	int index = getIndex(ErosionnessInterpolation, n);
+float MountainGenerator::ErosionNoise(float n) {
+	int index = GetIndex(erosionness_interpolation_, n);
 
-	float x1 = ErosionnessInterpolation[index].x;
-	float y1 = ErosionnessInterpolation[index].y;
+	float x1 = erosionness_interpolation_[index].x;
+	float y1 = erosionness_interpolation_[index].y;
 
 	index++;
 
-	float x2 = ErosionnessInterpolation[index].x;
-	float y2 = ErosionnessInterpolation[index].y;
+	float x2 = erosionness_interpolation_[index].x;
+	float y2 = erosionness_interpolation_[index].y;
 
 	float m = (y1 - y2) / (x1 - x2);
 
@@ -272,16 +269,16 @@ float MountainGenerator::erosionNoise(float n) {
 	return out;
 }
 
-float MountainGenerator::peaksandvalley(float n) {
-	int index = getIndex(PeaksValleyInterpolation, n);
+float MountainGenerator::PeaksAndValley(float n) {
+	int index = GetIndex(peaks_valley_interpolation_, n);
 
-	float x1 = PeaksValleyInterpolation[index].x;
-	float y1 = PeaksValleyInterpolation[index].y;
+	float x1 = peaks_valley_interpolation_[index].x;
+	float y1 = peaks_valley_interpolation_[index].y;
 
 	index++;
 
-	float x2 = PeaksValleyInterpolation[index].x;
-	float y2 = PeaksValleyInterpolation[index].y;
+	float x2 = peaks_valley_interpolation_[index].x;
+	float y2 = peaks_valley_interpolation_[index].y;
 
 	float m = (y1 - y2) / (x1 - x2);
 
@@ -290,7 +287,7 @@ float MountainGenerator::peaksandvalley(float n) {
 	return out;
 }
 
-int MountainGenerator::getIndex(std::vector<glm::vec2>& vec, float bottomBound) {
+int MountainGenerator::GetIndex(std::vector<glm::vec2>& vec, float bottomBound) {
 	for (int i = 0; i < vec.size(); i++) {
 		if (vec[i].x >= bottomBound) {
 			return i - 1;

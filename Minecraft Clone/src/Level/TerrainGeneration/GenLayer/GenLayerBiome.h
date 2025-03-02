@@ -10,12 +10,12 @@ private:
     std::vector<Biome*> mediumBiomes = { Biomes::FOREST, Biomes::ROOFED_FOREST, Biomes::EXTREME_HILLS, Biomes::PLAINS, Biomes::BIRCH_FOREST, Biomes::SWAMPLAND };
     std::vector<Biome*> iceBiomes = { Biomes::ICE_PLAINS, Biomes::ICE_PLAINS, Biomes::ICE_PLAINS, Biomes::COLD_TAIGA };
     std::vector<Biome*> coldBiomes = { Biomes::FOREST, Biomes::EXTREME_HILLS, Biomes::TAIGA, Biomes::PLAINS };
-    ChunkGeneratorSettings* settings;
+    ChunkGeneratorSettings* settings_;
 public:
 
 	GenLayerBiome(long long baseSeedIn, GenLayer* parentIn, ChunkGeneratorSettings* settingsIn) : GenLayer(baseSeedIn) { // add worldtype ;ater
         parent = parentIn;
-        settings = settingsIn;
+        settings_ = settingsIn;
 
 	}
 
@@ -33,9 +33,9 @@ public:
                 int l = (k & 3840) >> 8;
                 k = k & -3841;
 
-                if (settings != nullptr && settings->fixedBiome >= 0)
+                if (settings_ != nullptr && settings_->fixedBiome >= 0)
                 {
-                    aint1[j + i * areaWidth] = settings->fixedBiome;
+                    aint1[j + i * areaWidth] = settings_->fixedBiome;
                 }
                 else if (isBiomeOceanic(k))
                 {
@@ -49,7 +49,7 @@ public:
                 {
                     if (l > 0)
                     {
-                        if (nextInt(3) == 0)
+                        if (NextInt(3) == 0)
                         {
                             aint1[j + i * areaWidth] = Biome::getIdForBiome(Biomes::MESA_CLEAR_ROCK);
                         }
@@ -60,7 +60,7 @@ public:
                     }
                     else
                     {
-                        aint1[j + i * areaWidth] = Biome::getIdForBiome(warmBiomes[nextInt(static_cast<int>(warmBiomes.size()))]);
+                        aint1[j + i * areaWidth] = Biome::getIdForBiome(warmBiomes[NextInt(static_cast<int>(warmBiomes.size()))]);
                     }
                 }
                 else if (k == 2)
@@ -71,7 +71,7 @@ public:
                     }
                     else
                     {
-                        aint1[j + i * areaWidth] = Biome::getIdForBiome(mediumBiomes[nextInt(static_cast<int>(mediumBiomes.size()))]);
+                        aint1[j + i * areaWidth] = Biome::getIdForBiome(mediumBiomes[NextInt(static_cast<int>(mediumBiomes.size()))]);
                     }
                 }
                 else if (k == 3)
@@ -82,12 +82,12 @@ public:
                     }
                     else
                     {
-                        aint1[j + i * areaWidth] = Biome::getIdForBiome(coldBiomes[nextInt(static_cast<int>(coldBiomes.size()))]);
+                        aint1[j + i * areaWidth] = Biome::getIdForBiome(coldBiomes[NextInt(static_cast<int>(coldBiomes.size()))]);
                     }
                 }
                 else if (k == 4)
                 {
-                    aint1[j + i * areaWidth] = Biome::getIdForBiome(iceBiomes[nextInt(static_cast<int>(iceBiomes.size()))]);
+                    aint1[j + i * areaWidth] = Biome::getIdForBiome(iceBiomes[NextInt(static_cast<int>(iceBiomes.size()))]);
                 }
                 else
                 {

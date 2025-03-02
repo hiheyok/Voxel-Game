@@ -18,15 +18,15 @@ public:
     NoiseGeneratorImproved(JavaRandom& random) {
 
         permutations.resize(512);
-        xCoord = random.nextDouble() * 256.0;
-        yCoord = random.nextDouble() * 256.0;
-        zCoord = random.nextDouble() * 256.0;
+        xCoord = random.NextDouble() * 256.0;
+        yCoord = random.NextDouble() * 256.0;
+        zCoord = random.NextDouble() * 256.0;
 
         for (int i = 0; i < 256; permutations[i] = i++) {
         }
 
         for (int l = 0; l < 256; ++l) {
-            int j = random.nextInt(256 - l) + l;
+            int j = random.NextInt(256 - l) + l;
             int k = permutations[l];
             permutations[l] = permutations[j];
             permutations[j] = k;

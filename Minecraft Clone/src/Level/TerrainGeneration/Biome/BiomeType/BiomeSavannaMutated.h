@@ -9,7 +9,7 @@ public:
 		return typeid(*this);
 	}
 
-    void genTerrainBlocks(JavaRandom& rand, TallChunk* chunk, int x, int z, double noiseVal, ChunkGeneratorSettings* settings) override
+    void GenTerrainBlocks(JavaRandom& rand, TallChunk* chunk, int x, int z, double noiseVal, ChunkGeneratorSettings* settings_) override
     {
         topBlock = Blocks.GRASS;
         fillerBlock = Blocks.DIRT;
@@ -24,6 +24,6 @@ public:
             topBlock = Blocks.COARSE_DIRT;
         }
 
-        generateBiomeTerrain(rand, chunk, x, z, noiseVal, settings);
+        generateBiomeTerrain(rand, chunk, x, z, noiseVal, settings_);
     }
 };

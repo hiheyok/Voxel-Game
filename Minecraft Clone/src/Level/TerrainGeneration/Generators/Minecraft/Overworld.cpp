@@ -2,7 +2,7 @@
 #include "../../Biome/BiomeProvider.h"
 
 void OverworldGenerator::GenerateChunk(int x, int z, TallChunk* chunk) {
-    rand.setSeed((long long)x * 341873128712LL + (long long)z * 132897987541LL);
+    rand.SetSeed((long long)x * 341873128712LL + (long long)z * 132897987541LL);
     setBlocksInChunk(x, z, chunk);
     biomesForGeneration = BiomeProvider::getBiomes(x * 16, z * 16, 16, 16);
     replaceBiomeBlocks(x, z, chunk, biomesForGeneration);
@@ -17,16 +17,16 @@ void OverworldGenerator::replaceBiomeBlocks(int x, int z, TallChunk* chunk, std:
         for (int j = 0; j < 16; ++j)
         {
             Biome* biome = biomesIn[j + i * 16];
-            biome->genTerrainBlocks(rand, chunk, x * 16 + i, z * 16 + j, depthBuffer[j + i * 16], &settings);
+            biome->GenTerrainBlocks(rand, chunk, x * 16 + i, z * 16 + j, depthBuffer[j + i * 16], &settings_);
         }
     }
 }
 
 void OverworldGenerator::generateHeightmap(int x, int y, int z) {
-    depthRegion = depthNoise.generateNoiseOctaves(depthRegion, x, z, 5, 5, settings.depthNoiseScaleX, settings.depthNoiseScaleZ, settings.depthNoiseScaleExponent);
-    float f = settings.coordinateScale;
-    float f1 = settings.stretchY;
-    mainNoiseRegion = mainPerlinNoise.generateNoiseOctaves(mainNoiseRegion, x, y, z, 5, 33, 5, (double)(f / settings.mainNoiseScaleX), (double)(f1 / settings.mainNoiseScaleY), (double)(f / settings.mainNoiseScaleZ));
+    depthRegion = depthNoise.generateNoiseOctaves(depthRegion, x, z, 5, 5, settings_.depthNoiseScaleX, settings_.depthNoiseScaleZ, settings_.depthNoiseScaleExponent);
+    float f = settings_.coordinateScale;
+    float f1 = settings_.stretchY;
+    mainNoiseRegion = mainPerlinNoise.generateNoiseOctaves(mainNoiseRegion, x, y, z, 5, 33, 5, (double)(f / settings_.mainNoiseScaleX), (double)(f1 / settings_.mainNoiseScaleY), (double)(f / settings_.mainNoiseScaleZ));
     minLimitRegion = minLimitPerlinNoise.generateNoiseOctaves(minLimitRegion, x, y, z, 5, 33, 5, (double)f, (double)f1, (double)f);
     maxLimitRegion = maxLimitPerlinNoise.generateNoiseOctaves(maxLimitRegion, x, y, z, 5, 33, 5, (double)f, (double)f1, (double)f);
     int i = 0;
@@ -47,8 +47,8 @@ void OverworldGenerator::generateHeightmap(int x, int y, int z) {
                 for (int k1 = -2; k1 <= 2; ++k1)
                 {
                     Biome* biome1 = biomesForGeneration[k + j1 + 2 + (l + k1 + 2) * 10];
-                    float f5 = settings.biomeDepthOffset + biome1->getBaseHeight() * settings.biomeDepthWeight;
-                    float f6 = settings.biomeScaleOffset + biome1->getHeightVariation() * settings.biomeScaleWeight;
+                    float f5 = settings_.biomeDepthOffset + biome1->getBaseHeight() * settings_.biomeDepthWeight;
+                    float f6 = settings_.biomeScaleOffset + biome1->getHeightVariation() * settings_.biomeScaleWeight;
 
                     float f7 = biomeWeights[j1 + 2 + (k1 + 2) * 5] / (f5 + 2.0F);
 
@@ -101,20 +101,20 @@ void OverworldGenerator::generateHeightmap(int x, int y, int z) {
             double d8 = (double)f3;
             double d9 = (double)f2;
             d8 = d8 + d7 * 0.2;
-            d8 = d8 * (double)settings.baseSize / 8.0;
-            double d0 = (double)settings.baseSize + d8 * 4.0;
+            d8 = d8 * (double)settings_.baseSize / 8.0;
+            double d0 = (double)settings_.baseSize + d8 * 4.0;
 
             for (int l1 = 0; l1 < 33; ++l1)
             {
-                double d1 = ((double)l1 - d0) * (double)settings.stretchY * 128.0 / 256.0 / d9;
+                double d1 = ((double)l1 - d0) * (double)settings_.stretchY * 128.0 / 256.0 / d9;
 
                 if (d1 < 0.0)
                 {
                     d1 *= 4.0;
                 }
 
-                double d2 = minLimitRegion[i] / (double)settings.lowerLimitScale;
-                double d3 = maxLimitRegion[i] / (double)settings.upperLimitScale;
+                double d2 = minLimitRegion[i] / (double)settings_.lowerLimitScale;
+                double d3 = maxLimitRegion[i] / (double)settings_.upperLimitScale;
                 double d4 = (mainNoiseRegion[i] / 10.0 + 1.0) / 2.0;
                 double d5 = clampedLerp(d2, d3, d4) - d1;
 
@@ -181,7 +181,7 @@ void OverworldGenerator::setBlocksInChunk(int x, int z, TallChunk* chunk) {
                                 int genHeight = i2 * 8 + j2;
                                 chunk->SetBlockUnsafe(i * 4 + k2, genHeight, l * 4 + l2, Blocks.STONE);
                             }
-                            else if (i2 * 8 + j2 < settings.seaLevel) {
+                            else if (i2 * 8 + j2 < settings_.seaLevel) {
                                 int genHeight = i2 * 8 + j2;
                                 chunk->SetBlockUnsafe(i * 4 + k2, genHeight, l * 4 + l2, Blocks.WATER);
                             }

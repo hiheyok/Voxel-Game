@@ -7,7 +7,13 @@
 typedef unsigned long long int RegionID;
 
 struct Region { //32x32x32 Chunk Region
-	ChunkColumn* region[32 * 32]{ nullptr };
+	ChunkColumn* region_[32 * 32]{ nullptr };
+
+	~Region() {
+		for (int i = 0; i < 32 * 32; ++i) {
+			delete region_[i];
+		}
+	}
 
 	void AddChunk(Chunk* chunk, uint16_t x, uint16_t y, uint16_t z);
 	void AddChunkGlobalPos(Chunk* chunk, int32_t x, int32_t y, int32_t z);
@@ -27,7 +33,7 @@ struct Region { //32x32x32 Chunk Region
 	bool CheckChunkColumn(uint16_t x, uint16_t z) const;
 	bool CheckChunkColumnGlobalPos(int32_t x, int32_t z) const;
 
-	uint64_t AccessCount = 0;
+	uint64_t access_count_ = 0;
 };
 
 class ChunkMap {
@@ -48,7 +54,8 @@ public:
 	Chunk* GetChunk(const ChunkPos& pos) const;
 private:
 	//Input position is the chunk position
-	Region* GetRegion(const ChunkPos& pos) const;
+	const std::unique_ptr<Region>& GetRegion(const ChunkPos& pos) const;
+	const bool CheckRegion(const ChunkPos& pos) const;
 
-	FastHashMap<RegionPos, Region*> LiveRegion;
+	FastHashMap<RegionPos, std::unique_ptr<Region>> live_region_;
 };

@@ -34,9 +34,9 @@ public:
 
     NoiseGeneratorSimplex(JavaRandom& seed) {
         p.resize(512);
-        xo = seed.nextDouble() * 256.0;
-        yo = seed.nextDouble() * 256.0;
-        zo = seed.nextDouble() * 256.0;
+        xo = seed.NextDouble() * 256.0;
+        yo = seed.NextDouble() * 256.0;
+        zo = seed.NextDouble() * 256.0;
 
         for (int i = 0; i < 256; p[i] = i++)
         {
@@ -45,7 +45,7 @@ public:
 
         for (int l = 0; l < 256; ++l)
         {
-            int j = seed.nextInt(256 - l) + l;
+            int j = seed.NextInt(256 - l) + l;
             int k = p[l];
             p[l] = p[j];
             p[j] = k;

@@ -6,16 +6,16 @@
 
 class BlockList{
 private:
-	FastHashMap<std::string, BlockID> BlockIDNameData;
-	int BlockTypeCount = 0;
+	FastHashMap<std::string, BlockID> block_id_name_data_;
+	int block_type_count_ = 0;
 
 	void InitializeBlockModels();
 	void AddAssets(std::string namespaceIn);
 public:
-	std::vector<Block*> BlockTypeData = {};
-	std::vector<ModelV2::BlockModelV2> BlockModelData = {};
+	std::vector<Block*> block_type_data_ = {};
+	std::vector<ModelV2::BlockModelV2> block_model_data_ = {};
 
-	TextureAtlas BlockTextureAtlas;
+	TextureAtlas block_texture_atlas_;
 
 
 	BlockID AIR = RegisterBlock("minecraft:air", new MaterialNone(), true, false, false);
@@ -354,12 +354,12 @@ public:
 	BlockID ANVIL = RegisterBlock("minecraft:anvil", new MaterialNone(), false, true, false);
 
 	void Initialize() {
-		BlockTextureAtlas.Gen();
-		BlockTextureAtlas.SetSize(16 * 512, 16 * 512);
+		block_texture_atlas_.Gen();
+		block_texture_atlas_.SetSize(16 * 512, 16 * 512);
 
 		InitializeBlockModels();
 
-		BlockTextureAtlas.UploadToGPU();
+		block_texture_atlas_.UploadToGPU();
 	}
 
 	~BlockList() {
@@ -367,22 +367,22 @@ public:
 	}
 
 	void CleanUp() {
-		for (const auto& obj : BlockTypeData) {
+		for (const auto& obj : block_type_data_) {
 			delete obj;
 		}
 
-		BlockTypeData.clear();
+		block_type_data_.clear();
 	}
 
-	inline Block* getBlockType(BlockID id) {
-		return BlockTypeData[id];
+	inline Block* GetBlockType(BlockID id) {
+		return block_type_data_[id];
 	}
 
-	const inline ModelV2::BlockModelV2& getBlockModelDereferenced(BlockID id) {
-		return BlockModelData[id];
+	const inline ModelV2::BlockModelV2& GetBlockModelDereferenced(BlockID id) {
+		return block_model_data_[id];
 	}
 
-	BlockID RegisterBlock(std::string BlockName, Material* material, bool transparency, bool solid, bool isFluid);
+	BlockID RegisterBlock(std::string blockName, Material* material, bool transparency, bool solid, bool isFluid);
 
 } ;
 

@@ -4,75 +4,75 @@ using namespace std;
 using namespace glm;
 
 int Server::getChunkCount() {
-	return level.levelLoader.getChunkCount();
+	return level_.level_loader_.getChunkCount();
 }
 
 double Server::getMSPT() {
-	return MSPT;
+	return mspt_;
 }
 
-Timer* Server::getTimer() {
+Timer* Server::GetTimer() {
 	return &time;
 }
 
 vector<EntityProperty> Server::getUpdatedEntities() {
-	return level.mainWorld->worldInteractions.getUpdatedEntities();
+	return level_.main_world_->world_interactions_.getUpdatedEntities();
 }
 
 vector<EntityUUID> Server::getRemovedEntities() {
-	return level.mainWorld->worldInteractions.getRemovedEntities();
+	return level_.main_world_->world_interactions_.getRemovedEntities();
 }
 
-bool Server::checkEntityOnGround(EntityUUID id) {
-	return level.mainWorld->worldInteractions.Collusions.isEntityOnGround(level.mainWorld->worldInteractions.getEntity(id));
+bool Server::CheckEntityOnGround(EntityUUID id) {
+	return level_.main_world_->world_interactions_.collusions_.isEntityOnGround(level_.main_world_->world_interactions_.GetEntity(id));
 }
 
 void Server::join(Entity& entity) {
-	level.mainWorld->worldInteractions.summonEntity(entity);
+	level_.main_world_->world_interactions_.summonEntity(entity);
 }
 
-vector<ChunkPos> Server::getUpdatedChunkPos() {
-	return level.mainWorld->worldInteractions.getUpdatedChunkPos();
+vector<ChunkPos> Server::GetUpdatedChunkPos() {
+	return level_.main_world_->world_interactions_.GetUpdatedChunkPos();
 }
 
-Chunk* Server::getChunk(const ChunkPos& pos) {
-	return level.mainWorld->worldInteractions.getChunk(pos);
+Chunk* Server::GetChunk(const ChunkPos& pos) {
+	return level_.main_world_->world_interactions_.GetChunk(pos);
 }
 
-BlockID Server::getBlock(const BlockPos& pos) { //Include dimension in parameter later
-	return level.mainWorld->worldInteractions.getBlock(pos);
+BlockID Server::GetBlock(const BlockPos& pos) { //Include dimension in parameter later
+	return level_.main_world_->world_interactions_.GetBlock(pos);
 }
 
-bool Server::getRayIntersection(Ray& ray) { //Include dimension in paramter later
-	return level.mainWorld->worldInteractions.Collusions.CheckRayIntersection(ray);
+bool Server::GetRayIntersection(Ray& ray) { //Include dimension in paramter later
+	return level_.main_world_->world_interactions_.collusions_.CheckRayIntersection(ray);
 }
 
-vec3 Server::getEntityCollusionTime(EntityUUID entity) {
-	return level.mainWorld->worldInteractions.Collusions.GetTimeTillCollusion(level.mainWorld->worldInteractions.getEntity(entity));
+vec3 Server::GetEntityCollusionTime(EntityUUID entity) {
+	return level_.main_world_->world_interactions_.collusions_.GetTimeTillCollusion(level_.main_world_->world_interactions_.GetEntity(entity));
 }
 
-void Server::startServer(ServerSettings serverSettings) {
-	level.Start(serverSettings.genThreadCount, serverSettings.lightEngineThreadCount);
+void Server::StartServer(ServerSettings serverSettings) {
+	level_.Start(serverSettings.gen_thread_count_, serverSettings.light_engine_thread_count_);
 	stop = false;
-	settings = serverSettings;
-	mainServerLoop = thread(&Server::loop, this);
+	settings_ = serverSettings;
+	main_server_loop_ = thread(&Server::Loop, this);
 }
 
 void Server::Stop() {
 	stop = true;
-	mainServerLoop.join();
-	level.Stop();
+	main_server_loop_.join();
+	level_.Stop();
 }
 
-void Server::loop() {
+void Server::Loop() {
 	Logger.LogDebug("Server", "Started main server loop");
 	while (!stop) {
 		time.Set();
 
-		tick();
+		Tick();
 
-		MSPT = time.GetTimePassed_ms();
-		double timeLeft = (1000.0 / (double)settings.tickRate) - MSPT;
+		mspt_ = time.GetTimePassed_ms();
+		double timeLeft = (1000.0 / (double)settings_.tick_rate_) - mspt_;
 
 		if (timeLeft > 0) {
 			timerSleepNotPrecise(timeLeft);
@@ -81,13 +81,13 @@ void Server::loop() {
 	Logger.LogDebug("Server", "Shutting down main server loop");
 }
 
-void Server::tick() {
-	level.mainWorld->Tick();
-	level.mainWorld->EventTick();
-	level.updateDimensions();
-	level.mainWorld->worldInteractions.worldLoader->load();
+void Server::Tick() {
+	level_.main_world_->Tick();
+	level_.main_world_->EventTick();
+	level_.updateDimensions();
+	level_.main_world_->world_interactions_.worldLoader_->Load();
 }
 
-void Server::sendEvent(const Event::Event& pEventIn) {
-	level.mainWorld->EventManager.AddEvent(pEventIn);
+void Server::SendEvent(const Event::Event& pEventIn) {
+	level_.main_world_->event_manager_.AddEvent(pEventIn);
 }

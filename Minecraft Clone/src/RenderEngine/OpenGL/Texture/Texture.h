@@ -76,10 +76,9 @@ public:
     }
 
     GLuint textureID = NULL;
-
-    size_t width = NULL;
-    size_t height = NULL;
-    int Format = NULL;
+    size_t width_ = NULL;
+    size_t height_ = NULL;
+    int format_ = NULL;
 private:
 
 };

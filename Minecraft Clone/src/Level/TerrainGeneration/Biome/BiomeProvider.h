@@ -7,7 +7,7 @@ class BiomeProvider {
 private:
 	static std::vector<GenLayer*> genBiomes;
 	static std::vector<GenLayer*> biomeIndexLayer;
-	static ChunkGeneratorSettings* settings;
+	static ChunkGeneratorSettings* settings_;
 	static concurrency::concurrent_unordered_map<size_t, size_t> ThreadGenIndex;
 	static std::mutex lock;
 	
@@ -25,7 +25,7 @@ public:
 		std::vector<GenLayer*> agenlayer = CombinedGenLayers::initializeAllBiomeGenerators(seed, settingsIn);
 		BiomeProvider::genBiomes.push_back(agenlayer[0]);
 		BiomeProvider::biomeIndexLayer.push_back(agenlayer[1]);
-		BiomeProvider::settings = settingsIn;
+		BiomeProvider::settings_ = settingsIn;
 		BiomeProvider::biomeProviderSeed = seed;
 		BiomeProvider::lock.unlock();
 	}
@@ -35,7 +35,7 @@ public:
 		size_t mapSize = BiomeProvider::ThreadGenIndex.size();
 		if (!ThreadGenIndex.count(threadHash)) {
 			BiomeProvider::ThreadGenIndex[threadHash] = mapSize;
-			init(biomeProviderSeed, settings);
+			init(biomeProviderSeed, settings_);
 		}
 
 		size_t threadIndex = BiomeProvider::ThreadGenIndex[threadHash];
@@ -55,7 +55,7 @@ public:
 		size_t mapSize = BiomeProvider::ThreadGenIndex.size();
 		if (!ThreadGenIndex.count(threadHash)) {
 			BiomeProvider::ThreadGenIndex[threadHash] = mapSize;
-			init(biomeProviderSeed, settings);
+			init(biomeProviderSeed, settings_);
 		}
 
 		size_t threadIndex = BiomeProvider::ThreadGenIndex[threadHash];
@@ -73,7 +73,7 @@ public:
 
 _declspec(selectany) std::vector<GenLayer*> BiomeProvider::genBiomes = std::vector<GenLayer*>();
 _declspec(selectany) std::vector<GenLayer*> BiomeProvider::biomeIndexLayer = std::vector<GenLayer*>();
-_declspec(selectany) ChunkGeneratorSettings* BiomeProvider::settings = nullptr;
+_declspec(selectany) ChunkGeneratorSettings* BiomeProvider::settings_ = nullptr;
 _declspec(selectany) long long BiomeProvider::biomeProviderSeed = 0;
 _declspec(selectany) concurrency::concurrent_unordered_map<size_t, size_t> BiomeProvider::ThreadGenIndex = concurrency::concurrent_unordered_map<size_t, size_t>();
 _declspec(selectany) std::mutex BiomeProvider::lock;

@@ -7,33 +7,33 @@
 
 struct GUIElement {
 	struct GUIVertices {
-		std::vector<float> Vertices = {};
-		std::vector<int> Indices = {};
+		std::vector<float> vertices_ = {};
+		std::vector<int> indices_ = {};
 	};
 
 	GUIElement() {
 
 	}
 
-	GUIElement(std::string text, glm::vec2 size, glm::vec2 location) : Text(text), Size(size), Location(location) {
+	GUIElement(std::string text, glm::vec2 size, glm::vec2 location) : text_(text), size_(size), location_(location) {
 
 	}
 
 	GUIVertices GetVertices() {
 		GUIVertices data;
-		UV_P0.y = 1.f - UV_P0.y;
-		UV_P1.y = 1.f - UV_P1.y;
+		uv_p0_.y = 1.f - uv_p0_.y;
+		uv_p1_.y = 1.f - uv_p1_.y;
 
-		data.Vertices.insert(data.Vertices.end(),
+		data.vertices_.insert(data.vertices_.end(),
 
 			{
-				Location.x - (Size.x / 2.f), Location.y - (Size.y / 2.f), UV_P0.x, UV_P1.y,
-				Location.x + (Size.x / 2.f), Location.y - (Size.y / 2.f), UV_P1.x, UV_P1.y,
-				Location.x + (Size.x / 2.f), Location.y + (Size.y / 2.f), UV_P1.x, UV_P0.y,
-				Location.x - (Size.x / 2.f), Location.y + (Size.y / 2.f), UV_P0.x, UV_P0.y,
+				location_.x - (size_.x / 2.f), location_.y - (size_.y / 2.f), uv_p0_.x, uv_p1_.y,
+				location_.x + (size_.x / 2.f), location_.y - (size_.y / 2.f), uv_p1_.x, uv_p1_.y,
+				location_.x + (size_.x / 2.f), location_.y + (size_.y / 2.f), uv_p1_.x, uv_p0_.y,
+				location_.x - (size_.x / 2.f), location_.y + (size_.y / 2.f), uv_p0_.x, uv_p0_.y,
 			});
 
-		data.Indices.insert(data.Indices.end(),
+		data.indices_.insert(data.indices_.end(),
 			{
 				0, 1, 2,
 				2, 3, 0
@@ -41,21 +41,21 @@ struct GUIElement {
 			);
 
 
-		UV_P0.y = 1.f - UV_P0.y;
-		UV_P1.y = 1.f - UV_P1.y;
+		uv_p0_.y = 1.f - uv_p0_.y;
+		uv_p1_.y = 1.f - uv_p1_.y;
 
 		return data;
 	}
 
-	std::string Text = "";
-	glm::vec2 Size = glm::vec2(0.f, 0.f);;
-	glm::vec2 Location = glm::vec2(0.f,0.f);
-	glm::vec2 UV_P0 = glm::vec2(0.f, 0.f);
-	glm::vec2 UV_P1 = glm::vec2(0.f, 0.f);
+	std::string text_ = "";
+	glm::vec2 size_ = glm::vec2(0.f, 0.f);;
+	glm::vec2 location_ = glm::vec2(0.f,0.f);
+	glm::vec2 uv_p0_ = glm::vec2(0.f, 0.f);
+	glm::vec2 uv_p1_ = glm::vec2(0.f, 0.f);
 
-	int Texture = 0;
-	bool hasTexture = false;
-	bool isButton = 0;
+	int texture_ = 0;
+	bool has_texture_ = false;
+	bool is_button_ = 0;
 
-	int BufferIndex = 0;
+	int buffer_index_ = 0;
 };

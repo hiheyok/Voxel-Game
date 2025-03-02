@@ -2,37 +2,37 @@
 
 using namespace std;
 
-void LevelLoader::Start(int worldGenThreadCount, int lightEngineThreadCount, WorldAccess* world, long long worldGenSeedIn) {
+void LevelLoader::Start(int worldGenThreadCount, int light_engine_thread_count_, WorldAccess* world, long long worldGenSeedIn) {
 	Biomes::RegisterBiome();
 	BiomeProvider::init(worldGenSeedIn, new ChunkGeneratorSettings);
-	worldGenerator.Start(worldGenThreadCount, worldGenSeedIn);
-	lightEngine.Start(lightEngineThreadCount, world);
+	world_generator_.Start(worldGenThreadCount, worldGenSeedIn);
+	light_engine_.Start(light_engine_thread_count_, world);
 }
 
 void LevelLoader::Stop() {
-	worldGenerator.Stop();
+	world_generator_.Stop();
 }
 
 int LevelLoader::getChunkCount() {
 	return count;
 }
 
-void LevelLoader::sendRequestedChunks(vector<ChunkPos> requestedChunks, WorldGeneratorID worldGenTypeIn) { //Add option for requested chunks dimension type and generator type later
+void LevelLoader::SendRequestedChunks(vector<ChunkPos> requestedChunks, WorldGeneratorID worldGenTypeIn) { //Add option for requested chunks dimension type and generator type later
 	//Later this will check on the disk for chunks
-	worldGenerator.Generate(requestedChunks, worldGenTypeIn);
+	world_generator_.Generate(std::move(requestedChunks), worldGenTypeIn);
 }
 
-vector<Chunk*> LevelLoader::getGeneratedChunk() {
-	vector<Chunk*> out = worldGenerator.GetOutput();
+vector<Chunk*> LevelLoader::GetGeneratedChunk() {
+	vector<Chunk*> out = world_generator_.GetOutput();
 	count += out.size();
 	return out;
 }
 
-void LevelLoader::sendRequestedLightUpdates(vector<ChunkColumnPos> RequestedLight) {
+void LevelLoader::SendRequestedLightUpdates(vector<ChunkColumnPos> requestedLight) {
 	//Later this will check on the disk for baked light info
-	lightEngine.Generate(RequestedLight);
+	light_engine_.Generate(std::move(requestedLight));
 }
 
-vector<ChunkLightingContainer*> LevelLoader::getLightingInfomation() {
-	return lightEngine.GetOutput();
+vector<std::shared_ptr<ChunkLightingContainer>> LevelLoader::GetLightingInfomation() {
+	return light_engine_.GetOutput();
 }

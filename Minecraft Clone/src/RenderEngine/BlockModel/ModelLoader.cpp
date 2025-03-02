@@ -73,36 +73,36 @@ void ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
 				std::swap(arr[1], arr[3]);
 
 				for (int i = 0; i < 4; i++) {
-					bFace.UV[i] = arr[i];
+					bFace.uv_[i] = arr[i];
 				}
 			}
 			else if (!strcmp(faceElements.key().c_str(), "texture")) {
-				auto Tokens = Tokenize(faceElements.value(),  ':');
+				auto tokens = Tokenize(faceElements.value(),  ':');
 
-				string TexName = Tokens.back();
-				string TexNamespace = DEFAULT_NAMESPACE;
+				string texName = tokens.back();
+				string texNamespace = DEFAULT_NAMESPACE;
 
-				if (Tokens.size() == 2) {
-					TexNamespace = Tokens.front();
+				if (tokens.size() == 2) {
+					texNamespace = tokens.front();
 				}
 
-				bool isVariable = TexName[0] == '#';
+				bool isVariable = texName[0] == '#';
 
 				if (isVariable) {
-					bFace.ReferenceTexture = TexName;
+					bFace.reference_texture_ = texName;
 				}
 				else {
-					bFace.ReferenceTexture = TexName + ":" + TexNamespace;
+					bFace.reference_texture_ = texName + ":" + texNamespace;
 				}
 			}
 			else if (!strcmp(faceElements.key().c_str(), "cullface")) {
-				bFace.CullFace = ConvertStringFaceToIndex(faceElements.value()) - 1;
+				bFace.cull_face_ = ConvertStringFaceToIndex(faceElements.value()) - 1;
 			}
 			else if (!strcmp(faceElements.key().c_str(), "tintindex")) {
-				bFace.TintIndex = faceElements.value();
+				bFace.tint_index_ = faceElements.value();
 			}
 			else if (!strcmp(faceElements.key().c_str(), "rotation")) {
-				bFace.rotation = faceElements.value();
+				bFace.rotation_ = faceElements.value();
 			}
 			else {
 				Logger.LogError("Model Loader", "Unknown face attribute: " + faceElements.key());
@@ -121,20 +121,20 @@ CuboidRotationInfo getRotationalData(json JsonData) {
 			vector<float> arr = getJSONArrayValuesFloat(attribute.value());
 
 			for (int i = 0; i < 3; i++) {
-				rotationInfo.origin[i] = arr[i];
+				rotationInfo.origin_[i] = arr[i];
 			}
 		}
 		else if (!strcmp(attribute.key().c_str(), "axis")) {
-			char axis = static_cast<string>(attribute.value())[0];
+			char axis_ = static_cast<string>(attribute.value())[0];
 
-			if (axis == 'x') {
-				rotationInfo.axis = 0;
+			if (axis_ == 'x') {
+				rotationInfo.axis_ = 0;
 			}
-			else if (axis == 'y') {
-				rotationInfo.axis = 1;
+			else if (axis_ == 'y') {
+				rotationInfo.axis_ = 1;
 			}
-			else if (axis == 'z') {
-				rotationInfo.axis = 2;
+			else if (axis_ == 'z') {
+				rotationInfo.axis_ = 2;
 			}
 			else {
 				Logger.LogError("Model Loader", "Unknown rotational axis: " + attribute.value());
@@ -142,13 +142,13 @@ CuboidRotationInfo getRotationalData(json JsonData) {
 			
 		}
 		else if (!strcmp(attribute.key().c_str(), "axis")) {
-			int angle = attribute.value();
-			rotationInfo.angle = angle;
+			int angle_ = attribute.value();
+			rotationInfo.angle_ = angle_;
 		}
 		else if (!strcmp(attribute.key().c_str(), "rescale")) {
-			rotationInfo.rescale = true;
+			rotationInfo.rescale_ = true;
 		}
-		rotationInfo.Initialized = true;
+		rotationInfo.initialized_ = true;
 	}
 
 	return rotationInfo;
@@ -164,14 +164,14 @@ void UpdateModelElements(ModelV2::BlockModelV2* model, json JsonData) {
 			if (!strcmp(subElements.key().c_str(), "from")) {
 				vector<int> arr = getJSONArrayValues(subElements.value());
 				for (int i = 0; i < 3; i++) {
-					cuboid.From[i] = arr[i];
+					cuboid.from_[i] = arr[i];
 				}
 				arr.clear();
 			}
 			else if (!strcmp(subElements.key().c_str(), "to")) {
 				vector<int> arr = getJSONArrayValues(subElements.value());
 				for (int i = 0; i < 3; i++) {
-					cuboid.To[i] = arr[i];
+					cuboid.to_[i] = arr[i];
 				}
 				arr.clear();
 			}
@@ -180,13 +180,13 @@ void UpdateModelElements(ModelV2::BlockModelV2* model, json JsonData) {
 			}
 			else if (!strcmp(subElements.key().c_str(), "rotation")) { 
 				CuboidRotationInfo rotation = getRotationalData(subElements.value());
-				cuboid.rotation = rotation;
+				cuboid.rotation_ = rotation;
 			}
 			else if (!strcmp(subElements.key().c_str(), "__comment")) {
-				cuboid.comments = subElements.value();
+				cuboid.comments_ = subElements.value();
 			}
 			else if (!strcmp(subElements.key().c_str(), "shade")) {
-				cuboid.shade = static_cast<bool>(subElements.value());
+				cuboid.shade_ = static_cast<bool>(subElements.value());
 			}
 			else {
 				Logger.LogError("Model Loader", "Unknown element attribute: " + subElements.key());
@@ -199,25 +199,25 @@ void UpdateModelElements(ModelV2::BlockModelV2* model, json JsonData) {
 
 void ProcessCuboidTexture(ModelV2::BlockModelV2* model, json JsonData) {
 	for (auto& TextureElement : JsonData.items()) {
-		auto Tokens = Tokenize(TextureElement.value(), ':');
+		auto tokens = Tokenize(TextureElement.value(), ':');
 
-		string TextureName = Tokens.back();
-		string TextureNamespace = Tokens.front();
+		string textureName = tokens.back();
+		string textureNamespace = tokens.front();
 		
 
-		if (Tokens.size() == 1) {
-			TextureNamespace = DEFAULT_NAMESPACE;
+		if (tokens.size() == 1) {
+			textureNamespace = DEFAULT_NAMESPACE;
 		}
 
-		string TextureVariableName = TextureElement.key();
+		string textureVariableName = TextureElement.key();
 
-		bool isVariable = TextureName[0] == '#';
+		bool isVariable = textureName[0] == '#';
 
 		if (isVariable) {
-			model->TextureVariable[TextureVariableName] = TextureName;
+			model->texture_variable_[textureVariableName] = textureName;
 		}
 		else {
-			model->TextureVariable[TextureVariableName] = TextureName + ":" + TextureNamespace;
+			model->texture_variable_[textureVariableName] = textureName + ":" + textureNamespace;
 		}
 
 		
@@ -235,17 +235,17 @@ void ProcessModelDisplay(ModelV2::BlockModelV2* model, json JsonData) {
 
 			if (!strcmp(transitions.key().c_str(), "rotation")) {
 				for (int i = 0; i < 3; i++) {
-					display.rotation[i] = arr[i];
+					display.rotation_[i] = arr[i];
 				}
 			}
 			else if (!strcmp(transitions.key().c_str(), "translation")) {
 				for (int i = 0; i < 3; i++) {
-					display.translation[i] = arr[i];
+					display.translation_[i] = arr[i];
 				}
 			}
 			else if (!strcmp(transitions.key().c_str(), "scale")) {
 				for (int i = 0; i < 3; i++) {
-					display.scale[i] = arr[i];
+					display.scale_[i] = arr[i];
 				}
 			}
 			else {
@@ -282,7 +282,7 @@ void ProcessModelDisplay(ModelV2::BlockModelV2* model, json JsonData) {
 			return;
 		}
 
-		display.Initialized = true;
+		display.initialized_ = true;
 
 		model->AddDisplay(display, display.position);
 	}
@@ -310,19 +310,19 @@ ModelV2::BlockModelV2* recursiveGetBlockModel(string jsonName, string namespaceI
 	//Search for the parent
 	for (auto& item : JSONData.items()) {
 		if (item.key() == "parent") {
-			string ParentData = item.value();
+			string parentData = item.value();
 
 			//Parse for the parent json
 
-			vector<string> Tokens = Tokenize(ParentData, ':'); //This assumes that the parent is always in the same folder
-			string ParentJSON = Tokens.back();
-			string ParentNamespace = Tokens.front();
+			vector<string> tokens = Tokenize(parentData, ':'); //This assumes that the parent is always in the same folder
+			string parentJSON = tokens.back();
+			string parentNamespace = tokens.front();
 			
-			if (Tokens.size() == 1) { //default namespace is minecraft
-				ParentNamespace = DEFAULT_NAMESPACE;
+			if (tokens.size() == 1) { //default namespace is minecraft
+				parentNamespace = DEFAULT_NAMESPACE;
 			}
 
-			model = recursiveGetBlockModel(ParentJSON, ParentNamespace);
+			model = recursiveGetBlockModel(parentJSON, parentNamespace);
 
 			break;
 		}
@@ -335,7 +335,7 @@ ModelV2::BlockModelV2* recursiveGetBlockModel(string jsonName, string namespaceI
 
 	for (auto& item : JSONData.items()) {
 		if (!strcmp(item.key().c_str(), "elements")) {
-			model->Elements.clear(); //Child elements override parent elements
+			model->elements_.clear(); //Child elements override parent elements
 			UpdateModelElements(model, item.value());
 		}
 		else if (!strcmp(item.key().c_str(), "textures")) {
@@ -345,7 +345,7 @@ ModelV2::BlockModelV2* recursiveGetBlockModel(string jsonName, string namespaceI
 			ProcessModelDisplay(model, item.value());
 		}
 		else if (!strcmp(item.key().c_str(), "ambientocclusion")) {
-			model->AmbientOcclusion = static_cast<bool>(item.value());
+			model->ambient_occlusion_ = static_cast<bool>(item.value());
 		}
 	}
 
@@ -355,7 +355,7 @@ ModelV2::BlockModelV2* recursiveGetBlockModel(string jsonName, string namespaceI
 ModelV2::BlockModelV2* getBlockModel(string blockNameIn, string namespaceIn) {
 	//This will recursively go into parents files and build on it
 	ModelV2::BlockModelV2* model = recursiveGetBlockModel(blockNameIn, namespaceIn);
-	std::reverse(model->Elements.begin(), model->Elements.end());
+	std::reverse(model->elements_.begin(), model->elements_.end());
 	return model;
 
 }

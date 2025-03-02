@@ -1,27 +1,19 @@
 #pragma once
+#include <cctype>
 #include "../../Chunk/Block/Block.h"
 
 struct SetBlockRelative {
-	char m_x;
-	char m_y;
-	char m_z;
+	int8_t x_;
+	int8_t y_;
+	int8_t z_;
 
-	BlockID m_block;
+	BlockID block_;
 
-	SetBlockRelative() {
+	SetBlockRelative(BlockID block, int8_t x, int8_t y, int8_t z) : x_{ x }, y_{ y }, z_{ z }, block_{ block } {}
 
-	}
-
-	SetBlockRelative(BlockID block, char x, char y, char z) {
-		m_x = x;
-		m_y = y;
-		m_z = z;
-		m_block = block;
-	}
-
-	void SetPos(char x, char y, char z);
+	void SetPos(int8_t x, int8_t y, int8_t z);
 };
 
 struct Structure {
-	std::vector<SetBlockRelative> Build;
+	std::vector<SetBlockRelative> build_;
 };

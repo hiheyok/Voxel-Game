@@ -26,13 +26,13 @@ void LogUtils::MainLogger() {
 			std::string str = "";
 			std::string messageSeverity = "";
 
-			if (log.type == 0x01) {
+			if (log.type_ == 0x01) {
 				messageSeverity = "INFO";
-			} else if (log.type == 0x03) {
+			} else if (log.type_ == 0x03) {
 				messageSeverity = "WARNING";
-			} else if (log.type == 0x02) {
+			} else if (log.type_ == 0x02) {
 				messageSeverity = "ERROR";
-			} else if (log.type == 0x00) {
+			} else if (log.type_ == 0x00) {
 				messageSeverity = "DEBUG";
 			}
 
@@ -94,7 +94,7 @@ void LogUtils::Start() {
 
 void LogUtils::LogError(std::string Subtype, std::string Message) {
 	LogData log;
-	log.type = LOG_TYPE_ERROR;
+	log.type_ = LOG_TYPE_ERROR;
 	log.message = Message;
 	log.time = chrono::system_clock::now();
 	log.Subtype = Subtype;
@@ -106,7 +106,7 @@ void LogUtils::LogError(std::string Subtype, std::string Message) {
 
 void LogUtils::LogWarn(std::string Subtype, std::string Message) {
 	LogData log;
-	log.type = LOG_TYPE_WARN;
+	log.type_ = LOG_TYPE_WARN;
 	log.message = Message;
 	log.time = chrono::system_clock::now();
 	log.Subtype = Subtype;
@@ -118,7 +118,7 @@ void LogUtils::LogWarn(std::string Subtype, std::string Message) {
 
 void LogUtils::LogInfo(std::string Subtype, std::string Message) {
 	LogData log;
-	log.type = LOG_TYPE_INFO;
+	log.type_ = LOG_TYPE_INFO;
 	log.message = Message;
 	log.time = chrono::system_clock::now();
 	log.Subtype = Subtype;
@@ -130,7 +130,7 @@ void LogUtils::LogInfo(std::string Subtype, std::string Message) {
 
 void LogUtils::LogDebug(std::string Subtype, std::string Message) {
 	LogData log;
-	log.type = LOG_TYPE_DEBUG;
+	log.type_ = LOG_TYPE_DEBUG;
 	log.message = Message;
 	log.time = chrono::system_clock::now();
 	log.Subtype = Subtype;
@@ -149,7 +149,7 @@ void LogUtils::LogDebugf(std::string Subtype, std::string Message, ...) {
 	va_end(args);
 
 	LogData log;
-	log.type = LOG_TYPE_DEBUG;
+	log.type_ = LOG_TYPE_DEBUG;
 	log.message = formatedString;
 	log.time = chrono::system_clock::now();
 	log.Subtype = Subtype;

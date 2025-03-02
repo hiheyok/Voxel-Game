@@ -39,7 +39,7 @@ public:
                     Biome* biome3 = Biome::getMutationForBiome(biome);
                     aint2[j + i * areaWidth] = biome3 == nullptr ? k : Biome::getIdForBiome(biome3);
                 }
-                else if (nextInt(3) != 0 && !flag)
+                else if (NextInt(3) != 0 && !flag)
                 {
                     aint2[j + i * areaWidth] = k;
                 }
@@ -77,7 +77,7 @@ public:
                     }
                     else if (biome == Biomes::PLAINS)
                     {
-                        if (nextInt(3) == 0)
+                        if (NextInt(3) == 0)
                         {
                             biome1 = Biomes::FOREST_HILLS;
                         }
@@ -110,9 +110,9 @@ public:
                     {
                         biome1 = Biomes::MESA;
                     }
-                    else if (biome == Biomes::DEEP_OCEAN && nextInt(3) == 0)
+                    else if (biome == Biomes::DEEP_OCEAN && NextInt(3) == 0)
                     {
-                        int i1 = nextInt(2);
+                        int i1 = NextInt(2);
 
                         if (i1 == 0)
                         {

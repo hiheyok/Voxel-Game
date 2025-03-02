@@ -4,29 +4,29 @@
 #include "../../../Level/Dimension/Dimension.h"
 
 void UpdateSurrounding(const BlockPos& pos) {
-	Dimension* CurrentWorld = (Dimension*)Block::DimensionPTR;
+	Dimension* currentWorld = (Dimension*)Block::dimension_ptr_;
 	
 	for (int side = 0; side < 6;  side++) {
 		BlockPos newPos = pos;
 		newPos.incrementSide(side, 1);
 
-		BlockID block = CurrentWorld->worldInteractions.getBlock(newPos);
+		BlockID block = currentWorld->world_interactions_.GetBlock(newPos);
 
 		Event::BlockEvent tickNeighbor{newPos, block, EventHandler.BlockTick};
-		CurrentWorld->EventManager.AddEvent(tickNeighbor);
+		currentWorld->event_manager_.AddEvent(tickNeighbor);
 	}
 
-	Event::BlockEvent tickMain{pos, CurrentWorld->worldInteractions.getBlock(pos), EventHandler.BlockTick};
-	CurrentWorld->EventManager.AddEvent(tickMain);
+	Event::BlockEvent tickMain{pos, currentWorld->world_interactions_.GetBlock(pos), EventHandler.BlockTick};
+	currentWorld->event_manager_.AddEvent(tickMain);
 }
 
 void HandlePlaceBlock(BlockID block, const BlockPos& pos) {
-	Dimension* CurrentWorld = (Dimension*)Block::DimensionPTR;
-	CurrentWorld->worldInteractions.setBlock(block, pos);
+	Dimension* currentWorld = (Dimension*)Block::dimension_ptr_;
+	currentWorld->world_interactions_.SetBlock(block, pos);
 	UpdateSurrounding(pos);
 }
 
 void HandleBlockTick(BlockID block, const BlockPos& pos) {
-	Block* b = Blocks.getBlockType(block);
-	b->tick(pos);
+	Block* b = Blocks.GetBlockType(block);
+	b->Tick(pos);
 }

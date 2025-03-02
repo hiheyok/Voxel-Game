@@ -6,53 +6,53 @@
 #include "../../../Level/World/WorldInteraction/WorldInteractions.h"
 class FallingBlock : public EntityType {
 	virtual void Tick(Entity* entity) override {
-		Dimension* CurrentDimension = static_cast<Dimension*>(Block::DimensionPTR);
-		Server* CurrentServer = static_cast<Server*>(Block::serverPTR);
+		Dimension* currentDimension = static_cast<Dimension*>(Block::dimension_ptr_);
+		Server* currentServer = static_cast<Server*>(Block::server_ptr_);
 	//	std::cout << entity->Properties.Velocity.y << "\n";
-		float MSPT = 1.0f / (float)CurrentServer->settings.tickRate;
+		float mspt = 1.0f / (float)currentServer->settings_.tick_rate_;
 
 		//Physics
 
 		//Logger.LogInfo("Sand", std::to_string(entity->Properties.Position.y));
 
-		entity->Properties.Acceleration.y = -CurrentDimension->worldInteractions.settings.Gravity;
+		entity->properties_.acceleration_.y = -currentDimension->world_interactions_.settings_.gravity_;
 
-		entity->Properties.Velocity += entity->Properties.Acceleration * MSPT;
+		entity->properties_.velocity_ += entity->properties_.acceleration_ * mspt;
 
-		int DistanceCheck = (int)ceil(abs(entity->Properties.Velocity.y * MSPT));
+		int distanceCheck = (int)ceil(abs(entity->properties_.velocity_.y * mspt));
 
-		float CollusionDistance = CurrentDimension->worldInteractions.Collusions.GetDistanceUntilCollusionSingleDirection(entity->Properties.Position, NY, DistanceCheck + 1);
+		float collusionDistance = currentDimension->world_interactions_.collusions_.GetDistanceUntilCollusionSingleDirection(entity->properties_.position_, NY, distanceCheck + 1);
 
-		float TimeTillCollusion = abs(CollusionDistance / entity->Properties.Velocity.y);
+		float timeTillCollusion = abs(collusionDistance / entity->properties_.velocity_.y);
 
-		bool CollideWithGround = false;
+		bool collideWithGround = false;
 
-		if ((TimeTillCollusion < MSPT) && (CollusionDistance != -1.f)) {
-			entity->Properties.Position[1] += entity->Properties.Velocity[1] * (float)TimeTillCollusion;
-			entity->Properties.Velocity[1] = 0.f;
-			entity->Properties.Acceleration[1] = 0.f;
+		if ((timeTillCollusion < mspt) && (collusionDistance != -1.f)) {
+			entity->properties_.position_[1] += entity->properties_.velocity_[1] * (float)timeTillCollusion;
+			entity->properties_.velocity_[1] = 0.f;
+			entity->properties_.acceleration_[1] = 0.f;
 
-			CollideWithGround = true;
+			collideWithGround = true;
 		}
 		else {
-			entity->Properties.Position[1] += entity->Properties.Velocity[1] * MSPT;
+			entity->properties_.position_[1] += entity->properties_.velocity_[1] * mspt;
 		}
-		entity->isDirty = true;
+		entity->is_dirty_ = true;
 
-		if (CollideWithGround) {
+		if (collideWithGround) {
 			Event::BlockEvent addBlock{ BlockPos{
-											(int)entity->Properties.Position.x,
-											(int)entity->Properties.Position.y,
-											(int)entity->Properties.Position.z},
+											(int)entity->properties_.position_.x,
+											(int)entity->properties_.position_.y,
+											(int)entity->properties_.position_.z},
 										Blocks.SAND, EventHandler.BlockPlace };
-			CurrentDimension->EventManager.AddEvent(addBlock);
+			currentDimension->event_manager_.AddEvent(addBlock);
 
 			Event::EntityEvent removeEntity;
 			removeEntity.id_ = EventHandler.RemoveEntity;
-			removeEntity.entity_uuid_= entity->Properties.EntityUUID;
+			removeEntity.entity_uuid_= entity->properties_.entity_uuid_;
 			removeEntity.unique_id_ = 200;
 			
-			CurrentDimension->EventManager.AddEvent(removeEntity);
+			currentDimension->event_manager_.AddEvent(removeEntity);
 		}
 	}
 };

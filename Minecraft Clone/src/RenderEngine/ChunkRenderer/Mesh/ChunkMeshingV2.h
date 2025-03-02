@@ -65,16 +65,16 @@ namespace MeshingV2 {
 
 		}
 
-		void setChunk(Chunk* pChunk);
+		void SetChunk(Chunk* pChunk);
 
-		void reset();
+		void Reset();
 
 		//Mesh Vertices
-		std::vector<unsigned int> VerticesBuffer;
-		std::vector<unsigned int> TransparentVerticesBuffer;
+		std::vector<unsigned int> vertices_buffer_;
+		std::vector<unsigned int> transparent_vertices_buffer_;
 
-		uint64_t transparentFaceCount = 0;
-		uint64_t solidFaceCount = 0;
+		uint64_t transparent_face_count_ = 0;
+		uint64_t solid_face_count_ = 0;
 
 		//Generate the Mesh
 		void GenerateMesh();
@@ -95,22 +95,22 @@ namespace MeshingV2 {
 		inline bool CompareBlockSideUnsafe(int x, int y, int z, uint8_t side, BlockID b);
 
 		//Add faces to the mesh
-		inline void AddFacetoMesh(const BlockFace& face, uint8_t axis, glm::ivec3 From, glm::ivec3 To, bool allowAO, int x, int y, int z);
+		inline void AddFacetoMesh(const BlockFace& face, uint8_t axis_, glm::ivec3 from_, glm::ivec3 to_, bool allowAO, int x, int y, int z);
 
-		inline const BlockID& getCachedBlockID(int x, int y, int z) const;
-		inline const BlockID& getCachedBlockID(int* pos) const;
-		inline void setCachedBlockID(BlockID b, int x, int y, int z);
+		inline const BlockID& GetCachedBlockID(int x, int y, int z) const;
+		inline const BlockID& GetCachedBlockID(int* pos) const;
+		inline void SetCachedBlockID(BlockID b, int x, int y, int z);
 
 
 		inline glm::ivec4 getAO(uint8_t direction, int x, int y, int z);
 
 		//To check if a block had been used in the Greedy Meshing Algorithm
-		CompactBooleanData booleanMap;
+		CompactBooleanData boolean_map_;
 
 		const uint64_t BUFFER_SIZE_STEP = 262144;
 
-		Chunk* chunk;
+		Chunk* chunk_;
 
-		BlockID ChunkCache[18 * 18 * 18 * 3]{NULL}; // Use multiple copies of chunk in different ordering to optimize cache hits
+		BlockID chunk_cache_[18 * 18 * 18 * 3]{NULL}; // Use multiple copies of chunk in different ordering to optimize cache hits
 	};
 }

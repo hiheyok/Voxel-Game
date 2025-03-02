@@ -1,14 +1,14 @@
 #include "ItemTextureAtlas.h"
 
 void ItemTextureAtlas::RenderBlockItem(Item item) {
-	FramebufferSingleBlockRender.bindFBO();
+	framebuffer_single_block_render_.bindFBO();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	BlockItemRenderer.RenderBlock(item);
-	FramebufferSingleBlockRender.unbindFBO();
+	block_item_renderer_.RenderBlock(item);
+	framebuffer_single_block_render_.unbindFBO();
 }
 
 void ItemTextureAtlas::StitchTexture(size_t index, ItemID ItemID) {
-	int ratio = AtlasSize / IndividualSize;
+	int ratio = atlas_size_ / individual_size_;
 	float xCoord = (index % ratio);
 	float yCoord = floor((float)index / (float)ratio);
 
@@ -37,72 +37,72 @@ void ItemTextureAtlas::StitchTexture(size_t index, ItemID ItemID) {
 		2, 3, 0
 	};
 
-	ItemUVMapping UVMAP;
-	UVMAP.UV_1 = glm::vec2((xCoord + 1.f) * 0.5f, (yCoord + 1.f) * 0.5f);
-	UVMAP.UV_2 = glm::vec2((xCoord - Size + 1.f) * 0.5f, (yCoord - Size + 1.f) * 0.5f);
+	ItemUVMapping uvMap;
+	uvMap.uv_1_ = glm::vec2((xCoord + 1.f) * 0.5f, (yCoord + 1.f) * 0.5f);
+	uvMap.uv_2_ = glm::vec2((xCoord - Size + 1.f) * 0.5f, (yCoord - Size + 1.f) * 0.5f);
 
-	UVMAP.UV_1.y = 1.f - UVMAP.UV_1.y;
-	UVMAP.UV_2.y = 1.f - UVMAP.UV_2.y;
+	uvMap.uv_1_.y = 1.f - uvMap.uv_1_.y;
+	uvMap.uv_2_.y = 1.f - uvMap.uv_2_.y;
 
-	ItemsUVMap[ItemID] = UVMAP;
+	items_uv_map_[ItemID] = uvMap;
 
-	VBO.InsertData(sizeof(vertices), vertices, GL_STATIC_DRAW);
-	EBO.InsertData(sizeof(indices), indices, GL_STATIC_DRAW);
+	vbo_.InsertData(sizeof(vertices), vertices, GL_STATIC_DRAW);
+	ebo_.InsertData(sizeof(indices), indices, GL_STATIC_DRAW);
 	//Render
-	AtlasFramebuffer.bindFBO();
-	StitchingShader.bindTexture2D(0, FramebufferSingleBlockRender.texture, "ItemTexture");
+	atlas_framebuffer_.bindFBO();
+	stitching_shader_.bindTexture2D(0, framebuffer_single_block_render_.texture, "ItemTexture");
 
 	glEnable(GL_BLEND);
 
-	VAO.Bind();
-	EBO.Bind();
+	vao_.Bind();
+	ebo_.Bind();
 	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(uint32_t), GL_UNSIGNED_INT, 0);
-	VAO.Unbind();
-	EBO.Unbind();
+	vao_.Unbind();
+	ebo_.Unbind();
 
 	glDisable(GL_BLEND);
-	AtlasFramebuffer.unbindFBO();
+	atlas_framebuffer_.unbindFBO();
 }
 
-void ItemTextureAtlas::Initialize(int AtlasItemSize, int IndividualItemSize) {
-	StitchingShader.init("assets/shaders/ItemRender/AtlasStitchVert.glsl", "assets/shaders/ItemRender/AtlasStitchFrag.glsl");
+void ItemTextureAtlas::Initialize(int atlasItemSize, int individualItemSize) {
+	stitching_shader_.init("assets/shaders/ItemRender/AtlasStitchVert.glsl", "assets/shaders/ItemRender/AtlasStitchFrag.glsl");
 
-	IndividualSize = IndividualItemSize;
-	AtlasSize = AtlasItemSize;
+	individual_size_ = individualItemSize;
+	atlas_size_ = atlasItemSize;
 
-	AtlasFramebuffer.genBuffer(AtlasSize, AtlasSize, 1, GL_RGBA);
-	FramebufferSingleBlockRender.genBuffer(IndividualSize, IndividualSize, 2, GL_RGBA);
+	atlas_framebuffer_.genBuffer(atlas_size_, atlas_size_, 1, GL_RGBA);
+	framebuffer_single_block_render_.genBuffer(individual_size_, individual_size_, 2, GL_RGBA);
 
-	Atlas.width = AtlasSize;
-	Atlas.height = AtlasSize;
-	Atlas.textureID = AtlasFramebuffer.texture;
+	atlas_.width_ = atlas_size_;
+	atlas_.height_ = atlas_size_;
+	atlas_.textureID = atlas_framebuffer_.texture;
 
-	IndividualItem.width = IndividualSize;
-	IndividualItem.height = IndividualSize;
-	IndividualItem.textureID = FramebufferSingleBlockRender.texture;
+	individual_item_.width_ = individual_size_;
+	individual_item_.height_ = individual_size_;
+	individual_item_.textureID = framebuffer_single_block_render_.texture;
 
-	VBO.SetType(GL_ARRAY_BUFFER);
-	EBO.SetType(GL_ELEMENT_ARRAY_BUFFER);
+	vbo_.SetType(GL_ARRAY_BUFFER);
+	ebo_.SetType(GL_ELEMENT_ARRAY_BUFFER);
 
-	VBO.SetUsage(GL_STATIC_DRAW);
-	EBO.SetUsage(GL_STATIC_DRAW);
+	vbo_.SetUsage(GL_STATIC_DRAW);
+	ebo_.SetUsage(GL_STATIC_DRAW);
 
-	VAO.GenArray();
-	VBO.GenBuffer();
-	EBO.GenBuffer();
+	vao_.GenArray();
+	vbo_.GenBuffer();
+	ebo_.GenBuffer();
 
-	VAO.Bind();
-	VBO.Bind();
-	VAO.EnableAttriPTR(0, 2, GL_FLOAT, GL_FALSE, 4, 0);
-	VAO.EnableAttriPTR(1, 2, GL_FLOAT, GL_FALSE, 4, 2);
-	VAO.Unbind();
-	VBO.Unbind();
+	vao_.Bind();
+	vbo_.Bind();
+	vao_.EnableAttriPTR(0, 2, GL_FLOAT, GL_FALSE, 4, 0);
+	vao_.EnableAttriPTR(1, 2, GL_FLOAT, GL_FALSE, 4, 2);
+	vao_.Unbind();
+	vbo_.Unbind();
 
-	BlockItemRenderer.Initialize();
+	block_item_renderer_.Initialize();
 }
 
 void ItemTextureAtlas::AddItem(Item item) {
-	Offsets[item.Properties.ID] = Offsets.size();
+	offsets_[item.properties_.id_] = offsets_.size();
 	RenderBlockItem(item);
-	StitchTexture(Offsets.size() - 1, item.Properties.ID);
+	StitchTexture(offsets_.size() - 1, item.properties_.id_);
 }

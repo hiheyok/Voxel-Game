@@ -4,15 +4,15 @@
 #include <thread>
 
 class EntityRendererUpdater {
-	MultiEntityRenderer* renderer;
+	MultiEntityRenderer* renderer_;
 
-	bool stop = true;
+	bool stop = true; // TODO: Rename this
 
 	void UpdaterThread();
 
-	std::thread UpdateThread;
+	std::thread update_thread_;
 
-	Timer* ServerTime;
+	Timer* server_time_;
 
 public:
 

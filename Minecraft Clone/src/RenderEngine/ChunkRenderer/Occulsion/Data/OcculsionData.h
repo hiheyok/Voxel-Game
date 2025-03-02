@@ -4,7 +4,7 @@
 
 class ChunkOcculsionData {
 public:
-	bool isVisible(unsigned char c) {
+	bool IsVisible(unsigned char c) {
 		
 	}
 

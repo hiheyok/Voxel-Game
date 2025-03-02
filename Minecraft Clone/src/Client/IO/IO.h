@@ -20,7 +20,7 @@ struct MouseInputs {
 	ScrollState ScrollDirection = SCROLL_NONE; //-1 or 1
 
 	glm::dvec2 Displacement = glm::dvec2(0.f, 0.f);
-	glm::dvec2 Position = glm::dvec2(0.f, 0.f);
+	glm::dvec2 position_ = glm::dvec2(0.f, 0.f);
 };
 
 

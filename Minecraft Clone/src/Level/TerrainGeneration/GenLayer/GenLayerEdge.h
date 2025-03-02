@@ -92,9 +92,9 @@ private:
                 initChunkSeed((long long)(j + p_151625_1_), (long long)(i + p_151625_2_));
                 int k = aint[j + i * p_151625_3_];
 
-                if (k != 0 && nextInt(13) == 0)
+                if (k != 0 && NextInt(13) == 0)
                 {
-                    k |= 1 + nextInt(15) << 8 & 3840;
+                    k |= 1 + NextInt(15) << 8 & 3840;
                 }
 
                 aint1[j + i * p_151625_3_] = k;

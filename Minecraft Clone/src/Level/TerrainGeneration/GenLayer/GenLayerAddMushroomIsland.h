@@ -28,7 +28,7 @@ public:
                 int k2 = aint[j1 + 1 + (i1 + 1) * k];
                 initChunkSeed((long long)(j1 + areaX), (long long)(i1 + areaY));
 
-                if (k2 == 0 && k1 == 0 && l1 == 0 && i2 == 0 && j2 == 0 && nextInt(100) == 0)
+                if (k2 == 0 && k1 == 0 && l1 == 0 && i2 == 0 && j2 == 0 && NextInt(100) == 0)
                 {
                     aint1[j1 + i1 * areaWidth] = Biome::getIdForBiome(Biomes::MUSHROOM_ISLAND);
                 }

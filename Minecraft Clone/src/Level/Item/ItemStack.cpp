@@ -1,5 +1,5 @@
 #include "ItemStack.h"
 
 bool ItemStack::IsInitialized() {
-	return Initialized;
+	return initialized_;
 }

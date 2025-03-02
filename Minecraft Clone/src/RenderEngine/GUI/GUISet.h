@@ -9,7 +9,7 @@
 
 class GUISet {
 private:
-	std::vector<GUIElement> Elements;
+	std::vector<GUIElement> elements_;
 
 	int AddRenderingObj() {
 		VAOs.emplace_back();
@@ -38,36 +38,34 @@ private:
 
 public:
 
-	GUISet() {
-	}
-
+	GUISet() {}
 
 	void Initialize() {
 		
 	}
 
 	void Clean() {
-		for (auto& VAO : VAOs)
-			VAO.Delete();
-		for (auto& VBO : VBOs)
-			VBO.Delete();
-		for (auto& EBO : EBOs)
-			EBO.Delete();
+		for (auto& vao : VAOs)
+			vao.Delete();
+		for (auto& vbo : VBOs)
+			vbo.Delete();
+		for (auto& ebo : EBOs)
+			ebo.Delete();
 	}
 
 	void AddGUIElementNorm(std::string Name, std::string Text, glm::vec2 Size, glm::vec2 Position, glm::vec2 UV_P0, glm::vec2 UV_P1) {
 
-		if (!isInitialized) {
+		if (!is_initialized_) {
 			Initialize();
-			isInitialized = true;
+			is_initialized_ = true;
 		}
 
 		if (GUIElementIndex.find(Name) == GUIElementIndex.end()) {
-			Elements.emplace_back(Text, Size, Position);
-			Elements.back().BufferIndex = AddRenderingObj();
-			Elements.back().UV_P0 = UV_P0;
-			Elements.back().UV_P1 = UV_P1;
-			GUIElementIndex.emplace(Name, Elements.size() - 1);
+			elements_.emplace_back(Text, Size, Position);
+			elements_.back().buffer_index_ = AddRenderingObj();
+			elements_.back().uv_p0_ = UV_P0;
+			elements_.back().uv_p1_ = UV_P1;
+			GUIElementIndex.emplace(Name, elements_.size() - 1);
 			NumOfRenderableObjects++;
 			isDirty = true;
 		}
@@ -78,23 +76,23 @@ public:
 
 	void AddGUIElement(std::string Name, std::string Text, glm::vec2 Size, glm::vec2 Position, glm::vec2 UV_P0, glm::vec2 UV_P1) {
 
-		if (!isInitialized) {
+		if (!is_initialized_) {
 			Initialize();
-			isInitialized = true;
+			is_initialized_ = true;
 		}
 
-		UV_P0.x = UV_P0.x / (float)GUITexture.width;
-		UV_P1.x = UV_P1.x / (float)GUITexture.width;
+		UV_P0.x = UV_P0.x / (float)GUITexture.width_;
+		UV_P1.x = UV_P1.x / (float)GUITexture.width_;
 
-		UV_P0.y = UV_P0.y / (float)GUITexture.height;
-		UV_P1.y = UV_P1.y / (float)GUITexture.height;
+		UV_P0.y = UV_P0.y / (float)GUITexture.height_;
+		UV_P1.y = UV_P1.y / (float)GUITexture.height_;
 
 		if (GUIElementIndex.find(Name) == GUIElementIndex.end()) {
-			Elements.emplace_back(Text, Size, Position);
-			Elements.back().BufferIndex = AddRenderingObj();
-			Elements.back().UV_P0 = UV_P0;
-			Elements.back().UV_P1 = UV_P1;
-			GUIElementIndex.emplace(Name, Elements.size() - 1);
+			elements_.emplace_back(Text, Size, Position);
+			elements_.back().buffer_index_ = AddRenderingObj();
+			elements_.back().uv_p0_ = UV_P0;
+			elements_.back().uv_p1_ = UV_P1;
+			GUIElementIndex.emplace(Name, elements_.size() - 1);
 			NumOfRenderableObjects++;
 			isDirty = true;
 		}
@@ -106,7 +104,7 @@ public:
 	void EditElementPosition(std::string Name, glm::vec2 Position) {
 		if (GUIElementIndex.find(Name) != GUIElementIndex.end()) {
 			int Index = GUIElementIndex[Name];
-			Elements[Index].Location = Position;
+			elements_[Index].location_ = Position;
 			isDirty = true;
 		}
 		else {
@@ -117,8 +115,8 @@ public:
 	void EditElementUVNorm(std::string Name, glm::vec2 UV0, glm::vec2 UV1) {
 		if (GUIElementIndex.find(Name) != GUIElementIndex.end()) {
 			int Index = GUIElementIndex[Name];
-			Elements[Index].UV_P0 = UV0;
-			Elements[Index].UV_P1 = UV1;
+			elements_[Index].uv_p0_ = UV0;
+			elements_[Index].uv_p1_ = UV1;
 			isDirty = true;
 		}
 		else {
@@ -130,10 +128,10 @@ public:
 		GUITexture = Texture2D(RawTextureData(file.c_str()));
 	}
 
-	void SetGUITexture(GLuint TextureID, size_t x, size_t y) {
-		GUITexture.textureID = TextureID;
-		GUITexture.width = x;
-		GUITexture.height = y;
+	void SetGUITexture(GLuint texture_id_, size_t x, size_t y) {
+		GUITexture.textureID = texture_id_;
+		GUITexture.width_ = x;
+		GUITexture.height_ = y;
 	}
 
 	void PrepareRenderer() {
@@ -142,19 +140,19 @@ public:
 		}
 		isDirty = false;
 
-		for (auto& e : Elements) {
+		for (auto& e : elements_) {
 			
 			GUIElement::GUIVertices GUIData = e.GetVertices();
-			int BufferIndex = e.BufferIndex;
-			VBOs[BufferIndex].InsertData(GUIData.Vertices.size() * sizeof(float), GUIData.Vertices.data(), GL_STATIC_DRAW);
-			EBOs[BufferIndex].InsertData(GUIData.Indices.size() * sizeof(unsigned int), GUIData.Indices.data(), GL_STATIC_DRAW);
-			VBOSize[BufferIndex] = GUIData.Indices.size();
+			int BufferIndex = e.buffer_index_;
+			VBOs[BufferIndex].InsertData(GUIData.vertices_.size() * sizeof(float), GUIData.vertices_.data(), GL_STATIC_DRAW);
+			EBOs[BufferIndex].InsertData(GUIData.indices_.size() * sizeof(unsigned int), GUIData.indices_.data(), GL_STATIC_DRAW);
+			VBOSize[BufferIndex] = GUIData.indices_.size();
 		}
 
 		
 	}
 
-
+	// TODO: Rename
 	std::vector<VertexArray> VAOs;
 	std::vector<Buffer> VBOs;
 	std::vector<Buffer> EBOs;
@@ -168,5 +166,5 @@ public:
 
 	Texture2D GUITexture;
 
-	bool isInitialized = false;
+	bool is_initialized_ = false;
 };

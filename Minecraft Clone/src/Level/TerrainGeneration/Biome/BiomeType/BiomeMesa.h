@@ -4,17 +4,17 @@
 
 class BiomeMesa : public Biome {
 private:
-    std::vector<BlockID> clayBands;
-    long worldSeed;
-    NoiseGeneratorPerlin* pillarNoise;
-    NoiseGeneratorPerlin* pillarRoofNoise;
-    NoiseGeneratorPerlin* clayBandsOffsetNoise;
-    bool brycePillars;
+    std::vector<BlockID> clay_bands_;
+    long world_seed_;
+    NoiseGeneratorPerlin* pillar_noise_;
+    NoiseGeneratorPerlin* pillar_roof_noise_;
+    NoiseGeneratorPerlin* clay_bands_offset_noise_;
+    bool bryce_pillars_;
 
 public:
-	bool hasForest = false;
+	bool has_forest_ = false;
 
-	BiomeMesa(bool brycePillarsIn, bool hasForestIn, BiomeProperties properties) : Biome(properties), brycePillars(brycePillarsIn), hasForest(hasForestIn)  {
+	BiomeMesa(bool brycePillarsIn, bool hasForestIn, BiomeProperties properties) : Biome(properties), bryce_pillars_(brycePillarsIn), has_forest_(hasForestIn)  {
 		topBlock = Blocks.RED_SAND;
 		fillerBlock = Blocks.TERRACOTTA; //STAINED_HARDEN_CLAY
 	
@@ -24,119 +24,119 @@ public:
 		return typeid(*this);
 	}
 
-    void generateBands(long p_150619_1_)
+    void GenerateBands(long p_150619_1_)
     {
-        clayBands.resize(64);
-        for (int i = 0; i < 64; i++) clayBands[i] = Blocks.TERRACOTTA;
+        clay_bands_.resize(64);
+        for (int i = 0; i < 64; i++) clay_bands_[i] = Blocks.TERRACOTTA;
         JavaRandom random = JavaRandom(p_150619_1_);
-        clayBandsOffsetNoise = new NoiseGeneratorPerlin(random, 1);
+        clay_bands_offset_noise_ = new NoiseGeneratorPerlin(random, 1);
 
         for (int l1 = 0; l1 < 64; ++l1)
         {
-            l1 += random.nextInt(5) + 1;
+            l1 += random.NextInt(5) + 1;
 
             if (l1 < 64)
             {
-                clayBands[l1] = Blocks.ORANGE_TERRACOTTA;
+                clay_bands_[l1] = Blocks.ORANGE_TERRACOTTA;
             }
         }
 
-        int i2 = random.nextInt(4) + 2;
+        int i2 = random.NextInt(4) + 2;
 
         for (int i = 0; i < i2; ++i)
         {
-            int j = random.nextInt(3) + 1;
-            int k = random.nextInt(64);
+            int j = random.NextInt(3) + 1;
+            int k = random.NextInt(64);
 
             for (int l = 0; k + l < 64 && l < j; ++l)
             {
-                clayBands[k + l] = Blocks.YELLOW_TERRACOTTA;
+                clay_bands_[k + l] = Blocks.YELLOW_TERRACOTTA;
             }
         }
 
-        int j2 = random.nextInt(4) + 2;
+        int j2 = random.NextInt(4) + 2;
 
         for (int k2 = 0; k2 < j2; ++k2)
         {
-            int i3 = random.nextInt(3) + 2;
-            int l3 = random.nextInt(64);
+            int i3 = random.NextInt(3) + 2;
+            int l3 = random.NextInt(64);
 
             for (int i1 = 0; l3 + i1 < 64 && i1 < i3; ++i1)
             {
-                clayBands[l3 + i1] = Blocks.BROWN_TERRACOTTA;
+                clay_bands_[l3 + i1] = Blocks.BROWN_TERRACOTTA;
             }
         }
 
-        int l2 = random.nextInt(4) + 2;
+        int l2 = random.NextInt(4) + 2;
 
         for (int j3 = 0; j3 < l2; ++j3)
         {
-            int i4 = random.nextInt(3) + 1;
-            int k4 = random.nextInt(64);
+            int i4 = random.NextInt(3) + 1;
+            int k4 = random.NextInt(64);
 
             for (int j1 = 0; k4 + j1 < 64 && j1 < i4; ++j1)
             {
-                clayBands[k4 + j1] = Blocks.RED_TERRACOTTA;
+                clay_bands_[k4 + j1] = Blocks.RED_TERRACOTTA;
             }
         }
 
-        int k3 = random.nextInt(3) + 3;
+        int k3 = random.NextInt(3) + 3;
         int j4 = 0;
 
         for (int l4 = 0; l4 < k3; ++l4)
         {
             //int i5 = 1;
-            j4 += random.nextInt(16) + 4;
+            j4 += random.NextInt(16) + 4;
 
             for (int k1 = 0; j4 + k1 < 64 && k1 < 1; ++k1)
             {
-                clayBands[j4 + k1] = Blocks.WHITE_TERRACOTTA;
+                clay_bands_[j4 + k1] = Blocks.WHITE_TERRACOTTA;
 
-                if (j4 + k1 > 1 && random.nextBoolean())
+                if (j4 + k1 > 1 && random.NextBoolean())
                 {
-                    clayBands[j4 + k1 - 1] = Blocks.GRAY_TERRACOTTA; //silver terracotta
+                    clay_bands_[j4 + k1 - 1] = Blocks.GRAY_TERRACOTTA; //silver terracotta
                 }
 
-                if (j4 + k1 < 63 && random.nextBoolean())
+                if (j4 + k1 < 63 && random.NextBoolean())
                 {
-                    clayBands[j4 + k1 + 1] = Blocks.GRAY_TERRACOTTA;
+                    clay_bands_[j4 + k1 + 1] = Blocks.GRAY_TERRACOTTA;
                 }
             }
         }
     }
 
-    BlockID getBand(int p_180629_1_, int p_180629_2_, int p_180629_3_)
+    BlockID GetBand(int p_180629_1_, int p_180629_2_, int p_180629_3_)
     {
-        int i = (int)std::round(clayBandsOffsetNoise->getValue((double)p_180629_1_ / 512.0, (double)p_180629_1_ / 512.0) * 2.0);
-        return clayBands[(p_180629_2_ + i + 64) % 64];
+        int i = (int)std::round(clay_bands_offset_noise_->getValue((double)p_180629_1_ / 512.0, (double)p_180629_1_ / 512.0) * 2.0);
+        return clay_bands_[(p_180629_2_ + i + 64) % 64];
     }
 
-    void genTerrainBlocks(JavaRandom& rand, TallChunk* chunk, int x, int z, double noiseVal, ChunkGeneratorSettings* settings) override { //doiuble check this again later
-        if (clayBands.size() == 0 || worldSeed != -1587754402)
+    void GenTerrainBlocks(JavaRandom& rand, TallChunk* chunk, int x, int z, double noiseVal, ChunkGeneratorSettings* settings_) override { //doiuble check this again later
+        if (clay_bands_.size() == 0 || world_seed_ != -1587754402)
         {
-            generateBands(-1587754402); //world seed here
+            GenerateBands(-1587754402); //world seed here
         }
 
-        if (pillarNoise == nullptr || pillarRoofNoise == nullptr || worldSeed != -1587754402)
+        if (pillar_noise_ == nullptr || pillar_roof_noise_ == nullptr || world_seed_ != -1587754402)
         {
-            JavaRandom random = JavaRandom(worldSeed);
-            pillarNoise = new NoiseGeneratorPerlin(random, 4);
-            pillarRoofNoise = new NoiseGeneratorPerlin(random, 1);
+            JavaRandom random = JavaRandom(world_seed_);
+            pillar_noise_ = new NoiseGeneratorPerlin(random, 4);
+            pillar_roof_noise_ = new NoiseGeneratorPerlin(random, 1);
         }
 
-        worldSeed = -1587754402;
+        world_seed_ = -1587754402;
         double d4 = 0.0;
 
-        if (brycePillars)
+        if (bryce_pillars_)
         {
             int i = (x & -16) + (z & 15);
             int j = (z & -16) + (x & 15);
-            double d0 = std::min(abs(noiseVal), pillarNoise->getValue((double)i * 0.25, (double)j * 0.25));
+            double d0 = std::min(abs(noiseVal), pillar_noise_->getValue((double)i * 0.25, (double)j * 0.25));
 
             if (d0 > 0.0)
             {
                 // double d1 = 0.001953125;
-                double d2 = std::abs(pillarRoofNoise->getValue((double)i * 0.001953125, (double)j * 0.001953125));
+                double d2 = std::abs(pillar_roof_noise_->getValue((double)i * 0.001953125, (double)j * 0.001953125));
                 d4 = d0 * d0 * 2.5;
                 double d3 = ceil(d2 * 50.0) + 14.0;
 
@@ -151,10 +151,10 @@ public:
 
         int k1 = x & 15;
         int l1 = z & 15;
-        int i2 = settings->seaLevel;
+        int i2 = settings_->seaLevel;
         BlockID iblockstate = Blocks.WHITE_TERRACOTTA;
         BlockID iblockstate3 = fillerBlock;
-        int k = (int)(noiseVal / 3.0 + 3.0 + rand.nextDouble() * 0.25);
+        int k = (int)(noiseVal / 3.0 + 3.0 + rand.NextDouble() * 0.25);
         bool flag = cos(noiseVal / 3.0 * 3.14159) > 0.0;
         int l = -1;
         bool flag1 = false;
@@ -167,11 +167,11 @@ public:
                 chunk->SetBlockUnsafe(l1, j1, k1, Blocks.STONE);
             }
 
-            if (j1 <= rand.nextInt(5))
+            if (j1 <= rand.NextInt(5))
             {
                 chunk->SetBlockUnsafe(l1, j1, k1, Blocks.BEDROCK);
             }
-            else if (i1 < 15 || brycePillars)
+            else if (i1 < 15 || bryce_pillars_)
             {
                 BlockID iblockstate1 = chunk->GetBlockUnsafe(l1, j1, k1);
 
@@ -205,7 +205,7 @@ public:
 
                         if (j1 >= i2 - 1)
                         {
-                            if (hasForest && j1 > 86 + k * 2)
+                            if (has_forest_ && j1 > 86 + k * 2)
                             {
                                 if (flag)
                                 {
@@ -228,7 +228,7 @@ public:
                                     }
                                     else
                                     {
-                                        iblockstate2 = getBand(x, j1, z);
+                                        iblockstate2 = GetBand(x, j1, z);
                                     }
                                 }
                                 else
@@ -264,7 +264,7 @@ public:
                         }
                         else
                         {
-                            chunk->SetBlockUnsafe(l1, j1, k1, getBand(x, j1, z));
+                            chunk->SetBlockUnsafe(l1, j1, k1, GetBand(x, j1, z));
                         }
                     }
 

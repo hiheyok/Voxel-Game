@@ -5,34 +5,32 @@
 
 class MountainGenerator : public WorldGenerator {
 public:
-	FastNoiseLite Noise;
+	FastNoiseLite noise_;
 
 	Chunk* Generate(const ChunkPos& pos) override;
 
 	MountainGenerator() {
-		Noise.SetNoiseType(Noise.NoiseType_OpenSimplex2);
-		Noise.SetFrequency(0.005f);
+		noise_.SetNoiseType(noise_.NoiseType_OpenSimplex2);
+		noise_.SetFrequency(0.005f);
 	}
-
-	
 
 	void GenerateEnvironment(const ChunkPos& pos, Chunk* chunk);
 
 	void GenerateDecor(const ChunkPos& pos, Chunk* chunk);
 
-	float getNoise3D(glm::ivec3 ChunkCoordinate, glm::ivec3 RelativeBlockCoords, int samples, float frequency);
+	float GetNoise3D(glm::ivec3 ChunkCoordinate, glm::ivec3 RelativeBlockCoords, int samples, float frequency);
 
-	float getNoise2D(glm::ivec2 ChunkCoordinate, glm::ivec2 RelativeBlockCoords, int samples, float frequency);
+	float GetNoise2D(glm::ivec2 ChunkCoordinate, glm::ivec2 RelativeBlockCoords, int samples, float frequency);
 
-	float continentialNoise(float n);
+	float ContinentialNoise(float n);
 
-	float erosionNoise(float n);
+	float ErosionNoise(float n);
 
-	float peaksandvalley(float n);
+	float PeaksAndValley(float n);
 
-	int getIndex(std::vector<glm::vec2>& vec, float bottomBound);
+	int GetIndex(std::vector<glm::vec2>& vec, float bottomBound);
 
-	std::vector<glm::vec2> ContinentalnessInterpolation{
+	std::vector<glm::vec2> continentalness_interpolation_ {
 		glm::vec2(0.f, 0.75f),
 		glm::vec2(0.2f, 0.82f),
 		glm::vec2(0.23f, 0.8f),
@@ -42,7 +40,7 @@ public:
 		glm::vec2(1.f, 0.3f),
 	};
 
-	std::vector<glm::vec2> ErosionnessInterpolation{
+	std::vector<glm::vec2> erosionness_interpolation_ {
 		glm::vec2(0.f, 0.75f),
 		glm::vec2(0.2f, 0.82f),
 		glm::vec2(0.23f, 0.8f),
@@ -52,7 +50,7 @@ public:
 		glm::vec2(1.f, 0.3f),
 	};
 
-	std::vector<glm::vec2> PeaksValleyInterpolation{
+	std::vector<glm::vec2> peaks_valley_interpolation_ {
 		glm::vec2(0.f, 0.0f),
 		glm::vec2(0.075f, 0.0f),
 		glm::vec2(0.15f, 0.25f),

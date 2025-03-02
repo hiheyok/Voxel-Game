@@ -11,50 +11,50 @@
 
 class Dimension {
 private:
-	World* world;
-	DimensionProperties properties;
-	WorldParameters worldSettings;
+	World* world_;
+	DimensionProperties properties_;
+	WorldParameters world_settings_;
 	
-	FastHashMap<int, ska::flat_hash_set<ChunkPos>> TickUsage;
+	FastHashMap<int, ska::flat_hash_set<ChunkPos>> tick_usage_;
 
 protected:
-	WorldGeneratorID generatorType;
+	WorldGeneratorID generator_type_;
 
-	void Start(DimensionProperties p) {
-		world = new World;
-		world->Initialize();
-		properties = p;
-		worldSettings.HorizontalTickingDistance = AppOptions.HorizontalRenderDistance;
-		worldSettings.VerticalTickingDistance = AppOptions.VerticalRenderDistance;
+	void Start(DimensionProperties properties) {
+		world_ = new World;
+		world_->Initialize();
+		properties_ = properties;
+		world_settings_.horizontal_ticking_distance_ = AppOptions.horizontal_render_distance_;
+		world_settings_.vertical_ticking_distance_ = AppOptions.vertical_render_distance_;
 
-		worldInteractions.init(world, worldSettings);
+		world_interactions_.init(world_, world_settings_);
 
 
-		if (Generators.GetGenerator(generatorType)->useTallChunks) {
-			worldInteractions.UseTallGeneration();
+		if (g_generators.GetGenerator(generator_type_)->use_tall_chunks_) {
+			world_interactions_.UseTallGeneration();
 		}
 		
 	}
 public:
-	WorldInteractions worldInteractions;
-	EventSystem EventManager;
+	WorldInteractions world_interactions_;
+	EventSystem event_manager_;
 
-	Dimension(WorldGeneratorID generatorTypeIn = Generators.DEBUG) {
-		generatorType = generatorTypeIn;
+	Dimension(WorldGeneratorID generatorTypeIn = g_generators.DEBUG) {
+		generator_type_ = generatorTypeIn;
 	}
 
-	WorldGeneratorID getGeneratorType() {
-		return generatorType;
+	WorldGeneratorID GetGeneratorType() {
+		return generator_type_;
 	}
 	
 	// TODO: Use custom block classd
 
 	bool CheckTickUsed(EventID id, const BlockPos& pos) {//temp sol
-		return TickUsage[id].count(pos);
+		return tick_usage_[id].count(pos);
 	}
 
 	void TickUsed(EventID id, const BlockPos& pos) {//temp solution
-		TickUsage[id].insert(pos);
+		tick_usage_[id].insert(pos);
 	}
 
 	void Initialize(DimensionProperties p) { //Generate new world
@@ -66,7 +66,7 @@ public:
 	}
 
 	void EventTick() {
-		std::vector<Event::Event>* EventQueue = EventManager.GetQueue();
+		std::vector<Event::Event>* EventQueue = event_manager_.GetQueue();
 
 		for (int i = 0; i < EventQueue->size(); i++) {
 			const Event::Event& e = EventQueue->at(i);
@@ -102,12 +102,12 @@ public:
 		}
 
 		EventQueue->clear();
-		EventManager.Swap();
+		event_manager_.Swap();
 
-		TickUsage.clear();
+		tick_usage_.clear();
 
 		//Tick all entities
 
-		world->Entities.Tick();
+		world_->entities_.Tick();
 	}
 };

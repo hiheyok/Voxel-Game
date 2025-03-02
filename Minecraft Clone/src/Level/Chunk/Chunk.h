@@ -9,7 +9,7 @@ enum TerrainType {
 };
 
 
-class Chunk : public ChunkContainer {
+class Chunk : public chunk_container_ {
 public:
 
 	Chunk() {

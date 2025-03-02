@@ -24,154 +24,154 @@ enum DisplayPosition {
 };
 
 struct BlockFace {
-	glm::ivec3 Normal = glm::ivec3(0, 0, 0);
-	std::string ReferenceTexture = ""; // variables starts with #
-	int CullFace = -1;
-	int TintIndex = -1;
-	unsigned int TextureID = NULL;
-	unsigned int TextureCount = NULL; //For amination purposes.
-	unsigned int rotation = 0;
-	bool hasTransparency = false;
-	bool isSeeThrough = false;
-	glm::ivec4 UV = glm::ivec4(0, 0, 16, 16);
+	glm::ivec3 normal_ = glm::ivec3(0, 0, 0);
+	std::string reference_texture_ = ""; // variables starts with #
+	int cull_face_ = -1;
+	int tint_index_ = -1;
+	unsigned int texture_id_ = NULL;
+	unsigned int texture_count_ = NULL; //For amination purposes.
+	unsigned int rotation_ = 0;
+	bool has_transparency_ = false;
+	bool is_see_through_ = false;
+	glm::ivec4 uv_ = glm::ivec4(0, 0, 16, 16);
 
-	glm::ivec2 UVCoordNN{ 0, 0 };
-	glm::ivec2 UVCoordNP{ 0, 0 };
-	glm::ivec2 UVCoordPP{ 0, 0 };
-	glm::ivec2 UVCoordPN{ 0, 0 };
+	glm::ivec2 uv_coord_nn{ 0, 0 };
+	glm::ivec2 uv_coord_np{ 0, 0 };
+	glm::ivec2 uv_coord_pp{ 0, 0 };
+	glm::ivec2 uv_coord_pn{ 0, 0 };
 };
 
 struct BlockDisplay { //Positions {thirdperson_righthand, thirdperson_lefthand, firstperson_righthand, firstperson_lefthand, gui, head, ground, or fixed}
 	//fixed = item frame
-	DisplayPosition position;
-	glm::vec3 rotation = glm::vec3(0.f, 0.f, 0.f);
-	glm::vec3 translation = glm::vec3(0.f, 0.f, 0.f);
-	glm::vec3 scale = glm::vec3(0.f, 0.f, 0.f);
-	bool Initialized = false;
+	DisplayPosition position; // TODO: Rename this
+	glm::vec3 rotation_ = glm::vec3(0.f, 0.f, 0.f);
+	glm::vec3 translation_ = glm::vec3(0.f, 0.f, 0.f);
+	glm::vec3 scale_ = glm::vec3(0.f, 0.f, 0.f);
+	bool initialized_ = false;
 };
 
 struct CuboidRotationInfo {
-	glm::vec3 origin = glm::vec3(0.f, 0.f, 0.f);
-	int axis = 0;
-	int angle = 0;
-	bool rescale = false;
-	bool Initialized = false;
+	glm::vec3 origin_ = glm::vec3(0.f, 0.f, 0.f);
+	int axis_ = 0;
+	int angle_ = 0;
+	bool rescale_ = false;
+	bool initialized_ = false;
 };
 
 class Cuboid {
 public:
-	glm::ivec3 From = glm::ivec3(0,0,0);
-	glm::ivec3 To = glm::ivec3(16, 16, 16); //Relative inner block position from -16 to 32
-	BlockFace Faces[6]{};
-	CuboidRotationInfo rotation;
-	std::string comments = "";
-	bool shade = true;
+	glm::ivec3 from_ = glm::ivec3(0,0,0);
+	glm::ivec3 to_ = glm::ivec3(16, 16, 16); //Relative inner block position from -16 to 32
+	BlockFace faces_[6]{};
+	CuboidRotationInfo rotation_;
+	std::string comments_ = "";
+	bool shade_ = true;
 
 	void EditFace(int location, BlockFace f) {
-		Faces[location - 1] = f;
+		faces_[location - 1] = f;
 	}
 };
 
 namespace ModelV2 {
 	struct BlockModelV2 {
-		std::vector<Cuboid> Elements{};
-		bool AmbientOcclusion = true; //default value
-		bool isInitialized = false;
-		FastHashMap<std::string, std::string > TextureVariable;
-		BlockDisplay Display[8]{};
+		std::vector<Cuboid> elements_{};
+		bool ambient_occlusion_ = true; //default value
+		bool is_initialized_ = false;
+		FastHashMap<std::string, std::string > texture_variable_;
+		BlockDisplay display_[8]{};
 
 		void AddDisplay(BlockDisplay display, DisplayPosition position) {
-			Display[position] = display;
+			display_[position] = display;
 		}
 
 		bool CheckDisplay(DisplayPosition position) {
-			return Display[position].Initialized;
+			return display_[position].initialized_;
 		}
 
 		void AddElement(Cuboid element) {
-			Elements.push_back(element);
+			elements_.push_back(element);
 		}
 
-		void getVertices(std::vector<float>& Vertices, std::vector<unsigned int>& Indices){
-			for (Cuboid& element : Elements) {
-				glm::vec3 from = element.From;
-				glm::vec3 to = element.To;
+		void GetVertices(std::vector<float>& vertices, std::vector<unsigned int>& indices){
+			for (Cuboid& element : elements_) {
+				glm::vec3 from = element.from_;
+				glm::vec3 to = element.to_;
 				from = from / 16.f;
 				to = to / 16.f;
 				for (int i = 0; i < 6;  i++) {
-					BlockFace face = element.Faces[i];
-					if (face.ReferenceTexture.length() == 0) continue;
+					BlockFace face = element.faces_[i];
+					if (face.reference_texture_.length() == 0) continue;
 
-					glm::vec2 uv0{ face.UV.x,  face.UV.y };
-					glm::vec2 uv1{ face.UV.z,  face.UV.w };
+					glm::vec2 uv0{ face.uv_.x,  face.uv_.y };
+					glm::vec2 uv1{ face.uv_.z,  face.uv_.w };
 
 					uv0 = uv0 / 16.f;
 					uv1 = uv1 / 16.f;
 
-					uint8_t axis = i >> 1;
+					uint8_t axis_ = i >> 1;
 
-					uint32_t currIndex = static_cast<uint32_t>(Vertices.size()) / 7;
+					uint32_t currIndex = static_cast<uint32_t>(vertices.size()) / 7;
 
-					switch (axis) {
+					switch (axis_) {
 					case 0:
 						(i & 1) == 1 ?
-							Vertices.insert(Vertices.end(),
+							vertices.insert(vertices.end(),
 								{
-									from.x,	from.y, from.z,		uv1.x, uv0.y,	(float)face.TextureID,	8.f,
-									from.x, to.y,	from.z,		uv1.x, uv1.y,	(float)face.TextureID,	8.f,
-									from.x, to.y,	to.z,		uv0.x, uv1.y,	(float)face.TextureID,	8.f,
-									from.x, from.y,	to.z,		uv0.x, uv0.y,	(float)face.TextureID,	8.f,
+									from.x,	from.y, from.z,		uv1.x, uv0.y,	(float)face.texture_id_,	8.f,
+									from.x, to.y,	from.z,		uv1.x, uv1.y,	(float)face.texture_id_,	8.f,
+									from.x, to.y,	to.z,		uv0.x, uv1.y,	(float)face.texture_id_,	8.f,
+									from.x, from.y,	to.z,		uv0.x, uv0.y,	(float)face.texture_id_,	8.f,
 								}
 								) :
-							Vertices.insert(Vertices.end(),
+							vertices.insert(vertices.end(),
 								{
-									to.x, from.y,   from.z,		uv1.x, uv0.y,	(float)face.TextureID,	8.f,
-									to.x, to.y,		from.z,		uv1.x, uv1.y,	(float)face.TextureID,	8.f,
-									to.x, to.y,		to.z,		uv0.x, uv1.y,	(float)face.TextureID,	8.f,
-									to.x, from.y,	to.z,		uv0.x, uv0.y,	(float)face.TextureID,	8.f,
+									to.x, from.y,   from.z,		uv1.x, uv0.y,	(float)face.texture_id_,	8.f,
+									to.x, to.y,		from.z,		uv1.x, uv1.y,	(float)face.texture_id_,	8.f,
+									to.x, to.y,		to.z,		uv0.x, uv1.y,	(float)face.texture_id_,	8.f,
+									to.x, from.y,	to.z,		uv0.x, uv0.y,	(float)face.texture_id_,	8.f,
 								}
 						);
 					case 1:
 						(i & 1) == 1 ?
-							Vertices.insert(Vertices.end(),
+							vertices.insert(vertices.end(),
 								{
-									from.x, from.y, from.z,		uv1.x, uv0.y,	(float)face.TextureID,	15.f,
-									to.x,	from.y, from.z,		uv0.x, uv0.y,	(float)face.TextureID,	15.f,
-									to.x,	from.y, to.z,		uv0.x, uv1.y,	(float)face.TextureID,	15.f,
-									from.x, from.y, to.z,		uv1.x, uv1.y,	(float)face.TextureID,	15.f,
+									from.x, from.y, from.z,		uv1.x, uv0.y,	(float)face.texture_id_,	15.f,
+									to.x,	from.y, from.z,		uv0.x, uv0.y,	(float)face.texture_id_,	15.f,
+									to.x,	from.y, to.z,		uv0.x, uv1.y,	(float)face.texture_id_,	15.f,
+									from.x, from.y, to.z,		uv1.x, uv1.y,	(float)face.texture_id_,	15.f,
 								}
 								) :
-							Vertices.insert(Vertices.end(),
+							vertices.insert(vertices.end(),
 								{
-									from.x, to.y,	from.z,		uv1.x, uv0.y,	(float)face.TextureID,	15.f,
-									to.x,	to.y,	from.z,		uv0.x, uv0.y,	(float)face.TextureID,	15.f,
-									to.x,	to.y,	to.z,		uv0.x, uv1.y,	(float)face.TextureID,	15.f,
-									from.x, to.y,	to.z,		uv1.x, uv1.y,	(float)face.TextureID,	15.f,
+									from.x, to.y,	from.z,		uv1.x, uv0.y,	(float)face.texture_id_,	15.f,
+									to.x,	to.y,	from.z,		uv0.x, uv0.y,	(float)face.texture_id_,	15.f,
+									to.x,	to.y,	to.z,		uv0.x, uv1.y,	(float)face.texture_id_,	15.f,
+									from.x, to.y,	to.z,		uv1.x, uv1.y,	(float)face.texture_id_,	15.f,
 								}
 						);
 					case 2:
 						(i & 1) == 1 ?
-							Vertices.insert(Vertices.end(),
+							vertices.insert(vertices.end(),
 								{
-									from.x, from.y, from.z,		uv1.x, uv0.y,	(float)face.TextureID,	12.f,
-									to.x,	from.y, from.z,		uv0.x, uv0.y,	(float)face.TextureID,	12.f,
-									to.x,	to.y,	from.z,		uv0.x, uv1.y,	(float)face.TextureID,	12.f,
-									from.x, to.y,	from.z,		uv1.x, uv1.y,	(float)face.TextureID,	12.f,
+									from.x, from.y, from.z,		uv1.x, uv0.y,	(float)face.texture_id_,	12.f,
+									to.x,	from.y, from.z,		uv0.x, uv0.y,	(float)face.texture_id_,	12.f,
+									to.x,	to.y,	from.z,		uv0.x, uv1.y,	(float)face.texture_id_,	12.f,
+									from.x, to.y,	from.z,		uv1.x, uv1.y,	(float)face.texture_id_,	12.f,
 								}
 								) :
-							Vertices.insert(Vertices.end(),
+							vertices.insert(vertices.end(),
 								{
-									from.x, from.y, to.z,		uv1.x, uv0.y,	(float)face.TextureID,	12.f,
-									to.x,	from.y, to.z,		uv0.x, uv0.y,	(float)face.TextureID,	12.f,
-									to.x,	to.y,	to.z,		uv0.x, uv1.y,	(float)face.TextureID,	12.f,
-									from.x, to.y,	to.z,		uv1.x, uv1.y,	(float)face.TextureID,	12.f,
+									from.x, from.y, to.z,		uv1.x, uv0.y,	(float)face.texture_id_,	12.f,
+									to.x,	from.y, to.z,		uv0.x, uv0.y,	(float)face.texture_id_,	12.f,
+									to.x,	to.y,	to.z,		uv0.x, uv1.y,	(float)face.texture_id_,	12.f,
+									from.x, to.y,	to.z,		uv1.x, uv1.y,	(float)face.texture_id_,	12.f,
 								}
 						);
 
 					}
 
 					if ((i & 1) == 0) {
-						Indices.insert(Indices.end(),
+						indices.insert(indices.end(),
 							{
 								0 + currIndex, 1 + currIndex, 2 + currIndex,
 								2 + currIndex, 3 + currIndex, 0 + currIndex
@@ -184,9 +184,9 @@ namespace ModelV2 {
 			}
 		}
 
-		void flattenVariables();
+		void FlattenVariables();
 
-		void bakeTextureRotation();
+		void BakeTextureRotation();
 	};
 }
 

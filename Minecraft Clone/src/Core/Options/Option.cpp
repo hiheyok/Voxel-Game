@@ -30,8 +30,8 @@ void Options::ProcessTokens(std::vector<std::string> tokens) {
 }
 
 void Options::SetOptionNameTable() {
-	OptionName.insert(std::pair<std::string, int*>("HorizontalRenderDistance", &HorizontalRenderDistance));
-	OptionName.insert(std::pair<std::string, int*>("VerticalRenderDistance", &VerticalRenderDistance));
+	OptionName.insert(std::pair<std::string, int*>("HorizontalRenderDistance", &horizontal_render_distance_));
+	OptionName.insert(std::pair<std::string, int*>("VerticalRenderDistance", &vertical_render_distance_));
 	OptionName.insert(std::pair<std::string, int*>("WorldGenThreads", &WorldGenThreads));
 	OptionName.insert(std::pair<std::string, int*>("MeshThreads", &MeshThreads));
 	OptionName.insert(std::pair<std::string, int*>("GraphicsScale", &GraphicsScale));

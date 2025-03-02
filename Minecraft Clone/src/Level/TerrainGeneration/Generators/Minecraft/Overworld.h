@@ -28,13 +28,13 @@ public:
     std::vector<double> minLimitRegion;
     std::vector<double> maxLimitRegion;
     std::vector<double> depthRegion;
-    ChunkGeneratorSettings settings;
+    ChunkGeneratorSettings settings_;
 
     std::vector<float> biomeWeights;
     std::vector<Biome*> biomesForGeneration;
 
     OverworldGenerator(int64_t seed, ChunkGeneratorSettings setting) {
-        settings = setting;
+        settings_ = setting;
 
         rand = JavaRandom(seed);
         minLimitPerlinNoise = NoiseOctave(rand, 16);

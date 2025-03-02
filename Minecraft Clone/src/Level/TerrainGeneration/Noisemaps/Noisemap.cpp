@@ -32,7 +32,7 @@ void NoiseMapTypes::Initialize(int32_t SEED) {
 	}
 }
 
-template <typename T> float NoiseMapTypes::GetNoise(T x, T y, T z, int Octaves, float Zoom) {
+template <typename T> float NoiseMapTypes::GetNoise(T x, T y, T z, int Octaves, float zoom_) {
 	float gx = static_cast<float>(x);
 	float gy = static_cast<float>(y);
 	float gz = static_cast<float>(z);

@@ -2,15 +2,15 @@
 
 void WorldInteraction::Interact(Player* player, const UserInputs& Inputs) {
 	Ray ray;
-	ray.Origin = player->Properties.Position;
+	ray.Origin = player->properties_.position_;
 	ray.Direction = dvec3(
-		cos(player->Properties.Rotation.x * 0.0174533) * cos(player->Properties.Rotation.y * 0.0174533),
-		sin(player->Properties.Rotation.y * 0.0174533),
-		sin(player->Properties.Rotation.x * 0.0174533) * cos(player->Properties.Rotation.y * 0.0174533));
+		cos(player->properties_.rotation_.x * 0.0174533) * cos(player->properties_.rotation_.y * 0.0174533),
+		sin(player->properties_.rotation_.y * 0.0174533),
+		sin(player->properties_.rotation_.x * 0.0174533) * cos(player->properties_.rotation_.y * 0.0174533));
 
-	Dimension* world = static_cast<Dimension*>(Block::DimensionPTR);
+	Dimension* world = static_cast<Dimension*>(Block::dimension_ptr_);
 
-	BlockID block = player->m_EntityInventory.GetItem(player->m_EntityInventory.RightHandSlot).m_item.GetBlock();
+	BlockID block = player->entity_inventory_.GetItem(player->entity_inventory_.right_hand_slot_).item_.GetBlock();
 
 	if (Inputs.Mouse.RIGHT == Inputs.Mouse.PRESS) {
 		PlaceBlock(ray, block, world);
@@ -22,34 +22,34 @@ void WorldInteraction::Interact(Player* player, const UserInputs& Inputs) {
 	if (Inputs.Mouse.MIDDLE == Inputs.Mouse.PRESS) {
 		BlockID newBlock = GetBlock(ray, world);
 		if (newBlock != Blocks.AIR) {
-			player->m_EntityInventory.SetSlot(player->m_EntityInventory.RightHandSlot, ItemStack{ Items.GetItem(Items.GetBlockItem(newBlock)) });
+			player->entity_inventory_.SetSlot(player->entity_inventory_.right_hand_slot_, ItemStack{ g_items.GetItem(g_items.GetBlockItem(newBlock)) });
 		}
 		
 	}
 }
 
 BlockID WorldInteraction::GetBlock(Ray ray, Dimension* dimension) {
-	if (dimension->worldInteractions.Collusions.CheckRayIntersection(ray)) {
-		return dimension->worldInteractions.getBlock(BlockPos{ (int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z) });
+	if (dimension->world_interactions_.collusions_.CheckRayIntersection(ray)) {
+		return dimension->world_interactions_.GetBlock(BlockPos{ (int)floor(ray.EndPoint.x), (int)floor(ray.EndPoint.y), (int)floor(ray.EndPoint.z) });
 	}
 	return Blocks.AIR;
 }
 
 void WorldInteraction::BreakBlock(Ray ray, Dimension* dimension) {
-	if (dimension->worldInteractions.Collusions.CheckRayIntersection(ray)) {
+	if (dimension->world_interactions_.collusions_.CheckRayIntersection(ray)) {
 		Event::BlockEvent breakBlock;
 		breakBlock.block_= Blocks.AIR;
 		breakBlock.pos_ = BlockPos{ (int)floor(ray.EndPoint.x),
 									(int)floor(ray.EndPoint.y),
 									(int)floor(ray.EndPoint.z) };
 		breakBlock.id_ = EventHandler.BlockPlace;
-		dimension->EventManager.AddEvent(breakBlock);
+		dimension->event_manager_.AddEvent(breakBlock);
 
 	}
 }
 
 void WorldInteraction::PlaceBlock(Ray ray, BlockID block, Dimension* dimension) {
-	if (dimension->worldInteractions.Collusions.CheckRayIntersection(ray)) {
+	if (dimension->world_interactions_.collusions_.CheckRayIntersection(ray)) {
 		int BounceSurface = ray.bouncesurface;
 
 		ivec3 PlacePos = floor(ray.EndPoint);
@@ -62,7 +62,7 @@ void WorldInteraction::PlaceBlock(Ray ray, BlockID block, Dimension* dimension) 
 		placeBlock.pos_ = BlockPos{ PlacePos.x, PlacePos.y, PlacePos.z };
 		placeBlock.id_ = EventHandler.BlockPlace;
 
-		dimension->EventManager.AddEvent(placeBlock);
+		dimension->event_manager_.AddEvent(placeBlock);
 
 	}
 

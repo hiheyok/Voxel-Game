@@ -11,30 +11,30 @@ public:
 
 	void Stop();
 
-	glm::vec3 getPlayerCollusionTimes();
+	glm::vec3 GetPlayerCollusionTimes();
 
-	Chunk* getChunk(const ChunkPos& chunk);
+	Chunk* GetChunk(const ChunkPos& chunk);
 
-	Timer* getTickClock();
+	Timer* getTickClock(); // TODO: Rename
 
 	double getMSPT();
 
-	void setPlayer(Player player);
+	void SetPlayer(Player player);
 
-	bool checkPlayerOnGround();
+	bool CheckPlayerOnGround();
 
-	int getChunkCount();
+	int getChunkCount(); // TODO: Rename
 
-	std::vector<ChunkPos> getUpdatedChunks();
+	std::vector<ChunkPos> GetUpdatedChunks();
 
-	std::vector<EntityProperty> getUpdatedEntities();
+	std::vector<EntityProperty> getUpdatedEntities(); // TODO: Rename
 
-	std::vector<EntityUUID> getRemovedEntities();
+	std::vector<EntityUUID> getRemovedEntities(); // TODO: Rename
 
-	bool checkRayIntersection(Ray& ray);
+	bool CheckRayIntersection(Ray& ray);
 
-	BlockID getBlock(const BlockPos& pos);
+	BlockID GetBlock(const BlockPos& pos);
 
-	void sendEvent(Event::Event pEventIn);
+	void SendEvent(Event::Event pEventIn);
 
 };

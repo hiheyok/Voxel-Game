@@ -1,7 +1,7 @@
 #include "Item.h"
 
 const BlockID Item::GetBlock() {
-	return Properties.block;
+	return properties_.block_;
 }
 
 RawTextureData Item::GetTexture() {
@@ -9,5 +9,5 @@ RawTextureData Item::GetTexture() {
 }
 
 bool Item::CheckIsBlockItem() {
-	return Properties.IsBlockItem;
+	return properties_.is_block_item_;
 }

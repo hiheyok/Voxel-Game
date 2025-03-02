@@ -85,7 +85,7 @@ void CFrustum::CalculateFrustum(Camera* cam)
 	float clip[16];
 
 	glm::mat4 modl = cam->GetViewMatrix();
-	glm::mat4 proj = perspective(glm::radians(cam->FOV), (float)cam->screenRes.x / (float)cam->screenRes.y, 0.001f, 32768.0f);
+	glm::mat4 proj = perspective(glm::radians(cam->fov_), (float)cam->screen_res_.x / (float)cam->screen_res_.y, 0.001f, 32768.0f);
 
 
 
@@ -116,61 +116,61 @@ void CFrustum::CalculateFrustum(Camera* cam)
 	// the clipping planes we received above and extract the sides from them.
 
 	// This will extract the RIGHT side of the frustum
-	m_Frustum[RIGHT_][A] = clip[3] - clip[0];
-	m_Frustum[RIGHT_][B] = clip[7] - clip[4];
-	m_Frustum[RIGHT_][C] = clip[11] - clip[8];
-	m_Frustum[RIGHT_][D] = clip[15] - clip[12];
+	frustum_[RIGHT_][A] = clip[3] - clip[0];
+	frustum_[RIGHT_][B] = clip[7] - clip[4];
+	frustum_[RIGHT_][C] = clip[11] - clip[8];
+	frustum_[RIGHT_][D] = clip[15] - clip[12];
 
 	// Now that we have a normal (A,B,C) and a distance (D) to the plane,
 	// we want to normalize that normal and distance.
 
 	// Normalize the RIGHT side
-	NormalizePlane(m_Frustum, RIGHT_);
+	NormalizePlane(frustum_, RIGHT_);
 
 	// This will extract the LEFT side of the frustum
-	m_Frustum[LEFT_][A] = clip[3] + clip[0];
-	m_Frustum[LEFT_][B] = clip[7] + clip[4];
-	m_Frustum[LEFT_][C] = clip[11] + clip[8];
-	m_Frustum[LEFT_][D] = clip[15] + clip[12];
+	frustum_[LEFT_][A] = clip[3] + clip[0];
+	frustum_[LEFT_][B] = clip[7] + clip[4];
+	frustum_[LEFT_][C] = clip[11] + clip[8];
+	frustum_[LEFT_][D] = clip[15] + clip[12];
 
 	// Normalize the LEFT side
-	NormalizePlane(m_Frustum, LEFT_);
+	NormalizePlane(frustum_, LEFT_);
 
 	// This will extract the BOTTOM side of the frustum
-	m_Frustum[BOTTOM_][A] = clip[3] + clip[1];
-	m_Frustum[BOTTOM_][B] = clip[7] + clip[5];
-	m_Frustum[BOTTOM_][C] = clip[11] + clip[9];
-	m_Frustum[BOTTOM_][D] = clip[15] + clip[13];
+	frustum_[BOTTOM_][A] = clip[3] + clip[1];
+	frustum_[BOTTOM_][B] = clip[7] + clip[5];
+	frustum_[BOTTOM_][C] = clip[11] + clip[9];
+	frustum_[BOTTOM_][D] = clip[15] + clip[13];
 
 	// Normalize the BOTTOM side
-	NormalizePlane(m_Frustum, BOTTOM_);
+	NormalizePlane(frustum_, BOTTOM_);
 
 	// This will extract the TOP side of the frustum
-	m_Frustum[TOP_][A] = clip[3] - clip[1];
-	m_Frustum[TOP_][B] = clip[7] - clip[5];
-	m_Frustum[TOP_][C] = clip[11] - clip[9];
-	m_Frustum[TOP_][D] = clip[15] - clip[13];
+	frustum_[TOP_][A] = clip[3] - clip[1];
+	frustum_[TOP_][B] = clip[7] - clip[5];
+	frustum_[TOP_][C] = clip[11] - clip[9];
+	frustum_[TOP_][D] = clip[15] - clip[13];
 
 	// Normalize the TOP side
-	NormalizePlane(m_Frustum, TOP_);
+	NormalizePlane(frustum_, TOP_);
 
 	// This will extract the BACK side of the frustum
-	m_Frustum[BACK_][A] = clip[3] - clip[2];
-	m_Frustum[BACK_][B] = clip[7] - clip[6];
-	m_Frustum[BACK_][C] = clip[11] - clip[10];
-	m_Frustum[BACK_][D] = clip[15] - clip[14];
+	frustum_[BACK_][A] = clip[3] - clip[2];
+	frustum_[BACK_][B] = clip[7] - clip[6];
+	frustum_[BACK_][C] = clip[11] - clip[10];
+	frustum_[BACK_][D] = clip[15] - clip[14];
 
 	// Normalize the BACK side
-	NormalizePlane(m_Frustum, BACK_);
+	NormalizePlane(frustum_, BACK_);
 
 	// This will extract the FRONT side of the frustum
-	m_Frustum[FRONT_][A] = clip[3] + clip[2];
-	m_Frustum[FRONT_][B] = clip[7] + clip[6];
-	m_Frustum[FRONT_][C] = clip[11] + clip[10];
-	m_Frustum[FRONT_][D] = clip[15] + clip[14];
+	frustum_[FRONT_][A] = clip[3] + clip[2];
+	frustum_[FRONT_][B] = clip[7] + clip[6];
+	frustum_[FRONT_][C] = clip[11] + clip[10];
+	frustum_[FRONT_][D] = clip[15] + clip[14];
 
 	// Normalize the FRONT side
-	NormalizePlane(m_Frustum, FRONT_);
+	NormalizePlane(frustum_, FRONT_);
 }
 
 // The code below will allow us to make checks within the frustum.  For example,
@@ -206,7 +206,7 @@ bool CFrustum::PointInFrustum(float x, float y, float z)
 	for (int i = 0; i < 6; i++)
 	{
 		// Calculate the plane equation and check if the point is behind a side of the frustum
-		if (m_Frustum[i][A] * x + m_Frustum[i][B] * y + m_Frustum[i][C] * z + m_Frustum[i][D] <= 0)
+		if (frustum_[i][A] * x + frustum_[i][B] * y + frustum_[i][C] * z + frustum_[i][D] <= 0)
 		{
 			// The point was behind a side, so it ISN'T in the frustum
 			return false;
@@ -240,7 +240,7 @@ bool CFrustum::SphereInFrustum(float x, float y, float z, float radius)
 	for (int i = 0; i < 6; i++)
 	{
 		// If the center of the sphere is farther away from the plane than the radius
-		if (m_Frustum[i][A] * x + m_Frustum[i][B] * y + m_Frustum[i][C] * z + m_Frustum[i][D] <= -radius)
+		if (frustum_[i][A] * x + frustum_[i][B] * y + frustum_[i][C] * z + frustum_[i][D] <= -radius)
 		{
 			// The distance was greater than the radius so the sphere is outside of the frustum
 			return false;
@@ -273,21 +273,21 @@ bool CFrustum::CubeInFrustum(float x, float y, float z, float size)
 
 	for (int i = 0; i < 6; i++)
 	{
-		if (m_Frustum[i][A] * (x - size) + m_Frustum[i][B] * (y - size) + m_Frustum[i][C] * (z - size) + m_Frustum[i][D] > 0)
+		if (frustum_[i][A] * (x - size) + frustum_[i][B] * (y - size) + frustum_[i][C] * (z - size) + frustum_[i][D] > 0)
 			continue;
-		if (m_Frustum[i][A] * (x + size) + m_Frustum[i][B] * (y - size) + m_Frustum[i][C] * (z - size) + m_Frustum[i][D] > 0)
+		if (frustum_[i][A] * (x + size) + frustum_[i][B] * (y - size) + frustum_[i][C] * (z - size) + frustum_[i][D] > 0)
 			continue;
-		if (m_Frustum[i][A] * (x - size) + m_Frustum[i][B] * (y + size) + m_Frustum[i][C] * (z - size) + m_Frustum[i][D] > 0)
+		if (frustum_[i][A] * (x - size) + frustum_[i][B] * (y + size) + frustum_[i][C] * (z - size) + frustum_[i][D] > 0)
 			continue;
-		if (m_Frustum[i][A] * (x + size) + m_Frustum[i][B] * (y + size) + m_Frustum[i][C] * (z - size) + m_Frustum[i][D] > 0)
+		if (frustum_[i][A] * (x + size) + frustum_[i][B] * (y + size) + frustum_[i][C] * (z - size) + frustum_[i][D] > 0)
 			continue;
-		if (m_Frustum[i][A] * (x - size) + m_Frustum[i][B] * (y - size) + m_Frustum[i][C] * (z + size) + m_Frustum[i][D] > 0)
+		if (frustum_[i][A] * (x - size) + frustum_[i][B] * (y - size) + frustum_[i][C] * (z + size) + frustum_[i][D] > 0)
 			continue;
-		if (m_Frustum[i][A] * (x + size) + m_Frustum[i][B] * (y - size) + m_Frustum[i][C] * (z + size) + m_Frustum[i][D] > 0)
+		if (frustum_[i][A] * (x + size) + frustum_[i][B] * (y - size) + frustum_[i][C] * (z + size) + frustum_[i][D] > 0)
 			continue;
-		if (m_Frustum[i][A] * (x - size) + m_Frustum[i][B] * (y + size) + m_Frustum[i][C] * (z + size) + m_Frustum[i][D] > 0)
+		if (frustum_[i][A] * (x - size) + frustum_[i][B] * (y + size) + frustum_[i][C] * (z + size) + frustum_[i][D] > 0)
 			continue;
-		if (m_Frustum[i][A] * (x + size) + m_Frustum[i][B] * (y + size) + m_Frustum[i][C] * (z + size) + m_Frustum[i][D] > 0)
+		if (frustum_[i][A] * (x + size) + frustum_[i][B] * (y + size) + frustum_[i][C] * (z + size) + frustum_[i][D] > 0)
 			continue;
 
 		// If we get here, it isn't in the frustum

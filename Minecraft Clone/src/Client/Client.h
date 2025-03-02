@@ -24,7 +24,7 @@ private:
 
 	double Frametime = 0.5;
 
-	MainPlayer m_MainPlayer;
+	MainPlayer main_player_;
 
 	InternalServer server;
 	WorldRender TerrainRender;

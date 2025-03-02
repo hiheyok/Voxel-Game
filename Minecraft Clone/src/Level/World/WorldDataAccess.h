@@ -6,21 +6,21 @@
 
 class WorldAccess {
 private:
-	ChunkMap ChunkContainer;
+	ChunkMap chunk_container_;
 public:
-	EntityContainer Entities; //Remove tick later, this is going to be specific to dimension stuff
+	EntityContainer entities_; //Remove tick later, this is going to be specific to dimension stuff
 
-	BlockID getBlock(const BlockPos& pos);
+	BlockID GetBlock(const BlockPos& pos);
 	
-	void setBlock(BlockID block, const BlockPos& pos);
+	void SetBlock(BlockID block, const BlockPos& pos);
 
-	void setChunk(Chunk* chunk);
+	void SetChunk(Chunk* chunk);
 
-	Chunk* getChunk(const ChunkPos& ID) const;
+	Chunk* GetChunk(const ChunkPos& ID) const;
 
-	bool checkChunk(const ChunkPos& ID) const;
+	bool CheckChunk(const ChunkPos& ID) const;
 	
-	Heightmap& getColumnHeightmap(const ChunkColumnPos& v) const;
+	Heightmap& GetColumnHeightmap(const ChunkColumnPos& v) const;
 
-	ChunkColumn* getColumn(const ChunkPos& v) const;
+	ChunkColumn* GetColumn(const ChunkPos& v) const;
 };

@@ -18,7 +18,7 @@ public:
             for (int j = 0; j < areaWidth; ++j)
             {
                 initChunkSeed((long long)(areaX + j), (long long)(areaY + i));
-                aint[j + i * areaWidth] = nextInt(10) == 0 ? 1 : 0;
+                aint[j + i * areaWidth] = NextInt(10) == 0 ? 1 : 0;
             }
         }
 

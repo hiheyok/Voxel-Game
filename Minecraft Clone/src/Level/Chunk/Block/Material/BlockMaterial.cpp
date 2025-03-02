@@ -7,15 +7,15 @@ Block* MaterialNone::BuildNewBlockType() {
 
 Block* MaterialFluid::BuildNewBlockType() {
 	Fluid* fluid = new Fluid;
-	fluid->Properties.SpreadRate = Spread;
+	fluid->properties_.spread_rate_ = spread_;
 
 	return static_cast<Block*>(fluid);
 }
 
 Block* MaterialGrass::BuildNewBlockType() {
 	GrassBlock* grass = new GrassBlock;
-	grass->Properties.BreakChance = BreakChance;
-	grass->Properties.SpreadChance = SpreadChance;
+	grass->properties_.break_chance_ = break_chance_;
+	grass->properties_.spread_chance_ = spread_chance_;
 
 	return static_cast<Block*>(grass);
 }

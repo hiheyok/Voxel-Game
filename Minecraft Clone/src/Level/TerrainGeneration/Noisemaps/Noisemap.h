@@ -5,7 +5,7 @@ class NoiseMapTypes {
 public:
 	void Initialize(int32_t SEED);
 
-	template <typename T> float GetNoise(T x, T y, T z, int Octaves, float Zoom);
+	template <typename T> float GetNoise(T x, T y, T z, int Octaves, float zoom_);
 
 	FastNoiseLite IslandLayer4096;
 	FastNoiseLite IslandLayer2048;

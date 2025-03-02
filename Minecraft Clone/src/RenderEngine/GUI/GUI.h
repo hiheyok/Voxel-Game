@@ -11,21 +11,21 @@ class GUI {
 public:
 
 	void Initialize(GLFWwindow* win) {
-		window = win;
-		shader.init("assets/shaders/GUI/GUIVert.glsl", "assets/shaders/GUI/GUIFrag.glsl");
+		window_ = win;
+		shader_.init("assets/shaders/GUI/GUIVert.glsl", "assets/shaders/GUI/GUIFrag.glsl");
 	}
 
 	int AddGUI(std::string Name, GUISet set) {
-		GUIs.emplace_back(set);
-		return GUIs.size() - 1;
+		guis_.emplace_back(set);
+		return guis_.size() - 1;
 	}
 
 	GUISet& EditGUISet(int GUIIndex) {
-		return GUIs[GUIIndex];
+		return guis_[GUIIndex];
 	}
 
 	void PrepareRenderer() {
-		for (auto& gui : GUIs) {
+		for (auto& gui : guis_) {
 			gui.PrepareRenderer();
 		}
 
@@ -36,9 +36,9 @@ public:
 		Update();
 		SetupDrawCalls();
 
-		shader.use();
-		for (auto& gui : GUIs) {
-			shader.bindTexture2D(0, gui.GUITexture.get(), "GUITexture");
+		shader_.use();
+		for (auto& gui : guis_) {
+			shader_.bindTexture2D(0, gui.GUITexture.get(), "GUITexture");
 			for (int i = 0; i < gui.NumOfRenderableObjects; i++) {
 			//	std::cout << gui.Textures[i]->get() << "\n";
 				
@@ -65,16 +65,16 @@ private:
 	void Update() {
 
 		int Height, Width;
-		glfwGetWindowSize(window, &Width, &Height);
+		glfwGetWindowSize(window_, &Width, &Height);
 
-		shader.use();
-		shader.setFloat("AspectRatio", ((float)Height)/((float)Width));
+		shader_.use();
+		shader_.setFloat("AspectRatio", ((float)Height)/((float)Width));
 	}
 
-	std::vector<GUISet> GUIs = {};
+	std::vector<GUISet> guis_ = {};
 
-	Shader shader;
-	GLFWwindow* window;
+	Shader shader_;
+	GLFWwindow* window_;
 
 	//bool isDirty = false;
 };

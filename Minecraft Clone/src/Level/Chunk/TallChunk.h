@@ -3,43 +3,43 @@
 
 class TallChunk {
 private:
-	std::vector<Chunk*> ChunkSubColumn;
+	std::vector<Chunk*> chunk_sub_column_;
 public:
 	TallChunk() {
-		ChunkSubColumn.resize(16);
-		for (int i = 0; i < 16; i++) ChunkSubColumn[i] = new Chunk;
+		chunk_sub_column_.resize(16);
+		for (int i = 0; i < 16; i++) chunk_sub_column_[i] = new Chunk;
 	}
 
 	void SetPosition(int x, int y, int z) { // confusing y -> tall chunk pos
 		y = y * 16;
 		for (int i = 0; i < 16; i++) {
-			ChunkSubColumn[i]->SetPosition(x, y + i, z);
+			chunk_sub_column_[i]->SetPosition(x, y + i, z);
 		}
 	}
 
 	int GetYPosition() {
-		return ChunkSubColumn[0]->position_.y;
+		return chunk_sub_column_[0]->position_.y;
 	}
 
 	int GetXPosition() {
-		return ChunkSubColumn[0]->position_.x;
+		return chunk_sub_column_[0]->position_.x;
 	}
 
 	int GetZPosition() {
-		return ChunkSubColumn[0]->position_.z;
+		return chunk_sub_column_[0]->position_.z;
 	}
 
 	void SetBlockUnsafe(int x, int y, int z, BlockID block) {
 		int ChunkIndex = y / 16;
-		ChunkSubColumn[ChunkIndex]->SetBlockUnsafe(block, x, y & 0b1111, z);
+		chunk_sub_column_[ChunkIndex]->SetBlockUnsafe(block, x, y & 0b1111, z);
 	}
 
 	BlockID GetBlockUnsafe(int x, int y, int z) {
 		int ChunkIndex = y / 16;
-		return ChunkSubColumn[ChunkIndex]->GetBlockUnsafe(x, y & 0b1111, z);
+		return chunk_sub_column_[ChunkIndex]->GetBlockUnsafe(x, y & 0b1111, z);
 	}
 
-	std::vector<Chunk*> getCubicChunks() {
-		return ChunkSubColumn;
+	std::vector<Chunk*> GetCubicChunks() {
+		return chunk_sub_column_;
 	}
 };

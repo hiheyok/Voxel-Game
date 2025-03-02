@@ -28,7 +28,7 @@ public:
                 }
                 else
                 {
-                    int l1 = nextInt(6);
+                    int l1 = NextInt(6);
 
                     if (l1 == 0)
                     {

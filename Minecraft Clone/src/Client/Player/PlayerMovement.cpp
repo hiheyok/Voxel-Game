@@ -26,13 +26,13 @@ float PlayerMovement::velocityMovementCurve(float current, float max, float delt
 void PlayerMovement::RotatePlayer(Player* player, UserInputs Inputs) {
 	float CamSensitivity = 0.1f;
 
-	player->Properties.Rotation.x += static_cast<float>(Inputs.Mouse.Displacement.x * CamSensitivity);
-	player->Properties.Rotation.y -= static_cast<float>(Inputs.Mouse.Displacement.y * CamSensitivity);
+	player->properties_.rotation_.x += static_cast<float>(Inputs.Mouse.Displacement.x * CamSensitivity);
+	player->properties_.rotation_.y -= static_cast<float>(Inputs.Mouse.Displacement.y * CamSensitivity);
 
-	if (player->Properties.Rotation.y > 89.9999f)
-		player->Properties.Rotation.y = 89.9999f;
-	if (player->Properties.Rotation.y < -89.9999f)
-		player->Properties.Rotation.y = -89.9999f;
+	if (player->properties_.rotation_.y > 89.9999f)
+		player->properties_.rotation_.y = 89.9999f;
+	if (player->properties_.rotation_.y < -89.9999f)
+		player->properties_.rotation_.y = -89.9999f;
 }
 
 void PlayerMovement::MoveRelative(Player* player, float strafe, float up, float forward,  float friction) {
@@ -48,21 +48,21 @@ void PlayerMovement::MoveRelative(Player* player, float strafe, float up, float 
 		up = up * f;
 		forward = forward * f;
 
-		float zCoord = sin(player->Properties.Rotation.y * 0.017453292f);
-		float xCoord = cos(player->Properties.Rotation.y * 0.017453292f);
+		float zCoord = sin(player->properties_.rotation_.y * 0.017453292f);
+		float xCoord = cos(player->properties_.rotation_.y * 0.017453292f);
 
-		player->Properties.Velocity.x += strafe * xCoord - forward * zCoord;
-		player->Properties.Velocity.y += up;
-		player->Properties.Velocity.z += forward * xCoord + strafe * zCoord;
+		player->properties_.velocity_.x += strafe * xCoord - forward * zCoord;
+		player->properties_.velocity_.y += up;
+		player->properties_.velocity_.z += forward * xCoord + strafe * zCoord;
 	}
 }
 
 void PlayerMovement::MovePlayer(Player* player, UserInputs Inputs, InternalServer* server) {
 
 	vec3 front(
-		cos(player->Properties.Rotation.x * 0.0174533) * cos(player->Properties.Rotation.y * 0.0174533),
+		cos(player->properties_.rotation_.x * 0.0174533) * cos(player->properties_.rotation_.y * 0.0174533),
 		0,
-		sin(player->Properties.Rotation.x * 0.0174533) * cos(player->Properties.Rotation.y * 0.0174533)
+		sin(player->properties_.rotation_.x * 0.0174533) * cos(player->properties_.rotation_.y * 0.0174533)
 	);
 
 	front = normalize(front);
@@ -70,40 +70,40 @@ void PlayerMovement::MovePlayer(Player* player, UserInputs Inputs, InternalServe
 	vec3 right = normalize(cross(front, glm::vec3(0.0, 1.0, 0.0)));
 	right.y = 0;
 
-	float velocity = player->Properties.MaxSpeed;
+	float velocity = player->properties_.max_speed_;
 
 	if (Inputs.CheckKey(KEY_LEFT_CONTROL)) {
 		velocity *= 8.f;
 	}
 
-	float v = velocityMovementCurve(magnitude(player->Properties.Velocity), velocity, Inputs.delta) / sqrtf(2);
+	float v = velocityMovementCurve(magnitude(player->properties_.velocity_), velocity, Inputs.delta) / sqrtf(2);
 
-	player->Properties.Velocity = vec3(0.f, 0.f, 0.f);
+	player->properties_.velocity_ = vec3(0.f, 0.f, 0.f);
 
 	if (Inputs.CheckKey(KEY_W)) {
-		player->Properties.Velocity += front * v;
+		player->properties_.velocity_ += front * v;
 	}
 	if (Inputs.CheckKey(KEY_A)) {
-		player->Properties.Velocity += -right * v;
+		player->properties_.velocity_ += -right * v;
 	}
 	if (Inputs.CheckKey(KEY_S)) {
-		player->Properties.Velocity += -front * v;
+		player->properties_.velocity_ += -front * v;
 	}
 	if (Inputs.CheckKey(KEY_D)) {
-		player->Properties.Velocity += right * v;
+		player->properties_.velocity_ += right * v;
 	}
 
 	if (Inputs.CheckKey(KEY_LEFT_SHIFT)) {
-		player->Properties.Velocity.y += -velocityMovementCurve(magnitude(player->Properties.Velocity), velocity, Inputs.delta);
+		player->properties_.velocity_.y += -velocityMovementCurve(magnitude(player->properties_.velocity_), velocity, Inputs.delta);
 	}
 
 
-	if (Inputs.CheckKey(KEY_SPACE) && (server->checkPlayerOnGround() && m_EnableCollusion)) {
-		player->Properties.Velocity.y += velocity * 4000;
+	if (Inputs.CheckKey(KEY_SPACE) && (server->CheckPlayerOnGround() && m_EnableCollusion)) {
+		player->properties_.velocity_.y += velocity * 4000;
 	}
 
 	if (Inputs.CheckKey(KEY_SPACE)) {
-		player->Properties.Velocity.y += velocity;
+		player->properties_.velocity_.y += velocity;
 	}
 
 
@@ -111,27 +111,27 @@ void PlayerMovement::MovePlayer(Player* player, UserInputs Inputs, InternalServe
 		float gravity = -80;
 		gravity = 0;
 
-		player->Properties.Velocity.y += gravity;
+		player->properties_.velocity_.y += gravity;
 
-		vec3 time = server->getPlayerCollusionTimes();
+		vec3 time = server->GetPlayerCollusionTimes();
 
 		if ((time.x != -1.) && (time.x <= Inputs.delta)) {
-			player->Properties.Velocity.x = 0;
+			player->properties_.velocity_.x = 0;
 		}
 		if ((time.y != -1.) && (time.y <= Inputs.delta)) {
-			player->Properties.Velocity.y = 0;
+			player->properties_.velocity_.y = 0;
 
-			player->Properties.Velocity.x = player->Properties.Velocity.x * powf(1.f / 250.f, Inputs.delta);
-			player->Properties.Velocity.z = player->Properties.Velocity.z * powf(1.f / 250.f, Inputs.delta);
+			player->properties_.velocity_.x = player->properties_.velocity_.x * powf(1.f / 250.f, Inputs.delta);
+			player->properties_.velocity_.z = player->properties_.velocity_.z * powf(1.f / 250.f, Inputs.delta);
 		}
 		if ((time.z != -1.) && (time.z <= Inputs.delta)) {
-			player->Properties.Velocity.z = 0;
+			player->properties_.velocity_.z = 0;
 		}
 	}
 
 
-	player->Properties.Position += player->Properties.Velocity * Inputs.delta / 2.f;
-	player->Properties.Velocity = player->Properties.Velocity * powf(3.f / 25.f, Inputs.delta);
+	player->properties_.position_ += player->properties_.velocity_ * Inputs.delta / 2.f;
+	player->properties_.velocity_ = player->properties_.velocity_ * powf(3.f / 25.f, Inputs.delta);
 	/*float jumpMovementFactor = 0.02F;
 	float f = 0.91;
 

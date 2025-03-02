@@ -22,8 +22,8 @@ public:
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             Logger.LogDebug("Texture Loader", "Loaded 2D Texture: " + std::to_string(textureID));
-            width = data.width;
-            height = data.height;
+            width_ = data.width;
+            height_ = data.height;
             return true;
         }
         else {

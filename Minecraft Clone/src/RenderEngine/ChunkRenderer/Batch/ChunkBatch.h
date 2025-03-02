@@ -21,9 +21,9 @@ public:
 
 	void Reset();
 
-	void GenDrawCommands(int RenderDistance, int VerticalRenderDistance);
+	void GenDrawCommands(int RenderDistance, int verticalRenderDistance);
 
-	bool AddChunkVertices(std::vector<uint32_t>& Data, const ChunkPos& pos);
+	bool AddChunkVertices(const std::vector<uint32_t>& Data, const ChunkPos& pos);
 
 	void DeleteChunkVertices(const ChunkPos& ID);
 
@@ -43,29 +43,29 @@ public:
 
 	void ErrorCheck();
 
-	Camera* camera;
+	Camera* camera; // TODO: Rename
 
-	std::map<size_t, ChunkMemoryPoolOffset> RenderList; //f: Offset -> RenderInfo
+	std::map<size_t, ChunkMemoryPoolOffset> render_list_; //f: Offset -> RenderInfo
 
-	double debugTime = 0.0;
+	double debug_time_ = 0.0;
 
-	ChunkGPUMemoryPool MemoryPool;
+	ChunkGPUMemoryPool memory_pool_;
 private:
-	ChunkDrawCommandBuffer CommandBuffer;
-	CFrustum Frustum;
-	Buffer IBO, SSBO;
-	VertexArray Array;
-	size_t MaxBufferSize = NULL;
+	ChunkDrawCommandBuffer command_buffer_;
+	CFrustum frustum_;
+	Buffer ibo_, ssbo_;
+	VertexArray array_;
+	size_t max_buffer_size_ = NULL;
 
-	bool UpdateCommands = false;
+	bool update_commands_ = false;
 
-	FastHashMap<ChunkPos, size_t> RenderListOffsetLookup; //f: ChunkPos  -> Offset
-	std::vector<GLint> ChunkShaderPos;
+	FastHashMap<ChunkPos, size_t> render_list_offset_lookup_; //f: ChunkPos  -> Offset
+	std::vector<GLint> chunk_shader_pos_;
 
-	std::vector<DrawCommandIndirect> DrawCommands;
+	std::vector<DrawCommandIndirect> draw_commands_;
 
-	size_t AmountOfChunks = 0;
-	size_t AmountOfChunkBeingRendered = 0;
+	size_t amount_of_chunks_ = 0;
+	size_t amount_of_chunks_being_rendered_ = 0;
 
-	Buffer TransferBuffer;
+	Buffer transfer_buffer_;
 };

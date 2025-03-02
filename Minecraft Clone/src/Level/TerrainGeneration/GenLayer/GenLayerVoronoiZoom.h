@@ -30,17 +30,17 @@ public:
             {
                 // double d0 = 3.6;
                 initChunkSeed((long long)(l1 + i << 2), (long long)(k1 + j << 2));
-                double d1 = ((double)nextInt(1024) / 1024.0 - 0.5) * 3.6;
-                double d2 = ((double)nextInt(1024) / 1024.0 - 0.5) * 3.6;
+                double d1 = ((double)NextInt(1024) / 1024.0 - 0.5) * 3.6;
+                double d2 = ((double)NextInt(1024) / 1024.0 - 0.5) * 3.6;
                 initChunkSeed((long long)(l1 + i + 1 << 2), (long long)(k1 + j << 2));
-                double d3 = ((double)nextInt(1024) / 1024.0 - 0.5) * 3.6 + 4.0;
-                double d4 = ((double)nextInt(1024) / 1024.0 - 0.5) * 3.6;
+                double d3 = ((double)NextInt(1024) / 1024.0 - 0.5) * 3.6 + 4.0;
+                double d4 = ((double)NextInt(1024) / 1024.0 - 0.5) * 3.6;
                 initChunkSeed((long long)(l1 + i << 2), (long long)(k1 + j + 1 << 2));
-                double d5 = ((double)nextInt(1024) / 1024.0 - 0.5) * 3.6;
-                double d6 = ((double)nextInt(1024) / 1024.0 - 0.5) * 3.6 + 4.0;
+                double d5 = ((double)NextInt(1024) / 1024.0 - 0.5) * 3.6;
+                double d6 = ((double)NextInt(1024) / 1024.0 - 0.5) * 3.6 + 4.0;
                 initChunkSeed((long long)(l1 + i + 1 << 2), (long long)(k1 + j + 1 << 2));
-                double d7 = ((double)nextInt(1024) / 1024.0 - 0.5) * 3.6 + 4.0;
-                double d8 = ((double)nextInt(1024) / 1024.0 - 0.5) * 3.6 + 4.0;
+                double d7 = ((double)NextInt(1024) / 1024.0 - 0.5) * 3.6 + 4.0;
+                double d8 = ((double)NextInt(1024) / 1024.0 - 0.5) * 3.6 + 4.0;
                 int k2 = aint[l1 + 1 + (k1 + 0) * k] & 255;
                 int l2 = aint[l1 + 1 + (k1 + 1) * k] & 255;
 

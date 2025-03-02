@@ -12,10 +12,10 @@
 LogUtils Logger;
 Options AppOptions;
 BlockList Blocks;
-EntitiesList EntityList;
-ItemList Items;
-ItemTextureAtlas ItemAtlas;
-GeneratorType Generators;
+EntitiesList g_entity_list;
+ItemList g_items;
+ItemTextureAtlas g_item_atlas;
+GeneratorType g_generators;
 
 int AmountEntityDestroy = 0;
 

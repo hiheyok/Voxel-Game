@@ -10,9 +10,9 @@ public:
         ROOFED
     };
 
-    BiomeForest::Type type;
+    BiomeForest::Type type_;
 
-    BiomeForest(BiomeForest::Type biomeType, BiomeProperties properties) : Biome(properties), type(biomeType) {}
+    BiomeForest(BiomeForest::Type biomeType, BiomeProperties properties) : Biome(properties), type_(biomeType) {}
 
     const std::type_info& getBiomeClass() const override {
         return typeid(*this);

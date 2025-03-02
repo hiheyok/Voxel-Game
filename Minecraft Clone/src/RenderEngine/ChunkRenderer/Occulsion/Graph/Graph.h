@@ -4,15 +4,15 @@
 
 template <class T>
 struct Node {
-	T* Vertex;
-	Node* Edge;
+	T* vertex_;
+	Node* edge_;
 };
 
 template <class T> 
 class Graph {
 
 private:
-	std::list<Node> Nodes;
+	std::list<Node> nodes_;
 public:
 
 	void InsertVertex(T* vertex) {

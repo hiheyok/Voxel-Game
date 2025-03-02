@@ -55,7 +55,7 @@ public:
         worldGenSeed += baseSeed;
     }
 
-    int nextInt(int rngSeed) {
+    int NextInt(int rngSeed) {
         int i = (int)((chunkSeed >> 24) % (long long)rngSeed);
 
         if (i < 0) {
@@ -94,7 +94,7 @@ public:
     }
 
     int selectRandom(std::vector<int> rngNum) {
-        return rngNum[nextInt(static_cast<int>(rngNum.size()))];
+        return rngNum[NextInt(static_cast<int>(rngNum.size()))];
     }
 
     int selectModeOrRandom(int p_151617_1_, int p_151617_2_, int p_151617_3_, int p_151617_4_) {

@@ -9,8 +9,8 @@
 class MinecraftTerrain : public WorldGenerator {
 public:
 	MinecraftTerrain() {
-		settings = new ChunkGeneratorSettings;
-		useTallChunks = true;
+		settings_ = new ChunkGeneratorSettings;
+		use_tall_chunks_ = true;
 		
 	}
 
@@ -21,7 +21,7 @@ private:
 
 	NoiseMaps1122 Noisemaps;
 	TerrainParamters Paramters;
-	ChunkGeneratorSettings* settings = nullptr;
+	ChunkGeneratorSettings* settings_ = nullptr;
 	
 
 	//double* heightMap;

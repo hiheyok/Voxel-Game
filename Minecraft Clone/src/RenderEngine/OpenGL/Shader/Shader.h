@@ -141,17 +141,17 @@ private:
 
     FastHashMap<std::string, int> cache;
 
-    void checkCompileErrors(GLuint shader, std::string type)
+    void checkCompileErrors(GLuint shader, std::string type_)
     {
         GLint success;
         GLchar infoLog[1024];
-        if (type != "PROGRAM")
+        if (type_ != "PROGRAM")
         {
             glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
             if (!success)
             {
                 glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-                Logger.LogError("OpenGL Shader", "Failed to compile" + type + " Shader: \n" + std::string(infoLog) + "\n");
+                Logger.LogError("OpenGL Shader", "Failed to compile" + type_ + " Shader: \n" + std::string(infoLog) + "\n");
             }
         }
         else

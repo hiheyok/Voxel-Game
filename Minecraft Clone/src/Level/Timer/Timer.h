@@ -6,7 +6,7 @@ class Timer {
 public:
 	
 	Timer() {
-		First = std::chrono::high_resolution_clock::now();
+		first_ = std::chrono::high_resolution_clock::now();
 	}
 
 	double GetTimePassed_ns();
@@ -22,6 +22,6 @@ public:
 	void Set();
 
 private:
-	std::chrono::steady_clock::time_point First;
+	std::chrono::steady_clock::time_point first_;
 
 };

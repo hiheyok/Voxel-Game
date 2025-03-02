@@ -9,7 +9,7 @@ vec3 MinecraftTerrain::VecFloor(vec3 v) {
 }
 
 TallChunk* MinecraftTerrain::GenerateTall(const ChunkPos& pos) {
-	OverworldGenerator overworldGenerator = OverworldGenerator(WorldGenerator::worldSeed, *settings);
+	OverworldGenerator overworldGenerator = OverworldGenerator(WorldGenerator::world_seed_, *settings_);
 
 	TallChunk* chunk = new TallChunk();
 	chunk->SetPosition(pos.x, pos.y, pos.z);

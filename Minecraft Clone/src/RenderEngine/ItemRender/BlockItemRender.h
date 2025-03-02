@@ -14,10 +14,10 @@ private:
 	Camera camera;
 
 	void SetCamera() {
-		camera.FOV = 57;
-		camera.Position = glm::vec3(1.1f,1.1f,1.1f);
-		camera.Pitch = -35;
-		camera.Yaw = -135;
+		camera.fov_ = 57;
+		camera.position_ = glm::vec3(1.1f,1.1f,1.1f);
+		camera.pitch_ = -35;
+		camera.yaw_ = -135;
 
 		camera.updateCameraVectors();
 	}
@@ -63,26 +63,26 @@ public:
 		shader.setMat4("projection", orthoProj);
 
 
-		shader.bindTexture2D(0, Blocks.BlockTextureAtlas.get(), "BlockTexture");
+		shader.bindTexture2D(0, Blocks.block_texture_atlas_.get(), "BlockTexture");
 	}
 
 	void RenderBlock(Item item) {
-		if (Blocks.getBlockType(item.GetBlock())->BlockModelData == NULL) {
+		if (Blocks.GetBlockType(item.GetBlock())->block_model_data_ == NULL) {
 			return;
 		}
 
 		std::vector<float> vertices{};
 		std::vector<uint32_t> indices{};
 
-		Blocks.getBlockType(item.GetBlock())->BlockModelData->getVertices(vertices, indices);
+		Blocks.GetBlockType(item.GetBlock())->block_model_data_->GetVertices(vertices, indices);
 
 		VBO.InsertData(vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 		EBO.InsertData(indices.size() * sizeof(uint32_t), indices.data(), GL_STATIC_DRAW);
 		//std::cout << model.Vertices.size() << '\n';
-		camera.screenRes = glm::vec2(16.f, 16.f);
+		camera.screen_res_ = glm::vec2(16.f, 16.f);
 
 		shader.use();
-		shader.bindTexture2D(0, Blocks.BlockTextureAtlas.get(), "BlockTexture");
+		shader.bindTexture2D(0, Blocks.block_texture_atlas_.get(), "BlockTexture");
 		setDrawCalls();
 		VAO.Bind();
 		EBO.Bind();

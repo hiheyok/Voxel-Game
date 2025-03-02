@@ -31,11 +31,11 @@ public:
 
 	void Update();
 
-	void setSettings(uint32_t RenderDistance, uint32_t VerticalRenderDistance, float FOV);
+	void setSettings(uint32_t RenderDistance, uint32_t verticalRenderDistance, float fov_);
 
 	void LoadAssets();
 
-	void AddChunk(MeshingV2::ChunkVertexData* MeshData);
+	void AddChunk(std::unique_ptr<MeshingV2::ChunkVertexData> MeshData);
 
 	double getDebugTime();
 
@@ -48,9 +48,7 @@ public:
 	size_t amountOfMeshGenerated = 1;
 
 private:
-	void GarbageCollectorThread();
-
-	void AddChunk(const ChunkPos& pos, std::vector<uint32_t> data, std::vector<ChunkDrawBatch>* BatchType, FastHashMap<ChunkPos, int>* LookUpMap);
+	void AddChunk(const ChunkPos& pos, const std::vector<uint32_t>& data, std::vector<ChunkDrawBatch>& BatchType, FastHashMap<ChunkPos, int>& LookUpMap);
 
 	void SetupShaders();
 
@@ -58,21 +56,19 @@ private:
 
 	void CreateNewTransparentBatch();
 
-	Concurrency::concurrent_vector<void*> mGarbagePointers{};
-	int m_HorizontalRenderDistance = 16;
-	int m_VerticalRenderDistance = 16;
-	float m_FOV = 80.f;
+	int horizontal_render_distance_ = 16;
+	int vertical_render_distance_ = 16;
+	float fov_ = 80.f;
 	int TextureAminationIndex = 0;
 
-	std::vector<ChunkDrawBatch> ChunkSolidBatches;
-	FastHashMap<ChunkPos, int> ChunkBatchSolidLookup; //f: ChunkPos -> SolidBatchIndex
+	std::vector<ChunkDrawBatch> chunk_solid_batches_;
+	FastHashMap<ChunkPos, int> chunk_batch_solid_lookup_; //f: ChunkPos -> SolidBatchIndex
 
-	std::vector<ChunkDrawBatch> ChunkTransparentBatches;
-	FastHashMap<ChunkPos, int> ChunkBatchTransparentLookup; //f: ChunkPos -> TransparentBatchIndex
+	std::vector<ChunkDrawBatch> chunk_transparent_batches_;
+	FastHashMap<ChunkPos, int> chunk_batch_transparent_lookup_; //f: ChunkPos -> TransparentBatchIndex
 
 	GLFWwindow* window = nullptr;
 	bool stop = false;
-	std::thread mGarbageCollectorThread;
 
 	Shader CubicShader;
 	Camera* camera;

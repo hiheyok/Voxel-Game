@@ -3,35 +3,33 @@
 using namespace glm;
 using namespace std;
 
-BlockID WorldAccess::getBlock(const BlockPos& pos) {
-	return ChunkContainer.GetBlockGlobal(pos);
+BlockID WorldAccess::GetBlock(const BlockPos& pos) {
+	return chunk_container_.GetBlockGlobal(pos);
 }
 
-void WorldAccess::setBlock(BlockID block, const BlockPos& pos) {
-	if (!ChunkContainer.SetBlockGlobal(block, pos)) {
+void WorldAccess::SetBlock(BlockID block, const BlockPos& pos) {
+	if (!chunk_container_.SetBlockGlobal(block, pos)) {
 		throw exception("Tried to place block outside of the world");
 	}
 }
 
-void WorldAccess::setChunk(Chunk* chunk) {
-	ChunkContainer.InsertChunk(chunk);
+void WorldAccess::SetChunk(Chunk* chunk) {
+	chunk_container_.InsertChunk(chunk);
 }
 
-Chunk* WorldAccess::getChunk(const ChunkPos& pos) const {
-	Chunk* chunk = ChunkContainer.GetChunk(pos);
-
-	return chunk;
+Chunk* WorldAccess::GetChunk(const ChunkPos& pos) const {
+	return chunk_container_.GetChunk(pos);
 }
 
-bool WorldAccess::checkChunk(const ChunkPos& pos) const {
-	return ChunkContainer.GetChunk(pos) != nullptr;
+bool WorldAccess::CheckChunk(const ChunkPos& pos) const {
+	return chunk_container_.GetChunk(pos) != nullptr;
 }
 
-Heightmap& WorldAccess::getColumnHeightmap(const ChunkColumnPos& v) const {
-	ChunkColumn* col = ChunkContainer.GetColumn(v);
-	return col->getHeightmap();
+Heightmap& WorldAccess::GetColumnHeightmap(const ChunkColumnPos& v) const {
+	ChunkColumn* col = chunk_container_.GetColumn(v);
+	return col->GetHeightmap();
 }
 
-ChunkColumn* WorldAccess::getColumn(const ChunkPos& v) const {
-	return ChunkContainer.GetColumn(v);
+ChunkColumn* WorldAccess::GetColumn(const ChunkPos& v) const {
+	return chunk_container_.GetColumn(v);
 }

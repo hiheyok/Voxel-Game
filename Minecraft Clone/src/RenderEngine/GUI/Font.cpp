@@ -6,12 +6,12 @@ using namespace std;
 vec4 RenderableFont::GetCharUV(char c) {
 	int index = (int)c;
 
-	float Width = GetCharWidth(c);
+	float width = GetCharWidth(c);
 
 	float x0 = (float)(index & 0b1111);
 	float y0 = (float)(index >> 4);
 
-	float x1 = x0 + Width;
+	float x1 = x0 + width;
 	float y1 = y0 + 1.f;
 
 	x0 = x0 / 16.f;
@@ -30,71 +30,72 @@ float RenderableFont::GetCharWidth(char c) {
 vector<float> RenderableFont::GetCharactorVertex(char c, float xOffset, float yOffset, float xOrigin, float yOrigin) {
 	
 
-	vec4 UV = GetCharUV(c);
+	vec4 uv_ = GetCharUV(c);
 
-	float x0 = UV.x;
-	float y0 = UV.y;
-	float x1 = UV.z;
-	float y1 = UV.w;
+	float x0 = uv_.x;
+	float y0 = uv_.y;
+	float x1 = uv_.z;
+	float y1 = uv_.w;
 
 	float Width = GetCharWidth(c);
 
 	vector<float> out = {
-		0					, 0				,xOffset, yOffset, xOrigin, yOrigin, x0, y1, color.x, color.y, color.z,
-		0 + fontSize * Width, 0				,xOffset, yOffset, xOrigin, yOrigin, x1, y1, color.x, color.y, color.z,
-		0 + fontSize * Width, 0 + fontSize	,xOffset, yOffset, xOrigin, yOrigin, x1, y0, color.x, color.y, color.z,
-		0 + fontSize * Width, 0 + fontSize	,xOffset, yOffset, xOrigin, yOrigin, x1, y0, color.x, color.y, color.z,
-		0					, 0 + fontSize	,xOffset, yOffset, xOrigin, yOrigin, x0, y0, color.x, color.y, color.z,
-		0					, 0				,xOffset, yOffset, xOrigin, yOrigin, x0, y1, color.x, color.y, color.z
+		0					, 0				,xOffset, yOffset, xOrigin, yOrigin, x0, y1, color_.x, color_.y, color_.z,
+		0 + font_size_ * Width, 0				,xOffset, yOffset, xOrigin, yOrigin, x1, y1, color_.x, color_.y, color_.z,
+		0 + font_size_ * Width, 0 + font_size_	,xOffset, yOffset, xOrigin, yOrigin, x1, y0, color_.x, color_.y, color_.z,
+		0 + font_size_ * Width, 0 + font_size_	,xOffset, yOffset, xOrigin, yOrigin, x1, y0, color_.x, color_.y, color_.z,
+		0					, 0 + font_size_	,xOffset, yOffset, xOrigin, yOrigin, x0, y0, color_.x, color_.y, color_.z,
+		0					, 0				,xOffset, yOffset, xOrigin, yOrigin, x0, y1, color_.x, color_.y, color_.z
 	};
 
 	return out;
 }
 
-vector<float> RenderableFont::getVertices() {
+vector<float> RenderableFont::GetVertices() {
 	vector<float> out;
 
-	float Shift = fontSize;
+	float shift = font_size_;
 
-	vec2 coords = Position;
+	vec2 coords = position_;
 
-	float OffsetValue = 0.f;
+	float offsetValue = 0.f;
 
-	for (int i = 0; i < RenderText.size(); i++) {
-		char c = RenderText[i];
+	for (int i = 0; i < render_text_.size(); i++) {
+		char c = render_text_[i];
 		float Width = GetCharWidth(c);
-		float ShiftMag = Shift * Width + spacing * Shift;
+		float ShiftMag = shift * Width + spacing_ * shift;
 
-		vector<float> CharVert = GetCharactorVertex(RenderText[i], OffsetValue, 0.f, coords.x, coords.y);
+		vector<float> charVert = GetCharactorVertex(render_text_[i], offsetValue, 0.f, coords.x, coords.y);
 
-		OffsetValue = OffsetValue + ShiftMag;
+		offsetValue = offsetValue + ShiftMag;
 
-		out.insert(out.end(), CharVert.begin(), CharVert.end());
+		out.insert(out.end(), charVert.begin(), charVert.end());
+		charVert.clear();
 	}
 
-	textLength = OffsetValue;
+	text_length_ = offsetValue;
 
 	return out;
 }
 
-vector<float> RenderableFont::getBackgroundVertices() {
-	float r = backgroundColor.x;
-	float g = backgroundColor.y;
-	float b = backgroundColor.z;
-	float a = backgroundAlpha;
+vector<float> RenderableFont::GetBackgroundVertices() {
+	float r = background_color_.x;
+	float g = background_color_.y;
+	float b = background_color_.z;
+	float a = background_alpha_;
 
-	float xOrigin = Position.x;
-	float yOrigin = Position.y;
+	float xOrigin = position_.x;
+	float yOrigin = position_.y;
 
-	float W = backgroundWidthPadding;
-	float H = backgroundHeightPadding;
+	float W = background_width_padding_;
+	float H = background_height_padding_;
 
 	vector<float> out = {
 		0 - W				, 0	- H				, xOrigin, yOrigin, r, g, b, a,
-		0 + textLength + W	, 0 - H				, xOrigin, yOrigin, r, g, b, a,
-		0 + textLength + W	, 0 + fontSize + H	, xOrigin, yOrigin, r, g, b, a,
-		0 + textLength + W	, 0 + fontSize + H	, xOrigin, yOrigin, r, g, b, a,
-		0 - W				, 0 + fontSize + H	, xOrigin, yOrigin, r, g, b, a,
+		0 + text_length_ + W	, 0 - H				, xOrigin, yOrigin, r, g, b, a,
+		0 + text_length_ + W	, 0 + font_size_ + H	, xOrigin, yOrigin, r, g, b, a,
+		0 + text_length_ + W	, 0 + font_size_ + H	, xOrigin, yOrigin, r, g, b, a,
+		0 - W				, 0 + font_size_ + H	, xOrigin, yOrigin, r, g, b, a,
 		0 - W				, 0 - H				, xOrigin, yOrigin, r, g, b, a,
 	};
 

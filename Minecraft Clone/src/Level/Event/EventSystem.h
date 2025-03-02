@@ -9,33 +9,33 @@ public:
 	EventSystem() {
 		NullEvent.type_ = Event::NULL_EVENT;
 
-		QueueActive = new std::vector<Event::Event>;
-		QueueUnactive = new std::vector<Event::Event>;
+		queue_active_ = new std::vector<Event::Event>;
+		queue_unactive_ = new std::vector<Event::Event>;
 
-		QueueActive->reserve(16777215);
-		QueueUnactive->reserve(16777215);
+		queue_active_->reserve(16777215);
+		queue_unactive_->reserve(16777215);
 	}
 
 	~EventSystem() {
-		QueueActive->clear();
-		QueueUnactive->clear();
+		queue_active_->clear();
+		queue_unactive_->clear();
 
-		delete QueueActive;
-		delete QueueUnactive;
+		delete queue_active_;
+		delete queue_unactive_;
 	}
 
 	//Gets event; if empty, return null event
 	std::vector<Event::Event>* GetQueue();
 
 	template <class EventType> void AddEvent(EventType e) {
-		QueueUnactive->emplace_back(e);
+		queue_unactive_->emplace_back(e);
 	}
 
 	void Swap();
 
 private:
-	std::vector<Event::Event>* QueueActive;
-	std::vector<Event::Event>* QueueUnactive;
+	std::vector<Event::Event>* queue_active_;
+	std::vector<Event::Event>* queue_unactive_;
 
 	Event::Event NullEvent;
 };

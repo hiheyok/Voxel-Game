@@ -4,14 +4,14 @@
 
 class Level {
 public:
-	Dimension* mainWorld;
-	LevelLoader levelLoader;
+	Dimension* main_world_;
+	LevelLoader level_loader_;
 
 	Level() {
 
 	}
 
-	void Start(int worldGenThreadCount, int lightEngineThreadCount);
+	void Start(int worldGenThreadCount, int light_engine_thread_count_);
 
 	void Stop();
 

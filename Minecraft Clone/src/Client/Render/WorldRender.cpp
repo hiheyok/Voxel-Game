@@ -1,60 +1,56 @@
-#include "WorldRender.h"
+﻿#include "WorldRender.h"
 #include "../../Utils/Clock.h"
 #include "../../Core/Options/Option.h"
 
-using namespace std;
 using namespace glm;
 using namespace MeshingV2;
 
-void WorldRender::SetRotation(dvec2 rotation) {
-	player.SetRotation(rotation);
+void WorldRender::SetRotation(dvec2 rotation_) {
+	player_.SetRotation(rotation_);
 }
 
 void WorldRender::SetPosition(dvec3 position) {
-	player.SetPosition(position);
+	player_.SetPosition(position);
 }
 
 void WorldRender::Render() {
-	RendererV2.RenderSky();
-	RendererV2.Render();
+	renderer_v2_.RenderSky();
+	renderer_v2_.Render();
 }
 
 void WorldRender::LoadChunkToRenderer(ChunkPos chunk) {
-	if (server->getChunk(chunk) != nullptr) {
-		SchedulerLock.lock();
-		TaskList.push_back(chunk);
-		SchedulerLock.unlock();
+	if (server_->GetChunk(chunk) != nullptr) {
+		std::lock_guard<std::mutex> lock{ scheduler_lock_ };
+		task_list_.push_back(chunk);
 	}
 
 }
 
 void WorldRender::LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks) {
-	SchedulerLock.lock();
-	TaskList.insert(TaskList.end(), chunks.begin(), chunks.end());
-	SchedulerLock.unlock();
+	std::lock_guard<std::mutex> lock{ scheduler_lock_ };
+	task_list_.insert(task_list_.end(), std::make_move_iterator(chunks.begin()), std::make_move_iterator(chunks.end()));
 }
 
 
 void WorldRender::Worker(int id) {
 
-	const int WorkerID = id;
+	const int batchSize = 500;
+	const int workerId = id;
 
-	deque<ChunkPos> Jobs;
-	ChunkMeshData ChunkMesher;
+	std::deque<ChunkPos> Jobs;
+	ChunkMeshData chunkMesher;
 
-	deque<ChunkVertexData*> FinishedJobs;
+	std::deque<std::unique_ptr<ChunkVertexData>> finishedJobs;
 
 	while (!stop) {
 		//Fetches all of the tasks and put it in "Jobs"
-
-		WorkerLocks[WorkerID].lock();
-		Jobs.insert(Jobs.end(), WorkerTask[WorkerID].begin(), WorkerTask[WorkerID].end());
-		WorkerTask[WorkerID].clear();
-		WorkerLocks[WorkerID].unlock();
+		{
+			std::lock_guard<std::mutex> lock{ worker_locks_[workerId] };
+			Jobs.insert(Jobs.end(), std::make_move_iterator(worker_task_[workerId].begin()), std::make_move_iterator(worker_task_[workerId].end()));
+			worker_task_[workerId].clear();
+		}
 
 		int count = 0;
-
-		int BatchSize = 500;
 
 		while (!Jobs.empty()) {
 			ChunkPos pos = Jobs.front(); //fetches task
@@ -62,172 +58,160 @@ void WorldRender::Worker(int id) {
 
 			//Generates the meshes
 			
-			Chunk* c = server->getChunk(pos);
-			
-			auto t0 = std::chrono::high_resolution_clock::now();
-			ChunkMesher.reset();
-			ChunkMesher.setChunk(c);
-			ChunkMesher.GenerateMesh();
+			Chunk* chunk = server_->GetChunk(pos);
+
+			Timer time = Timer();
+
+			chunkMesher.Reset();
+			chunkMesher.SetChunk(chunk);
+			chunkMesher.GenerateMesh();
 
 			//Transfer Infomation
-			ChunkVertexData* data = new ChunkVertexData();
-			data->solidVertices.resize(ChunkMesher.solidFaceCount * 12);
-			data->transparentVertices.resize(ChunkMesher.transparentFaceCount * 12);
+			std::unique_ptr<ChunkVertexData> data = std::make_unique<ChunkVertexData>();
+			data->solidVertices.resize(chunkMesher.solid_face_count_ * 12);
+			data->transparentVertices.resize(chunkMesher.transparent_face_count_ * 12);
 			data->position_ = pos;
 
-			memcpy(data->solidVertices.data(), ChunkMesher.VerticesBuffer.data(), ChunkMesher.solidFaceCount * 12 * sizeof(uint32_t));
-			memcpy(data->transparentVertices.data(), ChunkMesher.TransparentVerticesBuffer.data(), ChunkMesher.transparentFaceCount * 12 * sizeof(uint32_t));
+			memcpy(data->solidVertices.data(), chunkMesher.vertices_buffer_.data(), chunkMesher.solid_face_count_ * 12 * sizeof(uint32_t));
+			memcpy(data->transparentVertices.data(), chunkMesher.transparent_vertices_buffer_.data(), chunkMesher.transparent_face_count_ * 12 * sizeof(uint32_t));
 
-			auto t1 = std::chrono::high_resolution_clock::now();
 			amountOfMeshGenerated++;
 
-			FinishedJobs.push_back(data);
+			finishedJobs.push_back(std::move(data));
 
-			buildTime += (double)(t1 - t0).count() / 1000.0;
-			count++;
-
-			if ((count % BatchSize) == 0) {
+			buildTime += time.GetTimePassed_μs();
+			
+			if (++count == batchSize) {
 				break;
 			}
 		}
 
-		if (FinishedJobs.size() != 0) {
-			WorkerLocks[WorkerID].lock();
-			WorkerOutput[WorkerID].insert(WorkerOutput[WorkerID].end(), FinishedJobs.begin(), FinishedJobs.end());
-			FinishedJobs.clear();
-			WorkerLocks[WorkerID].unlock();
+		if (finishedJobs.size() != 0) {
+			std::lock_guard<std::mutex> lock{ worker_locks_[workerId] };
+			worker_output_[workerId].insert(worker_output_[workerId].end(), std::make_move_iterator(finishedJobs.begin()), std::make_move_iterator(finishedJobs.end()));
+			finishedJobs.clear();
 		}
 
 		timerSleepNotPrecise(1);
 	}
 
-	Logger.LogInfo("Mesher", "Shutting down mesh worker: " + std::to_string(WorkerID));
+	Logger.LogInfo("Mesher", "Shutting down mesh worker: " + std::to_string(workerId));
 }
 
 void WorldRender::Update() {
 	
-	int ChunkUpdateLimit = 4000;
+	const int chunkUpdateLimit = 4000;
 
-	int UpdateAmount = 0;
-	for (int WorkerID = 0; WorkerID < WorkerCount; WorkerID++) {
+	int updateAmount = 0;
+	for (size_t workerId = 0; workerId < worker_count_; workerId++) {
+		std::lock_guard<std::mutex> lock{ worker_locks_[workerId] };
 
-		WorkerLocks[WorkerID].lock();
-
-		while (!WorkerOutput[WorkerID].empty()) {
-			if (ChunkUpdateLimit < UpdateAmount) {
+		while (!worker_output_[workerId].empty()) {
+			if (chunkUpdateLimit == updateAmount) {
 				break;
 			}
-			//mProfiler->CombineCache(WorkerOutput[(uint64_t)WorkerID].front()->profiler);
-			RendererV2.AddChunk(WorkerOutput[(uint64_t)WorkerID].front());
-			WorkerOutput[WorkerID].pop_front();
-			UpdateAmount++;
+			//profiler_->CombineCache(worker_output_[(uint64_t)workerId].front()->profiler);
+			renderer_v2_.AddChunk(std::move(worker_output_[workerId].front()));
+			worker_output_[workerId].pop_front();
 		}
 
-		WorkerLocks[WorkerID].unlock();
 	}
 
-	LoadChunkMultiToRenderer(server->getUpdatedChunks());
+	LoadChunkMultiToRenderer(server_->GetUpdatedChunks());
 
-	if (UpdateAmount < ChunkUpdateLimit) {
-		RendererV2.Defrag(ChunkUpdateLimit - UpdateAmount);
+	if (updateAmount < chunkUpdateLimit) {
+		renderer_v2_.Defrag(chunkUpdateLimit - updateAmount);
 	}
 
-	RendererV2.Update();
-	RendererV2.PrepareRenderer();
+	renderer_v2_.Update();
+	renderer_v2_.PrepareRenderer();
 
 }
 
 void WorldRender::Stop() {
 	stop = true;
 	Scheduler.join();
-	for (int i = 0; i < Workers.size(); i++) {
-		Workers[i].join();
+	for (int i = 0; i < workers_.size(); i++) {
+		workers_[i].join();
 	}
 
-	RendererV2.Cleanup();
+	renderer_v2_.Cleanup();
 
 }
 
-void WorldRender::Start(GLFWwindow* window_, InternalServer* server_, PerformanceProfiler* pProfilerIn) {
+void WorldRender::Start(GLFWwindow* window, InternalServer* server, PerformanceProfiler* profiler) {
 	stop = false;
 
-	HorizontalRenderDistance = AppOptions.HorizontalRenderDistance;
-	VerticalRenderDistance = AppOptions.VerticalRenderDistance;
+	horizontal_render_distance_ = AppOptions.horizontal_render_distance_;
+	vertical_render_distance_ = AppOptions.vertical_render_distance_;
 
-	int ThreadCount = AppOptions.MeshThreads;
+	int threadCount = AppOptions.MeshThreads;
 
-	window = window_;
-	server = server_;
-	WorkerCount = ThreadCount;
+	window_ = window;
+	server_ = server;
+	worker_count_ = threadCount;
 
-	RendererV2.Initialize(window, player.getCamera());
-	RendererV2.LoadAssets();
-	RendererV2.setSettings(HorizontalRenderDistance, VerticalRenderDistance, 90);
+	renderer_v2_.Initialize(window_, player_.getCamera());
+	renderer_v2_.LoadAssets();
+	renderer_v2_.setSettings(horizontal_render_distance_, vertical_render_distance_, 90);
 
-	WorkerCount = ThreadCount;
+	workers_.resize(threadCount);
+	worker_task_.resize(threadCount);
+	worker_output_.resize(threadCount);
+	worker_locks_.resize(threadCount);
 
-	Workers.resize(ThreadCount);
-	WorkerTask.resize(ThreadCount);
-	WorkerOutput.resize(ThreadCount);
-	WorkerLocks.resize(ThreadCount);
-
-	for (int i = 0; i < ThreadCount; i++) {
-		Workers[i] = std::thread(&WorldRender::Worker, this, i);
+	for (int i = 0; i < threadCount; i++) {
+		workers_[i] = std::thread(&WorldRender::Worker, this, i);
 	}
-	Scheduler = std::thread(&WorldRender::TaskScheduler, this);
 
-	mProfiler = pProfilerIn;
+	Scheduler = std::thread(&WorldRender::TaskScheduler, this);
+	profiler_ = profiler;
 }
 
 void WorldRender::TaskScheduler() {
 
-	int WorkerSelection = 0;
+	int workerSelection = 0;
 
-	std::deque<std::deque<ChunkPos>> DistributedTasks;
+	std::deque<std::deque<ChunkPos>> distributedTasks;
 
-	DistributedTasks.resize(WorkerCount);
+	distributedTasks.resize(worker_count_);
 
-	std::deque<ChunkPos> InternalTaskList;
+	std::deque<ChunkPos> internalTaskList;
 
 	while (!stop) {
 
 		//Fetch tasks
-
-		SchedulerLock.lock();
-		InternalTaskList.insert(InternalTaskList.end(), TaskList.begin(), TaskList.end());
-		TaskList.clear();
-		SchedulerLock.unlock();
+		{
+			std::lock_guard<std::mutex> lock{ scheduler_lock_ };
+			internalTaskList.insert(internalTaskList.end(), std::make_move_iterator(task_list_.begin()), std::make_move_iterator(task_list_.end()));
+			task_list_.clear();
+		}
 
 		//Interally distributes the jobs
 
-		while (!InternalTaskList.empty()) {
+		while (!internalTaskList.empty()) {
 
-			ChunkPos task = InternalTaskList.front();
-			InternalTaskList.pop_front();
+			ChunkPos task = std::move(internalTaskList.front());
+			internalTaskList.pop_front();
 
-			DistributedTasks[WorkerSelection].push_back(task);
+			distributedTasks[workerSelection].push_back(std::move(task));
 
-			WorkerSelection++;
+			workerSelection++;
 
-			if (WorkerSelection == WorkerCount)
-				WorkerSelection = 0;
+			if (workerSelection == worker_count_)
+				workerSelection = 0;
 		}
 
 		//Distributes the tasks
 
-		for (int i = 0; i < WorkerCount; i++) {
-			WorkerLocks[i].lock();
-			WorkerTask[i].insert(WorkerTask[i].end(), DistributedTasks[i].begin(), DistributedTasks[i].end());
-			WorkerLocks[i].unlock();
-
-			DistributedTasks[i].clear();
+		for (int i = 0; i < worker_count_; i++) {
+			{
+				std::lock_guard<std::mutex> lock{ worker_locks_[i] };
+				worker_task_[i].insert(worker_task_[i].end(), std::make_move_iterator(distributedTasks[i].begin()), std::make_move_iterator(distributedTasks[i].end()));
+			}
+			
+			distributedTasks[i].clear();
 		}
-
-
-
-
 	}
-
 	Logger.LogInfo("Mesher", "Shutting down mesh scheduler");
-
 }

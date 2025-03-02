@@ -2,23 +2,23 @@
 #include <new> 
 #include <iostream>
 
-void Heightmap::edit(int x, int z, int height) {
-	data[x * 16 + z] = height;
+void Heightmap::Edit(int x, int z, int height) {
+	data_[x * 16 + z] = height;
 }
 
-uint16_t Heightmap::get(int x, int z) const {
-	return data[x * 16 + z];
+uint16_t Heightmap::Get(int x, int z) const {
+	return data_[x * 16 + z];
 }
 
-std::vector<uint16_t> Heightmap::getData() const {
-	return data;
+std::vector<uint16_t> Heightmap::GetData() const {
+	return data_;
 }
 
-void Heightmap::init() {
-	data.resize(256);
-	isInit = true;
+void Heightmap::Init() {
+	data_.resize(256);
+	is_init_ = true;
 }
 
 void Heightmap::Clear() {
-	data.clear();
+	data_.clear();
 }

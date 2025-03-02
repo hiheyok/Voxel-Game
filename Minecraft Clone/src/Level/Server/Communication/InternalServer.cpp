@@ -7,15 +7,15 @@ void InternalServer::startInternalServer(Player* p) {
 	server = new Server();
 	player = p;
 
-	ServerSettings settings;
-	settings.genThreadCount = AppOptions.WorldGenThreads;
-	settings.lightEngineThreadCount = AppOptions.LightEngineThreads;
-	settings.HorizontalTickingDistance = AppOptions.HorizontalRenderDistance;
-	settings.VerticalTickingDistance = AppOptions.VerticalRenderDistance;
+	ServerSettings settings_;
+	settings_.gen_thread_count_ = AppOptions.WorldGenThreads;
+	settings_.light_engine_thread_count_ = AppOptions.LightEngineThreads;
+	settings_.horizontal_ticking_distance_ = AppOptions.horizontal_render_distance_;
+	settings_.vertical_ticking_distance_ = AppOptions.vertical_render_distance_;
 
-	server->startServer(settings);
+	server->StartServer(settings_);
 	server->join(*p);
-	Block::serverPTR = server;
+	Block::server_ptr_ = server;
 
 }
 
@@ -23,38 +23,36 @@ void InternalServer::Stop() {
 	server->Stop();
 }
 
-vec3 InternalServer::getPlayerCollusionTimes() {
-	return server->getEntityCollusionTime(player->Properties.EntityUUID);
+vec3 InternalServer::GetPlayerCollusionTimes() {
+	return server->GetEntityCollusionTime(player->properties_.entity_uuid_);
 }
 
-Chunk* InternalServer::getChunk(const ChunkPos& chunk) {
-	return server->getChunk(chunk);
+Chunk* InternalServer::GetChunk(const ChunkPos& chunk) {
+	return server->GetChunk(chunk);
 }
 
 Timer* InternalServer::getTickClock() {
-	return server->getTimer();
+	return server->GetTimer();
 }
 
 double InternalServer::getMSPT() {
 	return server->getMSPT();
 }
 
-void InternalServer::setPlayer(Player player) {
+void InternalServer::SetPlayer(Player player) {
 	server->join(player);
 }
 
-bool InternalServer::checkPlayerOnGround() {
-	return server->checkEntityOnGround(player->Properties.EntityUUID);
+bool InternalServer::CheckPlayerOnGround() {
+	return server->CheckEntityOnGround(player->properties_.entity_uuid_);
 }
 
 int InternalServer::getChunkCount() {
 	return server->getChunkCount();
 }
 
-vector<ChunkPos> InternalServer::getUpdatedChunks() {
-	vector<ChunkPos> updatedChunkPos = server->getUpdatedChunkPos();
-
-	return updatedChunkPos;
+vector<ChunkPos> InternalServer::GetUpdatedChunks() {
+	return server->GetUpdatedChunkPos();
 }
 
 vector<EntityProperty> InternalServer::getUpdatedEntities() {
@@ -65,14 +63,14 @@ vector<EntityUUID>  InternalServer::getRemovedEntities() {
 	return server->getRemovedEntities();
 }
 
-bool InternalServer::checkRayIntersection(Ray& ray) {
-	return server->getRayIntersection(ray);
+bool InternalServer::CheckRayIntersection(Ray& ray) {
+	return server->GetRayIntersection(ray);
 }
 
-BlockID InternalServer::getBlock(const BlockPos& pos) {
-	return server->getBlock(pos);
+BlockID InternalServer::GetBlock(const BlockPos& pos) {
+	return server->GetBlock(pos);
 }
 
-void InternalServer::sendEvent(Event::Event pEventIn) {
-	server->sendEvent(pEventIn);
+void InternalServer::SendEvent(Event::Event eventIn) {
+	server->SendEvent(eventIn);
 }
