@@ -44,13 +44,13 @@ class FallingBlock : public EntityType {
 											(int)entity->properties_.position_.x,
 											(int)entity->properties_.position_.y,
 											(int)entity->properties_.position_.z},
-										Blocks.SAND, EventHandler.BlockPlace };
+										g_blocks.SAND, EventHandler.BlockPlace };
 			currentDimension->event_manager_.AddEvent(addBlock);
 
 			Event::EntityEvent removeEntity;
 			removeEntity.id_ = EventHandler.RemoveEntity;
-			removeEntity.entity_uuid_= entity->properties_.entity_uuid_;
-			removeEntity.unique_id_ = 200;
+			removeEntity.entity_uuid_ = entity->properties_.entity_uuid_;
+			removeEntity.unique_id_ = 50;
 			
 			currentDimension->event_manager_.AddEvent(removeEntity);
 		}

@@ -179,11 +179,11 @@ void OverworldGenerator::setBlocksInChunk(int x, int z, TallChunk* chunk) {
                             if ((lvt_45_1_ += d16) > 0.0)
                             {
                                 int genHeight = i2 * 8 + j2;
-                                chunk->SetBlockUnsafe(i * 4 + k2, genHeight, l * 4 + l2, Blocks.STONE);
+                                chunk->SetBlockUnsafe(i * 4 + k2, genHeight, l * 4 + l2, g_blocks.STONE);
                             }
                             else if (i2 * 8 + j2 < settings_.seaLevel) {
                                 int genHeight = i2 * 8 + j2;
-                                chunk->SetBlockUnsafe(i * 4 + k2, genHeight, l * 4 + l2, Blocks.WATER);
+                                chunk->SetBlockUnsafe(i * 4 + k2, genHeight, l * 4 + l2, g_blocks.WATER);
                             }
                         }
 

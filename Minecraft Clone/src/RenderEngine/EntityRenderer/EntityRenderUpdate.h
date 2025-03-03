@@ -6,7 +6,7 @@
 class EntityRendererUpdater {
 	MultiEntityRenderer* renderer_;
 
-	bool stop = true; // TODO: Rename this
+	bool stop_ = true;
 
 	void UpdaterThread();
 

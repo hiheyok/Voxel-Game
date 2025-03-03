@@ -13,13 +13,13 @@ void LogUtils::MainLogger() {
 
 	string printOutput = "";
 
-	while (!stop) {
-		if (!LogsCache.empty()) {
+	while (!stop_) {
+		if (!logs_cache_.empty()) {
 
-			LogData log = LogsCache.front();
-			LogsCache.pop_front();
+			LogData log = logs_cache_.front();
+			logs_cache_.pop_front();
 
-			time_t timept = std::chrono::system_clock::to_time_t(log.time);
+			time_t timept = std::chrono::system_clock::to_time_t(log.time_);
 
 			string timestamp = string(strtok(ctime(&timept), "\n"));
 
@@ -36,27 +36,26 @@ void LogUtils::MainLogger() {
 				messageSeverity = "DEBUG";
 			}
 
-			str = formatMessage(messageSeverity, log.RTime, timestamp, log.Subtype, log.message);
+			str = FormatMessage(messageSeverity, log.r_time_, timestamp, log.subtype_, log.message_);
 			printOutput += str + "\n";
 
 			if (printOutput.size() > printLimit) {
 				printf("%s", printOutput.c_str());
-				file << printOutput;
+				file_ << printOutput;
 				printOutput.clear();
 			}
 		}
 		else {
 			if (printOutput.size() != 0) {
 				printf("%s", printOutput.c_str());
-				file << printOutput;
+				file_ << printOutput;
 				printOutput.clear();
 			}
 
-			if (!Logs.empty()) {
-				Mutex.lock();
-				LogsCache = Logs;
-				Logs.clear();
-				Mutex.unlock();
+			if (!logs_.empty()) {
+				std::lock_guard<std::mutex> lock{ mutex_ };
+				logs_cache_ = std::move(logs_);
+				logs_.clear();
 			}
 			else {
 				timerSleepNotPrecise(10);
@@ -66,7 +65,7 @@ void LogUtils::MainLogger() {
 }
 
 void LogUtils::Start() {
-	if (!Started) {
+	if (!started_) {
 		if (!FileManager::CheckFolder("Logs")) {
 			FileManager::CreateFolder("Logs");
 		}
@@ -78,7 +77,7 @@ void LogUtils::Start() {
 		oss << std::put_time(&tm, "%d-%m-%Y %H-%M-%S");
 		auto str = "Logs//" + oss.str() + ".log";
 
-		file.open(str);
+		file_.open(str);
 
 		LoggingThread = std::thread(&LogUtils::MainLogger, this);
 		LogInfo("Logger","Started Logger");
@@ -89,83 +88,75 @@ void LogUtils::Start() {
 	
 }
 
-
-
-
-void LogUtils::LogError(std::string Subtype, std::string Message) {
+void LogUtils::LogError(std::string subtype, std::string message) {
 	LogData log;
 	log.type_ = LOG_TYPE_ERROR;
-	log.message = Message;
-	log.time = chrono::system_clock::now();
-	log.Subtype = Subtype;
-	log.RTime = (std::chrono::high_resolution_clock::now() - InitTime).count();
-	Mutex.lock();
-	Logs.emplace_back(log);
-	Mutex.unlock();
+	log.message_ = message;
+	log.time_ = chrono::system_clock::now();
+	log.subtype_ = subtype;
+	log.r_time_ = (std::chrono::high_resolution_clock::now() - init_time_).count();
+	std::lock_guard<std::mutex> lock{ mutex_ };
+	logs_.emplace_back(log);
 }
 
-void LogUtils::LogWarn(std::string Subtype, std::string Message) {
+void LogUtils::LogWarn(std::string subtype, std::string message) {
 	LogData log;
 	log.type_ = LOG_TYPE_WARN;
-	log.message = Message;
-	log.time = chrono::system_clock::now();
-	log.Subtype = Subtype;
-	log.RTime = (std::chrono::high_resolution_clock::now() - InitTime).count();
-	Mutex.lock();
-	Logs.emplace_back(log);
-	Mutex.unlock();
+	log.message_ = message;
+	log.time_ = chrono::system_clock::now();
+	log.subtype_ = subtype;
+	log.r_time_ = (std::chrono::high_resolution_clock::now() - init_time_).count();
+	std::lock_guard<std::mutex> lock{ mutex_ };
+	logs_.emplace_back(log);
 }
 
-void LogUtils::LogInfo(std::string Subtype, std::string Message) {
+void LogUtils::LogInfo(std::string subtype, std::string message) {
 	LogData log;
 	log.type_ = LOG_TYPE_INFO;
-	log.message = Message;
-	log.time = chrono::system_clock::now();
-	log.Subtype = Subtype;
-	log.RTime = (std::chrono::high_resolution_clock::now() - InitTime).count();
-	Mutex.lock();
-	Logs.emplace_back(log);
-	Mutex.unlock();
+	log.message_ = message;
+	log.time_ = chrono::system_clock::now();
+	log.subtype_ = subtype;
+	log.r_time_ = (std::chrono::high_resolution_clock::now() - init_time_).count();
+	std::lock_guard<std::mutex> lock{mutex_};
+	logs_.emplace_back(log);
 }
 
-void LogUtils::LogDebug(std::string Subtype, std::string Message) {
+void LogUtils::LogDebug(std::string subtype, std::string message) {
 	LogData log;
 	log.type_ = LOG_TYPE_DEBUG;
-	log.message = Message;
-	log.time = chrono::system_clock::now();
-	log.Subtype = Subtype;
-	log.RTime = (std::chrono::high_resolution_clock::now() - InitTime).count();
-	Mutex.lock();
-	Logs.emplace_back(log);
-	Mutex.unlock();
+	log.message_ = message;
+	log.time_ = chrono::system_clock::now();
+	log.subtype_ = subtype;
+	log.r_time_ = (std::chrono::high_resolution_clock::now() - init_time_).count();
+	std::lock_guard<std::mutex> lock{ mutex_ };
+	logs_.emplace_back(log);
 }
 
-void LogUtils::LogDebugf(std::string Subtype, std::string Message, ...) {
+void LogUtils::LogDebugf(std::string subtype, std::string message, ...) {
 	va_list args;
-	va_start(args, Message);
+	va_start(args, message);
 
-	std::string formatedString = formatString(Message, args);
+	std::string formatedString = FormatString(message, args);
 
 	va_end(args);
 
 	LogData log;
 	log.type_ = LOG_TYPE_DEBUG;
-	log.message = formatedString;
-	log.time = chrono::system_clock::now();
-	log.Subtype = Subtype;
-	log.RTime = (std::chrono::high_resolution_clock::now() - InitTime).count();
-	Mutex.lock();
-	Logs.emplace_back(log);
-	Mutex.unlock();
+	log.message_ = formatedString;
+	log.time_ = chrono::system_clock::now();
+	log.subtype_ = subtype;
+	log.r_time_ = (std::chrono::high_resolution_clock::now() - init_time_).count();
+	std::lock_guard<std::mutex> lock{ mutex_ };
+	logs_.emplace_back(log);
 }
 
 void LogUtils::Stop() {
-	stop = true;
+	stop_ = true;
 	
 	
 }
 
 LogUtils* getLogger() {
-	return &Logger;
+	return &g_logger;
 }
 

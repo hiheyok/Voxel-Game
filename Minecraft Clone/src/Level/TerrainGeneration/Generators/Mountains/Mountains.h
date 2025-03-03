@@ -28,7 +28,7 @@ public:
 
 	float PeaksAndValley(float n);
 
-	int GetIndex(std::vector<glm::vec2>& vec, float bottomBound);
+	size_t GetIndex(std::vector<glm::vec2>& vec, float bottomBound);
 
 	std::vector<glm::vec2> continentalness_interpolation_ {
 		glm::vec2(0.f, 0.75f),

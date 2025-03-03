@@ -13,7 +13,7 @@ public:
 
 	void Stop();
 
-	int getChunkCount(); // TODO: Rename
+	size_t getChunkCount(); // TODO: Rename
 
 	void SendRequestedChunks(std::vector<ChunkPos> requestedChunks, WorldGeneratorID worldGenTypeIn);
 

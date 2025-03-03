@@ -30,7 +30,7 @@ BlockID chunk_container_::GetBlock(int x, int y, int z) const {
 	if (dy != 0) return neighbors_[dy]->GetBlock(x, y + NeighborOffset[dy & 0b1 ], z);
 	if (dz != 0) return neighbors_[dz]->GetBlock(x, y, z + NeighborOffset[dz & 0b1]);
 
-	return Blocks.AIR;
+	return g_blocks.AIR;
 }
 
 BlockID chunk_container_::GetBlockUnsafe(int x, int y, int z) const {

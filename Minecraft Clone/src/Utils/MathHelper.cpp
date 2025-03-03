@@ -1,4 +1,4 @@
-#include <tgmath.h>
+#include <cmath>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #define _CRTDBG_MAP_ALLOC

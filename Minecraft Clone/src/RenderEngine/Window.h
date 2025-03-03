@@ -10,13 +10,13 @@
 #include "../Client/IO/IO.h"
 
 struct WindowProperties {
-	int WindowSizeX = 1280;
-	int WindowSizeY = 720;
+	int window_size_x_ = 1280;
+	int window_size_y_ = 720;
 
-	bool WindowSizeDirty = false;
+	bool window_size_dirty_ = false;
 	bool initialized_ = false;
 
-	bool DrawSolid = true;
+	bool draw_solid_ = true;
 
 };
 
@@ -25,7 +25,7 @@ public:
 	void Start();
 	void Refresh();
 	void PollInputs();
-	GLFWwindow* getWindow();
+	GLFWwindow* GetWindow();
 
 protected:
 
@@ -35,8 +35,8 @@ protected:
 	
 	void UpdateWindowName(std::string name);
 
-	void renderSolid();
-	void renderLines();
+	void RenderSolid();
+	void RenderLines();
 
 	void MousePositionCallback(double xpos, double ypos);
 	void MouseButtonCallback(int button, int action);
@@ -44,13 +44,13 @@ protected:
 	void ResizeWindowCallback(int x, int y);
 	void ScrollCallback(GLFWwindow* win, double xoffset, double yoffset);
 
-	UserInputs Inputs;
+	UserInputs inputs_;
 
-	WindowProperties Properties;
+	WindowProperties properties_;
 
 private:
-	static void APIENTRY glDebugOutput(GLenum source, GLenum type_, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam);
+	static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam);
 
 	
-	GLFWwindow* window = nullptr;
+	GLFWwindow* window_ = nullptr;
 };

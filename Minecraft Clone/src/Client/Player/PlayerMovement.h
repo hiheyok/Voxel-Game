@@ -8,18 +8,18 @@
 class PlayerMovement {
 public:
 
-	void Update(Player* player, UserInputs Inputs, InternalServer* world);
+	void Update(Player* player, const UserInputs& inputs, InternalServer* world);
 
 private:
 
 	float velocityMovementCurve(float current, float max, float delta);
 
-	void RotatePlayer(Player* player, UserInputs Inputs);
+	void RotatePlayer(Player* player, const UserInputs& inputs);
 
-	void MovePlayer(Player* player, UserInputs Inputs, InternalServer* server);
+	void MovePlayer(Player* player, const UserInputs& inputs, InternalServer* server);
 
 	void MoveRelative(Player* player, float strafe, float up, float forward, float friction);
 
-	bool m_EnableCollusion = false;
+	bool enable_collusion_ = false;
 
 };

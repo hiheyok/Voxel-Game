@@ -22,16 +22,16 @@ private:
 	void Render();
 	void SetDebugScreen();
 
-	double Frametime = 0.5;
+	double frametime_ = 0.5;
 
 	MainPlayer main_player_;
 
-	InternalServer server;
-	WorldRender TerrainRender;
-	MultiEntityRenderer EntityRender;
-	EntityRendererUpdater EntityUpdater;
-	TexturedFrameBuffer Framebuffer;
-	TextRenderer TextRender;
-	DebugScreen debugScreen;
-	PerformanceProfiler profiler;
+	InternalServer server_;
+	WorldRender terrain_render_;
+	MultiEntityRenderer entity_render_;
+	EntityRendererUpdater entity_updater_;
+	TexturedFrameBuffer framebuffer_;
+	TextRenderer text_render_;
+	DebugScreen debug_screen_;
+	PerformanceProfiler profiler_;
 };

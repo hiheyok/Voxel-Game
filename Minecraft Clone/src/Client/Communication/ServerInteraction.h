@@ -5,30 +5,30 @@
 //For external server it will  store a cache of the world
 class ServerInteraction {
 public:
-	void AssignServer(InternalServer*  pServerIn) { //Default  to  integrated server for now
-		server = pServerIn;
+	void AssignServer(InternalServer*  server) { //Default  to  integrated server for now
+		server_ = server;
 	}
 
-	bool checkCollusion(Ray& ray) {
-		return server->CheckRayIntersection(ray);
+	bool CheckCollusion(Ray& ray) {
+		return server_->CheckRayIntersection(ray);
 	}
-	void SendEvent(Event pEventIn) {
-		server->SendEvent(pEventIn);
-	}
-
-	BlockID GetBlock(int x, int y, int z) {
-		return server->GetBlock(x, y, z);
+	void SendEvent(Event::Event event) {
+		server_->SendEvent(event);
 	}
 
-	std::vector<EntityUUID> getRemovedEntities() {
-		return server->getRemovedEntities();
+	BlockID GetBlock(const BlockPos& pos) {
+		return server_->GetBlock(pos);
 	}
 
-	std::vector<EntityProperty> getUpdatedEntities() {
-		return server->getUpdatedEntities();
+	std::vector<EntityUUID> GetRemovedEntities() {
+		return server_->GetRemovedEntities();
+	}
+
+	std::vector<EntityProperty> GetUpdatedEntities() {
+		return server_->GetUpdatedEntities();
 	}
 
 private:
-	int DimensionID = 0;
-	InternalServer* server;
+	int dimension_id_ = 0;
+	InternalServer* server_;
 };

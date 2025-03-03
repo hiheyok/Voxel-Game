@@ -20,7 +20,7 @@ private:
 
 
 	std::vector<std::shared_ptr<ChunkLightingContainer>> output_;
-	WorldAccess* world_;
+	WorldAccess* world_ = nullptr;
 
 	std::thread scheduler_thread_;
 

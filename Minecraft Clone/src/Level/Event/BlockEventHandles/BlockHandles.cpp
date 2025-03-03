@@ -27,6 +27,6 @@ void HandlePlaceBlock(BlockID block, const BlockPos& pos) {
 }
 
 void HandleBlockTick(BlockID block, const BlockPos& pos) {
-	Block* b = Blocks.GetBlockType(block);
+	Block* b = g_blocks.GetBlockType(block);
 	b->Tick(pos);
 }

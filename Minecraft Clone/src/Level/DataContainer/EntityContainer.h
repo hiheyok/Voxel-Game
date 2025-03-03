@@ -54,7 +54,6 @@ public:
 		FastHashSet<EntityUUID> out;
 		std::lock_guard<std::mutex> lock{ entity_lock_ };
 		out = std::move(removed_entity_);
-		entity_lock_.unlock();
 		return out;
 	}
 

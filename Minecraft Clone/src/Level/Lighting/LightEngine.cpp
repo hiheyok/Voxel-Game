@@ -43,7 +43,7 @@ void LightingEngine::LightSpreadSky(Chunk* chunk, std::shared_ptr<ChunkLightingC
 
 	int i = 0;
 
-	while (!FIFOQueues.isEmpty()) {
+	while (!FIFOQueues.IsEmpty()) {
 		//Get node
 		uint16_t node = FIFOQueues.get();
 		uint8_t nodeX, nodeY, nodeZ, nodeLight;
@@ -65,7 +65,7 @@ void LightingEngine::LightSpreadSky(Chunk* chunk, std::shared_ptr<ChunkLightingC
 		//Set node light level
 		IncreaseLightLevel(container, nodeLight, nodeX, nodeY, nodeZ);
 
-		if (chunk->GetBlockUnsafe(nodeX, nodeY, nodeZ) != Blocks.AIR) {
+		if (chunk->GetBlockUnsafe(nodeX, nodeY, nodeZ) != g_blocks.AIR) {
 			continue;
 		}
 
@@ -235,7 +235,7 @@ void LightingEngine::Worker(int id) {
 	FIFOQueues.clear();
 
 	jobs.clear();
-	Logger.LogInfo("Light Engine", "Shutting down light engine worker: " + std::to_string(WorkerID));
+	g_logger.LogInfo("Light Engine", "Shutting down light engine worker: " + std::to_string(WorkerID));
 }
 
 void LightingEngine::Scheduler() {
@@ -303,6 +303,6 @@ void LightingEngine::Scheduler() {
 
 	}
 
-	Logger.LogInfo("Light Engine", "Shutting down light engine scheduler");
+	g_logger.LogInfo("Light Engine", "Shutting down light engine scheduler");
 
 }

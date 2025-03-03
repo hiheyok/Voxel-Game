@@ -23,7 +23,7 @@ Chunk* FastTerrain::Generate(const ChunkPos& pos) {
 			for (int y = 0 + cy; y < 16 + cy; y++) {
 				if ((a == y || a + 1 == y || a + 2 == y || a + 3 == y || a + 4 == y) && a > 10) {
 					if (TREE_MAP >= (TREE_RAND_VAL - TREE_RAND_VAL_RANGE) && TREE_MAP <= (TREE_RAND_VAL + TREE_RAND_VAL_RANGE)) {
-						chunk->SetBlock(Blocks.OAK_LOG, x - cx, y - cy, z - cz);
+						chunk->SetBlock(g_blocks.OAK_LOG, x - cx, y - cy, z - cz);
 
 					}
 				}
@@ -32,7 +32,7 @@ Chunk* FastTerrain::Generate(const ChunkPos& pos) {
 						for (int tx = -2; tx <= 2; tx++) {
 							for (int ty = -2; ty <= 2; ty++) {
 								for (int tz = -2; tz <= 2; tz++) {
-									chunk->SetBlock(Blocks.OAK_LEAF, x + tx - cx, y + ty - cy, z + tz - cz);
+									chunk->SetBlock(g_blocks.OAK_LEAF, x + tx - cx, y + ty - cy, z + tz - cz);
 								}
 							}
 						}
@@ -41,21 +41,21 @@ Chunk* FastTerrain::Generate(const ChunkPos& pos) {
 				}
 
 				if (y < 10) {
-					chunk->SetBlockUnsafe(Blocks.WATER, x - cx, y - cy, z - cz);
+					chunk->SetBlockUnsafe(g_blocks.WATER, x - cx, y - cy, z - cz);
 				}
 
 				if (a > y) {
 					if (y < 12) {
-						chunk->SetBlockUnsafe(Blocks.SAND, x - cx, y - cy, z - cz);
+						chunk->SetBlockUnsafe(g_blocks.SAND, x - cx, y - cy, z - cz);
 					}
 					else {
 
 						if (a >= y) {
-							chunk->SetBlockUnsafe(Blocks.GRASS, x - cx, y - cy, z - cz);
+							chunk->SetBlockUnsafe(g_blocks.GRASS, x - cx, y - cy, z - cz);
 							chunk->is_empty_ = false;
 						}
 						if (a - 1 > y) {
-							chunk->SetBlockUnsafe(Blocks.DIRT, x - cx, y - cy, z - cz);
+							chunk->SetBlockUnsafe(g_blocks.DIRT, x - cx, y - cy, z - cz);
 						}
 
 

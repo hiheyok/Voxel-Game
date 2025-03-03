@@ -10,7 +10,7 @@ void WorldLoader::loadSummonEntitySurrounding(EntityUUID uuid) {
 	vec3 pos = e->properties_.position_ / 16.f;
 	// vec3 velocity = e->Properties.Velocity;
 
-	ivec3 initalPos((int)pos.x, (int)pos.y, (int)pos.z);
+	ivec3 initalPos{ (int)pos.x, (int)pos.y, (int)pos.z };
 
 	// TODO: Use light engine FIFO 
 	std::deque<ivec3> FIFO;
@@ -82,13 +82,13 @@ void WorldLoader::loadSurroundedMovedEntityChunk() {
 			continue;
 		}
 		
-		centerPositionList.push_back(ivec3(x, y, z));
-		centerVelocityList.push_back(entity->properties_.velocity_);
+		centerPositionList.emplace_back(x, y, z);
+		centerVelocityList.emplace_back(entity->properties_.velocity_);
 	}
 
 	if (centerPositionList.empty()) return;
 
-	ivec3 axisTickingDistance(settings_.horizontal_ticking_distance_, settings_.vertical_ticking_distance_, settings_.horizontal_ticking_distance_);
+	ivec3 axisTickingDistance{ settings_.horizontal_ticking_distance_, settings_.vertical_ticking_distance_, settings_.horizontal_ticking_distance_ };
 
 	int chunkPadding = 4;
 
@@ -153,7 +153,7 @@ void WorldLoader::loadSpawnChunks() {
 	is_spawn_chunks_loaded_ = true;
 }
 
-WorldAccess* WorldLoader::GetWorld() {
+WorldAccess* WorldLoader::GetWorld() const {
 	return static_cast<WorldAccess*>(world);
 }
 
@@ -186,7 +186,7 @@ void WorldLoader::DeleteEntityChunkLoader(EntityUUID uuid) {
 	entity_chunk_loaders_.erase(uuid);
 }
 
-bool WorldLoader::CheckEntityExistChunkLoader(EntityUUID uuid) {
+bool WorldLoader::CheckEntityExistChunkLoader(EntityUUID uuid) const {
 	return entity_chunk_loaders_.count(uuid);
 }
 

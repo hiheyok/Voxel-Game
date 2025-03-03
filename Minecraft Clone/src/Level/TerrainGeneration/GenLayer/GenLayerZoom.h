@@ -13,8 +13,8 @@ public:
         int k = (areaWidth >> 1) + 2;
         int l = (areaHeight >> 1) + 2;
         std::vector<int> aint = parent->getInts(i, j, k, l);
-        int i1 = k - 1 << 1;
-        int j1 = l - 1 << 1;
+        int i1 = (k - 1) << 1;
+        int j1 = (l - 1) << 1;
         std::vector<int> aint1 = std::vector<int>(i1 * j1); //int cache
 
         for (int k1 = 0; k1 < l - 1; ++k1)
@@ -25,7 +25,7 @@ public:
 
             for (int k2 = aint[i2 + 0 + (k1 + 1) * k]; i2 < k - 1; ++i2)
             {
-                initChunkSeed((long long)(i2 + i << 1), (long long)(k1 + j << 1));
+                initChunkSeed(static_cast<long long>(i2 + i) << 1, static_cast<long long>(k1 + j) << 1);
                 int l2 = aint[i2 + 1 + (k1 + 0) * k];
                 int i3 = aint[i2 + 1 + (k1 + 1) * k];
                 aint1[l1] = j2;

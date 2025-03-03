@@ -26,17 +26,17 @@ Chunk* MountainGenerator::Generate(const ChunkPos& pos) {
 
 				n += continental;
 				n += erosion;
-				n += (pv / (heightBias * (n + 0.5))) * gy;
+				n += (pv / (heightBias * (n + 0.5f))) * gy;
 
 				n = n * exp(-gy / heightBias);
 
 				if (n > 0.5f) {
 					if (n < 0.54f) {
-						chunk->SetBlockUnsafe(Blocks.GRASS, x, y, z);
-						chunk->SetBlock(Blocks.DIRT, x, y - 1, z);
+						chunk->SetBlockUnsafe(g_blocks.GRASS, x, y, z);
+						chunk->SetBlock(g_blocks.DIRT, x, y - 1, z);
 					}
 					else {
-						chunk->SetBlockUnsafe(Blocks.STONE, x, y, z);
+						chunk->SetBlockUnsafe(g_blocks.STONE, x, y, z);
 					}
 				}
 			}
@@ -52,7 +52,7 @@ Chunk* MountainGenerator::Generate(const ChunkPos& pos) {
 
 
 	if (pos.y == 3) {
-		int numBlocks = static_cast<int>(Blocks.block_type_data_.size());
+		int numBlocks = static_cast<int>(g_blocks.block_type_data_.size());
 
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
@@ -90,12 +90,12 @@ void MountainGenerator::GenerateEnvironment(const ChunkPos& pos, Chunk* chunk) {
 			for (int y = 0; y < 16; y++) {
 
 				if (y + pos.y < 34) {
-					if ((chunk->GetBlockUnsafe(x, y, z) == Blocks.AIR)) {
-						chunk->SetBlockUnsafe(Blocks.BLUE_CONCRETE, x, y, z);
+					if ((chunk->GetBlockUnsafe(x, y, z) == g_blocks.AIR)) {
+						chunk->SetBlockUnsafe(g_blocks.BLUE_CONCRETE, x, y, z);
 					}
 
-					if ((chunk->GetBlockUnsafe(x, y, z) == Blocks.GRASS)) {
-						chunk->SetBlockUnsafe(Blocks.SAND, x, y, z);
+					if ((chunk->GetBlockUnsafe(x, y, z) == g_blocks.GRASS)) {
+						chunk->SetBlockUnsafe(g_blocks.SAND, x, y, z);
 					}
 				}
 			}
@@ -115,7 +115,7 @@ void MountainGenerator::GenerateDecor(const ChunkPos& pos, Chunk* chunk) {
 
 			float TREE_MAP = (float)((double)(noise_.GetNoise((float)gx * 100.f, (float)gz * 100.f, 3453454.f) + 1.f) / 2.f);
 			for (int y = 0; y < 16; y++) {
-				if (chunk->GetBlock(x, y - 1, z) == Blocks.GRASS) {
+				if (chunk->GetBlock(x, y - 1, z) == g_blocks.GRASS) {
 
 					if (TREE_MAP <= 0.04) {
 						
@@ -125,7 +125,7 @@ void MountainGenerator::GenerateDecor(const ChunkPos& pos, Chunk* chunk) {
 									continue;
 								
 								for (int ty = tree_height; ty <= tree_height + 1; ty++)
-									chunk->SetBlock(Blocks.OAK_LEAF, x + tx, y + ty, z + tz);
+									chunk->SetBlock(g_blocks.OAK_LEAF, x + tx, y + ty, z + tz);
 
 							}
 						}
@@ -137,12 +137,12 @@ void MountainGenerator::GenerateDecor(const ChunkPos& pos, Chunk* chunk) {
 									if ((abs(tx) == 1) && (abs(tz) == 1) && (ty == tree_height + 3)) {
 										continue;
 									}
-									chunk->SetBlock(Blocks.OAK_LEAF, x + tx, y + ty, z + tz);
+									chunk->SetBlock(g_blocks.OAK_LEAF, x + tx, y + ty, z + tz);
 								}
 							}
 						}
 						for (int ty = 0; ty < tree_height + 2; ty++) {
-							chunk->SetBlock(Blocks.OAK_LOG, x, y + ty, z);
+							chunk->SetBlock(g_blocks.OAK_LOG, x, y + ty, z);
 						}
 					}
 				}
@@ -179,7 +179,7 @@ void MountainGenerator::GenerateDecor(const ChunkPos& pos, Chunk* chunk) {
 		for (int z = 0 + pos.z; z < 16 + pos.z; z++) {
 			for (int y = 0 + pos.y; y < 16 + pos.y; y++) {
 				if ((x * x) + (y - 140) * (y - 140) + z * z <= radius * radius) {
-					chunk->SetBlock(Blocks.SAND, x - pos.x, y - pos.y, z - pos.z);
+					chunk->SetBlock(g_blocks.SAND, x - pos.x, y - pos.y, z - pos.z);
 				}
 
 				//if (y == 90) {
@@ -205,10 +205,10 @@ float MountainGenerator::GetNoise3D(glm::ivec3 ChunkCoordinate, glm::ivec3 Relat
 			GlobalBlockPosition.z * powf(2.0, static_cast<float>(i))) + 1;
 
 		n *= 0.5f;
-		out += n * powf(0.5f, i);
+		out += n * powf(0.5f, static_cast<float>(i));
 	}
 
-	out = out * ((-0.5f) / (powf(0.5, samples) - 1));
+	out = out * ((-0.5f) / (powf(0.5, static_cast<float>(samples)) - 1));
 
 	return out;
 
@@ -224,17 +224,17 @@ float MountainGenerator::GetNoise2D(glm::ivec2 ChunkCoordinate, glm::ivec2 Relat
 		float n = noise_.GetNoise(GlobalBlockPosition.x * powf(2.0, static_cast<float>(i)),
 			GlobalBlockPosition.y * powf(2.0, static_cast<float>(i))) + 1;
 		n *= 0.5f;
-		out += n * powf(0.5f, i);
+		out += n * powf(0.5f, static_cast<float>(i));
 	}
 
-	out = out * ((-0.5f) / (powf(0.5, samples) - 1));
+	out = out * ((-0.5f) / (powf(0.5f, static_cast<float>(samples)) - 1.0f));
 
 	return out;
 }
 
 
 float MountainGenerator::ContinentialNoise(float n) {
-	int index = GetIndex(continentalness_interpolation_, n);
+	size_t index = GetIndex(continentalness_interpolation_, n);
 
 	float x1 = continentalness_interpolation_[index].x;
 	float y1 = continentalness_interpolation_[index].y;
@@ -252,7 +252,7 @@ float MountainGenerator::ContinentialNoise(float n) {
 }
 
 float MountainGenerator::ErosionNoise(float n) {
-	int index = GetIndex(erosionness_interpolation_, n);
+	size_t index = GetIndex(erosionness_interpolation_, n);
 
 	float x1 = erosionness_interpolation_[index].x;
 	float y1 = erosionness_interpolation_[index].y;
@@ -270,7 +270,7 @@ float MountainGenerator::ErosionNoise(float n) {
 }
 
 float MountainGenerator::PeaksAndValley(float n) {
-	int index = GetIndex(peaks_valley_interpolation_, n);
+	size_t index = GetIndex(peaks_valley_interpolation_, n);
 
 	float x1 = peaks_valley_interpolation_[index].x;
 	float y1 = peaks_valley_interpolation_[index].y;
@@ -287,7 +287,7 @@ float MountainGenerator::PeaksAndValley(float n) {
 	return out;
 }
 
-int MountainGenerator::GetIndex(std::vector<glm::vec2>& vec, float bottomBound) {
+size_t MountainGenerator::GetIndex(std::vector<glm::vec2>& vec, float bottomBound) {
 	for (int i = 0; i < vec.size(); i++) {
 		if (vec[i].x >= bottomBound) {
 			return i - 1;

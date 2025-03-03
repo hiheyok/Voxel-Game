@@ -2,28 +2,28 @@
 #include "../../../Utils/LogUtils.h"
 
 RawTextureData GetImageData(const char* path) {
-	RawTextureData Data;
-	Data.data = stbi_load(path, &Data.width, &Data.height, &Data.format, 0);
-	switch (Data.format) {
+	RawTextureData data;
+	data.data_ = stbi_load(path, &data.width_, &data.height_, &data.format_, 0);
+	switch (data.format_) {
 	case 1:
-		Data.format = GL_RED;
-		Logger.LogDebug("Image Loader", "Loaded image: " + std::string(path));
+		data.format_ = GL_RED;
+		g_logger.LogDebug("Image Loader", "Loaded image: " + std::string(path));
 		break;
 	case 2:
-		Data.format = GL_RG;
-		Logger.LogDebug("Image Loader", "Loaded image: " + std::string(path));
+		data.format_ = GL_RG;
+		g_logger.LogDebug("Image Loader", "Loaded image: " + std::string(path));
 		break;
 	case 3:
-		Data.format = GL_RGB;
-		Logger.LogDebug("Image Loader", "Loaded image: " + std::string(path));
+		data.format_ = GL_RGB;
+		g_logger.LogDebug("Image Loader", "Loaded image: " + std::string(path));
 		break;
 	case 4:
-		Data.format = GL_RGBA;
-		Logger.LogDebug("Image Loader", "Loaded image: " + std::string(path));
+		data.format_ = GL_RGBA;
+		g_logger.LogDebug("Image Loader", "Loaded image: " + std::string(path));
 		break;
 	default:
-		Logger.LogWarn("Image Loader","Image invalid format");
+		g_logger.LogWarn("Image Loader","Image invalid format");
 	}
 	
-	return Data;
+	return data;
 }

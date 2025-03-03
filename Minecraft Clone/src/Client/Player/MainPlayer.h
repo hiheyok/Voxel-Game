@@ -11,7 +11,7 @@ public:
 
 	void Initialize(GLFWwindow* win, InternalServer* server);
 
-	void Update(UserInputs Inputs);
+	void Update(UserInputs inputs);
 
 	EntityProperty GetEntityProperties();
 
@@ -21,23 +21,22 @@ public:
 
 	void RenderGUIs();
 
-	Player m_Player;
+	Player player_;
 private:
 
 	void PrepareGUIs();
 
-	void InventoryUpdate(UserInputs Inputs);
+	void InventoryUpdate(UserInputs inputs);
 
-	PlayerMovement m_Movement;
-	WorldInteraction m_Interactions;
-	InternalServer* internalServer;
+	PlayerMovement movement_;
+	WorldInteraction interactions_;
+	InternalServer* internal_server_ = nullptr;
 
-	GUI PlayerGUI;
+	GUI player_gui_;
 
-	int GUIIndex = 0;
-	int ItemGUIIndex = 0;
-	int SlotIndex = 0;
+	size_t gui_index_ = 0;
+	size_t item_gui_index_ = 0;
+	size_t slot_index_ = 0;
 
-	float HotbarSize = 0.135;
-
+	float hotbar_size_ = 0.135;
 };

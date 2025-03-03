@@ -16,51 +16,49 @@ public:
         Load(path);
     }
 
-    void Erase() { stbi_image_free(data); }
+    void Erase() { stbi_image_free(data_); }
     void Load(const char* path) {
-        ImagePath = path;
-        data = stbi_load(path, &width, &height, &format, 0);
+        image_path_ = path;
+        data_ = stbi_load(path, &width_, &height_, &format_, 0);
 
-        switch (format) {
+        switch (format_) {
         case 1:
-            format = GL_RED;
+            format_ = GL_RED;
             break;
         case 2:
-            format = GL_RG;
+            format_ = GL_RG;
             break;
         case 3:
-            format = GL_RGB;
+            format_ = GL_RGB;
             break;
         case 4:
-            format = GL_RGBA;
+            format_ = GL_RGBA;
             break;
         default:
             Erase();
-            Logger.LogWarn("Image Loader", "Image invalid format");
+            g_logger.LogWarn("Image Loader", "Image invalid format");
         }
     }
     unsigned char operator[](int index) {
-        return data[index];
+        return data_[index];
     }
 
     void Reload() {
         Erase();
-        Load(ImagePath);
+        Load(image_path_);
     }
-    int width = NULL;
-    int height = NULL;
-    int format = NULL;
-    unsigned char* data = nullptr;
+    int width_ = NULL;
+    int height_ = NULL;
+    int format_ = NULL;
+    unsigned char* data_ = nullptr;
 private:
-
-
-    const char* ImagePath;
+    const char* image_path_ = nullptr;
 };
 
 class Texture {
 public:
     void Gen() {
-        glGenTextures(1, &textureID);
+        glGenTextures(1, &texture_id_);
     }
 
     virtual bool Load(RawTextureData data) {
@@ -72,13 +70,11 @@ public:
     }
 
     GLuint get() {
-        return textureID;
+        return texture_id_;
     }
 
-    GLuint textureID = NULL;
+    GLuint texture_id_ = NULL;
     size_t width_ = NULL;
     size_t height_ = NULL;
     int format_ = NULL;
-private:
-
 };

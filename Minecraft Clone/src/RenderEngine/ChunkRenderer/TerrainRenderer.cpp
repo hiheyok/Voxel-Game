@@ -65,7 +65,7 @@ void TerrainRenderer::Render() {
 
 	for (ChunkDrawBatch& DrawBatch : chunk_solid_batches_) {
 		DrawBatch.Bind();
-		CubicShader.use();
+		CubicShader.Use();
 		DrawBatch.Draw();
 		DrawBatch.Unbind();
 	}
@@ -74,7 +74,7 @@ void TerrainRenderer::Render() {
 
 	for (ChunkDrawBatch& DrawBatch : chunk_transparent_batches_) {
 		DrawBatch.Bind();
-		CubicShader.use();
+		CubicShader.Use();
 		DrawBatch.Draw();
 		DrawBatch.Unbind();
 	}
@@ -108,18 +108,18 @@ void TerrainRenderer::Update() {
 	int x = width;
 	int y = height;
 	glm::mat4 projection = glm::perspective(glm::radians(camera->fov_), (float)x / (float)y, 0.1f, 1000000.0f);
-	CubicShader.use();
+	CubicShader.Use();
 
 	float clrMultiplier = 1.4f;
 
-	CubicShader.setMat4("view", view);
-	CubicShader.setMat4("model", model);
-	CubicShader.setMat4("projection", projection);
-	CubicShader.setFloat("RenderDistance", (float)(horizontal_render_distance_ * 16));
-	CubicShader.setFloat("VerticalRenderDistance", (float)(vertical_render_distance_ * 16));
-	CubicShader.setVec3("camPos", camera->position_);
-	CubicShader.setVec3("tintColor",  glm::vec3(0.40828402 * clrMultiplier, 0.5917159 * clrMultiplier, 0.2781065 * clrMultiplier));
-	CubicShader.setInt("TextureAimIndex", TextureAminationIndex);
+	CubicShader.SetMat4("view", view);
+	CubicShader.SetMat4("model", model);
+	CubicShader.SetMat4("projection", projection);
+	CubicShader.SetFloat("RenderDistance", (float)(horizontal_render_distance_ * 16));
+	CubicShader.SetFloat("VerticalRenderDistance", (float)(vertical_render_distance_ * 16));
+	CubicShader.SetVec3("camPos", camera->position_);
+	CubicShader.SetVec3("tintColor",  glm::vec3(0.40828402 * clrMultiplier, 0.5917159 * clrMultiplier, 0.2781065 * clrMultiplier));
+	CubicShader.SetInt("TextureAimIndex", TextureAminationIndex);
 
 	if (time.GetTimePassed_ms() > 100) {
 		time.Set();
@@ -140,7 +140,7 @@ void TerrainRenderer::setSettings(uint32_t renderDistance, uint32_t verticalRend
 }
 
 void TerrainRenderer::LoadAssets() {
-	CubicShader.bindTexture2D(0, Blocks.block_texture_atlas_.get(), "BlockTexture");
+	CubicShader.BindTexture2D(0, g_blocks.block_texture_atlas_.get(), "BlockTexture");
 }
 
 void TerrainRenderer::AddChunk(const ChunkPos& pos, const std::vector<uint32_t>& data, std::vector<ChunkDrawBatch>& batchType, FastHashMap<ChunkPos, int>& lookUpMap) {
@@ -171,7 +171,7 @@ void TerrainRenderer::AddChunk(const ChunkPos& pos, const std::vector<uint32_t>&
 	}
 
 	if (!success) {
-		Logger.LogInfo("Terrain Renderer", "Unable to add chunk. Solid buffers are full!");
+		g_logger.LogInfo("Terrain Renderer", "Unable to add chunk. Solid buffers are full!");
 	}
 }
 
@@ -193,13 +193,13 @@ double TerrainRenderer::getDebugTime() {
 }
 
 double TerrainRenderer::getFragmentationRate() {
-	int n = chunk_solid_batches_.size();
+	size_t n = chunk_solid_batches_.size();
 
 	double fragRate = 0;
 
-	for (int batchIndex = 0; batchIndex < n; batchIndex++) {
+	for (size_t batchIndex = 0; batchIndex < n; batchIndex++) {
 
-		auto& batch = chunk_solid_batches_[batchIndex];
+		const auto& batch = chunk_solid_batches_[batchIndex];
 
 		if (batch.render_list_.size() != 0) {
 
@@ -246,13 +246,13 @@ void TerrainRenderer::Cleanup() {
 }
 
 void TerrainRenderer::SetupShaders() {
-	CubicShader.init("assets/shaders/vert.glsl", "assets/shaders/frag.glsl");
+	CubicShader.Init("assets/shaders/vert.glsl", "assets/shaders/frag.glsl");
 }
 
 void TerrainRenderer::CreateNewSolidBatch() {
 	chunk_solid_batches_.emplace_back();
 	size_t i = chunk_solid_batches_.size() - 1;
-	chunk_solid_batches_[i].SetMaxSize(AppOptions.SolidBufferSize);
+	chunk_solid_batches_[i].SetMaxSize(g_app_options.solid_buffer_size_);
 	chunk_solid_batches_[i].SetupBuffers();
 	chunk_solid_batches_[i].camera = camera;
 }
@@ -260,7 +260,7 @@ void TerrainRenderer::CreateNewSolidBatch() {
 void TerrainRenderer::CreateNewTransparentBatch() {
 	chunk_transparent_batches_.emplace_back();
 	size_t i = chunk_transparent_batches_.size() - 1;
-	chunk_transparent_batches_[i].SetMaxSize(AppOptions.TransparentBufferSize);
+	chunk_transparent_batches_[i].SetMaxSize(g_app_options.transparent_buffer_size_);
 	chunk_transparent_batches_[i].SetupBuffers();
 	chunk_transparent_batches_[i].camera = camera;
 }

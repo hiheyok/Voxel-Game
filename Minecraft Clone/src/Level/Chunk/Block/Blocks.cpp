@@ -29,7 +29,7 @@ BlockID BlockList::RegisterBlock(std::string blockName, Material* material, bool
 
 	block_id_name_data_[blockName] = id;
 
-	Logger.LogInfo("Register", "Registered new block (ID): " + std::to_string(id));
+	g_logger.LogInfo("Register", "Registered new block (ID): " + std::to_string(id));
 
 	return id;
 }
@@ -55,7 +55,7 @@ void BlockList::AddAssets(std::string namespaceIn) {
 
 	}
 	catch (std::filesystem::filesystem_error& e) {
-		Logger.LogError("File System", e.what());
+		g_logger.LogError("File System", e.what());
 	}
 }
 
@@ -73,13 +73,13 @@ void BlockList::InitializeBlockModels()  {
 
 	}
 	catch (std::filesystem::filesystem_error& e) {
-		Logger.LogError("File System", e.what());
+		g_logger.LogError("File System", e.what());
 	}
 
-	FastHashMap<std::string, int> textureIds;
-	FastHashMap<int, int> textureRepeatCount;
-	FastHashMap<int, bool> textureTransparency;
-	FastHashMap<int, bool> textureSeeThrough;
+	FastHashMap<std::string, size_t> textureIds;
+	FastHashMap<size_t, size_t> textureRepeatCount;
+	FastHashMap<size_t, bool> textureTransparency;
+	FastHashMap<size_t, bool> textureSeeThrough;
  
 	//It will first go through the block models and create the models without loading the texture
 	for (const auto& [name, ID] : block_id_name_data_) {
@@ -109,7 +109,7 @@ void BlockList::InitializeBlockModels()  {
 
 		for (auto& element : block->block_model_data_->elements_) {
 			for (int i = 0; i < 6; i++) {
-				std::string path = element.faces_[i].reference_texture_;
+				const  std::string& path = element.faces_[i].reference_texture_;
 				if (path.length() == 0) continue;
 
 				//Check if it is loaded already
@@ -126,30 +126,30 @@ void BlockList::InitializeBlockModels()  {
 				//Load texture
 				std::string TexFile = "assets/" + Tokens.back() + "/textures/" + Tokens.front() + ".png";
 
-				int numLayersBefore = block_texture_atlas_.GetBlockCount();
+				size_t numLayersBefore = block_texture_atlas_.GetBlockCount();
 
 				// glm::vec4 uv{};
 
 				bool transparency = false;
-				bool is_see_through_ = false;
+				bool isSeeThrough = false;
 
-				std::optional<RawTextureData> d = block_texture_atlas_.AddTextureToAtlas(TexFile, transparency, is_see_through_);
+				std::optional<RawTextureData> d = block_texture_atlas_.AddTextureToAtlas(TexFile, transparency, isSeeThrough);
 
 				if (!d.has_value()) {
-					Logger.LogError("Texture Loading", "Unable to load texture");
+					g_logger.LogError("Texture Loading", "Unable to load texture");
 					continue;
 				}
 
 				textureIds[path] = numLayersBefore + 1;
 				textureRepeatCount[numLayersBefore + 1] = block_texture_atlas_.GetBlockCount() - numLayersBefore;
 				textureTransparency[numLayersBefore + 1] = transparency;
-				textureSeeThrough[numLayersBefore + 1] = is_see_through_;
+				textureSeeThrough[numLayersBefore + 1] = isSeeThrough;
 
 
 				element.faces_[i].texture_id_ = textureIds[path];
 				element.faces_[i].texture_count_ = textureRepeatCount[element.faces_[i].texture_id_];
 				element.faces_[i].has_transparency_ = transparency;
-				element.faces_[i].is_see_through_ = is_see_through_;
+				element.faces_[i].is_see_through_ = isSeeThrough;
 			}
 		}
 	}

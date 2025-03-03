@@ -61,8 +61,8 @@ void ChunkGeneration::Worker(int id) {
 
 		//Generates the chunks
 
-		const int numJobs = jobs.size();
-		const int batchSize = 100;
+		const size_t numJobs = jobs.size();
+		const size_t batchSize = 100;
 		
 		for (int i = 0; i < std::min(batchSize, numJobs); i++) {
 			std::pair<ChunkPos, WorldGeneratorID> task = std::move(jobs.front()); //fetches task
@@ -104,7 +104,7 @@ void ChunkGeneration::Worker(int id) {
 	}
 
 	jobs.clear();
-	Logger.LogInfo("World", "Shutting down world gen worker: " + to_string(workerId));
+	g_logger.LogInfo("World", "Shutting down world gen worker: " + to_string(workerId));
 }
 
 void ChunkGeneration::TaskScheduler() {
@@ -165,7 +165,7 @@ void ChunkGeneration::TaskScheduler() {
 
 	}
 
-	Logger.LogInfo("World", "Shutting down world gen scheduler");
+	g_logger.LogInfo("World", "Shutting down world gen scheduler");
 }
 
 void ChunkGeneration::Generate(ChunkPos pos, WorldGeneratorID genTypeIn) {

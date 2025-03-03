@@ -57,5 +57,5 @@ struct GUIElement {
 	bool has_texture_ = false;
 	bool is_button_ = 0;
 
-	int buffer_index_ = 0;
+	size_t buffer_index_ = 0;
 };

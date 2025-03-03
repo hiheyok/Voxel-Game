@@ -7,16 +7,24 @@
 #include <iostream>
 #include "../../../Level/Typenames.h"
 struct DrawCommandIndirect {
-	unsigned int  count_ = 0;
-	unsigned int  instance_count_ = 0;
-	unsigned int  first_ = 0;
-	unsigned int  base_instance_ = 0;
+	unsigned int  count_;
+	unsigned int  instance_count_;
+	unsigned int  first_;
+	unsigned int  base_instance_;
 
-	DrawCommandIndirect() {
+	DrawCommandIndirect() :
+		count_{ 0 },
+		instance_count_{ 0 },
+		first_{ 0 },
+		base_instance_{ 0 } {
 
 	}
 
-	DrawCommandIndirect(uint32_t count, uint32_t instanceCount, uint32_t first, uint32_t baseInstance) : count_(count_), instance_count_(instanceCount), first_(first), base_instance_(baseInstance) {
+	DrawCommandIndirect(uint32_t count, uint32_t instanceCount, uint32_t first, uint32_t baseInstance) : 
+		count_{count},
+		instance_count_{ instanceCount },
+		first_{ first },
+		base_instance_{ baseInstance } {
 
 	}
 
@@ -312,7 +320,7 @@ public:
 			current_node_visit_id_ = 0;
 		}
 
-		for (int i = commands_.size() - 1; i >= 0; i--) {
+		for (long long i = static_cast<long long>(commands_.size()) - 1; i >= 0; i--) {
 			size += commands_[i].size();
 			cmds.insert(cmds.end(), commands_[i].begin(), commands_[i].end());
 			cmdPos.insert(cmdPos.end(), commands_position_[i].begin(), commands_position_[i].end());

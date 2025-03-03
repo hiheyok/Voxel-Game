@@ -8,12 +8,12 @@ class Options {
 public:
 	int vertical_render_distance_ = 8;
 	int horizontal_render_distance_ = 16;
-	int WorldGenThreads = 6;
-	int MeshThreads = 6;
-	int GraphicsScale = 2;
-	int TransparentBufferSize = 1000000000;
-	int SolidBufferSize = 2000000000;
-	int LightEngineThreads = 2;
+	int world_gen_threads_ = 6;
+	int mesh_threads_ = 6;
+	int graphics_scale_ = 2;
+	int transparent_buffer_size_ = 1000000000;
+	int solid_buffer_size_ = 2000000000;
+	int light_engine_threads_ = 2;
 
 	Options() {
 		SetOptionNameTable();
@@ -40,6 +40,6 @@ private:
 
 	void GenerateOptionFile(); //Generate file if deleted
 
-	FastHashMap<std::string, int*> OptionName; //name -> ptr
+	FastHashMap<std::string, int*> option_name_; //name -> ptr
 
-} extern AppOptions;
+} extern g_app_options;

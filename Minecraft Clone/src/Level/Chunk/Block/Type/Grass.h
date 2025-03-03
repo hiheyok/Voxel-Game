@@ -18,14 +18,14 @@ struct GrassBlock : Block {
 		Dimension* currentWorld = static_cast<Dimension*>(Block::dimension_ptr_);
 
 		//Checks if ticking block changes 
-		if (currentWorld->world_interactions_.GetBlock(pos) != Blocks.GRASS) {
+		if (currentWorld->world_interactions_.GetBlock(pos) != g_blocks.GRASS) {
 			return;
 		}
 
 		BlockPos newPos = pos;
 		newPos.y += 1;
 
-		bool blockOnTopOfGrass = (currentWorld->world_interactions_.GetBlock(newPos) != Blocks.AIR);
+		bool blockOnTopOfGrass = (currentWorld->world_interactions_.GetBlock(newPos) != g_blocks.AIR);
 
 		bool isGrassDestroyed = false;
 
@@ -44,7 +44,7 @@ struct GrassBlock : Block {
 			return;
 		}
 
-		Event::BlockEvent grassSpread{pos, Blocks.GRASS, EventHandler.BlockTick};
+		Event::BlockEvent grassSpread{pos, g_blocks.GRASS, EventHandler.BlockTick};
 		currentWorld->event_manager_.AddEvent(grassSpread);
 	}
 
@@ -54,7 +54,7 @@ struct GrassBlock : Block {
 			return false;
 		}
 
-		currentWorld->world_interactions_.SetBlock(Blocks.DIRT, pos);
+		currentWorld->world_interactions_.SetBlock(g_blocks.DIRT, pos);
 
 		return true;
 	}
@@ -78,13 +78,13 @@ struct GrassBlock : Block {
 					newPos.z += z1;
 
 					//Checks if block is dirt
-					if (currentWorld->world_interactions_.GetBlock(newPos) != Blocks.DIRT) {
+					if (currentWorld->world_interactions_.GetBlock(newPos) != g_blocks.DIRT) {
 						continue;
 					}
 
 					//Checks if there isnt any block above
 					newPos.y += 1;
-					if (currentWorld->world_interactions_.GetBlock(newPos) != Blocks.AIR) {
+					if (currentWorld->world_interactions_.GetBlock(newPos) != g_blocks.AIR) {
 						continue;
 					}
 					newPos.y -= 1;
@@ -92,7 +92,7 @@ struct GrassBlock : Block {
 					//Chance it spread
 					if (TestProbability(properties_.spread_chance_)) {
 
-						Event::BlockEvent blockEvent{newPos,Blocks.GRASS, EventHandler.BlockPlace};
+						Event::BlockEvent blockEvent{newPos,g_blocks.GRASS, EventHandler.BlockPlace};
 						currentWorld->event_manager_.AddEvent(blockEvent);
 
 						continue;

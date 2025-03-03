@@ -20,11 +20,11 @@ public:
 
             for (int k = 255; k >= 0; --k)
             {
-                if (GetBlockChunkSafe(chunk, j, k, i) != Blocks.AIR)
+                if (GetBlockChunkSafe(chunk, j, k, i) != g_blocks.AIR)
                 {
-                    if (k == 62 && GetBlockChunkSafe(chunk, j, k, i) != Blocks.WATER)
+                    if (k == 62 && GetBlockChunkSafe(chunk, j, k, i) != g_blocks.WATER)
                     {
-                        SetBlockChunkSafe(chunk, Blocks.WATER, j, k, i);
+                        SetBlockChunkSafe(chunk, g_blocks.WATER, j, k, i);
 
                         //if (d0 < 0.12)
                         //{

@@ -10,7 +10,7 @@ private:
 	int64_t serial_version_uid_ = 3905348978240129619L;
 
 public:
-	JavaRandom() : JavaRandom{time(NULL)} {
+	JavaRandom() : JavaRandom{static_cast<uint64_t>(time(NULL))} {
 	}
 
 	JavaRandom(uint64_t seed) {

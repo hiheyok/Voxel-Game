@@ -4,8 +4,8 @@
 class BiomeBeach : public Biome {
 public:
 	BiomeBeach(BiomeProperties properties) : Biome(properties) {
-		topBlock = Blocks.SAND;
-		fillerBlock = Blocks.SAND;
+		topBlock = g_blocks.SAND;
+		fillerBlock = g_blocks.SAND;
 	}
 
 	const std::type_info& getBiomeClass() const override {

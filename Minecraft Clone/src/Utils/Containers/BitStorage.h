@@ -6,12 +6,12 @@ public:
 	void Initialize(int x, int y, int z);
 
 	inline void SetBit(int x, int y, int z) {
-		int index = sx * (sy * sz) + sy * (sz)+sz;
+		int index = sx_ * (sy_ * sz_) + sy_ * (sz_)+sz_;
 
 		size_t NumIndex = index >> 6;
 		size_t Index = index & 0b111111;
 
-		map[NumIndex] |= (0b1LL << Index);
+		map_[NumIndex] |= (0b1LL << Index);
 	}
 
 	inline void SetBit(int* pos) {
@@ -19,11 +19,11 @@ public:
 	}
 
 	inline bool GetBit(int x, int y, int z) {
-		int index = sx * (sy * sz) + sy * (sz)+sz;
+		int index = sx_ * (sy_ * sz_) + sy_ * (sz_)+sz_;
 
-		size_t NumIndex = index >> 6;
-		size_t Index = index & 0b111111;
-		return (map[NumIndex] >> Index) & 0b1;
+		size_t numIndex = index >> 6;
+		size_t bitIndex = index & 0b111111;
+		return (map_[numIndex] >> bitIndex) & 0b1;
 	}
 
 	inline bool GetBit(int* pos) {
@@ -32,8 +32,8 @@ public:
 
 	inline void ClearBit(int x, int y, int z);
 
-	inline void clear();
+	inline void Clear();
 private:
-	std::vector<uint64_t> map;
-	int sx = 0, sy = 0, sz = 0;
+	std::vector<uint64_t> map_;
+	int sx_ = 0, sy_ = 0, sz_ = 0;
 };

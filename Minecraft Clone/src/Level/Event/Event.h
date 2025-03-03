@@ -28,9 +28,9 @@ namespace Event {
 	};
 
 	struct EntityEvent {
-		BlockPos pos_;
-		EntityTypeID entity_type_;
-		EntityUUID entity_uuid_;
+		BlockPos pos_{0,0,0};
+		EntityTypeID entity_type_ = NULL;
+		EntityUUID entity_uuid_ = NULL;
 		EventID id_ = 0;
 		char unique_id_ = 0;
 	};

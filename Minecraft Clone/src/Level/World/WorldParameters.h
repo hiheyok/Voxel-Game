@@ -7,5 +7,5 @@ struct WorldParameters {
 	int spawn_chunk_horizontal_radius_ = 10;
 	int spawn_chunk_vertical_radius_ = 10;
 
-	double gravity_ = 10.f;
+	float gravity_ = 10.f;
 };

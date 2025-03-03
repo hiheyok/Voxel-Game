@@ -13,7 +13,7 @@
 class WorldRender : public WorldRenderInfo{
 public:
 
-	void SetRotation(glm::dvec2 rotation_);
+	void SetRotation(glm::dvec2 rotation);
 
 	void SetPosition(glm::dvec3 position);
 
@@ -23,7 +23,7 @@ public:
 
 	void LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks);
 
-	void Start(GLFWwindow* window_, InternalServer* world_, PerformanceProfiler* pProfilerIn);
+	void Start(GLFWwindow* window, InternalServer* server, PerformanceProfiler* profiler);
 
 	void Stop();
 
@@ -43,7 +43,7 @@ private:
 
 	int worker_count_ = NULL;
 
-	bool stop = false;
+	bool stop_ = false;
 
 	std::deque<ChunkPos> task_list_; //All tasks will go in here and they will be distributed to all the workers
 
@@ -52,6 +52,6 @@ private:
 	std::deque<std::deque<std::unique_ptr<MeshingV2::ChunkVertexData>>> worker_output_;
 	std::deque<std::mutex> worker_locks_;
 
-	std::thread Scheduler;
+	std::thread scheduler_;
 	std::mutex scheduler_lock_;
 };

@@ -8,13 +8,13 @@ void InternalServer::startInternalServer(Player* p) {
 	player = p;
 
 	ServerSettings settings_;
-	settings_.gen_thread_count_ = AppOptions.WorldGenThreads;
-	settings_.light_engine_thread_count_ = AppOptions.LightEngineThreads;
-	settings_.horizontal_ticking_distance_ = AppOptions.horizontal_render_distance_;
-	settings_.vertical_ticking_distance_ = AppOptions.vertical_render_distance_;
+	settings_.gen_thread_count_ = g_app_options.world_gen_threads_;
+	settings_.light_engine_thread_count_ = g_app_options.light_engine_threads_;
+	settings_.horizontal_ticking_distance_ = g_app_options.horizontal_render_distance_;
+	settings_.vertical_ticking_distance_ = g_app_options.vertical_render_distance_;
 
 	server->StartServer(settings_);
-	server->join(*p);
+	server->Join(*p);
 	Block::server_ptr_ = server;
 
 }
@@ -31,36 +31,36 @@ Chunk* InternalServer::GetChunk(const ChunkPos& chunk) {
 	return server->GetChunk(chunk);
 }
 
-Timer* InternalServer::getTickClock() {
+Timer* InternalServer::GetTickClock() {
 	return server->GetTimer();
 }
 
-double InternalServer::getMSPT() {
-	return server->getMSPT();
+double InternalServer::GetMSPT() {
+	return server->GetMSPT();
 }
 
 void InternalServer::SetPlayer(Player player) {
-	server->join(player);
+	server->Join(player);
 }
 
 bool InternalServer::CheckPlayerOnGround() {
 	return server->CheckEntityOnGround(player->properties_.entity_uuid_);
 }
 
-int InternalServer::getChunkCount() {
-	return server->getChunkCount();
+size_t InternalServer::GetChunkCount() {
+	return server->GetChunkCount();
 }
 
 vector<ChunkPos> InternalServer::GetUpdatedChunks() {
 	return server->GetUpdatedChunkPos();
 }
 
-vector<EntityProperty> InternalServer::getUpdatedEntities() {
-	return server->getUpdatedEntities();
+vector<EntityProperty> InternalServer::GetUpdatedEntities() {
+	return server->GetUpdatedEntities();
 }
 
-vector<EntityUUID>  InternalServer::getRemovedEntities() {
-	return server->getRemovedEntities();
+vector<EntityUUID>  InternalServer::GetRemovedEntities() {
+	return server->GetRemovedEntities();
 }
 
 bool InternalServer::CheckRayIntersection(Ray& ray) {

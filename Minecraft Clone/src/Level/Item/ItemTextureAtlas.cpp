@@ -1,15 +1,15 @@
 #include "ItemTextureAtlas.h"
 
 void ItemTextureAtlas::RenderBlockItem(Item item) {
-	framebuffer_single_block_render_.bindFBO();
+	framebuffer_single_block_render_.BindFBO();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	block_item_renderer_.RenderBlock(item);
-	framebuffer_single_block_render_.unbindFBO();
+	framebuffer_single_block_render_.UnbindFBO();
 }
 
 void ItemTextureAtlas::StitchTexture(size_t index, ItemID ItemID) {
 	int ratio = atlas_size_ / individual_size_;
-	float xCoord = (index % ratio);
+	float xCoord = static_cast<float>((index % ratio));
 	float yCoord = floor((float)index / (float)ratio);
 
 	//Normalize
@@ -49,8 +49,8 @@ void ItemTextureAtlas::StitchTexture(size_t index, ItemID ItemID) {
 	vbo_.InsertData(sizeof(vertices), vertices, GL_STATIC_DRAW);
 	ebo_.InsertData(sizeof(indices), indices, GL_STATIC_DRAW);
 	//Render
-	atlas_framebuffer_.bindFBO();
-	stitching_shader_.bindTexture2D(0, framebuffer_single_block_render_.texture, "ItemTexture");
+	atlas_framebuffer_.BindFBO();
+	stitching_shader_.BindTexture2D(0, framebuffer_single_block_render_.texture_, "ItemTexture");
 
 	glEnable(GL_BLEND);
 
@@ -61,25 +61,25 @@ void ItemTextureAtlas::StitchTexture(size_t index, ItemID ItemID) {
 	ebo_.Unbind();
 
 	glDisable(GL_BLEND);
-	atlas_framebuffer_.unbindFBO();
+	atlas_framebuffer_.UnbindFBO();
 }
 
 void ItemTextureAtlas::Initialize(int atlasItemSize, int individualItemSize) {
-	stitching_shader_.init("assets/shaders/ItemRender/AtlasStitchVert.glsl", "assets/shaders/ItemRender/AtlasStitchFrag.glsl");
+	stitching_shader_.Init("assets/shaders/ItemRender/AtlasStitchVert.glsl", "assets/shaders/ItemRender/AtlasStitchFrag.glsl");
 
 	individual_size_ = individualItemSize;
 	atlas_size_ = atlasItemSize;
 
-	atlas_framebuffer_.genBuffer(atlas_size_, atlas_size_, 1, GL_RGBA);
-	framebuffer_single_block_render_.genBuffer(individual_size_, individual_size_, 2, GL_RGBA);
+	atlas_framebuffer_.GenBuffer(atlas_size_, atlas_size_, 1, GL_RGBA);
+	framebuffer_single_block_render_.GenBuffer(individual_size_, individual_size_, 2, GL_RGBA);
 
 	atlas_.width_ = atlas_size_;
 	atlas_.height_ = atlas_size_;
-	atlas_.textureID = atlas_framebuffer_.texture;
+	atlas_.texture_id_ = atlas_framebuffer_.texture_;
 
 	individual_item_.width_ = individual_size_;
 	individual_item_.height_ = individual_size_;
-	individual_item_.textureID = framebuffer_single_block_render_.texture;
+	individual_item_.texture_id_ = framebuffer_single_block_render_.texture_;
 
 	vbo_.SetType(GL_ARRAY_BUFFER);
 	ebo_.SetType(GL_ELEMENT_ARRAY_BUFFER);

@@ -12,15 +12,15 @@ public:
 
 	void Initialize(GLFWwindow* win) {
 		window_ = win;
-		shader_.init("assets/shaders/GUI/GUIVert.glsl", "assets/shaders/GUI/GUIFrag.glsl");
+		shader_.Init("assets/shaders/GUI/GUIVert.glsl", "assets/shaders/GUI/GUIFrag.glsl");
 	}
 
-	int AddGUI(std::string Name, GUISet set) {
+	size_t AddGUI(std::string Name, GUISet set) {
 		guis_.emplace_back(set);
 		return guis_.size() - 1;
 	}
 
-	GUISet& EditGUISet(int GUIIndex) {
+	GUISet& EditGUISet(size_t GUIIndex) {
 		return guis_[GUIIndex];
 	}
 
@@ -36,17 +36,17 @@ public:
 		Update();
 		SetupDrawCalls();
 
-		shader_.use();
+		shader_.Use();
 		for (auto& gui : guis_) {
-			shader_.bindTexture2D(0, gui.GUITexture.get(), "GUITexture");
-			for (int i = 0; i < gui.NumOfRenderableObjects; i++) {
+			shader_.BindTexture2D(0, gui.gui_texture_.get(), "GUITexture");
+			for (int i = 0; i < gui.num_of_renderable_objects_; i++) {
 			//	std::cout << gui.Textures[i]->get() << "\n";
 				
-				gui.VAOs[i].Bind();
-				gui.EBOs[i].Bind();
-				glDrawElements(GL_TRIANGLES, gui.VBOSize[i], GL_UNSIGNED_INT, 0);
-				gui.EBOs[i].Unbind();
-				gui.VAOs[i].Unbind();
+				gui.vaos_[i].Bind();
+				gui.ebos_[i].Bind();
+				glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(gui.vbo_size_[i]), GL_UNSIGNED_INT, 0);
+				gui.ebos_[i].Unbind();
+				gui.vaos_[i].Unbind();
 			}
 			
 		}
@@ -67,14 +67,14 @@ private:
 		int Height, Width;
 		glfwGetWindowSize(window_, &Width, &Height);
 
-		shader_.use();
-		shader_.setFloat("AspectRatio", ((float)Height)/((float)Width));
+		shader_.Use();
+		shader_.SetFloat("AspectRatio", ((float)Height)/((float)Width));
 	}
 
 	std::vector<GUISet> guis_ = {};
 
 	Shader shader_;
-	GLFWwindow* window_;
+	GLFWwindow* window_ = nullptr;
 
 	//bool isDirty = false;
 };

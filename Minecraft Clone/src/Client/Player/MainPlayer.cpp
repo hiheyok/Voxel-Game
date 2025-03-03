@@ -2,117 +2,117 @@
 #include "../../Level/Item/ItemTextureAtlas.h"
 
 void MainPlayer::Initialize(GLFWwindow* win, InternalServer* server) {
-	PlayerGUI.Initialize(win);
+	player_gui_.Initialize(win);
 
 	float ItemViewRelativeSize = 0.85f;
 
-	GUISet Hotbar;
-	Hotbar.SetGUITexture("assets/minecraft/textures/gui/widgets.png");
-	Hotbar.AddGUIElement("Hotbar", "", vec2(9.f * HotbarSize * 1.0055555555f, HotbarSize * 1.05f), vec2(0.f, -1.f + HotbarSize * 0.5f), vec2(0.5f, 0.5f), vec2(181.5f, 21.5f));
-	Hotbar.AddGUIElement("Select", "", vec2(HotbarSize * 1.1f,  HotbarSize * 1.1f), vec2(-HotbarSize * 4.f, -1.f + HotbarSize * 0.5f), vec2(0.5f, 22.5f), vec2(22.5f, 44.5f));
-	GUISet ItemBar;
-	ItemBar.SetGUITexture(g_item_atlas.atlas_.textureID, g_item_atlas.atlas_.width_, g_item_atlas.atlas_.height_);
+	GUISet hotbar;
+	hotbar.SetGUITexture("assets/minecraft/textures/gui/widgets.png");
+	hotbar.AddGUIElement("Hotbar", "", vec2(9.f * hotbar_size_ * 1.0055555555f, hotbar_size_ * 1.05f), vec2(0.f, -1.f + hotbar_size_ * 0.5f), vec2(0.5f, 0.5f), vec2(181.5f, 21.5f));
+	hotbar.AddGUIElement("Select", "", vec2(hotbar_size_ * 1.1f,  hotbar_size_ * 1.1f), vec2(-hotbar_size_ * 4.f, -1.f + hotbar_size_ * 0.5f), vec2(0.5f, 22.5f), vec2(22.5f, 44.5f));
+	GUISet itemBar;
+	itemBar.SetGUITexture(g_item_atlas.atlas_.texture_id_, g_item_atlas.atlas_.width_, g_item_atlas.atlas_.height_);
 
 	for (int i = 0; i < 9; i++) {
-		ItemBar.AddGUIElementNorm(std::to_string(i), "", vec2(HotbarSize* ItemViewRelativeSize, HotbarSize * ItemViewRelativeSize), vec2(HotbarSize * (float)(i - 4), -1.f + HotbarSize * 0.5f), vec2(0,0), vec2(1,1));
+		itemBar.AddGUIElementNorm(std::to_string(i), "", vec2(hotbar_size_* ItemViewRelativeSize, hotbar_size_ * ItemViewRelativeSize), vec2(hotbar_size_ * (float)(i - 4), -1.f + hotbar_size_ * 0.5f), vec2(0,0), vec2(1,1));
 	}
 
-	GUIIndex = PlayerGUI.AddGUI("PlayerGUI", Hotbar);
-	ItemGUIIndex = PlayerGUI.AddGUI("Itembar", ItemBar);
-	internalServer = server;
+	gui_index_ = player_gui_.AddGUI("PlayerGUI", hotbar);
+	item_gui_index_ = player_gui_.AddGUI("Itembar", itemBar);
+	internal_server_ = server;
 }
 
 void MainPlayer::RenderGUIs() {
-	PlayerGUI.Render();
+	player_gui_.Render();
 }
 
 void MainPlayer::PrepareGUIs() {
-	int CurrentSlotIndex = m_Player.entity_inventory_.right_hand_slot_;
-	if (CurrentSlotIndex != SlotIndex) {
-		SlotIndex = CurrentSlotIndex;
-		PlayerGUI.EditGUISet(GUIIndex).EditElementPosition("Select", vec2(HotbarSize * (float)(SlotIndex - 4), -1.f + HotbarSize * 0.5f));
+	int currentSlotIndex = player_.entity_inventory_.right_hand_slot_;
+	if (currentSlotIndex != slot_index_) {
+		slot_index_ = currentSlotIndex;
+		player_gui_.EditGUISet(gui_index_).EditElementPosition("Select", vec2(hotbar_size_ * (float)(slot_index_ - 4), -1.f + hotbar_size_ * 0.5f));
 	}
 
 	for (int i = 0; i < 9; i++) {
-		ItemStack item = m_Player.entity_inventory_.GetItem(i);
+		ItemStack item = player_.entity_inventory_.GetItem(i);
 		ItemUVMapping uv = g_item_atlas.items_uv_map_[item.item_.properties_.id_];
 
 		if (item.IsInitialized()) {
-			PlayerGUI.EditGUISet(ItemGUIIndex).EditElementUVNorm(std::to_string(i), uv.uv_1_, uv.uv_2_);
+			player_gui_.EditGUISet(item_gui_index_).EditElementUVNorm(std::to_string(i), uv.uv_1_, uv.uv_2_);
 		}
 		else {
-			PlayerGUI.EditGUISet(ItemGUIIndex).EditElementUVNorm(std::to_string(i), vec2(0.f,0.f), vec2(0.f,0.f));
+			player_gui_.EditGUISet(item_gui_index_).EditElementUVNorm(std::to_string(i), vec2(0.f,0.f), vec2(0.f,0.f));
 		}
 		
 
 	}
 
-	PlayerGUI.PrepareRenderer();
+	player_gui_.PrepareRenderer();
 }
 
-void MainPlayer::Update(UserInputs Inputs) {
-	InventoryUpdate(Inputs);
-	m_Interactions.Interact(&m_Player, Inputs);
-	m_Movement.Update(&m_Player, Inputs, internalServer);
+void MainPlayer::Update(UserInputs inputs) {
+	InventoryUpdate(inputs);
+	interactions_.Interact(&player_, inputs);
+	movement_.Update(&player_, inputs, internal_server_);
 	PrepareGUIs();
 }
 
 EntityProperty MainPlayer::GetEntityProperties() {
-	return m_Player.properties_;
+	return player_.properties_;
 }
 
 void MainPlayer::SetPlayerRotation(float x, float y) {
-	m_Player.properties_.rotation_ = glm::vec2(x, y);
+	player_.properties_.rotation_ = glm::vec2(x, y);
 }
 
 void MainPlayer::SetPlayerPosition(float x, float y, float z) {
-	m_Player.properties_.position_ = glm::vec3(x, y, z);
+	player_.properties_.position_ = glm::vec3(x, y, z);
 }
 
-void MainPlayer::InventoryUpdate(UserInputs Inputs) {
+void MainPlayer::InventoryUpdate(UserInputs inputs) {
 	int Direction = 0;
 
-	switch (Inputs.Mouse.ScrollDirection) {
-	case Inputs.Mouse.SCROLL_DOWN:
+	switch (inputs.mouse_.scroll_direction_) {
+	case inputs.mouse_.SCROLL_DOWN:
 		Direction = 1;
 		break;
-	case Inputs.Mouse.SCROLL_UP:
+	case inputs.mouse_.SCROLL_UP:
 		Direction = -1;
 		break;
-	case Inputs.Mouse.SCROLL_NONE:
+	case inputs.mouse_.SCROLL_NONE:
 		break;
 	}
 
-	int CurrentInventorySlot = m_Player.entity_inventory_.right_hand_slot_;
+	int currentInventorySlot = player_.entity_inventory_.right_hand_slot_;
 	// int MaxInventorySize = m_Player.m_EntityInventory.GetSlotCount();
 
-	if (CurrentInventorySlot + Direction == 9) {
-		CurrentInventorySlot = 0;
-	} else if (CurrentInventorySlot + Direction == -1) {
-		CurrentInventorySlot = 8;
+	if (currentInventorySlot + Direction == 9) {
+		currentInventorySlot = 0;
+	} else if (currentInventorySlot + Direction == -1) {
+		currentInventorySlot = 8;
 	}
 	else {
-		CurrentInventorySlot += Direction;
+		currentInventorySlot += Direction;
 	}
 
-	if (Inputs.CheckKeyPress(KEY_1))
-		CurrentInventorySlot = 0;
-	if (Inputs.CheckKeyPress(KEY_2))
-		CurrentInventorySlot = 1;
-	if (Inputs.CheckKeyPress(KEY_3))
-		CurrentInventorySlot = 2;
-	if (Inputs.CheckKeyPress(KEY_4))
-		CurrentInventorySlot = 3;
-	if (Inputs.CheckKeyPress(KEY_5))
-		CurrentInventorySlot = 4;
-	if (Inputs.CheckKeyPress(KEY_6))
-		CurrentInventorySlot = 5;
-	if (Inputs.CheckKeyPress(KEY_7))
-		CurrentInventorySlot = 6;
-	if (Inputs.CheckKeyPress(KEY_8))
-		CurrentInventorySlot = 7;
-	if (Inputs.CheckKeyPress(KEY_9))
-		CurrentInventorySlot = 8;
+	if (inputs.CheckKeyPress(KEY_1))
+		currentInventorySlot = 0;
+	if (inputs.CheckKeyPress(KEY_2))
+		currentInventorySlot = 1;
+	if (inputs.CheckKeyPress(KEY_3))
+		currentInventorySlot = 2;
+	if (inputs.CheckKeyPress(KEY_4))
+		currentInventorySlot = 3;
+	if (inputs.CheckKeyPress(KEY_5))
+		currentInventorySlot = 4;
+	if (inputs.CheckKeyPress(KEY_6))
+		currentInventorySlot = 5;
+	if (inputs.CheckKeyPress(KEY_7))
+		currentInventorySlot = 6;
+	if (inputs.CheckKeyPress(KEY_8))
+		currentInventorySlot = 7;
+	if (inputs.CheckKeyPress(KEY_9))
+		currentInventorySlot = 8;
 
-	m_Player.entity_inventory_.right_hand_slot_ = CurrentInventorySlot;
+	player_.entity_inventory_.right_hand_slot_ = currentInventorySlot;
 }

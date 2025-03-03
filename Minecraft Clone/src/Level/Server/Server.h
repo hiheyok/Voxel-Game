@@ -18,9 +18,9 @@ struct ServerSettings {
 class Server {
 private:
 	Level level_;
-	bool stop = true; // TODO: Rename
+	bool stop_ = true; // TODO: Rename
 	std::thread main_server_loop_;
-	Timer time; // TODO: Rename
+	Timer time_; // TODO: Rename
 	double mspt_ = 0.0;
 public:
 	ServerSettings settings_;
@@ -29,23 +29,23 @@ public:
 
 	}
 
-	int getChunkCount();
+	size_t GetChunkCount();
 
-	double getMSPT();// TODO: Rename
+	double GetMSPT();// TODO: Rename
 
 	Timer* GetTimer();
 
-	std::vector<EntityProperty> getUpdatedEntities();// TODO: Rename
+	std::vector<EntityProperty> GetUpdatedEntities();// TODO: Rename
 
-	std::vector<EntityUUID> getRemovedEntities();// TODO: Rename
+	std::vector<EntityUUID> GetRemovedEntities();// TODO: Rename
 
 	bool CheckEntityOnGround(EntityUUID id);
 
-	void join(Entity& entity);// TODO: Rename
+	void Join(Entity& entity);// TODO: Rename
 
 	std::vector<ChunkPos> GetUpdatedChunkPos();
 
-	Chunk* GetChunk(const ChunkPos& ID);
+	Chunk* GetChunk(const ChunkPos& id);
 
 	BlockID GetBlock(const BlockPos& pos);
 
@@ -61,5 +61,5 @@ public:
 
 	void Tick();
 
-	void SendEvent(const Event::Event& pEventIn);
+	void SendEvent(const Event::Event& event);
 };

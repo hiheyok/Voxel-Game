@@ -37,7 +37,7 @@ public:
 
 	void Cleanup();
 
-	void Defrager(int iterations);
+	void Defrager(size_t iterations);
 
 	void UpdateCommandBufferSize();
 

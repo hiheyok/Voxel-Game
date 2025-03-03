@@ -7,7 +7,7 @@ public:
 
 	BiomeSnow(bool superIcyIn, BiomeProperties properties) : Biome(properties), superIcy(superIcyIn) {
 		if (superIcyIn) {
-			topBlock = Blocks.SNOW_BLOCK;
+			topBlock = g_blocks.SNOW_BLOCK;
 		}
 	}
 

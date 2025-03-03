@@ -24,8 +24,8 @@ protected:
 		world_ = new World;
 		world_->Initialize();
 		properties_ = properties;
-		world_settings_.horizontal_ticking_distance_ = AppOptions.horizontal_render_distance_;
-		world_settings_.vertical_ticking_distance_ = AppOptions.vertical_render_distance_;
+		world_settings_.horizontal_ticking_distance_ = g_app_options.horizontal_render_distance_;
+		world_settings_.vertical_ticking_distance_ = g_app_options.vertical_render_distance_;
 
 		world_interactions_.init(world_, world_settings_);
 
@@ -41,6 +41,7 @@ public:
 
 	Dimension(WorldGeneratorID generatorTypeIn = g_generators.DEBUG) {
 		generator_type_ = generatorTypeIn;
+		world_ = nullptr;
 	}
 
 	WorldGeneratorID GetGeneratorType() {

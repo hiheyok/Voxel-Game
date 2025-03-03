@@ -40,7 +40,7 @@ private:
 
 	bool is_dirty_ = true;
 
-	int num_entity_rendered_ = 0;
+	size_t num_entity_rendered_ = 0;
 
 	double time_past_tick_ = 0.0;
 public:
@@ -50,7 +50,7 @@ public:
 
 	void Clean();
 
-	int GetNumEntityRendered();
+	size_t GetNumEntityRendered();
 
 	void AddEntity(EntityProperty& entity);
 

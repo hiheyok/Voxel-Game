@@ -16,23 +16,23 @@
 struct LogData {
 	int type_ = NULL;
 	int thread = NULL;
-	std::string message;
-	std::string Subtype;
-	std::chrono::system_clock::time_point time;
-	long long int RTime = 0;
+	std::string message_;
+	std::string subtype_;
+	std::chrono::system_clock::time_point time_;
+	long long int r_time_ = 0;
 };
 
 class LogUtils {
 public:
 
 	LogUtils() {
-		m_buffer = new char[BUFFER_SIZE];
+		buffer_ = new char[buffer_size_];
 		Start();
 	}
 
 	~LogUtils() {
 		Stop();
-		delete[] m_buffer;
+		delete[] buffer_;
 	}
 
 
@@ -54,41 +54,41 @@ public:
 
 private:
 
-	std::mutex Mutex;
+	std::mutex mutex_;
 
-	bool stop = false;
+	bool stop_ = false;
 
-	bool Started = false;
+	bool started_ = false;
 
 	void MainLogger();
 
-	std::string formatString(std::string in,  ... ) {
+	std::string FormatString(std::string in,  ... ) {
 		va_list args;
 		va_start(args, in);
 
-		vsnprintf(m_buffer, BUFFER_SIZE, in.c_str(), args);
+		vsnprintf(buffer_, buffer_size_, in.c_str(), args);
 	
 		va_end(args);
 
-		std::string out(m_buffer);
-		memset(m_buffer, NULL, out.size());
+		std::string out(buffer_);
+		memset(buffer_, NULL, out.size());
 		return out;
 	}
 
-	std::string formatMessage(std::string pSeverity, long long pTime, std::string pTimestamp, std::string pSubtype, std::string pMessage) {
-		return formatString("[ %lld NS ] [ %s ] [ %s / %s ]: %s", pTime, pTimestamp.c_str(), pSeverity.c_str(), pSubtype.c_str(), pMessage.c_str());
+	std::string FormatMessage(std::string severity, long long time, std::string timestamp, std::string subtype, std::string message) {
+		return FormatString("[ %lld NS ] [ %s ] [ %s / %s ]: %s", time, timestamp.c_str(), severity.c_str(), subtype.c_str(), message.c_str());
 	}
 
-	std::chrono::high_resolution_clock::time_point InitTime = std::chrono::high_resolution_clock::now();
+	std::chrono::high_resolution_clock::time_point init_time_ = std::chrono::high_resolution_clock::now();
 	
-	std::deque<LogData> Logs;
-	std::deque<LogData> LogsCache;
+	std::deque<LogData> logs_;
+	std::deque<LogData> logs_cache_;
 
-	std::ofstream file;
+	std::ofstream file_;
 
-	char* m_buffer;
-	const uint64_t BUFFER_SIZE = 4096;
+	char* buffer_;
+	const uint64_t buffer_size_ = 4096;
 
 };
 
-extern LogUtils Logger;
+extern LogUtils g_logger;

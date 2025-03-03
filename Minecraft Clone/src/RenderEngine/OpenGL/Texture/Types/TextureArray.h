@@ -10,105 +10,103 @@ public:
 	void UploadToGPU() {
 		GLsizei mipLevelCount = 4;
 
-		glBindTexture(GL_TEXTURE_2D_ARRAY, textureID);
-		glTexStorage3D(GL_TEXTURE_2D_ARRAY, mipLevelCount, GL_RGBA8, 16, 16, Layers);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id_);
+		glTexStorage3D(GL_TEXTURE_2D_ARRAY, mipLevelCount, GL_RGBA8, 16, 16, layers_);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, width_, height_, Layers, GL_RGBA, GL_UNSIGNED_BYTE, ArrayData.data());
+		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, static_cast<GLsizei>(width_), static_cast<GLsizei>(height_), layers_, GL_RGBA, GL_UNSIGNED_BYTE, array_data_.data());
 		glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
-		Logger.LogDebug("Texture Loader", "Loaded Texture Array: " + std::to_string(textureID));
+		g_logger.LogDebug("Texture Loader", "Loaded Texture Array: " + std::to_string(texture_id_));
 	}
 	void SetSize(int width, int height) {
 		width_ = width;
 		height_ = height;
 	}
 
-	void AddData(std::vector<uint8_t> Data, size_t Width, size_t Height, int Format) {
-		if (Format == GL_RGB) {
-			for (size_t index = 0; index < Width * Height; index++) {
-				ArrayData.push_back(Data[(index * 3)]);
-				ArrayData.push_back(Data[(index * 3) + 1]);
-				ArrayData.push_back(Data[(index * 3) + 2]);
-				ArrayData.push_back(255);
+	void AddData(std::vector<uint8_t> data, size_t width, size_t height, int format) {
+		if (format == GL_RGB) {
+			for (size_t index = 0; index < width * height; index++) {
+				array_data_.push_back(data[(index * 3)]);
+				array_data_.push_back(data[(index * 3) + 1]);
+				array_data_.push_back(data[(index * 3) + 2]);
+				array_data_.push_back(255);
 			}
-			Layers++;
-		} else  if (Format == GL_RGBA) {
-			for (size_t index = 0; index < Width * Height; index++) {
-				ArrayData.push_back(Data[(index * 4)]);
-				ArrayData.push_back(Data[(index * 4) + 1]);
-				ArrayData.push_back(Data[(index * 4) + 2]);
-				ArrayData.push_back(Data[(index * 4) + 3]);
+			layers_++;
+		} else  if (format == GL_RGBA) {
+			for (size_t index = 0; index < width * height; index++) {
+				array_data_.push_back(data[(index * 4)]);
+				array_data_.push_back(data[(index * 4) + 1]);
+				array_data_.push_back(data[(index * 4) + 2]);
+				array_data_.push_back(data[(index * 4) + 3]);
 			}
-			Layers++;
+			layers_++;
 		}
-		else  if (Format == GL_RG) {
-			for (size_t index = 0; index < Width * Height; index++) {
-				ArrayData.push_back(Data[(index * 2)]);
-				ArrayData.push_back(Data[(index * 2)]);
-				ArrayData.push_back(Data[(index * 2)]);
-				ArrayData.push_back(Data[(index * 2) + 1]);
+		else  if (format == GL_RG) {
+			for (size_t index = 0; index < width * height; index++) {
+				array_data_.push_back(data[(index * 2)]);
+				array_data_.push_back(data[(index * 2)]);
+				array_data_.push_back(data[(index * 2)]);
+				array_data_.push_back(data[(index * 2) + 1]);
 			}
-			Layers++;
+			layers_++;
 		}
-		else if (Format == GL_RED) {
-			for (size_t index = 0; index < Width * Height; index++) {
-				ArrayData.push_back(Data[index]);
-				ArrayData.push_back(Data[index]);
-				ArrayData.push_back(Data[index]);
-				ArrayData.push_back(255);
+		else if (format == GL_RED) {
+			for (size_t index = 0; index < width * height; index++) {
+				array_data_.push_back(data[index]);
+				array_data_.push_back(data[index]);
+				array_data_.push_back(data[index]);
+				array_data_.push_back(255);
 			}
-			Layers++;
+			layers_++;
 		}
 		else {
 			throw std::runtime_error("Invalid texture type not handled");
 		}
 	}
 
-	bool _AddTextureToArray(RawTextureData* Data) {
-
-
+	bool AddTextureToArray(RawTextureData* data) {
 		format_ = GL_RGBA;
-		if (!Data->data) {
-			Logger.LogError("Texture Array Loader", "No texture");
+		if (!data->data_) {
+			g_logger.LogError("Texture Array Loader", "No texture");
 			return false;
 		}
 
-		if (((Data->width % width_) != 0) || ((Data->height % height_) != 0)) {
-			Logger.LogError("Texture Array Loader", "Width or height doesn't match");
+		if (((data->width_ % width_) != 0) || ((data->height_ % height_) != 0)) {
+			g_logger.LogError("Texture Array Loader", "Width or height doesn't match");
 			return false;
 		}
 
-		size_t ImgsX = Data->width / width_;
-		size_t ImgsY = Data->height / height_;
+		size_t imgsX = data->width_ / width_;
+		size_t imgsY = data->height_ / height_;
 
 		int colorSize = 3;
 
-		if (Data->format == GL_RGBA) {
+		if (data->format_ == GL_RGBA) {
 			colorSize = 4;
 		}
-		if (Data->format == GL_RG) {
+		if (data->format_ == GL_RG) {
 			colorSize = 2;
 		}
-		else if (Data->format == GL_RED) {
+		else if (data->format_ == GL_RED) {
 			colorSize = 1;
 		}
 
 		size_t cWidth = width_ * colorSize;
 
-		for (int x = 0; x < ImgsX; x++) {
-			for (int y = 0; y < ImgsY; y++) {
+		for (int x = 0; x < imgsX; x++) {
+			for (int y = 0; y < imgsY; y++) {
 				size_t gx = x * width_ * colorSize;
-				size_t gy = y * height_ * Data->width * colorSize;
+				size_t gy = y * height_ * data->width_ * colorSize;
 
 				std::vector<uint8_t> buffer(width_ * height_ * colorSize);
 
 				for (int h = 0; h < height_; h++) {
-					memcpy(buffer.data() + (h * cWidth), Data->data + (h * Data->width * colorSize + gx + gy), cWidth);
+					memcpy(buffer.data() + (h * cWidth), data->data_ + (h * data->width_ * colorSize + gx + gy), cWidth);
 				}
 
-				AddData(buffer, width_, height_, Data->format);
+				AddData(buffer, width_, height_, data->format_);
 			}
 		}
 
@@ -117,21 +115,21 @@ public:
 	std::optional<RawTextureData> AddTextureToArray(std::string file) {
 		std::optional<RawTextureData> data;
 		RawTextureData tex = GetImageData(file.c_str());
-		if (_AddTextureToArray(&tex)) {
-			Logger.LogInfo("Image Loader", "Loaded: " + file + " | Size: " + std::to_string(tex.height) + ", " + std::to_string(tex.width));
+		if (AddTextureToArray(&tex)) {
+			g_logger.LogInfo("Image Loader", "Loaded: " + file + " | Size: " + std::to_string(tex.height_) + ", " + std::to_string(tex.width_));
 			data = tex;
 			return data;
 		}
-		Logger.LogError("Image Loader", "Unable to load: " + file);
+		g_logger.LogError("Image Loader", "Unable to load: " + file);
 		return data;
 	}
 
 	int GetLayers() {
-		return Layers;
+		return layers_;
 	}
 
-	std::vector<unsigned char> ArrayData;
+	std::vector<unsigned char> array_data_;
 
-	int Layers = 0;
+	int layers_ = 0;
 
 };

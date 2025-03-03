@@ -1,11 +1,11 @@
 #include "DebugScreen.h"
 
 void DebugScreen::Render() {
-	renderer.RenderFont();
+	renderer_.RenderFont();
 }
 
 void DebugScreen::Update() {
-	renderer.ConstructBuffer();
+	renderer_.ConstructBuffer();
 }
 
 void DebugScreen::EditText(std::string name, const char* c) {
@@ -13,32 +13,32 @@ void DebugScreen::EditText(std::string name, const char* c) {
 }
 
 void DebugScreen::EditText(std::string name, std::string text) {
-	renderer.EditFontText(name, text);
+	renderer_.EditFontText(name, text);
 }
 
 void DebugScreen::Initialize(GLFWwindow* w) {
-	window = w;
-	renderer.InitializeTextRenderer(w);
+	window_ = w;
+	renderer_.InitializeTextRenderer(w);
 	glm::vec3 clr = glm::vec3(0.2f, 0.2f, 0.2f);
 	float a = 0.5;
 
-	RenderableFont VersionFont;
-	VersionFont.FontSize(0.05f);
-	VersionFont.SetText(std::string("Version 1.3.0A"));
-	VersionFont.SetPosition(glm::vec2(-1.f, 0.95f));
-	VersionFont.AddBackground(clr, a);
+	RenderableFont versionFont;
+	versionFont.FontSize(0.05f);
+	versionFont.SetText(std::string("Version 1.3.0A"));
+	versionFont.SetPosition(glm::vec2(-1.f, 0.95f));
+	versionFont.AddBackground(clr, a);
 
 	for (int i = 1; i <= 10; i++) {
-		RenderableFont Stat;
-		Stat.FontSize(0.04f);
-		Stat.SetText(std::string("N/A"));
-		Stat.SetPosition(glm::vec2(-1.f, 0.95f - 0.05f * i));
-		Stat.AddBackground(clr, a);
-		Stat.setBackgroundPadding(0.005f, 0.0f);
-		renderer.InsertFontObject("Stat" + std::to_string(i), Stat);
+		RenderableFont stat;
+		stat.FontSize(0.04f);
+		stat.SetText(std::string("N/A"));
+		stat.SetPosition(glm::vec2(-1.f, 0.95f - 0.05f * i));
+		stat.AddBackground(clr, a);
+		stat.setBackgroundPadding(0.005f, 0.0f);
+		renderer_.InsertFontObject("Stat" + std::to_string(i), stat);
 	}
 
-	renderer.InsertFontObject("Title", VersionFont);
+	renderer_.InsertFontObject("Title", versionFont);
 
 	Update();
 }

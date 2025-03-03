@@ -176,9 +176,9 @@ void WorldInteractions::AddChunks(vector<Chunk*> chunks) {
 
 	{
 		std::lock_guard<std::mutex> lock{ updated_chunk_lock_ };
-		for (const ChunkPos& id : chunkToUpdate) {
-			if (!updated_chunk_.count(id)) {
-				updated_chunk_.insert(id);
+		for (const ChunkPos& pos : chunkToUpdate) {
+			if (!updated_chunk_.count(pos)) {
+				updated_chunk_.insert(pos);
 			}
 
 		}
@@ -231,10 +231,8 @@ void WorldInteractions::SetBlock(BlockID b, const BlockPos& bpos) {
 		RequestLightUpdate(pos);
 	}
 	catch (exception& e) {
-		//UpdatedChunkLock.unlock();
-		Logger.LogError("World Exception", e.what());
+		g_logger.LogError("World Exception", e.what());
 	}
-	//UpdatedChunkLock.unlock();
 }
 
 BlockID WorldInteractions::GetBlock(const BlockPos& pos) {
@@ -242,8 +240,8 @@ BlockID WorldInteractions::GetBlock(const BlockPos& pos) {
 		return world->GetBlock(pos);
 	}
 	catch (exception& e) {
-		Logger.LogError("World", e.what());
-		return Blocks.AIR;
+		g_logger.LogError("World", e.what());
+		return g_blocks.AIR;
 	}
 }
 

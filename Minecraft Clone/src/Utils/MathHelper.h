@@ -16,8 +16,3 @@ double FindDistance(glm::vec3 pos0, glm::vec3 pos1);
 double FindDistance(glm::vec2 pos0, glm::vec2 pos1);
 
 template <typename T> double FindDistance(T x, T x1);
-
-long long unsigned int getChunkPos(int x, int y, int z);
-long long unsigned int getChunkPos(glm::ivec3 vec);
-
-glm::ivec3 ChunkPosToPOS(long long unsigned int n);

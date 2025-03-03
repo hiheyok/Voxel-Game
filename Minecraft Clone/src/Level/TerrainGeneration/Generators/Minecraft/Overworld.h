@@ -33,19 +33,18 @@ public:
     std::vector<float> biomeWeights;
     std::vector<Biome*> biomesForGeneration;
 
-    OverworldGenerator(int64_t seed, ChunkGeneratorSettings setting) {
-        settings_ = setting;
-
-        rand = JavaRandom(seed);
-        minLimitPerlinNoise = NoiseOctave(rand, 16);
-        maxLimitPerlinNoise = NoiseOctave(rand, 16);
-        mainPerlinNoise = NoiseOctave(rand, 8);
-        surfaceNoise = NoiseGeneratorPerlin(rand, 4);
-        scaleNoise = NoiseOctave(rand, 10);
-        depthNoise = NoiseOctave(rand, 16);
-        biomeWeights = std::vector<float>(25);
-        heightMap = std::vector<double>(825);
-        depthBuffer = std::vector<double>(256);
+    OverworldGenerator(int64_t seed, ChunkGeneratorSettings setting) : 
+        rand{ JavaRandom(seed) }, 
+        minLimitPerlinNoise{ NoiseOctave(rand, 16) },
+        maxLimitPerlinNoise{ NoiseOctave(rand, 16) }, 
+        mainPerlinNoise{ NoiseOctave(rand, 8) },
+        surfaceNoise{ NoiseGeneratorPerlin(rand, 4) }, 
+        scaleNoise{ NoiseOctave(rand, 10) },
+        depthNoise{ NoiseOctave(rand, 16) }, 
+        biomeWeights{ std::vector<float>(25) },
+        heightMap{ std::vector<double>(825) }, 
+        depthBuffer{ std::vector<double>(256) },
+        settings_{ setting } {
 
         for (int i = -2; i <= 2; ++i) {
             for (int j = -2; j <= 2; ++j) {

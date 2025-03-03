@@ -12,7 +12,7 @@ Chunk* MathWorld::Generate(const ChunkPos& pos) {
 		for (int y = 0; y < 16; y++) {
 			for (int z = 0; z < 16; z++) {
 
-				if ((chunk->GetBlock(x, y, z) == Blocks.RED_STAINED_GLASS) || (chunk->GetBlock(x, y, z) == Blocks.BLACK_STAINED_GLASS))
+				if ((chunk->GetBlock(x, y, z) == g_blocks.RED_STAINED_GLASS) || (chunk->GetBlock(x, y, z) == g_blocks.BLACK_STAINED_GLASS))
 					continue;
 
 				glm::vec3 globalPos(cx + x, cy + y, cz + z);
@@ -32,7 +32,7 @@ Chunk* MathWorld::Generate(const ChunkPos& pos) {
 				//}
 
 				if (gz * gz + gy * gy > 4) {
-					chunk->SetBlock(Blocks.BRICKS, x, y, z);
+					chunk->SetBlock(g_blocks.BRICKS, x, y, z);
 				}
 
 				int Unit = 1;
@@ -42,12 +42,12 @@ Chunk* MathWorld::Generate(const ChunkPos& pos) {
 					if (((int)globalPos.z % (Unit * (int)zoom)) == 0) {
 						for (int i = -UnitSize; i <= UnitSize; i++) {
 							for (int j = -UnitSize; j <= UnitSize; j++) {
-								chunk->SetBlock(Blocks.RED_STAINED_GLASS, x + j, y + i, z);
+								chunk->SetBlock(g_blocks.RED_STAINED_GLASS, x + j, y + i, z);
 							}
 						}
 					}
 					else {
-						chunk->SetBlock(Blocks.BLACK_STAINED_GLASS, x, y, z);
+						chunk->SetBlock(g_blocks.BLACK_STAINED_GLASS, x, y, z);
 					}
 
 				}
@@ -55,24 +55,24 @@ Chunk* MathWorld::Generate(const ChunkPos& pos) {
 					if (((int)globalPos.x % (Unit * (int)zoom)) == 0) {
 						for (int i = -UnitSize; i <= UnitSize; i++) {
 							for (int j = -UnitSize; j <= UnitSize; j++) {
-								chunk->SetBlock(Blocks.RED_STAINED_GLASS, x, y + i, z + j);
+								chunk->SetBlock(g_blocks.RED_STAINED_GLASS, x, y + i, z + j);
 							}
 						}
 					}
 					else {
-						chunk->SetBlock(Blocks.BLACK_STAINED_GLASS, x, y, z);
+						chunk->SetBlock(g_blocks.BLACK_STAINED_GLASS, x, y, z);
 					}
 				}
 				if (gz == 0 && gx == 0) {
 					if (((int)globalPos.y % (Unit * (int)zoom)) == 0) {
 						for (int i = -UnitSize; i <= UnitSize; i++) {
 							for (int j = -UnitSize; j <= UnitSize; j++) {
-								chunk->SetBlock(Blocks.RED_STAINED_GLASS, x + i, y, z + j);
+								chunk->SetBlock(g_blocks.RED_STAINED_GLASS, x + i, y, z + j);
 							}
 						}
 					}
 					else {
-						chunk->SetBlock(Blocks.BLACK_STAINED_GLASS, x, y, z);
+						chunk->SetBlock(g_blocks.BLACK_STAINED_GLASS, x, y, z);
 					}
 				}
 

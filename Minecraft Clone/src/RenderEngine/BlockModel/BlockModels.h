@@ -28,8 +28,8 @@ struct BlockFace {
 	std::string reference_texture_ = ""; // variables starts with #
 	int cull_face_ = -1;
 	int tint_index_ = -1;
-	unsigned int texture_id_ = NULL;
-	unsigned int texture_count_ = NULL; //For amination purposes.
+	size_t texture_id_ = NULL;
+	size_t texture_count_ = NULL; //For amination purposes.
 	unsigned int rotation_ = 0;
 	bool has_transparency_ = false;
 	bool is_see_through_ = false;
@@ -131,6 +131,7 @@ namespace ModelV2 {
 									to.x, from.y,	to.z,		uv0.x, uv0.y,	(float)face.texture_id_,	8.f,
 								}
 						);
+						break;
 					case 1:
 						(i & 1) == 1 ?
 							vertices.insert(vertices.end(),
@@ -149,6 +150,7 @@ namespace ModelV2 {
 									from.x, to.y,	to.z,		uv1.x, uv1.y,	(float)face.texture_id_,	15.f,
 								}
 						);
+						break;
 					case 2:
 						(i & 1) == 1 ?
 							vertices.insert(vertices.end(),
@@ -167,6 +169,7 @@ namespace ModelV2 {
 									from.x, to.y,	to.z,		uv1.x, uv1.y,	(float)face.texture_id_,	12.f,
 								}
 						);
+						break;
 
 					}
 
@@ -178,8 +181,6 @@ namespace ModelV2 {
 							}
 						);
 					}
-					
-
 				}
 			}
 		}

@@ -2,13 +2,13 @@
 template <class T>
 class FixedFIFOQueue {
 private:
-	T* mBuffer = NULL;
-	bool mIsInitialized = false;
+	T* buffer_ = NULL;
+	bool is_initialized_ = false;
 
-	uint64_t startPtr = 0;
-	uint64_t endPtr = 0;
-	uint64_t mQueueSize = 0;
-	uint64_t mElementCount = 0;
+	uint64_t start_ptr_ = 0;
+	uint64_t end_ptr_ = 0;
+	uint64_t queue_size_ = 0;
+	uint64_t element_count_ = 0;
 public:
 	FixedFIFOQueue() {
 
@@ -18,49 +18,49 @@ public:
 		setSize(size);
 	}
 
-	void setSize(uint64_t pSize) {
-		if (mIsInitialized) delete[] mBuffer;
-		mQueueSize = pSize;
-		mBuffer = new T[mQueueSize];
-		mIsInitialized = true;
+	void setSize(uint64_t size) {
+		if (is_initialized_) delete[] buffer_;
+		queue_size_ = size;
+		buffer_ = new T[queue_size_];
+		is_initialized_ = true;
 	}
 
 	inline void push(const T& obj) {
-		mBuffer[endPtr++] = obj;
-		endPtr = endPtr % mQueueSize;
-		++mElementCount;
+		buffer_[end_ptr_++] = obj;
+		end_ptr_ = end_ptr_ % queue_size_;
+		++element_count_;
 	}
 
 	inline T get() {
-		T out = mBuffer[startPtr++];
-		startPtr = startPtr % mQueueSize;
-		--mElementCount;
+		T out = buffer_[start_ptr_++];
+		start_ptr_ = start_ptr_ % queue_size_;
+		--element_count_;
 		return out;
 	}
 
 	void resetData() {
-		startPtr = 0;
-		endPtr = 0;
-		mElementCount = 0;
+		start_ptr_ = 0;
+		end_ptr_ = 0;
+		element_count_ = 0;
 	}
 
 	void clear() {
-		if (mIsInitialized) delete[] mBuffer;
-		startPtr = 0;
-		endPtr = 0;
-		mQueueSize = 0;
-		mElementCount = 0;
-		mIsInitialized = false;
+		if (is_initialized_) delete[] buffer_;
+		start_ptr_ = 0;
+		end_ptr_ = 0;
+		queue_size_ = 0;
+		element_count_ = 0;
+		is_initialized_ = false;
 	}
 
 	
 
-	inline bool isEmpty() {
-		return mElementCount <= 0;
+	inline bool IsEmpty() {
+		return element_count_ <= 0;
 	}
 
-	inline bool isFull() {
-		return mElementCount >= mQueueSize;
+	inline bool IsFull() {
+		return element_count_ >= queue_size_;
 	}
 
 	

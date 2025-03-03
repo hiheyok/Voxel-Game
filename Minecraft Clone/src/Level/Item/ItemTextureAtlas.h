@@ -38,7 +38,7 @@ public:
 	
 	Texture2D atlas_;
 
-	FastHashMap<int, int> offsets_;
+	FastHashMap<ItemID, size_t> offsets_;
 	
 	void Initialize(int atlasItemSize, int individualItemSize);
 

@@ -10,9 +10,9 @@ class Buffer {
 public:
 	void GenBuffer();
 
-	void SetType(GLenum Type_);
-	void SetMaxSize(size_t MaxSize_);
-	void SetUsage(GLenum DrawType_);
+	void SetType(GLenum type);
+	void SetMaxSize(size_t maxSize);
+	void SetUsage(GLenum drawType);
 
 	void ResetBuffer();
 
@@ -20,9 +20,9 @@ public:
 
 	void Delete();
 
-	void BindBase(int Index);
+	void BindBase(int index);
 
-	void UnbindBase(int Index);
+	void UnbindBase(int index);
 
 	void Bind();
 
@@ -30,20 +30,20 @@ public:
 
 	void getData(uint32_t* ptr, size_t offset, size_t size);
 
-	void CopyFrom(Buffer buffer, size_t ReadOffset, size_t WriteOffset, size_t Size);
+	void CopyFrom(Buffer buffer, size_t readOffset, size_t writeOffset, size_t size);
 
 	unsigned int GetID();
 
-	void InsertData(GLsizeiptr Size, const void* Data, GLenum Usage);
+	void InsertData(GLsizeiptr size, const void* data, GLenum usage);
 	void InsertSubData(GLintptr Offset, GLsizeiptr Size, const void* Data);
 
 	void SetStorage(int size);
 
 	void CopyTo(Buffer& destination, size_t offset, size_t desOffset, size_t size);
 
-	size_t MaxSize = NULL;
-	unsigned int BufferID = NULL;
-	GLenum Type = NULL, Usage = NULL;
+	size_t max_size_ = NULL;
+	unsigned int buffer_id_ = NULL;
+	GLenum type_ = NULL, usage_ = NULL;
 	
 };
 
@@ -51,37 +51,37 @@ class BufferStorage {
 public:
 
 	void Delete() {
-		glDeleteBuffers(1, &BufferStorageID);
+		glDeleteBuffers(1, &buffer_storage_id_);
 	}
 
 	void Bind() {
-		glBindBuffer(Target, BufferStorageID);
+		glBindBuffer(target_, buffer_storage_id_);
 	}
 
 	void Unbind() {
-		glBindBuffer(Target, 0);
+		glBindBuffer(target_, 0);
 	}
 
-	void Create(GLuint BufferTarget, uint64_t Size) {
-		Target = BufferTarget;
-		MaxSize = Size;
+	void Create(GLuint bufferTarget, uint64_t size) {
+		target_ = bufferTarget;
+		max_size_ = size;
 
-		glGenBuffers(1, &BufferStorageID);
+		glGenBuffers(1, &buffer_storage_id_);
 		Bind();
 		GLbitfield flags = GL_MAP_PERSISTENT_BIT | GL_MAP_READ_BIT | GL_DYNAMIC_STORAGE_BIT;
-		glBufferStorage(Target, Size, nullptr, flags);
+		glBufferStorage(target_, size, nullptr, flags);
 	}
 
 	void InsertData(uint64_t Offset, uint64_t Size, const void* data) {
 		Bind();
-		glBufferSubData(Target, Offset, Size, data);
+		glBufferSubData(target_, Offset, Size, data);
 		Unbind();
 	}
 
-	void CopyFrom(Buffer& buffer, size_t ReadOffset, size_t WriteOffset, size_t Size) {
+	void CopyFrom(Buffer& buffer, size_t readOffset, size_t writeOffset, size_t size) {
 		Bind();
 		buffer.Bind();
-		glCopyBufferSubData(buffer.Type, Target, ReadOffset, WriteOffset, Size);
+		glCopyBufferSubData(buffer.type_, target_, readOffset, writeOffset, size);
 		Unbind();
 		buffer.Unbind();
 	}
@@ -89,15 +89,15 @@ public:
 	void CopyTo(Buffer& buffer, size_t ReadOffset, size_t WriteOffset, size_t Size) {
 		Bind();
 		buffer.Bind();
-		glCopyBufferSubData(Target, buffer.Type, ReadOffset, WriteOffset, Size);
+		glCopyBufferSubData(target_, buffer.type_, ReadOffset, WriteOffset, Size);
 		Unbind();
 		buffer.Unbind();
 	}
 	
 private:
-	unsigned int BufferStorageID = NULL;
-	uint64_t MaxSize = NULL;
-	GLenum Target = NULL;
+	unsigned int buffer_storage_id_ = NULL;
+	uint64_t max_size_ = NULL;
+	GLenum target_ = NULL;
 };
 
 class VertexArray {
@@ -112,7 +112,7 @@ public:
 
 	void ResetArray();
 
-	void EnableAttriPTR(GLuint Index, GLint Size, GLenum Type, GLboolean normalized, GLsizei Stride, int SubIndex);
+	void EnableAttriPTR(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, int subIndex);
 private:
-	unsigned int ArrayID = NULL;
+	unsigned int array_id_ = NULL;
 };

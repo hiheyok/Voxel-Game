@@ -23,8 +23,8 @@ public:
 	static NoiseGeneratorPerlin TEMPERATURE_NOISE;
 	static NoiseGeneratorPerlin GRASS_COLOR_NOISE;
 
-	BlockID topBlock = Blocks.GRASS;
-	BlockID fillerBlock = Blocks.DIRT;
+	BlockID topBlock = g_blocks.GRASS;
+	BlockID fillerBlock = g_blocks.DIRT;
 
 	enum TempCategory {
 		OCEAN,
@@ -34,9 +34,9 @@ public:
 	};
 
 	static void Register(int ID, std::string BiomeName, Biome* biome) {
-		REGISTRY.Register(ID, ResourceLocation(BiomeName).PATH, biome);
+		REGISTRY.Register(ID, ResourceLocation(BiomeName).path_, biome);
 		BiomeIDs[biome] = ID;
-		Logger.LogDebug("Biome", "Registered biome: " + BiomeName);
+		g_logger.LogDebug("Biome", "Registered biome: " + BiomeName);
 		if (biome->isMutation()) {
 			MUTATION_TO_BASE_ID_MAP[ID] = biome;
 		}
@@ -54,7 +54,7 @@ public:
 	}
 
 	static Biome* getBiomeForId(int ID) {
-		return REGISTRY.GetValue(REGISTRY.getKey(ID));
+		return REGISTRY.GetValue(REGISTRY.GetKey(ID));
 	}
 
 	static Biome* getBiome(int id) {
@@ -64,10 +64,10 @@ public:
 	static Biome* getBiome(int biomeId, Biome* fallback) {
 		Biome* biome = nullptr;
 		try {
-			biome = REGISTRY.GetValue(REGISTRY.getKey(biomeId));
+			biome = REGISTRY.GetValue(REGISTRY.GetKey(biomeId));
 		}
-		catch (std::exception& e) {
-			//do nothing
+		catch (const std::exception& e) {
+			g_logger.LogError("Biome", e.what());
 		}
 		
 		return biome == nullptr ? fallback : biome;
@@ -156,7 +156,7 @@ public:
 	}
 
 	BlockID GetBlockChunkSafe(TallChunk* chunk, int x, int y, int z) {
-		if ((x | (y >> 4) | z) >> 4) return Blocks.AIR;
+		if ((x | (y >> 4) | z) >> 4) return g_blocks.AIR;
 		return chunk->GetBlockUnsafe( x, y, z);
 	}
 
@@ -174,24 +174,24 @@ public:
 		{
 			if (j1 <= rand.NextInt(5))
 			{
-				chunk->SetBlockUnsafe(i1, j1, l, Blocks.BEDROCK);
+				chunk->SetBlockUnsafe(i1, j1, l, g_blocks.BEDROCK);
 			}
 			else
 			{
 				BlockID iblockstate2 = chunk->GetBlockUnsafe(i1, j1, l);
 
-				if (iblockstate2 == Blocks.AIR)
+				if (iblockstate2 == g_blocks.AIR)
 				{
 					j = -1;
 				}
-				else if (iblockstate2 == Blocks.STONE)
+				else if (iblockstate2 == g_blocks.STONE)
 				{
 					if (j == -1)
 					{
 						if (k <= 0)
 						{
-							iblockstate = Blocks.AIR;
-							iblockstate1 = Blocks.STONE;
+							iblockstate = g_blocks.AIR;
+							iblockstate1 = g_blocks.STONE;
 						}
 						else if (j1 >= i - 4 && j1 <= i + 1)
 						{
@@ -199,15 +199,15 @@ public:
 							iblockstate1 = fillerBlock;
 						}
 
-						if (j1 < i && (iblockstate == Blocks.AIR))
+						if (j1 < i && (iblockstate == g_blocks.AIR))
 						{
 							if (getTemperature(glm::ivec3(x, j1, z)) < 0.15F)
 							{
-								iblockstate = Blocks.ICE;
+								iblockstate = g_blocks.ICE;
 							}
 							else
 							{
-								iblockstate = Blocks.WATER;
+								iblockstate = g_blocks.WATER;
 							}
 						}
 
@@ -219,9 +219,9 @@ public:
 						}
 						else if (j1 < i - 7 - k)
 						{
-							iblockstate = Blocks.AIR;
-							iblockstate1 = Blocks.STONE;
-							chunk->SetBlockUnsafe(i1, j1, l, Blocks.GRAVEL);
+							iblockstate = g_blocks.AIR;
+							iblockstate1 = g_blocks.STONE;
+							chunk->SetBlockUnsafe(i1, j1, l, g_blocks.GRAVEL);
 						}
 						else
 						{
@@ -233,10 +233,10 @@ public:
 						--j;
 						chunk->SetBlockUnsafe(i1, j1, l, iblockstate1);
 
-						if (j == 0 && iblockstate1 == Blocks.SAND && k > 1)
+						if (j == 0 && iblockstate1 == g_blocks.SAND && k > 1)
 						{
 							j = rand.NextInt(4) + std::max(0, j1 - 63);
-							iblockstate1 = Blocks.RED_SAND;
+							iblockstate1 = g_blocks.RED_SAND;
 						}
 					}
 				}

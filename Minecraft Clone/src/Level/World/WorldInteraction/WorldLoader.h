@@ -32,7 +32,7 @@ public:
 
 	WorldLoader(World* w, WorldParameters p) : settings_(p), world(w) {}
 
-	WorldAccess* GetWorld();
+	WorldAccess* GetWorld() const;
 
 	void ReplaceLightInfomation(std::shared_ptr<ChunkLightingContainer> lighting);
 
@@ -42,7 +42,7 @@ public:
 
 	void DeleteEntityChunkLoader(EntityUUID uuid);
 
-	bool CheckEntityExistChunkLoader(EntityUUID uuid);
+	bool CheckEntityExistChunkLoader(EntityUUID uuid) const;
 
 	void Load();
 

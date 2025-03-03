@@ -1,5 +1,4 @@
 #pragma once
-#include <mimalloc.h>
 #include <vector>
 #include "../Utils/Containers/skaHashmap.h"
 
@@ -17,7 +16,7 @@ template <class V>
 using FastHashSet = ska::flat_hash_set<V>;
 
 template <class T>
-using FastVector = std::vector<T, mi_stl_allocator<T>>;
+using FastVector = std::vector<T>;
 
 
 constexpr int FRONT = 0x00;

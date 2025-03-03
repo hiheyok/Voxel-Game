@@ -3,41 +3,42 @@
 bool Options::SetValue(std::string name, std::string value) {
 	int val = stoi(value);
 
-	if (!OptionName.count(name)) {
-		Logger.LogError("Option", "Unknown option: " + name);
+	if (!option_name_.count(name)) {
+		g_logger.LogError("Option", "Unknown option: " + name);
 		return false;
 	}
 
-	*OptionName[name] = val;
+	*option_name_[name] = val;
 	return true;
 }
 
 void Options::ProcessTokens(std::vector<std::string> tokens) {
-	bool Success = true;
+	bool success = true;
 
 	for (int i = 0; i < (tokens.size() / 2); i++) {
 		std::string name = tokens[2 * i];
 		std::string val = tokens[2 * i + 1];
+		g_logger.LogDebug("Options", name + ":" + val);
 		if (!SetValue(name, val)) {
-			Success = false;
+			success = false;
 		}
 	}
 	//Regenerate file if it has an error in it
-	if (!Success) {
+	if (!success) {
 		FileManager::DeleteFile("options.txt");
 		GenerateOptionFile();
 	}
 }
 
 void Options::SetOptionNameTable() {
-	OptionName.insert(std::pair<std::string, int*>("HorizontalRenderDistance", &horizontal_render_distance_));
-	OptionName.insert(std::pair<std::string, int*>("VerticalRenderDistance", &vertical_render_distance_));
-	OptionName.insert(std::pair<std::string, int*>("WorldGenThreads", &WorldGenThreads));
-	OptionName.insert(std::pair<std::string, int*>("MeshThreads", &MeshThreads));
-	OptionName.insert(std::pair<std::string, int*>("GraphicsScale", &GraphicsScale));
-	OptionName.insert(std::pair<std::string, int*>("TransparentBufferSize", &TransparentBufferSize));
-	OptionName.insert(std::pair<std::string, int*>("SolidBufferSize", &SolidBufferSize));
-	OptionName.insert(std::pair<std::string, int*>("LightEngineThreads", &LightEngineThreads));
+	option_name_.insert(std::pair<std::string, int*>("HorizontalRenderDistance", &horizontal_render_distance_));
+	option_name_.insert(std::pair<std::string, int*>("VerticalRenderDistance", &vertical_render_distance_));
+	option_name_.insert(std::pair<std::string, int*>("WorldGenThreads", &world_gen_threads_));
+	option_name_.insert(std::pair<std::string, int*>("MeshThreads", &mesh_threads_));
+	option_name_.insert(std::pair<std::string, int*>("GraphicsScale", &graphics_scale_));
+	option_name_.insert(std::pair<std::string, int*>("TransparentBufferSize", &transparent_buffer_size_));
+	option_name_.insert(std::pair<std::string, int*>("SolidBufferSize", &solid_buffer_size_));
+	option_name_.insert(std::pair<std::string, int*>("LightEngineThreads", &light_engine_threads_));
 }
 
 void Options::GenerateOptionFile() { //Generate file if deleted
@@ -45,10 +46,11 @@ void Options::GenerateOptionFile() { //Generate file if deleted
 
 	std::ofstream file("options.txt");
 
-	for (const auto& Option : OptionName) {
-		std::string str = Option.first + ":" + std::to_string((*Option.second));
+	for (const auto& option : option_name_) {
+		std::string str = option.first + ":" + std::to_string((*option.second));
 		file << str << "\n";
 	}
 
 	file.close();
+	g_logger.LogDebug("Option", "Generated option file");
 }

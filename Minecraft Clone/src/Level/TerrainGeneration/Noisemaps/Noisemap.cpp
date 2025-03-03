@@ -21,14 +21,14 @@ void NoiseMapTypes::Initialize(int32_t SEED) {
 	OctaveNoise.SetFrequency(1.f);
 	OctaveNoise.SetSeed(SEED + SEED_OFFSET * 5);
 
-	double Half = 1.0;
-	double Two = 1;
+	float Half = 1.0;
+	float Two = 1;
 
 	for (int i = 0; i < 32; i++) {
 		PowTableHalf[i] = Half;
 		PowTable[i] = Two;
-		Half = Half * 0.5;
-		Two = Two * 2.0;
+		Half = Half * 0.5f;
+		Two = Two * 2.0f;
 	}
 }
 

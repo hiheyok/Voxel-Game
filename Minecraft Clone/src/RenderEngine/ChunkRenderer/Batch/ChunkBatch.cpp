@@ -149,7 +149,7 @@ void ChunkDrawBatch::DeleteChunkVertices(const ChunkPos& id) {
 	if (memory_pool_.CheckChunk(id)) {
 		ChunkMemoryPoolOffset ChunkMemOffset = memory_pool_.GetChunkMemoryPoolOffset(id);
 		if (ChunkMemOffset.mem_offset_ == ULLONG_MAX) {
-			Logger.LogError("Chunk Batch", "Failed to delete chunk: " + std::to_string(id));
+			g_logger.LogError("Chunk Batch", "Failed to delete chunk: " + std::to_string(id));
 			return;
 		}
 		render_list_.erase(ChunkMemOffset.mem_offset_);
@@ -186,18 +186,18 @@ void ChunkDrawBatch::Draw() {
 	glMultiDrawArraysIndirect(GL_TRIANGLES, (GLvoid*)0, (GLsizei)amount_of_chunks_being_rendered_, 0);
 }
 
-void ChunkDrawBatch::Defrager(int cycles) {
+void ChunkDrawBatch::Defrager(size_t iterations) {
 	int i = 0;
 
-	int fragmentCount = memory_pool_.memory_pool_.GetFreeSpaceFragmentCount();
+	size_t fragmentCount = memory_pool_.memory_pool_.GetFreeSpaceFragmentCount();
 
 	if (fragmentCount == 1) {
 		return;
 	}
 
-	cycles = std::min(cycles, fragmentCount - 1);
+	iterations = std::min(iterations, fragmentCount - 1);
 
-	while (i < cycles) {
+	while (i < iterations) {
 		i++;
 
 		if (memory_pool_.memory_pool_.free_memory_blocks_.size() == 1) {
@@ -206,7 +206,7 @@ void ChunkDrawBatch::Defrager(int cycles) {
 
 		MemoryManagement::MemoryBlock freeMemoryBlock = memory_pool_.memory_pool_.free_memory_blocks_.begin()->second;
 
-		int freeSpaceOffset = freeMemoryBlock.offset_;
+		size_t freeSpaceOffset = freeMemoryBlock.offset_;
 
 		std::map<size_t, MemoryManagement::MemoryBlock>::iterator Reserve = memory_pool_.memory_pool_.reserved_memory_blocks_.getIterator(freeMemoryBlock.size_ + freeMemoryBlock.offset_);
 
@@ -246,7 +246,7 @@ void ChunkDrawBatch::ErrorCheck() {
 
 	}
 
-	Logger.LogDebug("Chunk Batch", "Errors: \n" + logs);
+	g_logger.LogDebug("Chunk Batch", "Errors: \n" + logs);
 
 
 }

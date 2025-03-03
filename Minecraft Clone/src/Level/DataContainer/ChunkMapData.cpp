@@ -47,7 +47,7 @@ bool ChunkMap::SetBlockGlobal(BlockID block, const BlockPos& pos) {
 }
 
 bool ChunkMap::CheckChunk(const ChunkPos& pos) const {
-	if (!CheckRegion(pos)) return Blocks.AIR;
+	if (!CheckRegion(pos)) return g_blocks.AIR;
 	const std::unique_ptr<Region>& reg = GetRegion(pos);
 
 	return reg->CheckChunkGlobalPos(pos.x, pos.y, pos.z);
@@ -63,7 +63,7 @@ BlockID ChunkMap::GetBlockGlobal(const BlockPos& pos) {
 
 	ChunkPos c{ x >> 4 ,y >> 4 ,z >> 4 };
 
-	if (!CheckRegion(c)) return Blocks.AIR;
+	if (!CheckRegion(c)) return g_blocks.AIR;
 
 	int l[3]{ x & 0b1111 ,y & 0b1111,z & 0b1111 };
 
@@ -75,7 +75,7 @@ BlockID ChunkMap::GetBlockGlobal(const BlockPos& pos) {
 	Chunk* chunk = reg->GetChunkGlobalPos(c[0], c[1], c[2]);
 
 	if (chunk == nullptr) {
-		return Blocks.AIR;
+		return g_blocks.AIR;
 	}
 
 	BlockID block = chunk->GetBlock(l[0], l[1], l[2]);

@@ -3,23 +3,23 @@
 using namespace std;
 using namespace glm;
 
-int Server::getChunkCount() {
+size_t Server::GetChunkCount() {
 	return level_.level_loader_.getChunkCount();
 }
 
-double Server::getMSPT() {
+double Server::GetMSPT() {
 	return mspt_;
 }
 
 Timer* Server::GetTimer() {
-	return &time;
+	return &time_;
 }
 
-vector<EntityProperty> Server::getUpdatedEntities() {
+vector<EntityProperty> Server::GetUpdatedEntities() {
 	return level_.main_world_->world_interactions_.getUpdatedEntities();
 }
 
-vector<EntityUUID> Server::getRemovedEntities() {
+vector<EntityUUID> Server::GetRemovedEntities() {
 	return level_.main_world_->world_interactions_.getRemovedEntities();
 }
 
@@ -27,7 +27,7 @@ bool Server::CheckEntityOnGround(EntityUUID id) {
 	return level_.main_world_->world_interactions_.collusions_.isEntityOnGround(level_.main_world_->world_interactions_.GetEntity(id));
 }
 
-void Server::join(Entity& entity) {
+void Server::Join(Entity& entity) {
 	level_.main_world_->world_interactions_.summonEntity(entity);
 }
 
@@ -53,32 +53,32 @@ vec3 Server::GetEntityCollusionTime(EntityUUID entity) {
 
 void Server::StartServer(ServerSettings serverSettings) {
 	level_.Start(serverSettings.gen_thread_count_, serverSettings.light_engine_thread_count_);
-	stop = false;
+	stop_ = false;
 	settings_ = serverSettings;
 	main_server_loop_ = thread(&Server::Loop, this);
 }
 
 void Server::Stop() {
-	stop = true;
+	stop_ = true;
 	main_server_loop_.join();
 	level_.Stop();
 }
 
 void Server::Loop() {
-	Logger.LogDebug("Server", "Started main server loop");
-	while (!stop) {
-		time.Set();
+	g_logger.LogDebug("Server", "Started main server loop");
+	while (!stop_) {
+		time_.Set();
 
 		Tick();
 
-		mspt_ = time.GetTimePassed_ms();
+		mspt_ = time_.GetTimePassed_ms();
 		double timeLeft = (1000.0 / (double)settings_.tick_rate_) - mspt_;
 
 		if (timeLeft > 0) {
-			timerSleepNotPrecise(timeLeft);
+			timerSleepNotPrecise(static_cast<int>(timeLeft));
 		}
 	}
-	Logger.LogDebug("Server", "Shutting down main server loop");
+	g_logger.LogDebug("Server", "Shutting down main server loop");
 }
 
 void Server::Tick() {

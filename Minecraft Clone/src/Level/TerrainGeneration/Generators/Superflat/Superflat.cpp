@@ -8,7 +8,7 @@ Chunk* SuperflatWorld::Generate(const ChunkPos& pos) {
 		for (int z = 0; z < 16; z++) {
 			for (int y = 0; y < 16; y++) {
 				if (y + cy < 10) {
-					chunk->SetBlockUnsafe(Blocks.WHITE_CONCRETE, x, y, z);
+					chunk->SetBlockUnsafe(g_blocks.WHITE_CONCRETE, x, y, z);
 				}
 			}
 		}

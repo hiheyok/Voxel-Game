@@ -1,7 +1,7 @@
 #include "MultiEntityRender.h"
 
 
-int MultiEntityRenderer::GetNumEntityRendered() {
+size_t MultiEntityRenderer::GetNumEntityRendered() {
 	return num_entity_rendered_;
 }
 
@@ -32,15 +32,15 @@ void MultiEntityRenderer::Initialize(PerformanceProfiler* pProfilerIn) {
 
 	}
 
-	shader_.init("assets/shaders/Entity/MultiEntityVert.glsl", "assets/shaders/Entity/MultiEntityFrag.glsl");
-	camera_ = player_.getCamera();
+	shader_.Init("assets/shaders/Entity/MultiEntityVert.glsl", "assets/shaders/Entity/MultiEntityFrag.glsl");
+	camera_ = player_.GetCamera();
 
 	//Initialize Buffers
 
 	for (auto& EntityModels : entity_cached_models_) {
 		Model::ModelData model = EntityModels.second.GetVertices();
 
-		int ModelIndex = entity_vertices_.size() / 5;
+		size_t ModelIndex = entity_vertices_.size() / 5;
 
 		entity_element_index_[EntityModels.first] = entity_indices_.size(); //temp solution
 		entity_element_size_[EntityModels.first] = model.indices_.size();
@@ -147,8 +147,8 @@ void MultiEntityRenderer::Render() {
 		ssbo_vel_.InsertSubData(0, (i * 3) * sizeof(float), velocity_arr_.data());
 		ssbo_acc_.InsertSubData(0, (i * 3) * sizeof(float), acceleration_arr_.data());
 
-		shader_.bindTexture2D(0, g_entity_list.entity_type_list_[entityarr.first]->texture_.get(), "EntityTexture");
-		shader_.use();
+		shader_.BindTexture2D(0, g_entity_list.entity_type_list_[entityarr.first]->texture_.get(), "EntityTexture");
+		shader_.Use();
 
 		vao_.Bind();
 		ebo_.Bind();
@@ -160,7 +160,8 @@ void MultiEntityRenderer::Render() {
 		ssbo_acc_.Bind();
 		ssbo_acc_.BindBase(3);
 
-		glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(entity_element_size_[entityarr.first]), GL_UNSIGNED_INT, (void*)(entity_element_index_[entityarr.first] * sizeof(unsigned int)), i);
+		glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(entity_element_size_[entityarr.first]),
+			GL_UNSIGNED_INT, (void*)(entity_element_index_[entityarr.first] * sizeof(unsigned int)), static_cast<GLsizei>(i));
 
 		ssbo_acc_.UnbindBase(3);
 		ssbo_acc_.Unbind();
@@ -205,14 +206,14 @@ void MultiEntityRenderer::Update() {
 	int y = height;
 	glm::mat4 projection = glm::perspective(glm::radians(camera_->fov_), (float)x / (float)y, 0.1f, 1000000.0f);
 
-	shader_.use();
-	shader_.setMat4("view", view);
-	shader_.setMat4("model", model);
-	shader_.setMat4("projection", projection);
-	shader_.setFloat("RenderDistance", (float)(horizontal_render_distance_ * 16));
-	shader_.setFloat("VerticalRenderDistance", (float)(vertical_render_distance_ * 16));
-	shader_.setVec3("camPos", camera_->position_);
-	shader_.setFloat("TimeDelta", static_cast<float>(time_past_tick_));
+	shader_.Use();
+	shader_.SetMat4("view", view);
+	shader_.SetMat4("model", model);
+	shader_.SetMat4("projection", projection);
+	shader_.SetFloat("RenderDistance", (float)(horizontal_render_distance_ * 16));
+	shader_.SetFloat("VerticalRenderDistance", (float)(vertical_render_distance_ * 16));
+	shader_.SetVec3("camPos", camera_->position_);
+	shader_.SetFloat("TimeDelta", static_cast<float>(time_past_tick_));
 	profiler_->ProfileStop("root/update/entity");
 }
 

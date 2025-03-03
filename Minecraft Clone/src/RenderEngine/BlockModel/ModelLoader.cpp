@@ -51,7 +51,7 @@ int ConvertStringFaceToIndex(const string& str) {
 		return EAST;
 	}
 	else {
-		Logger.LogError("Model Loader", "Unknown direction: " + str);
+		g_logger.LogError("Model Loader", "Unknown direction: " + str);
 		return NULL;
 	}
 
@@ -105,7 +105,7 @@ void ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
 				bFace.rotation_ = faceElements.value();
 			}
 			else {
-				Logger.LogError("Model Loader", "Unknown face attribute: " + faceElements.key());
+				g_logger.LogError("Model Loader", "Unknown face attribute: " + faceElements.key());
 			}
 
 
@@ -137,7 +137,7 @@ CuboidRotationInfo getRotationalData(json JsonData) {
 				rotationInfo.axis_ = 2;
 			}
 			else {
-				Logger.LogError("Model Loader", "Unknown rotational axis: " + attribute.value());
+				g_logger.LogError("Model Loader", "Unknown rotational axis: " + attribute.value());
 			}
 			
 		}
@@ -189,7 +189,7 @@ void UpdateModelElements(ModelV2::BlockModelV2* model, json JsonData) {
 				cuboid.shade_ = static_cast<bool>(subElements.value());
 			}
 			else {
-				Logger.LogError("Model Loader", "Unknown element attribute: " + subElements.key());
+				g_logger.LogError("Model Loader", "Unknown element attribute: " + subElements.key());
 			}
 		}
 
@@ -249,7 +249,7 @@ void ProcessModelDisplay(ModelV2::BlockModelV2* model, json JsonData) {
 				}
 			}
 			else {
-				Logger.LogError("Model Loader", "Unknown display attribute: " + transitions.key());
+				g_logger.LogError("Model Loader", "Unknown display attribute: " + transitions.key());
 			}
 		}
 
@@ -278,7 +278,7 @@ void ProcessModelDisplay(ModelV2::BlockModelV2* model, json JsonData) {
 			display.position = DisplayPosition::fixed;
 		}
 		else {
-			Logger.LogError("Model Loader", "Unknown display position: " + position);
+			g_logger.LogError("Model Loader", "Unknown display position: " + position);
 			return;
 		}
 
@@ -302,8 +302,8 @@ ModelV2::BlockModelV2* recursiveGetBlockModel(string jsonName, string namespaceI
 		}
 		JSONData = json::parse(file);
 	}
-	catch (exception& e) {
-		Logger.LogError("Model Loader", "Path doesn't exist: " + jsonPath);
+	catch (const exception& e) {
+		g_logger.LogError("Model Loader", e.what());
 		return nullptr;
 	}
 

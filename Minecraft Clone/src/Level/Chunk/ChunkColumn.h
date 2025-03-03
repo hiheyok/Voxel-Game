@@ -57,7 +57,7 @@ public:
 			if (curr == nullptr) continue;
 
 			for (int y = 15; y >= 0; y--) {
-				if (curr->GetBlockUnsafe(x, y, z) != Blocks.AIR) {
+				if (curr->GetBlockUnsafe(x, y, z) != g_blocks.AIR) {
 					return currChunk * 16 + y;
 				}
 			}
@@ -73,7 +73,7 @@ public:
 		Chunk* currChunk = column_[p_height];
 		if (currChunk == nullptr) return -1;
 		for (int y = 15; y >= 0; y--) {
-			if (currChunk->GetBlockUnsafe(x, y, z) != Blocks.AIR) return y;
+			if (currChunk->GetBlockUnsafe(x, y, z) != g_blocks.AIR) return y;
 		}
 		return -1;
 	}
@@ -92,7 +92,7 @@ public:
 			return;
 		}
 		
-		if (p_block == Blocks.AIR) {
+		if (p_block == g_blocks.AIR) {
 			if (currHeight == p_height) {
 				int16_t surfaceLevel = FindSurfaceHeight(x, z, p_height);
 				if (surfaceLevel == -1) {

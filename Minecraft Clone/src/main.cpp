@@ -9,12 +9,10 @@
 #include <time.h>
 #include "Core/Options/Option.h"
 
-#include <mimalloc-new-delete.h>
-
 int main() {
 	
 	stbi_set_flip_vertically_on_load(true);
-	srand(time(NULL));//Set rng seed
+	srand(static_cast<unsigned int>(time(NULL)));//Set rng seed
 
 	Initialize();
 
@@ -23,6 +21,6 @@ int main() {
 
 	Options options;
 
-	Logger.Stop();
+	g_logger.Stop();
 	return 0;
 }

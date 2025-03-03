@@ -1,58 +1,60 @@
 #include "IO.h"
 
 void UserInputs::UpdateAllKey() {
-	for (const auto& key : Keys) {
-		Keys[key.first] = HOLD;
+	for (const auto& key : keys_) {
+		keys_[key.first] = HOLD;
 	}
 
-	Mouse.ScrollDirection = Mouse.SCROLL_NONE;
+	mouse_.scroll_direction_ = mouse_.SCROLL_NONE;
 
-	Mouse.Displacement = glm::dvec2(0.0, 0.0);
+	mouse_.displacement_ = glm::dvec2(0.0, 0.0);
 
-	if (Mouse.LEFT == Mouse.PRESS) {
-		Mouse.LEFT = Mouse.HOLD;
+	if (mouse_.left_ == mouse_.PRESS) {
+		mouse_.left_ = mouse_.HOLD;
 	}
 
-	if (Mouse.RIGHT == Mouse.PRESS) {
-		Mouse.RIGHT = Mouse.HOLD;
+	if (mouse_.right_ == mouse_.PRESS) {
+		mouse_.right_ = mouse_.HOLD;
 	}
 
-	if (Mouse.MIDDLE == Mouse.PRESS) {
-		Mouse.MIDDLE = Mouse.HOLD;
+	if (mouse_.middle_ == mouse_.PRESS) {
+		mouse_.middle_ = mouse_.HOLD;
 	}
 }
 
 void UserInputs::PressIndividualKey(int key) {
-	if (Keys.count(key)) {
-		Keys[key] = HOLD;
+	if (keys_.count(key)) {
+		keys_[key] = HOLD;
 	} else {
-		Keys[key] = PRESS;
+		keys_[key] = PRESS;
 	}
 }
 
 void UserInputs::ReleaseIndividualKey(int key) {
-	if (Keys.count(key)) {
-		Keys.erase(key);
+	if (keys_.count(key)) {
+		keys_.erase(key);
 	}
 }
 
-bool UserInputs::CheckKey(int key) {
-	if (Keys.count(key)) {
+bool UserInputs::CheckKey(int key) const {
+	if (keys_.count(key)) {
 		return true;
 	}
 	return false;
 }
 
-bool UserInputs::CheckKeyPress(int key) {
+bool UserInputs::CheckKeyPress(int key) const {
 	if (!CheckKey(key)) {
 		return false;
 	}
-	return Keys[key] == PRESS;
+	auto it = keys_.find(key);
+	return it->second == PRESS;
 }
 
-bool UserInputs::CheckKeyHold(int key) {
+bool UserInputs::CheckKeyHold(int key) const {
 	if (!CheckKey(key)) {
 		return false;
 	}
-	return Keys[key] == HOLD;
+	auto it = keys_.find(key);
+	return it->second == HOLD;
 }

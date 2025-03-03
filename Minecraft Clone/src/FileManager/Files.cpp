@@ -2,43 +2,43 @@
 #include <filesystem>
 
 std::vector<std::string> Tokenize(std::string str, char divider) {
-	std::vector<std::string> Tokens = {};
+	std::vector<std::string> tokens = {};
 
 	std::stringstream check(str);
 
 	std::string intermediate;
 
 	while (std::getline(check, intermediate, divider)) {
-		Tokens.push_back(intermediate);
+		tokens.push_back(intermediate);
 	}
 
-	return Tokens;
+	return tokens;
 }
 
-void File::open(std::string dir_) {
-	dir = dir_;
-	file.open(dir_);
+void File::Open(std::string dir) {
+	dir_ = dir;
+	file_.open(dir_);
 }
 
-void File::close() {
-	file.close();
+void File::Close() {
+	file_.close();
 }
 
-std::vector<std::string> File::GetToken(char Divider) {
+std::vector<std::string> File::GetToken(char divider) {
 
-	std::ifstream f(dir);
+	std::ifstream f(dir_);
 
-	std::vector<std::string> Tokens = {};
+	std::vector<std::string> tokens = {};
 
 	std::string line;
 
 	while (std::getline(f, line)) {
 
-		std::vector<std::string> lineTokens = Tokenize(line, Divider);
-		Tokens.insert(Tokens.end(), lineTokens.begin(), lineTokens.end());
+		std::vector<std::string> lineTokens = Tokenize(line, divider);
+		tokens.insert(tokens.end(), lineTokens.begin(), lineTokens.end());
 	}
 
-	return Tokens;
+	return tokens;
 }
 
 bool FileManager::CheckFolder(const char* dir) {

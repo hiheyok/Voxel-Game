@@ -4,7 +4,7 @@
 Chunk* DebugWorldSecond::Generate(const ChunkPos& pos) {
 	Chunk* chunk = new Chunk;
 
-	chunk->SetBlock(Blocks.COBBLESTONE, 8, 8, 8);
+	chunk->SetBlock(g_blocks.COBBLESTONE, 8, 8, 8);
 
 	ChunkPos scaledPos = pos;
 
@@ -26,13 +26,13 @@ Chunk* DebugWorldSecond::Generate(const ChunkPos& pos) {
 				int z = gz + scaledPos.z;
 
 				if ((abs(x) >= abs(z)) && (abs(x) >= abs(y))) {
-					chunk->SetBlock(Blocks.BLUE_STAINED_GLASS, gx, gy, gz);
+					chunk->SetBlock(g_blocks.BLUE_STAINED_GLASS, gx, gy, gz);
 				}
 				if ((abs(z) >= abs(x)) && (abs(z) >= abs(y))) {
-					chunk->SetBlock(Blocks.DARK_OAK_PLANKS, gx, gy, gz);
+					chunk->SetBlock(g_blocks.DARK_OAK_PLANKS, gx, gy, gz);
 				}
 				if ((abs(y) >= abs(x)) && (abs(y) >= abs(z))) {
-					chunk->SetBlock(Blocks.ORANGE_CONCRETE, gx, gy, gz);
+					chunk->SetBlock(g_blocks.ORANGE_CONCRETE, gx, gy, gz);
 				}
 			}
 		}

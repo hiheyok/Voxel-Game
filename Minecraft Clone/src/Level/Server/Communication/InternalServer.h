@@ -15,21 +15,21 @@ public:
 
 	Chunk* GetChunk(const ChunkPos& chunk);
 
-	Timer* getTickClock(); // TODO: Rename
+	Timer* GetTickClock();
 
-	double getMSPT();
+	double GetMSPT();
 
 	void SetPlayer(Player player);
 
 	bool CheckPlayerOnGround();
 
-	int getChunkCount(); // TODO: Rename
+	size_t GetChunkCount();
 
 	std::vector<ChunkPos> GetUpdatedChunks();
 
-	std::vector<EntityProperty> getUpdatedEntities(); // TODO: Rename
+	std::vector<EntityProperty> GetUpdatedEntities();
 
-	std::vector<EntityUUID> getRemovedEntities(); // TODO: Rename
+	std::vector<EntityUUID> GetRemovedEntities();
 
 	bool CheckRayIntersection(Ray& ray);
 

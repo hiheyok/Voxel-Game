@@ -9,9 +9,9 @@
 #include "Options/Option.h"
 #include "../Level/TerrainGeneration/Biome/BiomeProvider.h"
 
-LogUtils Logger;
-Options AppOptions;
-BlockList Blocks;
+LogUtils g_logger;
+Options g_app_options;
+BlockList g_blocks;
 EntitiesList g_entity_list;
 ItemList g_items;
 ItemTextureAtlas g_item_atlas;

@@ -5,8 +5,8 @@
 using namespace glm;
 using namespace MeshingV2;
 
-void WorldRender::SetRotation(dvec2 rotation_) {
-	player_.SetRotation(rotation_);
+void WorldRender::SetRotation(dvec2 rotation) {
+	player_.SetRotation(rotation);
 }
 
 void WorldRender::SetPosition(dvec3 position) {
@@ -37,24 +37,24 @@ void WorldRender::Worker(int id) {
 	const int batchSize = 500;
 	const int workerId = id;
 
-	std::deque<ChunkPos> Jobs;
+	std::deque<ChunkPos> jobs;
 	ChunkMeshData chunkMesher;
 
 	std::deque<std::unique_ptr<ChunkVertexData>> finishedJobs;
 
-	while (!stop) {
+	while (!stop_) {
 		//Fetches all of the tasks and put it in "Jobs"
 		{
 			std::lock_guard<std::mutex> lock{ worker_locks_[workerId] };
-			Jobs.insert(Jobs.end(), std::make_move_iterator(worker_task_[workerId].begin()), std::make_move_iterator(worker_task_[workerId].end()));
+			jobs.insert(jobs.end(), std::make_move_iterator(worker_task_[workerId].begin()), std::make_move_iterator(worker_task_[workerId].end()));
 			worker_task_[workerId].clear();
 		}
 
 		int count = 0;
 
-		while (!Jobs.empty()) {
-			ChunkPos pos = Jobs.front(); //fetches task
-			Jobs.pop_front();
+		while (!jobs.empty()) {
+			ChunkPos pos = jobs.front(); //fetches task
+			jobs.pop_front();
 
 			//Generates the meshes
 			
@@ -75,11 +75,11 @@ void WorldRender::Worker(int id) {
 			memcpy(data->solidVertices.data(), chunkMesher.vertices_buffer_.data(), chunkMesher.solid_face_count_ * 12 * sizeof(uint32_t));
 			memcpy(data->transparentVertices.data(), chunkMesher.transparent_vertices_buffer_.data(), chunkMesher.transparent_face_count_ * 12 * sizeof(uint32_t));
 
-			amountOfMeshGenerated++;
+			amount_of_mesh_generated_++;
 
 			finishedJobs.push_back(std::move(data));
 
-			buildTime += time.GetTimePassed_μs();
+			build_time_ += time.GetTimePassed_μs();
 			
 			if (++count == batchSize) {
 				break;
@@ -95,7 +95,7 @@ void WorldRender::Worker(int id) {
 		timerSleepNotPrecise(1);
 	}
 
-	Logger.LogInfo("Mesher", "Shutting down mesh worker: " + std::to_string(workerId));
+	g_logger.LogInfo("Mesher", "Shutting down mesh worker: " + std::to_string(workerId));
 }
 
 void WorldRender::Update() {
@@ -129,8 +129,8 @@ void WorldRender::Update() {
 }
 
 void WorldRender::Stop() {
-	stop = true;
-	Scheduler.join();
+	stop_ = true;
+	scheduler_.join();
 	for (int i = 0; i < workers_.size(); i++) {
 		workers_[i].join();
 	}
@@ -140,18 +140,18 @@ void WorldRender::Stop() {
 }
 
 void WorldRender::Start(GLFWwindow* window, InternalServer* server, PerformanceProfiler* profiler) {
-	stop = false;
+	stop_ = false;
 
-	horizontal_render_distance_ = AppOptions.horizontal_render_distance_;
-	vertical_render_distance_ = AppOptions.vertical_render_distance_;
+	horizontal_render_distance_ = g_app_options.horizontal_render_distance_;
+	vertical_render_distance_ = g_app_options.vertical_render_distance_;
 
-	int threadCount = AppOptions.MeshThreads;
+	int threadCount = g_app_options.mesh_threads_;
 
 	window_ = window;
 	server_ = server;
 	worker_count_ = threadCount;
 
-	renderer_v2_.Initialize(window_, player_.getCamera());
+	renderer_v2_.Initialize(window_, player_.GetCamera());
 	renderer_v2_.LoadAssets();
 	renderer_v2_.setSettings(horizontal_render_distance_, vertical_render_distance_, 90);
 
@@ -164,7 +164,7 @@ void WorldRender::Start(GLFWwindow* window, InternalServer* server, PerformanceP
 		workers_[i] = std::thread(&WorldRender::Worker, this, i);
 	}
 
-	Scheduler = std::thread(&WorldRender::TaskScheduler, this);
+	scheduler_ = std::thread(&WorldRender::TaskScheduler, this);
 	profiler_ = profiler;
 }
 
@@ -178,7 +178,7 @@ void WorldRender::TaskScheduler() {
 
 	std::deque<ChunkPos> internalTaskList;
 
-	while (!stop) {
+	while (!stop_) {
 
 		//Fetch tasks
 		{
@@ -213,5 +213,5 @@ void WorldRender::TaskScheduler() {
 			distributedTasks[i].clear();
 		}
 	}
-	Logger.LogInfo("Mesher", "Shutting down mesh scheduler");
+	g_logger.LogInfo("Mesher", "Shutting down mesh scheduler");
 }

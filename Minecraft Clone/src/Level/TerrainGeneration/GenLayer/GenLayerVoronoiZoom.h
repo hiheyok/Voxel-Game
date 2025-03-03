@@ -17,8 +17,8 @@ public:
         int k = (areaWidth >> 2) + 2;
         int l = (areaHeight >> 2) + 2;
         std::vector<int> aint = parent->getInts(i, j, k, l);
-        int i1 = k - 1 << 2;
-        int j1 = l - 1 << 2;
+        int i1 = (k - 1) << 2;
+        int j1 = (l - 1) << 2;
         std::vector<int> aint1 = std::vector<int>(i1 * j1); //IntCache.getIntCache(i1 * j1);
 
         for (int k1 = 0; k1 < l - 1; ++k1)
@@ -29,16 +29,16 @@ public:
             for (int j2 = aint[l1 + 0 + (k1 + 1) * k]; l1 < k - 1; ++l1)
             {
                 // double d0 = 3.6;
-                initChunkSeed((long long)(l1 + i << 2), (long long)(k1 + j << 2));
+                initChunkSeed(static_cast<long long>(l1 + i) << 2, static_cast<long long>(k1 + j) << 2);
                 double d1 = ((double)NextInt(1024) / 1024.0 - 0.5) * 3.6;
                 double d2 = ((double)NextInt(1024) / 1024.0 - 0.5) * 3.6;
-                initChunkSeed((long long)(l1 + i + 1 << 2), (long long)(k1 + j << 2));
+                initChunkSeed(static_cast<long long>(l1 + i + 1) << 2, static_cast<long long>(k1 + j) << 2);
                 double d3 = ((double)NextInt(1024) / 1024.0 - 0.5) * 3.6 + 4.0;
                 double d4 = ((double)NextInt(1024) / 1024.0 - 0.5) * 3.6;
-                initChunkSeed((long long)(l1 + i << 2), (long long)(k1 + j + 1 << 2));
+                initChunkSeed(static_cast<long long>(l1 + i) << 2, static_cast<long long>(k1 + j + 1) << 2);
                 double d5 = ((double)NextInt(1024) / 1024.0 - 0.5) * 3.6;
                 double d6 = ((double)NextInt(1024) / 1024.0 - 0.5) * 3.6 + 4.0;
-                initChunkSeed((long long)(l1 + i + 1 << 2), (long long)(k1 + j + 1 << 2));
+                initChunkSeed(static_cast<long long>(l1 + i + 1) << 2, static_cast<long long>(k1 + j + 1) << 2);
                 double d7 = ((double)NextInt(1024) / 1024.0 - 0.5) * 3.6 + 4.0;
                 double d8 = ((double)NextInt(1024) / 1024.0 - 0.5) * 3.6 + 4.0;
                 int k2 = aint[l1 + 1 + (k1 + 0) * k] & 255;

@@ -20,16 +20,16 @@ public:
     void GenTerrainBlocks(JavaRandom& rand, TallChunk* chunk, int x, int z, double noiseVal, ChunkGeneratorSettings* settings_) override {
         if (type_ == BiomeTaiga::Type::MEGA || type_ == BiomeTaiga::Type::MEGA_SPRUCE)
         {
-            topBlock = Blocks.GRASS;
-            fillerBlock = Blocks.DIRT;
+            topBlock = g_blocks.GRASS;
+            fillerBlock = g_blocks.DIRT;
 
             if (noiseVal > 1.75)
             {
-                topBlock = Blocks.COARSE_DIRT;
+                topBlock = g_blocks.COARSE_DIRT;
             }
             else if (noiseVal > -0.95)
             {
-                topBlock = Blocks.PODZOL;
+                topBlock = g_blocks.PODZOL;
             }
         }
 

@@ -26,10 +26,6 @@ public:
         }
     }
 
-    NoiseGeneratorPerlin() {
-
-    }
-
     double getValue(double p_151601_1_, double p_151601_3_);
 
     std::vector<double> getRegion(std::vector<double>& p_151599_1_, double p_151599_2_, double p_151599_4_, int p_151599_6_, int p_151599_7_, double p_151599_8_, double p_151599_10_, double p_151599_12_);

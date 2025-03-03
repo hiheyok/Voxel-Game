@@ -13,13 +13,13 @@ struct MouseInputs {
 		SCROLL_NONE, SCROLL_DOWN, SCROLL_UP
 	};
 
-	ButtonState LEFT;
-	ButtonState MIDDLE;
-	ButtonState RIGHT;
+	ButtonState left_ = RELEASE;
+	ButtonState middle_ = RELEASE;
+	ButtonState right_ = RELEASE;
 
-	ScrollState ScrollDirection = SCROLL_NONE; //-1 or 1
+	ScrollState scroll_direction_ = SCROLL_NONE; //-1 or 1
 
-	glm::dvec2 Displacement = glm::dvec2(0.f, 0.f);
+	glm::dvec2 displacement_ = glm::dvec2(0.f, 0.f);
 	glm::dvec2 position_ = glm::dvec2(0.f, 0.f);
 };
 
@@ -32,7 +32,7 @@ private:
 		PRESS, HOLD
 	};
 
-	FastHashMap<int, KeyStatus> Keys;
+	FastHashMap<int, KeyStatus> keys_;
 
 public:
 
@@ -42,13 +42,13 @@ public:
 
 	void ReleaseIndividualKey(int key);
 	
-	bool CheckKey(int key);
+	bool CheckKey(int key) const;
 
-	bool CheckKeyPress(int key);
+	bool CheckKeyPress(int key) const;
 
-	bool CheckKeyHold(int key);
+	bool CheckKeyHold(int key) const;
 
-	MouseInputs Mouse;
+	MouseInputs mouse_;
 	
-	float delta = 0.f;
+	float delta_ = 0.f;
 };

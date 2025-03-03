@@ -11,29 +11,29 @@ class GUISet {
 private:
 	std::vector<GUIElement> elements_;
 
-	int AddRenderingObj() {
-		VAOs.emplace_back();
-		EBOs.emplace_back();
-		VBOs.emplace_back();
-		VAOs.back().GenArray();
-		VBOs.back().GenBuffer();
-		EBOs.back().GenBuffer();
+	size_t AddRenderingObj() {
+		vaos_.emplace_back();
+		ebos_.emplace_back();
+		vbos_.emplace_back();
+		vaos_.back().GenArray();
+		vbos_.back().GenBuffer();
+		ebos_.back().GenBuffer();
 
-		VBOs.back().SetType(GL_ARRAY_BUFFER);
-		EBOs.back().SetType(GL_ELEMENT_ARRAY_BUFFER);
+		vbos_.back().SetType(GL_ARRAY_BUFFER);
+		ebos_.back().SetType(GL_ELEMENT_ARRAY_BUFFER);
 
-		VBOs.back().SetUsage(GL_STATIC_DRAW);
-		EBOs.back().SetUsage(GL_STATIC_DRAW);
+		vbos_.back().SetUsage(GL_STATIC_DRAW);
+		ebos_.back().SetUsage(GL_STATIC_DRAW);
 
-		VAOs.back().Bind();
-		VBOs.back().Bind();
-		VAOs.back().EnableAttriPTR(0, 2, GL_FLOAT, GL_FALSE, 4, 0);
-		VAOs.back().EnableAttriPTR(1, 2, GL_FLOAT, GL_FALSE, 4, 2);
-		VBOs.back().Unbind();
-		VAOs.back().Unbind();
+		vaos_.back().Bind();
+		vbos_.back().Bind();
+		vaos_.back().EnableAttriPTR(0, 2, GL_FLOAT, GL_FALSE, 4, 0);
+		vaos_.back().EnableAttriPTR(1, 2, GL_FLOAT, GL_FALSE, 4, 2);
+		vbos_.back().Unbind();
+		vaos_.back().Unbind();
 
-		VBOSize.emplace_back(0);
-		return VAOs.size() - 1;
+		vbo_size_.emplace_back(0);
+		return vaos_.size() - 1;
 	}
 
 public:
@@ -45,11 +45,11 @@ public:
 	}
 
 	void Clean() {
-		for (auto& vao : VAOs)
+		for (auto& vao : vaos_)
 			vao.Delete();
-		for (auto& vbo : VBOs)
+		for (auto& vbo : vbos_)
 			vbo.Delete();
-		for (auto& ebo : EBOs)
+		for (auto& ebo : ebos_)
 			ebo.Delete();
 	}
 
@@ -60,17 +60,17 @@ public:
 			is_initialized_ = true;
 		}
 
-		if (GUIElementIndex.find(Name) == GUIElementIndex.end()) {
+		if (gui_element_index_.find(Name) == gui_element_index_.end()) {
 			elements_.emplace_back(Text, Size, Position);
 			elements_.back().buffer_index_ = AddRenderingObj();
 			elements_.back().uv_p0_ = UV_P0;
 			elements_.back().uv_p1_ = UV_P1;
-			GUIElementIndex.emplace(Name, elements_.size() - 1);
-			NumOfRenderableObjects++;
-			isDirty = true;
+			gui_element_index_.emplace(Name, elements_.size() - 1);
+			num_of_renderable_objects_++;
+			is_dirty_ = true;
 		}
 		else {
-			Logger.LogError("GUI", "Element " + Name + " already exist!");
+			g_logger.LogError("GUI", "Element " + Name + " already exist!");
 		}
 	}
 
@@ -81,90 +81,89 @@ public:
 			is_initialized_ = true;
 		}
 
-		UV_P0.x = UV_P0.x / (float)GUITexture.width_;
-		UV_P1.x = UV_P1.x / (float)GUITexture.width_;
+		UV_P0.x = UV_P0.x / (float)gui_texture_.width_;
+		UV_P1.x = UV_P1.x / (float)gui_texture_.width_;
 
-		UV_P0.y = UV_P0.y / (float)GUITexture.height_;
-		UV_P1.y = UV_P1.y / (float)GUITexture.height_;
+		UV_P0.y = UV_P0.y / (float)gui_texture_.height_;
+		UV_P1.y = UV_P1.y / (float)gui_texture_.height_;
 
-		if (GUIElementIndex.find(Name) == GUIElementIndex.end()) {
+		if (gui_element_index_.find(Name) == gui_element_index_.end()) {
 			elements_.emplace_back(Text, Size, Position);
 			elements_.back().buffer_index_ = AddRenderingObj();
 			elements_.back().uv_p0_ = UV_P0;
 			elements_.back().uv_p1_ = UV_P1;
-			GUIElementIndex.emplace(Name, elements_.size() - 1);
-			NumOfRenderableObjects++;
-			isDirty = true;
+			gui_element_index_.emplace(Name, elements_.size() - 1);
+			num_of_renderable_objects_++;
+			is_dirty_ = true;
 		}
 		else {
-			Logger.LogError("GUI", "Element " + Name + " already exist!");
+			g_logger.LogError("GUI", "Element " + Name + " already exist!");
 		}
 	}
 
 	void EditElementPosition(std::string Name, glm::vec2 Position) {
-		if (GUIElementIndex.find(Name) != GUIElementIndex.end()) {
-			int Index = GUIElementIndex[Name];
+		if (gui_element_index_.find(Name) != gui_element_index_.end()) {
+			int Index = gui_element_index_[Name];
 			elements_[Index].location_ = Position;
-			isDirty = true;
+			is_dirty_ = true;
 		}
 		else {
-			Logger.LogError("GUI", "Element " + Name + " doesn't exist!");
+			g_logger.LogError("GUI", "Element " + Name + " doesn't exist!");
 		}
 	}
 
 	void EditElementUVNorm(std::string Name, glm::vec2 UV0, glm::vec2 UV1) {
-		if (GUIElementIndex.find(Name) != GUIElementIndex.end()) {
-			int Index = GUIElementIndex[Name];
+		if (gui_element_index_.find(Name) != gui_element_index_.end()) {
+			int Index = gui_element_index_[Name];
 			elements_[Index].uv_p0_ = UV0;
 			elements_[Index].uv_p1_ = UV1;
-			isDirty = true;
+			is_dirty_ = true;
 		}
 		else {
-			Logger.LogError("GUI", "Element " + Name + " doesn't exist!");
+			g_logger.LogError("GUI", "Element " + Name + " doesn't exist!");
 		}
 	}
 
 	void SetGUITexture(std::string file) {
-		GUITexture = Texture2D(RawTextureData(file.c_str()));
+		gui_texture_ = Texture2D(RawTextureData(file.c_str()));
 	}
 
 	void SetGUITexture(GLuint texture_id_, size_t x, size_t y) {
-		GUITexture.textureID = texture_id_;
-		GUITexture.width_ = x;
-		GUITexture.height_ = y;
+		gui_texture_.texture_id_ = texture_id_;
+		gui_texture_.width_ = x;
+		gui_texture_.height_ = y;
 	}
 
 	void PrepareRenderer() {
-		if (!isDirty) {
+		if (!is_dirty_) {
 			return;
 		}
-		isDirty = false;
+		is_dirty_ = false;
 
 		for (auto& e : elements_) {
 			
 			GUIElement::GUIVertices GUIData = e.GetVertices();
-			int BufferIndex = e.buffer_index_;
-			VBOs[BufferIndex].InsertData(GUIData.vertices_.size() * sizeof(float), GUIData.vertices_.data(), GL_STATIC_DRAW);
-			EBOs[BufferIndex].InsertData(GUIData.indices_.size() * sizeof(unsigned int), GUIData.indices_.data(), GL_STATIC_DRAW);
-			VBOSize[BufferIndex] = GUIData.indices_.size();
+			size_t BufferIndex = e.buffer_index_;
+			vbos_[BufferIndex].InsertData(GUIData.vertices_.size() * sizeof(float), GUIData.vertices_.data(), GL_STATIC_DRAW);
+			ebos_[BufferIndex].InsertData(GUIData.indices_.size() * sizeof(unsigned int), GUIData.indices_.data(), GL_STATIC_DRAW);
+			vbo_size_[BufferIndex] = GUIData.indices_.size();
 		}
 
 		
 	}
 
-	// TODO: Rename
-	std::vector<VertexArray> VAOs;
-	std::vector<Buffer> VBOs;
-	std::vector<Buffer> EBOs;
-	std::vector<int> VBOSize;
+	std::vector<VertexArray> vaos_;
+	std::vector<Buffer> vbos_;
+	std::vector<Buffer> ebos_;
+	std::vector<size_t> vbo_size_;
 
-	int NumOfRenderableObjects = 0;
+	int num_of_renderable_objects_ = 0;
 
 	
-	FastHashMap<std::string, int> GUIElementIndex;
-	bool isDirty = true;
+	FastHashMap<std::string, int> gui_element_index_;
+	bool is_dirty_ = true;
 
-	Texture2D GUITexture;
+	Texture2D gui_texture_;
 
 	bool is_initialized_ = false;
 };

@@ -1,81 +1,81 @@
 #include "Buffer.h"
 
 unsigned int Buffer::GetID() {
-	return BufferID;
+	return buffer_id_;
 }
-void Buffer::InsertData(GLsizeiptr Size, const void* Data, GLenum Usage) {
+void Buffer::InsertData(GLsizeiptr size, const void* data, GLenum usage) {
 	Bind();
-	glBufferData(Type, Size, Data, Usage);
+	glBufferData(type_, size, data, usage);
 	Unbind();
 }
 
-void Buffer::InsertSubData(GLintptr Offset, GLsizeiptr Size, const void* Data) {
+void Buffer::InsertSubData(GLintptr offset, GLsizeiptr size, const void* data) {
 	Bind();
-	glBufferSubData(Type, Offset, Size, Data);
+	glBufferSubData(type_, offset, size, data);
 	Unbind();
 }
 
 void Buffer::ResetBuffer() {
-	glDeleteBuffers(1, &BufferID);
-	glGenBuffers(1, &BufferID);
+	glDeleteBuffers(1, &buffer_id_);
+	glGenBuffers(1, &buffer_id_);
 }
 
 void Buffer::Bind() {
-	glBindBuffer(Type, BufferID);
+	glBindBuffer(type_, buffer_id_);
 }
 
 void Buffer::Unbind() {
-	glBindBuffer(Type, 0);
+	glBindBuffer(type_, 0);
 }
 
 void Buffer::Delete() {
-	glDeleteBuffers(1, &BufferID);
-	BufferID = NULL;
-	MaxSize = NULL;
-	Type = NULL;
+	glDeleteBuffers(1, &buffer_id_);
+	buffer_id_ = NULL;
+	max_size_ = NULL;
+	type_ = NULL;
 }
 
-void Buffer::SetMaxSize(size_t MaxSize_) {
-	MaxSize = MaxSize_;
+void Buffer::SetMaxSize(size_t maxSize) {
+	max_size_ = maxSize;
 }
 
-void Buffer::SetType(GLenum Type_) {
-	Type = Type_;
+void Buffer::SetType(GLenum type) {
+	type_ = type;
 }
 
-void Buffer::SetUsage(GLenum Usage_) {
-	Usage = Usage_;
+void Buffer::SetUsage(GLenum usage) {
+	usage_ = usage;
 }
 
 void Buffer::InitializeData() {
 	Bind();
-	glBufferData(Type, MaxSize, nullptr, Usage);
+	glBufferData(type_, max_size_, nullptr, usage_);
 	Unbind();
 }
 
-void Buffer::BindBase(int Index) {
-	glBindBufferBase(Type, Index, BufferID);
+void Buffer::BindBase(int index) {
+	glBindBufferBase(type_, index, buffer_id_);
 }
 
-void Buffer::UnbindBase(int Index) {
-	glBindBufferBase(Type, Index, 0);
+void Buffer::UnbindBase(int index) {
+	glBindBufferBase(type_, index, 0);
 }
 
 void Buffer::GenBuffer() {
-	glGenBuffers(1, &BufferID);
-	Logger.LogDebug("Buffer", "Created buffer. ID: " + std::to_string(BufferID));
+	glGenBuffers(1, &buffer_id_);
+	g_logger.LogDebug("Buffer", "Created buffer. ID: " + std::to_string(buffer_id_));
 }
 
 void Buffer::getData(uint32_t* ptr, size_t offset, size_t size) {
 	Bind();
-	glGetBufferSubData(Type, offset, size, static_cast<void*>(ptr));
+	glGetBufferSubData(type_, offset, size, static_cast<void*>(ptr));
 	Unbind();
 }
 
-void Buffer::CopyFrom(Buffer buffer, size_t ReadOffset, size_t WriteOffset, size_t Size) {
-	glBindBuffer(GL_COPY_READ_BUFFER, buffer.BufferID);
-	glBindBuffer(GL_COPY_WRITE_BUFFER, BufferID);
-	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, ReadOffset, WriteOffset, Size);
+void Buffer::CopyFrom(Buffer buffer, size_t readOffset, size_t writeOffset, size_t size) {
+	glBindBuffer(GL_COPY_READ_BUFFER, buffer.buffer_id_);
+	glBindBuffer(GL_COPY_WRITE_BUFFER, buffer_id_);
+	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, readOffset, writeOffset, size);
 	glBindBuffer(GL_COPY_READ_BUFFER, 0);
 	glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
 }
@@ -84,35 +84,35 @@ void Buffer::CopyTo(Buffer& destination, size_t offset, size_t desOffset, size_t
 	Bind();
 	destination.Bind();
 //	glCopyNamedBufferSubData(BufferID, destination.BufferID, offset, desOffset, size);
-	glCopyBufferSubData(Type, destination.Type, offset, desOffset, size);
+	glCopyBufferSubData(type_, destination.type_, offset, desOffset, size);
 	Unbind();
 	destination.Unbind();
 }
 
 void VertexArray::Delete() {
-	glDeleteVertexArrays(1, &ArrayID);
-	ArrayID = NULL;
+	glDeleteVertexArrays(1, &array_id_);
+	array_id_ = NULL;
 }
 
 void VertexArray::Bind() {
-	glBindVertexArray(ArrayID);
+	glBindVertexArray(array_id_);
 }
 
 void VertexArray::Unbind() {
 	glBindVertexArray(0);
 }
 
-void VertexArray::EnableAttriPTR(GLuint Index, GLint Size, GLenum Type, GLboolean normalized, GLsizei Stride, int SubIndex) {
-	glVertexAttribPointer(Index, Size, Type, normalized, sizeof(GL_FLOAT) * Stride, (void*)(SubIndex * sizeof(unsigned int)));
-	glEnableVertexAttribArray(Index);
+void VertexArray::EnableAttriPTR(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, int subIndex) {
+	glVertexAttribPointer(index, size, type, normalized, sizeof(GL_FLOAT) * stride, (void*)(subIndex * sizeof(unsigned int)));
+	glEnableVertexAttribArray(index);
 }
 
 void VertexArray::ResetArray() {
-	glDeleteVertexArrays(1, &ArrayID);
-	glGenVertexArrays(1, &ArrayID);
+	glDeleteVertexArrays(1, &array_id_);
+	glGenVertexArrays(1, &array_id_);
 }
 
 void VertexArray::GenArray() {
-	glGenVertexArrays(1, &ArrayID);
-	Logger.LogDebug("Vertex Array", "Created array. ID: " + std::to_string(ArrayID));
+	glGenVertexArrays(1, &array_id_);
+	g_logger.LogDebug("Vertex Array", "Created array. ID: " + std::to_string(array_id_));
 }

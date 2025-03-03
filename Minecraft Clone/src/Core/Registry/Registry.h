@@ -7,34 +7,34 @@
 template <class K, class V> class Registry {
 public:
 	V GetValue(K key) {
-		if (!Hashmap.count(key)) {
+		if (!hashmap_.count(key)) {
 			throw std::exception("Cannot return value because key doesn't exist");
 		}
-		return Hashmap[key];
+		return hashmap_[key];
 	}
 
-	K getKey(int ID) {
-		if (!getKeybyID.count(ID)) {
+	K GetKey(int id) {
+		if (!get_key_by_id_.count(id)) {
 			throw std::exception("Cannot return key because ID doesn't exist");
 		}
-		return getKeybyID[ID];
+		return get_key_by_id_[id];
 	}
 
-	int getID(K key) {
-		if (!getIDbyKey.count(key)) {
+	int GetId(K key) {
+		if (!get_id_by_key_.count(key)) {
 			throw std::exception("Cannot return ID because key doesn't exist");
 		}
-		return getIDbyKey[key];
+		return get_id_by_key_[key];
 	}
 
-	void Register(int ID, K key, V value) {
-		Hashmap.emplace(std::pair<K, V>(key, value));
-		getIDbyKey.emplace(std::pair<K, int>(key, ID));
-		getKeybyID.emplace(std::pair<int, K>(ID, key));
+	void Register(int id, K key, V value) {
+		hashmap_.emplace(key, value);
+		get_id_by_key_.emplace(key, id);
+		get_key_by_id_.emplace(id, key);
 	}
 
 private:
-	FastHashMap<K, V> Hashmap;
-	FastHashMap<K, int> getIDbyKey;
-	FastHashMap<int, K> getKeybyID;
+	FastHashMap<K, V> hashmap_;
+	FastHashMap<K, int> get_id_by_key_;
+	FastHashMap<int, K> get_key_by_id_;
 };

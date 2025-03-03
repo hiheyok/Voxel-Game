@@ -11,17 +11,17 @@ public:
 
     void GenTerrainBlocks(JavaRandom& rand, TallChunk* chunk, int x, int z, double noiseVal, ChunkGeneratorSettings* settings_) override
     {
-        topBlock = Blocks.GRASS;
-        fillerBlock = Blocks.DIRT;
+        topBlock = g_blocks.GRASS;
+        fillerBlock = g_blocks.DIRT;
 
         if (noiseVal > 1.75)
         {
-            topBlock = Blocks.STONE;
-            fillerBlock = Blocks.STONE;
+            topBlock = g_blocks.STONE;
+            fillerBlock = g_blocks.STONE;
         }
         else if (noiseVal > -0.5)
         {
-            topBlock = Blocks.COARSE_DIRT;
+            topBlock = g_blocks.COARSE_DIRT;
         }
 
         generateBiomeTerrain(rand, chunk, x, z, noiseVal, settings_);

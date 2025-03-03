@@ -3,10 +3,10 @@
 #include "../../FileManager/Files.h"
 
 struct ResourceLocation {
-	const std::string NAMESPACE_DIVIDER = ":";
-	std::string DEFAULT_NAMESPACE = "minecraft";
-	std::string PATH = "";
-	std::string NAMESPACE = "";
+	const std::string namespace_divider_ = ":";
+	std::string default_namespace_ = "minecraft";
+	std::string path_ = "";
+	std::string namespace_ = "";
 
 	std::string GetPath();
 
@@ -14,5 +14,5 @@ struct ResourceLocation {
 
 	ResourceLocation() {}
 
-	ResourceLocation(std::string name) : PATH(name) {}
+	ResourceLocation(std::string name) : path_(name) {}
 };

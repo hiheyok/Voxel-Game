@@ -18,106 +18,106 @@
 class Shader
 {
 public:
-    unsigned int ShaderID = NULL;
+    unsigned int shader_id_ = NULL;
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
-    void init(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
+    void Init(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
     // activate the shader
     // ------------------------------------------------------------------------
-    void use();
+    void Use();
     // utility uniform functions
     // ------------------------------------------------------------------------
-    void setBool(const std::string& name, bool value)
+    void SetBool(const std::string& name, bool value)
     {
-        use();
-        glUniform1i(getUniformLocation(name), (int)value);
+        Use();
+        glUniform1i(GetUniformLocation(name), (int)value);
     }
     // ------------------------------------------------------------------------
-    void setInt(const std::string& name, int value)
+    void SetInt(const std::string& name, int value)
     {
-        use();
-        glUniform1i(getUniformLocation(name), value);
+        Use();
+        glUniform1i(GetUniformLocation(name), value);
     }
     // ------------------------------------------------------------------------
-    void setFloat(const std::string& name, float value)
+    void SetFloat(const std::string& name, float value)
     {
-        use();
-        glUniform1f(getUniformLocation(name), value);
+        Use();
+        glUniform1f(GetUniformLocation(name), value);
     }
     // ------------------------------------------------------------------------
-    void setVec2(const std::string& name, const glm::vec2& value)
+    void SetVec2(const std::string& name, const glm::vec2& value)
     {
-        use();
-        glUniform2fv(getUniformLocation(name), 1, &value[0]);
+        Use();
+        glUniform2fv(GetUniformLocation(name), 1, &value[0]);
     }
-    void setVec2(const std::string& name, float x, float y)
+    void SetVec2(const std::string& name, float x, float y)
     {
-        use();
-        glUniform2f(getUniformLocation(name), x, y);
+        Use();
+        glUniform2f(GetUniformLocation(name), x, y);
     }
     // ------------------------------------------------------------------------
-    void setVec3(const std::string& name, const glm::vec3& value)
+    void SetVec3(const std::string& name, const glm::vec3& value)
     {
-        use();
-        glUniform3fv(getUniformLocation(name), 1, &value[0]);
+        Use();
+        glUniform3fv(GetUniformLocation(name), 1, &value[0]);
     }
-    void setVec3(const std::string& name, float x, float y, float z)
+    void SetVec3(const std::string& name, float x, float y, float z)
     {
-        use();
-        glUniform3f(getUniformLocation(name), x, y, z);
+        Use();
+        glUniform3f(GetUniformLocation(name), x, y, z);
     }
 
-    void setIVec3(const std::string& name, const glm::ivec3& value)
+    void SetIVec3(const std::string& name, const glm::ivec3& value)
     {
-        use();
-        glUniform3iv(getUniformLocation(name), 1, &value[0]);
+        Use();
+        glUniform3iv(GetUniformLocation(name), 1, &value[0]);
     }
-    void setIVec3(const std::string& name, int x, int y, int z)
+    void SetIVec3(const std::string& name, int x, int y, int z)
     {
-        use();
-        glUniform3i(getUniformLocation(name), x, y, z);
-    }
-    // ------------------------------------------------------------------------
-    void setVec4(const std::string& name, const glm::vec4& value)
-    {
-        use();
-        glUniform4fv(getUniformLocation(name), 1, &value[0]);
-    }
-    void setVec4(const std::string& name, float x, float y, float z, float w)
-    {
-        use();
-        glUniform4f(getUniformLocation(name), x, y, z, w);
+        Use();
+        glUniform3i(GetUniformLocation(name), x, y, z);
     }
     // ------------------------------------------------------------------------
-    void setMat2(const std::string& name, const glm::mat2& mat)
+    void SetVec4(const std::string& name, const glm::vec4& value)
     {
-        use();
-        glUniformMatrix2fv(getUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
+        Use();
+        glUniform4fv(GetUniformLocation(name), 1, &value[0]);
+    }
+    void SetVec4(const std::string& name, float x, float y, float z, float w)
+    {
+        Use();
+        glUniform4f(GetUniformLocation(name), x, y, z, w);
     }
     // ------------------------------------------------------------------------
-    void setMat3(const std::string& name, const glm::mat3& mat)
+    void SetMat2(const std::string& name, const glm::mat2& mat)
     {
-        use();
-        glUniformMatrix3fv(getUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
+        Use();
+        glUniformMatrix2fv(GetUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
     }
     // ------------------------------------------------------------------------
-    void setMat4(const std::string& name, const glm::mat4& mat)
+    void SetMat3(const std::string& name, const glm::mat3& mat)
     {
-        use();
-        glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
+        Use();
+        glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
+    }
+    // ------------------------------------------------------------------------
+    void SetMat4(const std::string& name, const glm::mat4& mat)
+    {
+        Use();
+        glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
     }
 
-    void bindTexture2D(GLuint index, GLuint img, const std::string& name) {
+    void BindTexture2D(GLuint index, GLuint img, const std::string& name) {
 
-        setInt(name, index);
+        SetInt(name, index);
 
         glActiveTexture(GL_TEXTURE0 + index);
         glBindTexture(GL_TEXTURE_2D, img);
 
     }
 
-    void bindTextureArray2D(GLuint index, GLuint img, const std::string& name) {
-        setInt(name, index);
+    void BindTextureArray2D(GLuint index, GLuint img, const std::string& name) {
+        SetInt(name, index);
 
         glActiveTexture(GL_TEXTURE0 + index);
         glBindTexture(GL_TEXTURE_2D_ARRAY, img);
@@ -128,20 +128,20 @@ private:
     // utility function for checking shader compilation/linking errors.
     // ------------------------------------------------------------------------
 
-    GLint getUniformLocation(std::string name) {
-        if (cache.count(name)) {
-            return cache[name];
+    GLint GetUniformLocation(std::string name) {
+        if (cache_.count(name)) {
+            return cache_[name];
         }
         else {
-            GLint location = glGetUniformLocation(ShaderID, name.c_str());
-            cache[name] = location;
+            GLint location = glGetUniformLocation(shader_id_, name.c_str());
+            cache_[name] = location;
             return location;
         }
     }
 
-    FastHashMap<std::string, int> cache;
+    FastHashMap<std::string, int> cache_;
 
-    void checkCompileErrors(GLuint shader, std::string type_)
+    void CheckCompileErrors(GLuint shader, std::string type_)
     {
         GLint success;
         GLchar infoLog[1024];
@@ -151,7 +151,7 @@ private:
             if (!success)
             {
                 glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-                Logger.LogError("OpenGL Shader", "Failed to compile" + type_ + " Shader: \n" + std::string(infoLog) + "\n");
+                g_logger.LogError("OpenGL Shader", "Failed to compile" + type_ + " Shader: \n" + std::string(infoLog) + "\n");
             }
         }
         else
@@ -160,7 +160,7 @@ private:
             if (!success)
             {
                 glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-                Logger.LogError("OpenGL Shader", "Failed to link Shader Program: \n" + std::string(infoLog) + "\n");
+                g_logger.LogError("OpenGL Shader", "Failed to link Shader Program: \n" + std::string(infoLog) + "\n");
             }
         }
     }

@@ -4,7 +4,7 @@
 class BiomeMushroomIsland : public Biome {
 public:
 	BiomeMushroomIsland(BiomeProperties properties) : Biome(properties) {
-		topBlock = Blocks.MYCELIUM;
+		topBlock = g_blocks.MYCELIUM;
 	}
 
 	const std::type_info& getBiomeClass() const override {

@@ -386,4 +386,4 @@ public:
 
 } ;
 
-extern BlockList Blocks;
+extern BlockList g_blocks;

@@ -12,22 +12,22 @@ std::vector<std::string> Tokenize(std::string str, char divider);
 class File{
 public:
 
-	std::ifstream file;
-	std::string dir = "";
+	std::ifstream file_;
+	std::string dir_ = "";
 
 	File() {
 
 	}
 
-	File(std::string dir_) {
-		open(dir_);
+	File(std::string dir) {
+		Open(dir);
 	}
 
-	void open(std::string dir_);
+	void Open(std::string dir);
 
-	void close();
+	void Close();
 
-	std::vector<std::string> GetToken(char Divider);
+	std::vector<std::string> GetToken(char divider);
 };
 
 class FileManager {

@@ -27,7 +27,7 @@ float WorldCollusionDetector::GetDistanceUntilCollusionSingleDirection(vec3 orig
 
 		BlockID b = world_->GetBlock(BlockPos{ flooredPos.x, flooredPos.y, flooredPos.z });
 
-		if (Blocks.GetBlockType(b)->properties_->is_solid_) {
+		if (g_blocks.GetBlockType(b)->properties_->is_solid_) {
 			return (float)i + displacement - 1.f;
 		}
 	}
@@ -120,16 +120,16 @@ dvec3 WorldCollusionDetector::GetTimeTillCollusion(Entity* entity) {
 bool WorldCollusionDetector::CheckRayIntersection(Ray& ray) {
 
 	//Direction with magnitude
-	vec3 delta = ray.Direction;
+	vec3 delta = ray.direction_;
 
 	//Direction to Step
 	ivec3 direction = Sign(delta);
 
 	//Location in grid
-	ivec3 blockPos = ivec3(floor(ray.Origin.x), floor(ray.Origin.y), floor(ray.Origin.z));
+	ivec3 blockPos = ivec3(floor(ray.origin_.x), floor(ray.origin_.y), floor(ray.origin_.z));
 
 	//To keep track of point location
-	vec3 endPoint = ray.Origin;
+	vec3 endPoint = ray.origin_;
 
 	vec3 deltaDist(
 		abs(1 / delta[0]), abs(1 / delta[1]), abs(1 / delta[2])
@@ -153,23 +153,23 @@ bool WorldCollusionDetector::CheckRayIntersection(Ray& ray) {
 		
 		BlockID b = world_->GetBlock(BlockPos{ blockPos.x, blockPos.y, blockPos.z });
 
-		if (Blocks.GetBlockType(b)->properties_->is_solid_) {
+		if (g_blocks.GetBlockType(b)->properties_->is_solid_) {
 
-			ray.EndPoint = (vec3)blockPos;
+			ray.end_point_ = (vec3)blockPos;
 
-			ray.Length = sqrtf(powf(ray.EndPoint.x - ray.Origin.x, 2) + powf(ray.EndPoint.y - ray.Origin.y, 2) + powf(ray.EndPoint.z - ray.Origin.z, 2));
+			ray.length_ = sqrtf(powf(ray.end_point_.x - ray.origin_.x, 2) + powf(ray.end_point_.y - ray.origin_.y, 2) + powf(ray.end_point_.z - ray.origin_.z, 2));
 
 			for (int axis_ = 0; axis_ < 3; axis_++) {
 				if (mask[axis_]) {
-					ray.bouncesurface = delta[axis_] < 0 ? axis_ * 2 + 1 : axis_ * 2; //Set the surface it bounces off. + 1 means that the surface is behind, bottom, etc
+					ray.bounce_surface_ = delta[axis_] < 0 ? axis_ * 2 + 1 : axis_ * 2; //Set the surface it bounces off. + 1 means that the surface is behind, bottom, etc
 					return true;
 				}
 			}
 			return false;
 		}
 
-		bvec3 l1 = lessThan(sideDist[0], sideDist[1], sideDist[2], sideDist[1], sideDist[2], sideDist[0]);
-		bvec3 l2 = lessThanEqual(sideDist[0], sideDist[1], sideDist[2], sideDist[2], sideDist[0], sideDist[1]);
+		bvec3 l1 = LessThan(sideDist[0], sideDist[1], sideDist[2], sideDist[1], sideDist[2], sideDist[0]);
+		bvec3 l2 = LessThanEqual(sideDist[0], sideDist[1], sideDist[2], sideDist[2], sideDist[0], sideDist[1]);
 
 		mask[0] = l1[0] && l2[0];
 		mask[1] = l1[1] && l2[1];
@@ -208,17 +208,17 @@ bool WorldCollusionDetector::isEntityOnGround(Entity* entity) {
 
 	for (int x = 0; x <= ix; x++) {
 		for (int z = 0; z <= iz; z++) {
-			vec3 origin_ = hitboxStart + vec3(x, 0, z);
+			vec3 origin = hitboxStart + vec3(x, 0, z);
 
-			if (origin_.x > hitboxEnd.x)
-				origin_.x = hitboxEnd.x;
-			if (origin_.z > hitboxEnd.z)
-				origin_.z = hitboxEnd.z;
+			if (origin.x > hitboxEnd.x)
+				origin.x = hitboxEnd.x;
+			if (origin.z > hitboxEnd.z)
+				origin.z = hitboxEnd.z;
 
 			float distance = 0.f;
 
 			//Set the distance to check to the previose least length from collusion to optimize searching
-			distance = GetDistanceUntilCollusionSingleDirection(origin_, NY, (int)floor(leastLength) + 2);
+			distance = GetDistanceUntilCollusionSingleDirection(origin, NY, (int)floor(leastLength) + 2);
 
 			if (distance < leastLength) {
 				leastLength = distance;

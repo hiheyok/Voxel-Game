@@ -40,7 +40,9 @@ void MeshingV2::ChunkMeshData::GenerateCache() {
 	const BlockID* container = chunk_->block_storage_.GetContainerData();
 	for (int x = 0; x < 16; x++) {
 		for (int z = 0; z < 16; z++) {
-			memcpy(chunk_cache_ + (x + 1) * 18 * 18 + (z + 1) * 18 + (1), container + (x << 8) + (z << 4), 16 * sizeof(BlockID));
+			memcpy(chunk_cache_ + (x + 1) * 18 * 18 + (z + 1) * 18 + (1),
+				container + (static_cast<long long>(x) << 8) + (static_cast<long long>(z) << 4),
+				16 * sizeof(BlockID));
 		}
 	}
 
@@ -114,8 +116,8 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 					const BlockID& backBlock = GetCachedBlockID(pos[0], pos[1], pos[2]);
 					++pos[axis];
 
-					const ModelV2::BlockModelV2& currModel = Blocks.GetBlockModelDereferenced(currBlock);
-					const ModelV2::BlockModelV2& backModel = Blocks.GetBlockModelDereferenced(backBlock);
+					const ModelV2::BlockModelV2& currModel = g_blocks.GetBlockModelDereferenced(currBlock);
+					const ModelV2::BlockModelV2& backModel = g_blocks.GetBlockModelDereferenced(backBlock);
 
 					bool blankCurrModel = !currModel.is_initialized_ || pos[axis] == 16;
 					bool blankBackModel = !backModel.is_initialized_ || pos[axis] == 0;
@@ -202,7 +204,7 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 							break;
 						}
 
-						memset(usedBlock.data() + (qPos[axisU] << 4) + pos[axisV], vLength, vLength);
+						memset(usedBlock.data() + (static_cast<long long>(qPos[axisU]) << 4) + pos[axisV], vLength, vLength);
 
 						++uLength;
 					}
@@ -368,14 +370,14 @@ inline glm::ivec4 MeshingV2::ChunkMeshData::getAO(uint8_t direction, int x, int 
 	//Check up
 	pos[axis1] += 1;
 
-	if (GetCachedBlockID(pos.x, pos.y, pos.z) != Blocks.AIR) {
+	if (GetCachedBlockID(pos.x, pos.y, pos.z) != g_blocks.AIR) {
 		PP -= AMBIENT_OCCLUSION_STRENGTH;
 		PN -= AMBIENT_OCCLUSION_STRENGTH;
 	}
 
 	pos[axis1] -= 2;
 
-	if (GetCachedBlockID(pos.x, pos.y, pos.z) != Blocks.AIR) {
+	if (GetCachedBlockID(pos.x, pos.y, pos.z) != g_blocks.AIR) {
 		NP -= AMBIENT_OCCLUSION_STRENGTH;
 		NN -= AMBIENT_OCCLUSION_STRENGTH;
 	}
@@ -383,14 +385,14 @@ inline glm::ivec4 MeshingV2::ChunkMeshData::getAO(uint8_t direction, int x, int 
 	pos[axis1] += 1;
 	pos[axis2] += 1;
 
-	if (GetCachedBlockID(pos.x, pos.y, pos.z) != Blocks.AIR) {
+	if (GetCachedBlockID(pos.x, pos.y, pos.z) != g_blocks.AIR) {
 		NP -= AMBIENT_OCCLUSION_STRENGTH;
 		PP -= AMBIENT_OCCLUSION_STRENGTH;
 	}
 
 	pos[axis2] -= 2;
 
-	if (GetCachedBlockID(pos.x, pos.y, pos.z) != Blocks.AIR) {
+	if (GetCachedBlockID(pos.x, pos.y, pos.z) != g_blocks.AIR) {
 		PN -= AMBIENT_OCCLUSION_STRENGTH;
 		NN -= AMBIENT_OCCLUSION_STRENGTH;
 	}
@@ -402,21 +404,21 @@ inline glm::ivec4 MeshingV2::ChunkMeshData::getAO(uint8_t direction, int x, int 
 	pos[axis1] += 1;
 	pos[axis2] += 1;
 
-	if (GetCachedBlockID(pos.x, pos.y, pos.z) != Blocks.AIR)
+	if (GetCachedBlockID(pos.x, pos.y, pos.z) != g_blocks.AIR)
 		PP -= AMBIENT_OCCLUSION_STRENGTH;
 
 	pos[axis1] -= 2;
-	if (GetCachedBlockID(pos.x, pos.y, pos.z) != Blocks.AIR)
+	if (GetCachedBlockID(pos.x, pos.y, pos.z) != g_blocks.AIR)
 		NP -= AMBIENT_OCCLUSION_STRENGTH;
 
 	pos[axis2] -= 2;
 
-	if (GetCachedBlockID(pos.x, pos.y, pos.z) != Blocks.AIR)
+	if (GetCachedBlockID(pos.x, pos.y, pos.z) != g_blocks.AIR)
 		NN -= AMBIENT_OCCLUSION_STRENGTH;
 
 	pos[axis1] += 2;
 
-	if (GetCachedBlockID(pos.x, pos.y, pos.z) != Blocks.AIR)
+	if (GetCachedBlockID(pos.x, pos.y, pos.z) != g_blocks.AIR)
 		PN -= AMBIENT_OCCLUSION_STRENGTH;
 
 
@@ -456,7 +458,7 @@ inline bool MeshingV2::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int x, i
 	p[axis_] += 1 - 2 * (side & 0b1);
 //	return getCachedBlockID(p[0], p[1], p[2]) == Blocks.AIR;
 
-	const ModelV2::BlockModelV2& model = Blocks.GetBlockModelDereferenced(GetCachedBlockID(p[0], p[1], p[2]));
+	const ModelV2::BlockModelV2& model = g_blocks.GetBlockModelDereferenced(GetCachedBlockID(p[0], p[1], p[2]));
 
 	if (!model.is_initialized_) return true;
 
@@ -490,7 +492,7 @@ inline bool MeshingV2::ChunkMeshData::IsFaceVisibleUnsafe(const Cuboid& cube, in
 
 	p[axis_] += 1 - 2 * (side & 0b1);
 
-	return Blocks.GetBlockType(GetCachedBlockID(p[0], p[1], p[2]))->properties_->transparency_;
+	return g_blocks.GetBlockType(GetCachedBlockID(p[0], p[1], p[2]))->properties_->transparency_;
 }
 
 inline bool MeshingV2::ChunkMeshData::CompareBlockSide(int x, int y, int z, uint8_t side, BlockID b) {

@@ -31,5 +31,5 @@ private:
 		return (x << 8) | (z << 4) | y;
 	}
 	
-	BlockID data_[4096]{Blocks.AIR};
+	BlockID data_[4096]{g_blocks.AIR};
 };

@@ -4,10 +4,10 @@
 
 class DebugScreen {
 private:
-	GLFWwindow* window = nullptr;
-	TextRenderer renderer;
-	float fps;
-	int VRAMUsageMB = 0;
+	GLFWwindow* window_ = nullptr;
+	TextRenderer renderer_;
+	float fps_ = 0.0;
+	int vram_usage_mb_ = 0;
 	glm::vec3 position_ = glm::vec3(0.f, 0.f, 0.f);
 
 public:

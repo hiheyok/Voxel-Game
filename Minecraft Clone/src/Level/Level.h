@@ -4,7 +4,7 @@
 
 class Level {
 public:
-	Dimension* main_world_;
+	Dimension* main_world_  = nullptr;
 	LevelLoader level_loader_;
 
 	Level() {

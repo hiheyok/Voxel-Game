@@ -3,20 +3,20 @@
 using namespace glm;
 
 void PlayerPOV::SetPosition(vec3 pos) {
-	camera.position_ = pos;
+	camera_.position_ = pos;
 }
 
 void PlayerPOV::SetRotation(vec2 rot) {
-	camera.yaw_ = rot.x;
-	camera.pitch_ = rot.y;
+	camera_.yaw_ = rot.x;
+	camera_.pitch_ = rot.y;
 
-	camera.updateCameraVectors();
+	camera_.updateCameraVectors();
 }
 
-void PlayerPOV::SetFOV(float fov_) {
-	camera.fov_ = fov_;
+void PlayerPOV::SetFOV(float fov) {
+	camera_.fov_ = fov;
 }
 
-Camera* PlayerPOV::getCamera() {
-	return &camera;
+Camera* PlayerPOV::GetCamera() {
+	return &camera_;
 }

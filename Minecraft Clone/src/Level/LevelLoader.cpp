@@ -13,7 +13,7 @@ void LevelLoader::Stop() {
 	world_generator_.Stop();
 }
 
-int LevelLoader::getChunkCount() {
+size_t LevelLoader::getChunkCount() {
 	return count;
 }
 

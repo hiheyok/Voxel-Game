@@ -8,7 +8,7 @@ void EntityRendererUpdater::SetEntityRenderer(MultiEntityRenderer* render, Timer
 }
 
 void EntityRendererUpdater::UpdaterThread() {
-	while (!stop) {
+	while (!stop_) {
 		Dimension* world = static_cast<Dimension*>(Block::dimension_ptr_);
 
 		std::vector<EntityProperty> UpdatedEntities = world->world_interactions_.getUpdatedEntities();
@@ -28,12 +28,12 @@ void EntityRendererUpdater::UpdaterThread() {
 }
 
 void EntityRendererUpdater::Start() {
-	stop = false;
+	stop_ = false;
 	update_thread_ = std::thread(&EntityRendererUpdater::UpdaterThread, this);
 }
 
 void EntityRendererUpdater::Stop() {
-	stop = true;
+	stop_ = true;
 	update_thread_.join();
 }
 

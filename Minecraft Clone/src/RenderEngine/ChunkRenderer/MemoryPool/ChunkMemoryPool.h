@@ -82,7 +82,7 @@ namespace MemoryManagement {
 			return mem_blocks_.size();
 		}
 
-		int GetFragmentCount() const {
+		size_t GetFragmentCount() const {
 			return mem_blocks_.size();
 		}
 
@@ -200,11 +200,11 @@ namespace MemoryManagement {
 			return ULLONG_MAX;
 		}
 
-		int GetFreeSpaceFragmentCount() const {
+		size_t GetFreeSpaceFragmentCount() const {
 			return free_memory_blocks_.GetFragmentCount();
 		}
 
-		int GetReserveSpaceFragmentCount() const {
+		size_t GetReserveSpaceFragmentCount() const {
 			return reserved_memory_blocks_.GetFragmentCount();
 		}
 
@@ -228,7 +228,7 @@ namespace MemoryManagement {
 class ChunkGPUMemoryPool {
 public:
 
-	void Allocate(int MemoryPoolSize) {
+	void Allocate(size_t MemoryPoolSize) {
 		memory_pool_size_ = MemoryPoolSize;
 
 		buffer_.Create(GL_ARRAY_BUFFER, MemoryPoolSize);
@@ -244,7 +244,7 @@ public:
 
 	void DeleteChunk(ChunkPos pos) {
 		if (!chunk_memory_offsets_.count(pos)) {
-			Logger.LogDebug("GPU Memory Pool","Attempted to delete non-existant chunk with ID " + std::to_string(pos));
+			g_logger.LogDebug("GPU Memory Pool","Attempted to delete non-existant chunk with ID " + std::to_string(pos));
 			return;
 		}
 
@@ -263,7 +263,7 @@ public:
 		size_t blockOffset = memory_pool_.FindFreeSpace(blockSize);
 
 		if (blockOffset == ULLONG_MAX) { //Check if it is out of space
-			Logger.LogError("GPU Memory Pool", "Out of space!");
+			g_logger.LogError("GPU Memory Pool", "Out of space!");
 			return ChunkMemoryPoolOffset{ ULLONG_MAX, ULLONG_MAX };
 		}
 
@@ -334,6 +334,6 @@ public:
 	FastHashMap<ChunkPos, ChunkMemoryPoolOffset> chunk_memory_offsets_;
 	FastHashMap<size_t, ChunkPos> memory_chunk_offsets_;
 
-	int memory_pool_size_ = 0;
+	size_t memory_pool_size_ = 0;
 
 };

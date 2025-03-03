@@ -90,7 +90,7 @@ public:
     static Biome* getRegisteredBiome(std::string name) {
         Biome* biome;
 
-        biome = Biome::REGISTRY.GetValue(ResourceLocation(name).PATH);
+        biome = Biome::REGISTRY.GetValue(ResourceLocation(name).path_);
 
         return biome;
     }
