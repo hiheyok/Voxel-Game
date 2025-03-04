@@ -53,14 +53,16 @@ public:
 		is_initialized_ = false;
 	}
 
-	
-
 	inline bool IsEmpty() {
 		return element_count_ <= 0;
 	}
 
 	inline bool IsFull() {
 		return element_count_ >= queue_size_;
+	}
+
+	inline bool IsInitialized() {
+		return is_initialized_;
 	}
 
 	

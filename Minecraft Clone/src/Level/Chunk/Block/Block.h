@@ -51,5 +51,5 @@ struct Block {
 	std::string block_name_ = "";
 };
 
-__declspec(selectany) void* Block::dimension_ptr_ = nullptr;
-__declspec(selectany) void* Block::server_ptr_ = nullptr;
+inline void* Block::dimension_ptr_ = nullptr;
+inline void* Block::server_ptr_ = nullptr;

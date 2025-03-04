@@ -34,13 +34,13 @@ struct Fluid : Block {
 				continue;
 			}
 
-			if (currentWorld->CheckTickUsed(EventHandler.BlockPlace, pos)) {
+			if (currentWorld->CheckTickUsed(g_event_handler.BlockPlace, pos)) {
 				return;
 			}
 
-			currentWorld->TickUsed(EventHandler.BlockPlace, pos);
+			currentWorld->TickUsed(g_event_handler.BlockPlace, pos);
 
-			Event::BlockEvent blockEvent{newPos, g_blocks.WATER, EventHandler.BlockPlace};
+			Event::BlockEvent blockEvent{newPos, g_blocks.WATER, g_event_handler.BlockPlace};
 			currentWorld->event_manager_.AddEvent(blockEvent);
 
 		}

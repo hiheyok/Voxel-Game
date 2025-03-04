@@ -42,7 +42,7 @@ void WorldInteraction::BreakBlock(Ray ray, Dimension* dimension) {
 		breakBlock.pos_ = BlockPos{ (int)floor(ray.end_point_.x),
 									(int)floor(ray.end_point_.y),
 									(int)floor(ray.end_point_.z) };
-		breakBlock.id_ = EventHandler.BlockPlace;
+		breakBlock.id_ = g_event_handler.BlockPlace;
 		dimension->event_manager_.AddEvent(breakBlock);
 
 	}
@@ -60,7 +60,7 @@ void WorldInteraction::PlaceBlock(Ray ray, BlockID block, Dimension* dimension) 
 
 		placeBlock.block_ = block;
 		placeBlock.pos_ = BlockPos{ placePos.x, placePos.y, placePos.z };
-		placeBlock.id_ = EventHandler.BlockPlace;
+		placeBlock.id_ = g_event_handler.BlockPlace;
 
 		dimension->event_manager_.AddEvent(placeBlock);
 

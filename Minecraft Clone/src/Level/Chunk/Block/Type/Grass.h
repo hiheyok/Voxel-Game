@@ -44,7 +44,7 @@ struct GrassBlock : Block {
 			return;
 		}
 
-		Event::BlockEvent grassSpread{pos, g_blocks.GRASS, EventHandler.BlockTick};
+		Event::BlockEvent grassSpread{pos, g_blocks.GRASS, g_event_handler.BlockTick};
 		currentWorld->event_manager_.AddEvent(grassSpread);
 	}
 
@@ -92,7 +92,7 @@ struct GrassBlock : Block {
 					//Chance it spread
 					if (TestProbability(properties_.spread_chance_)) {
 
-						Event::BlockEvent blockEvent{newPos,g_blocks.GRASS, EventHandler.BlockPlace};
+						Event::BlockEvent blockEvent{newPos,g_blocks.GRASS, g_event_handler.BlockPlace};
 						currentWorld->event_manager_.AddEvent(blockEvent);
 
 						continue;

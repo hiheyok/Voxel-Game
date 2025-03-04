@@ -18,16 +18,13 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\World\World.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\World\Chunk\Chunk.cpp">
+    <ClCompile Include="src\Level\Chunk\Chunk.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Client\Client.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\World\Chunk\Block\Block.cpp">
+    <ClCompile Include="src\Level\Chunk\Block\Block.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Utils\LogUtils.cpp">
@@ -60,7 +57,7 @@
     <ClCompile Include="src\RenderEngine\OpenGL\OpenGL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\World\Chunk\ChunkData.cpp">
+    <ClCompile Include="src\Level\Chunk\ChunkData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Client\Render\WorldRender.cpp">
@@ -69,58 +66,49 @@
     <ClCompile Include="src\Client\Render\PlayerPOV.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshing.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\World\DataContainer\WorldData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\World\TerrainGeneration\Generator.cpp">
+    <ClCompile Include="src\Level\TerrainGeneration\Generator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\ChunkRenderer\Batch\ChunkBatch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\World\DataContainer\ChunkMapData.cpp">
+    <ClCompile Include="src\Level\DataContainer\ChunkMapData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\ChunkRenderer\TerrainRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\World\Server\Server.cpp">
+    <ClCompile Include="src\Level\Timer\Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\World\Server\Time\Timer.cpp">
+    <ClCompile Include="src\Utils\Math\Matrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Math\Matrix.cpp">
+    <ClCompile Include="src\Level\Chunk\Block\Blocks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\World\Chunk\Block\Blocks.cpp">
+    <ClCompile Include="src\Level\Collusion\CollusionTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\World\Collusion\CollusionTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\World\Event\BlockEventHandles\BlockHandles.cpp">
+    <ClCompile Include="src\Level\Event\BlockEventHandles\BlockHandles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Utils\Math\Probability\Probability.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\World\Chunk\Block\Material\BlockMaterial.cpp">
+    <ClCompile Include="src\Level\Chunk\Block\Material\BlockMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\EntityRenderer\Models\EntityModels.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\World\Entity\Entity.cpp">
+    <ClCompile Include="src\Level\Entity\Entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\World\Entity\Entities.cpp">
+    <ClCompile Include="src\Level\Entity\Entities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\World\Event\EntityEventHandles\EntityHandles.cpp">
+    <ClCompile Include="src\Level\Event\EntityEventHandles\EntityHandles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\EntityRenderer\MultiEntityRender.h">
@@ -129,7 +117,7 @@
     <ClCompile Include="src\Core\Initializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\World\Item\Items.cpp">
+    <ClCompile Include="src\Level\Item\Items.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Client\Player\MainPlayer.cpp">
@@ -153,39 +141,177 @@
     <ClCompile Include="src\RenderEngine\GUI\GUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Level\Event\ChunkEventHandles\ChunkHandles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\GUI\Font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\World\Collusion\WorldCollusion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\World\WorldDataAccess.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\World\World.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\World\WorldInteraction\WorldLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Registry\Registry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Registry\ResourceLocation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Options\Option.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Client\IO\IO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FileManager\Files.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Client\Render\DebugScreen\DebugScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utils\Containers\BitStorage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\LevelLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Level.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\World\WorldInteraction\WorldInteractions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Structures\Structure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Random\JavaRandom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Generators\GeneratorType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Generators\Superflat\Superflat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Generators\Mountains\Mountains.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Generators\Minecraft\Overworld.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Generators\Minecraft\MinecraftTerrain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Generators\Math\MainWorld.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Generators\FastTerrain\FastTerrain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugSecond\DebugSecond.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Noisemaps\NoiseOctave.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Noisemaps\Noisemap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Noisemaps\MinecraftNoiseGeneratorSimplex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Noisemaps\MinecraftNoiseGeneratorPerlin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Noisemaps\MinecraftNoiseGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Biome\BiomeProperties.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Server\Server.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Server\Communication\InternalServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Lighting\LightEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Item\ItemTextureAtlas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Item\ItemStack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Item\Item.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Item\Inventory\Inventory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Event\EventSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Event\EventHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Chunk\Heightmap\Heightmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\BlockModel\ModelLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\BlockModel\BlockModels.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshingV2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Generators\Debug\Debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Client\Profiler\PerformanceProfiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Chunk\ChunkPos\ChunkPos.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugPositioning\DebugPositioning.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utils\Math\Vector\Vec.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\World\World.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\World\Chunk\Chunk.h">
+    <ClInclude Include="src\Level\Chunk\Chunk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Client\Client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Chunk\Block\Block.h">
+    <ClInclude Include="src\Level\Chunk\Block\Block.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Chunk\Block\Blocks.h">
+    <ClInclude Include="src\Level\Chunk\Block\Blocks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\DataContainer\BlockData.h">
+    <ClInclude Include="src\Level\DataContainer\BlockData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Utils\LogUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Utils\Clock.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\World\Chunk\ChunkID.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Utils\Math\Matrix\mat4.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Utils\Math\FastMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Utils\FastNoiseLite.h">
@@ -197,13 +323,13 @@
     <ClInclude Include="src\Utils\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\DataContainer\ChunkMapData.h">
+    <ClInclude Include="src\Level\DataContainer\ChunkMapData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Chunk\ChunkData.h">
+    <ClInclude Include="src\Level\Chunk\ChunkData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\Camera\camera.h">
@@ -242,7 +368,7 @@
     <ClInclude Include="src\RenderEngine\OpenGL\OpenGL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Chunk\Block\Texture\BlockTexture.h">
+    <ClInclude Include="src\Level\Chunk\Block\Texture\BlockTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Client\Player.h">
@@ -257,25 +383,19 @@
     <ClInclude Include="src\Client\Render\PlayerPOV.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Entity\Entities.h">
+    <ClInclude Include="src\Level\Entity\Entities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Entity\Collusion\Hitbox.h">
+    <ClInclude Include="src\Level\Entity\Collusion\Hitbox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Entity\Type\EntityType.h">
+    <ClInclude Include="src\Level\Entity\Type\EntityType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Entity\Entity.h">
+    <ClInclude Include="src\Level\Entity\Entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshing.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\World\DataContainer\WorldData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\World\TerrainGeneration\Generator.h">
+    <ClInclude Include="src\Level\TerrainGeneration\Generator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\EntityRenderer\Models\EntityModel.h">
@@ -287,55 +407,52 @@
     <ClInclude Include="src\RenderEngine\ChunkRenderer\TerrainRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\TerrainGeneration\Structures\Structure.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\World\Server\Server.h">
+    <ClInclude Include="src\Level\TerrainGeneration\Structures\Structure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Occulsion\Graph\Graph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Chunk\Block\Type\Grass.h">
+    <ClInclude Include="src\Level\Chunk\Block\Type\Grass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Server\Time\Timer.h">
+    <ClInclude Include="src\Level\Timer\Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Utils\Math\vectorOperations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Event\EventSystem.h">
+    <ClInclude Include="src\Level\Event\EventSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Event\Event.h">
+    <ClInclude Include="src\Level\Event\Event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Math\Matrix.h">
+    <ClInclude Include="src\Utils\Math\Matrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Event\EventHandler.h">
+    <ClInclude Include="src\Level\Event\EventHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Chunk\Block\Type\Dirt.h">
+    <ClInclude Include="src\Level\Chunk\Block\Type\Dirt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Chunk\Block\Material\BlockMaterial.h">
+    <ClInclude Include="src\Level\Chunk\Block\Material\BlockMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Event\BlockEventHandles\BlockHandles.h">
+    <ClInclude Include="src\Level\Event\BlockEventHandles\BlockHandles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Utils\Math\Probability\Probability.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Chunk\Block\Type\Fluid.h">
+    <ClInclude Include="src\Level\Chunk\Block\Type\Fluid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Chunk\Block\Type\BlockTypes.h">
+    <ClInclude Include="src\Level\Chunk\Block\Type\BlockTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Entity\Properties\EntityProperties.h">
+    <ClInclude Include="src\Level\Entity\Properties\EntityProperties.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Occulsion\Data\OcculsionData.h">
@@ -344,55 +461,52 @@
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Occulsion\Data\OcculsionDataManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\DataContainer\EntityContainer.h">
+    <ClInclude Include="src\Level\DataContainer\EntityContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Entity\Type\Passive.h">
+    <ClInclude Include="src\Level\Entity\Type\Passive.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\EntityRenderer\EntityRenderCache.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Entity\Type\FallingBlock.h">
+    <ClInclude Include="src\Level\Entity\Type\FallingBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\WorldProperties.h">
+    <ClInclude Include="src\Level\Entity\Type\Hostile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Entity\Type\Hostile.h">
+    <ClInclude Include="src\Level\Chunk\Block\Type\GravityBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Chunk\Block\Type\GravityBlock.h">
+    <ClInclude Include="src\Level\Event\EntityEventHandles\EntityHandles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Event\EntityEventHandles\EntityHandles.h">
+    <ClInclude Include="src\Level\Typenames.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Typenames.h">
+    <ClInclude Include="src\Level\Entity\Type\Types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Entity\Type\Types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\World\Item\Inventory\Inventory.h">
+    <ClInclude Include="src\Level\Item\Inventory\Inventory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Client\Player\MainPlayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Item\Item.h">
+    <ClInclude Include="src\Level\Item\Item.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Item\ItemStack.h">
+    <ClInclude Include="src\Level\Item\ItemStack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Item\Type\BlockItem.h">
+    <ClInclude Include="src\Level\Item\Type\BlockItem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Item\Inventory\PlayerInventory.h">
+    <ClInclude Include="src\Level\Item\Inventory\PlayerInventory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Item\Items.h">
+    <ClInclude Include="src\Level\Item\Items.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Initializer.h">
@@ -407,7 +521,7 @@
     <ClInclude Include="src\Client\Player\WorldInteraction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Item\Inventory\EntityInventory.h">
+    <ClInclude Include="src\Level\Item\Inventory\EntityInventory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Client\Player\PlayerMovement.h">
@@ -416,7 +530,7 @@
     <ClInclude Include="src\Client\Render\WorldRenderInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Entity\Mobs\Player.h">
+    <ClInclude Include="src\Level\Entity\Mobs\Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\EntityRenderer\EntityRenderUpdate.h">
@@ -431,7 +545,7 @@
     <ClInclude Include="src\RenderEngine\GUI\GUISet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\World\Item\ItemTextureAtlas.h">
+    <ClInclude Include="src\Level\Item\ItemTextureAtlas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\ItemRender\BlockItemRender.h">
@@ -440,7 +554,328 @@
     <ClInclude Include="src\Utils\Containers\BitStorage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\ChunkRendererV2\MemoryPool\ChunkMemoryPool.h">
+    <ClInclude Include="src\RenderEngine\ChunkRenderer\MemoryPool\ChunkMemoryPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Generators\Generator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Generators\Mountains\Mountains.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Generators\Superflat\Superflat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Generators\FastTerrain\FastTerrain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Generators\Math\MathWorld.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Generators\DebugSecond\DebugSecond.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Generators\Generators.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Generators\GeneratorType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FileManager\Files.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Generators\Minecraft\MinecraftTerrain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Noisemaps\Noisemap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Noisemaps\TerrainParameters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Options\Option.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\ChunkRenderer\Batch\RenderCommandBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\BlockModel\RectangularModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\BlockModel\BlockModels.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Registry\Registry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Registry\ResourceLocation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Chunk\ChunkColumn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Noisemaps\NoiseOctave.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Noisemaps\Noise.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Noisemaps\MinecraftNoiseGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Random\JavaRandom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Noisemaps\MinecraftNoiseGeneratorPerlin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Noisemaps\MinecraftNoiseGeneratorSimplex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Generators\Minecraft\Overworld.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Chunk\Lighting\ChunkLighting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Event\ChunkEventHandles\ChunkHandles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\GUI\Font.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\GUI\TextRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Client\Render\DebugScreen\DebugScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Level.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Dimension\Dimension.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\World\World.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\World\WorldDataAccess.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\World\Collusion\WorldCollusion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Dimension\DimensionProperties.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\World\WorldInteraction\WorldInteractions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\World\WorldParameters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\World\WorldInteraction\WorldLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Dimension\Dimensions\Overworld.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Server\Server.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Server\Communication\InternalServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\LevelLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Lighting\LightEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\Biome.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeProperties.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Chunk\Heightmap\Heightmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\Biomes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeBeach.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeDesert.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeEnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeForest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeForestMutated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeHell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeHills.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeJungle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeMesa.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeMushroomIsland.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeOcean.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomePlains.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeRiver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeSavanna.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeSavannaMutated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeSnow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeStoneBeach.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeSwamp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeTaiga.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeVoid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\CombineLayers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerAddIsland.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerAddMushroomIsland.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerAddSnow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerBiome.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerBiomeEdge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerDeepOcean.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerEdge.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerFuzzyZoom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerHills.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerIsland.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerRareBiome.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerRemoveTooMuchOcean.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerRiver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerRiverInit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerRiverMix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerShore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerSmooth.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerVoronoiZoom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerZoom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\IntCache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Chunk\TallChunk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\MapGen\MapGenBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\MapGen\MapGenCaves.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\BlockModel\ModelLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils\Containers\skaHashmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshingV2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Generators\Debug\Debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureAtlas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Client\Communication\ServerInteraction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Client\Profiler\PerformanceProfiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils\Containers\FIFOQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Chunk\ChunkPos\ChunkPos.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Generators\DebugPositioning\DebugPositioning.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils\Math\Vector\Vec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils\ThreadPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

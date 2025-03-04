@@ -2,6 +2,7 @@
 #include "../GenLayer/CombineLayers.h"
 #include <concurrent_unordered_map.h>
 //mc src
+inline std::mutex g_biome_lock;
 
 class BiomeProvider {
 private:
@@ -9,8 +10,6 @@ private:
 	static std::vector<GenLayer*> biomeIndexLayer;
 	static ChunkGeneratorSettings* settings_;
 	static concurrency::concurrent_unordered_map<size_t, size_t> ThreadGenIndex;
-	static std::mutex lock;
-	
 	static long long biomeProviderSeed;
 public:
 	BiomeProvider() {
@@ -21,13 +20,12 @@ public:
 	}
 
 	static void init(long long seed, ChunkGeneratorSettings* settingsIn) {
-		BiomeProvider::lock.lock();
+		std::lock_guard<std::mutex> lock{ g_biome_lock };
 		std::vector<GenLayer*> agenlayer = CombinedGenLayers::initializeAllBiomeGenerators(seed, settingsIn);
 		BiomeProvider::genBiomes.push_back(agenlayer[0]);
 		BiomeProvider::biomeIndexLayer.push_back(agenlayer[1]);
 		BiomeProvider::settings_ = settingsIn;
 		BiomeProvider::biomeProviderSeed = seed;
-		BiomeProvider::lock.unlock();
 	}
 
 	static std::vector<Biome*> getBiomesForGeneration(int x, int z, int width, int length) {
@@ -71,9 +69,8 @@ public:
 	}
 };
 
-_declspec(selectany) std::vector<GenLayer*> BiomeProvider::genBiomes = std::vector<GenLayer*>();
-_declspec(selectany) std::vector<GenLayer*> BiomeProvider::biomeIndexLayer = std::vector<GenLayer*>();
-_declspec(selectany) ChunkGeneratorSettings* BiomeProvider::settings_ = nullptr;
-_declspec(selectany) long long BiomeProvider::biomeProviderSeed = 0;
-_declspec(selectany) concurrency::concurrent_unordered_map<size_t, size_t> BiomeProvider::ThreadGenIndex = concurrency::concurrent_unordered_map<size_t, size_t>();
-_declspec(selectany) std::mutex BiomeProvider::lock;
+inline std::vector<GenLayer*> BiomeProvider::genBiomes = std::vector<GenLayer*>();
+inline std::vector<GenLayer*> BiomeProvider::biomeIndexLayer = std::vector<GenLayer*>();
+inline ChunkGeneratorSettings* BiomeProvider::settings_ = nullptr;
+inline long long BiomeProvider::biomeProviderSeed = 0;
+inline concurrency::concurrent_unordered_map<size_t, size_t> BiomeProvider::ThreadGenIndex = concurrency::concurrent_unordered_map<size_t, size_t>();

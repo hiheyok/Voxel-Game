@@ -99,7 +99,7 @@ public:
 				throw std::exception("Not handled yet!");
 			}
 
-			EventHandler.ExecuteEvent(e);
+			g_event_handler.ExecuteEvent(e);
 		}
 
 		EventQueue->clear();

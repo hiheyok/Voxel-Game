@@ -14,10 +14,10 @@ struct GravityBlock : Block {
 		bool isBlockSupported = g_blocks.GetBlockType(currentWorld->world_interactions_.GetBlock(belowPos))->properties_->is_solid_;
 
 		if (!isBlockSupported) {
-			Event::BlockEvent destroyBlock{pos, g_blocks.AIR, EventHandler.BlockPlace};
+			Event::BlockEvent destroyBlock{pos, g_blocks.AIR, g_event_handler.BlockPlace};
 			Event::EntityEvent summonSand;
 
-			summonSand.id_ = EventHandler.SummonEntity;
+			summonSand.id_ = g_event_handler.SummonEntity;
 			summonSand.pos_ = pos;
 			summonSand.entity_type_ = g_entity_list.SAND_GRAVITY_BLOCK;
 

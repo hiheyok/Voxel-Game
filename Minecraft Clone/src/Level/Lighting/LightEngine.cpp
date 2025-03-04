@@ -3,7 +3,7 @@
 
 using namespace glm;
 
-thread_local FixedFIFOQueue<uint16_t> FIFOQueues;
+static thread_local FixedFIFOQueue<uint16_t> FIFOQueues;
 
 constexpr int8_t DIRECTION_OFFSETS[6][3] = {
 	{-1, 0, 0}, {1, 0, 0},  // X: Left, Right
@@ -116,10 +116,14 @@ void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, std::shared_ptr<ChunkLigh
 	}
 }
 
-std::vector<std::shared_ptr<ChunkLightingContainer>> LightingEngine::SkyLighting(const ChunkPos& pos) {
+std::vector<std::shared_ptr<ChunkLightingContainer>> LightingEngine::Worker(const ChunkPos& pos) {
+	if (!FIFOQueues.IsInitialized()) {
+		FIFOQueues.setSize(LightingEngine::DEFAULT_FIFO_QUEUE_SIZE);
+	}
+
 	uint8_t DarknessLightLevel = 12;
 	std::vector<std::shared_ptr<ChunkLightingContainer>> out;
-	ChunkColumn* col = world_->GetColumn(pos);
+	ChunkColumn* col = LightingEngine::world_->GetColumn(pos);
 
 	if (col == nullptr) return out;
 
@@ -145,164 +149,32 @@ std::vector<std::shared_ptr<ChunkLightingContainer>> LightingEngine::SkyLighting
 	return out;
 }
 
-void LightingEngine::Generate(std::vector<ChunkPos> IDs) {
-	std::lock_guard<std::mutex> lock{ scheduler_lock_ };
-	task_queue_.insert(task_queue_.end(), IDs.begin(), IDs.end());
+void LightingEngine::Generate(std::vector<ChunkPos> tasks) {
+	lighting_thread_pool_->SubmitTask(tasks);
 }
 
 std::vector<std::shared_ptr<ChunkLightingContainer>> LightingEngine::GetOutput() {
-	std::lock_guard<std::mutex> lock{ scheduler_lock_ };
-	std::vector<std::shared_ptr<ChunkLightingContainer>> out = std::move(output_);
-	output_.clear();
-
+	std::vector<std::shared_ptr<ChunkLightingContainer>> out;
+	for (auto& lights : lighting_thread_pool_->GetOutput()) {
+		out.insert(out.end(),
+			std::make_move_iterator(lights.begin()),
+			std::make_move_iterator(lights.end()));
+	}
 	return out;
 }
 
 void LightingEngine::Stop() {
-	stop_ = true;
-	scheduler_thread_.join();
-	for (size_t i = 0; i < workers_.size(); i++) {
-		workers_[i].join();
-	}
+	lighting_thread_pool_->Stop();
 }
 
 void LightingEngine::Start(int lightEngineThreadsCount, WorldAccess* w) {
-	stop_ = false;
-	thread_count_ = lightEngineThreadsCount;
-	world_ = w;
+	lighting_thread_pool_ = std::make_unique<ThreadPool<ChunkPos,
+		std::vector<std::shared_ptr<ChunkLightingContainer>>,
+		LightingEngine::Worker>>(lightEngineThreadsCount, "Light Engine", 100);
 
-	workers_.resize(thread_count_);
-	worker_task_.resize(thread_count_);
-	worker_locks_.resize(thread_count_);
-	worker_output_.resize(thread_count_);
-
-	scheduler_thread_ = std::thread(&LightingEngine::Scheduler, this);
-
-	for (int i = 0; i < thread_count_; i++) {
-		workers_[i] = std::thread(&LightingEngine::Worker, this, i);
-	}
+	LightingEngine::world_ = w;
 }
 
-void LightingEngine::QueueChunk(const ChunkColumnPos& columnID) {
-	//queue chunk
-	scheduler_lock_.lock();
-	task_queue_.emplace_back(columnID);
-	scheduler_lock_.unlock();
-}
-
-void LightingEngine::Worker(int id) {
-	const int WorkerID = id;
-
-	std::deque<ChunkColumnPos> jobs;
-	std::deque<std::shared_ptr<ChunkLightingContainer>> finishedJobs;
-
-	FIFOQueues.setSize(DEFAULT_FIFO_QUEUE_SIZE);
-
-	while (!stop_) {
-		//Fetches all of the tasks and put it in "Jobs"
-
-		{
-			std::lock_guard<std::mutex> lock{ worker_locks_[WorkerID] };
-			if (!worker_task_[WorkerID].empty()) {
-				jobs.insert(jobs.end(), worker_task_[WorkerID].begin(), worker_task_[WorkerID].end());
-				worker_task_[WorkerID].clear();
-			}
-			
-		}
-		
-
-		//Generates the chunks
-
-		const size_t numJobs = jobs.size();
-		const size_t batchSize = 100;
-
-		for (size_t i = 0; i < std::min(numJobs, batchSize); i++) {
-			ChunkPos task = std::move(jobs.front()); //fetches task
-			jobs.pop_front();
-			//Generate
-			
-			std::vector<std::shared_ptr<ChunkLightingContainer>> chunks = SkyLighting(task);
-			finishedJobs.insert(finishedJobs.end(), std::make_move_iterator(chunks.begin()), std::make_move_iterator(chunks.end()));
-		}
-
-		if (finishedJobs.size() != 0) {
-			std::lock_guard<std::mutex> lock{ worker_locks_[WorkerID] };
-			worker_output_[WorkerID].insert(worker_output_[WorkerID].end(), std::make_move_iterator(finishedJobs.begin()), std::make_move_iterator(finishedJobs.end()));
-			finishedJobs.clear();
-		}
-		timerSleepNotPrecise(1);
-	}
-	FIFOQueues.clear();
-
-	jobs.clear();
-	g_logger.LogInfo("Light Engine", "Shutting down light engine worker: " + std::to_string(WorkerID));
-}
-
-void LightingEngine::Scheduler() {
-	int workerSelection = 0;
-
-	std::deque<std::deque<ChunkPos>> distributedTasks;
-	std::deque<std::deque<std::shared_ptr<ChunkLightingContainer>>> chunkOutputs;
-
-	distributedTasks.resize(thread_count_);
-	chunkOutputs.resize(thread_count_);
-
-	std::deque<ChunkPos> internalTaskList;
-
-	while (!stop_) {
-
-		// Fetch tasks
-		{
-			std::lock_guard<std::mutex> lock{ scheduler_lock_ };
-			internalTaskList = std::move(task_queue_);
-			task_queue_.clear();
-		}
-		
-
-		// Internally distributes the jobs
-
-		while (!internalTaskList.empty()) {
-
-			ChunkPos task = std::move(internalTaskList.front());
-			internalTaskList.pop_front();
-
-			distributedTasks[workerSelection].push_back(task);
-
-			workerSelection++;
-
-			if (workerSelection == thread_count_)
-				workerSelection = 0;
-		}
-
-		// Distributes the tasks
-
-		for (int i = 0; i < thread_count_; i++) {
-			std::lock_guard<std::mutex> lock{ worker_locks_[i] };
-			worker_task_[i].insert(worker_task_[i].end(), std::make_move_iterator(distributedTasks[i].begin()), std::make_move_iterator(distributedTasks[i].end()));
-			distributedTasks[i].clear();
-		}
-
-		//Fetches worker output
-		for (int i = 0; i < thread_count_; i++) {
-			std::lock_guard<std::mutex> lock{ worker_locks_[i] };
-			chunkOutputs[i].insert(chunkOutputs[i].end(), std::make_move_iterator(worker_output_[i].begin()), std::make_move_iterator(worker_output_[i].end()));
-			worker_output_[i].clear();
-		}
-
-		//Output the chunks so it can be used
-		{
-			std::lock_guard<std::mutex> lock{ scheduler_lock_ };
-			for (int i = 0; i < thread_count_; i++) {
-				output_.insert(output_.end(), std::make_move_iterator(chunkOutputs[i].begin()), std::make_move_iterator(chunkOutputs[i].end()));
-				chunkOutputs[i].clear();
-			}
-		}
-		
-
-		timerSleepNotPrecise(1);
-
-	}
-
-	g_logger.LogInfo("Light Engine", "Shutting down light engine scheduler");
-
+void LightingEngine::QueueChunk(const ChunkPos& pos) {
+	lighting_thread_pool_->SubmitTask(pos);
 }

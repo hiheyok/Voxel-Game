@@ -26,4 +26,4 @@ public:
 	static long long world_seed_;
 };
 
-_declspec(selectany) long long WorldGenerator::world_seed_ = -1587754402;
+inline long long WorldGenerator::world_seed_ = -1587754402;

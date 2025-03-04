@@ -6,37 +6,9 @@
 #include <glm/vec4.hpp>
 #include "../../Utils/Containers/BitStorage.h"
 #include "../../Utils/Containers/FIFOQueue.h"
+#include "../../Utils/ThreadPool.h"
 
 class LightingEngine {
-private:
-	std::deque<ChunkPos> task_queue_;
-
-	std::mutex scheduler_lock_;
-
-	std::deque<std::thread> workers_;
-	std::deque<std::deque<ChunkPos>> worker_task_;
-	std::deque<std::deque<std::shared_ptr<ChunkLightingContainer>>> worker_output_;
-	std::deque<std::mutex> worker_locks_;
-
-
-	std::vector<std::shared_ptr<ChunkLightingContainer>> output_;
-	WorldAccess* world_ = nullptr;
-
-	std::thread scheduler_thread_;
-
-	int thread_count_ = 0;
-	const size_t DEFAULT_FIFO_QUEUE_SIZE = 32768;
-
-	bool stop_ = true;
-
-	void IncreaseLightLevel(std::shared_ptr<ChunkLightingContainer>& container, uint8_t lvl, int x, int y, int z);
-
-	void LightSpreadSky(Chunk* chunk, std::shared_ptr<ChunkLightingContainer>& container, const Heightmap& heightmap, int chunkHeight, int x, int y, int z);
-
-	void WorkOnChunkSkylight(Chunk* chunk, std::shared_ptr<ChunkLightingContainer>& light, const Heightmap& heightmap, int chunkHeight);
-
-	std::vector<std::shared_ptr<ChunkLightingContainer>> SkyLighting(const ChunkPos& id);
-
 public:
 	void Generate(std::vector<ChunkPos> IDs);
 
@@ -46,10 +18,26 @@ public:
 
 	void Start(int lightEngineThreadsCount, WorldAccess* w);
 
-	void QueueChunk(const ChunkPos& columnID);
+	void QueueChunk(const ChunkPos& pos);
 
-	void Worker(int id);
 
 	void Scheduler();
 
+private:
+	static std::vector<std::shared_ptr<ChunkLightingContainer>> Worker(const ChunkPos& pos);
+
+	std::unique_ptr<ThreadPool<ChunkPos, std::vector<std::shared_ptr<ChunkLightingContainer>>, LightingEngine::Worker>> lighting_thread_pool_;
+	static WorldAccess* world_;
+
+	static void IncreaseLightLevel(std::shared_ptr<ChunkLightingContainer>& container, uint8_t lvl, int x, int y, int z);
+
+	static void LightSpreadSky(Chunk* chunk, std::shared_ptr<ChunkLightingContainer>& container, const Heightmap& heightmap, int chunkHeight, int x, int y, int z);
+
+	static void WorkOnChunkSkylight(Chunk* chunk, std::shared_ptr<ChunkLightingContainer>& light, const Heightmap& heightmap, int chunkHeight);
+
+	static std::vector<std::shared_ptr<ChunkLightingContainer>> SkyLighting(const ChunkPos& id);
+	const static size_t DEFAULT_FIFO_QUEUE_SIZE = 32768;
+
 };
+
+inline WorldAccess* LightingEngine::world_ = nullptr;

@@ -9,6 +9,7 @@
 #include "../../RenderEngine/ChunkRenderer/TerrainRenderer.h"
 #include "WorldRenderInfo.h"
 #include "../Profiler/PerformanceProfiler.h"
+#include "../../Utils/ThreadPool.h"
 
 class WorldRender : public WorldRenderInfo{
 public:
@@ -32,26 +33,14 @@ public:
 	TerrainRenderer renderer_v2_;
 	PerformanceProfiler* profiler_;
 private:
-
-	void Worker(int id);
-
-	void TaskScheduler();
+	static std::unique_ptr<MeshingV2::ChunkVertexData> Worker(const ChunkPos& pos);
+	
+	std::unique_ptr<ThreadPool<ChunkPos, std::unique_ptr<MeshingV2::ChunkVertexData>, WorldRender::Worker>> mesh_thread_pool_;
+	std::vector<std::unique_ptr<MeshingV2::ChunkVertexData>> mesh_add_queue_;
 
 	PlayerPOV player_;
 	GLFWwindow* window_;
-	InternalServer* server_;
-
-	int worker_count_ = NULL;
-
-	bool stop_ = false;
-
-	std::deque<ChunkPos> task_list_; //All tasks will go in here and they will be distributed to all the workers
-
-	std::deque<std::thread> workers_;
-	std::deque<std::deque<ChunkPos>> worker_task_;
-	std::deque<std::deque<std::unique_ptr<MeshingV2::ChunkVertexData>>> worker_output_;
-	std::deque<std::mutex> worker_locks_;
-
-	std::thread scheduler_;
-	std::mutex scheduler_lock_;
+	static InternalServer* server_;
 };
+
+inline InternalServer* WorldRender::server_ = nullptr;

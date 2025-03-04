@@ -8,7 +8,7 @@
 #include "EntityEventHandles/EntityHandles.h"
 
 
-class _EventHandler {
+class EventHandler {
 private:
 	using EventFunctionTypes = std::variant<
 		void (*)(BlockID, const BlockPos&),
@@ -36,4 +36,4 @@ public:
 	void ExecuteEvent(Event::Event event);
 
 
-} __declspec(selectany) EventHandler;
+} inline g_event_handler;

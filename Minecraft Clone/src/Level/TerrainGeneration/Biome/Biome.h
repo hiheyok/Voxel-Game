@@ -246,9 +246,9 @@ public:
 
 };
 
-_declspec(selectany) Registry<std::string, Biome*> Biome::REGISTRY = Registry<std::string, Biome*>();
-_declspec(selectany) FastHashMap<Biome*, int> Biome::BiomeIDs = FastHashMap<Biome*, int>();
-_declspec(selectany) FastHashMap<int, Biome*> Biome::MUTATION_TO_BASE_ID_MAP = FastHashMap<int, Biome*>();
+inline Registry<std::string, Biome*> Biome::REGISTRY = Registry<std::string, Biome*>();
+inline FastHashMap<Biome*, int> Biome::BiomeIDs = FastHashMap<Biome*, int>();
+inline FastHashMap<int, Biome*> Biome::MUTATION_TO_BASE_ID_MAP = FastHashMap<int, Biome*>();
 
-_declspec(selectany) NoiseGeneratorPerlin Biome::TEMPERATURE_NOISE = NoiseGeneratorPerlin(JavaRandom(1234L), 1);
-_declspec(selectany) NoiseGeneratorPerlin Biome::GRASS_COLOR_NOISE = NoiseGeneratorPerlin(JavaRandom(2345L), 1);
+inline NoiseGeneratorPerlin Biome::TEMPERATURE_NOISE = NoiseGeneratorPerlin(JavaRandom(1234L), 1);
+inline NoiseGeneratorPerlin Biome::GRASS_COLOR_NOISE = NoiseGeneratorPerlin(JavaRandom(2345L), 1);

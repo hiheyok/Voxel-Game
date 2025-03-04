@@ -87,9 +87,9 @@ private:
 };
 
 // Initialize static variables
-__declspec(selectany) int IntCache::intCacheSize = 256;
-__declspec(selectany) std::vector<int*> IntCache::freeSmallArrays;
-__declspec(selectany) std::vector<int*> IntCache::inUseSmallArrays;
-__declspec(selectany) std::vector<int*> IntCache::freeLargeArrays;
-__declspec(selectany) std::vector<int*> IntCache::inUseLargeArrays;
-__declspec(selectany) std::mutex IntCache::mutex;
+inline int IntCache::intCacheSize = 256;
+inline std::vector<int*> IntCache::freeSmallArrays;
+inline std::vector<int*> IntCache::inUseSmallArrays;
+inline std::vector<int*> IntCache::freeLargeArrays;
+inline std::vector<int*> IntCache::inUseLargeArrays;
+inline std::mutex IntCache::mutex;

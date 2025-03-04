@@ -1,6 +1,6 @@
 #include "EventHandler.h"
 
-void _EventHandler::ExecuteEvent(Event::Event event) {
+void EventHandler::ExecuteEvent(Event::Event event) {
 	switch (event.type_) {
 	case Event::BLOCK_EVENT:
 	{
@@ -17,11 +17,11 @@ void _EventHandler::ExecuteEvent(Event::Event event) {
 	}
 }
 
-EventID _EventHandler::RegisterBlockEvent(void (*func)(BlockID, const BlockPos&)) {
+EventID EventHandler::RegisterBlockEvent(void (*func)(BlockID, const BlockPos&)) {
 	block_event_handles_[event_count_] = func;
 	return event_count_++;
 }
-EventID _EventHandler::RegisterEntityEvent(void (*func)(Event::EntityEvent)) {
+EventID EventHandler::RegisterEntityEvent(void (*func)(Event::EntityEvent)) {
 	entity_event_handles_[event_count_] = func;
 	return event_count_++;
 }

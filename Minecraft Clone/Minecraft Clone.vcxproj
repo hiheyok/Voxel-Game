@@ -30,20 +30,20 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2023</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2023</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2023</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <EnableASAN>false</EnableASAN>
     <EnableFuzzer>false</EnableFuzzer>
@@ -51,7 +51,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2023</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseIntelIPP1A>Dynamic_Library</UseIntelIPP1A>
@@ -118,20 +118,19 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <UseProcessorExtensions>None</UseProcessorExtensions>
-      <AdditionalOptions>-mavx2 %(AdditionalOptions)</AdditionalOptions>
-      <ControlFlowGuard>Guard</ControlFlowGuard>
+      <ControlFlowGuard>false</ControlFlowGuard>
       <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)bin\lib\x64;$(SolutionDir)Minecraft Clone\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32s.lib;glew32.lib;glfw3.lib;opengl32.lib;FastNoise.lib;freetype.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32s.lib;glew32.lib;glfw3.lib;opengl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>EnableAllWarnings</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
@@ -142,7 +141,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <UseProcessorExtensions>ALDERLAKE</UseProcessorExtensions>
+      <UseProcessorExtensions>AVX2</UseProcessorExtensions>
       <OptimizeForWindowsApplication>true</OptimizeForWindowsApplication>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -150,8 +149,10 @@
       </LoopUnrolling>
       <StructMemberAlignment>8Bytes</StructMemberAlignment>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <AdditionalOptions>-mavx2 %(AdditionalOptions)</AdditionalOptions>
       <OptimizationDiagnosticLevel>Disable</OptimizationDiagnosticLevel>
+      <GenerateAlternateCodePaths>None</GenerateAlternateCodePaths>
+      <StringPooling>true</StringPooling>
+      <PGOUsePreTrainedModel>false</PGOUsePreTrainedModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -159,7 +160,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)bin\lib\x64;$(SolutionDir)Minecraft Clone\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32s.lib;glew32.lib;glfw3.lib;opengl32.lib;FastNoise.lib;freetype.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32s.lib;glew32.lib;glfw3.lib;opengl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -169,6 +170,7 @@
     <ClCompile Include="src\Client\Player\PlayerMovement.cpp" />
     <ClCompile Include="src\Client\Player\WorldInteraction.cpp" />
     <ClCompile Include="src\Client\Render\DebugScreen\DebugScreen.cpp" />
+    <ClCompile Include="src\Client\Profiler\PerformanceProfiler.cpp" />
     <ClCompile Include="src\Client\Render\PlayerPOV.cpp" />
     <ClCompile Include="src\Client\Render\WorldRender.cpp" />
     <ClCompile Include="src\Core\Initializer.cpp" />
@@ -176,6 +178,7 @@
     <ClCompile Include="src\Core\Registry\Registry.cpp" />
     <ClCompile Include="src\Core\Registry\ResourceLocation.cpp" />
     <ClCompile Include="src\FileManager\Files.cpp" />
+    <ClCompile Include="src\Level\Chunk\ChunkPos\ChunkPos.cpp" />
     <ClCompile Include="src\Level\Chunk\Heightmap\Heightmap.cpp" />
     <ClCompile Include="src\Level\Event\EventHandler.cpp" />
     <ClCompile Include="src\Level\Event\EventSystem.cpp" />
@@ -189,6 +192,7 @@
     <ClCompile Include="src\Level\Server\Communication\InternalServer.cpp" />
     <ClCompile Include="src\Level\Server\Server.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Biome\BiomeProperties.cpp" />
+    <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugPositioning\DebugPositioning.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugSecond\DebugSecond.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\Debug\Debug.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\FastTerrain\FastTerrain.cpp" />
@@ -211,12 +215,12 @@
     <ClCompile Include="src\Level\World\WorldInteraction\WorldInteractions.cpp" />
     <ClCompile Include="src\Level\World\WorldInteraction\WorldLoader.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Math\Matrix.cpp" />
+    <ClCompile Include="src\Utils\Math\Matrix.cpp" />
+    <ClCompile Include="src\Utils\Math\Vector\Vec.cpp" />
     <ClCompile Include="src\RenderEngine\BlockModel\BlockModels.cpp" />
     <ClCompile Include="src\RenderEngine\BlockModel\ModelLoader.cpp" />
     <ClCompile Include="src\RenderEngine\Camera\camera.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRenderer\Batch\ChunkBatch.cpp" />
-    <ClCompile Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshing.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshingV2.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRenderer\TerrainRenderer.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRenderer\EntityRenderCache.cpp" />
@@ -255,18 +259,21 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Client\Client.h" />
+    <ClInclude Include="src\Client\Communication\ServerInteraction.h" />
     <ClInclude Include="src\Client\IO\IO.h" />
     <ClInclude Include="src\Client\IO\KEY_CODE.h" />
     <ClInclude Include="src\Client\Player.h" />
     <ClInclude Include="src\Client\Player\PlayerMovement.h" />
     <ClInclude Include="src\Client\Player\WorldInteraction.h" />
     <ClInclude Include="src\Client\Render\DebugScreen\DebugScreen.h" />
+    <ClInclude Include="src\Client\Profiler\PerformanceProfiler.h" />
     <ClInclude Include="src\Client\Render\WorldRenderInfo.h" />
     <ClInclude Include="src\Core\Initializer.h" />
     <ClInclude Include="src\Core\Options\Option.h" />
     <ClInclude Include="src\Core\Registry\Registry.h" />
     <ClInclude Include="src\Core\Registry\ResourceLocation.h" />
     <ClInclude Include="src\FileManager\Files.h" />
+    <ClInclude Include="src\Level\Chunk\ChunkPos\ChunkPos.h" />
     <ClInclude Include="src\Level\Chunk\Heightmap\Heightmap.h" />
     <ClInclude Include="src\Level\Chunk\TallChunk.h" />
     <ClInclude Include="src\Level\Dimension\Dimension.h" />
@@ -301,6 +308,7 @@
     <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeSwamp.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeTaiga.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeVoid.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Generators\DebugPositioning\DebugPositioning.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Generators\Debug\Debug.h" />
     <ClInclude Include="src\Level\TerrainGeneration\GenLayer\CombineLayers.h" />
     <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayer.h" />
@@ -332,6 +340,7 @@
     <ClInclude Include="src\Level\World\WorldInteraction\WorldInteractions.h" />
     <ClInclude Include="src\Level\World\WorldInteraction\WorldLoader.h" />
     <ClInclude Include="src\Level\World\WorldParameters.h" />
+    <ClInclude Include="src\Utils\Math\Vector\Vec.h" />
     <ClInclude Include="src\RenderEngine\BlockModel\ModelLoader.h" />
     <ClInclude Include="src\RenderEngine\BlockModel\RectangularModel.h" />
     <ClInclude Include="src\RenderEngine\BlockModel\BlockModels.h" />
@@ -345,6 +354,7 @@
     <ClInclude Include="src\RenderEngine\GUI\Font.h" />
     <ClInclude Include="src\RenderEngine\GUI\TextRenderer.h" />
     <ClInclude Include="src\RenderEngine\ItemRender\BlockItemRender.h" />
+    <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureAtlas.h" />
     <ClInclude Include="src\Utils\Containers\BitStorage.h" />
     <ClInclude Include="src\Level\Chunk\ChunkColumn.h" />
     <ClInclude Include="src\Level\Chunk\Lighting\ChunkLighting.h" />
@@ -355,11 +365,10 @@
     <ClInclude Include="src\Client\Player\MainPlayer.h" />
     <ClInclude Include="src\Client\Render\PlayerPOV.h" />
     <ClInclude Include="src\Client\Render\WorldRender.h" />
-    <ClInclude Include="src\Math\Matrix.h" />
+    <ClInclude Include="src\Utils\Math\Matrix.h" />
     <ClInclude Include="src\RenderEngine\Camera\camera.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Batch\ChunkBatch.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\BakedChunkMesh.h" />
-    <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshing.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\Mesher.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Occulsion\Data\OcculsionData.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Occulsion\Data\OcculsionDataManager.h" />
@@ -376,6 +385,7 @@
     <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\Texture2D.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureArray.h" />
     <ClInclude Include="src\RenderEngine\Window.h" />
+    <ClInclude Include="src\Utils\Containers\FIFOQueue.h" />
     <ClInclude Include="src\Utils\Math\Probability\Probability.h" />
     <ClInclude Include="src\Utils\Math\vectorOperations.h" />
     <ClInclude Include="src\Level\Chunk\Block\Material\BlockMaterial.h" />
@@ -405,7 +415,6 @@
     <ClInclude Include="src\Utils\LogUtils.h" />
     <ClInclude Include="src\Utils\MathHelper.h" />
     <ClInclude Include="src\Level\Chunk\Block\Type\Grass.h" />
-    <ClInclude Include="src\Level\Chunk\ChunkID.h" />
     <ClInclude Include="src\Utils\Math\Ray\Ray.h" />
     <ClInclude Include="src\Utils\Containers\skaHashmap.h" />
     <ClInclude Include="src\Utils\stb_image.h" />
@@ -443,6 +452,7 @@
     <ClInclude Include="src\Level\TerrainGeneration\Random\JavaRandom.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Structures\Structure.h" />
     <ClInclude Include="src\Level\Typenames.h" />
+    <ClInclude Include="src\Utils\ThreadPool.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
