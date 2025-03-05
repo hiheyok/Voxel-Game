@@ -208,7 +208,7 @@ void ChunkDrawBatch::Defrager(size_t iterations) {
 
 		size_t freeSpaceOffset = freeMemoryBlock.offset_;
 
-		std::map<size_t, MemoryManagement::MemoryBlock>::iterator Reserve = memory_pool_.memory_pool_.reserved_memory_blocks_.getIterator(freeMemoryBlock.size_ + freeMemoryBlock.offset_);
+		std::map<size_t, MemoryManagement::MemoryBlock>::const_iterator Reserve = memory_pool_.memory_pool_.reserved_memory_blocks_.getIterator(freeMemoryBlock.size_ + freeMemoryBlock.offset_);
 
 		MemoryManagement::MemoryBlock reservedBlock = Reserve->second;
 

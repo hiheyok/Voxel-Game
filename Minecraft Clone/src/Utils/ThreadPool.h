@@ -6,7 +6,7 @@
 #include <string>
 
 /*
-* Takes in a function ( the func that the worker runs)
+* Takes in a function (the func that the worker runs)
 * Has a task scheduler and an output manager
 * Can be fed in a templated input and it will provide an output
 */
@@ -15,7 +15,6 @@ template <class TaskIn, class TaskOut, TaskOut (*Task)(const TaskIn&)>
 class ThreadPool {
 public:
 	ThreadPool(int threads, std::string type, size_t batchSize = SIZE_MAX);
-
 	~ThreadPool();
 
 	void Stop();
@@ -24,7 +23,6 @@ public:
 	void SubmitTask(const TaskIn& task);
 
 	std::vector<TaskOut> GetOutput();
-	size_t batch_size_;
 
 private:
 	// Threads
@@ -52,6 +50,7 @@ private:
 	std::vector<TaskOut> output_list_;
 	std::vector<std::vector<TaskIn>> worker_task_;
 	std::vector<std::vector<TaskOut>> worker_output_;
+	size_t batch_size_;
 
 	void Scheduler();
 	void Worker(int workerId);
@@ -59,35 +58,34 @@ private:
 };
 
 template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-ThreadPool<TaskIn, TaskOut, Task>::ThreadPool(int threads, std::string type, size_t batchSize) :
+inline ThreadPool<TaskIn, TaskOut, Task>::ThreadPool(int threads, std::string type, size_t batchSize) :
 	workers_{ threads },
+	scheduler_{ &ThreadPool::Scheduler, this },
+	output_manager_{ &ThreadPool::OutputManager, this },
 	worker_count_{ threads },
 	worker_cv_{ threads },
-	type_{ type },
 	stop_{ false },
+	output_ready_{ false },
 	workers_locks_{ threads },
 	workers_output_locks_{ threads },
+	type_{ type },
 	worker_task_{ threads },
 	worker_output_{ threads },
-	output_ready_{ false },
 	batch_size_{ batchSize } {
 
 	for (int i = 0; i < threads; ++i) {
 		workers_[i] = std::thread(&ThreadPool::Worker, this, i);
 	}
-
-	scheduler_ = std::thread(&ThreadPool::Scheduler, this);
-	output_manager_ = std::thread(&ThreadPool::OutputManager, this);
 }
 
 template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-ThreadPool<TaskIn, TaskOut, Task>::~ThreadPool() {
+inline ThreadPool<TaskIn, TaskOut, Task>::~ThreadPool() {
 	if (!stop_)
 		Stop();
 }
 
 template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-void ThreadPool<TaskIn, TaskOut, Task>::Scheduler() {
+inline void ThreadPool<TaskIn, TaskOut, Task>::Scheduler() {
 	g_logger.LogDebug(type_ + " Thread Pool", "Started task scheduler");
 
 	std::vector<TaskIn> internalTaskList;
@@ -139,7 +137,7 @@ void ThreadPool<TaskIn, TaskOut, Task>::Scheduler() {
 }
 
 template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-void ThreadPool<TaskIn, TaskOut, Task>::Worker(int workerId) {
+inline void ThreadPool<TaskIn, TaskOut, Task>::Worker(int workerId) {
 	g_logger.LogDebug(type_ + " Thread Pool", "Started worker " + std::to_string(workerId));
 	bool workingOnBatch = false;
 	size_t batchIndex = 0;
@@ -195,9 +193,8 @@ void ThreadPool<TaskIn, TaskOut, Task>::Worker(int workerId) {
 }
 
 template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-void ThreadPool<TaskIn, TaskOut, Task>::OutputManager() {
+inline void ThreadPool<TaskIn, TaskOut, Task>::OutputManager() {
 	g_logger.LogDebug(type_ + " Thread Pool", "Started output manager ");
-
 	while (!stop_) {
 		// Waits for output
 		{
@@ -229,28 +226,28 @@ void ThreadPool<TaskIn, TaskOut, Task>::OutputManager() {
 }
 
 template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-void ThreadPool<TaskIn, TaskOut, Task>::SubmitTask(const std::vector<TaskIn>& task) {
+inline void ThreadPool<TaskIn, TaskOut, Task>::SubmitTask(const std::vector<TaskIn>& task) {
 	std::lock_guard<std::mutex> lock{ scheduler_lock_ };
 	task_list_.insert(task_list_.end(), task.begin(), task.end());
 	scheduler_cv_.notify_one();
 }
 
 template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-void ThreadPool<TaskIn, TaskOut, Task>::SubmitTask(const TaskIn& task) {
+inline void ThreadPool<TaskIn, TaskOut, Task>::SubmitTask(const TaskIn& task) {
 	std::lock_guard<std::mutex> lock{ scheduler_lock_ };
 	task_list_.push_back(task);
 	scheduler_cv_.notify_one();
 }
 
 template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-std::vector<TaskOut> ThreadPool<TaskIn, TaskOut, Task>::GetOutput() {
+inline std::vector<TaskOut> ThreadPool<TaskIn, TaskOut, Task>::GetOutput() {
 	std::lock_guard<std::mutex> lock{ output_lock_ };
 	std::vector<TaskOut> out = std::move(output_list_);
 	return out;
 }
 
 template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-void ThreadPool<TaskIn, TaskOut, Task>::Stop() {
+inline void ThreadPool<TaskIn, TaskOut, Task>::Stop() {
 	stop_ = true;
 	scheduler_.join();
 	output_manager_.join();

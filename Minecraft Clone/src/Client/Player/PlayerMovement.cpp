@@ -10,7 +10,7 @@ void PlayerMovement::Update(Player* player, const UserInputs& inputs, InternalSe
 	MovePlayer(player, inputs, server);
 }
 
-float PlayerMovement::velocityMovementCurve(float current, float max, float delta) {
+float PlayerMovement::VelocityMovementCurve(float current, float max, float delta) {
 
 	int currentTime = -log(max - current) + log(max);
 
@@ -59,7 +59,7 @@ void PlayerMovement::MoveRelative(Player* player, float strafe, float up, float 
 
 void PlayerMovement::MovePlayer(Player* player, const UserInputs& inputs, InternalServer* server) {
 
-	vec3 front(
+	glm::vec3 front(
 		cos(player->properties_.rotation_.x * 0.0174533) * cos(player->properties_.rotation_.y * 0.0174533),
 		0,
 		sin(player->properties_.rotation_.x * 0.0174533) * cos(player->properties_.rotation_.y * 0.0174533)
@@ -67,7 +67,7 @@ void PlayerMovement::MovePlayer(Player* player, const UserInputs& inputs, Intern
 
 	front = normalize(front);
 
-	vec3 right = normalize(cross(front, glm::vec3(0.0, 1.0, 0.0)));
+	glm::vec3 right = normalize(cross(front, glm::vec3(0.0, 1.0, 0.0)));
 	right.y = 0;
 
 	float velocity = player->properties_.max_speed_;
@@ -76,9 +76,9 @@ void PlayerMovement::MovePlayer(Player* player, const UserInputs& inputs, Intern
 		velocity *= 8.f;
 	}
 
-	float v = velocityMovementCurve(Magnitude(player->properties_.velocity_), velocity, inputs.delta_) / sqrtf(2);
+	float v = VelocityMovementCurve(Magnitude(player->properties_.velocity_), velocity, inputs.delta_) / sqrtf(2);
 
-	player->properties_.velocity_ = vec3(0.f, 0.f, 0.f);
+	player->properties_.velocity_ = glm::vec3(0.f, 0.f, 0.f);
 
 	if (inputs.CheckKey(KEY_W)) {
 		player->properties_.velocity_ += front * v;
@@ -94,7 +94,7 @@ void PlayerMovement::MovePlayer(Player* player, const UserInputs& inputs, Intern
 	}
 
 	if (inputs.CheckKey(KEY_LEFT_SHIFT)) {
-		player->properties_.velocity_.y += -velocityMovementCurve(Magnitude(player->properties_.velocity_), velocity, inputs.delta_);
+		player->properties_.velocity_.y += -VelocityMovementCurve(Magnitude(player->properties_.velocity_), velocity, inputs.delta_);
 	}
 
 
@@ -113,7 +113,7 @@ void PlayerMovement::MovePlayer(Player* player, const UserInputs& inputs, Intern
 
 		player->properties_.velocity_.y += gravity;
 
-		vec3 time = server->GetPlayerCollusionTimes();
+		glm::vec3 time = server->GetPlayerCollusionTimes();
 
 		if ((time.x != -1.) && (time.x <= inputs.delta_)) {
 			player->properties_.velocity_.x = 0;

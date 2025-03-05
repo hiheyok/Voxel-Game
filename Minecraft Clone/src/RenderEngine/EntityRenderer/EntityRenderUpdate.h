@@ -13,9 +13,7 @@ class EntityRendererUpdater {
 	std::thread update_thread_;
 
 	Timer* server_time_;
-
 public:
-
 	void SetEntityRenderer(MultiEntityRenderer* render, Timer* time);
 	void Start();
 	void Stop();

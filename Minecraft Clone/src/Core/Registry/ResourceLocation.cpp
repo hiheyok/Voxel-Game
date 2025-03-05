@@ -14,3 +14,6 @@ std::string ResourceLocation::SetResourceLocation(std::string name) {
 std::string ResourceLocation::GetPath() {
 	return path_;
 }
+
+ResourceLocation::ResourceLocation() {}
+ResourceLocation::ResourceLocation(std::string name) : path_(name) {}

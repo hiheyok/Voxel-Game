@@ -1,8 +1,5 @@
 #include "LightEngine.h"
 #include "../../Utils/Containers/FIFOQueue.h"
-
-using namespace glm;
-
 static thread_local FixedFIFOQueue<uint16_t> FIFOQueues;
 
 constexpr int8_t DIRECTION_OFFSETS[6][3] = {
@@ -26,20 +23,16 @@ inline void UnpackLightNode(uint16_t node, uint8_t& x, uint8_t& y, uint8_t& z, u
 
 void LightingEngine::IncreaseLightLevel(std::shared_ptr<ChunkLightingContainer>& container, uint8_t lvl, int x, int y, int z) {
 	uint8_t curr = container->GetLighting(x, y, z);
-	if (curr < lvl) {
+	if (curr < lvl)
 		container->EditLight(x, y, z, lvl);
-	}
 }
 
 void LightingEngine::LightSpreadSky(Chunk* chunk, std::shared_ptr<ChunkLightingContainer>& container, const Heightmap& heightmap, int ChunkHeight, int x, int y, int z) {
 	FIFOQueues.resetData();
-
 	FIFOQueues.push(PackLightNode(x, y, z, 15));
 
-	if (container->GetLighting(x, y, z) >= 15) {
+	if (container->GetLighting(x, y, z) >= 15)
 		return;
-	}
-
 
 	int i = 0;
 
@@ -105,21 +98,19 @@ void LightingEngine::LightSpreadSky(Chunk* chunk, std::shared_ptr<ChunkLightingC
 void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, std::shared_ptr<ChunkLightingContainer>& light, const Heightmap& heightmap, int chunkHeight) {
 	for (int x = 0; x < 16; x++) {
 		for (int z = 0; z < 16; z++) {
+			int h = heightmap.Get(x, z) - chunkHeight; // it will try to find pivot points
 
-		int h = heightmap.Get(x, z) - chunkHeight; // it will try to find pivot points
+			if (h >= 16)
+				continue;
 
-		if (h >= 16)
-			continue;
-
-		LightSpreadSky(chunk, light, heightmap, chunkHeight, x, 15, z);
+			LightSpreadSky(chunk, light, heightmap, chunkHeight, x, 15, z);
 		}
 	}
 }
 
 std::vector<std::shared_ptr<ChunkLightingContainer>> LightingEngine::Worker(const ChunkPos& pos) {
-	if (!FIFOQueues.IsInitialized()) {
+	if (!FIFOQueues.IsInitialized())
 		FIFOQueues.setSize(LightingEngine::DEFAULT_FIFO_QUEUE_SIZE);
-	}
 
 	uint8_t DarknessLightLevel = 12;
 	std::vector<std::shared_ptr<ChunkLightingContainer>> out;
@@ -133,14 +124,12 @@ std::vector<std::shared_ptr<ChunkLightingContainer>> LightingEngine::Worker(cons
 	int columnYLevel = pos.y / 32;
 
 	for (int i = 0; i <= relativeChunkHeight; i++) {
-		if (!col->light_dirty_[i]) {
+		if (!col->light_dirty_[i])
 			continue;
-		}
 
 		std::shared_ptr<ChunkLightingContainer> lighting = std::make_shared<ChunkLightingContainer>();
 		lighting->ResetLightingCustom(4);
 		lighting->position_.set(pos.x, columnYLevel + i, pos.z);
-
 		WorkOnChunkSkylight(col->GetChunk(i), lighting, heightmap, i * 16);
 
 		out.push_back(std::move(lighting));
@@ -171,7 +160,6 @@ void LightingEngine::Start(int lightEngineThreadsCount, WorldAccess* w) {
 	lighting_thread_pool_ = std::make_unique<ThreadPool<ChunkPos,
 		std::vector<std::shared_ptr<ChunkLightingContainer>>,
 		LightingEngine::Worker>>(lightEngineThreadsCount, "Light Engine", 100);
-
 	LightingEngine::world_ = w;
 }
 

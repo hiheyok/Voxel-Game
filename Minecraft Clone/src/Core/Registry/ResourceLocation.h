@@ -9,10 +9,8 @@ struct ResourceLocation {
 	std::string namespace_ = "";
 
 	std::string GetPath();
-
 	std::string SetResourceLocation(std::string name);
 
-	ResourceLocation() {}
-
-	ResourceLocation(std::string name) : path_(name) {}
+	ResourceLocation();
+	ResourceLocation(std::string name);
 };

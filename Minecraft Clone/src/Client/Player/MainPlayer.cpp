@@ -8,13 +8,29 @@ void MainPlayer::Initialize(GLFWwindow* win, InternalServer* server) {
 
 	GUISet hotbar;
 	hotbar.SetGUITexture("assets/minecraft/textures/gui/widgets.png");
-	hotbar.AddGUIElement("Hotbar", "", vec2(9.f * hotbar_size_ * 1.0055555555f, hotbar_size_ * 1.05f), vec2(0.f, -1.f + hotbar_size_ * 0.5f), vec2(0.5f, 0.5f), vec2(181.5f, 21.5f));
-	hotbar.AddGUIElement("Select", "", vec2(hotbar_size_ * 1.1f,  hotbar_size_ * 1.1f), vec2(-hotbar_size_ * 4.f, -1.f + hotbar_size_ * 0.5f), vec2(0.5f, 22.5f), vec2(22.5f, 44.5f));
+	hotbar.AddGUIElement("Hotbar", "",
+		glm::vec2(9.f * hotbar_size_ * 1.0055555555f, hotbar_size_ * 1.05f),
+		glm::vec2(0.f, -1.f + hotbar_size_ * 0.5f),
+		glm::vec2(0.5f, 0.5f),
+		glm::vec2(181.5f,21.5f));
+
+	hotbar.AddGUIElement("Select", "",
+		glm::vec2(hotbar_size_ * 1.1f,  hotbar_size_ * 1.1f),
+		glm::vec2(-hotbar_size_ * 4.f, -1.f + hotbar_size_ * 0.5f),
+		glm::vec2(0.5f, 22.5f),
+		glm::vec2(22.5f, 44.5f));
+
 	GUISet itemBar;
-	itemBar.SetGUITexture(g_item_atlas.atlas_.texture_id_, g_item_atlas.atlas_.width_, g_item_atlas.atlas_.height_);
+	itemBar.SetGUITexture(g_item_atlas.atlas_.texture_id_,
+		g_item_atlas.atlas_.width_,
+		g_item_atlas.atlas_.height_);
 
 	for (int i = 0; i < 9; i++) {
-		itemBar.AddGUIElementNorm(std::to_string(i), "", vec2(hotbar_size_* ItemViewRelativeSize, hotbar_size_ * ItemViewRelativeSize), vec2(hotbar_size_ * (float)(i - 4), -1.f + hotbar_size_ * 0.5f), vec2(0,0), vec2(1,1));
+		itemBar.AddGUIElementNorm(std::to_string(i), "",
+			glm::vec2(hotbar_size_* ItemViewRelativeSize, hotbar_size_ * ItemViewRelativeSize),
+			glm::vec2(hotbar_size_ * (float)(i - 4), -1.f + hotbar_size_ * 0.5f),
+			glm::vec2(0,0),
+			glm::vec2(1,1));
 	}
 
 	gui_index_ = player_gui_.AddGUI("PlayerGUI", hotbar);
@@ -30,7 +46,7 @@ void MainPlayer::PrepareGUIs() {
 	int currentSlotIndex = player_.entity_inventory_.right_hand_slot_;
 	if (currentSlotIndex != slot_index_) {
 		slot_index_ = currentSlotIndex;
-		player_gui_.EditGUISet(gui_index_).EditElementPosition("Select", vec2(hotbar_size_ * (float)(slot_index_ - 4), -1.f + hotbar_size_ * 0.5f));
+		player_gui_.EditGUISet(gui_index_).EditElementPosition("Select", glm::vec2(hotbar_size_ * (float)(slot_index_ - 4), -1.f + hotbar_size_ * 0.5f));
 	}
 
 	for (int i = 0; i < 9; i++) {
@@ -41,7 +57,7 @@ void MainPlayer::PrepareGUIs() {
 			player_gui_.EditGUISet(item_gui_index_).EditElementUVNorm(std::to_string(i), uv.uv_1_, uv.uv_2_);
 		}
 		else {
-			player_gui_.EditGUISet(item_gui_index_).EditElementUVNorm(std::to_string(i), vec2(0.f,0.f), vec2(0.f,0.f));
+			player_gui_.EditGUISet(item_gui_index_).EditElementUVNorm(std::to_string(i), glm::vec2(0.f,0.f), glm::vec2(0.f,0.f));
 		}
 		
 

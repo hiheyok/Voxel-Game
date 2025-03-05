@@ -79,7 +79,7 @@ void LogUtils::Start() {
 
 		file_.open(str);
 
-		LoggingThread = std::thread(&LogUtils::MainLogger, this);
+		logging_thread_ = std::thread(&LogUtils::MainLogger, this);
 		LogInfo("Logger","Started Logger");
 	}
 	else {
@@ -152,11 +152,31 @@ void LogUtils::LogDebugf(std::string subtype, std::string message, ...) {
 
 void LogUtils::Stop() {
 	stop_ = true;
-	
-	
 }
 
-LogUtils* getLogger() {
-	return &g_logger;
+LogUtils::LogUtils() {
+	buffer_ = new char[buffer_size_];
+	Start();
 }
 
+LogUtils::~LogUtils() {
+	Stop();
+	delete[] buffer_;
+}
+
+std::string LogUtils::FormatString(std::string in, ...) {
+	va_list args;
+	va_start(args, in);
+
+	vsnprintf(buffer_, buffer_size_, in.c_str(), args);
+
+	va_end(args);
+
+	std::string out(buffer_);
+	memset(buffer_, NULL, out.size());
+	return out;
+}
+
+std::string LogUtils::FormatMessage(std::string severity, long long time, std::string timestamp, std::string subtype, std::string message) {
+	return FormatString("[ %lld NS ] [ %s ] [ %s / %s ]: %s", time, timestamp.c_str(), severity.c_str(), subtype.c_str(), message.c_str());
+}

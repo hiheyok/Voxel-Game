@@ -27,3 +27,28 @@ void BitStorage3D::Clear() {
 		map_[i] = 0;
 	}
 }
+
+void BitStorage3D::SetBit(int x, int y, int z) {
+	int index = sx_ * (sy_ * sz_) + sy_ * (sz_)+sz_;
+
+	size_t NumIndex = index >> 6;
+	size_t Index = index & 0b111111;
+
+	map_[NumIndex] |= (0b1LL << Index);
+}
+
+void BitStorage3D::SetBit(int* pos) {
+	SetBit(pos[0], pos[1], pos[2]);
+}
+
+bool BitStorage3D::GetBit(int x, int y, int z) {
+	int index = sx_ * (sy_ * sz_) + sy_ * (sz_)+sz_;
+
+	size_t numIndex = index >> 6;
+	size_t bitIndex = index & 0b111111;
+	return (map_[numIndex] >> bitIndex) & 0b1;
+}
+
+bool BitStorage3D::GetBit(int* pos) {
+	return GetBit(pos[0], pos[1], pos[2]);
+}

@@ -7,12 +7,10 @@ size_t MultiEntityRenderer::GetNumEntityRendered() {
 
 void MultiEntityRenderer::AddEntity(EntityProperty& entity) {
 	renderable_entities_.AddEntity(entity);
-	is_dirty_ = true;
 }
 
 void MultiEntityRenderer::RemoveEntity(EntityUUID entityUUID) {
 	renderable_entities_.RemoveEntity(entityUUID);
-	is_dirty_ = true;
 }
 
 void MultiEntityRenderer::Clean() {
@@ -115,30 +113,26 @@ void MultiEntityRenderer::Render() {
 	size_t n = 0;
 
 	for (auto& entityarr : renderable_entities_.entity_separated_) {
-
 		//Fill SSBO POS data
 
 		size_t i = 0;
-		//if (isDirty) {
-			for (auto& e : entityarr.second) {
-				EntityProperty properties = e.second;
+		for (auto& e : entityarr.second) {
+			EntityProperty properties = e.second;
 
-				position_arr_[(i * 3 + 0)] = properties.position_.x;
-				position_arr_[(i * 3 + 1)] = properties.position_.y;
-				position_arr_[(i * 3 + 2)] = properties.position_.z;
+			position_arr_[(i * 3 + 0)] = properties.position_.x;
+			position_arr_[(i * 3 + 1)] = properties.position_.y;
+			position_arr_[(i * 3 + 2)] = properties.position_.z;
 
-				velocity_arr_[(i * 3 + 0)] = properties.velocity_.x;
-				velocity_arr_[(i * 3 + 1)] = properties.velocity_.y;
-				velocity_arr_[(i * 3 + 2)] = properties.velocity_.z;
+			velocity_arr_[(i * 3 + 0)] = properties.velocity_.x;
+			velocity_arr_[(i * 3 + 1)] = properties.velocity_.y;
+			velocity_arr_[(i * 3 + 2)] = properties.velocity_.z;
 
-				acceleration_arr_[(i * 3 + 0)] = properties.acceleration_.x;
-				acceleration_arr_[(i * 3 + 1)] = properties.acceleration_.y;
-				acceleration_arr_[(i * 3 + 2)] = properties.acceleration_.z;
+			acceleration_arr_[(i * 3 + 0)] = properties.acceleration_.x;
+			acceleration_arr_[(i * 3 + 1)] = properties.acceleration_.y;
+			acceleration_arr_[(i * 3 + 2)] = properties.acceleration_.z;
 
-				i++;
-			}
-			is_dirty_ = false;
-	//	}
+			i++;
+		}
 		
 
 		n += entityarr.second.size();

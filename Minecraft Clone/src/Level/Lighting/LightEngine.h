@@ -20,7 +20,6 @@ public:
 
 	void QueueChunk(const ChunkPos& pos);
 
-
 	void Scheduler();
 
 private:

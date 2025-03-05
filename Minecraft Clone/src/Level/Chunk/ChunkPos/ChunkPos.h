@@ -31,42 +31,117 @@ public:
 		z = 0;
 	}
 
-	inline void set(int px, int py, int pz) {
+	void set(int px, int py, int pz) {
 		x = px;
 		y = py;
 		z = pz;
 	}
 
-	inline void incrementSide(int side, int val) {
+	void incrementSide(int side, int val) {
 		reinterpret_cast<int*>(this)[side >> 1] += (1 - 2 * (side & 1)) * val;
 	}
 
-	inline int& operator[](int i) {
+	int& operator[](int i) {
 		return reinterpret_cast<int*>(this)[i];
 	}
 
-	inline void operator=(const ChunkPos& other) {
+	void operator=(const ChunkPos& other) {
 		x = other.x;
 		y = other.y;
 		z = other.z;
 	}
 
-	inline ChunkPos operator-(const ChunkPos& other) const {
+	ChunkPos operator-(const ChunkPos& other) const {
 		return ChunkPos{ x - other.x, y - other.y, z - other.z };
 	}
 
-	inline ChunkPos operator+(const ChunkPos& other) const {
+	ChunkPos operator+(const ChunkPos& other) const {
 		return ChunkPos{ x + other.x, y + other.y, z + other.z };
 	}
 
 	template <typename T> 
-	inline ChunkPos operator*(const T& other) const {
+	ChunkPos operator*(const T& other) const {
 		return ChunkPos{ x * other, y * other, z * other };
 	}
 
 	template <typename T> 
-	inline ChunkPos operator/(const T& other) const {
+	ChunkPos operator/(const T& other) const {
 		return ChunkPos{ x / other, y / other, z / other };
+	}
+
+	template <typename T>
+	ChunkPos operator<<(const T& other) const {
+		static_assert(std::is_integral<T>::value, "Integral required.");
+		return ChunkPos{ x << other, y << other, z << other };
+	}
+
+	template <typename T>
+	ChunkPos operator>>(const T& other) const {
+		static_assert(std::is_integral<T>::value, "Integral required.");
+		return ChunkPos{ x >> other, y >> other, z >> other };
+	}
+
+	template <typename T>
+	ChunkPos operator&(const T& other) const {
+		static_assert(std::is_integral<T>::value, "Integral required.");
+		return ChunkPos{ x & other, y & other, z & other };
+	}
+
+	template <typename T>
+	ChunkPos operator^(const T& other) const {
+		static_assert(std::is_integral<T>::value, "Integral required.");
+		return ChunkPos{ x ^ other, y ^ other, z ^ other };
+	}
+
+	template <typename T>
+	ChunkPos operator|(const T& other) const {
+		static_assert(std::is_integral<T>::value, "Integral required.");
+		return ChunkPos{ x | other, y | other, z | other };
+	}
+
+	template <typename T>
+	ChunkPos& operator<<=(const T& other) {
+		static_assert(std::is_integral<T>::value, "Integral required.");
+		x <<= other;
+		x <<= other;
+		x <<= other;
+		return *this;
+	}
+
+	template <typename T>
+	ChunkPos& operator>>=(const T& other) {
+		static_assert(std::is_integral<T>::value, "Integral required.");
+		x >>= other;
+		x >>= other;
+		x >>= other;
+		return *this;
+	}
+
+	template <typename T>
+	ChunkPos& operator&=(const T& other) {
+		static_assert(std::is_integral<T>::value, "Integral required.");
+		x &= other;
+		x &= other;
+		x &= other;
+		return *this;
+	}
+
+	template <typename T>
+	ChunkPos& operator^=(const T& other) {
+		static_assert(std::is_integral<T>::value, "Integral required.");
+		x ^= other;
+		x ^= other;
+		x ^= other;
+		return *this;
+	}
+
+	template <typename T>
+	ChunkPos& operator|=(const T& other) {
+		static_assert(std::is_integral<T>::value, "Integral required.");
+		x |= other;
+		x |= other;
+		x |= other;
+		return *this;
 	}
 
 	template <typename T> 
@@ -76,22 +151,22 @@ public:
 		z *= other;
 	}
 
-	inline friend std::ostream& operator<<(std::ostream& os, const ChunkPos& m) {
+	friend std::ostream& operator<<(std::ostream& os, const ChunkPos& m) {
 		return os << '[' << m.x << ',' << m.y << ',' << m.z << ']';
 	}
 
-	inline friend std::string operator+(const char* str, const ChunkPos& m) {
+	friend std::string operator+(const char* str, const ChunkPos& m) {
 		std::string s = std::string(str) + "[" + std::to_string(m.x) + "," + std::to_string(m.y) + "," + std::to_string(m.z) + "]";
 		return s;
 	}
 
 	// for HashMaps and HashSets
 
-	inline bool operator==(const ChunkPos& other) const {
+	bool operator==(const ChunkPos& other) const {
 		return x == other.x && y == other.y && z == other.z;
 	}
 
-	inline size_t hash() const {
+	size_t hash() const {
 		size_t h = 2166136261u;  // FNV offset basis
 		h ^= static_cast<size_t>(x);
 		h *= 16777619u;  // FNV prime
@@ -118,5 +193,6 @@ using RegionPos = ChunkPos;
 using TallChunkPos = ChunkPos;
 using ChunkColumnPos = ChunkPos;
 using BlockPos = ChunkPos;
+using LocalBlockPos = ChunkPos;
 
 #endif

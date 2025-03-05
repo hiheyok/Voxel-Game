@@ -3,7 +3,7 @@
 void WorldInteraction::Interact(Player* player, const UserInputs& inputs) {
 	Ray ray;
 	ray.origin_ = player->properties_.position_;
-	ray.direction_ = dvec3(
+	ray.direction_ = glm::dvec3(
 		cos(player->properties_.rotation_.x * 0.0174533) * cos(player->properties_.rotation_.y * 0.0174533),
 		sin(player->properties_.rotation_.y * 0.0174533),
 		sin(player->properties_.rotation_.x * 0.0174533) * cos(player->properties_.rotation_.y * 0.0174533));
@@ -52,7 +52,7 @@ void WorldInteraction::PlaceBlock(Ray ray, BlockID block, Dimension* dimension) 
 	if (dimension->world_interactions_.collusions_.CheckRayIntersection(ray)) {
 		int BounceSurface = ray.bounce_surface_;
 
-		ivec3 placePos = floor(ray.end_point_);
+		glm::ivec3 placePos = floor(ray.end_point_);
 
 		placePos[(int)floor(BounceSurface >> 1)] += (BounceSurface & 0b1) - ((BounceSurface + 1) & 0b1); //Offsets block location to be placed by 1 block
 
@@ -63,7 +63,5 @@ void WorldInteraction::PlaceBlock(Ray ray, BlockID block, Dimension* dimension) 
 		placeBlock.id_ = g_event_handler.BlockPlace;
 
 		dimension->event_manager_.AddEvent(placeBlock);
-
 	}
-
 }

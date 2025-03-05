@@ -18,7 +18,7 @@ constexpr int blockShadingBitOffset = 28; // 4 bits
 
 #define PROFILE_DEBUG
 
-void MeshingV2::ChunkMeshData::Reset() {
+void Mesh::ChunkMeshData::Reset() {
 	if (vertices_buffer_.size() != BUFFER_SIZE_STEP) {
 		vertices_buffer_.resize(BUFFER_SIZE_STEP, 0);
 	}
@@ -33,7 +33,7 @@ void MeshingV2::ChunkMeshData::Reset() {
 	memset(chunk_cache_, NULL, 18 * 18 * 18 * sizeof(BlockID));
 }
 
-void MeshingV2::ChunkMeshData::GenerateCache() {
+void Mesh::ChunkMeshData::GenerateCache() {
 	int pos[3]{ 0, 0, 0 };
 	int localPos[3]{ 0, 0, 0 };
 
@@ -71,11 +71,11 @@ void MeshingV2::ChunkMeshData::GenerateCache() {
 	}
 }
 
-void MeshingV2::ChunkMeshData::SetChunk(Chunk* pChunk) {
+void Mesh::ChunkMeshData::SetChunk(Chunk* pChunk) {
 	chunk_ = pChunk;
 }
 
-void MeshingV2::ChunkMeshData::GenerateMesh() {
+void Mesh::ChunkMeshData::GenerateMesh() {
 	//Initialize
 	if (chunk_ == nullptr) {
 		return;
@@ -89,7 +89,7 @@ void MeshingV2::ChunkMeshData::GenerateMesh() {
 }
 
 //Loops through all the blocks in the chunk and check if each block side is visible. If a block side is visible, it generates the quad and puts it in the cache
-void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
+void Mesh::ChunkMeshData::GenerateFaceCollection() {
 	std::vector<uint8_t> faceVisibilityBack(4096, 0b00);
 	std::vector<uint8_t> faceVisibility(4096, 0b00);
 	std::vector<uint8_t> usedBlock(16 * 16, 0b00);
@@ -255,7 +255,7 @@ void MeshingV2::ChunkMeshData::GenerateFaceCollection() {
 	}
 }
 
-inline void MeshingV2::ChunkMeshData::AddFacetoMesh(const BlockFace& face, uint8_t axis_, glm::ivec3 from_, glm::ivec3 to_, bool allowAO, int x, int y, int z) {
+inline void Mesh::ChunkMeshData::AddFacetoMesh(const BlockFace& face, uint8_t axis_, glm::ivec3 from_, glm::ivec3 to_, bool allowAO, int x, int y, int z) {
 	uint8_t NN = 15, PN = 15, PP = 15, NP = 15;
 	uint8_t direction = axis_ & 0b1;
 	uint8_t facing = axis_ >> 1;
@@ -337,19 +337,19 @@ inline void MeshingV2::ChunkMeshData::AddFacetoMesh(const BlockFace& face, uint8
 	}
 }
 
-inline const BlockID& MeshingV2::ChunkMeshData::GetCachedBlockID(int x, int y, int z) const {
+inline const BlockID& Mesh::ChunkMeshData::GetCachedBlockID(int x, int y, int z) const {
 	return chunk_cache_[(x + 1) * 18 * 18 + (z + 1) * 18 + (y + 1)];
 }
 
-inline const BlockID& MeshingV2::ChunkMeshData::GetCachedBlockID(int* pos) const {
+inline const BlockID& Mesh::ChunkMeshData::GetCachedBlockID(int* pos) const {
 	return GetCachedBlockID(pos[0], pos[1], pos[2]);
 }
 
-inline void MeshingV2::ChunkMeshData::SetCachedBlockID(BlockID b, int x, int y, int z) {
+inline void Mesh::ChunkMeshData::SetCachedBlockID(BlockID b, int x, int y, int z) {
 	chunk_cache_[(x + 1) * 18 * 18 + (z + 1) * 18 + (y + 1)] = b;
 }
 
-inline glm::ivec4 MeshingV2::ChunkMeshData::getAO(uint8_t direction, int x, int y, int z) {
+inline glm::ivec4 Mesh::ChunkMeshData::getAO(uint8_t direction, int x, int y, int z) {
 	const uint8_t AMBIENT_OCCLUSION_STRENGTH = 2;
 	glm::ivec3 pos{x, y, z};
 
@@ -447,7 +447,7 @@ inline glm::ivec4 MeshingV2::ChunkMeshData::getAO(uint8_t direction, int x, int 
 }
 
 //Checks if a block side is visible to the player
-inline bool MeshingV2::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int x, int y, int z, uint8_t side) {
+inline bool Mesh::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int x, int y, int z, uint8_t side) {
 	const uint8_t axis_ = (side >> 1); //Get side
 	const uint8_t axis1 = (axis_ + 1) % 3;
 	const uint8_t axis2 = (axis_ + 2) % 3;
@@ -485,7 +485,7 @@ inline bool MeshingV2::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int x, i
 	return true;
 }
 
-inline bool MeshingV2::ChunkMeshData::IsFaceVisibleUnsafe(const Cuboid& cube, int x, int y, int z, uint8_t side) {
+inline bool Mesh::ChunkMeshData::IsFaceVisibleUnsafe(const Cuboid& cube, int x, int y, int z, uint8_t side) {
 	uint8_t axis_ = (side >> 1); //Get side
 
 	int p[3]{ x,y,z };
@@ -495,7 +495,7 @@ inline bool MeshingV2::ChunkMeshData::IsFaceVisibleUnsafe(const Cuboid& cube, in
 	return g_blocks.GetBlockType(GetCachedBlockID(p[0], p[1], p[2]))->properties_->transparency_;
 }
 
-inline bool MeshingV2::ChunkMeshData::CompareBlockSide(int x, int y, int z, uint8_t side, BlockID b) {
+inline bool Mesh::ChunkMeshData::CompareBlockSide(int x, int y, int z, uint8_t side, BlockID b) {
 	//IsFaceVisibleCalls++;
 
 	uint8_t axis_ = (side >> 1); //Get side
@@ -507,7 +507,7 @@ inline bool MeshingV2::ChunkMeshData::CompareBlockSide(int x, int y, int z, uint
 	return GetCachedBlockID(p[0], p[1], p[2]) == b;
 }
 
-inline bool MeshingV2::ChunkMeshData::CompareBlockSideUnsafe(int x, int y, int z, uint8_t side, BlockID b) {
+inline bool Mesh::ChunkMeshData::CompareBlockSideUnsafe(int x, int y, int z, uint8_t side, BlockID b) {
 	uint8_t axis_ = (side >> 1); //Get side
 
 	int p[3]{ x,y,z };

@@ -4,104 +4,35 @@
 #include <stack>
 
 #include "../../Level/Timer/Timer.h"
-#include "../../Utils/Containers/skaHashmap.h"
 #include "../../FileManager/Files.h"
+#include "../../Level/Typenames.h"
 
 
 
 class PerformanceProfiler {
 public:
-	PerformanceProfiler() {
-		initial_time_ = std::chrono::high_resolution_clock::now();
-	}
+	PerformanceProfiler();
 
-	void ProfileStart(uint64_t hash) {
-		timer_stack_.emplace(hash, 0);
-		timer_stack_.top().second = (std::chrono::high_resolution_clock::now() - initial_time_).count();
-	}
+	void ProfileStart(uint64_t hash);
 
-	void ProfileStart(std::string path) {
-		uint64_t hash = Hasher(path);
-		if (!string_hash_container_.count(hash)) {
-			RegisterPaths(path);
-		}
+	void ProfileStart(std::string path);
 
-		timer_stack_.emplace(hash, (std::chrono::high_resolution_clock::now() - initial_time_).count());
-	}
+	void ProfileStop(uint64_t hash);
 
-	void ProfileStop(uint64_t hash) {
-		uint64_t timePass = (std::chrono::high_resolution_clock::now() - initial_time_).count() - timer_stack_.top().second;
-		time_pass_cache_.emplace_back(hash, timePass);
-		timer_stack_.pop();
-	}
-
-	void ProfileStop(std::string path) {
-		uint64_t hash = Hasher(path);
-		uint64_t timePass = (std::chrono::high_resolution_clock::now() - initial_time_).count() - timer_stack_.top().second;
-
-		time_pass_cache_.emplace_back(hash, timePass);
-		timer_stack_.pop();
-	}
+	void ProfileStop(std::string path);
 
 	// TOOD: Fix me
-	void RegisterPaths(std::string path) {
-		string_hash_container_[Hasher(path)] = path;
-		std::vector<std::string> tokens = Tokenize(path, '/');
-		std::vector<std::string> pathTokens = {};
+	void RegisterPaths(std::string path);
 
-		if (tokens.size() != 1) {
-			pathTokens.insert(pathTokens.end(), tokens.begin(), tokens.end());
-		}
+	uint64_t Hasher(std::string path);
 
-		string_tokenized_hash_container_[Hasher(path)] = pathTokens;
-		
-	}
+	void LoadCache();
 
-	uint64_t Hasher(std::string path) {
-		return std::hash<std::string>{}(path);
-	}
+	void print();
 
-	void LoadCache() {
-		CondenseCache();
+	void CondenseCache();
 
-		for (const auto& [hash, time] : time_pass_cache_) {
-			std::vector<std::string> tokens = string_tokenized_hash_container_[hash];
-			root_.ChangeTime(tokens, 0, (double)time);
-		}
-
-		time_pass_cache_.clear();
-	}
-
-	void print() {
-		root_.print();
-	}
-
-	void CondenseCache() {
-		FastHashMap<uint64_t, uint64_t> condensedCache = {};
-
-		for (const auto& [hash, time] : time_pass_cache_) {
-			if (condensedCache.count(hash)) {
-				condensedCache[hash] += time;
-			}
-			else {
-				condensedCache[hash] = time;
-			}
-		}
-
-		time_pass_cache_.clear();
-
-		time_pass_cache_.insert(time_pass_cache_.end(), condensedCache.begin(), condensedCache.end());
-
-	}
-
-	void CombineCache(PerformanceProfiler profiler) {
-		//Simplify cache first
-		profiler.CondenseCache();
-		time_pass_cache_.insert(time_pass_cache_.end(), profiler.time_pass_cache_.begin(), profiler.time_pass_cache_.end());
-		string_hash_container_.insert(profiler.string_hash_container_.begin(), profiler.string_hash_container_.end());
-		string_tokenized_hash_container_.insert(profiler.string_tokenized_hash_container_.begin(), profiler.string_tokenized_hash_container_.end());
-		CondenseCache();
-	}
+	void CombineCache(PerformanceProfiler profiler);
 
 	std::vector<std::pair<uint64_t, uint64_t>> time_pass_cache_{};
 

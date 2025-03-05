@@ -36,12 +36,15 @@ vector<ChunkPos> WorldInteractions::GetUpdatedChunkPos() {
 
 vector<ChunkPos> WorldInteractions::GetRequestedLightUpdates() {
 	std::lock_guard<std::mutex> lock{ updated_chunk_lock_ };
-	vector<ChunkPos> columnIDs = std::move(light_update_request_);
-	light_update_request_.clear();
-	return columnIDs;
+	vector<ChunkPos> pos = std::move(light_updates_);
+	light_updates_.clear();
+	for (const ChunkPos& p : pos) {
+		requested_light_update_[p].second = SIZE_MAX;
+	}
+	return pos;
 }
 
-vector<EntityProperty> WorldInteractions::getUpdatedEntities() {
+vector<EntityProperty> WorldInteractions::GetUpdatedEntities() {
 	FastHashMap<EntityUUID, EntityProperty> m = world->entities_.ClientGetEntityUpdate();
 	vector<EntityProperty> properties = {};
 
@@ -52,7 +55,7 @@ vector<EntityProperty> WorldInteractions::getUpdatedEntities() {
 	return properties;
 }
 
-vector<EntityUUID> WorldInteractions::getRemovedEntities() {
+vector<EntityUUID> WorldInteractions::GetRemovedEntities() {
 	FastHashSet<EntityUUID> m = world->entities_.getRemovedEntities();
 	vector<EntityUUID> ids = {};
 	ids.insert(ids.end(), m.begin(), m.end());
@@ -60,13 +63,34 @@ vector<EntityUUID> WorldInteractions::getRemovedEntities() {
 }
 
 void WorldInteractions::RequestLightUpdate(const ChunkPos& pos) {
-	if (requested_light_update_.count(pos)) {
-		return;
-	}
+	ChunkColumnPos columnPos = pos;
+	columnPos.y /= 32;
+	int y = pos.y & 31;
 
 	std::lock_guard<std::mutex> lock{ updated_chunk_lock_ };
-	requested_light_update_.emplace(pos);
-	light_update_request_.push_back(pos);
+
+	if (requested_light_update_.count(pos)) {
+		auto& info = requested_light_update_[pos];
+
+		int currY = info.first;
+		size_t index = info.second;
+
+		if (currY < y) {
+			if (index == SIZE_MAX) {
+				info.second = light_updates_.size();
+				light_updates_.push_back(pos);
+			} else {
+				info.first = y;
+				light_updates_[index].y = y;
+			}
+		}
+	}
+	else {
+		requested_light_update_.emplace(columnPos, std::pair<int, size_t>{y, light_updates_.size()});
+		light_updates_.push_back(pos);
+	}
+
+
 
 }
 
@@ -91,6 +115,7 @@ void WorldInteractions::UpdateLighting(std::shared_ptr<ChunkLightingContainer> c
 	if (!updated_chunk_.count(pos)) {
 		updated_chunk_.insert(pos);
 	}
+	pos.y /= 32;
 
 	requested_light_update_.erase(pos);
 }
@@ -111,6 +136,7 @@ void WorldInteractions::UpdateLighting(vector<std::shared_ptr<ChunkLightingConta
 		if (!updated_chunk_.count(pos)) {
 			updated_chunk_.insert(pos);
 		}
+		pos.y /= 32;
 		// TODO: Fix this with Chunk Column ID
 		requested_light_update_.erase(pos);
 
@@ -165,7 +191,7 @@ void WorldInteractions::AddChunks(vector<Chunk*> chunks) {
 		for (int side = 0; side < 6; side++) {
 			ChunkPos neighborPos = position;
 			neighborPos.incrementSide(side, 1);
-			
+
 			if (!duplicatedInputs.count(neighborPos) && world->CheckChunk(neighborPos)) {
 				chunkToUpdate.push_back(neighborPos);
 				duplicatedInputs.insert(neighborPos);
@@ -207,7 +233,7 @@ void WorldInteractions::SetBlock(BlockID b, const BlockPos& bpos) {
 		if (!updated_chunk_.count(pos)) {
 			updated_chunk_.insert(pos);
 		}
-		
+
 		int v[3]{ x % 16, y % 16, z % 16 };
 
 		for (int axis_ = 0; axis_ < 3; axis_++) {

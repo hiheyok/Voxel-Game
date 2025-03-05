@@ -25,70 +25,35 @@ struct LogData {
 class LogUtils {
 public:
 
-	LogUtils() {
-		buffer_ = new char[buffer_size_];
-		Start();
-	}
-
-	~LogUtils() {
-		Stop();
-		delete[] buffer_;
-	}
-
+	LogUtils();
+	~LogUtils();
 
 	void Start();
-	
 	void Stop();
 
 	void LogError(std::string Subtype, std::string Message);
-
 	void LogWarn(std::string Subtype, std::string Message);
-
 	void LogInfo(std::string Subtype, std::string Message);
-
 	void LogDebug(std::string Subtype, std::string Message);
 	void LogDebugf(std::string Subtype, std::string Message,...);
 
-	std::thread LoggingThread;
-
-
+	std::thread logging_thread_;
 private:
-
-	std::mutex mutex_;
-
-	bool stop_ = false;
-
-	bool started_ = false;
-
 	void MainLogger();
 
-	std::string FormatString(std::string in,  ... ) {
-		va_list args;
-		va_start(args, in);
-
-		vsnprintf(buffer_, buffer_size_, in.c_str(), args);
-	
-		va_end(args);
-
-		std::string out(buffer_);
-		memset(buffer_, NULL, out.size());
-		return out;
-	}
-
-	std::string FormatMessage(std::string severity, long long time, std::string timestamp, std::string subtype, std::string message) {
-		return FormatString("[ %lld NS ] [ %s ] [ %s / %s ]: %s", time, timestamp.c_str(), severity.c_str(), subtype.c_str(), message.c_str());
-	}
+	std::string FormatString(std::string in, ...);
+	std::string FormatMessage(std::string severity, long long time, std::string timestamp, std::string subtype, std::string message);
 
 	std::chrono::high_resolution_clock::time_point init_time_ = std::chrono::high_resolution_clock::now();
-	
+
+	std::mutex mutex_;
+	bool stop_ = false;
+	bool started_ = false;
 	std::deque<LogData> logs_;
 	std::deque<LogData> logs_cache_;
-
 	std::ofstream file_;
-
 	char* buffer_;
 	const uint64_t buffer_size_ = 4096;
-
 };
 
 extern LogUtils g_logger;

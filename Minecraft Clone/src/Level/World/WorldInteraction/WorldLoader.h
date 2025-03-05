@@ -3,6 +3,7 @@
 #include "../WorldParameters.h"
 #include <mutex>
 
+// Add chunk unloading later when entity goes out of range
 class WorldLoader {
 private:
 	WorldParameters settings_;
@@ -16,10 +17,6 @@ private:
 	void loadSpawnChunks();
 
 	void loadSurroundedMovedEntityChunk();
-
-	void unloadSurroundedMovedEntityChunk() {
-
-	}
 
 	bool RequestLoad(const ChunkPos& pos);
 

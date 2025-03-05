@@ -2,16 +2,13 @@
 #include "../../Utils/Clock.h"
 #include "../../Core/Options/Option.h"
 
-using namespace glm;
-using namespace MeshingV2;
+static thread_local Mesh::ChunkMeshData chunkMesher;
 
-static thread_local MeshingV2::ChunkMeshData chunkMesher;
-
-void WorldRender::SetRotation(dvec2 rotation) {
+void WorldRender::SetRotation(glm::dvec2 rotation) {
 	player_.SetRotation(rotation);
 }
 
-void WorldRender::SetPosition(dvec3 position) {
+void WorldRender::SetPosition(glm::dvec3 position) {
 	player_.SetPosition(position);
 }
 
@@ -32,18 +29,21 @@ void WorldRender::LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks) {
 }
 
 
-std::unique_ptr<ChunkVertexData> WorldRender::Worker(const ChunkPos& pos) {
+std::unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(const ChunkPos& pos) {
 	Chunk* chunk = WorldRender::server_->GetChunk(pos);
 
+	Timer timer;
 	chunkMesher.Reset();
 	chunkMesher.SetChunk(chunk);
 	chunkMesher.GenerateMesh();
+	size_t time = timer.GetTimePassed_μs();
 
 	//Transfer Infomation
-	std::unique_ptr<ChunkVertexData> data = std::make_unique<ChunkVertexData>();
+	std::unique_ptr<Mesh::ChunkVertexData> data = std::make_unique<Mesh::ChunkVertexData>();
 	data->solidVertices.resize(chunkMesher.solid_face_count_ * 12);
 	data->transparentVertices.resize(chunkMesher.transparent_face_count_ * 12);
 	data->position_ = pos;
+	data->time_ = time;
 
 	memcpy(data->solidVertices.data(), chunkMesher.vertices_buffer_.data(), chunkMesher.solid_face_count_ * 12 * sizeof(uint32_t));
 	memcpy(data->transparentVertices.data(), chunkMesher.transparent_vertices_buffer_.data(), chunkMesher.transparent_face_count_ * 12 * sizeof(uint32_t));
@@ -56,7 +56,7 @@ void WorldRender::Update() {
 	const int chunkUpdateLimit = 4000;
 	int updateAmount = 0;
 
-	std::vector<std::unique_ptr<MeshingV2::ChunkVertexData>> output = mesh_thread_pool_->GetOutput();
+	std::vector<std::unique_ptr<Mesh::ChunkVertexData>> output = mesh_thread_pool_->GetOutput();
 
 	mesh_add_queue_.insert(mesh_add_queue_.end(), std::make_move_iterator(output.begin()), std::make_move_iterator(output.end()));
 
@@ -65,6 +65,7 @@ void WorldRender::Update() {
 			break;
 		}
 		//profiler_->CombineCache(worker_output_[(uint64_t)workerId].front()->profiler);
+		build_time_ += mesh_add_queue_.back()->time_;
 		renderer_v2_.AddChunk(std::move(mesh_add_queue_.back()));
 		mesh_add_queue_.pop_back();
 	}
@@ -83,7 +84,6 @@ void WorldRender::Update() {
 void WorldRender::Stop() {
 	mesh_thread_pool_->Stop();
 	renderer_v2_.Cleanup();
-
 }
 
 void WorldRender::Start(GLFWwindow* window, InternalServer* server, PerformanceProfiler* profiler) {
@@ -93,7 +93,7 @@ void WorldRender::Start(GLFWwindow* window, InternalServer* server, PerformanceP
 	int threadCount = g_app_options.mesh_threads_;
 
 	mesh_thread_pool_ = std::make_unique<ThreadPool<ChunkPos, 
-		std::unique_ptr<MeshingV2::ChunkVertexData>, 
+		std::unique_ptr<Mesh::ChunkVertexData>, 
 		WorldRender::Worker>>(threadCount, "Mesher", 250);
 
 	window_ = window;

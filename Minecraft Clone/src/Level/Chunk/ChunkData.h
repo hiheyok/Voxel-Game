@@ -13,20 +13,17 @@
 
 
 
-class chunk_container_ {
+class ChunkContainer {
 	
 public:
 
-	chunk_container_() {
+	ChunkContainer() {
 		lighting_ = std::make_shared<ChunkLightingContainer>();
 	}
 	
-	void SetNeighbor(chunk_container_* neighbor, unsigned int side);
+	void SetNeighbor(ChunkContainer* neighbor, unsigned int side);
 
 	void ClearNeighbors();
-
-	BlockID GetBlock(glm::ivec3 posIn) const;
-	BlockID GetBlockUnsafe(glm::ivec3 posIn) const;
 
 	BlockID GetBlock(int x, int y, int z) const;
 	BlockID GetBlockUnsafe(int x, int y, int z) const;
@@ -37,7 +34,7 @@ public:
 	void Use();
 	void Unuse();
 
-	chunk_container_* GetNeighbor(unsigned int side) const;
+	ChunkContainer* GetNeighbor(unsigned int side) const;
 	
 	void SetPosition(int x, int y, int z);
 
@@ -45,7 +42,7 @@ public:
 
 	bool is_empty_ = true;
 
-	chunk_container_* neighbors_[6]{nullptr};
+	ChunkContainer* neighbors_[6]{nullptr};
 	std::vector<SetBlockRelative> outside_block_to_place_[6]{};
 	std::shared_ptr<ChunkLightingContainer> lighting_;
 

@@ -11,19 +11,11 @@
 #include "../../Level/Entity/Properties/EntityProperties.h"
 #include "../../Level/Server/Communication/InternalServer.h"
 
-using namespace glm;
-
 class WorldInteraction {
-
 public:
-
 	void Interact(Player* player, const UserInputs& Inputs);
-
 private:
-
 	BlockID GetBlock(Ray ray, Dimension* dimension);
-
 	void BreakBlock(Ray ray, Dimension* dimension);
-
 	void PlaceBlock(Ray ray, BlockID block, Dimension* dimension);
 };

@@ -6,7 +6,7 @@
 #include "../../../Client/Profiler/PerformanceProfiler.h"
 #include "../../../Utils/Containers/BitStorage.h"
 
-namespace MeshingV2 {
+namespace Mesh {
 
 	static PerformanceProfiler profiler;
 
@@ -56,6 +56,7 @@ namespace MeshingV2 {
 		std::vector<uint32_t> solidVertices;
 		std::vector<uint32_t> transparentVertices;
 		ChunkPos position_;
+		size_t time_;
 	};
 
 

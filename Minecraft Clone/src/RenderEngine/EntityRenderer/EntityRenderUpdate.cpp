@@ -11,8 +11,8 @@ void EntityRendererUpdater::UpdaterThread() {
 	while (!stop_) {
 		Dimension* world = static_cast<Dimension*>(Block::dimension_ptr_);
 
-		std::vector<EntityProperty> UpdatedEntities = world->world_interactions_.getUpdatedEntities();
-		std::vector<EntityUUID> RemovedEntities = world->world_interactions_.getRemovedEntities();
+		std::vector<EntityProperty> UpdatedEntities = world->world_interactions_.GetUpdatedEntities();
+		std::vector<EntityUUID> RemovedEntities = world->world_interactions_.GetRemovedEntities();
 
 		for (auto& entity : UpdatedEntities) {
 			renderer_->AddEntity(entity);

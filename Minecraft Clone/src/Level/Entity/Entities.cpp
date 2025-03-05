@@ -11,6 +11,10 @@ using namespace glm;
 
 using json = nlohmann::json;
 
+EntitiesList::EntitiesList() {
+
+}
+
 EntityTypeID EntitiesList::RegisterEntity(std::string EntityName, EntityTypeEnums type_) {
 	EntityTypeID ID = static_cast<EntityTypeID>(entity_type_list_.size());
 	EntityType* newEntity = nullptr;

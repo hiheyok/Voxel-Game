@@ -58,7 +58,7 @@ bool WorldLoader::RequestLoad(const ChunkPos& pos) {
 
 	//Request chunk
 	generating_chunk_.insert(p);
-	chunk_request_.emplace_back(p);
+	chunk_request_.push_back(p);
 	return true;
 }
 
@@ -194,7 +194,6 @@ void WorldLoader::Load() {
 	if (!is_spawn_chunks_loaded_) loadSpawnChunks();
 
 	loadSurroundedMovedEntityChunk();
-	unloadSurroundedMovedEntityChunk();
 }
 
 void WorldLoader::AddChunk(Chunk* chunk) {

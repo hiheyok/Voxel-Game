@@ -7,9 +7,7 @@ public:
 	Dimension* main_world_  = nullptr;
 	LevelLoader level_loader_;
 
-	Level() {
-
-	}
+	Level();
 
 	void Start(int worldGenThreadCount, int light_engine_thread_count_);
 

@@ -2,6 +2,10 @@
 #include "Dimension/Dimensions/Overworld.h"
 using namespace std;
 
+Level::Level() {
+
+}
+
 void Level::Start(int worldGenThreadCount, int light_engine_thread_count_) {
 	DimensionProperties properties;
 	main_world_ = new OverworldDimension();

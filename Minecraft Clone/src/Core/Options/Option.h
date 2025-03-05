@@ -15,21 +15,7 @@ public:
 	int solid_buffer_size_ = 2000000000;
 	int light_engine_threads_ = 2;
 
-	Options() {
-		SetOptionNameTable();
-
-		//Set values from option file
-		if (!FileManager::CheckFile("options.txt")) {
-			GenerateOptionFile();
-			return; //check if option file exist
-		}
-
-		File file = FileManager::GetFile("options.txt");
-
-		std::vector<std::string> tokens = file.GetToken(':');
-
-		ProcessTokens(tokens);
-	}
+	Options();
 private:
 
 	bool SetValue(std::string name, std::string value);

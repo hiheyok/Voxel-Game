@@ -16,11 +16,11 @@ Timer* Server::GetTimer() {
 }
 
 vector<EntityProperty> Server::GetUpdatedEntities() {
-	return level_.main_world_->world_interactions_.getUpdatedEntities();
+	return level_.main_world_->world_interactions_.GetUpdatedEntities();
 }
 
 vector<EntityUUID> Server::GetRemovedEntities() {
-	return level_.main_world_->world_interactions_.getRemovedEntities();
+	return level_.main_world_->world_interactions_.GetRemovedEntities();
 }
 
 bool Server::CheckEntityOnGround(EntityUUID id) {

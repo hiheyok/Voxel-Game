@@ -16,7 +16,6 @@ public:
 	EntityProperty GetEntityProperties();
 
 	void SetPlayerRotation(float x, float y);
-
 	void SetPlayerPosition(float x, float y, float z);
 
 	void RenderGUIs();

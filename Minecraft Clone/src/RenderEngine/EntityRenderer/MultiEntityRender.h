@@ -38,8 +38,6 @@ private:
 
 	PerformanceProfiler* profiler_;
 
-	bool is_dirty_ = true;
-
 	size_t num_entity_rendered_ = 0;
 
 	double time_past_tick_ = 0.0;

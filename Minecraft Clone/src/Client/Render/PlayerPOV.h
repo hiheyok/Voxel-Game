@@ -8,7 +8,6 @@ public:
 	void SetRotation(glm::vec2 rot);
 	void SetFOV(float fov);
 
-
 	Camera* GetCamera();
 private:
 	Camera camera_;

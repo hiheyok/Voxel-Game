@@ -35,7 +35,7 @@ public:
 
 	void LoadAssets();
 
-	void AddChunk(std::unique_ptr<MeshingV2::ChunkVertexData> MeshData);
+	void AddChunk(std::unique_ptr<Mesh::ChunkVertexData> MeshData);
 
 	double getDebugTime();
 
@@ -67,12 +67,9 @@ private:
 	std::vector<ChunkDrawBatch> chunk_transparent_batches_;
 	FastHashMap<ChunkPos, int> chunk_batch_transparent_lookup_; //f: ChunkPos -> TransparentBatchIndex
 
-	GLFWwindow* window = nullptr;
-	bool stop = false;
-
-	Shader CubicShader;
-	Camera* camera;
-	Timer time;
-	std::mutex mLock;
+	GLFWwindow* window_ = nullptr;
+	Shader cubic_shader_;
+	Camera* camera_;
+	Timer time_;
 };
 

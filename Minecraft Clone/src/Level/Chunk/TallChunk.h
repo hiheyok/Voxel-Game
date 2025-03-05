@@ -31,12 +31,12 @@ public:
 
 	void SetBlockUnsafe(int x, int y, int z, BlockID block) {
 		int ChunkIndex = y / 16;
-		chunk_sub_column_[ChunkIndex]->SetBlockUnsafe(block, x, y & 0b1111, z);
+		chunk_sub_column_[ChunkIndex]->SetBlockUnsafe(block, x, y & 0b1111, z );
 	}
 
 	BlockID GetBlockUnsafe(int x, int y, int z) {
 		int ChunkIndex = y / 16;
-		return chunk_sub_column_[ChunkIndex]->GetBlockUnsafe(x, y & 0b1111, z);
+		return chunk_sub_column_[ChunkIndex]->GetBlockUnsafe(x, y & 0b1111, z );
 	}
 
 	std::vector<Chunk*> GetCubicChunks() {

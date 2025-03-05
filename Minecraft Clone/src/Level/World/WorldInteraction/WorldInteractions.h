@@ -14,9 +14,9 @@ private:
 	World* world = nullptr;
 	std::mutex updated_chunk_lock_;
 	FastHashSet<ChunkPos> updated_chunk_;
-	FastHashSet<ChunkPos> requested_light_update_;
+	FastHashMap<ChunkPos, std::pair<int, size_t>> requested_light_update_; // pair<y height, index in update vector>
+	std::vector<ChunkPos> light_updates_;
 public:
-	std::vector<ChunkPos> light_update_request_;
 	WorldLoader* worldLoader_ = nullptr;
 	WorldParameters settings_;
 	WorldCollusionDetector collusions_;
@@ -39,9 +39,9 @@ public:
 
 	std::vector<ChunkPos> GetRequestedLightUpdates();
 
-	std::vector<EntityProperty> getUpdatedEntities(); // TODO: Rename
+	std::vector<EntityProperty> GetUpdatedEntities(); // TODO: Rename
 
-	std::vector<EntityUUID> getRemovedEntities(); // TODO: Rename
+	std::vector<EntityUUID> GetRemovedEntities(); // TODO: Rename
 
 	void RequestLightUpdate(const ChunkPos& pos);
 

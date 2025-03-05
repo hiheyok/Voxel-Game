@@ -37,7 +37,7 @@ namespace MemoryManagement {
 			if (!mem_blocks_iterators_.count(offset)) {
 				return;
 			}
-			std::map<size_t, MemoryBlock>::iterator it = mem_blocks_iterators_[offset];
+			std::map<size_t, MemoryBlock>::const_iterator it = mem_blocks_iterators_[offset];
 			Delete(it);
 		}
 
@@ -48,15 +48,21 @@ namespace MemoryManagement {
 			mem_blocks_iterators_.erase(offset);
 		}
 
-		std::map<size_t, MemoryBlock>::iterator getIterator(size_t offset) {
-			return mem_blocks_iterators_.count(offset) ? mem_blocks_iterators_[offset] : end();
+		std::map<size_t, MemoryBlock>::const_iterator getIterator(size_t offset) const {
+			if (mem_blocks_iterators_.count(offset)) {
+				const auto& it = mem_blocks_iterators_.find(offset);
+				return it->second;
+			}
+			else {
+				return end();
+			}
 		}
 
-		std::map<size_t, MemoryBlock>::iterator begin() {
+		std::map<size_t, MemoryBlock>::const_iterator begin() const {
 			return mem_blocks_.begin();
 		}
 
-		std::map<size_t, MemoryBlock>::iterator end() {
+		std::map<size_t, MemoryBlock>::const_iterator end() const {
 			return mem_blocks_.end();
 		}
 
@@ -88,7 +94,7 @@ namespace MemoryManagement {
 
 	private:
 		std::map<size_t, MemoryBlock> mem_blocks_;
-		FastHashMap<size_t, std::map<size_t, MemoryBlock>::iterator> mem_blocks_iterators_;
+		FastHashMap<size_t, std::map<size_t, MemoryBlock>::const_iterator> mem_blocks_iterators_;
 	};
 
 	class MemoryPoolManager {
@@ -104,7 +110,7 @@ namespace MemoryManagement {
 
 			reserved_memory_blocks_.Add(MemoryBlock{ memOffset, memSize });
 
-			std::map<size_t, MemoryBlock>::iterator left = free_memory_blocks_.getIterator(memOffset);
+			std::map<size_t, MemoryBlock>::const_iterator left = free_memory_blocks_.getIterator(memOffset);
 
 			MemoryBlock current = left->second;
 
@@ -286,11 +292,12 @@ public:
 		return chunkMemoryBlock;
 	}
 
-	ChunkMemoryPoolOffset GetChunkMemoryPoolOffset(ChunkPos pos) {
-		if (chunk_memory_offsets_.count(pos)) {
-			return chunk_memory_offsets_[pos];
+	ChunkMemoryPoolOffset GetChunkMemoryPoolOffset(ChunkPos pos) const {
+		const auto& it = chunk_memory_offsets_.find(pos);
+		if (it != chunk_memory_offsets_.end()) {
+			return it->second;
 		}	
-		return ChunkMemoryPoolOffset(ULLONG_MAX, ULLONG_MAX, pos);
+		return ChunkMemoryPoolOffset{ ULLONG_MAX, ULLONG_MAX, pos };
 	}
 
 	bool CheckChunk(ChunkPos pos) const {
@@ -327,7 +334,7 @@ public:
 	}
 
 	MemoryManagement::MemoryPoolStatistics statistics_;
-	Buffer stagging_buffer_;
+	Buffer stagging_buffer_; 
 	BufferStorage buffer_;
 
 	MemoryManagement::MemoryPoolManager memory_pool_;

@@ -15,9 +15,7 @@ struct WindowProperties {
 
 	bool window_size_dirty_ = false;
 	bool initialized_ = false;
-
 	bool draw_solid_ = true;
-
 };
 
 class Window {
@@ -45,12 +43,9 @@ protected:
 	void ScrollCallback(GLFWwindow* win, double xoffset, double yoffset);
 
 	UserInputs inputs_;
-
 	WindowProperties properties_;
-
 private:
 	static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam);
-
 	
 	GLFWwindow* window_ = nullptr;
 };

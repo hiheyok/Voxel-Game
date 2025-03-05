@@ -1,5 +1,21 @@
 #include "Option.h"
 
+Options::Options() {
+	SetOptionNameTable();
+
+	//Set values from option file
+	if (!FileManager::CheckFile("options.txt")) {
+		GenerateOptionFile();
+		return; //check if option file exist
+	}
+
+	File file = FileManager::GetFile("options.txt");
+
+	std::vector<std::string> tokens = file.GetToken(':');
+
+	ProcessTokens(tokens);
+}
+
 bool Options::SetValue(std::string name, std::string value) {
 	int val = stoi(value);
 
