@@ -20,5 +20,5 @@ GeneratorType g_generators;
 int AmountEntityDestroy = 0;
 
 void Initialize() {
-	
+    
 }

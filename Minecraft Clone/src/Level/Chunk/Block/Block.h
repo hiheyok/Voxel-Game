@@ -7,48 +7,43 @@
 
 struct BlockType {
 
-	BlockType(bool transparent, bool solid, bool fluid) {
-		transparency_ = transparent;
-		is_solid_ = solid;
-		is_fluid_ = fluid;
-	}
+    BlockType(bool transparent, bool solid, bool fluid) {
+        transparency_ = transparent;
+        is_solid_ = solid;
+        is_fluid_ = fluid;
+    }
 
-	BlockType() {
+    BlockType() {
 
-	}
+    }
 
-	bool is_fluid_ = NULL;
-	bool transparency_ = NULL;
-	bool is_solid_ = NULL;
+    bool is_fluid_ = NULL;
+    bool transparency_ = NULL;
+    bool is_solid_ = NULL;
 };
 
 struct Block {
-	virtual ~Block() {
-		Clean();
-	}
+    virtual ~Block() {
+        Clean();
+    }
 
-	void Clean() {
-		if (properties_ != nullptr) {
-			delete properties_;
-		}
-		if (texture_ != nullptr) {
-			delete texture_;
-		}
-	}
+    void Clean() {
+    
+    }
 
-	virtual void Tick(const BlockPos& pos) {
+    virtual void Tick(const BlockPos& pos) {
 
-	}
+    }
 
-	static void* dimension_ptr_;
-	static void* server_ptr_;
+    static void* dimension_ptr_;
+    static void* server_ptr_;
 
-	BlockID id_ = NULL;
-	BlockType* properties_ = nullptr;
-	BlockTexture* texture_ = nullptr;
+    BlockID id_ = NULL;
+    std::unique_ptr<BlockType> properties_ = nullptr;
+    std::unique_ptr<BlockTexture> texture_ = nullptr;
 
-	ModelV2::BlockModelV2* block_model_data_ = NULL;
-	std::string block_name_ = "";
+    ModelV2::BlockModelV2* block_model_data_ = NULL;
+    std::string block_name_ = "";
 };
 
 inline void* Block::dimension_ptr_ = nullptr;

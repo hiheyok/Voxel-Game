@@ -4,9 +4,9 @@
 
 class GenLayerDeepOcean : public GenLayer {
 public:
-	GenLayerDeepOcean(long long baseSeedIn, GenLayer* parentIn) : GenLayer(baseSeedIn) {
-		parent = parentIn;
-	}
+    GenLayerDeepOcean(long long baseSeedIn, GenLayer* parentIn) : GenLayer(baseSeedIn) {
+        parent = parentIn;
+    }
 
     std::vector<int> getInts(int areaX, int areaY, int areaWidth, int areaHeight)
     {

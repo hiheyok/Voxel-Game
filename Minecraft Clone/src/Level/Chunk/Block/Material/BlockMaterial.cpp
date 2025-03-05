@@ -2,32 +2,32 @@
 #include "../Type/BlockTypes.h"
 
 Block* MaterialNone::BuildNewBlockType() {
-	return new Block();
+    return new Block();
 }
 
 Block* MaterialFluid::BuildNewBlockType() {
-	Fluid* fluid = new Fluid;
-	fluid->properties_.spread_rate_ = spread_;
+    Fluid* fluid = new Fluid;
+    fluid->properties_.spread_rate_ = spread_;
 
-	return static_cast<Block*>(fluid);
+    return static_cast<Block*>(fluid);
 }
 
 Block* MaterialGrass::BuildNewBlockType() {
-	GrassBlock* grass = new GrassBlock;
-	grass->properties_.break_chance_ = break_chance_;
-	grass->properties_.spread_chance_ = spread_chance_;
+    GrassBlock* grass = new GrassBlock;
+    grass->properties_.break_chance_ = break_chance_;
+    grass->properties_.spread_chance_ = spread_chance_;
 
-	return static_cast<Block*>(grass);
+    return static_cast<Block*>(grass);
 }
 
 Block* MaterialDirt::BuildNewBlockType() {
-	DirtBlock* dirt = new DirtBlock();
+    DirtBlock* dirt = new DirtBlock();
 
-	return static_cast<Block*>(dirt);
+    return static_cast<Block*>(dirt);
 }
 
 Block* MaterialGravity::BuildNewBlockType() {
-	GravityBlock* gravity = new GravityBlock();
+    GravityBlock* gravity = new GravityBlock();
 
-	return static_cast<Block*>(gravity);
+    return static_cast<Block*>(gravity);
 }

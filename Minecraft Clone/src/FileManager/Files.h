@@ -12,38 +12,38 @@ std::vector<std::string> Tokenize(std::string str, char divider);
 class File{
 public:
 
-	std::ifstream file_;
-	std::string dir_ = "";
+    std::ifstream file_;
+    std::string dir_ = "";
 
-	File() {
+    File() {
 
-	}
+    }
 
-	File(std::string dir) {
-		Open(dir);
-	}
+    File(std::string dir) {
+        Open(dir);
+    }
 
-	void Open(std::string dir);
+    void Open(std::string dir);
 
-	void Close();
+    void Close();
 
-	std::vector<std::string> GetToken(char divider);
+    std::vector<std::string> GetToken(char divider);
 };
 
 class FileManager {
 public:
-	static bool CheckFolder(const char* dir);
+    static bool CheckFolder(const char* dir);
 
-	static bool CreateFolder(const char* name);
+    static bool CreateFolder(const char* name);
 
-	//Return true of file exist and false if it doesn't
-	static bool CheckFile(const char* dir);
+    //Return true of file exist and false if it doesn't
+    static bool CheckFile(const char* dir);
 
-	static bool CheckFile(std::string dir);
+    static bool CheckFile(std::string dir);
 
-	static void CreateFile(std::string name, std::string dir = "N/A");
+    static void CreateFile(std::string name, std::string dir = "N/A");
 
-	static File GetFile(std::string name, std::string dir = "N/A");
+    static File GetFile(std::string name, std::string dir = "N/A");
 
-	static void DeleteFile(std::string name, std::string dir = "N/A");
+    static void DeleteFile(std::string name, std::string dir = "N/A");
 };

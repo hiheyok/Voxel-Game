@@ -7,7 +7,7 @@ in vec2 UVa;
 uniform sampler2D ItemTexture;
 
 void main() {
-	vec4 Tex = texture(ItemTexture, UVa);
+    vec4 Tex = texture(ItemTexture, UVa);
 
-	final = Tex;
+    final = Tex;
 }

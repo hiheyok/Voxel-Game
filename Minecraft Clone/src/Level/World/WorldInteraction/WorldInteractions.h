@@ -11,61 +11,61 @@
 
 class WorldInteractions {
 private:
-	World* world = nullptr;
-	std::mutex updated_chunk_lock_;
-	FastHashSet<ChunkPos> updated_chunk_;
-	FastHashMap<ChunkPos, std::pair<int, size_t>> requested_light_update_; // pair<y height, index in update vector>
-	std::vector<ChunkPos> light_updates_;
+    World* world = nullptr;
+    std::mutex updated_chunk_lock_;
+    FastHashSet<ChunkPos> updated_chunk_;
+    FastHashMap<ChunkPos, std::pair<int, size_t>> requested_light_update_; // pair<y height, index in update vector>
+    std::vector<ChunkPos> light_updates_;
 public:
-	WorldLoader* worldLoader_ = nullptr;
-	WorldParameters settings_;
-	WorldCollusionDetector collusions_;
+    WorldLoader* worldLoader_ = nullptr;
+    WorldParameters settings_;
+    WorldCollusionDetector collusions_;
 
-	WorldInteractions() {
+    WorldInteractions() {
 
-	}
+    }
 
-	WorldInteractions(World* w, WorldParameters parameters) {
-		init(w, parameters);
-	}
+    WorldInteractions(World* w, WorldParameters parameters) {
+        init(w, parameters);
+    }
 
-	void UseTallGeneration();
+    void UseTallGeneration();
 
-	void init(World* w, WorldParameters parameters);
+    void init(World* w, WorldParameters parameters);
 
-	void summonEntity(Entity& entity);
+    void summonEntity(Entity& entity);
 
-	std::vector<ChunkPos> GetUpdatedChunkPos();
+    std::vector<ChunkPos> GetUpdatedChunkPos();
 
-	std::vector<ChunkPos> GetRequestedLightUpdates();
+    std::vector<ChunkPos> GetRequestedLightUpdates();
 
-	std::vector<EntityProperty> GetUpdatedEntities(); // TODO: Rename
+    std::vector<EntityProperty> GetUpdatedEntities(); // TODO: Rename
 
-	std::vector<EntityUUID> GetRemovedEntities(); // TODO: Rename
+    std::vector<EntityUUID> GetRemovedEntities(); // TODO: Rename
 
-	void RequestLightUpdate(const ChunkPos& pos);
+    void RequestLightUpdate(const ChunkPos& pos);
 
-	void KillEntity(EntityUUID id);
+    void KillEntity(EntityUUID id);
 
-	void Update();
+    void Update();
 
-	void UpdateLighting(std::shared_ptr<ChunkLightingContainer> chunkLighting);
+    void UpdateLighting(std::shared_ptr<ChunkLightingContainer> chunkLighting);
 
-	void UpdateLighting(std::vector<std::shared_ptr<ChunkLightingContainer>> chunkLighting);
+    void UpdateLighting(std::vector<std::shared_ptr<ChunkLightingContainer>> chunkLighting);
 
-	void AddChunk(Chunk* chunk);
+    void AddChunk(Chunk* chunk);
 
-	void AddChunks(std::vector<Chunk*> chunks);
+    void AddChunks(std::vector<Chunk*> chunks);
 
-	Chunk* GetChunk(const ChunkPos& pos) const;
+    Chunk* GetChunk(const ChunkPos& pos) const;
 
-	void SetBlock(BlockID b, const BlockPos& pos);
+    void SetBlock(BlockID b, const BlockPos& pos);
 
-	BlockID GetBlock(const BlockPos& pos);
+    BlockID GetBlock(const BlockPos& pos);
 
-	Entity* GetEntity(EntityUUID id);
+    Entity* GetEntity(EntityUUID id);
 
-	void AddEntity(Entity& entity);
+    void AddEntity(Entity& entity);
 
-	void AddEntity(Entity* entity);
+    void AddEntity(Entity* entity);
 };

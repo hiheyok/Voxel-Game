@@ -8,25 +8,25 @@
 
 class MinecraftTerrain : public WorldGenerator {
 public:
-	MinecraftTerrain() {
-		settings_ = new ChunkGeneratorSettings;
-		use_tall_chunks_ = true;
-		
-	}
+    MinecraftTerrain() {
+        settings_ = new ChunkGeneratorSettings;
+        use_tall_chunks_ = true;
+        
+    }
 
-	TallChunk* GenerateTall(const ChunkPos& pos) override;
+    TallChunk* GenerateTall(const ChunkPos& pos) override;
 
 private:
-	void Init();
+    void Init();
 
-	NoiseMaps1122 Noisemaps;
-	TerrainParamters Paramters;
-	ChunkGeneratorSettings* settings_ = nullptr;
-	
+    NoiseMaps1122 Noisemaps;
+    TerrainParamters Paramters;
+    ChunkGeneratorSettings* settings_ = nullptr;
+    
 
-	//double* heightMap;
+    //double* heightMap;
 
-	//bool isInitialized = false;
+    //bool isInitialized = false;
 
-	glm::vec3 VecFloor(glm::vec3 v);
+    glm::vec3 VecFloor(glm::vec3 v);
 };

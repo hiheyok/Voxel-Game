@@ -3,9 +3,9 @@
 
 class BiomeHell : public Biome {
 public:
-	BiomeHell(BiomeProperties properties) : Biome(properties) {}
+    BiomeHell(BiomeProperties properties) : Biome(properties) {}
 
-	const std::type_info& getBiomeClass() const override {
-		return typeid(*this);
-	}
+    const std::type_info& getBiomeClass() const override {
+        return typeid(*this);
+    }
 };

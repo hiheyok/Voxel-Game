@@ -159,9 +159,6 @@
     <ClCompile Include="src\Level\World\WorldInteraction\WorldLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Registry\Registry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Registry\ResourceLocation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -289,6 +286,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Utils\Math\Vector\Vec.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Client\Communication\ServerInteraction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -878,5 +878,26 @@
     <ClInclude Include="src\Utils\ThreadPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\shaders\frag.glsl" />
+    <None Include="assets\shaders\vert.glsl" />
+    <None Include="assets\BlockTextures.json" />
+    <None Include="assets\EntityShape.json" />
+    <None Include="assets\GUI.json" />
+    <None Include="assets\shaders\screen\frag.glsl" />
+    <None Include="assets\shaders\screen\vert.glsl" />
+    <None Include="assets\shaders\ItemRender\AtlasStitchFrag.glsl" />
+    <None Include="assets\shaders\ItemRender\AtlasStitchVert.glsl" />
+    <None Include="assets\shaders\ItemRender\BlockModelFrag.glsl" />
+    <None Include="assets\shaders\ItemRender\BlockModelVert.glsl" />
+    <None Include="assets\shaders\GUI\GUIFrag.glsl" />
+    <None Include="assets\shaders\GUI\GUIVert.glsl" />
+    <None Include="assets\shaders\Font\FontBackgroundFrag.glsl" />
+    <None Include="assets\shaders\Font\FontBackgroundVert.glsl" />
+    <None Include="assets\shaders\Font\FontFrag.glsl" />
+    <None Include="assets\shaders\Font\FontVert.glsl" />
+    <None Include="assets\shaders\Entity\MultiEntityFrag.glsl" />
+    <None Include="assets\shaders\Entity\MultiEntityVert.glsl" />
   </ItemGroup>
 </Project>

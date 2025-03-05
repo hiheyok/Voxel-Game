@@ -4,9 +4,9 @@
 
 class GenLayerAddMushroomIsland : public GenLayer {
 public:
-	GenLayerAddMushroomIsland(long long baseSeedIn, GenLayer* parentIn) : GenLayer(baseSeedIn) {
-		parent = parentIn;
-	}
+    GenLayerAddMushroomIsland(long long baseSeedIn, GenLayer* parentIn) : GenLayer(baseSeedIn) {
+        parent = parentIn;
+    }
 
 
     std::vector<int> getInts(int areaX, int areaY, int areaWidth, int areaHeight) override {

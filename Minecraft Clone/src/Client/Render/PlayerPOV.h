@@ -4,11 +4,11 @@
 
 class PlayerPOV {
 public:
-	void SetPosition(glm::vec3 pos);
-	void SetRotation(glm::vec2 rot);
-	void SetFOV(float fov);
+    void SetPosition(glm::vec3 pos);
+    void SetRotation(glm::vec2 rot);
+    void SetFOV(float fov);
 
-	Camera* GetCamera();
+    Camera* GetCamera();
 private:
-	Camera camera_;
+    Camera camera_;
 };

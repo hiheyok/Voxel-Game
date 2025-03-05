@@ -7,5 +7,5 @@ in vec2 TexUV;
 uniform sampler2D GUITexture;
 
 void main() {
-	clr = texture(GUITexture, TexUV);
+    clr = texture(GUITexture, TexUV);
 }

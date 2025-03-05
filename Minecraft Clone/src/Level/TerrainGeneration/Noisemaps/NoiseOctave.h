@@ -7,26 +7,26 @@ class NoiseOctave {
 
 private:
 
-	static int64_t lfloor(double value);
+    static int64_t lfloor(double value);
 
-	int octaves = NULL;
-	std::vector<NoiseGeneratorImproved> generatorCollection;
+    int octaves = NULL;
+    std::vector<NoiseGeneratorImproved> generatorCollection;
 public:
-	NoiseOctave(JavaRandom& seed, int octavesIn) {
-		octaves = octavesIn;
-		
-		for (int i = 0; i < octavesIn; i++) {
-			generatorCollection.emplace_back(seed);
-		}
-	}
+    NoiseOctave(JavaRandom& seed, int octavesIn) {
+        octaves = octavesIn;
+        
+        for (int i = 0; i < octavesIn; i++) {
+            generatorCollection.emplace_back(seed);
+        }
+    }
 
-	NoiseOctave() {
+    NoiseOctave() {
 
-	}
+    }
 
-	std::vector<double> generateNoiseOctaves(std::vector<double>& noiseArray, int xOffset, int yOffset, int zOffset, int xSize, int ySize, int zSize, double xScale, double yScale, double zScale);
+    std::vector<double> generateNoiseOctaves(std::vector<double>& noiseArray, int xOffset, int yOffset, int zOffset, int xSize, int ySize, int zSize, double xScale, double yScale, double zScale);
 
-	std::vector<double> generateNoiseOctaves(std::vector<double>& noiseArray, int xOffset, int zOffset, int xSize, int zSize, double xScale, double zScale, double p_76305_10_);
+    std::vector<double> generateNoiseOctaves(std::vector<double>& noiseArray, int xOffset, int zOffset, int xSize, int zSize, double xScale, double zScale, double p_76305_10_);
 
 
 };

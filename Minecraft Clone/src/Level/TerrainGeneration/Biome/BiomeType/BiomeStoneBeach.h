@@ -3,12 +3,12 @@
 
 class BiomeStoneBeach : public Biome {
 public:
-	BiomeStoneBeach(BiomeProperties properties) : Biome(properties) {
-		topBlock = g_blocks.STONE;
-		fillerBlock = g_blocks.STONE;
-	}
+    BiomeStoneBeach(BiomeProperties properties) : Biome(properties) {
+        topBlock = g_blocks.STONE;
+        fillerBlock = g_blocks.STONE;
+    }
 
-	const std::type_info& getBiomeClass() const override {
-		return typeid(*this);
-	}
+    const std::type_info& getBiomeClass() const override {
+        return typeid(*this);
+    }
 };

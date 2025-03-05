@@ -4,17 +4,17 @@
 #include <thread>
 
 class EntityRendererUpdater {
-	MultiEntityRenderer* renderer_;
+    MultiEntityRenderer* renderer_;
 
-	bool stop_ = true;
+    bool stop_ = true;
 
-	void UpdaterThread();
+    void UpdaterThread();
 
-	std::thread update_thread_;
+    std::thread update_thread_;
 
-	Timer* server_time_;
+    Timer* server_time_;
 public:
-	void SetEntityRenderer(MultiEntityRenderer* render, Timer* time);
-	void Start();
-	void Stop();
+    void SetEntityRenderer(MultiEntityRenderer* render, Timer* time);
+    void Start();
+    void Stop();
 };

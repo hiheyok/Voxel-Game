@@ -165,6 +165,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Client\Client.cpp" />
+    <ClCompile Include="src\Client\Communication\ServerInteraction.cpp" />
     <ClCompile Include="src\Client\IO\IO.cpp" />
     <ClCompile Include="src\Client\Player\MainPlayer.cpp" />
     <ClCompile Include="src\Client\Player\PlayerMovement.cpp" />
@@ -175,7 +176,6 @@
     <ClCompile Include="src\Client\Render\WorldRender.cpp" />
     <ClCompile Include="src\Core\Initializer.cpp" />
     <ClCompile Include="src\Core\Options\Option.cpp" />
-    <ClCompile Include="src\Core\Registry\Registry.cpp" />
     <ClCompile Include="src\Core\Registry\ResourceLocation.cpp" />
     <ClCompile Include="src\FileManager\Files.cpp" />
     <ClCompile Include="src\Level\Chunk\ChunkPos\ChunkPos.cpp" />
@@ -453,6 +453,27 @@
     <ClInclude Include="src\Level\TerrainGeneration\Structures\Structure.h" />
     <ClInclude Include="src\Level\Typenames.h" />
     <ClInclude Include="src\Utils\ThreadPool.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\BlockTextures.json" />
+    <None Include="assets\EntityShape.json" />
+    <None Include="assets\GUI.json" />
+    <None Include="assets\shaders\Entity\MultiEntityFrag.glsl" />
+    <None Include="assets\shaders\Entity\MultiEntityVert.glsl" />
+    <None Include="assets\shaders\Font\FontBackgroundFrag.glsl" />
+    <None Include="assets\shaders\Font\FontBackgroundVert.glsl" />
+    <None Include="assets\shaders\Font\FontFrag.glsl" />
+    <None Include="assets\shaders\Font\FontVert.glsl" />
+    <None Include="assets\shaders\frag.glsl" />
+    <None Include="assets\shaders\GUI\GUIFrag.glsl" />
+    <None Include="assets\shaders\GUI\GUIVert.glsl" />
+    <None Include="assets\shaders\ItemRender\AtlasStitchFrag.glsl" />
+    <None Include="assets\shaders\ItemRender\AtlasStitchVert.glsl" />
+    <None Include="assets\shaders\ItemRender\BlockModelFrag.glsl" />
+    <None Include="assets\shaders\ItemRender\BlockModelVert.glsl" />
+    <None Include="assets\shaders\screen\frag.glsl" />
+    <None Include="assets\shaders\screen\vert.glsl" />
+    <None Include="assets\shaders\vert.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

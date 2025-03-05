@@ -3,9 +3,9 @@
 
 class DebugWorldSecond : public WorldGenerator {
 public:
-	DebugWorldSecond() {
+    DebugWorldSecond() {
 
-	}
+    }
 
-	Chunk* Generate(const ChunkPos& pos) override;
+    Chunk* Generate(const ChunkPos& pos) override;
 };

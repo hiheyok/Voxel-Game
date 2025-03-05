@@ -3,9 +3,9 @@
 
 class MathWorld : public WorldGenerator {
 public:
-	MathWorld() {
+    MathWorld() {
 
-	}
+    }
 
-	Chunk* Generate(const ChunkPos& pos) override;
+    Chunk* Generate(const ChunkPos& pos) override;
 };

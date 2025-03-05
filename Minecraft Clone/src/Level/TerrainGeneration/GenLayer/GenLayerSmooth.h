@@ -4,9 +4,9 @@
 
 class GenLayerSmooth : public GenLayer {
 public:
-	GenLayerSmooth(long long baseSeedIn, GenLayer* parentIn) : GenLayer(baseSeedIn) {
-		parent = parentIn;
-	}
+    GenLayerSmooth(long long baseSeedIn, GenLayer* parentIn) : GenLayer(baseSeedIn) {
+        parent = parentIn;
+    }
 
     std::vector<int> getInts(int areaX, int areaY, int areaWidth, int areaHeight) override {
         int i = areaX - 1;

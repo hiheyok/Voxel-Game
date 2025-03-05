@@ -1,11 +1,11 @@
 #include "EventSystem.h"
 
-std::vector<Event::Event>* EventSystem::GetQueue() {
-	return queue_active_;
+std::unique_ptr<std::vector<Event::Event>>& EventSystem::GetQueue() {
+    return queue_active_;
 }
 
 void EventSystem::Swap() {
-	std::vector<Event::Event>* tmp = queue_active_;
-	queue_active_ = queue_unactive_;
-	queue_unactive_ = tmp;
+    std::unique_ptr<std::vector<Event::Event>> tmp = std::move(queue_active_);
+    queue_active_ = std::move(queue_unactive_);
+    queue_unactive_ = std::move(tmp);
 }

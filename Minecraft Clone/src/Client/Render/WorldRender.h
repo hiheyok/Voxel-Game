@@ -10,33 +10,35 @@
 class WorldRender : public WorldRenderInfo{
 public:
 
-	void SetRotation(glm::dvec2 rotation);
+    void SetRotation(glm::dvec2 rotation);
 
-	void SetPosition(glm::dvec3 position);
+    void SetPosition(glm::dvec3 position);
 
-	void Render();
+    void Render();
 
-	void LoadChunkToRenderer(ChunkPos chunk);
+    void LoadChunkToRenderer(ChunkPos chunk);
 
-	void LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks);
+    void LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks);
 
-	void Start(GLFWwindow* window, InternalServer* server, PerformanceProfiler* profiler);
+    void Start(GLFWwindow* window, InternalServer* server, PerformanceProfiler* profiler);
 
-	void Stop();
+    void Stop();
 
-	void Update();
+    void Update();
 
-	TerrainRenderer renderer_v2_;
-	PerformanceProfiler* profiler_;
+    size_t GetQueuedSize();
+
+    TerrainRenderer renderer_v2_;
+    PerformanceProfiler* profiler_;
 private:
-	static std::unique_ptr<Mesh::ChunkVertexData> Worker(const ChunkPos& pos);
-	
-	std::unique_ptr<ThreadPool<ChunkPos, std::unique_ptr<Mesh::ChunkVertexData>, WorldRender::Worker>> mesh_thread_pool_;
-	std::vector<std::unique_ptr<Mesh::ChunkVertexData>> mesh_add_queue_;
+    static std::unique_ptr<Mesh::ChunkVertexData> Worker(const ChunkPos& pos);
+    
+    std::unique_ptr<ThreadPool<ChunkPos, std::unique_ptr<Mesh::ChunkVertexData>, WorldRender::Worker>> mesh_thread_pool_;
+    std::vector<std::unique_ptr<Mesh::ChunkVertexData>> mesh_add_queue_;
 
-	PlayerPOV player_;
-	GLFWwindow* window_;
-	static InternalServer* server_;
+    PlayerPOV player_;
+    GLFWwindow* window_;
+    static InternalServer* server_;
 };
 
 inline InternalServer* WorldRender::server_ = nullptr;

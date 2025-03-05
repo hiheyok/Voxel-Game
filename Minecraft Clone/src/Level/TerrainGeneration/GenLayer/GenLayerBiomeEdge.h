@@ -5,9 +5,9 @@
 
 class GenLayerBiomeEdge : public GenLayer {
 public:
-	GenLayerBiomeEdge(long long baseSeedIn, GenLayer* parentIn) : GenLayer(baseSeedIn) {
-		parent = parentIn;
-	}
+    GenLayerBiomeEdge(long long baseSeedIn, GenLayer* parentIn) : GenLayer(baseSeedIn) {
+        parent = parentIn;
+    }
 
    std::vector<int> getInts(int areaX, int areaY, int areaWidth, int areaHeight) override {
        std::vector<int> aint = parent->getInts(areaX - 1, areaY - 1, areaWidth + 2, areaHeight + 2);

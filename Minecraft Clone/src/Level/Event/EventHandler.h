@@ -10,30 +10,30 @@
 
 class EventHandler {
 private:
-	using EventFunctionTypes = std::variant<
-		void (*)(BlockID, const BlockPos&),
-		void (*)(Event::EntityEvent)
-	>;
+    using EventFunctionTypes = std::variant<
+        void (*)(BlockID, const BlockPos&),
+        void (*)(Event::EntityEvent)
+    >;
 
-	int event_count_ = 0;
-	EventID RegisterBlockEvent(void (*func)(BlockID, const BlockPos&));
+    int event_count_ = 0;
+    EventID RegisterBlockEvent(void (*func)(BlockID, const BlockPos&));
 
-	EventID RegisterEntityEvent(void (*func)(Event::EntityEvent));
+    EventID RegisterEntityEvent(void (*func)(Event::EntityEvent));
 
-	FastHashMap<EventID, void (*)(BlockID, const BlockPos&)> block_event_handles_;
-	FastHashMap<EventID, void (*)(Event::EntityEvent)> entity_event_handles_;
+    FastHashMap<EventID, void (*)(BlockID, const BlockPos&)> block_event_handles_;
+    FastHashMap<EventID, void (*)(Event::EntityEvent)> entity_event_handles_;
 
 public:
 
-	// TODO: Naming scheme exception?
-	EventID BlockPlace = RegisterBlockEvent(HandlePlaceBlock);
-	EventID BlockTick = RegisterBlockEvent(HandleBlockTick);
+    // TODO: Naming scheme exception?
+    EventID BlockPlace = RegisterBlockEvent(HandlePlaceBlock);
+    EventID BlockTick = RegisterBlockEvent(HandleBlockTick);
 
-	EventID SummonEntity = RegisterEntityEvent(HandleEntitySummon);
-	EventID EntityTick = RegisterEntityEvent(HandleEntityTick);
-	EventID RemoveEntity = RegisterEntityEvent(HandleRemoveEntity);
+    EventID SummonEntity = RegisterEntityEvent(HandleEntitySummon);
+    EventID EntityTick = RegisterEntityEvent(HandleEntityTick);
+    EventID RemoveEntity = RegisterEntityEvent(HandleRemoveEntity);
 
-	void ExecuteEvent(Event::Event event);
+    void ExecuteEvent(Event::Event event);
 
 
 } inline g_event_handler;

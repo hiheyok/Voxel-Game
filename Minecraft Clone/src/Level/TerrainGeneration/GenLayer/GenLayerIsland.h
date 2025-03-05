@@ -6,9 +6,9 @@ class GenLayerIsland : public GenLayer {
 private:
 
 public:
-	GenLayerIsland(long long baseSeedIn) : GenLayer(baseSeedIn) {
+    GenLayerIsland(long long baseSeedIn) : GenLayer(baseSeedIn) {
 
-	}
+    }
 
     std::vector<int> getInts(int areaX, int areaY, int areaWidth, int areaHeight) override {
         std::vector<int> aint = std::vector<int>(areaWidth * areaHeight);

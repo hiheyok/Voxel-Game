@@ -4,37 +4,38 @@
 
 class InternalServer {
 private:
-	Server* server;
-	Player* player;
+    Player* player;
 public:
-	void startInternalServer(Player* p);
+    Server* server;
 
-	void Stop();
+    void startInternalServer(Player* p);
 
-	glm::vec3 GetPlayerCollusionTimes();
+    void Stop();
 
-	Chunk* GetChunk(const ChunkPos& chunk);
+    glm::vec3 GetPlayerCollusionTimes();
 
-	Timer* GetTickClock();
+    Chunk* GetChunk(const ChunkPos& chunk);
 
-	double GetMSPT();
+    Timer* GetTickClock();
 
-	void SetPlayer(Player player);
+    double GetMSPT();
 
-	bool CheckPlayerOnGround();
+    void SetPlayer(Player player);
 
-	size_t GetChunkCount();
+    bool CheckPlayerOnGround();
 
-	std::vector<ChunkPos> GetUpdatedChunks();
+    size_t GetChunkCount();
 
-	std::vector<EntityProperty> GetUpdatedEntities();
+    std::vector<ChunkPos> GetUpdatedChunks();
 
-	std::vector<EntityUUID> GetRemovedEntities();
+    std::vector<EntityProperty> GetUpdatedEntities();
 
-	bool CheckRayIntersection(Ray& ray);
+    std::vector<EntityUUID> GetRemovedEntities();
 
-	BlockID GetBlock(const BlockPos& pos);
+    bool CheckRayIntersection(Ray& ray);
 
-	void SendEvent(Event::Event pEventIn);
+    BlockID GetBlock(const BlockPos& pos);
+
+    void SendEvent(Event::Event pEventIn);
 
 };

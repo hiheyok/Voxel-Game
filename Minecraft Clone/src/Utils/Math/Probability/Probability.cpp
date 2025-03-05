@@ -3,12 +3,12 @@
 
 
 bool TestProbability(double odds) {
-	int rng = rand();
+    int rng = rand();
 
-	if (((double)RAND_MAX) * odds >= (double)rng) {
-		return true;
-	}
+    if (((double)RAND_MAX) * odds >= (double)rng) {
+        return true;
+    }
 
-	return false;
-	
+    return false;
+    
 }

@@ -13,11 +13,11 @@ private:
     ChunkGeneratorSettings* settings_;
 public:
 
-	GenLayerBiome(long long baseSeedIn, GenLayer* parentIn, ChunkGeneratorSettings* settingsIn) : GenLayer(baseSeedIn) { // add worldtype ;ater
+    GenLayerBiome(long long baseSeedIn, GenLayer* parentIn, ChunkGeneratorSettings* settingsIn) : GenLayer(baseSeedIn) { // add worldtype ;ater
         parent = parentIn;
         settings_ = settingsIn;
 
-	}
+    }
 
     std::vector<int> getInts(int areaX, int areaY, int areaWidth, int areaHeight) override
     {

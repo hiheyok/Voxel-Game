@@ -3,11 +3,11 @@
 
 class BiomeSwamp : public Biome {
 public:
-	BiomeSwamp(BiomeProperties properties) : Biome(properties) {}
+    BiomeSwamp(BiomeProperties properties) : Biome(properties) {}
 
-	const std::type_info& getBiomeClass() const override {
-		return typeid(*this);
-	}
+    const std::type_info& getBiomeClass() const override {
+        return typeid(*this);
+    }
 
     void GenTerrainBlocks(JavaRandom& rand, TallChunk* chunk, int x, int z, double noiseVal, ChunkGeneratorSettings* settings_) override
     {

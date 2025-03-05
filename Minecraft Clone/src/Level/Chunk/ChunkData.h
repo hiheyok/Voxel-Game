@@ -14,42 +14,42 @@
 
 
 class ChunkContainer {
-	
+    
 public:
 
-	ChunkContainer() {
-		lighting_ = std::make_shared<ChunkLightingContainer>();
-	}
-	
-	void SetNeighbor(ChunkContainer* neighbor, unsigned int side);
+    ChunkContainer() {
+        lighting_ = std::make_shared<ChunkLightingContainer>();
+    }
+    
+    void SetNeighbor(ChunkContainer* neighbor, unsigned int side);
 
-	void ClearNeighbors();
+    void ClearNeighbors();
 
-	BlockID GetBlock(int x, int y, int z) const;
-	BlockID GetBlockUnsafe(int x, int y, int z) const;
+    BlockID GetBlock(int x, int y, int z) const;
+    BlockID GetBlockUnsafe(int x, int y, int z) const;
 
-	void SetBlock(BlockID block, int x, int y, int z);
-	void SetBlockUnsafe(BlockID block, int x, int y, int z);
+    void SetBlock(BlockID block, int x, int y, int z);
+    void SetBlockUnsafe(BlockID block, int x, int y, int z);
 
-	void Use();
-	void Unuse();
+    void Use();
+    void Unuse();
 
-	ChunkContainer* GetNeighbor(unsigned int side) const;
-	
-	void SetPosition(int x, int y, int z);
+    ChunkContainer* GetNeighbor(unsigned int side) const;
+    
+    void SetPosition(int x, int y, int z);
 
-	ChunkPos position_;
+    ChunkPos position_;
 
-	bool is_empty_ = true;
+    bool is_empty_ = true;
 
-	ChunkContainer* neighbors_[6]{nullptr};
-	std::vector<SetBlockRelative> outside_block_to_place_[6]{};
-	std::shared_ptr<ChunkLightingContainer> lighting_;
+    ChunkContainer* neighbors_[6]{nullptr};
+    std::vector<SetBlockRelative> outside_block_to_place_[6]{};
+    std::shared_ptr<ChunkLightingContainer> lighting_;
 
-	BlockContainer block_storage_;
+    BlockContainer block_storage_;
 private:
-	bool in_use_ = false;
-	
+    bool in_use_ = false;
+    
 };
 
 #endif

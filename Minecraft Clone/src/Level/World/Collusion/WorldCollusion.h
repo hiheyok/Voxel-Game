@@ -6,18 +6,18 @@
 
 class WorldCollusionDetector {
 private:
-	WorldAccess* world_;
+    WorldAccess* world_;
 
 public:
-	void Initialize(WorldAccess* w) {
-		world_ = w;
-	}
+    void Initialize(WorldAccess* w) {
+        world_ = w;
+    }
 
-	bool CheckRayIntersection(Ray& ray);
+    bool CheckRayIntersection(Ray& ray);
 
-	float GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int direction, int distanceTest);
+    float GetDistanceUntilCollusionSingleDirection(glm::vec3 Origin, int direction, int distanceTest);
 
-	glm::dvec3 GetTimeTillCollusion(Entity* entity);
+    glm::dvec3 GetTimeTillCollusion(Entity* entity);
 
-	bool isEntityOnGround(Entity* entity);
+    bool isEntityOnGround(Entity* entity);
 };

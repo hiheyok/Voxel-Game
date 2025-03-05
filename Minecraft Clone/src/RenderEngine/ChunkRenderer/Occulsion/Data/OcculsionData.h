@@ -4,13 +4,13 @@
 
 class ChunkOcculsionData {
 public:
-	bool IsVisible(unsigned char c) {
-		
-	}
+    bool IsVisible(unsigned char c) {
+        
+    }
 
-	void AnalysisChunk(Chunk* chunk) {
-		
-	}
+    void AnalysisChunk(Chunk* chunk) {
+        
+    }
 
 private:
 

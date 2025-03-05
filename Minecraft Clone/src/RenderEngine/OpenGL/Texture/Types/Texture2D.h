@@ -12,7 +12,7 @@ public:
     Texture2D() {
     }
 
-	bool Load(RawTextureData data) override {
+    bool Load(RawTextureData data) override {
         if (data.data_) {
             glBindTexture(GL_TEXTURE_2D, texture_id_);
             glTexImage2D(GL_TEXTURE_2D, 0, data.format_, data.width_, data.height_, 0, data.format_, GL_UNSIGNED_BYTE, data.data_);
@@ -31,5 +31,5 @@ public:
             return false;
         }
         
-	}
+    }
 };

@@ -7,38 +7,38 @@
 
 class EntityType {
 public:
-	
-	EntityType() {
+    
+    EntityType() {
 
-	}
-	
-	void ChangeHitboxSize(glm::vec3 size) {
-		hitbox_.size_ = size;
-	}
+    }
+    
+    void ChangeHitboxSize(glm::vec3 size) {
+        hitbox_.size_ = size;
+    }
 
-	void ChangeHitboxSize(float x, float y, float z) {
-		hitbox_.size_ = glm::vec3(x, y, z);
-	}
+    void ChangeHitboxSize(float x, float y, float z) {
+        hitbox_.size_ = glm::vec3(x, y, z);
+    }
 
-	AABB& GetHitbox() {
-		return hitbox_;
-	}
+    AABB& GetHitbox() {
+        return hitbox_;
+    }
 
-	virtual void Tick(Entity* entity) {
-		
-	}
+    virtual void Tick(Entity* entity) {
+        
+    }
 
-	EntityTypeID id_ = NULL;
+    EntityTypeID id_ = NULL;
 
-	EntityModel render_model_;
+    EntityModel render_model_;
 
-	Texture2D texture_;
+    Texture2D texture_;
 
-	std::string entity_name_;
+    std::string entity_name_;
 
 private:
-	
-	AABB hitbox_;
+    
+    AABB hitbox_;
 };
 
 

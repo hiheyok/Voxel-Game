@@ -4,24 +4,24 @@
 
 class Timer {
 public:
-	
-	Timer() {
-		first_ = std::chrono::high_resolution_clock::now();
-	}
+    
+    Timer() {
+        first_ = std::chrono::high_resolution_clock::now();
+    }
 
-	double GetTimePassed_ns();
-	double GetTimePassed_μs();
-	double GetTimePassed_ms();
-	double GetTimePassed_s();
+    double GetTimePassed_ns();
+    double GetTimePassed_μs();
+    double GetTimePassed_ms();
+    double GetTimePassed_s();
 
-	std::string StrGetTimePassed_ns();
-	std::string StrGetTimePassed_μs();
-	std::string StrGetTimePassed_ms();
-	std::string StrGetTimePassed_s();
+    std::string StrGetTimePassed_ns();
+    std::string StrGetTimePassed_μs();
+    std::string StrGetTimePassed_ms();
+    std::string StrGetTimePassed_s();
 
-	void Set();
+    void Set();
 
 private:
-	std::chrono::steady_clock::time_point first_;
+    std::chrono::steady_clock::time_point first_;
 
 };

@@ -5,7 +5,7 @@
 
 class MapGenBase {
 protected:
-	JavaRandom rand = JavaRandom();
+    JavaRandom rand = JavaRandom();
     int range = 0;
 
     void generate(int x, int z, TallChunk* chunk)

@@ -4,15 +4,14 @@
 
 class Level {
 public:
-	Dimension* main_world_  = nullptr;
-	LevelLoader level_loader_;
+    Dimension* main_world_  = nullptr;
+    LevelLoader level_loader_;
 
-	Level();
+    Level();
 
-	void Start(int worldGenThreadCount, int light_engine_thread_count_);
+    void Start(int worldGenThreadCount, int light_engine_thread_count_);
 
-	void Stop();
+    void Stop();
 
-	void updateDimensions();
-
+    void updateDimensions();
 };

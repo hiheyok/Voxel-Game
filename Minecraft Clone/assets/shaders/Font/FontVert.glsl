@@ -12,7 +12,7 @@ out vec2 TexUV;
 out vec3 clr;
 
 void main() {
-	TexUV = UV;
-	clr = Color;
-	gl_Position = vec4(vertices.x * AspectRatio + Offset.x* AspectRatio + Origin.x, vertices.y + Offset.y + Origin.y, 1.f, 1.f);
+    TexUV = UV;
+    clr = Color;
+    gl_Position = vec4(vertices.x * AspectRatio + Offset.x* AspectRatio + Origin.x, vertices.y + Offset.y + Origin.y, 1.f, 1.f);
 }

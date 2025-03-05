@@ -4,32 +4,32 @@
 
 template <class T>
 struct Node {
-	T* vertex_;
-	Node* edge_;
+    T* vertex_;
+    Node* edge_;
 };
 
 template <class T> 
 class Graph {
 
 private:
-	std::list<Node> nodes_;
+    std::list<Node> nodes_;
 public:
 
-	void InsertVertex(T* vertex) {
+    void InsertVertex(T* vertex) {
 
-	}
+    }
 
-	void InsertEdge(T* vertex0, T* vertex1) {
+    void InsertEdge(T* vertex0, T* vertex1) {
 
-	}
+    }
 
-	void DeleteEdge() {
+    void DeleteEdge() {
 
-	}
+    }
 
-	void DeleteVertex(T* vertex) {
+    void DeleteVertex(T* vertex) {
 
-	}
+    }
 
 
 };

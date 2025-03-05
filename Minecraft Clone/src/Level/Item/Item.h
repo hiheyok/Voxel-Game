@@ -5,27 +5,27 @@
 #include <string>
 
 struct ItemProperties {
-	int max_stack_ = 64;
-	bool is_block_item_ = false;
-	BlockID block_ = NULL;
-	ItemID id_ = NULL;
-	std::string name_ = "";
+    int max_stack_ = 64;
+    bool is_block_item_ = false;
+    BlockID block_ = NULL;
+    ItemID id_ = NULL;
+    std::string name_ = "";
 };
 
 class Item {
 public:
-	Item() {
+    Item() {
 
-	}
+    }
 
-	const BlockID GetBlock();
+    const BlockID GetBlock();
 
-	RawTextureData GetTexture();
+    RawTextureData GetTexture();
 
-	bool CheckIsBlockItem();
+    bool CheckIsBlockItem();
 
-	ItemProperties properties_;
-	
+    ItemProperties properties_;
+    
 private:
 
 };

@@ -4,8 +4,8 @@
 
 class NoiseGenerator {
 private:
-	FastNoiseLite noise;
+    FastNoiseLite noise;
 
 public:
-	NoiseGenerator(JavaRandom seed) {}
+    NoiseGenerator(JavaRandom seed) {}
 };

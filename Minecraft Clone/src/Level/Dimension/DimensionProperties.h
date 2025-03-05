@@ -3,7 +3,7 @@
 #include <glm/vec2.hpp>
 
 struct DimensionProperties {
-	DimensionProperties() {
+    DimensionProperties() {
 
-	}
+    }
 };

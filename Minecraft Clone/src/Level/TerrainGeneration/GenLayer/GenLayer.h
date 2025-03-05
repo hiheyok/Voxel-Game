@@ -5,11 +5,11 @@
 class GenLayer {
 public:
 
-	long long int baseSeed = 0, chunkSeed = 0, worldGenSeed = 0;
+    long long int baseSeed = 0, chunkSeed = 0, worldGenSeed = 0;
 
-	GenLayer* parent = nullptr;
+    GenLayer* parent = nullptr;
 
-	GenLayer(long long int baseSeedIn) {
+    GenLayer(long long int baseSeedIn) {
         baseSeed = baseSeedIn;
         baseSeed *= baseSeed * 6364136223846793005LL + 1442695040888963407L;
         baseSeed += baseSeedIn;
@@ -17,16 +17,16 @@ public:
         baseSeed += baseSeedIn;
         baseSeed *= baseSeed * 6364136223846793005LL + 1442695040888963407L;
         baseSeed += baseSeedIn;
-	}
+    }
 
-	GenLayer() {
+    GenLayer() {
 
-	}
-	
+    }
+    
 
-	virtual std::vector<int> getInts(int areaX, int areaY, int areaWidth, int areaHeight) {
+    virtual std::vector<int> getInts(int areaX, int areaY, int areaWidth, int areaHeight) {
         throw std::exception("no");
-	}
+    }
 
     void initChunkSeed(long long val1, long long val2) {
         chunkSeed = worldGenSeed;

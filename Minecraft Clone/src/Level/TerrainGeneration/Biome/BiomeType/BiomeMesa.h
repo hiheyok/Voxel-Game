@@ -12,21 +12,21 @@ private:
     bool bryce_pillars_;
 
 public:
-	bool has_forest_ = false;
+    bool has_forest_ = false;
 
     BiomeMesa(bool brycePillarsIn, bool hasForestIn, BiomeProperties properties) : 
         Biome{ properties },
         bryce_pillars_{ brycePillarsIn },
         has_forest_{ hasForestIn } {
 
-		topBlock = g_blocks.RED_SAND;
-		fillerBlock = g_blocks.TERRACOTTA; //STAINED_HARDEN_CLAY
-	
-	}
+        topBlock = g_blocks.RED_SAND;
+        fillerBlock = g_blocks.TERRACOTTA; //STAINED_HARDEN_CLAY
+    
+    }
 
-	const std::type_info& getBiomeClass() const override {
-		return typeid(*this);
-	}
+    const std::type_info& getBiomeClass() const override {
+        return typeid(*this);
+    }
 
     void GenerateBands(long p_150619_1_)
     {

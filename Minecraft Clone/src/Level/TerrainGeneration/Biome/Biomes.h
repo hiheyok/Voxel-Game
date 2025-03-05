@@ -97,7 +97,7 @@ public:
         return biome;
     }
 
-	static void RegisterBiome() {
+    static void RegisterBiome() {
         Biome::Register(0, "ocean", new BiomeOcean(BiomeProperties("Ocean").setBaseHeight(-1.0F).setHeightVariation(0.1F)));
         Biome::Register(1, "plains", new BiomePlains(false, BiomeProperties("Plains").setBaseHeight(0.125F).setHeightVariation(0.05F).setTemperature(0.8F).setRainfall(0.4F)));
         Biome::Register(2, "desert", new BiomeDesert(BiomeProperties("Desert").setBaseHeight(0.125F).setHeightVariation(0.05F).setTemperature(2.0F).setRainfall(0.0F).setRainDisabled()));
@@ -160,7 +160,7 @@ public:
         Biome::Register(165, "mutated_mesa", new BiomeMesa(true, false, BiomeProperties("Mesa (Bryce)").setBaseBiome("mesa").setTemperature(2.0F).setRainfall(0.0F).setRainDisabled()));
         Biome::Register(166, "mutated_mesa_rock", new BiomeMesa(false, true, BiomeProperties("Mesa Plateau F M").setBaseBiome("mesa_rock").setBaseHeight(0.45F).setHeightVariation(0.3F).setTemperature(2.0F).setRainfall(0.0F).setRainDisabled()));
         Biome::Register(167, "mutated_mesa_clear_rock", new BiomeMesa(false, false, BiomeProperties("Mesa Plateau M").setBaseBiome("mesa_clear_rock").setBaseHeight(0.45F).setHeightVariation(0.3F).setTemperature(2.0F).setRainfall(0.0F).setRainDisabled()));
-	
+    
         Biomes::OCEAN = getRegisteredBiome("ocean");
         Biomes::DEFAULT = OCEAN;
         Biomes::PLAINS = getRegisteredBiome("plains");

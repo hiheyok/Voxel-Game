@@ -8,7 +8,7 @@ in vec3 clr;
 uniform sampler2D FontTexture;
 
 void main() {
-	vec4 Tex = texture(FontTexture, TexUV);
+    vec4 Tex = texture(FontTexture, TexUV);
 
-	FinalColor = vec4(clr, Tex.a);
+    FinalColor = vec4(clr, Tex.a);
 }

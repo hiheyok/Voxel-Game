@@ -1,18 +1,18 @@
 #include "ResourceLocation.h"
 
 std::string ResourceLocation::SetResourceLocation(std::string name) {
-	std::vector<std::string> tokens = Tokenize(name, ':');
+    std::vector<std::string> tokens = Tokenize(name, ':');
 
-	if (tokens.size() != 2) {
-		throw std::exception("Invalid resource location");
-	}
+    if (tokens.size() != 2) {
+        throw std::exception("Invalid resource location");
+    }
 
-	namespace_ = tokens[0];
-	path_ = tokens[1];
+    namespace_ = tokens[0];
+    path_ = tokens[1];
 }
 
 std::string ResourceLocation::GetPath() {
-	return path_;
+    return path_;
 }
 
 ResourceLocation::ResourceLocation() {}

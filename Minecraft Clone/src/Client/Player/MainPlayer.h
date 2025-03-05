@@ -9,33 +9,33 @@
 class MainPlayer {
 public:
 
-	void Initialize(GLFWwindow* win, InternalServer* server);
+    void Initialize(GLFWwindow* win, InternalServer* server);
 
-	void Update(UserInputs inputs);
+    void Update(UserInputs inputs);
 
-	EntityProperty GetEntityProperties();
+    EntityProperty GetEntityProperties();
 
-	void SetPlayerRotation(float x, float y);
-	void SetPlayerPosition(float x, float y, float z);
+    void SetPlayerRotation(float x, float y);
+    void SetPlayerPosition(float x, float y, float z);
 
-	void RenderGUIs();
+    void RenderGUIs();
 
-	Player player_;
+    Player player_;
 private:
 
-	void PrepareGUIs();
+    void PrepareGUIs();
 
-	void InventoryUpdate(UserInputs inputs);
+    void InventoryUpdate(UserInputs inputs);
 
-	PlayerMovement movement_;
-	WorldInteraction interactions_;
-	InternalServer* internal_server_ = nullptr;
+    PlayerMovement movement_;
+    WorldInteraction interactions_;
+    InternalServer* internal_server_ = nullptr;
 
-	GUI player_gui_;
+    GUI player_gui_;
 
-	size_t gui_index_ = 0;
-	size_t item_gui_index_ = 0;
-	size_t slot_index_ = 0;
+    size_t gui_index_ = 0;
+    size_t item_gui_index_ = 0;
+    size_t slot_index_ = 0;
 
-	float hotbar_size_ = 0.135;
+    float hotbar_size_ = 0.135;
 };

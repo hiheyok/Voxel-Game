@@ -4,12 +4,12 @@
 
 class GenLayerVoronoiZoom : public GenLayer {
 public:
-	GenLayerVoronoiZoom(long long int baseSeedIn, GenLayer* parentIn) : GenLayer(baseSeedIn) {
+    GenLayerVoronoiZoom(long long int baseSeedIn, GenLayer* parentIn) : GenLayer(baseSeedIn) {
         parent = parentIn;
     }
 
 
-	std::vector<int> getInts(int areaX, int areaY, int areaWidth, int areaHeight) override {
+    std::vector<int> getInts(int areaX, int areaY, int areaWidth, int areaHeight) override {
         areaX = areaX - 2;
         areaY = areaY - 2;
         int i = areaX >> 2;
@@ -88,5 +88,5 @@ public:
         }
 
         return aint2;
-	}
+    }
 };

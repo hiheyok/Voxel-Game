@@ -137,7 +137,7 @@ public:
         glDisable(GL_CULL_FACE);
         glUseProgram(shader_id_);
         glBindVertexArray(quad_vao_);
-        glBindTexture(GL_TEXTURE_2D, texture_);	// use the color attachment texture as the texture of the quad plane
+        glBindTexture(GL_TEXTURE_2D, texture_);    // use the color attachment texture as the texture of the quad plane
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);

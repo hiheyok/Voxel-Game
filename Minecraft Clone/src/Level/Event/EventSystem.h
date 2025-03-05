@@ -5,37 +5,34 @@
 
 class EventSystem {
 public:
-	
-	EventSystem() {
-		NullEvent.type_ = Event::NULL_EVENT;
+    
+    EventSystem() {
+        NullEvent.type_ = Event::NULL_EVENT;
 
-		queue_active_ = new std::vector<Event::Event>;
-		queue_unactive_ = new std::vector<Event::Event>;
+        queue_active_ = std::make_unique<std::vector<Event::Event>>();
+        queue_unactive_ = std::make_unique<std::vector<Event::Event>>();
 
-		queue_active_->reserve(16777215);
-		queue_unactive_->reserve(16777215);
-	}
+        queue_active_->reserve(16777215);
+        queue_unactive_->reserve(16777215);
+    }
 
-	~EventSystem() {
-		queue_active_->clear();
-		queue_unactive_->clear();
+    ~EventSystem() {
+        queue_active_->clear();
+        queue_unactive_->clear();
+    }
 
-		delete queue_active_;
-		delete queue_unactive_;
-	}
+    //Gets event; if empty, return null event
+    std::unique_ptr<std::vector<Event::Event>>& GetQueue();
 
-	//Gets event; if empty, return null event
-	std::vector<Event::Event>* GetQueue();
+    template <class EventType> void AddEvent(EventType e) {
+        queue_unactive_->emplace_back(e);
+    }
 
-	template <class EventType> void AddEvent(EventType e) {
-		queue_unactive_->emplace_back(e);
-	}
-
-	void Swap();
+    void Swap();
 
 private:
-	std::vector<Event::Event>* queue_active_;
-	std::vector<Event::Event>* queue_unactive_;
+    std::unique_ptr<std::vector<Event::Event>> queue_active_;
+    std::unique_ptr<std::vector<Event::Event>> queue_unactive_;
 
-	Event::Event NullEvent;
+    Event::Event NullEvent;
 };

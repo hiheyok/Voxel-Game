@@ -15,7 +15,7 @@ private:
     static double clampedLerp(double lowerBnd, double upperBnd, double slide);
 
 public:
-	JavaRandom rand;
+    JavaRandom rand;
     NoiseOctave minLimitPerlinNoise;
     NoiseOctave maxLimitPerlinNoise;
     NoiseOctave mainPerlinNoise;

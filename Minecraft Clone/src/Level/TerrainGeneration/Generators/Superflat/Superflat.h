@@ -3,9 +3,9 @@
 
 class SuperflatWorld : public  WorldGenerator {
 public:
-	SuperflatWorld() {
+    SuperflatWorld() {
 
-	}
+    }
 
-	Chunk* Generate(const ChunkPos& pos) override;
+    Chunk* Generate(const ChunkPos& pos) override;
 };

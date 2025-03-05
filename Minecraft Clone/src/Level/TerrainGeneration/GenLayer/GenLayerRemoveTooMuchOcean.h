@@ -4,9 +4,9 @@
 
 class GenLayerRemoveTooMuchOcean : public GenLayer {
 public:
-	GenLayerRemoveTooMuchOcean(long long baseSeedIn, GenLayer* parentIn) : GenLayer(baseSeedIn) {
-		parent = parentIn;
-	}
+    GenLayerRemoveTooMuchOcean(long long baseSeedIn, GenLayer* parentIn) : GenLayer(baseSeedIn) {
+        parent = parentIn;
+    }
 
     std::vector<int> getInts(int areaX, int areaY, int areaWidth, int areaHeight) override {
         int i = areaX - 1;

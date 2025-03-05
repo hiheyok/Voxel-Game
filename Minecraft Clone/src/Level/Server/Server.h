@@ -6,60 +6,61 @@
 #include "../../Core/Options/Option.h"
 
 struct ServerSettings {
-	int gen_thread_count_ = 8;
-	int light_engine_thread_count_ = 2;
-	int tick_rate_ = 20;
-	int horizontal_ticking_distance_ = 10;
-	int vertical_ticking_distance_ = 8;
+    int gen_thread_count_ = 8;
+    int light_engine_thread_count_ = 2;
+    int tick_rate_ = 20;
+    int horizontal_ticking_distance_ = 10;
+    int vertical_ticking_distance_ = 8;
 };
 
 //This manages the input/output system of the world
 //This also manages the ticking system
 class Server {
 private:
-	Level level_;
-	bool stop_ = true; // TODO: Rename
-	std::thread main_server_loop_;
-	Timer time_; // TODO: Rename
-	double mspt_ = 0.0;
+    bool stop_ = true; // TODO: Rename
+    std::thread main_server_loop_;
+    Timer time_; // TODO: Rename
+    double mspt_ = 0.0;
 public:
-	ServerSettings settings_;
+    Level level_;
 
-	Server() {
+    ServerSettings settings_;
 
-	}
+    Server() {
 
-	size_t GetChunkCount();
+    }
 
-	double GetMSPT();// TODO: Rename
+    size_t GetChunkCount();
 
-	Timer* GetTimer();
+    double GetMSPT();// TODO: Rename
 
-	std::vector<EntityProperty> GetUpdatedEntities();// TODO: Rename
+    Timer* GetTimer();
 
-	std::vector<EntityUUID> GetRemovedEntities();// TODO: Rename
+    std::vector<EntityProperty> GetUpdatedEntities();// TODO: Rename
 
-	bool CheckEntityOnGround(EntityUUID id);
+    std::vector<EntityUUID> GetRemovedEntities();// TODO: Rename
 
-	void Join(Entity& entity);// TODO: Rename
+    bool CheckEntityOnGround(EntityUUID id);
 
-	std::vector<ChunkPos> GetUpdatedChunkPos();
+    void Join(Entity& entity);// TODO: Rename
 
-	Chunk* GetChunk(const ChunkPos& id);
+    std::vector<ChunkPos> GetUpdatedChunkPos();
 
-	BlockID GetBlock(const BlockPos& pos);
+    Chunk* GetChunk(const ChunkPos& id);
 
-	bool GetRayIntersection(Ray& ray);
+    BlockID GetBlock(const BlockPos& pos);
 
-	glm::vec3 GetEntityCollusionTime(EntityUUID entity);
+    bool GetRayIntersection(Ray& ray);
 
-	void StartServer(ServerSettings serverSettings);
+    glm::vec3 GetEntityCollusionTime(EntityUUID entity);
 
-	void Stop();
+    void StartServer(ServerSettings serverSettings);
 
-	void Loop();
+    void Stop();
 
-	void Tick();
+    void Loop();
 
-	void SendEvent(const Event::Event& event);
+    void Tick();
+
+    void SendEvent(const Event::Event& event);
 };

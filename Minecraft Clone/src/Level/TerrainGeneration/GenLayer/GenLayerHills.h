@@ -5,12 +5,12 @@
 
 class GenLayerHills : public GenLayer {
 private:
-	GenLayer* riverLayer = nullptr;
+    GenLayer* riverLayer = nullptr;
 public:
-	GenLayerHills(long long baseSeedIn, GenLayer* parentIn, GenLayer* riverLayerIn) : GenLayer(baseSeedIn) {
-		parent = parentIn;
-		riverLayer = riverLayerIn;
-	}
+    GenLayerHills(long long baseSeedIn, GenLayer* parentIn, GenLayer* riverLayerIn) : GenLayer(baseSeedIn) {
+        parent = parentIn;
+        riverLayer = riverLayerIn;
+    }
 
     std::vector<int> getInts(int areaX, int areaY, int areaWidth, int areaHeight) {
         std::vector<int> aint = parent->getInts(areaX - 1, areaY - 1, areaWidth + 2, areaHeight + 2);

@@ -7,55 +7,55 @@
 typedef unsigned long long int RegionID;
 
 struct Region { //32x32x32 Chunk Region
-	ChunkColumn* region_[32 * 32]{ nullptr };
+    ChunkColumn* region_[32 * 32]{ nullptr };
 
-	~Region() {
-		for (int i = 0; i < 32 * 32; ++i) {
-			delete region_[i];
-		}
-	}
+    ~Region() {
+        for (int i = 0; i < 32 * 32; ++i) {
+            delete region_[i];
+        }
+    }
 
-	void AddChunk(Chunk* chunk, uint16_t x, uint16_t y, uint16_t z);
-	void AddChunkGlobalPos(Chunk* chunk, int32_t x, int32_t y, int32_t z);
+    void AddChunk(Chunk* chunk, uint16_t x, uint16_t y, uint16_t z);
+    void AddChunkGlobalPos(Chunk* chunk, int32_t x, int32_t y, int32_t z);
 
-	void EraseChunk(uint16_t x, uint16_t y, uint16_t z);
-	void EraseChunkGlobalPos(int32_t x, int32_t y, int32_t z);
+    void EraseChunk(uint16_t x, uint16_t y, uint16_t z);
+    void EraseChunkGlobalPos(int32_t x, int32_t y, int32_t z);
 
-	bool CheckChunk(uint16_t x, uint16_t y, uint16_t z) const;
-	bool CheckChunkGlobalPos(int32_t x, int32_t y, int32_t z) const;
+    bool CheckChunk(uint16_t x, uint16_t y, uint16_t z) const;
+    bool CheckChunkGlobalPos(int32_t x, int32_t y, int32_t z) const;
 
-	Chunk* GetChunk(uint16_t x, uint16_t y, uint16_t z) const;
-	Chunk* GetChunkGlobalPos(int32_t x, int32_t y, int32_t z) const;
+    Chunk* GetChunk(uint16_t x, uint16_t y, uint16_t z) const;
+    Chunk* GetChunkGlobalPos(int32_t x, int32_t y, int32_t z) const;
 
-	ChunkColumn* GetChunkColumn(uint16_t x, uint16_t z) const;
-	ChunkColumn* GetChunkColumnGlobalPos(int32_t x, int32_t z) const;
+    ChunkColumn* GetChunkColumn(uint16_t x, uint16_t z) const;
+    ChunkColumn* GetChunkColumnGlobalPos(int32_t x, int32_t z) const;
 
-	bool CheckChunkColumn(uint16_t x, uint16_t z) const;
-	bool CheckChunkColumnGlobalPos(int32_t x, int32_t z) const;
+    bool CheckChunkColumn(uint16_t x, uint16_t z) const;
+    bool CheckChunkColumnGlobalPos(int32_t x, int32_t z) const;
 
-	uint64_t access_count_ = 0;
+    uint64_t access_count_ = 0;
 };
 
 class ChunkMap {
 public:
 
-	ChunkColumn* GetColumn(const ChunkPos& pos) const;
+    ChunkColumn* GetColumn(const ChunkPos& pos) const;
 
-	bool CheckChunk(const ChunkPos& pos) const;
+    bool CheckChunk(const ChunkPos& pos) const;
 
-	BlockID GetBlockGlobal(const BlockPos& pos);
+    BlockID GetBlockGlobal(const BlockPos& pos);
 
-	bool SetBlockGlobal(BlockID block, const BlockPos& pos);
+    bool SetBlockGlobal(BlockID block, const BlockPos& pos);
 
-	void InsertChunk(Chunk* chunk);
+    void InsertChunk(Chunk* chunk);
 
-	bool EraseChunk(const ChunkPos& pos);
+    bool EraseChunk(const ChunkPos& pos);
 
-	Chunk* GetChunk(const ChunkPos& pos) const;
+    Chunk* GetChunk(const ChunkPos& pos) const;
 private:
-	//Input position is the chunk position
-	const std::unique_ptr<Region>& GetRegion(const ChunkPos& pos) const;
-	const bool CheckRegion(const ChunkPos& pos) const;
+    //Input position is the chunk position
+    const std::unique_ptr<Region>& GetRegion(const ChunkPos& pos) const;
+    const bool CheckRegion(const ChunkPos& pos) const;
 
-	FastHashMap<RegionPos, std::unique_ptr<Region>> live_region_;
+    FastHashMap<RegionPos, std::unique_ptr<Region>> live_region_;
 };

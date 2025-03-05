@@ -1,298 +1,298 @@
 #include "Mountains.h"
 
 Chunk* MountainGenerator::Generate(const ChunkPos& pos) {
-	Chunk* chunk = new Chunk;
+    Chunk* chunk = new Chunk;
 
-	ChunkPos scaledPos = pos;
-	scaledPos *= 16;
+    ChunkPos scaledPos = pos;
+    scaledPos *= 16;
 
-	float heightBias = 50;
-	float noiseOffset = 0.3;
+    float heightBias = 50;
+    float noiseOffset = 0.3;
 
-	for (int x = 0; x < 16; x++) {
-		for (int z = 0; z < 16; z++) {
+    for (int x = 0; x < 16; x++) {
+        for (int z = 0; z < 16; z++) {
 
-			float continental = ContinentialNoise(GetNoise2D(glm::ivec2(pos.x, pos.z), glm::ivec2(x, z), 3, 0.3f));
-			float erosion = ErosionNoise(GetNoise2D(glm::ivec2(pos.x, pos.z), glm::ivec2(x + 4345, z + 6443), 3, 1.f)) / 2.f;
-			float pv = PeaksAndValley(GetNoise2D(glm::ivec2(pos.x, pos.z), glm::ivec2(x + 65345, z + 12323), 3, 4.f)) / 8;
+            float continental = ContinentialNoise(GetNoise2D(glm::ivec2(pos.x, pos.z), glm::ivec2(x, z), 3, 0.3f));
+            float erosion = ErosionNoise(GetNoise2D(glm::ivec2(pos.x, pos.z), glm::ivec2(x + 4345, z + 6443), 3, 1.f)) / 2.f;
+            float pv = PeaksAndValley(GetNoise2D(glm::ivec2(pos.x, pos.z), glm::ivec2(x + 65345, z + 12323), 3, 4.f)) / 8;
 
-			for (int y = 0; y < 16; y++) {
+            for (int y = 0; y < 16; y++) {
 
-				float gy = (float)(y + scaledPos.y);
+                float gy = (float)(y + scaledPos.y);
 
-				float n = GetNoise3D(glm::ivec3{ pos.x,pos.y ,pos.z }, glm::ivec3(x, y, z), 4, 1.f);
+                float n = GetNoise3D(glm::ivec3{ pos.x,pos.y ,pos.z }, glm::ivec3(x, y, z), 4, 1.f);
 
-				n = n + noiseOffset;
+                n = n + noiseOffset;
 
-				n += continental;
-				n += erosion;
-				n += (pv / (heightBias * (n + 0.5f))) * gy;
+                n += continental;
+                n += erosion;
+                n += (pv / (heightBias * (n + 0.5f))) * gy;
 
-				n = n * exp(-gy / heightBias);
+                n = n * exp(-gy / heightBias);
 
-				if (n > 0.5f) {
-					if (n < 0.54f) {
-						chunk->SetBlockUnsafe(g_blocks.GRASS, x, y, z);
-						chunk->SetBlock(g_blocks.DIRT, x, y - 1, z);
-					}
-					else {
-						chunk->SetBlockUnsafe(g_blocks.STONE, x, y, z);
-					}
-				}
-			}
-		}
-	}
+                if (n > 0.5f) {
+                    if (n < 0.54f) {
+                        chunk->SetBlockUnsafe(g_blocks.GRASS, x, y, z);
+                        chunk->SetBlock(g_blocks.DIRT, x, y - 1, z);
+                    }
+                    else {
+                        chunk->SetBlockUnsafe(g_blocks.STONE, x, y, z);
+                    }
+                }
+            }
+        }
+    }
 
-	GenerateEnvironment(scaledPos, chunk);
-	GenerateDecor(scaledPos, chunk);
+    GenerateEnvironment(scaledPos, chunk);
+    GenerateDecor(scaledPos, chunk);
 
-	int gx = scaledPos.x;
-	int gz = scaledPos.z;
-	int gy = scaledPos.y;
+    int gx = scaledPos.x;
+    int gz = scaledPos.z;
+    int gy = scaledPos.y;
 
 
-	if (pos.y == 3) {
-		int numBlocks = static_cast<int>(g_blocks.block_type_data_.size());
+    if (pos.y == 3) {
+        int numBlocks = static_cast<int>(g_blocks.block_type_data_.size());
 
-		for (int x = 0; x < 16; x++) {
-			for (int z = 0; z < 16; z++) {
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
 
-				int px = x + gx;
-				int pz = z + gz;
+                int px = x + gx;
+                int pz = z + gz;
 
-				if (((px & 0b1) == 1) || ((pz & 0b1) == 1)) {
-					continue;
-				}
+                if (((px & 0b1) == 1) || ((pz & 0b1) == 1)) {
+                    continue;
+                }
 
-				px = px / 2;
-				pz = pz / 2;
+                px = px / 2;
+                pz = pz / 2;
 
-				if ((px < 0) || (px >= 20)) {
-					continue;
-				}
+                if ((px < 0) || (px >= 20)) {
+                    continue;
+                }
 
-				int b = px + pz * 20;
+                int b = px + pz * 20;
 
-				if ((b < numBlocks) && (b >= 0)) {
-					chunk->SetBlockUnsafe(b, x, 3, z);
-				}
-			}
-		}
-	}
+                if ((b < numBlocks) && (b >= 0)) {
+                    chunk->SetBlockUnsafe(b, x, 3, z);
+                }
+            }
+        }
+    }
 
-	return chunk;
+    return chunk;
 }
 
 void MountainGenerator::GenerateEnvironment(const ChunkPos& pos, Chunk* chunk) {
 
-	for (int x = 0; x < 16; x++) {
-		for (int z = 0; z < 16; z++) {
-			for (int y = 0; y < 16; y++) {
+    for (int x = 0; x < 16; x++) {
+        for (int z = 0; z < 16; z++) {
+            for (int y = 0; y < 16; y++) {
 
-				if (y + pos.y < 34) {
-					if ((chunk->GetBlockUnsafe(x, y, z) == g_blocks.AIR)) {
-						chunk->SetBlockUnsafe(g_blocks.BLUE_CONCRETE, x, y, z);
-					}
+                if (y + pos.y < 34) {
+                    if ((chunk->GetBlockUnsafe(x, y, z) == g_blocks.AIR)) {
+                        chunk->SetBlockUnsafe(g_blocks.BLUE_CONCRETE, x, y, z);
+                    }
 
-					if ((chunk->GetBlockUnsafe(x, y, z) == g_blocks.GRASS)) {
-						chunk->SetBlockUnsafe(g_blocks.SAND, x, y, z);
-					}
-				}
-			}
-		}
-	}
+                    if ((chunk->GetBlockUnsafe(x, y, z) == g_blocks.GRASS)) {
+                        chunk->SetBlockUnsafe(g_blocks.SAND, x, y, z);
+                    }
+                }
+            }
+        }
+    }
 }
 
 void MountainGenerator::GenerateDecor(const ChunkPos& pos, Chunk* chunk) {
-	const int tree_height = 3;
+    const int tree_height = 3;
 
-	for (int x = 0; x < 16; x++) {
-		for (int z = 0; z < 16; z++) {
+    for (int x = 0; x < 16; x++) {
+        for (int z = 0; z < 16; z++) {
 
-			//Global Pos
-			int gx = pos.x + x;
-			int gz = pos.z + z;
+            //Global Pos
+            int gx = pos.x + x;
+            int gz = pos.z + z;
 
-			float TREE_MAP = (float)((double)(noise_.GetNoise((float)gx * 100.f, (float)gz * 100.f, 3453454.f) + 1.f) / 2.f);
-			for (int y = 0; y < 16; y++) {
-				if (chunk->GetBlock(x, y - 1, z) == g_blocks.GRASS) {
+            float TREE_MAP = (float)((double)(noise_.GetNoise((float)gx * 100.f, (float)gz * 100.f, 3453454.f) + 1.f) / 2.f);
+            for (int y = 0; y < 16; y++) {
+                if (chunk->GetBlock(x, y - 1, z) == g_blocks.GRASS) {
 
-					if (TREE_MAP <= 0.04) {
-						
-						for (int tx = -2; tx <= 2; tx++) {
-							for (int tz = -2; tz <= 2; tz++) {
-								if ((abs(tx) == 2) && (abs(tz) == 2))
-									continue;
-								
-								for (int ty = tree_height; ty <= tree_height + 1; ty++)
-									chunk->SetBlock(g_blocks.OAK_LEAF, x + tx, y + ty, z + tz);
+                    if (TREE_MAP <= 0.04) {
+                        
+                        for (int tx = -2; tx <= 2; tx++) {
+                            for (int tz = -2; tz <= 2; tz++) {
+                                if ((abs(tx) == 2) && (abs(tz) == 2))
+                                    continue;
+                                
+                                for (int ty = tree_height; ty <= tree_height + 1; ty++)
+                                    chunk->SetBlock(g_blocks.OAK_LEAF, x + tx, y + ty, z + tz);
 
-							}
-						}
+                            }
+                        }
 
-						for (int tx = -1; tx <= 1; tx++) {
-							for (int tz = -1; tz <= 1; tz++) {
-								for (int ty = tree_height + 2; ty <= tree_height + 3; ty++) {
+                        for (int tx = -1; tx <= 1; tx++) {
+                            for (int tz = -1; tz <= 1; tz++) {
+                                for (int ty = tree_height + 2; ty <= tree_height + 3; ty++) {
 
-									if ((abs(tx) == 1) && (abs(tz) == 1) && (ty == tree_height + 3)) {
-										continue;
-									}
-									chunk->SetBlock(g_blocks.OAK_LEAF, x + tx, y + ty, z + tz);
-								}
-							}
-						}
-						for (int ty = 0; ty < tree_height + 2; ty++) {
-							chunk->SetBlock(g_blocks.OAK_LOG, x, y + ty, z);
-						}
-					}
-				}
-			}
-		}
-	}
+                                    if ((abs(tx) == 1) && (abs(tz) == 1) && (ty == tree_height + 3)) {
+                                        continue;
+                                    }
+                                    chunk->SetBlock(g_blocks.OAK_LEAF, x + tx, y + ty, z + tz);
+                                }
+                            }
+                        }
+                        for (int ty = 0; ty < tree_height + 2; ty++) {
+                            chunk->SetBlock(g_blocks.OAK_LOG, x, y + ty, z);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-	//Cube 
+    //Cube 
 
-	int xSize = 316;
-	int ySize = 100;
-	int zSize = 316;
+    int xSize = 316;
+    int ySize = 100;
+    int zSize = 316;
 
-	int xOffset = 0;
-	int yOffset = 160;
-	int zOffset = 0;
+    int xOffset = 0;
+    int yOffset = 160;
+    int zOffset = 0;
 
-	/*for (int x = 0 + Position.x; x < 16 + Position.x; x++) {
-		for (int z = 0 + Position.z; z < 16 + Position.z; z++) {
-			for (int y = 0 + Position.y; y < 16 + Position.y; y++) {
-				if (((x - xOffset) >= 0) && ((x - xOffset) < xSize) &&
-					((y - yOffset) >= 0) && ((y - yOffset) < ySize) &&
-					((z - zOffset) >= 0) && ((z - zOffset) < zSize)) {
-					chunk->SetBlock(Blocks.SAND, x - Position.x, y - Position.y, z - Position.z);
-				}
-			}
-		}
-	}*/
+    /*for (int x = 0 + Position.x; x < 16 + Position.x; x++) {
+        for (int z = 0 + Position.z; z < 16 + Position.z; z++) {
+            for (int y = 0 + Position.y; y < 16 + Position.y; y++) {
+                if (((x - xOffset) >= 0) && ((x - xOffset) < xSize) &&
+                    ((y - yOffset) >= 0) && ((y - yOffset) < ySize) &&
+                    ((z - zOffset) >= 0) && ((z - zOffset) < zSize)) {
+                    chunk->SetBlock(Blocks.SAND, x - Position.x, y - Position.y, z - Position.z);
+                }
+            }
+        }
+    }*/
 
 
-	int radius = 40;
+    int radius = 40;
 
-	for (int x = 0 + pos.x; x < 16 + pos.x; x++) {
-		for (int z = 0 + pos.z; z < 16 + pos.z; z++) {
-			for (int y = 0 + pos.y; y < 16 + pos.y; y++) {
-				if ((x * x) + (y - 140) * (y - 140) + z * z <= radius * radius) {
-					chunk->SetBlock(g_blocks.SAND, x - pos.x, y - pos.y, z - pos.z);
-				}
+    for (int x = 0 + pos.x; x < 16 + pos.x; x++) {
+        for (int z = 0 + pos.z; z < 16 + pos.z; z++) {
+            for (int y = 0 + pos.y; y < 16 + pos.y; y++) {
+                if ((x * x) + (y - 140) * (y - 140) + z * z <= radius * radius) {
+                    chunk->SetBlock(g_blocks.SAND, x - pos.x, y - pos.y, z - pos.z);
+                }
 
-				//if (y == 90) {
-				//	SetBlock(Blocks.SAND, x - cx, y - cy, z - cz);
-				//}
-			}
-		}
-	}
+                //if (y == 90) {
+                //    SetBlock(Blocks.SAND, x - cx, y - cy, z - cz);
+                //}
+            }
+        }
+    }
 }
 
 
 float MountainGenerator::GetNoise3D(glm::ivec3 ChunkCoordinate, glm::ivec3 RelativeBlockCoords, int samples, float frequency) {
-	glm::vec3 GlobalBlockPosition = glm::vec3(ChunkCoordinate * 16 + RelativeBlockCoords);
+    glm::vec3 GlobalBlockPosition = glm::vec3(ChunkCoordinate * 16 + RelativeBlockCoords);
 
-	GlobalBlockPosition *= frequency;
+    GlobalBlockPosition *= frequency;
 
-	float out = 0.0f;
+    float out = 0.0f;
 
-	for (int i = 0; i < samples; i++) {
-		float n = noise_.GetNoise(
-			GlobalBlockPosition.x * powf(2.0, static_cast<float>(i)),
-			GlobalBlockPosition.y * powf(2.0, static_cast<float>(i)),
-			GlobalBlockPosition.z * powf(2.0, static_cast<float>(i))) + 1;
+    for (int i = 0; i < samples; i++) {
+        float n = noise_.GetNoise(
+            GlobalBlockPosition.x * powf(2.0, static_cast<float>(i)),
+            GlobalBlockPosition.y * powf(2.0, static_cast<float>(i)),
+            GlobalBlockPosition.z * powf(2.0, static_cast<float>(i))) + 1;
 
-		n *= 0.5f;
-		out += n * powf(0.5f, static_cast<float>(i));
-	}
+        n *= 0.5f;
+        out += n * powf(0.5f, static_cast<float>(i));
+    }
 
-	out = out * ((-0.5f) / (powf(0.5, static_cast<float>(samples)) - 1));
+    out = out * ((-0.5f) / (powf(0.5, static_cast<float>(samples)) - 1));
 
-	return out;
+    return out;
 
 }
 float MountainGenerator::GetNoise2D(glm::ivec2 ChunkCoordinate, glm::ivec2 RelativeBlockCoords, int samples, float frequency) {
-	glm::vec2 GlobalBlockPosition = glm::vec2(ChunkCoordinate * 16 + RelativeBlockCoords);
+    glm::vec2 GlobalBlockPosition = glm::vec2(ChunkCoordinate * 16 + RelativeBlockCoords);
 
-	GlobalBlockPosition *= frequency;
+    GlobalBlockPosition *= frequency;
 
-	float out = 0.0f;
+    float out = 0.0f;
 
-	for (int i = 0; i < samples; i++) {
-		float n = noise_.GetNoise(GlobalBlockPosition.x * powf(2.0, static_cast<float>(i)),
-			GlobalBlockPosition.y * powf(2.0, static_cast<float>(i))) + 1;
-		n *= 0.5f;
-		out += n * powf(0.5f, static_cast<float>(i));
-	}
+    for (int i = 0; i < samples; i++) {
+        float n = noise_.GetNoise(GlobalBlockPosition.x * powf(2.0, static_cast<float>(i)),
+            GlobalBlockPosition.y * powf(2.0, static_cast<float>(i))) + 1;
+        n *= 0.5f;
+        out += n * powf(0.5f, static_cast<float>(i));
+    }
 
-	out = out * ((-0.5f) / (powf(0.5f, static_cast<float>(samples)) - 1.0f));
+    out = out * ((-0.5f) / (powf(0.5f, static_cast<float>(samples)) - 1.0f));
 
-	return out;
+    return out;
 }
 
 
 float MountainGenerator::ContinentialNoise(float n) {
-	size_t index = GetIndex(continentalness_interpolation_, n);
+    size_t index = GetIndex(continentalness_interpolation_, n);
 
-	float x1 = continentalness_interpolation_[index].x;
-	float y1 = continentalness_interpolation_[index].y;
+    float x1 = continentalness_interpolation_[index].x;
+    float y1 = continentalness_interpolation_[index].y;
 
-	index++;
+    index++;
 
-	float x2 = continentalness_interpolation_[index].x;
-	float y2 = continentalness_interpolation_[index].y;
+    float x2 = continentalness_interpolation_[index].x;
+    float y2 = continentalness_interpolation_[index].y;
 
-	float m = (y1 - y2) / (x1 - x2);
+    float m = (y1 - y2) / (x1 - x2);
 
-	float out = m * (n - x1) + y1;
+    float out = m * (n - x1) + y1;
 
-	return out;
+    return out;
 }
 
 float MountainGenerator::ErosionNoise(float n) {
-	size_t index = GetIndex(erosionness_interpolation_, n);
+    size_t index = GetIndex(erosionness_interpolation_, n);
 
-	float x1 = erosionness_interpolation_[index].x;
-	float y1 = erosionness_interpolation_[index].y;
+    float x1 = erosionness_interpolation_[index].x;
+    float y1 = erosionness_interpolation_[index].y;
 
-	index++;
+    index++;
 
-	float x2 = erosionness_interpolation_[index].x;
-	float y2 = erosionness_interpolation_[index].y;
+    float x2 = erosionness_interpolation_[index].x;
+    float y2 = erosionness_interpolation_[index].y;
 
-	float m = (y1 - y2) / (x1 - x2);
+    float m = (y1 - y2) / (x1 - x2);
 
-	float out = m * (n - x1) + y1;
+    float out = m * (n - x1) + y1;
 
-	return out;
+    return out;
 }
 
 float MountainGenerator::PeaksAndValley(float n) {
-	size_t index = GetIndex(peaks_valley_interpolation_, n);
+    size_t index = GetIndex(peaks_valley_interpolation_, n);
 
-	float x1 = peaks_valley_interpolation_[index].x;
-	float y1 = peaks_valley_interpolation_[index].y;
+    float x1 = peaks_valley_interpolation_[index].x;
+    float y1 = peaks_valley_interpolation_[index].y;
 
-	index++;
+    index++;
 
-	float x2 = peaks_valley_interpolation_[index].x;
-	float y2 = peaks_valley_interpolation_[index].y;
+    float x2 = peaks_valley_interpolation_[index].x;
+    float y2 = peaks_valley_interpolation_[index].y;
 
-	float m = (y1 - y2) / (x1 - x2);
+    float m = (y1 - y2) / (x1 - x2);
 
-	float out = m * (n - x1) + y1;
+    float out = m * (n - x1) + y1;
 
-	return out;
+    return out;
 }
 
 size_t MountainGenerator::GetIndex(std::vector<glm::vec2>& vec, float bottomBound) {
-	for (int i = 0; i < vec.size(); i++) {
-		if (vec[i].x >= bottomBound) {
-			return i - 1;
-		}
-	}
+    for (int i = 0; i < vec.size(); i++) {
+        if (vec[i].x >= bottomBound) {
+            return i - 1;
+        }
+    }
 
-	return vec.size() - 1;
+    return vec.size() - 1;
 }

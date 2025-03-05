@@ -10,17 +10,17 @@
 #include "Core/Options/Option.h"
 
 int main() {
-	
-	stbi_set_flip_vertically_on_load(true);
-	srand(static_cast<unsigned int>(time(NULL)));//Set rng seed
+    
+    stbi_set_flip_vertically_on_load(true);
+    srand(static_cast<unsigned int>(time(NULL)));//Set rng seed
 
-	Initialize();
+    Initialize();
 
-	Client GameClient;
-	GameClient.run();
+    Client GameClient;
+    GameClient.run();
 
-	Options options;
+    Options options;
 
-	g_logger.Stop();
-	return 0;
+    g_logger.Stop();
+    return 0;
 }

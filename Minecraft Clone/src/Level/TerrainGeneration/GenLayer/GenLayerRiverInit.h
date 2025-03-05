@@ -4,9 +4,9 @@
 
 class GenLayerRiverInit : public GenLayer {
 public:
-	GenLayerRiverInit(long long baseSeedIn, GenLayer* parentIn) : GenLayer(baseSeedIn) {
-		parent = parentIn;
-	}
+    GenLayerRiverInit(long long baseSeedIn, GenLayer* parentIn) : GenLayer(baseSeedIn) {
+        parent = parentIn;
+    }
 
     std::vector<int> getInts(int areaX, int areaY, int areaWidth, int areaHeight) override {
         std::vector<int> aint = parent->getInts(areaX, areaY, areaWidth, areaHeight);

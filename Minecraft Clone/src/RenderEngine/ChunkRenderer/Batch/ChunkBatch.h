@@ -17,55 +17,55 @@
 class ChunkDrawBatch {
 public:
 
-	void SetupBuffers();
+    void SetupBuffers();
 
-	void Reset();
+    void Reset();
 
-	void GenDrawCommands(int RenderDistance, int verticalRenderDistance);
+    void GenDrawCommands(int RenderDistance, int verticalRenderDistance);
 
-	bool AddChunkVertices(const std::vector<uint32_t>& Data, const ChunkPos& pos);
+    bool AddChunkVertices(const std::vector<uint32_t>& Data, const ChunkPos& pos);
 
-	void DeleteChunkVertices(const ChunkPos& ID);
+    void DeleteChunkVertices(const ChunkPos& ID);
 
-	void SetMaxSize(size_t size);
+    void SetMaxSize(size_t size);
 
-	void Draw();
+    void Draw();
 
-	void Bind();
+    void Bind();
 
-	void Unbind();
+    void Unbind();
 
-	void Cleanup();
+    void Cleanup();
 
-	void Defrager(size_t iterations);
+    void Defrager(size_t iterations);
 
-	void UpdateCommandBufferSize();
+    void UpdateCommandBufferSize();
 
-	void ErrorCheck();
+    void ErrorCheck();
 
-	Camera* camera; // TODO: Rename
+    Camera* camera; // TODO: Rename
 
-	std::map<size_t, ChunkMemoryPoolOffset> render_list_; //f: Offset -> RenderInfo
+    std::map<size_t, ChunkMemoryPoolOffset> render_list_; //f: Offset -> RenderInfo
 
-	double debug_time_ = 0.0;
+    double debug_time_ = 0.0;
 
-	ChunkGPUMemoryPool memory_pool_;
+    ChunkGPUMemoryPool memory_pool_;
 private:
-	ChunkDrawCommandBuffer command_buffer_;
-	CFrustum frustum_;
-	Buffer ibo_, ssbo_;
-	VertexArray array_;
-	size_t max_buffer_size_ = NULL;
+    ChunkDrawCommandBuffer command_buffer_;
+    CFrustum frustum_;
+    Buffer ibo_, ssbo_;
+    VertexArray array_;
+    size_t max_buffer_size_ = NULL;
 
-	bool update_commands_ = false;
+    bool update_commands_ = false;
 
-	FastHashMap<ChunkPos, size_t> render_list_offset_lookup_; //f: ChunkPos  -> Offset
-	std::vector<GLint> chunk_shader_pos_;
+    FastHashMap<ChunkPos, size_t> render_list_offset_lookup_; //f: ChunkPos  -> Offset
+    std::vector<GLint> chunk_shader_pos_;
 
-	std::vector<DrawCommandIndirect> draw_commands_;
+    std::vector<DrawCommandIndirect> draw_commands_;
 
-	size_t amount_of_chunks_ = 0;
-	size_t amount_of_chunks_being_rendered_ = 0;
+    size_t amount_of_chunks_ = 0;
+    size_t amount_of_chunks_being_rendered_ = 0;
 
-	Buffer transfer_buffer_;
+    Buffer transfer_buffer_;
 };

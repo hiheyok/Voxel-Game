@@ -9,9 +9,9 @@ private:
         return p_151630_1_ >= 2 ? 2 + (p_151630_1_ & 1) : p_151630_1_;
     }
 public:
-	GenLayerRiver(long long baseSeedIn, GenLayer* parentIn) : GenLayer(baseSeedIn) {
-		parent = parentIn;
-	}
+    GenLayerRiver(long long baseSeedIn, GenLayer* parentIn) : GenLayer(baseSeedIn) {
+        parent = parentIn;
+    }
 
     std::vector<int> getInts(int areaX, int areaY, int areaWidth, int areaHeight) override
     {

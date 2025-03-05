@@ -9,6 +9,6 @@ uniform float AspectRatio;
 out vec4 clr;
 
 void main() {
-	clr = Color;
-	gl_Position = vec4(vertices.x * AspectRatio + Origin.x, vertices.y + Origin.y, 1.f, 1.f);
+    clr = Color;
+    gl_Position = vec4(vertices.x * AspectRatio + Origin.x, vertices.y + Origin.y, 1.f, 1.f);
 }

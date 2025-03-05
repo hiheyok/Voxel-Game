@@ -6,7 +6,7 @@ class Block;
 
 struct DirtBlock : Block {
 
-	void Tick(const BlockPos& pos) override {
+    void Tick(const BlockPos& pos) override {
 
-	}
+    }
 };

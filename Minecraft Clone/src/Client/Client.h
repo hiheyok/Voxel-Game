@@ -13,25 +13,25 @@
 
 class Client : protected Window {
 public:
-	void run();
+    void run();
 private:
-	void Initialize();
-	void GameLoop();
-	void Update();
-	void Cleanup();
-	void Render();
-	void SetDebugScreen();
+    void Initialize();
+    void GameLoop();
+    void Update();
+    void Cleanup();
+    void Render();
+    void SetDebugScreen();
 
-	double frametime_ = 0.5;
+    double frametime_ = 0.5;
 
-	MainPlayer main_player_;
+    MainPlayer main_player_;
 
-	InternalServer server_;
-	WorldRender terrain_render_;
-	MultiEntityRenderer entity_render_;
-	EntityRendererUpdater entity_updater_;
-	TexturedFrameBuffer framebuffer_;
-	TextRenderer text_render_;
-	DebugScreen debug_screen_;
-	PerformanceProfiler profiler_;
+    InternalServer server_;
+    WorldRender terrain_render_;
+    MultiEntityRenderer entity_render_;
+    EntityRendererUpdater entity_updater_;
+    TexturedFrameBuffer framebuffer_;
+    TextRenderer text_render_;
+    DebugScreen debug_screen_;
+    PerformanceProfiler profiler_;
 };

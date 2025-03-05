@@ -8,6 +8,6 @@ uniform float AspectRatio;
 out vec2 TexUV;
 
 void main() {
-	TexUV = UV;
-	gl_Position = vec4(vertices.x * AspectRatio, vertices.y, 1.f, 1.f);
+    TexUV = UV;
+    gl_Position = vec4(vertices.x * AspectRatio, vertices.y, 1.f, 1.f);
 }

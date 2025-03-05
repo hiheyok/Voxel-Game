@@ -13,9 +13,9 @@
 
 class WorldInteraction {
 public:
-	void Interact(Player* player, const UserInputs& Inputs);
+    void Interact(Player* player, const UserInputs& Inputs);
 private:
-	BlockID GetBlock(Ray ray, Dimension* dimension);
-	void BreakBlock(Ray ray, Dimension* dimension);
-	void PlaceBlock(Ray ray, BlockID block, Dimension* dimension);
+    BlockID GetBlock(Ray ray, Dimension* dimension);
+    void BreakBlock(Ray ray, Dimension* dimension);
+    void PlaceBlock(Ray ray, BlockID block, Dimension* dimension);
 };

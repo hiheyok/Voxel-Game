@@ -5,21 +5,21 @@
 using namespace glm;
 
 vec3 MinecraftTerrain::VecFloor(vec3 v) {
-	return vec3(floor(v.x), floor(v.y), floor(v.z));
+    return vec3(floor(v.x), floor(v.y), floor(v.z));
 }
 
 TallChunk* MinecraftTerrain::GenerateTall(const ChunkPos& pos) {
-	OverworldGenerator overworldGenerator = OverworldGenerator(WorldGenerator::world_seed_, *settings_);
+    OverworldGenerator overworldGenerator = OverworldGenerator(WorldGenerator::world_seed_, *settings_);
 
-	TallChunk* chunk = new TallChunk();
-	chunk->SetPosition(pos.x, pos.y, pos.z);
-	
-	overworldGenerator.GenerateChunk(pos.x, pos.z, chunk);
+    TallChunk* chunk = new TallChunk();
+    chunk->SetPosition(pos.x, pos.y, pos.z);
+    
+    overworldGenerator.GenerateChunk(pos.x, pos.z, chunk);
 
-	return chunk;
+    return chunk;
 }
 
 void MinecraftTerrain::Init() {
-	
-	return;
+    
+    return;
 }
