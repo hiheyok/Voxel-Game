@@ -1,5 +1,6 @@
 #pragma once
 #include "BlockModels.h"
 #include <string>
+#include <memory>
 
-ModelV2::BlockModelV2* getBlockModel(std::string blockNameIn, std::string namespaceIn);
+std::unique_ptr<ModelV2::BlockModelV2> getBlockModel(std::string blockNameIn, std::string namespaceIn);

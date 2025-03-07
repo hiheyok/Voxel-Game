@@ -25,7 +25,7 @@ public:
     }
 
     virtual void Tick(Entity* entity) {
-        
+        (void)entity;
     }
 
     EntityTypeID id_ = NULL;

@@ -168,10 +168,17 @@ void WorldLoader::ReplaceLightInfomation(std::shared_ptr<ChunkLightingContainer>
 
 std::vector<ChunkPos> WorldLoader::GetRequestedChunks() {
     std::lock_guard<std::mutex> lock{ lock_ };
+
+    // Ensure the vector is in a valid state before moving and clearing
+    if (chunk_request_.empty()) {
+        return {};
+    }
+
     std::vector<ChunkPos> tmp = std::move(chunk_request_);
     chunk_request_.clear();
 
     return tmp;
+
 }
 
 void WorldLoader::AddEntityChunkLoader(EntityUUID uuid) {

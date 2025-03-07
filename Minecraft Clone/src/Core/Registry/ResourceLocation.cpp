@@ -1,6 +1,6 @@
 #include "ResourceLocation.h"
 
-std::string ResourceLocation::SetResourceLocation(std::string name) {
+void ResourceLocation::SetResourceLocation(std::string name) {
     std::vector<std::string> tokens = Tokenize(name, ':');
 
     if (tokens.size() != 2) {

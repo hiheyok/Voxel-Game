@@ -1,7 +1,7 @@
 #pragma once
 #include "../../../../Level/Dimension/Dimension.h"
 
-class Block;
+struct Block;
 
 struct FluidProperties {
     int spread_rate_ = 1; // Ticks for fluid to spread

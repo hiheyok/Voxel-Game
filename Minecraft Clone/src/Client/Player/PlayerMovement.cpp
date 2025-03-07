@@ -12,7 +12,7 @@ void PlayerMovement::Update(Player* player, const UserInputs& inputs, InternalSe
 
 float PlayerMovement::VelocityMovementCurve(float current, float max, float delta) {
 
-    int currentTime = -log(max - current) + log(max);
+    int currentTime = static_cast<int>(-log(max - current) + log(max)); //TODO: Fix this
 
     int x = delta - log(max) - currentTime;
 

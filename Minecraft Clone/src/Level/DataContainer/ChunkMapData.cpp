@@ -55,7 +55,7 @@ BlockID ChunkMap::GetBlockGlobal(const BlockPos& pos) {
     //c[3] is the position of the chunk
     //l[3] is the local position of a block inside a chunk
 
-    int x = pos.x;
+    //int x = pos.x;
     int y = pos.y;
     int z = pos.z;
 

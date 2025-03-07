@@ -23,7 +23,7 @@
 class CombinedGenLayers {
 public:
     static std::vector<GenLayer*> initializeAllBiomeGenerators(long long seed, ChunkGeneratorSettings* p_180781_3_)
-    {
+    { // TODO: Use unique ptr
         GenLayer* genlayer = new GenLayerIsland(1L);
         genlayer = new GenLayerFuzzyZoom(2000L, genlayer);
         GenLayer* genlayeraddisland = new GenLayerAddIsland(1L, genlayer);

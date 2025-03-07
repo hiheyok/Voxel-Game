@@ -12,7 +12,7 @@ namespace Mesh {
 
     struct CompactBooleanData {
 
-        inline void InsertBit(size_t index) {
+        void InsertBit(size_t index) {
             size_t NumIndex = index >> 6;
             size_t Index = index & 0b111111;
 
@@ -20,21 +20,21 @@ namespace Mesh {
 
         }
 
-        inline bool Getbit(size_t index) {
+        bool Getbit(size_t index) const {
             size_t NumIndex = index >> 6;
             size_t Index = index & 0b111111;
             return (data[NumIndex] >> Index) & 0b1;
         }
 
-        inline void InsertBitPos(uint16_t x, uint16_t y, uint16_t z) {
+        void InsertBitPos(uint16_t x, uint16_t y, uint16_t z) {
             InsertBit((x << 8) + (y << 4) + z);
         }
 
-        inline bool GetBitPos(uint16_t x, uint16_t y, uint16_t z) {
+        bool GetBitPos(uint16_t x, uint16_t y, uint16_t z) const {
             return Getbit((x << 8) + (y << 4) + z);
         }
 
-        inline void clear() {
+        void clear() {
             for (int i = 0; i < 64; i++) {
                 data[i] = 0;
             }
@@ -103,7 +103,7 @@ namespace Mesh {
         inline void SetCachedBlockID(BlockID b, int x, int y, int z);
 
 
-        inline glm::ivec4 getAO(uint8_t direction, int x, int y, int z);
+        inline glm::u8vec4  getAO(uint8_t direction, int x, int y, int z);
 
         //To check if a block had been used in the Greedy Meshing Algorithm
         CompactBooleanData boolean_map_;

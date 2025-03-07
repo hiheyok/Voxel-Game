@@ -184,7 +184,7 @@ void CFrustum::CalculateFrustum(Camera* cam)
 /////
 ///////////////////////////////// POINT IN FRUSTUM \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*
 
-bool CFrustum::PointInFrustum(float x, float y, float z)
+bool CFrustum::PointInFrustum(float x, float y, float z) const
 {
     // If you remember the plane equation (A*x + B*y + C*z + D = 0), then the rest
     // of this code should be quite obvious and easy to figure out yourself.
@@ -224,7 +224,7 @@ bool CFrustum::PointInFrustum(float x, float y, float z)
 /////
 ///////////////////////////////// SPHERE IN FRUSTUM \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*
 
-bool CFrustum::SphereInFrustum(float x, float y, float z, float radius)
+bool CFrustum::SphereInFrustum(float x, float y, float z, float radius) const
 {
     // Now this function is almost identical to the PointInFrustum(), except we
     // now have to deal with a radius around the point.  The point is the center of
@@ -258,7 +258,7 @@ bool CFrustum::SphereInFrustum(float x, float y, float z, float radius)
 /////
 ///////////////////////////////// CUBE IN FRUSTUM \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\*
 
-bool CFrustum::CubeInFrustum(float x, float y, float z, float size)
+bool CFrustum::CubeInFrustum(float x, float y, float z, float size) const
 {
     // This test is a bit more work, but not too much more complicated.
     // Basically, what is going on is, that we are given the center of the cube,

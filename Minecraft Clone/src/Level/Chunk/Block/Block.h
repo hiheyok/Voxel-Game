@@ -32,7 +32,7 @@ struct Block {
     }
 
     virtual void Tick(const BlockPos& pos) {
-
+        (void)pos;
     }
 
     static void* dimension_ptr_;
@@ -42,7 +42,7 @@ struct Block {
     std::unique_ptr<BlockType> properties_ = nullptr;
     std::unique_ptr<BlockTexture> texture_ = nullptr;
 
-    ModelV2::BlockModelV2* block_model_data_ = NULL;
+    std::unique_ptr<ModelV2::BlockModelV2> block_model_data_ = nullptr;
     std::string block_name_ = "";
 };
 

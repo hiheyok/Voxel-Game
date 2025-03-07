@@ -29,7 +29,7 @@ BlockID BlockList::RegisterBlock(std::string blockName, Material* material, bool
     block_id_name_data_[blockName] = id;
 
     g_logger.LogInfo("Register", "Registered new block (ID): " + std::to_string(id));
-
+    delete material; // replace w/ unique ptr later
     return id;
 }
 
@@ -84,9 +84,9 @@ void BlockList::InitializeBlockModels()  {
     for (const auto& [name, ID] : block_id_name_data_) {
         auto tokens = Tokenize(name, ':');
 
-        ModelV2::BlockModelV2* model = getBlockModel("block/" + tokens.back(), tokens.front());
+        std::unique_ptr<ModelV2::BlockModelV2> model = getBlockModel("block/" + tokens.back(), tokens.front());
         model->is_initialized_ = true;
-        GetBlockType(ID)->block_model_data_ = model;
+        GetBlockType(ID)->block_model_data_ = std::move(model);
     }
 
     //Bake all of the texture variables next

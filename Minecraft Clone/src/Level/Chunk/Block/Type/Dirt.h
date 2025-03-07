@@ -2,7 +2,7 @@
 #include "../../../../Utils/Math/Probability/Probability.h"
 #include "../../../Event/EventHandler.h"
 
-class Block;
+struct Block;
 
 struct DirtBlock : Block {
 

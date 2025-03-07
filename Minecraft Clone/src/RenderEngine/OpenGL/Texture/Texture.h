@@ -62,10 +62,12 @@ public:
     }
 
     virtual bool Load(RawTextureData data) {
+        (void)data;
         return false;
     }
 
     virtual bool Load(std::string file) {
+        (void)file;
         return false;
     }
 

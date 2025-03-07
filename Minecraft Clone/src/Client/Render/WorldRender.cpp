@@ -36,7 +36,7 @@ std::unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(const ChunkPos& pos) 
     chunkMesher.Reset();
     chunkMesher.SetChunk(chunk);
     chunkMesher.GenerateMesh();
-    size_t time = timer.GetTimePassed_μs();
+    size_t time = static_cast<size_t>(timer.GetTimePassed_μs());
 
     //Transfer Infomation
     std::unique_ptr<Mesh::ChunkVertexData> data = std::make_unique<Mesh::ChunkVertexData>();

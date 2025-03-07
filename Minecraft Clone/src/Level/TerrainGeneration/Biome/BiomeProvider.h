@@ -17,6 +17,9 @@ public:
     }
 
     BiomeProvider(long long seed, ChunkGeneratorSettings* settingsIn) {
+        (void)seed;
+        (void)settingsIn;
+        throw std::exception("Not used");
     }
 
     static void init(long long seed, ChunkGeneratorSettings* settingsIn) {

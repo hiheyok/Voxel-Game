@@ -6,9 +6,9 @@ class BiomeMesa : public Biome {
 private:
     std::vector<BlockID> clay_bands_;
     long world_seed_;
-    NoiseGeneratorPerlin* pillar_noise_;
-    NoiseGeneratorPerlin* pillar_roof_noise_;
-    NoiseGeneratorPerlin* clay_bands_offset_noise_;
+    std::unique_ptr<NoiseGeneratorPerlin> pillar_noise_;
+    std::unique_ptr<NoiseGeneratorPerlin> pillar_roof_noise_;
+    std::unique_ptr<NoiseGeneratorPerlin> clay_bands_offset_noise_;
     bool bryce_pillars_;
 
 public:
@@ -33,7 +33,7 @@ public:
         clay_bands_.resize(64);
         for (int i = 0; i < 64; i++) clay_bands_[i] = g_blocks.TERRACOTTA;
         JavaRandom random = JavaRandom(p_150619_1_);
-        clay_bands_offset_noise_ = new NoiseGeneratorPerlin(random, 1);
+        clay_bands_offset_noise_ = std::make_unique<NoiseGeneratorPerlin>(random, 1);
 
         for (int l1 = 0; l1 < 64; ++l1)
         {
@@ -124,8 +124,8 @@ public:
         if (pillar_noise_ == nullptr || pillar_roof_noise_ == nullptr || world_seed_ != -1587754402)
         {
             JavaRandom random = JavaRandom(world_seed_);
-            pillar_noise_ = new NoiseGeneratorPerlin(random, 4);
-            pillar_roof_noise_ = new NoiseGeneratorPerlin(random, 1);
+            pillar_noise_ = std::make_unique<NoiseGeneratorPerlin>(random, 4);
+            pillar_roof_noise_ = std::make_unique<NoiseGeneratorPerlin>(random, 1);
         }
 
         world_seed_ = -1587754402;

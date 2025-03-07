@@ -101,7 +101,7 @@ namespace MemoryManagement {
     public:
         void Initialize(size_t spaceAvailable) {
             pool_size_ = spaceAvailable;
-            free_memory_blocks_.Add(MemoryBlock(0, pool_size_));
+            free_memory_blocks_.Add(MemoryBlock{ 0, pool_size_ });
             std::multimap<size_t, size_t>::iterator it = sorted_mem_sizes_.emplace(pool_size_, 0); //use for deletions
             sorted_mem_sizes_iterators[0] = it;
         }
@@ -319,6 +319,7 @@ public:
 
         statistics_.memory_usage_ += blockSize;
         Update();
+        (void)side;
         return chunkMemoryBlock;
     }
 
@@ -327,7 +328,9 @@ public:
             return;
         }
 
-        statistics_.full_memory_usage_ = memory_pool_.reserved_memory_blocks_.rbegin()->first + memory_pool_.reserved_memory_blocks_.rbegin()->second.size_;
+        statistics_.full_memory_usage_ = memory_pool_.reserved_memory_blocks_.rbegin()->first +
+            memory_pool_.reserved_memory_blocks_.rbegin()->second.size_;
+
         if (statistics_.full_memory_usage_ != 0) {
             statistics_.fragmentation_rate_ = (double)statistics_.memory_usage_ / (double)statistics_.full_memory_usage_;
         }

@@ -311,8 +311,8 @@ inline void Mesh::ChunkMeshData::AddFacetoMesh(const BlockFace& face, uint8_t ax
         out.resize(out.size() + BUFFER_SIZE_STEP);
 
     //Get AO
-    glm::ivec4 AO = allowAO ? getAO(axis_, x / 16, y / 16, z / 16) : glm::ivec4{ 15, 15, 15, 15 };
-
+    glm::u8vec4 AO = allowAO ? getAO(axis_, x / 16, y / 16, z / 16) : glm::u8vec4{ 15, 15, 15, 15 };
+   
     PP = AO[0], PN = AO[1], NP = AO[2], NN = AO[3];
 
     out[currIndex * 12 + 0]  = 0u | P0[0] | P0[1] | P0[2] | norm | tint;
@@ -349,7 +349,7 @@ inline void Mesh::ChunkMeshData::SetCachedBlockID(BlockID b, int x, int y, int z
     chunk_cache_[(x + 1) * 18 * 18 + (z + 1) * 18 + (y + 1)] = b;
 }
 
-inline glm::ivec4 Mesh::ChunkMeshData::getAO(uint8_t direction, int x, int y, int z) {
+inline glm::u8vec4 Mesh::ChunkMeshData::getAO(uint8_t direction, int x, int y, int z) {
     const uint8_t AMBIENT_OCCLUSION_STRENGTH = 2;
     glm::ivec3 pos{x, y, z};
 
@@ -442,7 +442,7 @@ inline glm::ivec4 Mesh::ChunkMeshData::getAO(uint8_t direction, int x, int y, in
     else
         NP = 0;
 
-    return glm::ivec4(PP, PN, NP, NN);
+    return glm::u8vec4(PP, PN, NP, NN);
 
 }
 

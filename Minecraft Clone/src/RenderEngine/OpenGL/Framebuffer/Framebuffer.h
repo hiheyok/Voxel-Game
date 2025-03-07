@@ -9,12 +9,12 @@
 class TexturedFrameBuffer {
 public:
 
-    GLuint fbo_, rbo_, texture_, shader_id_ = 0;
+    GLuint fbo_ = 0, rbo_ = 0, texture_ = 0, shader_id_ = 0;
     GLint sx = 0;
     GLint sy = 0;
 
-    GLint text_size_x_, text_size_y_;
-    unsigned int quad_vao_, quad_vbo_ = 0;
+    GLint text_size_x_ = 0, text_size_y_ = 0;
+    unsigned int quad_vao_ = 0, quad_vbo_ = 0;
     GLfloat res_multiplier_ = 1;
 
     Shader* screen_ = new Shader;
@@ -83,11 +83,11 @@ public:
         sy = static_cast<GLint>(muti * y);
     }
 
-    void BindRBO() {
+    void BindRBO() const {
         glBindRenderbuffer(GL_RENDERBUFFER, rbo_);
     }
 
-    void UnbindRBO() {
+    void UnbindRBO() const {
         glBindRenderbuffer(GL_RENDERBUFFER, rbo_);
     }
 
@@ -117,7 +117,7 @@ public:
         }
     }
 
-    void Clear() {
+    void Clear() const {
         glDeleteFramebuffers(1, &fbo_);
         glDeleteTextures(1, &texture_);
         glDeleteRenderbuffers(1, &rbo_);

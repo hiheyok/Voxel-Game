@@ -1,6 +1,6 @@
 #pragma once
-#include "EntityRenderCache.h"
 #include <vector>
+#include "EntityRenderCache.h"
 #include "../OpenGL/Buffers/Buffer.h"
 #include "../OpenGL/Shader/Shader.h"
 #include "../../Client/Render/PlayerPOV.h"
@@ -12,7 +12,7 @@ class MultiEntityRenderer {
 private:
 
     std::vector<float> entity_vertices_;
-    std::vector<int> entity_indices_;
+    std::vector<unsigned int> entity_indices_;
 
     FastHashMap<EntityTypeID, EntityModel> entity_cached_models_;
 

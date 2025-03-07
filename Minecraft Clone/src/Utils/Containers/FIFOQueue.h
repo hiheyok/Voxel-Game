@@ -6,6 +6,9 @@ public:
     FixedFIFOQueue(uint64_t size);
     ~FixedFIFOQueue();
 
+    FixedFIFOQueue(FixedFIFOQueue&& q) = delete;
+    FixedFIFOQueue(const FixedFIFOQueue& q) = delete;
+
     void setSize(uint64_t size);
     void push(const T& obj);
 
@@ -30,7 +33,7 @@ inline FixedFIFOQueue<T>::FixedFIFOQueue() {}
 
 template <class T>
 inline FixedFIFOQueue<T>::~FixedFIFOQueue() {
-    if (buffer_ != nullptr) delete buffer_;
+    if (buffer_ != nullptr) delete[] buffer_;
 }
 
 template <class T>

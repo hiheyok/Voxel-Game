@@ -14,10 +14,12 @@ public:
     }
 
     virtual Chunk* Generate(const ChunkPos& pos) {
+        (void)pos;
         return nullptr;
     }
     // TODO: Use custom tall chunk positioning
     virtual TallChunk* GenerateTall(const ChunkPos& pos) {
+        (void)pos;
         return nullptr;
     }
 

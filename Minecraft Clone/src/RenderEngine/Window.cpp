@@ -11,7 +11,7 @@
 using namespace std;
 
 void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam) {
-
+    (void)userParam;
     std::stringstream str;
 
     if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
@@ -154,16 +154,18 @@ void Window::ResizeWindowCallback(int x, int y) {
     g_logger.LogInfo("OpenGL"," Resized Window: " + std::to_string(x) + ", " + std::to_string(y));
 }
 
-void Window::ScrollCallback(GLFWwindow* win, double xoffset, double yoffset) {
-    if (yoffset == -1.0) {
+void Window::ScrollCallback(GLFWwindow* win, double xOffset, double yOffset) {
+    if (yOffset == -1.0) {
         inputs_.mouse_.scroll_direction_ = inputs_.mouse_.SCROLL_DOWN;
         return;
     }
 
-    if (yoffset == 1.0) {
+    if (yOffset == 1.0) {
         inputs_.mouse_.scroll_direction_ = inputs_.mouse_.SCROLL_UP;
         return;
     }
+    (void)xOffset;
+    (void)win;
 }
 
 void Window::Refresh() {

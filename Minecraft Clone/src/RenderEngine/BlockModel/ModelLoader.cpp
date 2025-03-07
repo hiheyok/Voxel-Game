@@ -11,7 +11,7 @@ using json = nlohmann::json;
 using namespace std;
 
 
-vector<int> getJSONArrayValues(json JsonData) {
+static vector<int> getJSONArrayValues(json JsonData) {
     vector<int> arr{};
 
     for (auto& value : JsonData.items()) {    
@@ -21,7 +21,7 @@ vector<int> getJSONArrayValues(json JsonData) {
     return arr;
 }
 
-vector<float> getJSONArrayValuesFloat(json JsonData) {
+static vector<float> getJSONArrayValuesFloat(json JsonData) {
     vector<float> arr{};
 
     for (auto& value : JsonData.items()) {
@@ -31,7 +31,7 @@ vector<float> getJSONArrayValuesFloat(json JsonData) {
     return arr;
 }
 
-int ConvertStringFaceToIndex(const string& str) {
+static int ConvertStringFaceToIndex(const string& str) {
     if (!strcmp(str.c_str(), "down")) {
         return DOWN;
     }
@@ -57,7 +57,7 @@ int ConvertStringFaceToIndex(const string& str) {
 
 }
 
-void ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
+static void ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
     for (auto& face : JsonData.items()) {
         int faceIndex = ConvertStringFaceToIndex(face.key());
         BlockFace bFace;
@@ -154,7 +154,7 @@ CuboidRotationInfo getRotationalData(json JsonData) {
     return rotationInfo;
 }
 
-void UpdateModelElements(ModelV2::BlockModelV2* model, json JsonData) {
+void UpdateModelElements(std::unique_ptr<ModelV2::BlockModelV2>& model, json JsonData) {
     for (auto& item : JsonData.items()) {
 
         Cuboid cuboid;
@@ -197,7 +197,7 @@ void UpdateModelElements(ModelV2::BlockModelV2* model, json JsonData) {
     }
 }
 
-void ProcessCuboidTexture(ModelV2::BlockModelV2* model, json JsonData) {
+void ProcessCuboidTexture(std::unique_ptr<ModelV2::BlockModelV2>& model, json JsonData) {
     for (auto& TextureElement : JsonData.items()) {
         auto tokens = Tokenize(TextureElement.value(), ':');
 
@@ -224,7 +224,7 @@ void ProcessCuboidTexture(ModelV2::BlockModelV2* model, json JsonData) {
     }
 }
 
-void ProcessModelDisplay(ModelV2::BlockModelV2* model, json JsonData) {
+void ProcessModelDisplay(std::unique_ptr<ModelV2::BlockModelV2>& model, json JsonData) {
     for (auto& displayPlaces : JsonData.items()) {
 
         string position = displayPlaces.key();
@@ -288,8 +288,9 @@ void ProcessModelDisplay(ModelV2::BlockModelV2* model, json JsonData) {
     }
 }
 
-ModelV2::BlockModelV2* recursiveGetBlockModel(string jsonName, string namespaceIn) {
-    ModelV2::BlockModelV2* model = nullptr;
+//TODO: Work on caching
+static std::unique_ptr<ModelV2::BlockModelV2> recursiveGetBlockModel(string jsonName, string namespaceIn) {
+    std::unique_ptr<ModelV2::BlockModelV2> model = nullptr;
 
     string jsonPath = "assets/" + namespaceIn + "/models/" + jsonName + ".json";
     
@@ -329,7 +330,7 @@ ModelV2::BlockModelV2* recursiveGetBlockModel(string jsonName, string namespaceI
     }
 
     if (model == nullptr)
-        model = new ModelV2::BlockModelV2();
+        model = std::make_unique<ModelV2::BlockModelV2>();
 
     //Searches for the other stuff like textures and elements 
 
@@ -352,9 +353,9 @@ ModelV2::BlockModelV2* recursiveGetBlockModel(string jsonName, string namespaceI
     return model;
 }
 
-ModelV2::BlockModelV2* getBlockModel(string blockNameIn, string namespaceIn) {
+std::unique_ptr<ModelV2::BlockModelV2> getBlockModel(string blockNameIn, string namespaceIn) {
     //This will recursively go into parents files and build on it
-    ModelV2::BlockModelV2* model = recursiveGetBlockModel(blockNameIn, namespaceIn);
+    std::unique_ptr<ModelV2::BlockModelV2> model = recursiveGetBlockModel(blockNameIn, namespaceIn);
     std::reverse(model->elements_.begin(), model->elements_.end());
     return model;
 

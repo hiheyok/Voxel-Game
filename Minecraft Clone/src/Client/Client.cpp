@@ -58,7 +58,6 @@ void Client::Cleanup() {
     server_.Stop();
     g_logger.Stop();
     entity_updater_.Stop();
-    g_logger.logging_thread_.join();
     g_blocks.CleanUp();
     glfwDestroyWindow(GetWindow());
 }

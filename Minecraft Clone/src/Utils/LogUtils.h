@@ -7,11 +7,12 @@
 #include <mutex>
 #include <fstream>
 #include <cstdarg>
+#include <condition_variable>
 
-#define LOG_TYPE_DEBUG 0x00;
-#define LOG_TYPE_INFO 0x01;
-#define LOG_TYPE_ERROR 0x02;
-#define LOG_TYPE_WARN 0x03;
+inline constexpr int LOG_TYPE_DEBUG = 0x00;
+inline constexpr int LOG_TYPE_INFO = 0x01;
+inline constexpr int LOG_TYPE_ERROR = 0x02;
+inline constexpr int LOG_TYPE_WARN = 0x03;
 
 struct LogData {
     int type_ = NULL;
@@ -31,13 +32,12 @@ public:
     void Start();
     void Stop();
 
-    void LogError(std::string Subtype, std::string Message);
-    void LogWarn(std::string Subtype, std::string Message);
-    void LogInfo(std::string Subtype, std::string Message);
-    void LogDebug(std::string Subtype, std::string Message);
-    void LogDebugf(std::string Subtype, std::string Message,...);
+    void LogError(std::string subtype, std::string message);
+    void LogWarn(std::string subtype, std::string message);
+    void LogInfo(std::string subtype, std::string message);
+    void LogDebug(std::string subtype, std::string message);
+    void LogDebugf(std::string subtype, std::string message,...);
 
-    std::thread logging_thread_;
 private:
     void MainLogger();
 
@@ -46,7 +46,9 @@ private:
 
     std::chrono::high_resolution_clock::time_point init_time_ = std::chrono::high_resolution_clock::now();
 
+    std::thread logging_thread_;
     std::mutex mutex_;
+    std::condition_variable cv_;
     bool stop_ = false;
     bool started_ = false;
     std::deque<LogData> logs_;

@@ -25,6 +25,10 @@ public:
     
 
     virtual std::vector<int> getInts(int areaX, int areaY, int areaWidth, int areaHeight) {
+        (void)areaHeight;
+        (void)areaWidth;
+        (void)areaY;
+        (void)areaX;
         throw std::exception("no");
     }
 

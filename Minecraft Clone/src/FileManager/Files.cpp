@@ -3,13 +3,14 @@
 
 std::vector<std::string> Tokenize(std::string str, char divider) {
     std::vector<std::string> tokens = {};
+    int l = 0, r = 0;
+    while (r < str.size()) {
+        // Shift right ptr to the first non-divider character
 
-    std::stringstream check(str);
-
-    std::string intermediate;
-
-    while (std::getline(check, intermediate, divider)) {
-        tokens.push_back(intermediate);
+        while (r < str.size() && str[r] != divider) r++;
+        tokens.push_back(str.substr(l, r));
+        l = r + 1;
+        r++;
     }
 
     return tokens;

@@ -2,7 +2,7 @@
 #include "../../../Event/EventHandler.h"
 #include "../../../Entity/Entities.h"
 
-class Block;
+struct Block;
 
 struct GravityBlock : Block {
 

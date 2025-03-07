@@ -16,108 +16,27 @@ private:
 public:
     std::vector<bool> light_dirty_;
 
-    Heightmap& GetHeightmap() {
-        return column_heightmap_;
-    }
+    Heightmap& GetHeightmap();
 
-    void ReplaceLightContainer(int y, std::shared_ptr<ChunkLightingContainer> c) {
-        if (light_column_[y] == nullptr) {
-            light_column_[y] = std::move(c);
-            return;
-        }
+    void ReplaceLightContainer(int y, std::shared_ptr<ChunkLightingContainer> c);
 
-        light_column_[y]->ReplaceData(c->getData());
-    }
+    ChunkColumn();
 
-    ChunkColumn() {
-        column_.resize(32, nullptr);
-        light_column_.resize(32, nullptr);
-        light_dirty_.resize(32, false);
-        column_heightmap_.Init();
-    }
+    void AddChunk(Chunk* chunk, int relativeHeightLevel);
 
-    void AddChunk(Chunk* chunk, int relativeHeightLevel) {
-        column_[relativeHeightLevel] = chunk;
-        light_column_[relativeHeightLevel] = chunk->lighting_;
-        UpdateHeightmap(relativeHeightLevel);
-    }
+    void UpdateChunk(int relativeHeightLevel);
 
-    void UpdateChunk(int relativeHeightLevel) {
-        UpdateHeightmap(relativeHeightLevel);
-    }
+    Chunk* GetChunk(int heightLevel) const;
 
-    Chunk* GetChunk(int heightLevel) const {
-        return column_[heightLevel];
-    }
-
-    int16_t FindSurfaceHeight(uint8_t x, uint8_t z, uint8_t startingChunk = 31) const {
-        for (int currChunk = startingChunk;  currChunk >= 0; --currChunk) {
-            Chunk* curr = column_[currChunk];
-            
-            if (curr == nullptr) continue;
-
-            for (int y = 15; y >= 0; y--) {
-                if (curr->GetBlockUnsafe(x, y, z) != g_blocks.AIR) {
-                    return currChunk * 16 + y;
-                }
-            }
-        }
-        return -1;
-    }
+    int16_t FindSurfaceHeight(uint8_t x, uint8_t z, uint8_t startingChunk = 31) const;
 
     /*
     Input is the y axis where the chunk is located at and the x and z block position relative to the chunk
     */
 
-    int16_t FindSurfaceHeightSingleChunk(uint8_t height, uint8_t x, uint8_t z) const {
-        Chunk* currChunk = column_[height];
-        if (currChunk == nullptr) return -1;
-        for (int y = 15; y >= 0; y--) {
-            if (currChunk->GetBlockUnsafe(x, y, z) != g_blocks.AIR) return y;
-        }
-        return -1;
-    }
+    int16_t FindSurfaceHeightSingleChunk(uint8_t height, uint8_t x, uint8_t z) const;
 
-    void UpdateHeightmapSingleBlock(int height, BlockID block, uint8_t x, uint8_t y, uint8_t z) {
-        int currHeight = column_heightmap_.Get(z, y);
+    void UpdateHeightmapSingleBlock(int height, BlockID block, uint8_t x, uint8_t y, uint8_t z);
 
-        //tmp
-        for (int i = 0; i <= height; i++) {
-            if (column_[i] != nullptr) {
-                light_dirty_[i] = true;
-            }
-        }
-
-        if (height * 16 + y < currHeight) {
-            return;
-        }
-        
-        if (block == g_blocks.AIR) {
-            if (currHeight == height) {
-                int16_t surfaceLevel = FindSurfaceHeight(x, z, height);
-                if (surfaceLevel == -1) {
-                    surfaceLevel = 0;
-                }
-                column_heightmap_.Edit(x, z, surfaceLevel);
-            }
-        } else {
-            column_heightmap_.Edit(x, z, height * 16 + y);
-        }
-    }
-
-    void UpdateHeightmap(uint16_t height) {
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
-                int16_t surfaceLevel = FindSurfaceHeight(x, z, static_cast<uint8_t>(height));
-                surfaceLevel = (surfaceLevel != -1) * surfaceLevel;
-                column_heightmap_.Edit(x, z, surfaceLevel);
-            }
-        }
-
-        for (int i = 0; i <= height; i++) {
-            if (column_[i] != nullptr) {
-                light_dirty_[i] = true;
-            }
-        } 
-    }
+    void UpdateHeightmap(int height);
 }; 

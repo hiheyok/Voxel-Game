@@ -38,7 +38,7 @@ void MultiEntityRenderer::Initialize(PerformanceProfiler* pProfilerIn) {
     for (auto& EntityModels : entity_cached_models_) {
         Model::ModelData model = EntityModels.second.GetVertices();
 
-        size_t ModelIndex = entity_vertices_.size() / 5;
+        unsigned int ModelIndex = static_cast<unsigned int>(entity_vertices_.size() / 5);
 
         entity_element_index_[EntityModels.first] = entity_indices_.size(); //temp solution
         entity_element_size_[EntityModels.first] = model.indices_.size();

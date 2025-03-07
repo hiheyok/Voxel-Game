@@ -20,8 +20,9 @@ void LogUtils::MainLogger() {
             logs_cache_.pop_front();
 
             time_t timept = std::chrono::system_clock::to_time_t(log.time_);
+            char* context = nullptr;
 
-            string timestamp = string(strtok(ctime(&timept), "\n"));
+            string timestamp = string(strtok_s(ctime(&timept), "\n", &context));
 
             std::string str = "";
             std::string messageSeverity = "";
@@ -52,14 +53,11 @@ void LogUtils::MainLogger() {
                 printOutput.clear();
             }
 
-            if (!logs_.empty()) {
-                std::lock_guard<std::mutex> lock{ mutex_ };
-                logs_cache_ = std::move(logs_);
-                logs_.clear();
-            }
-            else {
-                timerSleepNotPrecise(10);
-            }
+            std::unique_lock<std::mutex> lock{ mutex_ };
+            cv_.wait_for(lock, std::chrono::milliseconds(100), [this] { return !logs_cache_.empty() || stop_; });
+            if (stop_) break;
+            logs_cache_ = std::move(logs_);
+            logs_.clear();
         }
     }
 }
@@ -97,6 +95,7 @@ void LogUtils::LogError(std::string subtype, std::string message) {
     log.r_time_ = (std::chrono::high_resolution_clock::now() - init_time_).count();
     std::lock_guard<std::mutex> lock{ mutex_ };
     logs_.emplace_back(log);
+    cv_.notify_one();
 }
 
 void LogUtils::LogWarn(std::string subtype, std::string message) {
@@ -108,6 +107,7 @@ void LogUtils::LogWarn(std::string subtype, std::string message) {
     log.r_time_ = (std::chrono::high_resolution_clock::now() - init_time_).count();
     std::lock_guard<std::mutex> lock{ mutex_ };
     logs_.emplace_back(log);
+    cv_.notify_one();
 }
 
 void LogUtils::LogInfo(std::string subtype, std::string message) {
@@ -119,6 +119,7 @@ void LogUtils::LogInfo(std::string subtype, std::string message) {
     log.r_time_ = (std::chrono::high_resolution_clock::now() - init_time_).count();
     std::lock_guard<std::mutex> lock{mutex_};
     logs_.emplace_back(log);
+    cv_.notify_one();
 }
 
 void LogUtils::LogDebug(std::string subtype, std::string message) {
@@ -130,6 +131,7 @@ void LogUtils::LogDebug(std::string subtype, std::string message) {
     log.r_time_ = (std::chrono::high_resolution_clock::now() - init_time_).count();
     std::lock_guard<std::mutex> lock{ mutex_ };
     logs_.emplace_back(log);
+    cv_.notify_one();
 }
 
 void LogUtils::LogDebugf(std::string subtype, std::string message, ...) {
@@ -148,6 +150,7 @@ void LogUtils::LogDebugf(std::string subtype, std::string message, ...) {
     log.r_time_ = (std::chrono::high_resolution_clock::now() - init_time_).count();
     std::lock_guard<std::mutex> lock{ mutex_ };
     logs_.emplace_back(log);
+    cv_.notify_one();
 }
 
 void LogUtils::Stop() {
@@ -160,7 +163,7 @@ LogUtils::LogUtils() {
 }
 
 LogUtils::~LogUtils() {
-    Stop();
+    logging_thread_.join();
     delete[] buffer_;
 }
 

@@ -15,7 +15,7 @@
 template <class TaskIn, class TaskOut, TaskOut (*Task)(const TaskIn&)>
 class ThreadPool {
 public:
-    ThreadPool(int threads, std::string type, size_t batchSize = SIZE_MAX);
+    ThreadPool(size_t threads, std::string type, size_t batchSize = SIZE_MAX);
     ~ThreadPool();
 
     void Stop();
@@ -62,7 +62,7 @@ private:
 };
 
 template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-inline ThreadPool<TaskIn, TaskOut, Task>::ThreadPool(int threads, std::string type, size_t batchSize) :
+inline ThreadPool<TaskIn, TaskOut, Task>::ThreadPool(size_t threads, std::string type, size_t batchSize) :
     workers_{ threads },
     scheduler_{ &ThreadPool::Scheduler, this },
     output_manager_{ &ThreadPool::OutputManager, this },
@@ -110,14 +110,14 @@ inline void ThreadPool<TaskIn, TaskOut, Task>::Scheduler() {
 
 
         // Evenly distribute the tasks
-        int taskPerWorker = internalTaskList.size() / worker_count_;
-        int taskPerWorkerRemainder = internalTaskList.size() % worker_count_;
+        size_t taskPerWorker = internalTaskList.size() / worker_count_;
+        size_t taskPerWorkerRemainder = internalTaskList.size() % worker_count_;
 
-        int currIndex = 0;
+        size_t currIndex = 0;
 
-        for (int i = 0; !stop_ && i < worker_count_; ++i) {
+        for (size_t i = 0; !stop_ && i < worker_count_; ++i) {
 
-            int taskCount = taskPerWorker;
+            size_t taskCount = taskPerWorker;
             if (taskPerWorkerRemainder != 0) {
                 taskCount += 1;
                 --taskPerWorkerRemainder;
@@ -160,7 +160,7 @@ inline void ThreadPool<TaskIn, TaskOut, Task>::Worker(int workerId) {
             workerTasks = std::move(worker_task_[workerId]);
             worker_task_[workerId].clear();
         }
-        int i = batchIndex;
+        size_t i = batchIndex;
         for (; !stop_ && i < std::min(workerTasks.size(), batchIndex + batch_size_); ++i) {
             if (stop_) break;
             const TaskIn& task = workerTasks[i];
