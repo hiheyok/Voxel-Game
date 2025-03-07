@@ -14,7 +14,7 @@ public:
         
     }
 
-    TallChunk* GenerateTall(const ChunkPos& pos) override;
+    void GenerateTall(const ChunkPos& pos, std::unique_ptr <TallChunk>& chunk) override;
 
 private:
     void Init();

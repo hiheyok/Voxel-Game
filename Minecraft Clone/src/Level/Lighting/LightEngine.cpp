@@ -22,13 +22,13 @@ inline void UnpackLightNode(uint16_t node, uint8_t& x, uint8_t& y, uint8_t& z, u
     light = (node >> 12) & 0xF;
 }
 
-void LightingEngine::IncreaseLightLevel(std::shared_ptr<ChunkLightingContainer>& container, uint8_t lvl, int x, int y, int z) {
+void LightingEngine::IncreaseLightLevel(std::unique_ptr<ChunkLightingContainer>& container, uint8_t lvl, int x, int y, int z) {
     uint8_t curr = container->GetLighting(x, y, z);
     if (curr < lvl)
         container->EditLight(x, y, z, lvl);
 }
 
-void LightingEngine::LightSpreadSky(Chunk* chunk, std::shared_ptr<ChunkLightingContainer>& container, const Heightmap& heightmap, int ChunkHeight, int x, int y, int z) {
+void LightingEngine::LightSpreadSky(Chunk* chunk, std::unique_ptr<ChunkLightingContainer>& container, const Heightmap& heightmap, int ChunkHeight, int x, int y, int z) {
     FIFOQueues.resetData();
     FIFOQueues.push(PackLightNode(x, y, z, 15));
 
@@ -96,7 +96,7 @@ void LightingEngine::LightSpreadSky(Chunk* chunk, std::shared_ptr<ChunkLightingC
     }
 }
 
-void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, std::shared_ptr<ChunkLightingContainer>& light, const Heightmap& heightmap, int chunkHeight) {
+void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<ChunkLightingContainer>& light, const Heightmap& heightmap, int chunkHeight) {
     for (int x = 0; x < 16; x++) {
         for (int z = 0; z < 16; z++) {
             int h = heightmap.Get(x, z) - chunkHeight; // it will try to find pivot points
@@ -109,12 +109,12 @@ void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, std::shared_ptr<ChunkLigh
     }
 }
 
-std::vector<std::shared_ptr<ChunkLightingContainer>> LightingEngine::Worker(const ChunkPos& pos) {
+std::vector<std::unique_ptr<ChunkLightingContainer>> LightingEngine::Worker(const ChunkPos& pos) {
     if (!FIFOQueues.IsInitialized())
         FIFOQueues.setSize(LightingEngine::DEFAULT_FIFO_QUEUE_SIZE);
 
     uint8_t DarknessLightLevel = 12;
-    std::vector<std::shared_ptr<ChunkLightingContainer>> out;
+    std::vector<std::unique_ptr<ChunkLightingContainer>> out;
     ChunkColumn* col = LightingEngine::world_->GetColumn(pos);
 
     if (col == nullptr) return out;
@@ -122,15 +122,19 @@ std::vector<std::shared_ptr<ChunkLightingContainer>> LightingEngine::Worker(cons
     const Heightmap& heightmap = world_->GetColumnHeightmap(pos);
 
     int relativeChunkHeight = pos.y & 0b11111;
-    int columnYLevel = pos.y / 32;
+    int columnYLevel = pos.y - relativeChunkHeight;
 
     for (int i = 0; i <= relativeChunkHeight; i++) {
         if (!col->light_dirty_[i])
             continue;
+        if (col->GetChunk(i) == nullptr)
+            continue;
 
-        std::shared_ptr<ChunkLightingContainer> lighting = std::make_shared<ChunkLightingContainer>();
+
+        std::unique_ptr<ChunkLightingContainer> lighting = std::make_unique<ChunkLightingContainer>();
         lighting->ResetLightingCustom(4);
         lighting->position_.set(pos.x, columnYLevel + i, pos.z);
+
         WorkOnChunkSkylight(col->GetChunk(i), lighting, heightmap, i * 16);
 
         out.push_back(std::move(lighting));
@@ -143,8 +147,8 @@ void LightingEngine::Generate(std::vector<ChunkPos> tasks) {
     lighting_thread_pool_->SubmitTask(tasks);
 }
 
-std::vector<std::shared_ptr<ChunkLightingContainer>> LightingEngine::GetOutput() {
-    std::vector<std::shared_ptr<ChunkLightingContainer>> out;
+std::vector<std::unique_ptr<ChunkLightingContainer>> LightingEngine::GetOutput() {
+    std::vector<std::unique_ptr<ChunkLightingContainer>> out;
     for (auto& lights : lighting_thread_pool_->GetOutput()) {
         out.insert(out.end(),
             std::make_move_iterator(lights.begin()),
@@ -159,8 +163,9 @@ void LightingEngine::Stop() {
 
 void LightingEngine::Start(int lightEngineThreadsCount, WorldAccess* w) {
     lighting_thread_pool_ = std::make_unique<ThreadPool<ChunkPos,
-        std::vector<std::shared_ptr<ChunkLightingContainer>>,
+        std::vector<std::unique_ptr<ChunkLightingContainer>>,
         LightingEngine::Worker>>(lightEngineThreadsCount, "Light Engine", 100);
+
     LightingEngine::world_ = w;
 }
 

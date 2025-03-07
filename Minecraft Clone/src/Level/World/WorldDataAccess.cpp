@@ -1,20 +1,17 @@
 #include "WorldDataAccess.h"
 
-using namespace glm;
-using namespace std;
-
 BlockID WorldAccess::GetBlock(const BlockPos& pos) {
     return chunk_container_.GetBlockGlobal(pos);
 }
 
 void WorldAccess::SetBlock(BlockID block, const BlockPos& pos) {
     if (!chunk_container_.SetBlockGlobal(block, pos)) {
-        throw exception("Tried to place block outside of the world");
+        throw std::exception("Tried to place block outside of the world");
     }
 }
 
-void WorldAccess::SetChunk(Chunk* chunk) {
-    chunk_container_.InsertChunk(chunk);
+void WorldAccess::SetChunk(std::unique_ptr<Chunk> chunk) {
+    chunk_container_.InsertChunk(std::move(chunk));
 }
 
 Chunk* WorldAccess::GetChunk(const ChunkPos& pos) const {

@@ -8,8 +8,7 @@
 #include <iostream>
 #include <sys/types.h>
 #include <filesystem>
-using namespace std;
-
+#include <string>
 using json = nlohmann::json;
 
 BlockID BlockList::RegisterBlock(std::string blockName, Material* material, bool transparency, bool solid, bool isFluid) {
@@ -48,7 +47,7 @@ void BlockList::AddAssets(std::string namespaceIn) {
             allOtherBlocks.push_back(name);
         }
 
-        for (string& name : allOtherBlocks) {
+        for (std::string& name : allOtherBlocks) {
             RegisterBlock(name, new MaterialNone(), false, true, false);
         }
 

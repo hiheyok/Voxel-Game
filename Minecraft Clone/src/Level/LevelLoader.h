@@ -17,11 +17,11 @@ public:
 
     void SendRequestedChunks(std::vector<ChunkPos> requestedChunks, WorldGeneratorID worldGenTypeIn);
 
-    std::vector<Chunk*> GetGeneratedChunk();
+    std::vector<std::unique_ptr<Chunk>> GetGeneratedChunk();
 
     void SendRequestedLightUpdates(std::vector<ChunkColumnPos> requestedLight);
 
-    std::vector<std::shared_ptr<ChunkLightingContainer>> GetLightingInfomation();
+    std::vector<std::unique_ptr<ChunkLightingContainer>> GetLightingInfomation();
 
     size_t GetLightEngineQueueSize();
 };

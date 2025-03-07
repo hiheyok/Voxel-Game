@@ -1,6 +1,6 @@
 #pragma once
 #include "../Biome.h"
-#include <tgmath.h>
+#include <cmath>
 
 class BiomeMesa : public Biome {
 private:

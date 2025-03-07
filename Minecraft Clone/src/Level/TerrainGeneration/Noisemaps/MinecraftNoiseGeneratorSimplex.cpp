@@ -1,14 +1,12 @@
 #include "MinecraftNoiseGeneratorSimplex.h"
 
-using namespace std;
-
-static int grad3[12][3]{ {1, 1, 0}, { -1, 1, 0}, {1, -1, 0}, { -1, -1, 0}, {1, 0, 1}, { -1, 0, 1}, {1, 0, -1}, { -1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1} };
+static constexpr const int grad3[12][3]{ {1, 1, 0}, { -1, 1, 0}, {1, -1, 0}, { -1, -1, 0}, {1, 0, 1}, { -1, 0, 1}, {1, 0, -1}, { -1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1} };
 
 int NoiseGeneratorSimplex::fastFloor(double value) {
     return value > 0.0 ? (int)value : (int)value - 1;
 }
 
-double NoiseGeneratorSimplex::dot(int p_151604_0_[], double p_151604_1_, double p_151604_3_) {
+double NoiseGeneratorSimplex::dot(const int p_151604_0_[], double p_151604_1_, double p_151604_3_) {
     return (double)p_151604_0_[0] * p_151604_1_ + (double)p_151604_0_[1] * p_151604_3_;
 }
 
@@ -80,7 +78,7 @@ double NoiseGeneratorSimplex::getValue(double p_151605_1_, double p_151605_3_) {
     return 70.0 * (d0 + d1 + d2);
 }
 
-void NoiseGeneratorSimplex::add(vector<double>& p_151606_1_, double p_151606_2_, double p_151606_4_, int p_151606_6_, int p_151606_7_, double p_151606_8_, double p_151606_10_, double p_151606_12_) {
+void NoiseGeneratorSimplex::add(std::vector<double>& p_151606_1_, double p_151606_2_, double p_151606_4_, int p_151606_6_, int p_151606_7_, double p_151606_8_, double p_151606_10_, double p_151606_12_) {
     int i = 0;
 
     for (int j = 0; j < p_151606_7_; ++j) {

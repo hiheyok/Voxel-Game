@@ -1,13 +1,11 @@
 #include "NoiseOctave.h"
 
-using namespace std;
-
 int64_t NoiseOctave::lfloor(double value) {
     int64_t i = (int64_t)value;
     return value < (double)i ? i - 1L : i;
 }
 
-vector<double> NoiseOctave::generateNoiseOctaves(vector<double>& noiseArray, int xOffset, int yOffset, int zOffset, int xSize, int ySize, int zSize, double xScale, double yScale, double zScale) {
+std::vector<double> NoiseOctave::generateNoiseOctaves(std::vector<double>& noiseArray, int xOffset, int yOffset, int zOffset, int xSize, int ySize, int zSize, double xScale, double yScale, double zScale) {
     if (noiseArray.size() == 0) {
         noiseArray.resize(xSize * ySize * zSize);
     }
@@ -42,6 +40,6 @@ vector<double> NoiseOctave::generateNoiseOctaves(vector<double>& noiseArray, int
 
 }
 
-vector<double> NoiseOctave::generateNoiseOctaves(vector<double>& noiseArray, int xOffset, int zOffset, int xSize, int zSize, double xScale, double zScale, double p_76305_10_) {
+std::vector<double> NoiseOctave::generateNoiseOctaves(std::vector<double>& noiseArray, int xOffset, int zOffset, int xSize, int zSize, double xScale, double zScale, double p_76305_10_) {
     return generateNoiseOctaves(noiseArray, xOffset, 10, zOffset, xSize, 1, zSize, xScale, 1.0, zScale);
 }

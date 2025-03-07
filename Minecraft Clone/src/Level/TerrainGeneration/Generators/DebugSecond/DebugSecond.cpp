@@ -1,9 +1,7 @@
 #include "DebugSecond.h"
 
 
-Chunk* DebugWorldSecond::Generate(const ChunkPos& pos) {
-    Chunk* chunk = new Chunk;
-
+void DebugWorldSecond::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
     chunk->SetBlock(g_blocks.COBBLESTONE, 8, 8, 8);
 
     ChunkPos scaledPos = pos;
@@ -37,5 +35,4 @@ Chunk* DebugWorldSecond::Generate(const ChunkPos& pos) {
             }
         }
     }
-    return chunk;
 }

@@ -18,7 +18,7 @@ class ChunkContainer {
 public:
 
     ChunkContainer() {
-        lighting_ = std::make_shared<ChunkLightingContainer>();
+        lighting_ = std::make_unique<ChunkLightingContainer>();
     }
     
     void SetNeighbor(ChunkContainer* neighbor, unsigned int side);
@@ -40,15 +40,15 @@ public:
 
     ChunkPos position_;
 
-    bool is_empty_ = true;
+    std::atomic<bool> is_empty_ = true;
 
     ChunkContainer* neighbors_[6]{nullptr};
     std::vector<SetBlockRelative> outside_block_to_place_[6]{};
-    std::shared_ptr<ChunkLightingContainer> lighting_;
+    std::unique_ptr<ChunkLightingContainer> lighting_;
 
     BlockContainer block_storage_;
 private:
-    bool in_use_ = false;
+    std::atomic<bool> in_use_ = false;
     
 };
 

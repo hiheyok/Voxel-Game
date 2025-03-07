@@ -5,13 +5,12 @@
 #include <ctime>
 #include "../FileManager/Files.h"
 #include <sstream>
-using namespace std;
 
 void LogUtils::MainLogger() {
 
     const uint64_t printLimit = 8192;
 
-    string printOutput = "";
+    std::string printOutput = "";
 
     while (!stop_) {
         if (!logs_cache_.empty()) {
@@ -22,7 +21,7 @@ void LogUtils::MainLogger() {
             time_t timept = std::chrono::system_clock::to_time_t(log.time_);
             char* context = nullptr;
 
-            string timestamp = string(strtok_s(ctime(&timept), "\n", &context));
+            std::string timestamp = std::string(strtok_s(ctime(&timept), "\n", &context));
 
             std::string str = "";
             std::string messageSeverity = "";
@@ -90,7 +89,7 @@ void LogUtils::LogError(std::string subtype, std::string message) {
     LogData log;
     log.type_ = LOG_TYPE_ERROR;
     log.message_ = message;
-    log.time_ = chrono::system_clock::now();
+    log.time_ = std::chrono::system_clock::now();
     log.subtype_ = subtype;
     log.r_time_ = (std::chrono::high_resolution_clock::now() - init_time_).count();
     std::lock_guard<std::mutex> lock{ mutex_ };
@@ -102,7 +101,7 @@ void LogUtils::LogWarn(std::string subtype, std::string message) {
     LogData log;
     log.type_ = LOG_TYPE_WARN;
     log.message_ = message;
-    log.time_ = chrono::system_clock::now();
+    log.time_ = std::chrono::system_clock::now();
     log.subtype_ = subtype;
     log.r_time_ = (std::chrono::high_resolution_clock::now() - init_time_).count();
     std::lock_guard<std::mutex> lock{ mutex_ };
@@ -114,7 +113,7 @@ void LogUtils::LogInfo(std::string subtype, std::string message) {
     LogData log;
     log.type_ = LOG_TYPE_INFO;
     log.message_ = message;
-    log.time_ = chrono::system_clock::now();
+    log.time_ = std::chrono::system_clock::now();
     log.subtype_ = subtype;
     log.r_time_ = (std::chrono::high_resolution_clock::now() - init_time_).count();
     std::lock_guard<std::mutex> lock{mutex_};
@@ -126,7 +125,7 @@ void LogUtils::LogDebug(std::string subtype, std::string message) {
     LogData log;
     log.type_ = LOG_TYPE_DEBUG;
     log.message_ = message;
-    log.time_ = chrono::system_clock::now();
+    log.time_ = std::chrono::system_clock::now();
     log.subtype_ = subtype;
     log.r_time_ = (std::chrono::high_resolution_clock::now() - init_time_).count();
     std::lock_guard<std::mutex> lock{ mutex_ };
@@ -145,7 +144,7 @@ void LogUtils::LogDebugf(std::string subtype, std::string message, ...) {
     LogData log;
     log.type_ = LOG_TYPE_DEBUG;
     log.message_ = formatedString;
-    log.time_ = chrono::system_clock::now();
+    log.time_ = std::chrono::system_clock::now();
     log.subtype_ = subtype;
     log.r_time_ = (std::chrono::high_resolution_clock::now() - init_time_).count();
     std::lock_guard<std::mutex> lock{ mutex_ };

@@ -1,13 +1,9 @@
 #include "DebugPositioning.h"
 
 
-Chunk* DebugPositioning::Generate(const ChunkPos& pos) {
-    Chunk* chunk = new Chunk;
-    // Print location in binary
-
-    ChunkPos newPos = pos;
-
+void DebugPositioning::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
     // Red -> x
+    ChunkPos newPos = chunk->position_;
     for (int i = 0; i < 16; ++i) {
         if (newPos.x & 1)
             chunk->SetBlockUnsafe(g_blocks.RED_WOOL, i, 0, 0);
@@ -36,6 +32,4 @@ Chunk* DebugPositioning::Generate(const ChunkPos& pos) {
             chunk->SetBlockUnsafe(g_blocks.WHITE_CONCRETE, i, 3, 0);
         }
     }
-
-    return chunk;
 }

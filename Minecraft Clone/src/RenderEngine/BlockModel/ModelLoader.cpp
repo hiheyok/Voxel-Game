@@ -8,11 +8,9 @@
 const std::string DEFAULT_NAMESPACE = "minecraft";
 
 using json = nlohmann::json;
-using namespace std;
 
-
-static vector<int> getJSONArrayValues(json JsonData) {
-    vector<int> arr{};
+static std::vector<int> getJSONArrayValues(json JsonData) {
+    std::vector<int> arr{};
 
     for (auto& value : JsonData.items()) {    
         arr.push_back(value.value());
@@ -21,8 +19,8 @@ static vector<int> getJSONArrayValues(json JsonData) {
     return arr;
 }
 
-static vector<float> getJSONArrayValuesFloat(json JsonData) {
-    vector<float> arr{};
+static std::vector<float> getJSONArrayValuesFloat(json JsonData) {
+    std::vector<float> arr{};
 
     for (auto& value : JsonData.items()) {
         arr.push_back(value.value());
@@ -31,7 +29,7 @@ static vector<float> getJSONArrayValuesFloat(json JsonData) {
     return arr;
 }
 
-static int ConvertStringFaceToIndex(const string& str) {
+static int ConvertStringFaceToIndex(const std::string& str) {
     if (!strcmp(str.c_str(), "down")) {
         return DOWN;
     }
@@ -64,7 +62,7 @@ static void ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
         for (auto& faceElements : face.value().items()) {
 
             if (!strcmp(faceElements.key().c_str(), "uv")) {
-                vector<int> arr = getJSONArrayValues(faceElements.value());
+                std::vector<int> arr = getJSONArrayValues(faceElements.value());
 
                 //flip
                 arr[1] = 16 - arr[1];
@@ -79,8 +77,8 @@ static void ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
             else if (!strcmp(faceElements.key().c_str(), "texture")) {
                 auto tokens = Tokenize(faceElements.value(),  ':');
 
-                string texName = tokens.back();
-                string texNamespace = DEFAULT_NAMESPACE;
+                std::string texName = tokens.back();
+                std::string texNamespace = DEFAULT_NAMESPACE;
 
                 if (tokens.size() == 2) {
                     texNamespace = tokens.front();
@@ -114,18 +112,18 @@ static void ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
     }
 }
 
-CuboidRotationInfo getRotationalData(json JsonData) {
+static CuboidRotationInfo getRotationalData(json JsonData) {
     CuboidRotationInfo rotationInfo;
     for (auto& attribute : JsonData.items()) {
         if (!strcmp(attribute.key().c_str(), "origin")) {
-            vector<float> arr = getJSONArrayValuesFloat(attribute.value());
+            std::vector<float> arr = getJSONArrayValuesFloat(attribute.value());
 
             for (int i = 0; i < 3; i++) {
                 rotationInfo.origin_[i] = arr[i];
             }
         }
         else if (!strcmp(attribute.key().c_str(), "axis")) {
-            char axis_ = static_cast<string>(attribute.value())[0];
+            char axis_ = static_cast<std::string>(attribute.value())[0];
 
             if (axis_ == 'x') {
                 rotationInfo.axis_ = 0;
@@ -154,7 +152,7 @@ CuboidRotationInfo getRotationalData(json JsonData) {
     return rotationInfo;
 }
 
-void UpdateModelElements(std::unique_ptr<ModelV2::BlockModelV2>& model, json JsonData) {
+static void UpdateModelElements(std::unique_ptr<ModelV2::BlockModelV2>& model, json JsonData) {
     for (auto& item : JsonData.items()) {
 
         Cuboid cuboid;
@@ -162,14 +160,14 @@ void UpdateModelElements(std::unique_ptr<ModelV2::BlockModelV2>& model, json Jso
         for (auto& subElements : item.value().items()) {
 
             if (!strcmp(subElements.key().c_str(), "from")) {
-                vector<int> arr = getJSONArrayValues(subElements.value());
+                std::vector<int> arr = getJSONArrayValues(subElements.value());
                 for (int i = 0; i < 3; i++) {
                     cuboid.from_[i] = arr[i];
                 }
                 arr.clear();
             }
             else if (!strcmp(subElements.key().c_str(), "to")) {
-                vector<int> arr = getJSONArrayValues(subElements.value());
+                std::vector<int> arr = getJSONArrayValues(subElements.value());
                 for (int i = 0; i < 3; i++) {
                     cuboid.to_[i] = arr[i];
                 }
@@ -197,19 +195,19 @@ void UpdateModelElements(std::unique_ptr<ModelV2::BlockModelV2>& model, json Jso
     }
 }
 
-void ProcessCuboidTexture(std::unique_ptr<ModelV2::BlockModelV2>& model, json JsonData) {
+static void ProcessCuboidTexture(std::unique_ptr<ModelV2::BlockModelV2>& model, json JsonData) {
     for (auto& TextureElement : JsonData.items()) {
         auto tokens = Tokenize(TextureElement.value(), ':');
 
-        string textureName = tokens.back();
-        string textureNamespace = tokens.front();
+        std::string textureName = tokens.back();
+        std::string textureNamespace = tokens.front();
         
 
         if (tokens.size() == 1) {
             textureNamespace = DEFAULT_NAMESPACE;
         }
 
-        string textureVariableName = TextureElement.key();
+        std::string textureVariableName = TextureElement.key();
 
         bool isVariable = textureName[0] == '#';
 
@@ -224,14 +222,14 @@ void ProcessCuboidTexture(std::unique_ptr<ModelV2::BlockModelV2>& model, json Js
     }
 }
 
-void ProcessModelDisplay(std::unique_ptr<ModelV2::BlockModelV2>& model, json JsonData) {
+static void ProcessModelDisplay(std::unique_ptr<ModelV2::BlockModelV2>& model, json JsonData) {
     for (auto& displayPlaces : JsonData.items()) {
 
-        string position = displayPlaces.key();
+        std::string position = displayPlaces.key();
         BlockDisplay display;
 
         for (auto& transitions : displayPlaces.value().items()) {
-            vector<float> arr = getJSONArrayValuesFloat(transitions.value());
+            std::vector<float> arr = getJSONArrayValuesFloat(transitions.value());
 
             if (!strcmp(transitions.key().c_str(), "rotation")) {
                 for (int i = 0; i < 3; i++) {
@@ -289,21 +287,21 @@ void ProcessModelDisplay(std::unique_ptr<ModelV2::BlockModelV2>& model, json Jso
 }
 
 //TODO: Work on caching
-static std::unique_ptr<ModelV2::BlockModelV2> recursiveGetBlockModel(string jsonName, string namespaceIn) {
+static std::unique_ptr<ModelV2::BlockModelV2> recursiveGetBlockModel(std::string jsonName, std::string namespaceIn) {
     std::unique_ptr<ModelV2::BlockModelV2> model = nullptr;
 
-    string jsonPath = "assets/" + namespaceIn + "/models/" + jsonName + ".json";
+    std::string jsonPath = "assets/" + namespaceIn + "/models/" + jsonName + ".json";
     
     json JSONData;
 
     try {
-        ifstream file(jsonPath);
+        std::ifstream file(jsonPath);
         if (!file.good()) { //checks if  it exist
             return nullptr;
         }
         JSONData = json::parse(file);
     }
-    catch (const exception& e) {
+    catch (const std::exception& e) {
         g_logger.LogError("Model Loader", e.what());
         return nullptr;
     }
@@ -311,13 +309,13 @@ static std::unique_ptr<ModelV2::BlockModelV2> recursiveGetBlockModel(string json
     //Search for the parent
     for (auto& item : JSONData.items()) {
         if (item.key() == "parent") {
-            string parentData = item.value();
+            std::string parentData = item.value();
 
             //Parse for the parent json
 
-            vector<string> tokens = Tokenize(parentData, ':'); //This assumes that the parent is always in the same folder
-            string parentJSON = tokens.back();
-            string parentNamespace = tokens.front();
+            std::vector<std::string> tokens = Tokenize(parentData, ':'); //This assumes that the parent is always in the same folder
+            std::string parentJSON = tokens.back();
+            std::string parentNamespace = tokens.front();
             
             if (tokens.size() == 1) { //default namespace is minecraft
                 parentNamespace = DEFAULT_NAMESPACE;
@@ -353,7 +351,7 @@ static std::unique_ptr<ModelV2::BlockModelV2> recursiveGetBlockModel(string json
     return model;
 }
 
-std::unique_ptr<ModelV2::BlockModelV2> getBlockModel(string blockNameIn, string namespaceIn) {
+std::unique_ptr<ModelV2::BlockModelV2> getBlockModel(std::string blockNameIn, std::string namespaceIn) {
     //This will recursively go into parents files and build on it
     std::unique_ptr<ModelV2::BlockModelV2> model = recursiveGetBlockModel(blockNameIn, namespaceIn);
     std::reverse(model->elements_.begin(), model->elements_.end());

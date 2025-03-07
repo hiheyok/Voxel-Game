@@ -12,7 +12,7 @@ private:
 
     int fastFloor(double value);
 
-    double dot(int p_151604_0_[], double p_151604_1_, double p_151604_3_);
+    double dot(const int p_151604_0_[], double p_151604_1_, double p_151604_3_);
 
     double SQRT_3 = sqrt(3.0);
 

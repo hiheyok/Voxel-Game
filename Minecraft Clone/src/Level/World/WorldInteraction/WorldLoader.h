@@ -10,6 +10,7 @@ private:
     World* world = nullptr;
     std::mutex lock_;
     bool is_spawn_chunks_loaded_ = false;
+    std::vector<ChunkPos> chunk_request_;
 
     FastHashSet<EntityUUID> entity_chunk_loaders_; //List of entities that force loads chunks 
     FastHashSet<ChunkPos> generating_chunk_;
@@ -25,13 +26,12 @@ private:
 public:
     bool tall_generation_ = false;
 
-    std::vector<ChunkPos> chunk_request_;
 
     WorldLoader(World* w, WorldParameters p) : settings_(p), world(w) {}
 
     WorldAccess* GetWorld() const;
 
-    void ReplaceLightInfomation(std::shared_ptr<ChunkLightingContainer> lighting);
+    void ReplaceLightInfomation(std::unique_ptr<ChunkLightingContainer> lighting);
 
     std::vector<ChunkPos> GetRequestedChunks();
 
@@ -43,6 +43,6 @@ public:
 
     void Load();
 
-    void AddChunk(Chunk* chunk);
+    void AddChunk(std::unique_ptr<Chunk> chunk);
 
 };

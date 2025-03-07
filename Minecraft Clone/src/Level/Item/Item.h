@@ -18,11 +18,11 @@ public:
 
     }
 
-    const BlockID GetBlock();
+    BlockID GetBlock() const;
 
-    RawTextureData GetTexture();
+    RawTextureData GetTexture() const;
 
-    bool CheckIsBlockItem();
+    bool CheckIsBlockItem() const;
 
     ItemProperties properties_;
     

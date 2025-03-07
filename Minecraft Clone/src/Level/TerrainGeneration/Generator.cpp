@@ -4,12 +4,9 @@
 #include "Generators/GeneratorType.h"
 #include <concurrent_unordered_set.h>
 
-using namespace std;
-using namespace glm;
-
-vector<Chunk*> ChunkGeneration::GetOutput() {
-    std::vector<Chunk*> output;
-    for (const auto& chunks : gen_pool_->GetOutput()) {
+std::vector<std::unique_ptr<Chunk>> ChunkGeneration::GetOutput() {
+    std::vector<std::unique_ptr<Chunk>> output;
+    for (auto& chunks : gen_pool_->GetOutput()) {
         output.insert(output.end(), std::make_move_iterator(chunks.begin()), std::make_move_iterator(chunks.end()));
     }
 
@@ -17,7 +14,10 @@ vector<Chunk*> ChunkGeneration::GetOutput() {
 }
 
 void ChunkGeneration::Start(int threadCount, long long int worldSeedIn) {
-    gen_pool_ = std::make_unique<ThreadPool<std::pair<ChunkPos, WorldGeneratorID>, std::vector<Chunk*>, ChunkGeneration::Worker>>(threadCount, "World Generator", 100);
+    gen_pool_ = std::make_unique<ThreadPool<std::pair<ChunkPos, WorldGeneratorID>,
+        std::vector<std::unique_ptr<Chunk>>,
+        ChunkGeneration::Worker>>(threadCount, "World Generator", 100);
+
     WorldGenerator::SetSeed(worldSeedIn);
 }
 
@@ -28,27 +28,25 @@ void ChunkGeneration::Stop() {
 /*
 * Static function for the thread pool to use
 */
-std::vector<Chunk*> ChunkGeneration::Worker(const std::pair<ChunkPos, WorldGeneratorID>& task ) {
+std::vector<std::unique_ptr<Chunk>> ChunkGeneration::Worker(const std::pair<ChunkPos, WorldGeneratorID>& task ) {
     //Generate
     const ChunkPos& pos = task.first;
     const WorldGeneratorID& generatorUse = task.second;
-    std::vector<Chunk*> output;
+    std::vector<std::unique_ptr<Chunk>> output;
 
     if (!g_generators.GetGenerator(generatorUse)->use_tall_chunks_) {
-        Chunk* chunk = g_generators.GetGenerator(generatorUse)->Generate(pos);
+        std::unique_ptr<Chunk> chunk = std::make_unique<Chunk>();
+        chunk->SetPosition(pos.x, pos.y, pos.z);
+        g_generators.GetGenerator(generatorUse)->Generate(pos, chunk);
 
-        chunk->position_ = pos;
-        output.push_back(chunk);
+        output.push_back(std::move(chunk));
     }
     else {
-        TallChunk* chunk = nullptr;
-        if (pos.y != 0) {
-            chunk = new TallChunk();
+        std::unique_ptr<TallChunk> chunk = std::make_unique<TallChunk>();
+        if (pos.y == 0) {
+            g_generators.GetGenerator(generatorUse)->GenerateTall(pos, chunk);
         }
-        else {
-            chunk = g_generators.GetGenerator(generatorUse)->GenerateTall(pos);
-        }
-        output = chunk->GetCubicChunks();
+        output.insert(output.end(), std::make_move_iterator(chunk->chunk_sub_column_.begin()), std::make_move_iterator(chunk->chunk_sub_column_.end()));
     }
 
     return output;
@@ -59,7 +57,7 @@ void ChunkGeneration::Generate(ChunkPos pos, WorldGeneratorID genType) {
     gen_pool_->SubmitTask(std::pair<ChunkPos, WorldGeneratorID>(pos, genType));
 }
 
-void ChunkGeneration::Generate(vector<ChunkPos> ids, WorldGeneratorID genTypeIn) {
+void ChunkGeneration::Generate(std::vector<ChunkPos> ids, WorldGeneratorID genTypeIn) {
     std::vector<std::pair<ChunkPos, WorldGeneratorID>> tasks;
     for (const auto& chunkId : ids) {
         tasks.emplace_back(chunkId, genTypeIn);

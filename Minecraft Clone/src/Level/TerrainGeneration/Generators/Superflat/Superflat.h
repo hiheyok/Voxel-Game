@@ -7,5 +7,5 @@ public:
 
     }
 
-    Chunk* Generate(const ChunkPos& pos) override;
+    void Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) override;
 };

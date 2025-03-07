@@ -1,11 +1,5 @@
 #include "WorldInteractions.h"
 
-#include <intrin.h>
-
-using namespace std;
-using namespace glm;
-
-
 void WorldInteractions::UseTallGeneration() {
     worldLoader_->tall_generation_ = true;
 }
@@ -18,25 +12,25 @@ void WorldInteractions::init(World* w, WorldParameters parameters) {
 }
 
 void WorldInteractions::summonEntity(Entity& entity) {
-    if (world == nullptr) throw exception("Cannot summon entity. World is null");
+    if (world == nullptr) throw std::exception("Cannot summon entity. World is null");
     world->entities_.AddEntities(entity);
 
     if (entity.properties_.is_chunk_loader_)
         worldLoader_->AddEntityChunkLoader(entity.properties_.entity_uuid_);
 }
 
-vector<ChunkPos> WorldInteractions::GetUpdatedChunkPos() {
+std::vector<ChunkPos> WorldInteractions::GetUpdatedChunkPos() {
     std::lock_guard<std::mutex> lock{ updated_chunk_lock_ };
-    vector<ChunkPos> chunkIDs = {};
+    std::vector<ChunkPos> chunkIDs = {};
     chunkIDs.insert(chunkIDs.end(), updated_chunk_.begin(), updated_chunk_.end());
     updated_chunk_.clear();
 
     return chunkIDs;
 }
 
-vector<ChunkPos> WorldInteractions::GetRequestedLightUpdates() {
+std::vector<ChunkPos> WorldInteractions::GetRequestedLightUpdates() {
     std::lock_guard<std::mutex> lock{ updated_chunk_lock_ };
-    vector<ChunkPos> pos = std::move(light_updates_);
+    std::vector<ChunkPos> pos = std::move(light_updates_);
     light_updates_.clear();
     for (const ChunkPos& p : pos) {
         requested_light_update_[p].second = SIZE_MAX;
@@ -44,9 +38,9 @@ vector<ChunkPos> WorldInteractions::GetRequestedLightUpdates() {
     return pos;
 }
 
-vector<EntityProperty> WorldInteractions::GetUpdatedEntities() {
+std::vector<EntityProperty> WorldInteractions::GetUpdatedEntities() {
     FastHashMap<EntityUUID, EntityProperty> m = world->entities_.ClientGetEntityUpdate();
-    vector<EntityProperty> properties = {};
+    std::vector<EntityProperty> properties = {};
 
     for (const auto& e : m) {
         properties.push_back(e.second);
@@ -55,9 +49,9 @@ vector<EntityProperty> WorldInteractions::GetUpdatedEntities() {
     return properties;
 }
 
-vector<EntityUUID> WorldInteractions::GetRemovedEntities() {
+std::vector<EntityUUID> WorldInteractions::GetRemovedEntities() {
     FastHashSet<EntityUUID> m = world->entities_.getRemovedEntities();
-    vector<EntityUUID> ids = {};
+    std::vector<EntityUUID> ids = {};
     ids.insert(ids.end(), m.begin(), m.end());
     return ids;
 }
@@ -106,7 +100,7 @@ void WorldInteractions::Update() {
     worldLoader_->Load();
 }
 
-void WorldInteractions::UpdateLighting(std::shared_ptr<ChunkLightingContainer> chunkLighting) {
+void WorldInteractions::UpdateLighting(std::unique_ptr<ChunkLightingContainer> chunkLighting) {
     ChunkPos pos = chunkLighting->position_;
 
     world->GetColumn(chunkLighting->position_);
@@ -121,8 +115,8 @@ void WorldInteractions::UpdateLighting(std::shared_ptr<ChunkLightingContainer> c
     requested_light_update_.erase(pos);
 }
 
-void WorldInteractions::UpdateLighting(vector<std::shared_ptr<ChunkLightingContainer>> chunkLighting) {
-    stack<ChunkPos> chunkToUpdate;
+void WorldInteractions::UpdateLighting(std::vector<std::unique_ptr<ChunkLightingContainer>> chunkLighting) {
+    std::stack<ChunkPos> chunkToUpdate;
 
     for (auto& chunk : chunkLighting) {
         chunkToUpdate.push(chunk->position_);
@@ -144,12 +138,12 @@ void WorldInteractions::UpdateLighting(vector<std::shared_ptr<ChunkLightingConta
     }
 }
 
-void WorldInteractions::AddChunk(Chunk* chunk) {
-    world->SetChunk(chunk);
-    stack<ChunkPos> chunkToUpdate;
+void WorldInteractions::AddChunk(std::unique_ptr<Chunk> chunk) {
+    std::stack<ChunkPos> chunkToUpdate;
 
     const ChunkPos& position = chunk->position_;
 
+    world->SetChunk(std::move(chunk));
     RequestLightUpdate(position);
     chunkToUpdate.push(position);
 
@@ -176,17 +170,15 @@ void WorldInteractions::AddChunk(Chunk* chunk) {
     }
 }
 
-void WorldInteractions::AddChunks(vector<Chunk*> chunks) {
-    vector<ChunkPos> chunkToUpdate;
+void WorldInteractions::AddChunks(std::vector<std::unique_ptr<Chunk>> chunks) {
+    std::vector<ChunkPos> chunkToUpdate;
     FastHashSet<ChunkPos> duplicatedInputs;
 
-    for (const auto& chunk : chunks) {
-        world->SetChunk(chunk);
+    for (auto& chunk : chunks) {
 
         const ChunkPos& position = chunk->position_;
 
         chunkToUpdate.push_back(position);
-
         //Update neighbor chunks
 
         for (int side = 0; side < 6; side++) {
@@ -199,6 +191,7 @@ void WorldInteractions::AddChunks(vector<Chunk*> chunks) {
             }
         }
         RequestLightUpdate(position);
+        world->SetChunk(std::move(chunk));
     }
 
     {
@@ -257,7 +250,7 @@ void WorldInteractions::SetBlock(BlockID b, const BlockPos& bpos) {
 
         RequestLightUpdate(pos);
     }
-    catch (exception& e) {
+    catch (std::exception& e) {
         g_logger.LogError("World Exception", e.what());
     }
 }
@@ -266,7 +259,7 @@ BlockID WorldInteractions::GetBlock(const BlockPos& pos) {
     try {
         return world->GetBlock(pos);
     }
-    catch (exception& e) {
+    catch (std::exception& e) {
         g_logger.LogError("World", e.what());
         return g_blocks.AIR;
     }

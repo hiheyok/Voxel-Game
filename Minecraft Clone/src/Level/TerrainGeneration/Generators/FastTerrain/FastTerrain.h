@@ -8,7 +8,7 @@ public:
         noise_.SetFrequency(0.009f);
     }
 
-    Chunk* Generate(const ChunkPos& pos) override;
+    void Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) override;
 
     FastNoiseLite noise_;
 

@@ -1,8 +1,5 @@
 #include "Server.h"
 
-using namespace std;
-using namespace glm;
-
 size_t Server::GetChunkCount() {
     return level_.level_loader_.GetChunkCount();
 }
@@ -15,11 +12,11 @@ Timer* Server::GetTimer() {
     return &time_;
 }
 
-vector<EntityProperty> Server::GetUpdatedEntities() {
+std::vector<EntityProperty> Server::GetUpdatedEntities() {
     return level_.main_world_->world_interactions_.GetUpdatedEntities();
 }
 
-vector<EntityUUID> Server::GetRemovedEntities() {
+std::vector<EntityUUID> Server::GetRemovedEntities() {
     return level_.main_world_->world_interactions_.GetRemovedEntities();
 }
 
@@ -31,7 +28,7 @@ void Server::Join(Entity& entity) {
     level_.main_world_->world_interactions_.summonEntity(entity);
 }
 
-vector<ChunkPos> Server::GetUpdatedChunkPos() {
+std::vector<ChunkPos> Server::GetUpdatedChunkPos() {
     return level_.main_world_->world_interactions_.GetUpdatedChunkPos();
 }
 
@@ -47,7 +44,7 @@ bool Server::GetRayIntersection(Ray& ray) { //Include dimension in paramter late
     return level_.main_world_->world_interactions_.collusions_.CheckRayIntersection(ray);
 }
 
-vec3 Server::GetEntityCollusionTime(EntityUUID entity) {
+glm::vec3 Server::GetEntityCollusionTime(EntityUUID entity) {
     return level_.main_world_->world_interactions_.collusions_.GetTimeTillCollusion(level_.main_world_->world_interactions_.GetEntity(entity));
 }
 
@@ -55,7 +52,7 @@ void Server::StartServer(ServerSettings serverSettings) {
     level_.Start(serverSettings.gen_thread_count_, serverSettings.light_engine_thread_count_);
     stop_ = false;
     settings_ = serverSettings;
-    main_server_loop_ = thread(&Server::Loop, this);
+    main_server_loop_ = std::thread(&Server::Loop, this);
 }
 
 void Server::Stop() {

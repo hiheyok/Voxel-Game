@@ -9,7 +9,7 @@ public:
         return data_[GetDataIndex(x,y,z)];
     }
 
-    const void ChangeBlock(BlockID ID, unsigned int x, unsigned int y, unsigned int z) {
+    void ChangeBlock(BlockID ID, unsigned int x, unsigned int y, unsigned int z) {
         data_[GetDataIndex(x,y,z)] = ID;
     }
 

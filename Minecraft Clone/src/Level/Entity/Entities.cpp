@@ -6,9 +6,6 @@
 #include <nlohmann/json.hpp>
 #include <iostream>
 
-using namespace std;
-using namespace glm;
-
 using json = nlohmann::json;
 
 EntitiesList::EntitiesList() {
@@ -50,7 +47,7 @@ EntityTypeID EntitiesList::RegisterEntity(std::string EntityName, EntityTypeEnum
 
 
 void EntitiesList::InitializeModels() {
-    ifstream file("assets/EntityShape.json");
+    std::ifstream file("assets/EntityShape.json");
     
     json data = json::parse(file);
 
@@ -60,16 +57,16 @@ void EntitiesList::InitializeModels() {
         json::iterator d = b.value().begin();
 
         if (d.value().is_string()) {
-            g_logger.LogInfo("Entity Texture", "Entity: " + b.key() + " | Texture Loading: " + (string)d.value());
+            g_logger.LogInfo("Entity Texture", "Entity: " + b.key() + " | Texture Loading: " + (std::string)d.value());
             RawTextureData TexData;
-            TexData.Load(((string)d.value()).c_str());
+            TexData.Load(((std::string)d.value()).c_str());
             entity_type_list_[entityType]->texture_.Gen();
             entity_type_list_[entityType]->texture_.Load(TexData);
         }
 
         d++;
 
-        vec3 hitboxSize(d.value().at(0), d.value().at(1), d.value().at(2));
+        glm::vec3 hitboxSize(d.value().at(0), d.value().at(1), d.value().at(2));
 
         entity_type_list_[entityType]->ChangeHitboxSize(hitboxSize);
         
@@ -78,11 +75,11 @@ void EntitiesList::InitializeModels() {
         for (auto& SubData : d.value().items()) {
             json::iterator it = SubData.value().begin();
 
-            vec3 offset(it.value().at(0), it.value().at(1), it.value().at(2));
+            glm::vec3 offset(it.value().at(0), it.value().at(1), it.value().at(2));
 
             it++;
 
-            vec3 shapeSize(it.value().at(0), it.value().at(1), it.value().at(2));
+            glm::vec3 shapeSize(it.value().at(0), it.value().at(1), it.value().at(2));
 
             it++;
 
@@ -91,12 +88,12 @@ void EntitiesList::InitializeModels() {
             for (auto& ShapeUV : it.value().items()) {
                 json::iterator uv_iterator = ShapeUV.value().begin();
 
-                vector<int> uvFaces = {};
+                std::vector<int> uvFaces = {};
 
                 for (auto& uvFace : uv_iterator.value().items()) {
                     int s = 0xFF;
 
-                    string texSide = uvFace.value();
+                    std::string texSide = uvFace.value();
 
                     if (!strcmp(texSide.c_str(), "FRONT"))
                         s = FRONT;
@@ -116,12 +113,12 @@ void EntitiesList::InitializeModels() {
 
                 uv_iterator++;
                 
-                vec2 pts[2]{};
+                glm::vec2 pts[2]{};
 
                 int index = 0;
 
                 for (auto& UV_Points : uv_iterator.value().items()) { //iterate though uv points
-                    pts[1 - index] = vec2((float)UV_Points.value().at(0), 1.f - (float)UV_Points.value().at(1));
+                    pts[1 - index] = glm::vec2((float)UV_Points.value().at(0), 1.f - (float)UV_Points.value().at(1));
                     index++;
                 }
 

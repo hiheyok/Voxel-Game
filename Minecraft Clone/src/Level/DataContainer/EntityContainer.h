@@ -51,10 +51,8 @@ public:
     }
 
     FastHashSet<EntityUUID> getRemovedEntities() {
-        FastHashSet<EntityUUID> out;
         std::lock_guard<std::mutex> lock{ entity_lock_ };
-        out = std::move(removed_entity_);
-        return out;
+        return std::move(removed_entity_);
     }
 
     Entity* GetEntity(EntityUUID entityId) {

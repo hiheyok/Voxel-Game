@@ -1,13 +1,13 @@
 #include "Item.h"
 
-const BlockID Item::GetBlock() {
+BlockID Item::GetBlock() const {
     return properties_.block_;
 }
 
-RawTextureData Item::GetTexture() {
+RawTextureData Item::GetTexture() const {
     return RawTextureData();
 }
 
-bool Item::CheckIsBlockItem() {
+bool Item::CheckIsBlockItem() const {
     return properties_.is_block_item_;
 }

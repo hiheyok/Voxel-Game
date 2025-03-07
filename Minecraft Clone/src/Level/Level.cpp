@@ -1,6 +1,5 @@
 #include "Level.h"
 #include "Dimension/Dimensions/Overworld.h"
-using namespace std;
 
 Level::Level() {
 
@@ -24,11 +23,11 @@ void Level::Stop() {
 void Level::updateDimensions() {
     //Generated Chunks
     level_loader_.SendRequestedChunks(main_world_->world_interactions_.worldLoader_->GetRequestedChunks(), main_world_->GetGeneratorType());
-    vector<Chunk*> chunks = level_loader_.GetGeneratedChunk();
+    std::vector<std::unique_ptr<Chunk>> chunks = level_loader_.GetGeneratedChunk();
     main_world_->world_interactions_.AddChunks(std::move(chunks));
 
     //Updated Light Info
     level_loader_.SendRequestedLightUpdates(std::move(main_world_->world_interactions_.GetRequestedLightUpdates()));
-    vector<std::shared_ptr<ChunkLightingContainer>> lighting = level_loader_.GetLightingInfomation();
+    std::vector<std::unique_ptr<ChunkLightingContainer>> lighting = level_loader_.GetLightingInfomation();
     main_world_->world_interactions_.UpdateLighting(std::move(lighting));
 }

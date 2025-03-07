@@ -15,8 +15,8 @@ struct Region { //32x32x32 Chunk Region
         }
     }
 
-    void AddChunk(Chunk* chunk, uint16_t x, uint16_t y, uint16_t z);
-    void AddChunkGlobalPos(Chunk* chunk, int32_t x, int32_t y, int32_t z);
+    void AddChunk(std::unique_ptr<Chunk> chunk, uint16_t x, uint16_t y, uint16_t z);
+    void AddChunkGlobalPos(std::unique_ptr<Chunk> chunk, int32_t x, int32_t y, int32_t z);
 
     void EraseChunk(uint16_t x, uint16_t y, uint16_t z);
     void EraseChunkGlobalPos(int32_t x, int32_t y, int32_t z);
@@ -47,7 +47,7 @@ public:
 
     bool SetBlockGlobal(BlockID block, const BlockPos& pos);
 
-    void InsertChunk(Chunk* chunk);
+    void InsertChunk(std::unique_ptr<Chunk> chunk);
 
     bool EraseChunk(const ChunkPos& pos);
 

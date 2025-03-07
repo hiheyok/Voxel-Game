@@ -58,6 +58,8 @@ bool WorldLoader::RequestLoad(const ChunkPos& pos) {
 
     //Request chunk
     generating_chunk_.insert(p);
+
+    std::lock_guard<std::mutex> lock{ lock_ };
     chunk_request_.push_back(p);
     return true;
 }
@@ -158,7 +160,7 @@ WorldAccess* WorldLoader::GetWorld() const {
 }
 
 //TODO: Fix me
-void WorldLoader::ReplaceLightInfomation(std::shared_ptr<ChunkLightingContainer> lighting) {
+void WorldLoader::ReplaceLightInfomation(std::unique_ptr<ChunkLightingContainer> lighting) {
     ChunkColumn* col = world->GetColumn(lighting->position_);
     int y = lighting->position_.y & 0b11111;
     if (col == nullptr) return; //fix this nullptr
@@ -168,11 +170,6 @@ void WorldLoader::ReplaceLightInfomation(std::shared_ptr<ChunkLightingContainer>
 
 std::vector<ChunkPos> WorldLoader::GetRequestedChunks() {
     std::lock_guard<std::mutex> lock{ lock_ };
-
-    // Ensure the vector is in a valid state before moving and clearing
-    if (chunk_request_.empty()) {
-        return {};
-    }
 
     std::vector<ChunkPos> tmp = std::move(chunk_request_);
     chunk_request_.clear();
@@ -203,10 +200,10 @@ void WorldLoader::Load() {
     loadSurroundedMovedEntityChunk();
 }
 
-void WorldLoader::AddChunk(Chunk* chunk) {
+void WorldLoader::AddChunk(std::unique_ptr<Chunk> chunk) {
     const ChunkPos& pos = chunk->position_;
 
     if (generating_chunk_.count(pos)) generating_chunk_.erase(pos);
 
-    world->SetChunk(chunk);
+    world->SetChunk(std::move(chunk));
 }

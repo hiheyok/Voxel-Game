@@ -12,7 +12,7 @@
 #define _CRTDBG_MAP_ALLOC
 #include "../Camera/camera.h"
 #include "frustum.h"
-#include <tgmath.h>
+#include <cmath>
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 

@@ -1,10 +1,9 @@
 #pragma once
 #include "Chunk.h"
 
-class TallChunk {
-private:
-    std::vector<Chunk*> chunk_sub_column_;
-public:
+struct TallChunk {
+    std::vector<std::unique_ptr<Chunk>> chunk_sub_column_;
+
     TallChunk();
 
     void SetPosition(int x, int y, int z);
@@ -18,6 +17,4 @@ public:
     void SetBlockUnsafe(int x, int y, int z, BlockID block);
 
     BlockID GetBlockUnsafe(int x, int y, int z);
-
-    std::vector<Chunk*> GetCubicChunks();
 };

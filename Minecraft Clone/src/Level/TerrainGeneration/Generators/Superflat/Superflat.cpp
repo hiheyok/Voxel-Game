@@ -1,7 +1,6 @@
 #include "Superflat.h"
 
-Chunk* SuperflatWorld::Generate(const ChunkPos& pos) {
-    Chunk* chunk = new Chunk;
+void SuperflatWorld::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
     int cy = pos.y * 16;
 
     for (int x = 0; x < 16; x++) {
@@ -13,5 +12,4 @@ Chunk* SuperflatWorld::Generate(const ChunkPos& pos) {
             }
         }
     }
-    return chunk;
 }

@@ -9,8 +9,7 @@
 // TODO: Rework this refactor ChunkColumnPos system
 class ChunkColumn { //Helps with stuff like lighting
 private:
-    std::vector<Chunk*> column_;
-    std::vector<std::shared_ptr<ChunkLightingContainer>> light_column_;
+    std::vector<std::unique_ptr<Chunk>> column_;
     Heightmap column_heightmap_;
     // glm::ivec2 Position;
 public:
@@ -18,11 +17,11 @@ public:
 
     Heightmap& GetHeightmap();
 
-    void ReplaceLightContainer(int y, std::shared_ptr<ChunkLightingContainer> c);
+    void ReplaceLightContainer(int y, std::unique_ptr<ChunkLightingContainer> c);
 
     ChunkColumn();
 
-    void AddChunk(Chunk* chunk, int relativeHeightLevel);
+    void AddChunk(std::unique_ptr<Chunk> chunk, int relativeHeightLevel);
 
     void UpdateChunk(int relativeHeightLevel);
 

@@ -4,25 +4,22 @@ Heightmap& ChunkColumn::GetHeightmap() {
     return column_heightmap_;
 }
 
-void ChunkColumn::ReplaceLightContainer(int y, std::shared_ptr<ChunkLightingContainer> c) {
-    if (light_column_[y] == nullptr) {
-        light_column_[y] = std::move(c);
-        return;
+void ChunkColumn::ReplaceLightContainer(int y, std::unique_ptr<ChunkLightingContainer> c) {
+    if (column_[y] == nullptr) {
+        throw std::exception("Couldn't place lighting");
     }
 
-    light_column_[y]->ReplaceData(c->getData());
+    column_[y]->lighting_->ReplaceData(c->getData());
 }
 
 ChunkColumn::ChunkColumn() {
-    column_.resize(32, nullptr);
-    light_column_.resize(32, nullptr);
+    column_.resize(32);
     light_dirty_.resize(32, false);
     column_heightmap_.Init();
 }
 
-void ChunkColumn::AddChunk(Chunk* chunk, int relativeHeightLevel) {
-    column_[relativeHeightLevel] = chunk;
-    light_column_[relativeHeightLevel] = chunk->lighting_;
+void ChunkColumn::AddChunk(std::unique_ptr<Chunk> chunk, int relativeHeightLevel) {
+    column_[relativeHeightLevel] = std::move(chunk);
     UpdateHeightmap(relativeHeightLevel);
 }
 
@@ -31,12 +28,12 @@ void ChunkColumn::UpdateChunk(int relativeHeightLevel) {
 }
 
 Chunk* ChunkColumn::GetChunk(int heightLevel) const {
-    return column_[heightLevel];
+    return column_[heightLevel].get();
 }
 
 int16_t ChunkColumn::FindSurfaceHeight(uint8_t x, uint8_t z, uint8_t startingChunk) const {
     for (int16_t currChunk = startingChunk; currChunk >= 0; --currChunk) {
-        Chunk* curr = column_[currChunk];
+        const std::unique_ptr<Chunk>& curr = column_[currChunk];
 
         if (curr == nullptr) continue;
 
@@ -50,10 +47,10 @@ int16_t ChunkColumn::FindSurfaceHeight(uint8_t x, uint8_t z, uint8_t startingChu
 }
 
 int16_t ChunkColumn::FindSurfaceHeightSingleChunk(uint8_t height, uint8_t x, uint8_t z) const {
-    Chunk* currChunk = column_[height];
-    if (currChunk == nullptr) return -1;
+    const std::unique_ptr<Chunk>& chunk = column_[height];
+    if (chunk == nullptr) return -1;
     for (int y = 15; y >= 0; y--) {
-        if (currChunk->GetBlockUnsafe(x, y, z) != g_blocks.AIR) return y;
+        if (chunk->GetBlockUnsafe(x, y, z) != g_blocks.AIR) return y;
     }
     return -1;
 }

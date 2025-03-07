@@ -7,7 +7,7 @@ class MountainGenerator : public WorldGenerator {
 public:
     FastNoiseLite noise_;
 
-    Chunk* Generate(const ChunkPos& pos) override;
+    void Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) override;
 
     MountainGenerator() {
         noise_.SetNoiseType(noise_.NoiseType_OpenSimplex2);

@@ -2,9 +2,7 @@
 
 using namespace glm;
 
-Chunk* FastTerrain::Generate(const ChunkPos& pos) {
-    Chunk* chunk = new Chunk;
-
+void FastTerrain::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
     int cx = pos.x * 16;
     int cy = pos.y * 16;
     int cz = pos.z * 16;
@@ -86,6 +84,4 @@ Chunk* FastTerrain::Generate(const ChunkPos& pos) {
     //        }
     //    }
     //}
-
-    return chunk;
 }

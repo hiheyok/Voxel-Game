@@ -1,8 +1,5 @@
 #include "InternalServer.h"
 
-using namespace std;
-using namespace glm;
-
 void InternalServer::startInternalServer(Player* p) {
     server = new Server();
     player = p;
@@ -23,7 +20,7 @@ void InternalServer::Stop() {
     server->Stop();
 }
 
-vec3 InternalServer::GetPlayerCollusionTimes() {
+glm::vec3 InternalServer::GetPlayerCollusionTimes() {
     return server->GetEntityCollusionTime(player->properties_.entity_uuid_);
 }
 
@@ -51,15 +48,15 @@ size_t InternalServer::GetChunkCount() {
     return server->GetChunkCount();
 }
 
-vector<ChunkPos> InternalServer::GetUpdatedChunks() {
+std::vector<ChunkPos> InternalServer::GetUpdatedChunks() {
     return server->GetUpdatedChunkPos();
 }
 
-vector<EntityProperty> InternalServer::GetUpdatedEntities() {
+std::vector<EntityProperty> InternalServer::GetUpdatedEntities() {
     return server->GetUpdatedEntities();
 }
 
-vector<EntityUUID>  InternalServer::GetRemovedEntities() {
+std::vector<EntityUUID>  InternalServer::GetRemovedEntities() {
     return server->GetRemovedEntities();
 }
 

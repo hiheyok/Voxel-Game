@@ -13,14 +13,12 @@ public:
         WorldGenerator::world_seed_ = worldSeedIn;
     }
 
-    virtual Chunk* Generate(const ChunkPos& pos) {
-        (void)pos;
-        return nullptr;
+    virtual void Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
+        throw std::exception("Don't use");
     }
     // TODO: Use custom tall chunk positioning
-    virtual TallChunk* GenerateTall(const ChunkPos& pos) {
-        (void)pos;
-        return nullptr;
+    virtual void GenerateTall(const ChunkPos& pos, std::unique_ptr<TallChunk>& chunk) {
+        throw std::exception("Don't use");
     }
 
     bool use_tall_chunks_ = false;

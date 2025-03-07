@@ -5,8 +5,6 @@
 #include <thread>
 #include <chrono>
 
-using namespace std;
-using namespace chrono;
 
 
 void precisePause(double nanoseconds) {
@@ -20,8 +18,6 @@ void precisePause(double nanoseconds) {
 }
 
 void timerSleep(double seconds) {
-    using namespace std;
-    using namespace std::chrono;
 
     static double estimate = 2e-3;
     static double mean = 2e-3;
@@ -29,11 +25,11 @@ void timerSleep(double seconds) {
     static int64_t count = 1;
 
     while (seconds > estimate) {
-        auto start = high_resolution_clock::now();
+        auto start = std::chrono::high_resolution_clock::now();
         timeBeginPeriod(1);
-        this_thread::sleep_for(microseconds(1));
+        std::this_thread::sleep_for(std::chrono::microseconds(1));
         timeEndPeriod(1);
-        auto end = high_resolution_clock::now();
+        auto end = std::chrono::high_resolution_clock::now();
 
         double observed = (end - start).count() / 1e9;
         seconds -= observed;
@@ -47,8 +43,8 @@ void timerSleep(double seconds) {
     }
 
     // spin lock
-    auto start = high_resolution_clock::now();
-    while ((high_resolution_clock::now() - start).count() / 1e9 < seconds);
+    auto start = std::chrono::high_resolution_clock::now();
+    while ((std::chrono::high_resolution_clock::now() - start).count() / 1e9 < seconds);
 }
 
 void timerSleepNotPrecise(int milliseconds) {

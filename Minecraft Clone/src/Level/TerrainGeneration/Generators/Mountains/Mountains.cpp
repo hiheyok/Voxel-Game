@@ -1,8 +1,6 @@
 #include "Mountains.h"
 
-Chunk* MountainGenerator::Generate(const ChunkPos& pos) {
-    Chunk* chunk = new Chunk;
-
+void MountainGenerator::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
     ChunkPos scaledPos = pos;
     scaledPos *= 16;
 
@@ -43,8 +41,8 @@ Chunk* MountainGenerator::Generate(const ChunkPos& pos) {
         }
     }
 
-    GenerateEnvironment(scaledPos, chunk);
-    GenerateDecor(scaledPos, chunk);
+    GenerateEnvironment(scaledPos, chunk.get());
+    GenerateDecor(scaledPos, chunk.get());
 
     int gx = scaledPos.x;
     int gz = scaledPos.z;
@@ -79,12 +77,9 @@ Chunk* MountainGenerator::Generate(const ChunkPos& pos) {
             }
         }
     }
-
-    return chunk;
 }
 
 void MountainGenerator::GenerateEnvironment(const ChunkPos& pos, Chunk* chunk) {
-
     for (int x = 0; x < 16; x++) {
         for (int z = 0; z < 16; z++) {
             for (int y = 0; y < 16; y++) {

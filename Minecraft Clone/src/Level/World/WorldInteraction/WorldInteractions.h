@@ -49,13 +49,13 @@ public:
 
     void Update();
 
-    void UpdateLighting(std::shared_ptr<ChunkLightingContainer> chunkLighting);
+    void UpdateLighting(std::unique_ptr<ChunkLightingContainer> chunkLighting);
 
-    void UpdateLighting(std::vector<std::shared_ptr<ChunkLightingContainer>> chunkLighting);
+    void UpdateLighting(std::vector<std::unique_ptr<ChunkLightingContainer>> chunkLighting);
 
-    void AddChunk(Chunk* chunk);
+    void AddChunk(std::unique_ptr<Chunk> chunk);
 
-    void AddChunks(std::vector<Chunk*> chunks);
+    void AddChunks(std::vector<std::unique_ptr<Chunk>> chunks);
 
     Chunk* GetChunk(const ChunkPos& pos) const;
 

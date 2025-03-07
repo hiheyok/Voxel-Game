@@ -2,8 +2,6 @@
 
 #include <iterator>
 #include "../../../Level/Timer/Timer.h"
-using namespace glm;
-using namespace std;
 
 void ChunkDrawBatch::SetupBuffers() {
     memory_pool_.Allocate(max_buffer_size_);
@@ -67,7 +65,7 @@ void ChunkDrawBatch::GenDrawCommands(int renderDistance, int verticalRenderDista
 
     frustum_.CalculateFrustum(camera);
 
-    ivec3 position(floor(camera->position_.x / 16.f), floor(camera->position_.y / 16.f), floor(camera->position_.z / 16.f));
+    glm::ivec3 position(floor(camera->position_.x / 16.f), floor(camera->position_.y / 16.f), floor(camera->position_.z / 16.f));
     
     bool useNew = false;
 

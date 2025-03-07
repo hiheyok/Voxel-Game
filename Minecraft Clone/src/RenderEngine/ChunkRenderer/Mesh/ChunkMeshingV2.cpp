@@ -4,8 +4,6 @@
 #include <bit> 
 #include <cstdint>
 #include <intrin.h>
-using namespace std;
-using namespace glm;
 
 constexpr int POSITION_OFFSET = 16;
 
@@ -295,15 +293,15 @@ inline void Mesh::ChunkMeshData::AddFacetoMesh(const BlockFace& face, uint8_t ax
     P1.z = tP1[(facing + 2) % 3];
 
     if (direction == 0)
-        swap(P0.x, P1.x);
+        std::swap(P0.x, P1.x);
     if (facing == 2)
-        swap(texPN, texNP);
+        std::swap(texPN, texNP);
 
     uint32_t tex = face.texture_id_ << textureBitOffset;
     uint32_t norm = facing << NormBitOffset;
     uint32_t tint = (static_cast<uint32_t>(!!face.tint_index_)) << tintBitOffset;
 
-    vector<uint32_t>& out = face.has_transparency_ ? transparent_vertices_buffer_ : vertices_buffer_;
+    std::vector<uint32_t>& out = face.has_transparency_ ? transparent_vertices_buffer_ : vertices_buffer_;
 
     uint64_t currIndex = face.has_transparency_ ? transparent_face_count_++ : solid_face_count_++;
 
@@ -329,11 +327,11 @@ inline void Mesh::ChunkMeshData::AddFacetoMesh(const BlockFace& face, uint8_t ax
     out[currIndex * 12 + 11] = 0u | texPP.x | texPP.y | tex | (PP << blockShadingBitOffset);
 
     if (direction == 0) {
-        swap(out[currIndex * 12 + 2], out[currIndex * 12 + 4]);
-        swap(out[currIndex * 12 + 3], out[currIndex * 12 + 5]);
+        std::swap(out[currIndex * 12 + 2], out[currIndex * 12 + 4]);
+        std::swap(out[currIndex * 12 + 3], out[currIndex * 12 + 5]);
 
-        swap(out[currIndex * 12 + 8], out[currIndex * 12 + 10]);
-        swap(out[currIndex * 12 + 9], out[currIndex * 12 + 11]);
+        std::swap(out[currIndex * 12 + 8], out[currIndex * 12 + 10]);
+        std::swap(out[currIndex * 12 + 9], out[currIndex * 12 + 11]);
     }
 }
 

@@ -6,10 +6,6 @@
 
 #include "../Client/IO/KEY_CODE.h"
 
-#define _CRTDBG_MAP_ALLOC
-
-using namespace std;
-
 void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam) {
     (void)userParam;
     std::stringstream str;
@@ -49,7 +45,7 @@ void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, unsigned int id,
     case GL_DEBUG_SEVERITY_NOTIFICATION: str << "Severity: notification"; break;
     }
 
-    str.seekg(0, ios::end);
+    str.seekg(0, std::ios::end);
 
     if (str.str().size() != 0) {
         g_logger.LogError("OpenGL", str.str());

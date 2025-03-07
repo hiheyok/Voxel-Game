@@ -2,7 +2,7 @@
 
 TallChunk::TallChunk() {
     chunk_sub_column_.resize(16);
-    for (int i = 0; i < 16; i++) chunk_sub_column_[i] = new Chunk;
+    for (int i = 0; i < 16; i++) chunk_sub_column_[i] = std::make_unique<Chunk>();
 }
 
 void TallChunk::SetPosition(int x, int y, int z) { // confusing y -> tall chunk pos
@@ -32,8 +32,4 @@ void TallChunk::SetBlockUnsafe(int x, int y, int z, BlockID block) {
 BlockID TallChunk::GetBlockUnsafe(int x, int y, int z) {
     int ChunkIndex = y / 16;
     return chunk_sub_column_[ChunkIndex]->GetBlockUnsafe(x, y & 0b1111, z);
-}
-
-std::vector<Chunk*> TallChunk::GetCubicChunks() {
-    return chunk_sub_column_;
 }

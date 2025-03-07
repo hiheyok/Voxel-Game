@@ -14,7 +14,7 @@ public:
     
     void SetBlock(BlockID block, const BlockPos& pos);
 
-    void SetChunk(Chunk* chunk);
+    void SetChunk(std::unique_ptr<Chunk> chunk);
 
     Chunk* GetChunk(const ChunkPos& ID) const;
 

@@ -1,6 +1,5 @@
 #include "MultiEntityRender.h"
 
-
 size_t MultiEntityRenderer::GetNumEntityRendered() {
     return num_entity_rendered_;
 }
