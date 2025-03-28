@@ -43,10 +43,10 @@ void MainPlayer::RenderGUIs() {
 }
 
 void MainPlayer::PrepareGUIs() {
-    int currentSlotIndex = player_.entity_inventory_.right_hand_slot_;
+    size_t currentSlotIndex = player_.entity_inventory_.right_hand_slot_;
     if (currentSlotIndex != slot_index_) {
         slot_index_ = currentSlotIndex;
-        player_gui_.EditGUISet(gui_index_).EditElementPosition("Select", glm::vec2(hotbar_size_ * (float)(slot_index_ - 4), -1.f + hotbar_size_ * 0.5f));
+        player_gui_.EditGUISet(gui_index_).EditElementPosition("Select", glm::vec2(hotbar_size_ * (float)((int)slot_index_ - 4), -1.f + hotbar_size_ * 0.5f));
     }
 
     for (int i = 0; i < 9; i++) {
