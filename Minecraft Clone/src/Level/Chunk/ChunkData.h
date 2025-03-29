@@ -10,12 +10,21 @@
 #include "Lighting/ChunkLighting.h"
 #include "../Typenames.h"
 #include "ChunkPos/ChunkPos.h"
+#include "Palette.h"
 
 
 
 class ChunkContainer {
-    
+private:
+    std::atomic<bool> in_use_ = false;
+
+    Palette block_storage_;
 public:
+    ChunkPos position_;
+    std::vector<SetBlockRelative> outside_block_to_place_[6]{};
+    ChunkContainer* neighbors_[6]{ nullptr };
+    std::unique_ptr<ChunkLightingContainer> lighting_;
+    std::atomic<bool> is_empty_ = true;
 
     ChunkContainer() {
         lighting_ = std::make_unique<ChunkLightingContainer>();
@@ -37,19 +46,6 @@ public:
     ChunkContainer* GetNeighbor(unsigned int side) const;
     
     void SetPosition(int x, int y, int z);
-
-    ChunkPos position_;
-
-    std::atomic<bool> is_empty_ = true;
-
-    ChunkContainer* neighbors_[6]{nullptr};
-    std::vector<SetBlockRelative> outside_block_to_place_[6]{};
-    std::unique_ptr<ChunkLightingContainer> lighting_;
-
-    BlockContainer block_storage_;
-private:
-    std::atomic<bool> in_use_ = false;
-    
 };
 
 #endif

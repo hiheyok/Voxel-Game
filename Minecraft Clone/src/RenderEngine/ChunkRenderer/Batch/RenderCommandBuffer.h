@@ -249,7 +249,7 @@ namespace CMDGraph {
             }
         }
 
-        const int GetSideLocation(const ChunkPos& p2) const {
+        int GetSideLocation(const ChunkPos& p2) const {
             ChunkPos relativePosition = p2 - position_;
 
             int x = relativePosition.x;

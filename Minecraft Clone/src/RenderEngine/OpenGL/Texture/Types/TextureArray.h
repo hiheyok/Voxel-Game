@@ -95,14 +95,14 @@ public:
 
         size_t cWidth = width_ * colorSize;
 
-        for (int x = 0; x < imgsX; x++) {
-            for (int y = 0; y < imgsY; y++) {
+        for (size_t x = 0; x < imgsX; x++) {
+            for (size_t y = 0; y < imgsY; y++) {
                 size_t gx = x * width_ * colorSize;
                 size_t gy = y * height_ * data->width_ * colorSize;
 
                 std::vector<uint8_t> buffer(width_ * height_ * colorSize);
 
-                for (int h = 0; h < height_; h++) {
+                for (size_t h = 0; h < height_; h++) {
                     memcpy(buffer.data() + (h * cWidth), data->data_ + (h * data->width_ * colorSize + gx + gy), cWidth);
                 }
 

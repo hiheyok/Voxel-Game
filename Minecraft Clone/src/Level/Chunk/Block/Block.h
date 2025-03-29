@@ -24,11 +24,7 @@ struct BlockType {
 
 struct Block {
     virtual ~Block() {
-        Clean();
-    }
-
-    void Clean() {
-    
+        // Clean();
     }
 
     virtual void Tick(const BlockPos& pos) {

@@ -78,8 +78,9 @@ void PerformanceProfiler::CondenseCache() {
     }
 
     time_pass_cache_.clear();
-
-    time_pass_cache_.insert(time_pass_cache_.end(), condensedCache.begin(), condensedCache.end());
+    for (const auto& [hash, time] : condensedCache) {
+        time_pass_cache_.emplace_back(hash, time);
+    }
 
 }
 

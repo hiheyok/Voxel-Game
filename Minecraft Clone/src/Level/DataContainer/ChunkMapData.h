@@ -1,5 +1,5 @@
 #pragma once
-
+#include <vector>
 #include "../Chunk/Chunk.h"
 #include "../Chunk/ChunkColumn.h"
 #include "../../Utils/Containers/skaHashmap.h"
@@ -7,13 +7,10 @@
 typedef unsigned long long int RegionID;
 
 struct Region { //32x32x32 Chunk Region
-    ChunkColumn* region_[32 * 32]{ nullptr };
-
-    ~Region() {
-        for (int i = 0; i < 32 * 32; ++i) {
-            delete region_[i];
-        }
-    }
+    //ChunkColumn* region_[32 * 32]{ nullptr };
+    std::vector<std::unique_ptr<ChunkColumn>> region_;
+    Region();
+    ~Region();
 
     void AddChunk(std::unique_ptr<Chunk> chunk, uint16_t x, uint16_t y, uint16_t z);
     void AddChunkGlobalPos(std::unique_ptr<Chunk> chunk, int32_t x, int32_t y, int32_t z);
@@ -55,7 +52,7 @@ public:
 private:
     //Input position is the chunk position
     const std::unique_ptr<Region>& GetRegion(const ChunkPos& pos) const;
-    const bool CheckRegion(const ChunkPos& pos) const;
+    bool CheckRegion(const ChunkPos& pos) const;
 
     FastHashMap<RegionPos, std::unique_ptr<Region>> live_region_;
 };

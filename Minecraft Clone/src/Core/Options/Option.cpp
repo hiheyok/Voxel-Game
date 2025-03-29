@@ -47,14 +47,14 @@ void Options::ProcessTokens(std::vector<std::string> tokens) {
 }
 
 void Options::SetOptionNameTable() {
-    option_name_.insert(std::pair<std::string, int*>("HorizontalRenderDistance", &horizontal_render_distance_));
-    option_name_.insert(std::pair<std::string, int*>("VerticalRenderDistance", &vertical_render_distance_));
-    option_name_.insert(std::pair<std::string, int*>("WorldGenThreads", &world_gen_threads_));
-    option_name_.insert(std::pair<std::string, int*>("MeshThreads", &mesh_threads_));
-    option_name_.insert(std::pair<std::string, int*>("GraphicsScale", &graphics_scale_));
-    option_name_.insert(std::pair<std::string, int*>("TransparentBufferSize", &transparent_buffer_size_));
-    option_name_.insert(std::pair<std::string, int*>("SolidBufferSize", &solid_buffer_size_));
-    option_name_.insert(std::pair<std::string, int*>("LightEngineThreads", &light_engine_threads_));
+    option_name_["HorizontalRenderDistance"] = &horizontal_render_distance_;
+    option_name_["VerticalRenderDistance"] = &vertical_render_distance_;
+    option_name_["WorldGenThreads"] = &world_gen_threads_;
+    option_name_["MeshThreads"] = &mesh_threads_;
+    option_name_["GraphicsScale"] = &graphics_scale_;
+    option_name_["TransparentBufferSize"] = &transparent_buffer_size_;
+    option_name_["SolidBufferSize"] = &solid_buffer_size_;
+    option_name_["LightEngineThreads"] = &light_engine_threads_;
 }
 
 void Options::GenerateOptionFile() { //Generate file if deleted

@@ -56,9 +56,9 @@ public:
         for (Model::RectangularPrism& shape : shapes_) {
             Model::ModelData SubModel = shape.GetVertices();
 
-            int CurrentIndex = model.vertices_count_;
+            size_t CurrentIndex = model.vertices_count_;
 
-            for (int i = 0; i < SubModel.vertices_.size(); i++) {
+            for (size_t i = 0; i < SubModel.vertices_.size(); i++) {
                 if ((i % 5) < 3) {
                     model.vertices_.push_back(SubModel.vertices_[i] + shape.offset_[i % 5]);
                 }
@@ -68,7 +68,7 @@ public:
                 
             }
 
-            for (int i = 0; i < SubModel.indices_.size(); i++) {
+            for (size_t i = 0; i < SubModel.indices_.size(); i++) {
                 model.indices_.push_back(SubModel.indices_[i] + CurrentIndex);
             }
 

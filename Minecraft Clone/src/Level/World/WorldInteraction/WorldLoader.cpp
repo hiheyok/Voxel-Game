@@ -94,7 +94,7 @@ void WorldLoader::loadSurroundedMovedEntityChunk() {
 
     int chunkPadding = 4;
 
-    for (int i = 0; i < centerPositionList.size(); i++) {
+    for (size_t i = 0; i < centerPositionList.size(); i++) {
         ivec3 pos = centerPositionList[i];
         vec3 vel = centerVelocityList[i];
 

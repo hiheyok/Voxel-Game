@@ -9,7 +9,7 @@ public:
         return data_[GetDataIndex(x,y,z)];
     }
 
-    void ChangeBlock(BlockID ID, unsigned int x, unsigned int y, unsigned int z) {
+    void SetBlock(BlockID ID, unsigned int x, unsigned int y, unsigned int z) {
         data_[GetDataIndex(x,y,z)] = ID;
     }
 
@@ -17,7 +17,7 @@ public:
         return data_[index];
     }
 
-    void ChangeBlockUnsafe(BlockID ID, unsigned int index) {
+    void SetBlockUnsafe(BlockID ID, unsigned int index) {
         data_[index] = ID;
     }
 
@@ -27,7 +27,7 @@ public:
 
 private:
 
-    constexpr const static uint16_t GetDataIndex(unsigned int x, unsigned int y, unsigned int z) {
+    constexpr static uint16_t GetDataIndex(unsigned int x, unsigned int y, unsigned int z) {
         return (x << 8) | (z << 4) | y;
     }
     

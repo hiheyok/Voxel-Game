@@ -8,8 +8,8 @@
 class Inventory {
 public:
 
-    Inventory(int inventorySize = 0xFFFFFFFF) {
-        if (inventorySize == 0xFFFFFFFF)
+    Inventory(int inventorySize = 0x7FFFFFFF) {
+        if (inventorySize == 0x7FFFFFFF)
             return;
         Initialize(inventorySize);
     }

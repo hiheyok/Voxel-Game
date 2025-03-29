@@ -35,12 +35,11 @@ void Mesh::ChunkMeshData::GenerateCache() {
     int pos[3]{ 0, 0, 0 };
     int localPos[3]{ 0, 0, 0 };
 
-    const BlockID* container = chunk_->block_storage_.GetContainerData();
     for (int x = 0; x < 16; x++) {
         for (int z = 0; z < 16; z++) {
-            memcpy(chunk_cache_ + (x + 1) * 18 * 18 + (z + 1) * 18 + (1),
-                container + (static_cast<long long>(x) << 8) + (static_cast<long long>(z) << 4),
-                16 * sizeof(BlockID));
+            for (int y = 0; y < 16; ++y) {
+                SetCachedBlockID(chunk_->GetBlockUnsafe(x, y, z), x, y, z);
+            }
         }
     }
 

@@ -111,6 +111,7 @@ public:
 
     BlockID GetBand(int p_180629_1_, int p_180629_2_, int p_180629_3_)
     {
+        (void)p_180629_3_;
         int i = (int)std::round(clay_bands_offset_noise_->getValue((double)p_180629_1_ / 512.0, (double)p_180629_1_ / 512.0) * 2.0);
         return clay_bands_[(p_180629_2_ + i + 64) % 64];
     }

@@ -127,7 +127,7 @@ namespace MemoryManagement {
 
             MemoryBlock newFreeBlock(newFreeSpaceOffset, newFreeSpaceSize);
             
-            std::multimap<size_t, size_t>::iterator it = sorted_mem_sizes_.emplace(std::pair<size_t, size_t>(newFreeSpaceSize, newFreeSpaceOffset)); //use for deletions
+            std::multimap<size_t, size_t>::iterator it = sorted_mem_sizes_.emplace(newFreeSpaceSize, newFreeSpaceOffset); //use for deletions
             sorted_mem_sizes_iterators[newFreeSpaceOffset] = it;
 
             free_memory_blocks_.Add(newFreeBlock);

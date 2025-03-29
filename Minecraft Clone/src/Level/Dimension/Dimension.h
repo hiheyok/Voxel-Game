@@ -69,7 +69,7 @@ public:
     void EventTick() {
         std::unique_ptr<std::vector<Event::Event>>& EventQueue = event_manager_.GetQueue();
 
-        for (int i = 0; i < EventQueue->size(); i++) {
+        for (size_t i = 0; i < EventQueue->size(); i++) {
             const Event::Event& e = EventQueue->at(i);
             switch (e.type_) {
             case Event::NULL_EVENT:

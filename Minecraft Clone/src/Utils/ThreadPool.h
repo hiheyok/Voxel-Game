@@ -78,7 +78,7 @@ inline ThreadPool<TaskIn, TaskOut, Task>::ThreadPool(size_t threads, std::string
     batch_size_{ batchSize },
     task_queued_{ 0 } {
 
-    for (int i = 0; i < threads; ++i) {
+    for (size_t i = 0; i < threads; ++i) {
         workers_[i] = std::thread(&ThreadPool::Worker, this, i);
     }
 }
@@ -212,7 +212,7 @@ inline void ThreadPool<TaskIn, TaskOut, Task>::OutputManager() {
 
         // Find workers output and manage them
 
-        for (int i = 0; !stop_ && i < worker_count_; ++i) {
+        for (size_t i = 0; !stop_ && i < worker_count_; ++i) {
             std::vector<TaskOut> workerOut;
             {
                 std::lock_guard<std::mutex> lock{ workers_output_locks_[i] };
@@ -260,7 +260,7 @@ inline void ThreadPool<TaskIn, TaskOut, Task>::Stop() {
     scheduler_.join();
     output_manager_.join();
 
-    for (int i = 0; i < worker_count_; ++i) {
+    for (size_t i = 0; i < worker_count_; ++i) {
         workers_[i].join();
     }
     worker_cv_.clear();

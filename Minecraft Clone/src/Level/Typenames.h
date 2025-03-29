@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "../Utils/Containers/skaHashmap.h"
+#include "../Utils/Containers/robin_hood.h"
 
 typedef unsigned int EventID;
 typedef unsigned short int BlockID;
@@ -9,11 +10,11 @@ typedef unsigned short EntityTypeID;
 typedef unsigned int ItemID;
 
  
-template <class K, class V>
-using FastHashMap = ska::flat_hash_map<K, V>;
+template <class K, class V, class _Hash = robin_hood::hash<K>>
+using FastHashMap = robin_hood::unordered_flat_map<K, V, _Hash>;
 
-template <class V>
-using FastHashSet = ska::flat_hash_set<V>;
+template <class V, class _Hash = robin_hood::hash<V>>
+using FastHashSet = robin_hood::unordered_flat_set<V, _Hash>;
 
 template <class T>
 using FastVector = std::vector<T>;

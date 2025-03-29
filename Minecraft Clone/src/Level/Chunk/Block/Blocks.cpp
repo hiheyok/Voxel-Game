@@ -9,6 +9,8 @@
 #include <sys/types.h>
 #include <filesystem>
 #include <string>
+
+// TODO : Implement model caching
 using json = nlohmann::json;
 
 BlockID BlockList::RegisterBlock(std::string blockName, Material* material, bool transparency, bool solid, bool isFluid) {
@@ -60,19 +62,18 @@ void BlockList::AddAssets(std::string namespaceIn) {
 
 void BlockList::InitializeBlockModels()  {
     //add every single block  in the assets bc why not
-    
-    try {
-        for (const auto& entry : std::filesystem::directory_iterator("assets")) {
-            if (!entry.is_directory()) continue;
-            std::string name = entry.path().filename().string();//epic one liner
-            if (!strcmp(name.c_str(), "shaders")) continue;
-            AddAssets(name);
-        }
+    //try {
+    //    for (const auto& entry : std::filesystem::directory_iterator("assets")) {
+    //        if (!entry.is_directory()) continue;
+    //        std::string name = entry.path().filename().string();//epic one liner
+    //        if (!strcmp(name.c_str(), "shaders")) continue;
+    //        AddAssets(name);
+    //    }
 
-    }
-    catch (std::filesystem::filesystem_error& e) {
-        g_logger.LogError("File System", e.what());
-    }
+    //}
+    //catch (std::filesystem::filesystem_error& e) {
+    //    g_logger.LogError("File System", e.what());
+    //}
 
     FastHashMap<std::string, size_t> textureIds;
     FastHashMap<size_t, size_t> textureRepeatCount;
