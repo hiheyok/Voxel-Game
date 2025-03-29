@@ -1,9 +1,11 @@
 #pragma once
+#include <vector>
 #include "Texture/BlockTexture.h"
 #include "../../Typenames.h"
-#include <vector>
 #include "../../../RenderEngine/BlockModel/BlockModels.h"
 #include "../../Chunk/ChunkPos/ChunkPos.h"
+
+class Dimension;
 
 struct BlockType {
 
@@ -27,12 +29,7 @@ struct Block {
         // Clean();
     }
 
-    virtual void Tick(const BlockPos& pos) {
-        (void)pos;
-    }
-
-    static void* dimension_ptr_;
-    static void* server_ptr_;
+    virtual void Tick(const BlockPos& pos, Dimension* currentWorld) = 0;
 
     BlockID id_ = NULL;
     std::unique_ptr<BlockType> properties_ = nullptr;
@@ -41,6 +38,3 @@ struct Block {
     std::unique_ptr<ModelV2::BlockModelV2> block_model_data_ = nullptr;
     std::string block_name_ = "";
 };
-
-inline void* Block::dimension_ptr_ = nullptr;
-inline void* Block::server_ptr_ = nullptr;

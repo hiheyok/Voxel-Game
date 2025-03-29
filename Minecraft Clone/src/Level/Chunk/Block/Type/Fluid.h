@@ -1,8 +1,6 @@
 #pragma once
 #include "../../../../Level/Dimension/Dimension.h"
 
-struct Block;
-
 struct FluidProperties {
     int spread_rate_ = 1; // Ticks for fluid to spread
 };
@@ -11,10 +9,7 @@ struct Fluid : Block {
 
     FluidProperties properties_;
 
-    void Tick(const BlockPos& pos) override {
-
-        Dimension* currentWorld = static_cast<Dimension*>(Block::dimension_ptr_);
-
+    void Tick(const BlockPos& pos, Dimension* currentWorld) override {
         for (int side = 0; side < 6; side++) {
             BlockPos newPos = pos;
 

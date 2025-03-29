@@ -13,7 +13,7 @@
 
 class WorldInteraction {
 public:
-    void Interact(Player* player, const UserInputs& Inputs);
+    void Interact(Player* player, const UserInputs& Inputs, Dimension* dimension);
 private:
     BlockID GetBlock(Ray ray, Dimension* dimension);
     void BreakBlock(Ray ray, Dimension* dimension);

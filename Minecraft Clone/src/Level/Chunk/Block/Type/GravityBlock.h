@@ -2,13 +2,9 @@
 #include "../../../Event/EventHandler.h"
 #include "../../../Entity/Entities.h"
 
-struct Block;
-
 struct GravityBlock : Block {
 
-    void Tick(const BlockPos& pos) override {
-        Dimension* currentWorld = static_cast<Dimension*>(Block::dimension_ptr_);
-
+    void Tick(const BlockPos& pos, Dimension* currentWorld) override {
         BlockPos belowPos = pos;
         belowPos.y -= 1;
         bool isBlockSupported = g_blocks.GetBlockType(currentWorld->world_interactions_.GetBlock(belowPos))->properties_->is_solid_;

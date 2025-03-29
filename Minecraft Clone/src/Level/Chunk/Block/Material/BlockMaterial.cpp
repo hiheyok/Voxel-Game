@@ -2,7 +2,7 @@
 #include "../Type/BlockTypes.h"
 
 Block* MaterialNone::BuildNewBlockType() {
-    return new Block();
+    return static_cast<Block*>(new DefaultBlock());
 }
 
 Block* MaterialFluid::BuildNewBlockType() {

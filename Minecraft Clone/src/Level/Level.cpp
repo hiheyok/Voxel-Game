@@ -13,7 +13,6 @@ void Level::Start(int worldGenThreadCount, int light_engine_thread_count_) {
     long long Seed = -501575345763903LL;//-501575345763903LL;//-1587754402LL
 
     level_loader_.Start(worldGenThreadCount, light_engine_thread_count_, main_world_->world_interactions_.worldLoader_->GetWorld(), Seed);
-    Block::dimension_ptr_ = main_world_;
 }
 
 void Level::Stop() {

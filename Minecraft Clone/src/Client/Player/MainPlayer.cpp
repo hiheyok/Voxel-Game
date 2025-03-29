@@ -66,9 +66,9 @@ void MainPlayer::PrepareGUIs() {
     player_gui_.PrepareRenderer();
 }
 
-void MainPlayer::Update(UserInputs inputs) {
+void MainPlayer::Update(UserInputs inputs, Dimension* dimension) {
     InventoryUpdate(inputs);
-    interactions_.Interact(&player_, inputs);
+    interactions_.Interact(&player_, inputs, dimension);
     movement_.Update(&player_, inputs, internal_server_);
     PrepareGUIs();
 }

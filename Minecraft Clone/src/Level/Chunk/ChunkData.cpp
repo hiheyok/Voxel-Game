@@ -25,7 +25,6 @@ BlockID ChunkContainer::GetBlockUnsafe(int x, int y, int z) const {
     return block_storage_.GetBlockUnsafe(x, y, z);
 }
 
-//TODO: debug this later (trees getting cut off at chunk borders)
 void ChunkContainer::SetBlock(BlockID block, int x, int y, int z) {
     if (!((x | y | z) >> 4)) { //check if it is in the chunk
         SetBlockUnsafe(block, x, y, z);
@@ -36,15 +35,15 @@ void ChunkContainer::SetBlock(BlockID block, int x, int y, int z) {
     int dy = ((y >> 31) & 0b1) + 2;
     int dz = ((z >> 31) & 0b1) + 4;
 
-    if (neighbors_[dx] && (x >> 4)) {
+    if (x >> 4) {
         outside_block_to_place_[dx].emplace_back(block, x + NeighborOffset[dx], y, z);
         return;
     }
-    if (neighbors_[dy] && (y >> 4)) {
+    if (y >> 4) {
         outside_block_to_place_[dy].emplace_back(block, x, y + NeighborOffset[dy], z);
         return;
     }
-    if (neighbors_[dz] && (z >> 4)) {
+    if (z >> 4) {
         outside_block_to_place_[dz].emplace_back(block, x, y, z + NeighborOffset[dz]);
         return;
     }

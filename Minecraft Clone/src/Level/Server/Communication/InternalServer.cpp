@@ -12,8 +12,6 @@ void InternalServer::startInternalServer(Player* p) {
 
     server->StartServer(settings_);
     server->Join(*p);
-    Block::server_ptr_ = server;
-
 }
 
 void InternalServer::Stop() {

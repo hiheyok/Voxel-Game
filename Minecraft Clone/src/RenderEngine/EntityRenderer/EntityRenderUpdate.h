@@ -5,6 +5,7 @@
 
 class EntityRendererUpdater {
     MultiEntityRenderer* renderer_;
+    Dimension* dimension_;
 
     bool stop_ = true;
 
@@ -14,7 +15,8 @@ class EntityRendererUpdater {
 
     Timer* server_time_;
 public:
+    EntityRendererUpdater();
     void SetEntityRenderer(MultiEntityRenderer* render, Timer* time);
-    void Start();
+    void Start(Dimension* dimension);
     void Stop();
 };

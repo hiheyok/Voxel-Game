@@ -5,23 +5,21 @@
 #include "../../../Level/Server/Server.h"
 #include "../../../Level/World/WorldInteraction/WorldInteractions.h"
 class FallingBlock : public EntityType {
-    virtual void Tick(Entity* entity) override {
-        Dimension* currentDimension = static_cast<Dimension*>(Block::dimension_ptr_);
-        Server* currentServer = static_cast<Server*>(Block::server_ptr_);
+    virtual void Tick(Entity* entity, Dimension* dimension) override {
     //    std::cout << entity->Properties.Velocity.y << "\n";
-        float mspt = 1.0f / (float)currentServer->settings_.tick_rate_;
+        float mspt = 1.0f / static_cast<float>(dimension->tick_rate_);
 
         //Physics
 
         //Logger.LogInfo("Sand", std::to_string(entity->Properties.Position.y));
 
-        entity->properties_.acceleration_.y = -currentDimension->world_interactions_.settings_.gravity_;
+        entity->properties_.acceleration_.y = -dimension->world_interactions_.settings_.gravity_;
 
         entity->properties_.velocity_ += entity->properties_.acceleration_ * mspt;
 
         int distanceCheck = (int)ceil(abs(entity->properties_.velocity_.y * mspt));
 
-        float collusionDistance = currentDimension->world_interactions_.collusions_.GetDistanceUntilCollusionSingleDirection(entity->properties_.position_, NY, distanceCheck + 1);
+        float collusionDistance = dimension->world_interactions_.collusions_.GetDistanceUntilCollusionSingleDirection(entity->properties_.position_, NY, distanceCheck + 1);
 
         float timeTillCollusion = abs(collusionDistance / entity->properties_.velocity_.y);
 
@@ -45,14 +43,14 @@ class FallingBlock : public EntityType {
                                             (int)entity->properties_.position_.y,
                                             (int)entity->properties_.position_.z},
                                         g_blocks.SAND, g_event_handler.BlockPlace };
-            currentDimension->event_manager_.AddEvent(addBlock);
+            dimension->event_manager_.AddEvent(addBlock);
 
             Event::EntityEvent removeEntity;
             removeEntity.id_ = g_event_handler.RemoveEntity;
             removeEntity.entity_uuid_ = entity->properties_.entity_uuid_;
             removeEntity.unique_id_ = 50;
             
-            currentDimension->event_manager_.AddEvent(removeEntity);
+            dimension->event_manager_.AddEvent(removeEntity);
         }
     }
 };

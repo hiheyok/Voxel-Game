@@ -2,6 +2,10 @@
 #include "../../Utils/Clock.h"
 #include "../../Level/Dimension/Dimension.h"
 
+EntityRendererUpdater::EntityRendererUpdater() : stop_{ true }, dimension_{ nullptr } {
+
+}
+
 void EntityRendererUpdater::SetEntityRenderer(MultiEntityRenderer* render, Timer* time) {
     renderer_ = render;
     server_time_ = time;
@@ -9,10 +13,8 @@ void EntityRendererUpdater::SetEntityRenderer(MultiEntityRenderer* render, Timer
 
 void EntityRendererUpdater::UpdaterThread() {
     while (!stop_) {
-        Dimension* world = static_cast<Dimension*>(Block::dimension_ptr_);
-
-        std::vector<EntityProperty> UpdatedEntities = world->world_interactions_.GetUpdatedEntities();
-        std::vector<EntityUUID> RemovedEntities = world->world_interactions_.GetRemovedEntities();
+        std::vector<EntityProperty> UpdatedEntities = dimension_->world_interactions_.GetUpdatedEntities();
+        std::vector<EntityUUID> RemovedEntities = dimension_->world_interactions_.GetRemovedEntities();
 
         for (auto& entity : UpdatedEntities) {
             renderer_->AddEntity(entity);
@@ -27,7 +29,8 @@ void EntityRendererUpdater::UpdaterThread() {
     }
 }
 
-void EntityRendererUpdater::Start() {
+void EntityRendererUpdater::Start(Dimension* dimension) {
+    dimension_ = dimension;
     stop_ = false;
     update_thread_ = std::thread(&EntityRendererUpdater::UpdaterThread, this);
 }

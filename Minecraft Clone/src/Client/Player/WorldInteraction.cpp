@@ -1,6 +1,6 @@
 #include "WorldInteraction.h"
 
-void WorldInteraction::Interact(Player* player, const UserInputs& inputs) {
+void WorldInteraction::Interact(Player* player, const UserInputs& inputs, Dimension* dimension) {
     Ray ray;
     ray.origin_ = player->properties_.position_;
     ray.direction_ = glm::dvec3(
@@ -8,19 +8,17 @@ void WorldInteraction::Interact(Player* player, const UserInputs& inputs) {
         sin(player->properties_.rotation_.y * 0.0174533),
         sin(player->properties_.rotation_.x * 0.0174533) * cos(player->properties_.rotation_.y * 0.0174533));
 
-    Dimension* world = static_cast<Dimension*>(Block::dimension_ptr_);
-
     BlockID block = player->entity_inventory_.GetItem(player->entity_inventory_.right_hand_slot_).item_.GetBlock();
 
     if (inputs.mouse_.right_ == inputs.mouse_.PRESS) {
-        PlaceBlock(ray, block, world);
+        PlaceBlock(ray, block, dimension);
     }
 
     if (inputs.mouse_.left_ == inputs.mouse_.PRESS) {
-        BreakBlock(ray, world);
+        BreakBlock(ray, dimension);
     }
     if (inputs.mouse_.middle_ == inputs.mouse_.PRESS) {
-        BlockID newBlock = GetBlock(ray, world);
+        BlockID newBlock = GetBlock(ray, dimension);
         if (newBlock != g_blocks.AIR) {
             player->entity_inventory_.SetSlot(player->entity_inventory_.right_hand_slot_, ItemStack{ g_items.GetItem(g_items.GetBlockItem(newBlock)) });
         }

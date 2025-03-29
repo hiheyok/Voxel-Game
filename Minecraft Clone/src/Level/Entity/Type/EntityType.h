@@ -24,9 +24,7 @@ public:
         return hitbox_;
     }
 
-    virtual void Tick(Entity* entity) {
-        (void)entity;
-    }
+    virtual void Tick(Entity* entity, Dimension* dimension) = 0;
 
     EntityTypeID id_ = NULL;
 

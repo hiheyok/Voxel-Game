@@ -2,6 +2,8 @@
 #include "../../Entity/Entity.h"
 #include "../../Event/Event.h"
 
-void HandleEntityTick(Event::EntityEvent e);
-void HandleEntitySummon(Event::EntityEvent e);
-void HandleRemoveEntity(Event::EntityEvent e);
+class Dimension;
+
+void HandleEntityTick(const Event::EntityEvent& e, Dimension* dimension);
+void HandleEntitySummon(const Event::EntityEvent& e, Dimension* dimension);
+void HandleRemoveEntity(const Event::EntityEvent& e, Dimension* dimension);

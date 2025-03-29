@@ -12,9 +12,7 @@ struct Material {
 
     }
 
-    virtual Block* BuildNewBlockType() {
-        return new Block();
-    }
+    virtual Block* BuildNewBlockType() = 0;
 };
 
 struct MaterialNone : Material {

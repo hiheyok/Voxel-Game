@@ -11,7 +11,7 @@ public:
 
     void Initialize(GLFWwindow* win, InternalServer* server);
 
-    void Update(UserInputs inputs);
+    void Update(UserInputs inputs, Dimension* dimension);
 
     EntityProperty GetEntityProperties();
 

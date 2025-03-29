@@ -33,7 +33,7 @@ void Client::Initialize() {
 
     entity_updater_.SetEntityRenderer(&entity_render_, server_.GetTickClock());
 
-    entity_updater_.Start();
+    entity_updater_.Start(server_.server->level_.main_world_);
 
     g_logger.LogInfo("Client::Initialize", "Generating World");
     terrain_render_.Start(GetWindow(), &server_, &profiler_);
@@ -155,7 +155,7 @@ void Client::Update() {
         framebuffer_.GenBuffer(properties_.window_size_x_, properties_.window_size_y_, (float)g_app_options.graphics_scale_);
     }
 
-    main_player_.Update(inputs_);
+    main_player_.Update(inputs_, server_.server->level_.main_world_);
 
     terrain_render_.SetPosition(main_player_.GetEntityProperties().position_);
     terrain_render_.SetRotation(main_player_.GetEntityProperties().rotation_);

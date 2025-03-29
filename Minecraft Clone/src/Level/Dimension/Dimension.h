@@ -37,6 +37,7 @@ protected:
 public:
     WorldInteractions world_interactions_;
     EventSystem event_manager_;
+    const int tick_rate_ = 20;
 
     Dimension(WorldGeneratorID generatorTypeIn = g_generators.DEBUG) {
         generator_type_ = generatorTypeIn;
@@ -98,7 +99,7 @@ public:
                 throw std::exception("Not handled yet!");
             }
 
-            g_event_handler.ExecuteEvent(e);
+            g_event_handler.ExecuteEvent(e, this);
         }
 
         EventQueue->clear();
@@ -108,6 +109,6 @@ public:
 
         //Tick all entities
 
-        world_->entities_.Tick();
+        world_->entities_.Tick(this);
     }
 };

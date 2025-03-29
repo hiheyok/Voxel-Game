@@ -59,9 +59,6 @@ private:
             curr++;
         }
 
-        // Double check
-        if (unique_blocks_count_ != curr) throw std::runtime_error("Palette::Resize - unique block count mismatch!");
-
         for (int i = 0; i < CHUNK_SIZE; ++i) {
             PaletteIndex currVal = data_.Get(i);
             PaletteIndex newVal = newPaletteIndex[currVal];

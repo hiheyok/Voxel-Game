@@ -60,9 +60,9 @@ public:
         return nullptr;
     }
 
-    void Tick() {
+    void Tick(Dimension* dimension) {
         for (auto& entity : entities_) {
-            entity.second->Tick();
+            entity.second->Tick(dimension);
         }
     }
 

@@ -3,8 +3,6 @@
 #include "../../../../Utils/Math/Probability/Probability.h"
 #include "../../../Event/EventHandler.h"
 
-struct Block;
-
 struct GrassProperties {
     double spread_chance_ = 0.001;
     double break_chance_ = 0.001;
@@ -14,9 +12,7 @@ struct GrassBlock : Block {
 
     GrassProperties properties_;
 
-    void Tick(const BlockPos& pos) override {
-        Dimension* currentWorld = static_cast<Dimension*>(Block::dimension_ptr_);
-
+    void Tick(const BlockPos& pos, Dimension* currentWorld) override {
         //Checks if ticking block changes 
         if (currentWorld->world_interactions_.GetBlock(pos) != g_blocks.GRASS) {
             return;
