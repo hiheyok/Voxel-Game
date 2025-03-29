@@ -251,7 +251,7 @@ void WorldInteractions::SetBlock(BlockID b, const BlockPos& bpos) {
         RequestLightUpdate(pos);
     }
     catch (std::exception& e) {
-        g_logger.LogError("World Exception", e.what());
+        g_logger.LogError("WorldInteractions::SetBlock", e.what());
     }
 }
 
@@ -260,7 +260,7 @@ BlockID WorldInteractions::GetBlock(const BlockPos& pos) {
         return world->GetBlock(pos);
     }
     catch (std::exception& e) {
-        g_logger.LogError("World", e.what());
+        g_logger.LogError("WorldInteractions::GetBlock", e.what());
         return g_blocks.AIR;
     }
 }

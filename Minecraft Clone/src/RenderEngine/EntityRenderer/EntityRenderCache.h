@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../Level/Entity/Entity.h"
-#include "../../Utils/Containers/skaHashmap.h"
 struct EntityRenderCache { // stores all entity to be rendered
 
     FastHashMap<EntityUUID, EntityProperty> entity_container_;

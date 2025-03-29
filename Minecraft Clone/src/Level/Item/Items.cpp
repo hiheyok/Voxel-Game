@@ -14,7 +14,7 @@ Item ItemList::RegisterBlockItem(BlockID block) {
 
     item_count_++;
     
-    g_logger.LogInfo("Item", "Registered Block Item: " + std::to_string(item_count_) + " | Name: " + item.properties_.name_);
+    g_logger.LogInfo("ItemList::RegisterBlockItem", "Registered Block Item: " + std::to_string(item_count_) + " | Name: " + item.properties_.name_);
 
     return item;
 }

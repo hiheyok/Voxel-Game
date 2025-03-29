@@ -171,7 +171,7 @@ void TerrainRenderer::AddChunk(const ChunkPos& pos, const std::vector<uint32_t>&
     }
 
     if (!success) {
-        g_logger.LogInfo("Terrain Renderer", "Unable to add chunk. Solid buffers are full!");
+        g_logger.LogInfo("TerrainRenderer::AddChunk", "Unable to add chunk. Solid buffers are full!");
     }
 }
 

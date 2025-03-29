@@ -1,6 +1,5 @@
 #pragma once
 #include "../Entity/Entity.h"
-#include "../../Utils/Containers/skaHashmap.h"
 #include <mutex>
 
 class EntityContainer { //Manages all entities in world

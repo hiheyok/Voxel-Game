@@ -13,8 +13,8 @@ void WorldRender::SetPosition(glm::dvec3 position) {
 }
 
 void WorldRender::Render() {
-    renderer_v2_.RenderSky();
-    renderer_v2_.Render();
+    renderer_.RenderSky();
+    renderer_.Render();
 }
 
 void WorldRender::LoadChunkToRenderer(ChunkPos chunk) {
@@ -66,24 +66,24 @@ void WorldRender::Update() {
         }
         //profiler_->CombineCache(worker_output_[(uint64_t)workerId].front()->profiler);
         build_time_ += mesh_add_queue_.back()->time_;
-        renderer_v2_.AddChunk(std::move(mesh_add_queue_.back()));
+        renderer_.AddChunk(std::move(mesh_add_queue_.back()));
         mesh_add_queue_.pop_back();
     }
 
     LoadChunkMultiToRenderer(server_->GetUpdatedChunks());
 
     if (updateAmount < chunkUpdateLimit) {
-        renderer_v2_.Defrag(chunkUpdateLimit - updateAmount);
+        renderer_.Defrag(1);
     }
 
-    renderer_v2_.Update();
-    renderer_v2_.PrepareRenderer();
+    renderer_.Update();
+    renderer_.PrepareRenderer();
 
 }
 
 void WorldRender::Stop() {
     mesh_thread_pool_->Stop();
-    renderer_v2_.Cleanup();
+    renderer_.Cleanup();
 }
 
 void WorldRender::Start(GLFWwindow* window, InternalServer* server, PerformanceProfiler* profiler) {
@@ -99,9 +99,9 @@ void WorldRender::Start(GLFWwindow* window, InternalServer* server, PerformanceP
     window_ = window;
     WorldRender::server_ = server;
 
-    renderer_v2_.Initialize(window_, player_.GetCamera());
-    renderer_v2_.LoadAssets();
-    renderer_v2_.setSettings(horizontal_render_distance_, vertical_render_distance_, 90);
+    renderer_.Initialize(window_, player_.GetCamera());
+    renderer_.LoadAssets();
+    renderer_.setSettings(horizontal_render_distance_, vertical_render_distance_, 90);
 
     profiler_ = profiler;
 }

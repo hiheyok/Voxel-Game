@@ -70,7 +70,7 @@ public:
             is_dirty_ = true;
         }
         else {
-            g_logger.LogError("GUI", "Element " + Name + " already exist!");
+            g_logger.LogError("GUISet::AddGUIElementNorm", "Element " + Name + " already exist!");
         }
     }
 
@@ -97,7 +97,7 @@ public:
             is_dirty_ = true;
         }
         else {
-            g_logger.LogError("GUI", "Element " + Name + " already exist!");
+            g_logger.LogError("GUISet::AddGUIElement", "Element " + Name + " already exist!");
         }
     }
 
@@ -108,7 +108,7 @@ public:
             is_dirty_ = true;
         }
         else {
-            g_logger.LogError("GUI", "Element " + Name + " doesn't exist!");
+            g_logger.LogError("GUISet::EditElementPosition", "Element " + Name + " doesn't exist!");
         }
     }
 
@@ -120,7 +120,7 @@ public:
             is_dirty_ = true;
         }
         else {
-            g_logger.LogError("GUI", "Element " + Name + " doesn't exist!");
+            g_logger.LogError("GUISet::EditElementUVNorm", "Element " + Name + " doesn't exist!");
         }
     }
 

@@ -50,49 +50,139 @@ public:
 class BufferStorage {
 public:
 
+    BufferStorage() = default; // Add default constructor
+
+    ~BufferStorage() {
+        if (buffer_storage_id_ != 0) {
+            Delete();
+        }
+    }
+
     void Delete() {
-        glDeleteBuffers(1, &buffer_storage_id_);
+        if (buffer_storage_id_ != 0) {
+            glDeleteBuffers(1, &buffer_storage_id_);
+            buffer_storage_id_ = 0; // Use 0 to indicate deleted/uninitialized
+            max_size_ = 0;
+            target_ = 0;
+            g_logger.LogDebug("BufferStorage::Delete", "Deleted buffer storage. ID was: " + std::to_string(buffer_storage_id_)); // Log before setting to 0
+        }
+
     }
 
     void Bind() {
-        glBindBuffer(target_, buffer_storage_id_);
+        if (buffer_storage_id_ != 0) {
+            glBindBuffer(target_, buffer_storage_id_);
+        }
+        else {
+            g_logger.LogWarn("BufferStorage::Bind", "Attempted to bind an uninitialized/deleted buffer storage.");
+        }
     }
 
     void Unbind() {
         glBindBuffer(target_, 0);
     }
 
-    void Create(GLuint bufferTarget, uint64_t size) {
+
+    void Create(GLuint bufferTarget, uint64_t size, bool dynamic = true, const void* data = nullptr) {
+        if (buffer_storage_id_ != 0) {
+            g_logger.LogWarn("BufferStorage::Create", "Create called on an already initialized buffer storage. Deleting old one. ID: " + std::to_string(buffer_storage_id_));
+            Delete();
+        }
+
         target_ = bufferTarget;
         max_size_ = size;
 
         glGenBuffers(1, &buffer_storage_id_);
+
+        if (buffer_storage_id_ == 0) {
+            g_logger.LogError("BufferStorage::Create", "glGenBuffers failed!");
+            max_size_ = 0;
+            target_ = 0;
+            return;
+        }
+
+        g_logger.LogDebug("BufferStorage::Create", "Generated buffer storage. ID: " + std::to_string(buffer_storage_id_));
+        Bind();
+
+        // *** Use glBufferStorage ***
+        GLbitfield flags = 0;
+        if (dynamic) {
+            flags |= GL_DYNAMIC_STORAGE_BIT; // Crucial for glBufferSubData/glCopyBufferSubData
+        }
+        // *** NO MAPPING FLAGS (GL_MAP_*) are included ***
+        // This strongly hints the driver to keep the buffer in VRAM if possible.
+
+        glBufferStorage(target_, static_cast<GLsizeiptr>(size), data, flags);
+
+        // Check for OpenGL errors after buffer storage creation
+        GLenum err;
+        if ((err = glGetError()) != GL_NO_ERROR) {
+            g_logger.LogError("BufferStorage::Create", "OpenGL error after glBufferStorage: " + std::to_string(err));
+            Delete(); // Clean up failed buffer
+            return;
+        }
+
+
+        g_logger.LogInfo("BufferStorage::Create", "Created buffer storage ID: " + std::to_string(buffer_storage_id_)
+            + " Size: " + std::to_string(size) + " bytes, Target: " + std::to_string(target_)
+            + ", Dynamic: " + (dynamic ? "Yes" : "No"));
+
+        /*glGenBuffers(1, &buffer_storage_id_);
         Bind();
         GLbitfield flags = GL_MAP_PERSISTENT_BIT | GL_MAP_READ_BIT | GL_DYNAMIC_STORAGE_BIT;
-        glBufferStorage(target_, size, nullptr, flags);
+        glBufferStorage(target_, size, nullptr, flags);*/
     }
 
-    void InsertData(uint64_t Offset, uint64_t Size, const void* data) {
+    void InsertData(uint64_t offset, uint64_t size, const void* data) {
+        if (buffer_storage_id_ == 0) {
+            g_logger.LogError("BufferStorage::InsertData", "Attempted InsertData on uninitialized buffer.");
+            return;
+        }
+
+        if (offset + size > max_size_) {
+            g_logger.LogError("BufferStorage::InsertData", "InsertData exceeds buffer bounds. Offset: " + std::to_string(offset)
+                + ", Size: " + std::to_string(size) + ", MaxSize: " + std::to_string(max_size_));
+            return;
+        }
+
         Bind();
-        glBufferSubData(target_, Offset, Size, data);
-        Unbind();
+        glBufferSubData(target_, offset, size, data);
     }
 
-    void CopyFrom(Buffer& buffer, size_t readOffset, size_t writeOffset, size_t size) {
-        Bind();
-        buffer.Bind();
-        glCopyBufferSubData(buffer.type_, target_, readOffset, writeOffset, size);
-        Unbind();
-        buffer.Unbind();
+    void CopyFrom(BufferStorage& sourceBuffer, size_t readOffset, size_t writeOffset, size_t size) {
+        if (buffer_storage_id_ == 0 || sourceBuffer.buffer_storage_id_ == 0) {
+            g_logger.LogError("BufferStorage::CopyFrom", "Attempted CopyFrom with uninitialized buffer(s).");
+            return;
+        }
+        if (writeOffset + size > max_size_ || readOffset + size > sourceBuffer.max_size_) {
+            g_logger.LogError("BufferStorage::CopyFrom", "CopyFrom exceeds buffer bounds.");
+            return;
+        }
+        glBindBuffer(GL_COPY_READ_BUFFER, sourceBuffer.buffer_storage_id_);
+        glBindBuffer(GL_COPY_WRITE_BUFFER, buffer_storage_id_);
+        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, readOffset, writeOffset, size);
+        glBindBuffer(GL_COPY_READ_BUFFER, 0);
+        glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
     }
 
-    void CopyTo(Buffer& buffer, size_t ReadOffset, size_t WriteOffset, size_t Size) {
-        Bind();
-        buffer.Bind();
-        glCopyBufferSubData(target_, buffer.type_, ReadOffset, WriteOffset, Size);
-        Unbind();
-        buffer.Unbind();
+    void CopyTo(BufferStorage& destinationBuffer, size_t readOffset, size_t writeOffset, size_t size) {
+        if (buffer_storage_id_ == 0 || destinationBuffer.buffer_storage_id_ == 0) {
+            g_logger.LogError("BufferStorage::CopyTo", "Attempted CopyTo with uninitialized buffer(s).");
+            return;
+        }
+        if (readOffset + size > max_size_ || writeOffset + size > destinationBuffer.max_size_) {
+            g_logger.LogError("BufferStorage::CopyTo", "CopyTo exceeds buffer bounds.");
+            return;
+        }
+        glBindBuffer(GL_COPY_READ_BUFFER, buffer_storage_id_);
+        glBindBuffer(GL_COPY_WRITE_BUFFER, destinationBuffer.buffer_storage_id_);
+        glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, readOffset, writeOffset, size);
+        glBindBuffer(GL_COPY_READ_BUFFER, 0);
+        glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
     }
+
+    bool IsInitialized() const { return buffer_storage_id_ != 0; }
+    size_t GetMaxSize() const { return max_size_; }
     
 private:
     unsigned int buffer_storage_id_ = NULL;

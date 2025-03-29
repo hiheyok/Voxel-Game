@@ -4,8 +4,6 @@
 #define CHUNKDATA_H
 
 #include <glm/vec3.hpp>
-
-#include "../DataContainer/BlockData.h"
 #include "../TerrainGeneration/Structures/Structure.h"
 #include "Lighting/ChunkLighting.h"
 #include "../Typenames.h"

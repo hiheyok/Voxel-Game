@@ -63,7 +63,7 @@ void Buffer::UnbindBase(int index) {
 
 void Buffer::GenBuffer() {
     glGenBuffers(1, &buffer_id_);
-    g_logger.LogDebug("Buffer", "Created buffer. ID: " + std::to_string(buffer_id_));
+    g_logger.LogDebug("Buffer::GenBuffer", "Created buffer. ID: " + std::to_string(buffer_id_));
 }
 
 void Buffer::getData(uint32_t* ptr, size_t offset, size_t size) {
@@ -114,5 +114,5 @@ void VertexArray::ResetArray() {
 
 void VertexArray::GenArray() {
     glGenVertexArrays(1, &array_id_);
-    g_logger.LogDebug("Vertex Array", "Created array. ID: " + std::to_string(array_id_));
+    g_logger.LogDebug("VertexArray::GenArray", "Created array. ID: " + std::to_string(array_id_));
 }

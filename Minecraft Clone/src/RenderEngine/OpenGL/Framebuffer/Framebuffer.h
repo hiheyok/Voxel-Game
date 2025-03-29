@@ -48,7 +48,7 @@ public:
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo_); // now actually attach it
         // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-            g_logger.LogError("Framebuffer", "Failed to create framebuffer!");
+            g_logger.LogError("TexturedFrameBuffer::GenBuffer", "Failed to create framebuffer!");
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         screen_->BindTexture2D(0, texture_, "screenTexture");
@@ -75,7 +75,7 @@ public:
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
-        g_logger.LogDebug("Framebuffer", "Created new frame buffer: " + std::to_string(fbo_));
+        g_logger.LogDebug("TexturedFrameBuffer::GenBuffer", "Created new frame buffer: " + std::to_string(fbo_));
     }
 
     void UpdateResolution(GLint x, GLint y, float muti = 1.f) {

@@ -49,7 +49,7 @@ static int ConvertStringFaceToIndex(const std::string& str) {
         return EAST;
     }
     else {
-        g_logger.LogError("Model Loader", "Unknown direction: " + str);
+        g_logger.LogError("ConvertStringFaceToIndex", "Unknown direction: " + str);
         return NULL;
     }
 
@@ -103,7 +103,7 @@ static void ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
                 bFace.rotation_ = faceElements.value();
             }
             else {
-                g_logger.LogError("Model Loader", "Unknown face attribute: " + faceElements.key());
+                g_logger.LogError("ProcessSingleCubeFaces", "Unknown face attribute: " + faceElements.key());
             }
 
 
@@ -135,7 +135,7 @@ static CuboidRotationInfo getRotationalData(json JsonData) {
                 rotationInfo.axis_ = 2;
             }
             else {
-                g_logger.LogError("Model Loader", "Unknown rotational axis: " + attribute.value());
+                g_logger.LogError("getRotationalData", "Unknown rotational axis: " + attribute.value());
             }
             
         }
@@ -187,7 +187,7 @@ static void UpdateModelElements(std::unique_ptr<ModelV2::BlockModelV2>& model, j
                 cuboid.shade_ = static_cast<bool>(subElements.value());
             }
             else {
-                g_logger.LogError("Model Loader", "Unknown element attribute: " + subElements.key());
+                g_logger.LogError("UpdateModelElements", "Unknown element attribute: " + subElements.key());
             }
         }
 
@@ -247,7 +247,7 @@ static void ProcessModelDisplay(std::unique_ptr<ModelV2::BlockModelV2>& model, j
                 }
             }
             else {
-                g_logger.LogError("Model Loader", "Unknown display attribute: " + transitions.key());
+                g_logger.LogError("ProcessModelDisplay", "Unknown display attribute: " + transitions.key());
             }
         }
 
@@ -276,7 +276,7 @@ static void ProcessModelDisplay(std::unique_ptr<ModelV2::BlockModelV2>& model, j
             display.position = DisplayPosition::fixed;
         }
         else {
-            g_logger.LogError("Model Loader", "Unknown display position: " + position);
+            g_logger.LogError("ProcessModelDisplay", "Unknown display position: " + position);
             return;
         }
 
@@ -302,7 +302,7 @@ static std::unique_ptr<ModelV2::BlockModelV2> recursiveGetBlockModel(std::string
         JSONData = json::parse(file);
     }
     catch (const std::exception& e) {
-        g_logger.LogError("Model Loader", e.what());
+        g_logger.LogError("recursiveGetBlockModel", e.what());
         return nullptr;
     }
 

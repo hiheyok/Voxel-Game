@@ -28,7 +28,7 @@ public:
 
     size_t GetQueuedSize();
 
-    TerrainRenderer renderer_v2_;
+    TerrainRenderer renderer_;
     PerformanceProfiler* profiler_;
 private:
     static std::unique_ptr<Mesh::ChunkVertexData> Worker(const ChunkPos& pos);

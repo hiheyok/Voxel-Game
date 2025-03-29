@@ -66,7 +66,7 @@ public:
         font_texture_.Load(RawTexture);
         font_shader_.BindTexture2D(0, font_texture_.get(), "FontTexture");
         window_ = w;
-        g_logger.LogDebug("Font Renderer", "Initialized font renderer");
+        g_logger.LogDebug("TextRenderer::InitializeTextRenderer", "Initialized font renderer");
     }
 
     void InsertFontObject(std::string name ,RenderableFont font) {

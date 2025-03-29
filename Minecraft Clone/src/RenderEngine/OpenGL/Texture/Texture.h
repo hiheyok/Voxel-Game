@@ -36,7 +36,7 @@ public:
             break;
         default:
             Erase();
-            g_logger.LogWarn("Image Loader", "Image invalid format");
+            g_logger.LogWarn("RawTextureData::Load", "Image invalid format");
         }
     }
     unsigned char operator[](int index) {

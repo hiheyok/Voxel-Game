@@ -21,7 +21,7 @@ public:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 4);
 
-        g_logger.LogDebug("Texture Loader", "Loaded 2D Texture: " + std::to_string(texture_id_));
+        g_logger.LogDebug("TextureAtlas::UploadToGPU", "Loaded 2D Texture: " + std::to_string(texture_id_));
     }
     void SetSize(int width, int height) {
         width_ = width;
@@ -91,7 +91,7 @@ public:
             count_++;
             break;
         default:
-            g_logger.LogError("Texture Atlas Stitcher", "Invalid image format!");
+            g_logger.LogError("TextureAtlas::AddData", "Invalid image format!");
             break;
         }
     }
@@ -100,12 +100,12 @@ public:
 
         format_ = GL_RGBA;
         if (!data->data_) {
-            g_logger.LogError("Texture Atlas", "No texture");
+            g_logger.LogError("TextureAtlas::_AddTextureToAtlas", "No texture");
             return false;
         }
 
         if (((data->width_ % 16) != 0) || ((data->height_ % 16) != 0)) {
-            g_logger.LogError("Texture Atlas", "Width or height doesn't match");
+            g_logger.LogError("TextureAtlas::_AddTextureToAtlas", "Width or height doesn't match");
             return false;
         }
 
@@ -148,11 +148,11 @@ public:
         std::optional<RawTextureData> data;
         RawTextureData tex = GetImageData(file.c_str());
         if (_AddTextureToAtlas(&tex, transparency, isSeeThrough)) {
-            g_logger.LogInfo("Texture Atlas", "Loaded: " + file + " | Size: " + std::to_string(tex.height_) + ", " + std::to_string(tex.width_));
+            g_logger.LogInfo("TextureAtlas::AddTextureToAtlas", "Loaded: " + file + " | Size: " + std::to_string(tex.height_) + ", " + std::to_string(tex.width_));
             data = tex;
             return data;
         }
-        g_logger.LogError("Texture Atlas", "Unable to load: " + file);
+        g_logger.LogError("TextureAtlas::AddTextureToAtlas", "Unable to load: " + file);
         return data;
     }
 

@@ -48,7 +48,8 @@ void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, unsigned int id,
     str.seekg(0, std::ios::end);
 
     if (str.str().size() != 0) {
-        g_logger.LogError("OpenGL", str.str());
+        std::cout << str.str() << '\n';
+        g_logger.LogError("Window::glDebugOutput", str.str());
     }
 
 }
@@ -64,14 +65,14 @@ bool Window::WindowCloseCheck() {
 void Window::Start() {
 
     if (properties_.initialized_) {
-        g_logger.LogError("OpenGL","Already initialized");
+        g_logger.LogError("Window::Start","Already initialized");
         return;
     }
 
     glfwInit();
     if (!glfwInit())
     {
-        g_logger.LogError("OpenGL", "Initialization Failed: GLFW");
+        g_logger.LogError("Window::Start", "Initialization Failed: GLFW");
         return;
     }
 
@@ -85,13 +86,13 @@ void Window::Start() {
 
     if (window_ == nullptr)
     {
-        g_logger.LogError("OpenGL", "Failed to create GLFW Window");
+        g_logger.LogError("Window::Start", "Failed to create GLFW Window");
 
         glfwTerminate();
         return;
     }
     else {
-        g_logger.LogInfo("OpenGL","Created GLFW Window");
+        g_logger.LogInfo("Window::Start","Created GLFW Window");
     }
 
     glfwSetWindowUserPointer(window_, this);
@@ -104,13 +105,13 @@ void Window::Start() {
     glewInit();
 
     if (glewInit() != GLEW_OK) {
-        g_logger.LogError("OpenGL", "Initialization Failed: GLEW");
+        g_logger.LogError("Window::Start", "Initialization Failed: GLEW");
         return;
     }
 
     std::stringstream str;
     str << "OpenGL Version: " << glGetString(GL_VERSION);
-    g_logger.LogInfo("OpenGL", str.str());
+    g_logger.LogInfo("Window::Start", str.str());
 
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
@@ -147,7 +148,7 @@ void Window::ResizeWindowCallback(int x, int y) {
     properties_.window_size_y_ = y;
     properties_.window_size_dirty_ = true;
 
-    g_logger.LogInfo("OpenGL"," Resized Window: " + std::to_string(x) + ", " + std::to_string(y));
+    g_logger.LogInfo("Window::ResizeWindowCallback"," Resized Window: " + std::to_string(x) + ", " + std::to_string(y));
 }
 
 void Window::ScrollCallback(GLFWwindow* win, double xOffset, double yOffset) {

@@ -36,7 +36,7 @@ public:
     static void Register(int ID, std::string BiomeName, Biome* biome) {
         REGISTRY.Register(ID, ResourceLocation(BiomeName).path_, biome);
         BiomeIDs[biome] = ID;
-        g_logger.LogDebug("Biome", "Registered biome: " + BiomeName);
+        g_logger.LogDebug("Biome::Register", "Registered biome: " + BiomeName);
         if (biome->isMutation()) {
             MUTATION_TO_BASE_ID_MAP[ID] = biome;
         }
@@ -67,7 +67,7 @@ public:
             biome = REGISTRY.GetValue(REGISTRY.GetKey(biomeId));
         }
         catch (const std::exception& e) {
-            g_logger.LogError("Biome", e.what());
+            g_logger.LogError("Biome::getBiome", e.what());
         }
         
         return biome == nullptr ? fallback : biome;

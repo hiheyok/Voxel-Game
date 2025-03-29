@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include "../Utils/Containers/skaHashmap.h"
 #include "../Utils/Containers/robin_hood.h"
 
 typedef unsigned int EventID;

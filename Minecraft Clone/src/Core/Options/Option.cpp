@@ -17,10 +17,10 @@ Options::Options() {
 }
 
 bool Options::SetValue(std::string name, std::string value) {
-    int val = stoi(value);
+    size_t val = stoll(value);
 
     if (!option_name_.count(name)) {
-        g_logger.LogError("Option", "Unknown option: " + name);
+        g_logger.LogError("Options::SetValue", "Unknown option: " + name);
         return false;
     }
 
@@ -34,7 +34,7 @@ void Options::ProcessTokens(std::vector<std::string> tokens) {
     for (int i = 0; i < (tokens.size() / 2); i++) {
         std::string name = tokens[2 * i];
         std::string val = tokens[2 * i + 1];
-        g_logger.LogDebug("Options", name + ":" + val);
+        g_logger.LogDebug("Options::ProcessTokens", name + ":" + val);
         if (!SetValue(name, val)) {
             success = false;
         }
@@ -68,5 +68,5 @@ void Options::GenerateOptionFile() { //Generate file if deleted
     }
 
     file.close();
-    g_logger.LogDebug("Option", "Generated option file");
+    g_logger.LogDebug("Options::GenerateOptionFile", "Generated option file");
 }

@@ -91,7 +91,7 @@ inline ThreadPool<TaskIn, TaskOut, Task>::~ThreadPool() {
 
 template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
 inline void ThreadPool<TaskIn, TaskOut, Task>::Scheduler() {
-    g_logger.LogDebug(type_ + " Thread Pool", "Started task scheduler");
+    g_logger.LogDebug("ThreadPool::Scheduler", type_ + " Thread Pool | Started task scheduler");
 
     std::vector<TaskIn> internalTaskList;
 
@@ -138,12 +138,12 @@ inline void ThreadPool<TaskIn, TaskOut, Task>::Scheduler() {
         internalTaskList.clear();
     }
 
-    g_logger.LogDebug(type_ + " Thread Pool", "Shutting down task scheduler");
+    g_logger.LogDebug("ThreadPool::Scheduler", type_ + " Thread Pool | Shutting down task scheduler");
 }
 
 template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
 inline void ThreadPool<TaskIn, TaskOut, Task>::Worker(int workerId) {
-    g_logger.LogDebug(type_ + " Thread Pool", "Started worker " + std::to_string(workerId));
+    g_logger.LogDebug("ThreadPool::Worker", type_ + " Thread Pool | Started worker " + std::to_string(workerId));
     bool workingOnBatch = false;
     size_t batchIndex = 0;
     std::vector<TaskIn> workerTasks;
@@ -194,12 +194,12 @@ inline void ThreadPool<TaskIn, TaskOut, Task>::Worker(int workerId) {
         output.clear();
 
     }
-    g_logger.LogDebug(type_ + " Thread Pool", "Shutting down worker " + std::to_string(workerId));
+    g_logger.LogDebug("ThreadPool::Worker", type_ + " Thread Pool | Shutting down worker " + std::to_string(workerId));
 }
 
 template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
 inline void ThreadPool<TaskIn, TaskOut, Task>::OutputManager() {
-    g_logger.LogDebug(type_ + " Thread Pool", "Started output manager ");
+    g_logger.LogDebug("ThreadPool::Worker", type_ + " Thread Pool | Started output manager");
     while (!stop_) {
         // Waits for output
         {
@@ -227,7 +227,7 @@ inline void ThreadPool<TaskIn, TaskOut, Task>::OutputManager() {
             }
         }
     }
-    g_logger.LogDebug(type_ + " Thread Pool", "Shutting down output manager ");
+    g_logger.LogDebug("ThreadPool::Worker", type_ + " Thread Pool | Shutting down output manager");
 }
 
 template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>

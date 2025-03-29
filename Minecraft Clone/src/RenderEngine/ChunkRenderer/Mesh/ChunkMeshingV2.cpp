@@ -211,6 +211,13 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
                     qPos[2] = pos[2];
 
                     //Memorize & Add Faces
+
+                    // TODO: Add some AO Checks and Greedy Meshing here
+
+                    /*
+                    * Center wont have AO check as it is no sides
+                    * Do lighting checks when combining faces
+                    */
                     if (!blankCurrModel) {
                         for (int i = 0; i < currModel.elements_.size(); i++) {
                             if (faceVisibility[i] != 1) continue;

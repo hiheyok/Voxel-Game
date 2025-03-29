@@ -233,24 +233,49 @@ namespace MemoryManagement {
 
 class ChunkGPUMemoryPool {
 public:
+    //TODO: Add some cleanup
+    void Allocate(size_t memoryPoolSize) {
+        if (memory_pool_size_ != 0) {
+            g_logger.LogWarn("ChunkGPUMemoryPool::Allocate", "Allocate called on already allocated pool. Re-allocating.");
 
-    void Allocate(size_t MemoryPoolSize) {
-        memory_pool_size_ = MemoryPoolSize;
+            buffer_.Delete();
+            stagging_buffer_.Delete();
+            memory_pool_ = MemoryManagement::MemoryPoolManager(); // Re-create manager
+            chunk_memory_offsets_.clear();
+            memory_chunk_offsets_.clear();
+            statistics_ = MemoryManagement::MemoryPoolStatistics(); // Reset stats
+        }
 
-        buffer_.Create(GL_ARRAY_BUFFER, MemoryPoolSize);
+        memory_pool_size_ = memoryPoolSize;
+        if (memory_pool_size_ == 0) {
+            g_logger.LogError("ChunkGPUMemoryPool::Allocate", "Attempted to allocate with zero size.");
+            return;
+        }
 
-        stagging_buffer_.GenBuffer();
-        stagging_buffer_.SetType(GL_COPY_WRITE_BUFFER);
-        stagging_buffer_.SetUsage(GL_DYNAMIC_COPY);
-        stagging_buffer_.SetMaxSize(10000000);
-        stagging_buffer_.InitializeData();
+        // Use the modified Create method with dynamic=true
+        buffer_.Create(GL_ARRAY_BUFFER, memory_pool_size_, true, nullptr);
+        if (!buffer_.IsInitialized()) {
+            g_logger.LogError("ChunkGPUMemoryPool::Allocate", "Failed to create main buffer storage.");
+            memory_pool_size_ = 0; // Reset size on failure
+            return;
+        }
 
+
+        size_t stagingSize = 10000000; 
+        stagging_buffer_.Create(GL_COPY_WRITE_BUFFER, stagingSize, true, nullptr); // Dynamic for potential reuse
+        if (!stagging_buffer_.IsInitialized()) {
+            g_logger.LogError("ChunkGPUMemoryPool::Allocate", "Failed to create staging buffer storage.");
+            buffer_.Delete(); // Clean up main buffer if staging fails
+            memory_pool_size_ = 0;
+            return;
+        }
         memory_pool_.Initialize(memory_pool_size_);
+        g_logger.LogInfo("ChunkGPUMemoryPool::Allocate", "Allocated GPU memory pool. Size: " + std::to_string(memory_pool_size_) + " bytes.");
     }
 
     void DeleteChunk(ChunkPos pos) {
         if (!chunk_memory_offsets_.count(pos)) {
-            g_logger.LogDebug("GPU Memory Pool","Attempted to delete non-existant chunk with ID " + std::to_string(pos));
+            g_logger.LogDebug("ChunkGPUMemoryPool::AddChunk","Attempted to delete non-existant chunk with ID " + std::to_string(pos));
             return;
         }
 
@@ -269,7 +294,7 @@ public:
         size_t blockOffset = memory_pool_.FindFreeSpace(blockSize);
 
         if (blockOffset == ULLONG_MAX) { //Check if it is out of space
-            g_logger.LogError("GPU Memory Pool", "Out of space!");
+            g_logger.LogError("ChunkGPUMemoryPool::AddChunk", "Out of space!");
             return ChunkMemoryPoolOffset{ ULLONG_MAX, ULLONG_MAX };
         }
 
@@ -304,7 +329,7 @@ public:
         return chunk_memory_offsets_.count(pos);
     }
 
-    ChunkMemoryPoolOffset AddChunkStaggingBuffer(ChunkPos pos, int side, uint64_t blockOffset, uint64_t blockSize) { //assumes vertices.size() != 0
+    ChunkMemoryPoolOffset AddChunkStaggingBuffer(ChunkPos pos, uint64_t blockOffset, uint64_t blockSize) { //assumes vertices.size() != 0
         ChunkMemoryPoolOffset chunkMemoryBlock;
         chunkMemoryBlock.mem_offset_ = blockOffset;
         chunkMemoryBlock.mem_size_ = blockSize;
@@ -319,7 +344,6 @@ public:
 
         statistics_.memory_usage_ += blockSize;
         Update();
-        (void)side;
         return chunkMemoryBlock;
     }
 
@@ -337,7 +361,7 @@ public:
     }
 
     MemoryManagement::MemoryPoolStatistics statistics_;
-    Buffer stagging_buffer_; 
+    BufferStorage stagging_buffer_; 
     BufferStorage buffer_;
 
     MemoryManagement::MemoryPoolManager memory_pool_;

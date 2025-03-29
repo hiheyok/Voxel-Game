@@ -10,8 +10,35 @@
 #include <mutex>
 
 class TerrainRenderer {
+private:
+    void AddChunk(const ChunkPos& pos, const std::vector<uint32_t>& data, std::vector<ChunkDrawBatch>& BatchType, FastHashMap<ChunkPos, int>& LookUpMap);
+
+    void SetupShaders();
+
+    void CreateNewSolidBatch();
+
+    void CreateNewTransparentBatch();
+
+    int horizontal_render_distance_ = 16;
+    int vertical_render_distance_ = 16;
+    float fov_ = 80.f;
+    int TextureAminationIndex = 0;
+
+    std::vector<ChunkDrawBatch> chunk_solid_batches_;
+    FastHashMap<ChunkPos, int> chunk_batch_solid_lookup_; //f: ChunkPos -> SolidBatchIndex
+
+    std::vector<ChunkDrawBatch> chunk_transparent_batches_;
+    FastHashMap<ChunkPos, int> chunk_batch_transparent_lookup_; //f: ChunkPos -> TransparentBatchIndex
+
+    GLFWwindow* window_ = nullptr;
+    Shader cubic_shader_;
+    Camera* camera_;
+    Timer time_;
 public:
-    TerrainRenderer() {
+    TerrainRenderer() : chunk_solid_batches_{ 0 },
+        chunk_batch_solid_lookup_{ 0 },
+        chunk_transparent_batches_{ 0 },
+        chunk_batch_transparent_lookup_{ 0 } {
 
     }
 
@@ -47,29 +74,6 @@ public:
 
     size_t amountOfMeshGenerated = 1;
 
-private:
-    void AddChunk(const ChunkPos& pos, const std::vector<uint32_t>& data, std::vector<ChunkDrawBatch>& BatchType, FastHashMap<ChunkPos, int>& LookUpMap);
 
-    void SetupShaders();
-
-    void CreateNewSolidBatch();
-
-    void CreateNewTransparentBatch();
-
-    int horizontal_render_distance_ = 16;
-    int vertical_render_distance_ = 16;
-    float fov_ = 80.f;
-    int TextureAminationIndex = 0;
-
-    std::vector<ChunkDrawBatch> chunk_solid_batches_;
-    FastHashMap<ChunkPos, int> chunk_batch_solid_lookup_; //f: ChunkPos -> SolidBatchIndex
-
-    std::vector<ChunkDrawBatch> chunk_transparent_batches_;
-    FastHashMap<ChunkPos, int> chunk_batch_transparent_lookup_; //f: ChunkPos -> TransparentBatchIndex
-
-    GLFWwindow* window_ = nullptr;
-    Shader cubic_shader_;
-    Camera* camera_;
-    Timer time_;
 };
 

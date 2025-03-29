@@ -7,7 +7,6 @@
 #include "../Event/EventHandler.h"
 #include "../../Core/Options/Option.h"
 #include "../TerrainGeneration/Generators/GeneratorType.h"
-#include "../../Utils/Containers/skaHashmap.h"
 
 class Dimension {
 private:
@@ -15,7 +14,7 @@ private:
     DimensionProperties properties_;
     WorldParameters world_settings_;
     
-    FastHashMap<int, ska::flat_hash_set<ChunkPos>> tick_usage_;
+    FastHashMap<int, FastHashSet<ChunkPos>> tick_usage_;
 
 protected:
     WorldGeneratorID generator_type_;

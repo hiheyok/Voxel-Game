@@ -34,7 +34,7 @@ EntityTypeID EntitiesList::RegisterEntity(std::string EntityName, EntityTypeEnum
 
     newEntity->entity_name_ = EntityName;
 
-    g_logger.LogInfo("Entity Register", "Registered new entity: " + EntityName + " | EntityID: " + std::to_string(ID));
+    g_logger.LogInfo("EntitiesList::RegisterEntity", "Registered new entity: " + EntityName + " | EntityID: " + std::to_string(ID));
 
     newEntity->id_ = ID;
 
@@ -57,7 +57,7 @@ void EntitiesList::InitializeModels() {
         json::iterator d = b.value().begin();
 
         if (d.value().is_string()) {
-            g_logger.LogInfo("Entity Texture", "Entity: " + b.key() + " | Texture Loading: " + (std::string)d.value());
+            g_logger.LogInfo("EntitiesList::InitializeModels", "Entity: " + b.key() + " | Texture Loading: " + (std::string)d.value());
             RawTextureData TexData;
             TexData.Load(((std::string)d.value()).c_str());
             entity_type_list_[entityType]->texture_.Gen();

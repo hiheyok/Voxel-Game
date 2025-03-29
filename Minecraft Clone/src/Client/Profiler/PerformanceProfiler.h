@@ -48,7 +48,7 @@ private:
         
         std::string name_ = "";
         double time_passed_ = 0.0;
-        std::vector<PerformanceTree*> nodes_{};
+        std::vector<std::unique_ptr<PerformanceTree>> nodes_{};
 
         void ChangeTime(std::vector<std::string>& path, int depth, double time) {
             time_passed_ += time;
@@ -57,18 +57,18 @@ private:
                 return;
             }
 
-            for (PerformanceTree* node : nodes_) {
+            for (auto& node : nodes_) {
                 if (!strcmp(node->name_.c_str(), path[depth].c_str())) {
                     node->ChangeTime(path, depth + 1, time);
                     return;
                 }
             }
 
-            nodes_.push_back(new PerformanceTree(path[depth]));
+            nodes_.push_back(std::make_unique<PerformanceTree>(path[depth]));
             nodes_.back()->ChangeTime(path, depth + 1, time);
         }
         
-        void print(int depth = 0) {
+        void print(int depth = 0) const {
             std::string out = "";
 
             for (int i = 0; i < depth; i++) {
@@ -83,7 +83,7 @@ private:
             out += std::to_string(time_passed_ / 1000000.0) + " ms\n";
             std::cout << out;
 
-            for (PerformanceTree* node : nodes_) {
+            for (const auto& node : nodes_) {
                 node->print(depth + 1);
             }
         }

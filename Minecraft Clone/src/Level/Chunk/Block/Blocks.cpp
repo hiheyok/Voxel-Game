@@ -4,7 +4,6 @@
 #include "../../../FileManager/Files.h"
 #include <fstream>
 #include "../../../RenderEngine/BlockModel/ModelLoader.h"
-#include "../../../Utils/Containers/skaHashmap.h"
 #include <iostream>
 #include <sys/types.h>
 #include <filesystem>
@@ -29,7 +28,7 @@ BlockID BlockList::RegisterBlock(std::string blockName, Material* material, bool
 
     block_id_name_data_[blockName] = id;
 
-    g_logger.LogInfo("Register", "Registered new block (ID): " + std::to_string(id));
+    g_logger.LogInfo("BlockList::RegisterBlock", "Registered new block (ID): " + std::to_string(id));
     delete material; // replace w/ unique ptr later
     return id;
 }
@@ -55,7 +54,7 @@ void BlockList::AddAssets(std::string namespaceIn) {
 
     }
     catch (std::filesystem::filesystem_error& e) {
-        g_logger.LogError("File System", e.what());
+        g_logger.LogError("BlockList::AddAssets", e.what());
     }
 }
 
@@ -135,7 +134,7 @@ void BlockList::InitializeBlockModels()  {
                 std::optional<RawTextureData> d = block_texture_atlas_.AddTextureToAtlas(TexFile, transparency, isSeeThrough);
 
                 if (!d.has_value()) {
-                    g_logger.LogError("Texture Loading", "Unable to load texture");
+                    g_logger.LogError("BlockList::InitializeBlockModel", "Unable to load texture");
                     continue;
                 }
 

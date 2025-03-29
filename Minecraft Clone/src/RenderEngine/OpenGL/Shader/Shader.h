@@ -151,7 +151,7 @@ private:
             if (!success)
             {
                 glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-                g_logger.LogError("OpenGL Shader", "Failed to compile" + type_ + " Shader: \n" + std::string(infoLog) + "\n");
+                g_logger.LogError("Shader::CheckCompileErrors", "Failed to compile" + type_ + " Shader: \n" + std::string(infoLog) + "\n");
             }
         }
         else
@@ -160,7 +160,7 @@ private:
             if (!success)
             {
                 glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-                g_logger.LogError("OpenGL Shader", "Failed to link Shader Program: \n" + std::string(infoLog) + "\n");
+                g_logger.LogError("Shader::CheckCompileErrors", "Failed to link Shader Program: \n" + std::string(infoLog) + "\n");
             }
         }
     }

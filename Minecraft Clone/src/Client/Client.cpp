@@ -15,7 +15,7 @@ void Client::Initialize() {
     entity_render_.SetWindow(GetWindow());
     text_render_.InitializeTextRenderer(GetWindow());
     g_items.RegisterAll();
-    g_item_atlas.Initialize(512*16 * 2, 16*2*8);
+    g_item_atlas.Initialize(512 * 16 * 2, 16 * 2 * 8);
 
     for (auto& item : g_items.item_container_) {
         g_item_atlas.AddItem(item.second);
@@ -35,9 +35,9 @@ void Client::Initialize() {
 
     entity_updater_.Start();
 
-    g_logger.LogInfo("World", "Generating World");
+    g_logger.LogInfo("Client::Initialize", "Generating World");
     terrain_render_.Start(GetWindow(), &server_, &profiler_);
-    g_logger.LogInfo("Client", "Starting Gameloop");
+    g_logger.LogInfo("Client::Initialize", "Starting Gameloop");
 
     debug_screen_.Initialize(GetWindow());
 }
@@ -59,10 +59,10 @@ void Client::Cleanup() {
 }
 
 void Client::SetDebugScreen() {
-    debug_screen_.EditText("Stat1", "VRAM Usage: " + std::to_string((double)terrain_render_.renderer_v2_.getVRAMUsageFull() / 1000000.0) + " MB");
+    debug_screen_.EditText("Stat1", "VRAM Usage: " + std::to_string((double)terrain_render_.renderer_.getVRAMUsageFull() / 1000000.0) + " MB");
     debug_screen_.EditText("Stat2", "XYZ: " + std::to_string(main_player_.GetEntityProperties().position_.x) + "/" + std::to_string(main_player_.GetEntityProperties().position_.y) + "/" + std::to_string(main_player_.GetEntityProperties().position_.z));
     debug_screen_.EditText("Stat3", "Velocity XYZ: " + std::to_string(main_player_.GetEntityProperties().velocity_.x) + "/" + std::to_string(main_player_.GetEntityProperties().velocity_.y) + "/" + std::to_string(main_player_.GetEntityProperties().velocity_.z));
-    debug_screen_.EditText("Stat4", "VRAM Fragmentation Rate: " + std::to_string(terrain_render_.renderer_v2_.getFragmentationRate() * 100) + "%");
+    debug_screen_.EditText("Stat4", "VRAM Fragmentation Rate: " + std::to_string(terrain_render_.renderer_.getFragmentationRate() * 100) + "%");
     debug_screen_.EditText("Stat5", "FPS: " + std::to_string(1.0 / frametime_));
     debug_screen_.EditText("Stat6", "Mesh Stats (ms) Total/S0/S1/S2: " + std::to_string(terrain_render_.build_time_ / 1000.f) + "/" + std::to_string(terrain_render_.build_stage_0_ / 1000.f) + "/" + std::to_string(terrain_render_.build_stage_1_ / 1000.f) + "/" + std::to_string(terrain_render_.build_stage_2_ / 1000.f));
     debug_screen_.EditText("Stat7", "Lighting Engine Queued: " + std::to_string(server_.server->level_.level_loader_.GetLightEngineQueueSize()));

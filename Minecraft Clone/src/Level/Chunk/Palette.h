@@ -187,4 +187,34 @@ public:
             Resize();
         }
     }
+
+    void SetBlockUnsafe(BlockID block, int x, int y, int z) {
+        // Look at original block
+        PaletteIndex oldPaletteIdx = data_.GetUnsafe(GetIndex(x, y, z));
+        if (oldPaletteIdx >= palette_entries_.size() || palette_entries_[oldPaletteIdx].second <= 0) {
+            throw std::runtime_error("Palette::SetBlock - Corrupt old palette index found in data.");
+        }
+        palette_entries_[oldPaletteIdx].second--;
+        BlockID oldBlockId = palette_entries_[oldPaletteIdx].first;
+        bool uniqueCountChanged = false;
+        if (block == oldBlockId) {
+            return;
+        }
+
+        if (palette_entries_[oldPaletteIdx].second == 0) {
+            unique_blocks_count_--;
+            uniqueCountChanged = !uniqueCountChanged;
+        }
+
+        PaletteIndex idx = GetOrAddPaletteIndex(block);
+        if (palette_entries_[idx].second++ == 0) {
+            unique_blocks_count_++;
+            uniqueCountChanged = !uniqueCountChanged;
+        }
+
+        data_.Set(GetIndex(x, y, z), idx);
+        if (uniqueCountChanged) {
+            Resize();
+        }
+    }
 };

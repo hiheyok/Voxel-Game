@@ -62,7 +62,7 @@ void Server::Stop() {
 }
 
 void Server::Loop() {
-    g_logger.LogDebug("Server", "Started main server loop");
+    g_logger.LogDebug("Server::Loop", "Started main server loop");
     while (!stop_) {
         time_.Set();
 
@@ -75,7 +75,7 @@ void Server::Loop() {
             timerSleepNotPrecise(static_cast<int>(timeLeft));
         }
     }
-    g_logger.LogDebug("Server", "Shutting down main server loop");
+    g_logger.LogDebug("Server::Loop", "Shutting down main server loop");
 }
 
 void Server::Tick() {

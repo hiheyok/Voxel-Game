@@ -147,7 +147,7 @@ void ChunkDrawBatch::DeleteChunkVertices(const ChunkPos& id) {
     if (memory_pool_.CheckChunk(id)) {
         ChunkMemoryPoolOffset ChunkMemOffset = memory_pool_.GetChunkMemoryPoolOffset(id);
         if (ChunkMemOffset.mem_offset_ == ULLONG_MAX) {
-            g_logger.LogError("Chunk Batch", "Failed to delete chunk: " + std::to_string(id));
+            g_logger.LogError("ChunkDrawBatch::DeleteChunkVertices", "Failed to delete chunk: " + std::to_string(id));
             return;
         }
         render_list_.erase(ChunkMemOffset.mem_offset_);
@@ -206,25 +206,54 @@ void ChunkDrawBatch::Defrager(size_t iterations) {
 
         size_t freeSpaceOffset = freeMemoryBlock.offset_;
 
-        std::map<size_t, MemoryManagement::MemoryBlock>::const_iterator Reserve = memory_pool_.memory_pool_.reserved_memory_blocks_.getIterator(freeMemoryBlock.size_ + freeMemoryBlock.offset_);
+        const auto& reserveIt = memory_pool_.memory_pool_.reserved_memory_blocks_.getIterator(freeMemoryBlock.size_ + freeMemoryBlock.offset_);
 
-        MemoryManagement::MemoryBlock reservedBlock = Reserve->second;
+        const MemoryManagement::MemoryBlock& reservedBlock = reserveIt->second;
 
         ChunkPos pos = memory_pool_.memory_chunk_offsets_[reservedBlock.offset_];
 
-        DeleteChunkVertices(pos);
+        // --- Temporarily remove from render list & pool ---
+       // (Slightly inefficient to lookup again, but safer)
+        if (render_list_offset_lookup_.count(pos)) {
+            size_t render_list_offset = render_list_offset_lookup_[pos];
+            render_list_.erase(render_list_offset);
+            render_list_offset_lookup_.erase(pos);
+        }
+        else {
+            g_logger.LogError("Defrager", "Chunk Pos not found in render_list_offset_lookup_ during defrag!");
+            // This indicates a potential inconsistency, skip this defrag step
+            continue;
+        }
+        // Delete logic needs the size from the offset lookup or reservedBlock
+        memory_pool_.DeleteChunk(pos); // This calls DeallocateSpace internally
 
+        // --- Perform the GPU Copy ---
+        // 1. Copy from main buffer to staging buffer
+        if (reservedBlock.size_ > memory_pool_.stagging_buffer_.GetMaxSize()) {
+            g_logger.LogError("Defrager", "Chunk size too large for staging buffer! Skipping defrag for this block.");
+            // Need to re-add the chunk info we just removed, or handle this state
+            // Re-adding is complex, maybe just log and accept fragmentation for this block.
+            continue;
+        }
         memory_pool_.buffer_.CopyTo(memory_pool_.stagging_buffer_, reservedBlock.offset_, 0, reservedBlock.size_);
-        
-        //Add chunk back
 
-        ChunkMemoryPoolOffset memoryPoolBlockData = memory_pool_.AddChunkStaggingBuffer(pos, NULL, freeSpaceOffset, reservedBlock.size_);
+        // 2. *** INSERT MEMORY BARRIER ***
+        glMemoryBarrier(GL_ALL_BARRIER_BITS); // Or GL_COPY_WRITE_BARRIER_BIT or GL_ALL_BARRIER_BITS
 
-        render_list_[memoryPoolBlockData.mem_offset_] = memoryPoolBlockData;
-        render_list_offset_lookup_[pos] = memoryPoolBlockData.mem_offset_;
-    //    CommandBuffer.AddDrawCommand(DrawCommandIndirect(memoryPoolBlockData.mem_size_ >> 3, 1, memoryPoolBlockData.mem_offset_ >> 3, 0), pos.x, pos.y, pos.z);
-        amount_of_chunks_++;
-        update_commands_ = true;
+        // 3. Add chunk back at the new location (copies from staging buffer)
+        ChunkMemoryPoolOffset newMemoryPoolBlockData = memory_pool_.AddChunkStaggingBuffer(pos, freeMemoryBlock.offset_, reservedBlock.size_);
+
+        if (newMemoryPoolBlockData.mem_offset_ == std::numeric_limits<size_t>::max()) {
+            g_logger.LogError("Defrager", "Failed to re-add chunk from staging buffer during defrag!");
+            // State is potentially inconsistent here, might need recovery logic
+            continue;
+        }
+
+        // --- Update render list with new offset ---
+        render_list_[newMemoryPoolBlockData.mem_offset_] = newMemoryPoolBlockData;
+        render_list_offset_lookup_[pos] = newMemoryPoolBlockData.mem_offset_;
+
+        update_commands_ = true; // Mark commands need regeneration
     }
 }
 
@@ -244,7 +273,7 @@ void ChunkDrawBatch::ErrorCheck() {
 
     }
 
-    g_logger.LogDebug("Chunk Batch", "Errors: \n" + logs);
+    g_logger.LogDebug("ChunkDrawBatch::ErrorCheck", "Errors: \n" + logs);
 
 
 }
