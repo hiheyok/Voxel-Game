@@ -1,8 +1,19 @@
 #pragma once
-#include "../../Level/Server/Communication/InternalServer.h"
+#include <vector>
+#include "../../Level/Typenames.h"
 
 //Abstraction to interact with server
 //For external server it will  store a cache of the world
+
+class InternalServer;
+
+struct EntityProperty;
+struct Ray;
+
+namespace Event {
+    struct Event;
+}
+
 class ServerInteraction {
 public:
     void AssignServer(InternalServer* server);

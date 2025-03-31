@@ -5,7 +5,5 @@
 class World : public WorldAccess {
 private:
 public:
-    void Initialize() {
-        
-    }
+    void Initialize();
 };

@@ -1,4 +1,5 @@
 #include "Superflat.h"
+SuperflatWorld::SuperflatWorld() = default;
 
 void SuperflatWorld::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
     int cy = pos.y * 16;

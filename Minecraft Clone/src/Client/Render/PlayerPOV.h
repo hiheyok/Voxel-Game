@@ -1,14 +1,18 @@
 #pragma once
-#include "../../RenderEngine/Camera/camera.h"
+#include <memory>
+#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
 
+class Camera;
 
 class PlayerPOV {
 public:
+    PlayerPOV();
     void SetPosition(glm::vec3 pos);
     void SetRotation(glm::vec2 rot);
     void SetFOV(float fov);
 
     Camera* GetCamera();
 private:
-    Camera camera_;
+    std::unique_ptr<Camera> camera_;
 };

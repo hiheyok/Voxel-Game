@@ -38,7 +38,8 @@ public:
     TerrainRenderer() : chunk_solid_batches_{ 0 },
         chunk_batch_solid_lookup_{ 0 },
         chunk_transparent_batches_{ 0 },
-        chunk_batch_transparent_lookup_{ 0 } {
+        chunk_batch_transparent_lookup_{ 0 },
+        camera_{ nullptr } {
 
     }
 

@@ -2,11 +2,10 @@
 
 
 #include "../Frustum/frustum.h"
-
 #include "../OpenGL/Texture/Texture.h"
-#include "../../Utils/MathHelper.h"
+#include "../OpenGL/Texture/Types/TextureAtlas.h"
 #include "../OpenGL/Buffers/Buffer.h"
-
+#include "../../Utils/MathHelper.h"
 
 #include <unordered_map>
 #include <deque>
@@ -129,8 +128,6 @@ void TerrainRenderer::Update() {
             TextureAminationIndex = 0;
         }
     }
-    
-
 }
 
 void TerrainRenderer::setSettings(uint32_t renderDistance, uint32_t verticalRenderDistance, float fov) {
@@ -140,7 +137,7 @@ void TerrainRenderer::setSettings(uint32_t renderDistance, uint32_t verticalRend
 }
 
 void TerrainRenderer::LoadAssets() {
-    cubic_shader_.BindTexture2D(0, g_blocks.block_texture_atlas_.get(), "BlockTexture");
+    cubic_shader_.BindTexture2D(0, g_blocks.block_texture_atlas_->get(), "BlockTexture");
 }
 
 void TerrainRenderer::AddChunk(const ChunkPos& pos, const std::vector<uint32_t>& data, std::vector<ChunkDrawBatch>& batchType, FastHashMap<ChunkPos, int>& lookUpMap) {
@@ -201,11 +198,8 @@ double TerrainRenderer::getFragmentationRate() {
         const auto& batch = chunk_solid_batches_[batchIndex];
 
         if (batch.render_list_.size() != 0) {
-
             fragRate += (batch.memory_pool_.statistics_.fragmentation_rate_ / (double)n);
         }
-
-
     }
 
     return 1.0 - fragRate;

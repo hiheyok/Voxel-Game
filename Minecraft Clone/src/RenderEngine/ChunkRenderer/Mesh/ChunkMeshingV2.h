@@ -1,15 +1,17 @@
 #pragma once
 #include <vector>
 #include <glm/vec2.hpp>
-#include  <glm/vec4.hpp>
-#include "../../../Level/Chunk/Chunk.h"
-#include "../../../Client/Profiler/PerformanceProfiler.h"
-#include "../../../Utils/Containers/BitStorage.h"
+#include <glm/vec3.hpp>
+#include <glm/ext.hpp>
+
+#include "../../../Level/Typenames.h"
+
+class Chunk;
+
+struct Cuboid;
+struct BlockFace;
 
 namespace Mesh {
-
-    static PerformanceProfiler profiler;
-
     struct CompactBooleanData {
 
         void InsertBit(size_t index) {
@@ -103,7 +105,7 @@ namespace Mesh {
         inline void SetCachedBlockID(BlockID b, int x, int y, int z);
 
 
-        inline glm::u8vec4  getAO(uint8_t direction, int x, int y, int z);
+        inline glm::u8vec4 getAO(uint8_t direction, int x, int y, int z);
 
         //To check if a block had been used in the Greedy Meshing Algorithm
         CompactBooleanData boolean_map_;

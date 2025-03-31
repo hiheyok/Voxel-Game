@@ -12,8 +12,8 @@ private:
     std::vector<uint16_t> data_;
     bool is_init_ = false;
 public:
-    Heightmap() {
-    }
+    Heightmap();
+    ~Heightmap();
 
     void Edit(int x, int z, int height);
 

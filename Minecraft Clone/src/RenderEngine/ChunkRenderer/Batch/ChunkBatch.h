@@ -15,6 +15,24 @@
 #include <array>
 
 class ChunkDrawBatch {
+private:
+    ChunkDrawCommandBuffer command_buffer_;
+    CFrustum frustum_;
+    Buffer ibo_, ssbo_;
+    VertexArray array_;
+    size_t max_buffer_size_ = NULL;
+
+    bool update_commands_ = false;
+
+    FastHashMap<ChunkPos, size_t> render_list_offset_lookup_; //f: ChunkPos  -> Offset
+    std::vector<GLint> chunk_shader_pos_;
+
+    std::vector<DrawCommandIndirect> draw_commands_;
+
+    size_t amount_of_chunks_ = 0;
+    size_t amount_of_chunks_being_rendered_ = 0;
+
+    Buffer transfer_buffer_;
 public:
 
     void SetupBuffers();
@@ -43,29 +61,11 @@ public:
 
     void ErrorCheck();
 
-    Camera* camera; // TODO: Rename
+    Camera* camera = nullptr; // TODO: Rename
 
     std::map<size_t, ChunkMemoryPoolOffset> render_list_; //f: Offset -> RenderInfo
 
     double debug_time_ = 0.0;
 
     ChunkGPUMemoryPool memory_pool_;
-private:
-    ChunkDrawCommandBuffer command_buffer_;
-    CFrustum frustum_;
-    Buffer ibo_, ssbo_;
-    VertexArray array_;
-    size_t max_buffer_size_ = NULL;
-
-    bool update_commands_ = false;
-
-    FastHashMap<ChunkPos, size_t> render_list_offset_lookup_; //f: ChunkPos  -> Offset
-    std::vector<GLint> chunk_shader_pos_;
-
-    std::vector<DrawCommandIndirect> draw_commands_;
-
-    size_t amount_of_chunks_ = 0;
-    size_t amount_of_chunks_being_rendered_ = 0;
-
-    Buffer transfer_buffer_;
 };

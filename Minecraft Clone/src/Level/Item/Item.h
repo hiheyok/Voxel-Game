@@ -1,8 +1,9 @@
 #pragma once
-#include "../Chunk/Block/Blocks.h"
 #include "../Typenames.h"
 
 #include <string>
+
+class RawTextureData;
 
 struct ItemProperties {
     int max_stack_ = 64;

@@ -1,11 +1,13 @@
 #pragma once
-#include "Dimension/Dimension.h"
-#include "LevelLoader.h"
+#include <memory>
+
+class Dimension;
+class LevelLoader;
 
 class Level {
 public:
-    Dimension* main_world_  = nullptr;
-    LevelLoader level_loader_;
+    std::unique_ptr<Dimension> main_world_;
+    std::unique_ptr<LevelLoader> level_loader_;
 
     Level();
 

@@ -31,7 +31,7 @@ Chunk* ChunkColumn::GetChunk(int heightLevel) const {
     return column_[heightLevel].get();
 }
 
-int16_t ChunkColumn::FindSurfaceHeight(uint8_t x, uint8_t z, uint8_t startingChunk) const {
+int16_t ChunkColumn::FindSurfaceHeight(int x, int z, int startingChunk) const {
     for (int16_t currChunk = startingChunk; currChunk >= 0; --currChunk) {
         const std::unique_ptr<Chunk>& curr = column_[currChunk];
 
@@ -46,7 +46,7 @@ int16_t ChunkColumn::FindSurfaceHeight(uint8_t x, uint8_t z, uint8_t startingChu
     return -1;
 }
 
-int16_t ChunkColumn::FindSurfaceHeightSingleChunk(uint8_t height, uint8_t x, uint8_t z) const {
+int16_t ChunkColumn::FindSurfaceHeightSingleChunk(int height, int x, int z) const {
     const std::unique_ptr<Chunk>& chunk = column_[height];
     if (chunk == nullptr) return -1;
     for (int y = 15; y >= 0; y--) {
@@ -55,7 +55,7 @@ int16_t ChunkColumn::FindSurfaceHeightSingleChunk(uint8_t height, uint8_t x, uin
     return -1;
 }
 
-void ChunkColumn::UpdateHeightmapSingleBlock(int height, BlockID block, uint8_t x, uint8_t y, uint8_t z) {
+void ChunkColumn::UpdateHeightmapSingleBlock(int height, BlockID block, int x, int y, int z) {
     int currHeight = column_heightmap_.Get(z, y);
 
     //tmp

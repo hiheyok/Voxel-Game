@@ -1,4 +1,13 @@
+#include <glm/vec3.hpp>
+#include <glm/geometric.hpp>
+#include <cmath>
+
 #include "PlayerMovement.h"
+#include "../IO/IO.h"
+#include "../IO/KEY_CODE.h"
+#include "../../Level/Entity/Mobs/Player.h"
+#include "../../Level/Server/Communication/InternalServer.h"
+#include "../../Utils/Math/vectorOperations.h"
 
 void PlayerMovement::Update(Player* player, const UserInputs& inputs, InternalServer* server) {
 
@@ -14,7 +23,7 @@ float PlayerMovement::VelocityMovementCurve(float current, float max, float delt
 
     int currentTime = static_cast<int>(-log(max - current) + log(max)); //TODO: Fix this
 
-    int x = delta - log(max) - currentTime;
+    int x = static_cast<int>(delta - log(max) - currentTime);
 
     if (x <= 0) {
         x = 0;

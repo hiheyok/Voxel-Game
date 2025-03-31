@@ -6,6 +6,8 @@
 #include <string>
 #include <atomic>
 
+#include "LogUtils.h"
+
 /*
 * Takes in a function (the func that the worker runs)
 * Has a task scheduler and an output manager

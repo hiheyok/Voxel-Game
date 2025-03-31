@@ -3,8 +3,7 @@
 #include <iostream>
 #include <stack>
 
-#include "../../Level/Timer/Timer.h"
-#include "../../FileManager/Files.h"
+
 #include "../../Level/Typenames.h"
 
 
@@ -43,50 +42,16 @@ private:
     
 
     struct PerformanceTree {
-        PerformanceTree() {}
-        PerformanceTree(std::string name) : name_(name) {};
+        PerformanceTree();
+        PerformanceTree(std::string name);
+
+        void ChangeTime(std::vector<std::string>& path, int depth, double time);
         
-        std::string name_ = "";
+        void print(int depth = 0) const;
+
         double time_passed_ = 0.0;
+        std::string name_ = "";
         std::vector<std::unique_ptr<PerformanceTree>> nodes_{};
-
-        void ChangeTime(std::vector<std::string>& path, int depth, double time) {
-            time_passed_ += time;
-
-            if (path.size() == depth) {
-                return;
-            }
-
-            for (auto& node : nodes_) {
-                if (!strcmp(node->name_.c_str(), path[depth].c_str())) {
-                    node->ChangeTime(path, depth + 1, time);
-                    return;
-                }
-            }
-
-            nodes_.push_back(std::make_unique<PerformanceTree>(path[depth]));
-            nodes_.back()->ChangeTime(path, depth + 1, time);
-        }
-        
-        void print(int depth = 0) const {
-            std::string out = "";
-
-            for (int i = 0; i < depth; i++) {
-                out += ' ';
-            }
-
-            if (depth != 0) {
-                out += '-';
-            }
-
-            out += name_ + ':';
-            out += std::to_string(time_passed_ / 1000000.0) + " ms\n";
-            std::cout << out;
-
-            for (const auto& node : nodes_) {
-                node->print(depth + 1);
-            }
-        }
         
     };
 

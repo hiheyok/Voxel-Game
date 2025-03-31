@@ -4,10 +4,12 @@
 #include "../../../FileManager/Files.h"
 #include <fstream>
 #include "../../../RenderEngine/BlockModel/ModelLoader.h"
+#include "../../../RenderEngine/BlockModel/BlockModels.h"
 #include <iostream>
 #include <sys/types.h>
 #include <filesystem>
 #include <string>
+#include "../../../RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
 
 // TODO : Implement model caching
 using json = nlohmann::json;
@@ -83,7 +85,7 @@ void BlockList::InitializeBlockModels()  {
     for (const auto& [name, ID] : block_id_name_data_) {
         auto tokens = Tokenize(name, ':');
 
-        std::unique_ptr<ModelV2::BlockModelV2> model = getBlockModel("block/" + tokens.back(), tokens.front());
+        std::unique_ptr<Model::BlockModel> model = getBlockModel("block/" + tokens.back(), tokens.front());
         model->is_initialized_ = true;
         GetBlockType(ID)->block_model_data_ = std::move(model);
     }
@@ -124,14 +126,14 @@ void BlockList::InitializeBlockModels()  {
                 //Load texture
                 std::string TexFile = "assets/" + Tokens.back() + "/textures/" + Tokens.front() + ".png";
 
-                size_t numLayersBefore = block_texture_atlas_.GetBlockCount();
+                size_t numLayersBefore = block_texture_atlas_->GetBlockCount();
 
                 // glm::vec4 uv{};
 
                 bool transparency = false;
                 bool isSeeThrough = false;
 
-                std::optional<RawTextureData> d = block_texture_atlas_.AddTextureToAtlas(TexFile, transparency, isSeeThrough);
+                std::optional<RawTextureData> d = block_texture_atlas_->AddTextureToAtlas(TexFile, transparency, isSeeThrough);
 
                 if (!d.has_value()) {
                     g_logger.LogError("BlockList::InitializeBlockModel", "Unable to load texture");
@@ -139,7 +141,7 @@ void BlockList::InitializeBlockModels()  {
                 }
 
                 textureIds[path] = numLayersBefore + 1;
-                textureRepeatCount[numLayersBefore + 1] = block_texture_atlas_.GetBlockCount() - numLayersBefore;
+                textureRepeatCount[numLayersBefore + 1] = block_texture_atlas_->GetBlockCount() - numLayersBefore;
                 textureTransparency[numLayersBefore + 1] = transparency;
                 textureSeeThrough[numLayersBefore + 1] = isSeeThrough;
 
@@ -154,7 +156,7 @@ void BlockList::InitializeBlockModels()  {
 
 
     for (int i = 0; i < block_type_data_.size(); i++) {
-        ModelV2::BlockModelV2 model;
+        Model::BlockModel model;
 
         if (block_type_data_[i]->block_model_data_ != NULL) {
             model = *block_type_data_[i]->block_model_data_;
@@ -162,4 +164,38 @@ void BlockList::InitializeBlockModels()  {
         model.texture_variable_.clear();
         block_model_data_.emplace_back(model);
     }
+}
+
+void BlockList::Initialize() {
+    block_texture_atlas_ = std::make_unique<TextureAtlas>();
+    block_texture_atlas_->Gen();
+    block_texture_atlas_->SetSize(16 * 512, 16 * 512);
+
+    InitializeBlockModels();
+
+    block_texture_atlas_->UploadToGPU();
+}
+
+BlockList::BlockList() : block_texture_atlas_{ std::make_unique<TextureAtlas>() } {
+
+}
+
+BlockList::~BlockList() {
+    CleanUp();
+}
+
+void BlockList::CleanUp() {
+    for (const auto& obj : block_type_data_) {
+        delete obj;
+    }
+
+    block_type_data_.clear();
+}
+
+Block* BlockList::GetBlockType(BlockID id) {
+    return block_type_data_[id];
+}
+
+const Model::BlockModel& BlockList::GetBlockModelDereferenced(BlockID id) {
+    return block_model_data_[id];
 }

@@ -1,4 +1,5 @@
 #include "MathWorld.h"
+MathWorld::MathWorld() = default;
 
 void MathWorld::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
     int cx = pos.x * 16;

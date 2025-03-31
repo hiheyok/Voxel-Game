@@ -1,4 +1,7 @@
+#include <gl/glew.h>
+#include <GLFW/glfw3.h>
 #include "IO.h"
+#include "KEY_CODE.h"
 
 void UserInputs::UpdateAllKey() {
     for (const auto& key : keys_) {

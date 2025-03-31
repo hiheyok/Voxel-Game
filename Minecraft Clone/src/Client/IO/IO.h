@@ -1,7 +1,6 @@
 #pragma once
-#include <GLFW/glfw3.h>
 #include <glm/vec2.hpp>
-#include "KEY_CODE.h"
+
 #include "../../Level/Typenames.h"
 
 struct MouseInputs {
@@ -25,7 +24,6 @@ struct MouseInputs {
 
 
 class UserInputs {
-
 private:
 
     enum KeyStatus {

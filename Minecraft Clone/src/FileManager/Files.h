@@ -15,13 +15,8 @@ public:
     std::ifstream file_;
     std::string dir_ = "";
 
-    File() {
-
-    }
-
-    File(std::string dir) {
-        Open(dir);
-    }
+    File();
+    File(std::string dir);
 
     void Open(std::string dir);
 

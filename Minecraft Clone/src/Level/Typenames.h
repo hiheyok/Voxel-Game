@@ -1,12 +1,14 @@
 #pragma once
 #include <vector>
 #include "../Utils/Containers/robin_hood.h"
+#include "Chunk/ChunkPos/ChunkPos.h"
 
 typedef unsigned int EventID;
 typedef unsigned short int BlockID;
 typedef unsigned long long int EntityUUID; //UUID
 typedef unsigned short EntityTypeID;
 typedef unsigned int ItemID;
+typedef uint64_t WorldGeneratorID;
 
  
 template <class K, class V, class _Hash = robin_hood::hash<K>>

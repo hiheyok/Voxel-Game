@@ -1,9 +1,19 @@
+#include <glm/vec3.hpp>
+
 #include "WorldLoader.h"
+#include "../World.h"
+#include "../WorldParameters.h"
+#include "../../Chunk/Lighting/ChunkLighting.h"
+#include "../../Chunk/ChunkColumn.h"
+#include "../../Entity/Entity.h"
+#include "../../DataContainer/EntityContainer.h"
 
 using namespace glm;
 
+WorldLoader::WorldLoader(World* w, WorldParameters p) : settings_{ std::make_unique<WorldParameters>( p ) }, world{ w } {}
+
 void WorldLoader::loadSummonEntitySurrounding(EntityUUID uuid) {
-    Entity* e = world->entities_.GetEntity(uuid);
+    Entity* e = world->entities_->GetEntity(uuid);
 
     if (e == nullptr) throw std::exception(std::string("Entity with UUID " + std::to_string(uuid) + " not found").c_str());
 
@@ -25,9 +35,9 @@ void WorldLoader::loadSummonEntitySurrounding(EntityUUID uuid) {
         ivec3 offset = initalPos - chunkPos;
 
         //Checks if it is in range
-        if ((abs(offset.x) > settings_.horizontal_ticking_distance_) || (abs(offset.z) > settings_.horizontal_ticking_distance_))
+        if ((abs(offset.x) > settings_->horizontal_ticking_distance_) || (abs(offset.z) > settings_->horizontal_ticking_distance_))
             continue;
-        if (abs(offset.y) > settings_.vertical_ticking_distance_)
+        if (abs(offset.y) > settings_->vertical_ticking_distance_)
             continue;
 
         bool isSuccess = RequestLoad(ChunkPos{ chunkPos.x, chunkPos.y, chunkPos.z });
@@ -72,7 +82,7 @@ void WorldLoader::loadSurroundedMovedEntityChunk() {
     //Get entity chunk position
 
     for (const auto& e : entity_chunk_loaders_) {
-        Entity* entity = world->entities_.GetEntity(e);
+        Entity* entity = world->entities_->GetEntity(e);
 
         if (entity == nullptr) throw std::exception(std::string("Entity with UUID " + std::to_string(e) + " not found").c_str());
 
@@ -90,7 +100,7 @@ void WorldLoader::loadSurroundedMovedEntityChunk() {
 
     if (centerPositionList.empty()) return;
 
-    ivec3 axisTickingDistance{ settings_.horizontal_ticking_distance_, settings_.vertical_ticking_distance_, settings_.horizontal_ticking_distance_ };
+    ivec3 axisTickingDistance{ settings_->horizontal_ticking_distance_, settings_->vertical_ticking_distance_, settings_->horizontal_ticking_distance_ };
 
     int chunkPadding = 4;
 
@@ -139,9 +149,9 @@ void WorldLoader::loadSurroundedMovedEntityChunk() {
 void WorldLoader::loadSpawnChunks() {
     if (world == nullptr) throw std::exception("World is not initialized. Couldn't set spawn chunks");
     return;
-    for (int x = -settings_.spawn_chunk_horizontal_radius_; x <= settings_.spawn_chunk_horizontal_radius_; x++) {
-        for (int z = -settings_.spawn_chunk_horizontal_radius_; z <= settings_.spawn_chunk_horizontal_radius_; z++) {
-            for (int y = -settings_.spawn_chunk_vertical_radius_; y <= settings_.spawn_chunk_vertical_radius_; y++) {
+    for (long long int x = -settings_->spawn_chunk_horizontal_radius_; x <= settings_->spawn_chunk_horizontal_radius_; x++) {
+        for (long long int z = -settings_->spawn_chunk_horizontal_radius_; z <= settings_->spawn_chunk_horizontal_radius_; z++) {
+            for (long long int y = -settings_->spawn_chunk_vertical_radius_; y <= settings_->spawn_chunk_vertical_radius_; y++) {
                 bool isSuccess = RequestLoad(ChunkPos{ x, y, z });
 
                 if (!isSuccess) {

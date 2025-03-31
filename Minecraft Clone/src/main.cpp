@@ -1,3 +1,7 @@
+#include <gl/glew.h>
+#include <GLFW/glfw3.h>
+
+
 #include "Utils/LogUtils.h"
 #include "Client/Client.h"
 #include "Level/Chunk/Block/Blocks.h"

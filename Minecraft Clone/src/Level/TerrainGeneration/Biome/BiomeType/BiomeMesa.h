@@ -5,7 +5,7 @@
 class BiomeMesa : public Biome {
 private:
     std::vector<BlockID> clay_bands_;
-    long world_seed_;
+    long world_seed_ = 0;
     std::unique_ptr<NoiseGeneratorPerlin> pillar_noise_;
     std::unique_ptr<NoiseGeneratorPerlin> pillar_roof_noise_;
     std::unique_ptr<NoiseGeneratorPerlin> clay_bands_offset_noise_;

@@ -1,12 +1,16 @@
 #pragma once
-#include "../World/WorldDataAccess.h"
-#include "../../Utils/Clock.h"
-#include <thread>
-#include <mutex>
-#include <glm/vec4.hpp>
-#include "../../Utils/Containers/BitStorage.h"
-#include "../../Utils/Containers/FIFOQueue.h"
+#include <memory>
+
 #include "../../Utils/ThreadPool.h"
+#include "../Typenames.h"
+
+class ChunkLightingContainer;
+class Heightmap;
+class Chunk;
+
+struct WorldAccess;
+
+
 
 class LightingEngine {
 public:
@@ -38,7 +42,6 @@ private:
 
     static std::vector<std::unique_ptr<ChunkLightingContainer>> SkyLighting(const ChunkPos& id);
     const static size_t DEFAULT_FIFO_QUEUE_SIZE = 32768;
-
 };
 
 inline WorldAccess* LightingEngine::world_ = nullptr;

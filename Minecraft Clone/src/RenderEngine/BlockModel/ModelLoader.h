@@ -3,4 +3,4 @@
 #include <string>
 #include <memory>
 
-std::unique_ptr<ModelV2::BlockModelV2> getBlockModel(std::string blockNameIn, std::string namespaceIn);
+std::unique_ptr<Model::BlockModel> getBlockModel(std::string blockNameIn, std::string namespaceIn);

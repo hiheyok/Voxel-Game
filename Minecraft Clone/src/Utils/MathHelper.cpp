@@ -2,8 +2,6 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #define _CRTDBG_MAP_ALLOC
-using namespace glm;
-
 double toRadians(double x)
 {
     return x* 0.01745329251;
@@ -29,19 +27,19 @@ template <typename T> double FindDistance(T x, T x1) {
     return sqrt(pow((double)x - x1, 2));
 }
 
-double FindDistance(ivec3 pos0, ivec3 pos1) {
+double FindDistance(glm::ivec3 pos0, glm::ivec3 pos1) {
     return sqrt(pow((double)pos0.x - pos1.x, 2) + pow((double)pos0.y - pos1.y, 2) + pow((double)pos0.z - pos1.z, 2));
 }
 
-double FindDistance(ivec2 pos0, ivec2 pos1) {
+double FindDistance(glm::ivec2 pos0, glm::ivec2 pos1) {
     return sqrt(pow((double)pos0.x - pos1.x, 2) + pow((double)pos0.y - pos1.y, 2));
 }
 
-double FindDistance(vec3 pos0, vec3 pos1) {
+double FindDistance(glm::vec3 pos0, glm::vec3 pos1) {
     return sqrt(pow((double)pos0.x - pos1.x, 2) + pow((double)pos0.y - pos1.y, 2) + pow((double)pos0.z - pos1.z, 2));
 }
 
-double FindDistance(vec2 pos0, vec2 pos1) {
+double FindDistance(glm::vec2 pos0, glm::vec2 pos1) {
     return sqrt(pow((double)pos0.x - pos1.x, 2) + pow((double)pos0.y - pos1.y, 2));
 }
 

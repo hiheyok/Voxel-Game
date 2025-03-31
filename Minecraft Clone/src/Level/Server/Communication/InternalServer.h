@@ -1,6 +1,20 @@
 #pragma once
-#include "../Server.h"
-#include "../../Entity/Mobs/Player.h"
+#include <vector>
+#include <glm/vec3.hpp>
+
+#include "../../Typenames.h"
+
+class Player;
+class Timer;
+class Chunk;
+class Server;
+
+struct Ray;
+struct EntityProperty;
+
+namespace Event {
+    struct Event;
+}
 
 class InternalServer {
 private:

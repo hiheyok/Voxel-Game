@@ -1,12 +1,20 @@
 #pragma once
-#include "../World.h"
-#include "../WorldParameters.h"
 #include <mutex>
+#include <memory>
+
+#include "../../Typenames.h"
+
+class World;
+class Chunk;
+class ChunkLightingContainer;
+
+struct WorldAccess;
+struct WorldParameters;
 
 // Add chunk unloading later when entity goes out of range
 class WorldLoader {
 private:
-    WorldParameters settings_;
+    std::unique_ptr<WorldParameters> settings_;
     World* world = nullptr;
     std::mutex lock_;
     bool is_spawn_chunks_loaded_ = false;
@@ -26,8 +34,7 @@ private:
 public:
     bool tall_generation_ = false;
 
-
-    WorldLoader(World* w, WorldParameters p) : settings_(p), world(w) {}
+    WorldLoader(World* w, WorldParameters p);
 
     WorldAccess* GetWorld() const;
 

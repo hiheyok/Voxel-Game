@@ -1,4 +1,19 @@
+#include <exception>
+
 #include "WorldInteractions.h"
+#include "WorldLoader.h"
+#include "../Collusion/WorldCollusion.h"
+#include "../WorldParameters.h"
+#include "../../Chunk/Chunk.h"
+#include "../../Chunk/Lighting/ChunkLighting.h"
+#include "../../DataContainer/EntityContainer.h"
+#include "../../Entity/Entity.h"
+
+WorldInteractions::WorldInteractions() = default;
+
+WorldInteractions::WorldInteractions(World* w, WorldParameters parameters) {
+    init(w, parameters);
+}
 
 void WorldInteractions::UseTallGeneration() {
     worldLoader_->tall_generation_ = true;
@@ -6,14 +21,15 @@ void WorldInteractions::UseTallGeneration() {
 
 void WorldInteractions::init(World* w, WorldParameters parameters) {
     world = w;
-    settings_ = parameters;
+    settings_ = std::make_unique<WorldParameters>(parameters);
+    collusions_ = std::make_unique<WorldCollusionDetector>();
     worldLoader_ = new WorldLoader(w, parameters);
-    collusions_.Initialize(static_cast<WorldAccess*>(w));
+    collusions_->Initialize(w->chunk_container_.get());
 }
 
 void WorldInteractions::summonEntity(Entity& entity) {
     if (world == nullptr) throw std::exception("Cannot summon entity. World is null");
-    world->entities_.AddEntities(entity);
+    world->entities_->AddEntities(entity);
 
     if (entity.properties_.is_chunk_loader_)
         worldLoader_->AddEntityChunkLoader(entity.properties_.entity_uuid_);
@@ -39,7 +55,7 @@ std::vector<ChunkPos> WorldInteractions::GetRequestedLightUpdates() {
 }
 
 std::vector<EntityProperty> WorldInteractions::GetUpdatedEntities() {
-    FastHashMap<EntityUUID, EntityProperty> m = world->entities_.ClientGetEntityUpdate();
+    FastHashMap<EntityUUID, EntityProperty> m = world->entities_->ClientGetEntityUpdate();
     std::vector<EntityProperty> properties = {};
 
     for (const auto& e : m) {
@@ -50,7 +66,7 @@ std::vector<EntityProperty> WorldInteractions::GetUpdatedEntities() {
 }
 
 std::vector<EntityUUID> WorldInteractions::GetRemovedEntities() {
-    FastHashSet<EntityUUID> m = world->entities_.getRemovedEntities();
+    FastHashSet<EntityUUID> m = world->entities_->getRemovedEntities();
     std::vector<EntityUUID> ids = {};
     ids.insert(ids.end(), m.begin(), m.end());
     return ids;
@@ -90,7 +106,7 @@ void WorldInteractions::RequestLightUpdate(const ChunkPos& pos) {
 }
 
 void WorldInteractions::KillEntity(EntityUUID id) {
-    world->entities_.RemoveEntity(id);
+    world->entities_->RemoveEntity(id);
     if (worldLoader_->CheckEntityExistChunkLoader(id)) {
         worldLoader_->DeleteEntityChunkLoader(id);
     }
@@ -266,13 +282,13 @@ BlockID WorldInteractions::GetBlock(const BlockPos& pos) {
 }
 
 Entity* WorldInteractions::GetEntity(EntityUUID id) {
-    return world->entities_.GetEntity(id);
+    return world->entities_->GetEntity(id);
 }
 
 void WorldInteractions::AddEntity(Entity& entity) {
-    world->entities_.AddEntities(entity);
+    world->entities_->AddEntities(entity);
 }
 
 void WorldInteractions::AddEntity(Entity* entity) {
-    world->entities_.AddEntities(entity);
+    world->entities_->AddEntities(entity);
 }

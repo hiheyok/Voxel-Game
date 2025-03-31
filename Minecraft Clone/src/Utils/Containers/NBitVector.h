@@ -14,7 +14,7 @@ private:
     static constexpr const StorageBit all_ones_ = ~(static_cast<StorageBit>(0));
     StorageBit all_ones_bit_width_;
 
-    std::pair<StorageBit, StorageBit> GetMask(int idx) const;
+    std::pair<StorageBit, StorageBit> GetMask(size_t idx) const;
 
 public:
 
@@ -34,7 +34,7 @@ public:
 template<typename StorageBit>
 template <typename T>
 void NBitVector<StorageBit>::Set(size_t idx, T val) {
-    if (val >= (1 << bit_width_)) throw std::runtime_error("Invalid number. Wrong size");
+    if (static_cast<size_t>(val) >= (1ULL << bit_width_)) throw std::runtime_error("Invalid number. Wrong size");
     if (idx >= num_elements_) throw std::out_of_range("Index out of range");
 
     StorageBit data = static_cast<StorageBit>(val);
@@ -111,7 +111,7 @@ void NBitVector<StorageBit>::Append(T val) {
 }
 
 template<typename StorageBit>
-std::pair<StorageBit, StorageBit> NBitVector<StorageBit>::GetMask(int integerIndex) const {
+std::pair<StorageBit, StorageBit> NBitVector<StorageBit>::GetMask(size_t integerIndex) const {
     StorageBit mask = all_ones_bit_width_ << integerIndex;
     StorageBit overflowMask = 0;
 

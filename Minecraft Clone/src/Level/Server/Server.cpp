@@ -1,7 +1,20 @@
 #include "Server.h"
+#include "Interfaces/InternalInterface.h"
+#include "../Chunk/ChunkPos/ChunkPos.h"
+#include "../Dimension/Dimension.h"
+#include "../Entity/Properties/EntityProperties.h"
+#include "../Level.h"
+#include "../LevelLoader.h"
+#include "../World/WorldInteraction/WorldLoader.h"
+#include "../Timer/Timer.h"
+#include "../../Utils/Math/Ray/Ray.h"
+#include "../../Utils/Clock.h"
+
+Server::Server() = default;
+Server::~Server() = default;
 
 size_t Server::GetChunkCount() {
-    return level_.level_loader_.GetChunkCount();
+    return level_->level_loader_->GetChunkCount();
 }
 
 double Server::GetMSPT() {
@@ -9,67 +22,71 @@ double Server::GetMSPT() {
 }
 
 Timer* Server::GetTimer() {
-    return &time_;
+    return time_.get();
 }
 
 std::vector<EntityProperty> Server::GetUpdatedEntities() {
-    return level_.main_world_->world_interactions_.GetUpdatedEntities();
+    return level_->main_world_->world_interactions_.GetUpdatedEntities();
 }
 
 std::vector<EntityUUID> Server::GetRemovedEntities() {
-    return level_.main_world_->world_interactions_.GetRemovedEntities();
+    return level_->main_world_->world_interactions_.GetRemovedEntities();
 }
 
 bool Server::CheckEntityOnGround(EntityUUID id) {
-    return level_.main_world_->world_interactions_.collusions_.isEntityOnGround(level_.main_world_->world_interactions_.GetEntity(id));
+    return level_->main_world_->world_interactions_.collusions_->isEntityOnGround(level_->main_world_->world_interactions_.GetEntity(id));
 }
 
 void Server::Join(Entity& entity) {
-    level_.main_world_->world_interactions_.summonEntity(entity);
+    level_->main_world_->world_interactions_.summonEntity(entity);
 }
 
 std::vector<ChunkPos> Server::GetUpdatedChunkPos() {
-    return level_.main_world_->world_interactions_.GetUpdatedChunkPos();
+    return level_->main_world_->world_interactions_.GetUpdatedChunkPos();
 }
 
 Chunk* Server::GetChunk(const ChunkPos& pos) {
-    return level_.main_world_->world_interactions_.GetChunk(pos);
+    return level_->main_world_->world_interactions_.GetChunk(pos);
 }
 
 BlockID Server::GetBlock(const BlockPos& pos) { //Include dimension in parameter later
-    return level_.main_world_->world_interactions_.GetBlock(pos);
+    return level_->main_world_->world_interactions_.GetBlock(pos);
 }
 
 bool Server::GetRayIntersection(Ray& ray) { //Include dimension in paramter later
-    return level_.main_world_->world_interactions_.collusions_.CheckRayIntersection(ray);
+    return level_->main_world_->world_interactions_.collusions_->CheckRayIntersection(ray);
 }
 
 glm::vec3 Server::GetEntityCollusionTime(EntityUUID entity) {
-    return level_.main_world_->world_interactions_.collusions_.GetTimeTillCollusion(level_.main_world_->world_interactions_.GetEntity(entity));
+    return level_->main_world_->world_interactions_.collusions_->GetTimeTillCollusion(level_->main_world_->world_interactions_.GetEntity(entity));
 }
 
 void Server::StartServer(ServerSettings serverSettings) {
-    level_.Start(serverSettings.gen_thread_count_, serverSettings.light_engine_thread_count_);
+    level_ = std::make_unique<Level>();
+    level_->Start(static_cast<int>(serverSettings.gen_thread_count_), static_cast<int>(serverSettings.light_engine_thread_count_));
+    time_ = std::make_unique<Timer>();
     stop_ = false;
-    settings_ = serverSettings;
+    settings_ = std::make_unique<ServerSettings>(serverSettings);
     main_server_loop_ = std::thread(&Server::Loop, this);
 }
 
 void Server::Stop() {
     stop_ = true;
     main_server_loop_.join();
-    level_.Stop();
+    level_->Stop();
 }
 
 void Server::Loop() {
     g_logger.LogDebug("Server::Loop", "Started main server loop");
     while (!stop_) {
-        time_.Set();
+        time_->Set();
+        // Process Client -> Server events
+        
 
         Tick();
 
-        mspt_ = time_.GetTimePassed_ms();
-        double timeLeft = (1000.0 / (double)settings_.tick_rate_) - mspt_;
+        mspt_ = time_->GetTimePassed_ms();
+        double timeLeft = (1000.0 / (double)settings_->tick_rate_) - mspt_;
 
         if (timeLeft > 0) {
             timerSleepNotPrecise(static_cast<int>(timeLeft));
@@ -79,12 +96,21 @@ void Server::Loop() {
 }
 
 void Server::Tick() {
-    level_.main_world_->Tick();
-    level_.main_world_->EventTick();
-    level_.updateDimensions();
-    level_.main_world_->world_interactions_.worldLoader_->Load();
+    level_->main_world_->Tick();
+    level_->main_world_->EventTick();
+    level_->updateDimensions();
+    level_->main_world_->world_interactions_.worldLoader_->Load();
 }
 
 void Server::SendEvent(const Event::Event& pEventIn) {
-    level_.main_world_->event_manager_.AddEvent(pEventIn);
+    level_->main_world_->event_manager_.AddEvent(pEventIn);
+}
+
+void Server::SetInternalConnection(InternalInterface* interface) {
+    client_interface_ = static_cast<ClientInterface*>(interface);
+}
+
+void Server::ProcessPacket() {
+    // Process player actions
+    
 }

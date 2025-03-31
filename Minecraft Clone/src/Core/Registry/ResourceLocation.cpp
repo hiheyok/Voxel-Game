@@ -1,4 +1,5 @@
 #include "ResourceLocation.h"
+#include "../../FileManager/Files.h"
 
 void ResourceLocation::SetResourceLocation(std::string name) {
     std::vector<std::string> tokens = Tokenize(name, ':');

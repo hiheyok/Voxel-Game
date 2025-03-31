@@ -1,11 +1,19 @@
+#include <gl/glew.h>
+#include <GLFW/glfw3.h>
+
 #include "DebugScreen.h"
+#include "../../../RenderEngine/GUI/TextRenderer.h"
+DebugScreen::DebugScreen() : renderer_{std::make_unique<TextRenderer>() } {
+}
+
+DebugScreen::~DebugScreen() = default;
 
 void DebugScreen::Render() {
-    renderer_.RenderFont();
+    renderer_->RenderFont();
 }
 
 void DebugScreen::Update() {
-    renderer_.ConstructBuffer();
+    renderer_->ConstructBuffer();
 }
 
 void DebugScreen::EditText(std::string name, const char* c) {
@@ -13,12 +21,12 @@ void DebugScreen::EditText(std::string name, const char* c) {
 }
 
 void DebugScreen::EditText(std::string name, std::string text) {
-    renderer_.EditFontText(name, text);
+    renderer_->EditFontText(name, text);
 }
 
 void DebugScreen::Initialize(GLFWwindow* w) {
     window_ = w;
-    renderer_.InitializeTextRenderer(w);
+    renderer_->InitializeTextRenderer(w);
     glm::vec3 clr = glm::vec3(0.2f, 0.2f, 0.2f);
     float a = 0.5;
 
@@ -35,10 +43,10 @@ void DebugScreen::Initialize(GLFWwindow* w) {
         stat.SetPosition(glm::vec2(-1.f, 0.95f - 0.05f * i));
         stat.AddBackground(clr, a);
         stat.setBackgroundPadding(0.005f, 0.0f);
-        renderer_.InsertFontObject("Stat" + std::to_string(i), stat);
+        renderer_->InsertFontObject("Stat" + std::to_string(i), stat);
     }
 
-    renderer_.InsertFontObject("Title", versionFont);
+    renderer_->InsertFontObject("Title", versionFont);
 
     Update();
 }

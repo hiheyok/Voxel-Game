@@ -1,8 +1,9 @@
 #pragma once
 #include "EntityType.h"
 
-class Hostile : public EntityType {
-    virtual void Tick(Entity* entity, Dimension* dimension) override {
+class Entity;
+class Dimension;
 
-    }
+class Hostile : public EntityType {
+    void Tick(Entity* entity, Dimension* dimension) override;
 };

@@ -1,4 +1,6 @@
 #include "ServerInteraction.h"
+#include "../../Level/Server/Communication/InternalServer.h"
+#include "../../Level/Event/Event.h"
 
 void ServerInteraction::AssignServer(InternalServer* server) { //Default  to  integrated server for now
     server_ = server;

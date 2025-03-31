@@ -1,5 +1,5 @@
-#include "Files.h"
 #include <filesystem>
+#include "Files.h"
 
 std::vector<std::string> Tokenize(std::string str, char divider) {
     std::vector<std::string> tokens = {};
@@ -14,6 +14,12 @@ std::vector<std::string> Tokenize(std::string str, char divider) {
     }
 
     return tokens;
+}
+
+File::File() = default;
+
+File::File(std::string dir) {
+    Open(dir);
 }
 
 void File::Open(std::string dir) {

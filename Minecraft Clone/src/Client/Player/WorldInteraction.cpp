@@ -1,4 +1,13 @@
+#include <glm/geometric.hpp>
+#include <glm/vec3.hpp>
+
 #include "WorldInteraction.h"
+#include "../IO/IO.h"
+#include "../IO/KEY_CODE.h"
+#include "../../Level/Dimension/Dimension.h"
+#include "../../Level/Entity/Mobs/Player.h"
+#include "../../Utils/Math/vectorOperations.h"
+#include "../../Utils/Math/Ray/Ray.h"
 
 void WorldInteraction::Interact(Player* player, const UserInputs& inputs, Dimension* dimension) {
     Ray ray;
@@ -27,14 +36,14 @@ void WorldInteraction::Interact(Player* player, const UserInputs& inputs, Dimens
 }
 
 BlockID WorldInteraction::GetBlock(Ray ray, Dimension* dimension) {
-    if (dimension->world_interactions_.collusions_.CheckRayIntersection(ray)) {
+    if (dimension->world_interactions_.collusions_->CheckRayIntersection(ray)) {
         return dimension->world_interactions_.GetBlock(BlockPos{ (int)floor(ray.end_point_.x), (int)floor(ray.end_point_.y), (int)floor(ray.end_point_.z) });
     }
     return g_blocks.AIR;
 }
 
 void WorldInteraction::BreakBlock(Ray ray, Dimension* dimension) {
-    if (dimension->world_interactions_.collusions_.CheckRayIntersection(ray)) {
+    if (dimension->world_interactions_.collusions_->CheckRayIntersection(ray)) {
         Event::BlockEvent breakBlock;
         breakBlock.block_= g_blocks.AIR;
         breakBlock.pos_ = BlockPos{ (int)floor(ray.end_point_.x),
@@ -47,7 +56,7 @@ void WorldInteraction::BreakBlock(Ray ray, Dimension* dimension) {
 }
 
 void WorldInteraction::PlaceBlock(Ray ray, BlockID block, Dimension* dimension) {
-    if (dimension->world_interactions_.collusions_.CheckRayIntersection(ray)) {
+    if (dimension->world_interactions_.collusions_->CheckRayIntersection(ray)) {
         int BounceSurface = ray.bounce_surface_;
 
         glm::ivec3 placePos = floor(ray.end_point_);

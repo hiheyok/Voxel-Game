@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include "../../FileManager/Files.h"
 
 struct ResourceLocation {
     const std::string namespace_divider_ = ":";

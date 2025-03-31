@@ -9,7 +9,6 @@ void OverworldGenerator::GenerateChunk(int x, int z, TallChunk* chunk) {
 }
 
 void OverworldGenerator::replaceBiomeBlocks(int x, int z, TallChunk* chunk, std::vector<Biome*> biomesIn) {
-    double d0 = 0.03125;
     depthBuffer = surfaceNoise.getRegion(depthBuffer, (double)(x * 16), (double)(z * 16), 16, 16, 0.0625, 0.0625, 1.0);
 
     for (int i = 0; i < 16; ++i)

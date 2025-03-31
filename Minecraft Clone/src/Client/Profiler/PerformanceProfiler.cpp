@@ -1,5 +1,8 @@
 #include "PerformanceProfiler.h"
 
+#include "../../Level/Timer/Timer.h"
+#include "../../FileManager/Files.h"
+
 PerformanceProfiler::PerformanceProfiler() {
     initial_time_ = std::chrono::high_resolution_clock::now();
 }
@@ -91,4 +94,45 @@ void PerformanceProfiler::CombineCache(PerformanceProfiler profiler) {
     string_hash_container_.insert(profiler.string_hash_container_.begin(), profiler.string_hash_container_.end());
     string_tokenized_hash_container_.insert(profiler.string_tokenized_hash_container_.begin(), profiler.string_tokenized_hash_container_.end());
     CondenseCache();
+}
+
+PerformanceProfiler::PerformanceTree::PerformanceTree() = default;
+PerformanceProfiler::PerformanceTree::PerformanceTree(std::string name) : name_(name) {};
+
+void PerformanceProfiler::PerformanceTree::ChangeTime(std::vector<std::string>& path, int depth, double time) {
+    time_passed_ += time;
+
+    if (path.size() == depth) {
+        return;
+    }
+
+    for (auto& node : nodes_) {
+        if (!strcmp(node->name_.c_str(), path[depth].c_str())) {
+            node->ChangeTime(path, depth + 1, time);
+            return;
+        }
+    }
+
+    nodes_.push_back(std::make_unique<PerformanceTree>(path[depth]));
+    nodes_.back()->ChangeTime(path, depth + 1, time);
+}
+
+void PerformanceProfiler::PerformanceTree::print(int depth) const {
+    std::string out = "";
+
+    for (int i = 0; i < depth; i++) {
+        out += ' ';
+    }
+
+    if (depth != 0) {
+        out += '-';
+    }
+
+    out += name_ + ':';
+    out += std::to_string(time_passed_ / 1000000.0) + " ms\n";
+    std::cout << out;
+
+    for (const auto& node : nodes_) {
+        node->print(depth + 1);
+    }
 }

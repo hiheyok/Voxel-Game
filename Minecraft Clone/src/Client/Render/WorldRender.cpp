@@ -1,20 +1,31 @@
 ﻿#include "WorldRender.h"
+
+#include "../Render/PlayerPOV.h"
 #include "../../Utils/Clock.h"
 #include "../../Core/Options/Option.h"
+#include "../../Level/Server/Communication/InternalServer.h"
+#include "../../RenderEngine/ChunkRenderer/Mesh/ChunkMeshingV2.h"
+#include "../../RenderEngine/ChunkRenderer/TerrainRenderer.h"
 
 static thread_local Mesh::ChunkMeshData chunkMesher;
 
+WorldRender::WorldRender() : 
+    player_{std::make_unique<PlayerPOV>()},
+    renderer_{std::make_unique<TerrainRenderer>()} {
+
+}
+
 void WorldRender::SetRotation(glm::dvec2 rotation) {
-    player_.SetRotation(rotation);
+    player_->SetRotation(rotation);
 }
 
 void WorldRender::SetPosition(glm::dvec3 position) {
-    player_.SetPosition(position);
+    player_->SetPosition(position);
 }
 
 void WorldRender::Render() {
-    renderer_.RenderSky();
-    renderer_.Render();
+    renderer_->RenderSky();
+    renderer_->Render();
 }
 
 void WorldRender::LoadChunkToRenderer(ChunkPos chunk) {
@@ -66,31 +77,31 @@ void WorldRender::Update() {
         }
         //profiler_->CombineCache(worker_output_[(uint64_t)workerId].front()->profiler);
         build_time_ += mesh_add_queue_.back()->time_;
-        renderer_.AddChunk(std::move(mesh_add_queue_.back()));
+        renderer_->AddChunk(std::move(mesh_add_queue_.back()));
         mesh_add_queue_.pop_back();
     }
 
     LoadChunkMultiToRenderer(server_->GetUpdatedChunks());
 
     if (updateAmount < chunkUpdateLimit) {
-        renderer_.Defrag(1);
+        renderer_->Defrag(1);
     }
 
-    renderer_.Update();
-    renderer_.PrepareRenderer();
+    renderer_->Update();
+    renderer_->PrepareRenderer();
 
 }
 
 void WorldRender::Stop() {
     mesh_thread_pool_->Stop();
-    renderer_.Cleanup();
+    renderer_->Cleanup();
 }
 
 void WorldRender::Start(GLFWwindow* window, InternalServer* server, PerformanceProfiler* profiler) {
     horizontal_render_distance_ = g_app_options.horizontal_render_distance_;
     vertical_render_distance_ = g_app_options.vertical_render_distance_;
 
-    int threadCount = g_app_options.mesh_threads_;
+    size_t threadCount = g_app_options.mesh_threads_;
 
     mesh_thread_pool_ = std::make_unique<ThreadPool<ChunkPos, 
         std::unique_ptr<Mesh::ChunkVertexData>, 
@@ -99,9 +110,9 @@ void WorldRender::Start(GLFWwindow* window, InternalServer* server, PerformanceP
     window_ = window;
     WorldRender::server_ = server;
 
-    renderer_.Initialize(window_, player_.GetCamera());
-    renderer_.LoadAssets();
-    renderer_.setSettings(horizontal_render_distance_, vertical_render_distance_, 90);
+    renderer_->Initialize(window_, player_->GetCamera());
+    renderer_->LoadAssets();
+    renderer_->setSettings(horizontal_render_distance_, vertical_render_distance_, 90);
 
     profiler_ = profiler;
 }

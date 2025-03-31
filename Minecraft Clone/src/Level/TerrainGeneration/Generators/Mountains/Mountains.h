@@ -1,18 +1,19 @@
 #pragma once
-#include "../Generator.h"
-#include <glm/vec2.hpp>
+#include <memory>
 #include <vector>
+#include <glm/vec2.hpp>
+
+#include "../Generator.h"
+
+class FastNoiseLite;
 
 class MountainGenerator : public WorldGenerator {
 public:
-    FastNoiseLite noise_;
+    std::unique_ptr<FastNoiseLite> noise_;
 
     void Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) override;
 
-    MountainGenerator() {
-        noise_.SetNoiseType(noise_.NoiseType_OpenSimplex2);
-        noise_.SetFrequency(0.005f);
-    }
+    MountainGenerator();
 
     void GenerateEnvironment(const ChunkPos& pos, Chunk* chunk);
 

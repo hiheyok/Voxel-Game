@@ -57,6 +57,8 @@ private:
 
 class Texture {
 public:
+    Texture() = default;
+
     void Gen() {
         glGenTextures(1, &texture_id_);
     }

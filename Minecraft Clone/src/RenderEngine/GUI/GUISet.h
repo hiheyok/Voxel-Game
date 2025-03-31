@@ -65,7 +65,7 @@ public:
             elements_.back().buffer_index_ = AddRenderingObj();
             elements_.back().uv_p0_ = UV_P0;
             elements_.back().uv_p1_ = UV_P1;
-            gui_element_index_.emplace(Name, elements_.size() - 1);
+            gui_element_index_.emplace(Name, static_cast<int>(elements_.size() - 1));
             num_of_renderable_objects_++;
             is_dirty_ = true;
         }
@@ -74,7 +74,7 @@ public:
         }
     }
 
-    void AddGUIElement(std::string Name, std::string Text, glm::vec2 Size, glm::vec2 Position, glm::vec2 UV_P0, glm::vec2 UV_P1) {
+    void AddGUIElement(std::string name, std::string text, glm::vec2 size, glm::vec2 position, glm::vec2 UV_P0, glm::vec2 UV_P1) {
 
         if (!is_initialized_) {
             Initialize();
@@ -87,17 +87,17 @@ public:
         UV_P0.y = UV_P0.y / (float)gui_texture_.height_;
         UV_P1.y = UV_P1.y / (float)gui_texture_.height_;
 
-        if (gui_element_index_.find(Name) == gui_element_index_.end()) {
-            elements_.emplace_back(Text, Size, Position);
+        if (gui_element_index_.find(name) == gui_element_index_.end()) {
+            elements_.emplace_back(text, size, position);
             elements_.back().buffer_index_ = AddRenderingObj();
             elements_.back().uv_p0_ = UV_P0;
             elements_.back().uv_p1_ = UV_P1;
-            gui_element_index_.emplace(Name, elements_.size() - 1);
+            gui_element_index_.emplace(name, static_cast<int>(elements_.size() - 1));
             num_of_renderable_objects_++;
             is_dirty_ = true;
         }
         else {
-            g_logger.LogError("GUISet::AddGUIElement", "Element " + Name + " already exist!");
+            g_logger.LogError("GUISet::AddGUIElement", "Element " + name + " already exist!");
         }
     }
 

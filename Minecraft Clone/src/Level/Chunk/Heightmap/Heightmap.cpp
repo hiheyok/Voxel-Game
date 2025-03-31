@@ -2,6 +2,9 @@
 #include <new> 
 #include <iostream>
 
+Heightmap::Heightmap() = default;
+Heightmap::~Heightmap() = default;
+
 void Heightmap::Edit(int x, int z, int height) {
     data_[x * 16 + z] = height;
 }

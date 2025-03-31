@@ -289,7 +289,7 @@ public:
         Update();
     }
 
-    ChunkMemoryPoolOffset AddChunk(const std::vector<uint32_t>& vertices, ChunkPos pos, int side) { //assumes vertices.size() != 0
+    ChunkMemoryPoolOffset AddChunk(const std::vector<uint32_t>& vertices, ChunkPos pos) { //assumes vertices.size() != 0
         size_t blockSize = vertices.size() * sizeof(uint32_t);
         size_t blockOffset = memory_pool_.FindFreeSpace(blockSize);
 

@@ -1,5 +1,11 @@
 #include "LightEngine.h"
 #include "../../Utils/Containers/FIFOQueue.h"
+#include "../Chunk/Chunk.h"
+#include "../Chunk/ChunkColumn.h"
+#include "../Chunk/Heightmap/Heightmap.h"
+#include "../Chunk/Lighting/ChunkLighting.h"
+#include "../World/WorldDataAccess.h"
+
 
 static thread_local FixedFIFOQueue<uint16_t> FIFOQueues;
 
@@ -45,11 +51,11 @@ void LightingEngine::LightSpreadSky(Chunk* chunk, std::unique_ptr<ChunkLightingC
         UnpackLightNode(node, nodeX, nodeY, nodeZ, nodeLight);
 
         i++;
-        int nx = nodeX;
-        int ny = nodeY + ChunkHeight;
-        int nz = nodeZ;
+        int currNX = nodeX;
+        int currNY = nodeY + ChunkHeight;
+        int currNZ = nodeZ;
 
-        if (heightmap.Get(nx, nz) <= ny) {
+        if (heightmap.Get(currNX, currNZ) <= currNY) {
             nodeLight = 15;
         }
 
@@ -113,7 +119,6 @@ std::vector<std::unique_ptr<ChunkLightingContainer>> LightingEngine::Worker(cons
     if (!FIFOQueues.IsInitialized())
         FIFOQueues.setSize(LightingEngine::DEFAULT_FIFO_QUEUE_SIZE);
 
-    uint8_t DarknessLightLevel = 12;
     std::vector<std::unique_ptr<ChunkLightingContainer>> out;
     ChunkColumn* col = LightingEngine::world_->GetColumn(pos);
 

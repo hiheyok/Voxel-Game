@@ -5,6 +5,8 @@
 
 extern int AmountEntityDestroy;
 
+class Dimension;
+
 struct Entity  {
     
     EntityProperty properties_; //Provide properties such as position, acceleration, etc.

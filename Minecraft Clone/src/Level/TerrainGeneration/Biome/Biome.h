@@ -3,6 +3,10 @@
 #include "../../../Core/Registry/ResourceLocation.h"
 #include "BiomeProperties.h"
 #include "../../Chunk/TallChunk.h"
+
+#include "../Noisemaps/MinecraftNoiseGeneratorPerlin.h"
+#include "../Noisemaps/TerrainParameters.h"
+
 class Biome {
 private:
     std::string biomeName = "";

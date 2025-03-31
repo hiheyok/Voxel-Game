@@ -1,6 +1,7 @@
 #include "Items.h"
 #include "Type/BlockItem.h"
 #include "../../Utils/LogUtils.h"
+#include "../Chunk/Block/Block.h"
 
 Item ItemList::RegisterBlockItem(BlockID block) {
     BlockItem item{ block };

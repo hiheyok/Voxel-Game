@@ -152,7 +152,7 @@ static CuboidRotationInfo getRotationalData(json JsonData) {
     return rotationInfo;
 }
 
-static void UpdateModelElements(std::unique_ptr<ModelV2::BlockModelV2>& model, json JsonData) {
+static void UpdateModelElements(std::unique_ptr<Model::BlockModel>& model, json JsonData) {
     for (auto& item : JsonData.items()) {
 
         Cuboid cuboid;
@@ -195,7 +195,7 @@ static void UpdateModelElements(std::unique_ptr<ModelV2::BlockModelV2>& model, j
     }
 }
 
-static void ProcessCuboidTexture(std::unique_ptr<ModelV2::BlockModelV2>& model, json JsonData) {
+static void ProcessCuboidTexture(std::unique_ptr<Model::BlockModel>& model, json JsonData) {
     for (auto& TextureElement : JsonData.items()) {
         auto tokens = Tokenize(TextureElement.value(), ':');
 
@@ -222,7 +222,7 @@ static void ProcessCuboidTexture(std::unique_ptr<ModelV2::BlockModelV2>& model, 
     }
 }
 
-static void ProcessModelDisplay(std::unique_ptr<ModelV2::BlockModelV2>& model, json JsonData) {
+static void ProcessModelDisplay(std::unique_ptr<Model::BlockModel>& model, json JsonData) {
     for (auto& displayPlaces : JsonData.items()) {
 
         std::string position = displayPlaces.key();
@@ -287,8 +287,8 @@ static void ProcessModelDisplay(std::unique_ptr<ModelV2::BlockModelV2>& model, j
 }
 
 //TODO: Work on caching
-static std::unique_ptr<ModelV2::BlockModelV2> recursiveGetBlockModel(std::string jsonName, std::string namespaceIn) {
-    std::unique_ptr<ModelV2::BlockModelV2> model = nullptr;
+static std::unique_ptr<Model::BlockModel> recursiveGetBlockModel(std::string jsonName, std::string namespaceIn) {
+    std::unique_ptr<Model::BlockModel> model = nullptr;
 
     std::string jsonPath = "assets/" + namespaceIn + "/models/" + jsonName + ".json";
     
@@ -328,7 +328,7 @@ static std::unique_ptr<ModelV2::BlockModelV2> recursiveGetBlockModel(std::string
     }
 
     if (model == nullptr)
-        model = std::make_unique<ModelV2::BlockModelV2>();
+        model = std::make_unique<Model::BlockModel>();
 
     //Searches for the other stuff like textures and elements 
 
@@ -351,9 +351,9 @@ static std::unique_ptr<ModelV2::BlockModelV2> recursiveGetBlockModel(std::string
     return model;
 }
 
-std::unique_ptr<ModelV2::BlockModelV2> getBlockModel(std::string blockNameIn, std::string namespaceIn) {
+std::unique_ptr<Model::BlockModel> getBlockModel(std::string blockNameIn, std::string namespaceIn) {
     //This will recursively go into parents files and build on it
-    std::unique_ptr<ModelV2::BlockModelV2> model = recursiveGetBlockModel(blockNameIn, namespaceIn);
+    std::unique_ptr<Model::BlockModel> model = recursiveGetBlockModel(blockNameIn, namespaceIn);
     std::reverse(model->elements_.begin(), model->elements_.end());
     return model;
 

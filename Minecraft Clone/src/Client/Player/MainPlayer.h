@@ -1,13 +1,23 @@
 #pragma once
-#include "../../Level/Item/Inventory/PlayerInventory.h"
-#include "WorldInteraction.h"
-#include "PlayerMovement.h"
-#include "../IO/IO.h"
-#include "../../Level/Entity/Mobs/Player.h"
-#include "../../RenderEngine/GUI/GUI.h"
+#include <memory>
+
+class InternalServer;
+class UserInputs;
+class Dimension;
+class PlayerMovement;
+class Player;
+class WorldInteraction;
+class GUI;
+
+struct GLFWwindow;
+struct EntityProperty;
+
 
 class MainPlayer {
 public:
+
+    MainPlayer();
+    ~MainPlayer();
 
     void Initialize(GLFWwindow* win, InternalServer* server);
 
@@ -20,18 +30,17 @@ public:
 
     void RenderGUIs();
 
-    Player player_;
+    std::unique_ptr<Player> player_;
 private:
 
     void PrepareGUIs();
-
     void InventoryUpdate(UserInputs inputs);
 
-    PlayerMovement movement_;
-    WorldInteraction interactions_;
-    InternalServer* internal_server_ = nullptr;
+    std::unique_ptr<PlayerMovement> movement_;
+    std::unique_ptr<WorldInteraction> interactions_;
+    std::unique_ptr<GUI> player_gui_;
 
-    GUI player_gui_;
+    InternalServer* internal_server_ = nullptr;
 
     size_t gui_index_ = 0;
     size_t item_gui_index_ = 0;

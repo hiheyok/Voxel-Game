@@ -1,7 +1,4 @@
 #pragma once
-#include "../../FileManager/Files.h"
-#include "../../Utils/LogUtils.h"
-#include <iostream>
 #include "../../Level/Typenames.h"
 
 class Options {

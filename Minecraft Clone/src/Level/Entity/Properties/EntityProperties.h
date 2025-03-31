@@ -1,9 +1,14 @@
 #pragma once
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
+
 #include "../../Typenames.h"
 
 struct EntityProperty {
+    EntityProperty() = default;
+    EntityProperty(const EntityProperty&) = default;
+    ~EntityProperty() = default;
+
     glm::vec3 velocity_ = glm::vec3(0.f, 0.f, 0.f);
     glm::vec3 position_ = glm::vec3(0.f, 0.f, 0.f);
     glm::vec3 acceleration_ = glm::vec3(0.f, 0.f, 0.f);
@@ -15,6 +20,20 @@ struct EntityProperty {
 
     bool is_chunk_loader_ = false;
 
-    EntityUUID entity_uuid_ = 0x00000000;
+    EntityUUID entity_uuid_ = NULL;
     EntityTypeID type_ = NULL; //State what type of entity is it. Zombie? Human??
+
+    bool operator==(const EntityProperty& other) {
+        return entity_uuid_ == other.entity_uuid_;
+    }
 };
+
+namespace std {
+    template <>
+    struct hash<EntityProperty> {
+        size_t operator ()(const EntityProperty& e) const {
+            return hash<EntityTypeID>{}(e.entity_uuid_);
+        }
+    };
+    
+}

@@ -1,9 +1,12 @@
 #pragma once
+#include "../Camera/camera.h"
 #include "../OpenGL/Buffers/Buffer.h"
 #include "../OpenGL/Shader/Shader.h"
+#include "../OpenGL/Texture/Types/TextureAtlas.h"
+#include "../BlockModel/BlockModels.h"
 #include "../../Level/Chunk/Block/Block.h"
+#include "../../Level/Chunk/Block/Blocks.h"
 #include "../../Level/Item/Item.h"
-#include "../Camera/camera.h"
 
 class BlockItemRender {
 private:
@@ -63,7 +66,7 @@ public:
         shader_.SetMat4("projection", orthoProj);
 
 
-        shader_.BindTexture2D(0, g_blocks.block_texture_atlas_.get(), "BlockTexture");
+        shader_.BindTexture2D(0, g_blocks.block_texture_atlas_->get(), "BlockTexture");
     }
 
     void RenderBlock(Item item) {
@@ -82,7 +85,7 @@ public:
         camera_.screen_res_ = glm::vec2(16.f, 16.f);
 
         shader_.Use();
-        shader_.BindTexture2D(0, g_blocks.block_texture_atlas_.get(), "BlockTexture");
+        shader_.BindTexture2D(0, g_blocks.block_texture_atlas_->get(), "BlockTexture");
         setDrawCalls();
         vao_.Bind();
         ebo_.Bind();

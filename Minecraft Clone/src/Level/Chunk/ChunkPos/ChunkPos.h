@@ -15,8 +15,9 @@ class ChunkPos {
 public:
     int x, y, z;
 
-    ChunkPos(int px, int py, int pz) {
-        set(px, py, pz);
+    template <typename T>
+    ChunkPos(T px, T py, T pz) {
+        set(static_cast<int>(px), static_cast<int>(py), static_cast<int>(pz));
     }
 
     ChunkPos(const ChunkPos& m) {

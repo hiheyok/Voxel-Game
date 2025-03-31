@@ -9,7 +9,7 @@ struct SetBlockRelative {
 
     BlockID block_;
 
-    SetBlockRelative(BlockID block, int8_t x, int8_t y, int8_t z) : x_{ x }, y_{ y }, z_{ z }, block_{ block } {}
+    SetBlockRelative(BlockID block, int8_t x, int8_t y, int8_t z);
 
     void SetPos(int8_t x, int8_t y, int8_t z);
 };

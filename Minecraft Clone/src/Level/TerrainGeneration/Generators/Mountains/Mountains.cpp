@@ -1,4 +1,10 @@
 #include "Mountains.h"
+#include "../../../../Utils/FastNoiseLite.h"
+
+MountainGenerator::MountainGenerator() : noise_{std::make_unique<FastNoiseLite>()} {
+    noise_->SetNoiseType(noise_->NoiseType_OpenSimplex2);
+    noise_->SetFrequency(0.005f);
+}
 
 void MountainGenerator::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
     ChunkPos scaledPos = pos;
@@ -108,7 +114,7 @@ void MountainGenerator::GenerateDecor(const ChunkPos& pos, Chunk* chunk) {
             int gx = pos.x + x;
             int gz = pos.z + z;
 
-            float TREE_MAP = (float)((double)(noise_.GetNoise((float)gx * 100.f, (float)gz * 100.f, 3453454.f) + 1.f) / 2.f);
+            float TREE_MAP = (float)((double)(noise_->GetNoise((float)gx * 100.f, (float)gz * 100.f, 3453454.f) + 1.f) / 2.f);
             for (int y = 0; y < 16; y++) {
                 if (chunk->GetBlock(x, y - 1, z) == g_blocks.GRASS) {
 
@@ -194,7 +200,7 @@ float MountainGenerator::GetNoise3D(glm::ivec3 ChunkCoordinate, glm::ivec3 Relat
     float out = 0.0f;
 
     for (int i = 0; i < samples; i++) {
-        float n = noise_.GetNoise(
+        float n = noise_->GetNoise(
             GlobalBlockPosition.x * powf(2.0, static_cast<float>(i)),
             GlobalBlockPosition.y * powf(2.0, static_cast<float>(i)),
             GlobalBlockPosition.z * powf(2.0, static_cast<float>(i))) + 1;
@@ -216,7 +222,7 @@ float MountainGenerator::GetNoise2D(glm::ivec2 ChunkCoordinate, glm::ivec2 Relat
     float out = 0.0f;
 
     for (int i = 0; i < samples; i++) {
-        float n = noise_.GetNoise(GlobalBlockPosition.x * powf(2.0, static_cast<float>(i)),
+        float n = noise_->GetNoise(GlobalBlockPosition.x * powf(2.0, static_cast<float>(i)),
             GlobalBlockPosition.y * powf(2.0, static_cast<float>(i))) + 1;
         n *= 0.5f;
         out += n * powf(0.5f, static_cast<float>(i));

@@ -3,7 +3,6 @@
 #include <vector>
 #include "../../../Utils/LogUtils.h"
 
-typedef uint64_t WorldGeneratorID;
 
 class GeneratorType {
 private:

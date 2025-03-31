@@ -1,28 +1,27 @@
 #pragma once
+#include <memory>
+#include <glm/vec3.hpp>
+
 #include "../Generator.h"
-#include "../../Noisemaps/Noisemap.h"
-#include "../../Noisemaps/TerrainParameters.h"
-#include "Overworld.h"
-#include "../../../Chunk/Heightmap/Heightmap.h"
-#include "../../Biome/BiomeProvider.h"
+
+
+class NoiseMaps1122;
+
+struct TerrainParamters;
+struct ChunkGeneratorSettings;
 
 class MinecraftTerrain : public WorldGenerator {
 public:
-    MinecraftTerrain() {
-        settings_ = new ChunkGeneratorSettings;
-        use_tall_chunks_ = true;
-        
-    }
+    MinecraftTerrain();
 
     void GenerateTall(const ChunkPos& pos, std::unique_ptr <TallChunk>& chunk) override;
 
 private:
     void Init();
 
-    NoiseMaps1122 Noisemaps;
-    TerrainParamters Paramters;
-    ChunkGeneratorSettings* settings_ = nullptr;
-    
+    std::unique_ptr<NoiseMaps1122> noisemaps_;
+    std::unique_ptr<TerrainParamters> parameters_;
+    std::unique_ptr<ChunkGeneratorSettings> settings_;
 
     //double* heightMap;
 

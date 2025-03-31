@@ -1,8 +1,15 @@
 #pragma once
-#include "Block.h"
-#include "Material/BlockMaterial.h"
-#include "Texture/BlockTexture.h"
+#include <memory>
+#include <vector>
 
+#include "../../Typenames.h"
+#include "Material/BlockMaterial.h"
+
+class TextureAtlas;
+
+namespace Model {
+    struct BlockModel;
+}
 
 class BlockList{
 private:
@@ -12,10 +19,10 @@ private:
     void InitializeBlockModels();
     void AddAssets(std::string namespaceIn);
 public:
-    std::vector<Block*> block_type_data_ = {};
-    std::vector<ModelV2::BlockModelV2> block_model_data_ = {};
+    std::vector<Block*> block_type_data_;
+    std::vector<Model::BlockModel> block_model_data_;
 
-    TextureAtlas block_texture_atlas_;
+    std::unique_ptr<TextureAtlas> block_texture_atlas_;
 
 
     BlockID AIR = RegisterBlock("minecraft:air", new MaterialNone(), true, false, false);
@@ -353,34 +360,16 @@ public:
 
     BlockID ANVIL = RegisterBlock("minecraft:anvil", new MaterialNone(), false, true, false);
 
-    void Initialize() {
-        block_texture_atlas_.Gen();
-        block_texture_atlas_.SetSize(16 * 512, 16 * 512);
+    void Initialize();
 
-        InitializeBlockModels();
+    BlockList();
+    ~BlockList();
 
-        block_texture_atlas_.UploadToGPU();
-    }
+    void CleanUp();
 
-    ~BlockList() {
-        CleanUp();
-    }
+    Block* GetBlockType(BlockID id);
 
-    void CleanUp() {
-        for (const auto& obj : block_type_data_) {
-            delete obj;
-        }
-
-        block_type_data_.clear();
-    }
-
-    inline Block* GetBlockType(BlockID id) {
-        return block_type_data_[id];
-    }
-
-    const inline ModelV2::BlockModelV2& GetBlockModelDereferenced(BlockID id) {
-        return block_model_data_[id];
-    }
+    const Model::BlockModel& GetBlockModelDereferenced(BlockID id);
 
     BlockID RegisterBlock(std::string blockName, Material* material, bool transparency, bool solid, bool isFluid);
 

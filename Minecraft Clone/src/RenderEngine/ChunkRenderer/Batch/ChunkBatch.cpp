@@ -129,7 +129,7 @@ void ChunkDrawBatch::UpdateCommandBufferSize() {
 bool ChunkDrawBatch::AddChunkVertices(const std::vector<uint32_t>& Data, const ChunkPos& pos) {
     //size_t DataSize = Data.size() * sizeof(uint32_t);
 
-    ChunkMemoryPoolOffset memoryPoolBlockData = memory_pool_.AddChunk(Data, pos, NULL);
+    ChunkMemoryPoolOffset memoryPoolBlockData = memory_pool_.AddChunk(Data, pos);
 
     if (memoryPoolBlockData.mem_offset_ == ULLONG_MAX) {
         return false;
@@ -230,7 +230,7 @@ void ChunkDrawBatch::Defrager(size_t iterations) {
         // --- Perform the GPU Copy ---
         // 1. Copy from main buffer to staging buffer
         if (reservedBlock.size_ > memory_pool_.stagging_buffer_.GetMaxSize()) {
-            g_logger.LogError("Defrager", "Chunk size too large for staging buffer! Skipping defrag for this block.");
+            g_logger.LogError("Defrager", "Chunk size too large for staging buffer! Skipping defrag for this block."); // TODO: Fix this later 
             // Need to re-add the chunk info we just removed, or handle this state
             // Re-adding is complex, maybe just log and accept fragmentation for this block.
             continue;

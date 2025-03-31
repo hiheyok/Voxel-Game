@@ -3,6 +3,8 @@
 #include "../../Chunk/TallChunk.h"
 #include <glm/vec3.hpp>
 
+// TODO: Fix me later
+
 class WorldGenerator {
 public:
     WorldGenerator() {

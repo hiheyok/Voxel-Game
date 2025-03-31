@@ -1,12 +1,14 @@
 #pragma once
-#include "../World/World.h"
 #include "DimensionProperties.h"
-#include "../TerrainGeneration/Generator.h"
-#include "../World/WorldInteraction/WorldInteractions.h"
+#include "../DataContainer/EntityContainer.h"
 #include "../Event/EventSystem.h"
 #include "../Event/EventHandler.h"
-#include "../../Core/Options/Option.h"
+#include "../TerrainGeneration/Generator.h"
 #include "../TerrainGeneration/Generators/GeneratorType.h"
+#include "../World/World.h"
+#include "../World/WorldInteraction/WorldInteractions.h"
+#include "../World/WorldParameters.h"
+#include "../../Core/Options/Option.h"
 
 class Dimension {
 private:
@@ -37,7 +39,7 @@ protected:
 public:
     WorldInteractions world_interactions_;
     EventSystem event_manager_;
-    const int tick_rate_ = 20;
+    const int tick_rate_ = 20; //TODO: tmp fix
 
     Dimension(WorldGeneratorID generatorTypeIn = g_generators.DEBUG) {
         generator_type_ = generatorTypeIn;
@@ -109,6 +111,6 @@ public:
 
         //Tick all entities
 
-        world_->entities_.Tick(this);
+        world_->entities_->Tick(this);
     }
 };

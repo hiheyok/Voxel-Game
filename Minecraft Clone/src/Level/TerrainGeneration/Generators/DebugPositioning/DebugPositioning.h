@@ -3,9 +3,7 @@
 
 class DebugPositioning : public WorldGenerator {
 public:
-    DebugPositioning() {
-
-    }
+    DebugPositioning();
 
     void Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) override;
 };

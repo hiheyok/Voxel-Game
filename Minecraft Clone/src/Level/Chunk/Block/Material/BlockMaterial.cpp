@@ -1,8 +1,20 @@
 #include "BlockMaterial.h"
 #include "../Type/BlockTypes.h"
 
+Material::~Material() = default;
+
+MaterialNone::MaterialNone() {
+    type_ = MATERIAL_NONE;
+}
+
 Block* MaterialNone::BuildNewBlockType() {
     return static_cast<Block*>(new DefaultBlock());
+}
+
+MaterialFluid::MaterialFluid(int spreadRate) { //Spreadrate in ticks
+    type_ = MATERIAL_FLUID;
+
+    spread_ = spreadRate;
 }
 
 Block* MaterialFluid::BuildNewBlockType() {
@@ -10,6 +22,12 @@ Block* MaterialFluid::BuildNewBlockType() {
     fluid->properties_.spread_rate_ = spread_;
 
     return static_cast<Block*>(fluid);
+}
+
+MaterialGrass::MaterialGrass(double spreadChance, double breakChance) {
+    type_ = MATERIAL_GRASS;
+    spread_chance_ = spreadChance;
+    break_chance_ = breakChance;
 }
 
 Block* MaterialGrass::BuildNewBlockType() {
@@ -20,10 +38,18 @@ Block* MaterialGrass::BuildNewBlockType() {
     return static_cast<Block*>(grass);
 }
 
+MaterialDirt::MaterialDirt() {
+    type_ = MATERIAL_DIRT;
+}
+
 Block* MaterialDirt::BuildNewBlockType() {
     DirtBlock* dirt = new DirtBlock();
 
     return static_cast<Block*>(dirt);
+}
+
+MaterialGravity::MaterialGravity() {
+    type_ = MATERIAL_GRAVITY;
 }
 
 Block* MaterialGravity::BuildNewBlockType() {

@@ -5,6 +5,8 @@
 #include "../Entity.h"
 #include "../../../RenderEngine/OpenGL/Texture/Types/Texture2D.h"
 
+class Dimension;
+
 class EntityType {
 public:
     

@@ -1,9 +1,8 @@
 #include "ChunkMeshingV2.h"
-#include <immintrin.h>
+#include "../../BlockModel/BlockModels.h"
+#include "../../../Level/Chunk/Chunk.h"
 #include "../../../Level/Chunk/Block/Blocks.h"
-#include <bit> 
 #include <cstdint>
-#include <intrin.h>
 
 constexpr int POSITION_OFFSET = 16;
 
@@ -13,7 +12,6 @@ constexpr int tintBitOffset = 29; // 1 bit
 
 constexpr int textureBitOffset = 10; // 18 bits
 constexpr int blockShadingBitOffset = 28; // 4 bits
-
 #define PROFILE_DEBUG
 
 void Mesh::ChunkMeshData::Reset() {
@@ -113,8 +111,8 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
                     const BlockID& backBlock = GetCachedBlockID(pos[0], pos[1], pos[2]);
                     ++pos[axis];
 
-                    const ModelV2::BlockModelV2& currModel = g_blocks.GetBlockModelDereferenced(currBlock);
-                    const ModelV2::BlockModelV2& backModel = g_blocks.GetBlockModelDereferenced(backBlock);
+                    const Model::BlockModel& currModel = g_blocks.GetBlockModelDereferenced(currBlock);
+                    const Model::BlockModel& backModel = g_blocks.GetBlockModelDereferenced(backBlock);
 
                     bool blankCurrModel = !currModel.is_initialized_ || pos[axis] == 16;
                     bool blankBackModel = !backModel.is_initialized_ || pos[axis] == 0;
@@ -462,7 +460,7 @@ inline bool Mesh::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int x, int y,
     p[axis_] += 1 - 2 * (side & 0b1);
 //    return getCachedBlockID(p[0], p[1], p[2]) == Blocks.AIR;
 
-    const ModelV2::BlockModelV2& model = g_blocks.GetBlockModelDereferenced(GetCachedBlockID(p[0], p[1], p[2]));
+    const Model::BlockModel& model = g_blocks.GetBlockModelDereferenced(GetCachedBlockID(p[0], p[1], p[2]));
 
     if (!model.is_initialized_) return true;
 

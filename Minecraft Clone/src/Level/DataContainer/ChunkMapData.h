@@ -11,23 +11,23 @@ struct Region { //32x32x32 Chunk Region
     Region();
     ~Region();
 
-    void AddChunk(std::unique_ptr<Chunk> chunk, uint16_t x, uint16_t y, uint16_t z);
-    void AddChunkGlobalPos(std::unique_ptr<Chunk> chunk, int32_t x, int32_t y, int32_t z);
+    void AddChunk(std::unique_ptr<Chunk> chunk, int x, int y, int z);
+    void AddChunkGlobalPos(std::unique_ptr<Chunk> chunk, int x, int y, int z);
 
-    void EraseChunk(uint16_t x, uint16_t y, uint16_t z);
-    void EraseChunkGlobalPos(int32_t x, int32_t y, int32_t z);
+    void EraseChunk(int x, int y, int z);
+    void EraseChunkGlobalPos(int x, int y, int z);
 
-    bool CheckChunk(uint16_t x, uint16_t y, uint16_t z) const;
-    bool CheckChunkGlobalPos(int32_t x, int32_t y, int32_t z) const;
+    bool CheckChunk(int x, int y, int z) const;
+    bool CheckChunkGlobalPos(int x, int y, int z) const;
 
-    Chunk* GetChunk(uint16_t x, uint16_t y, uint16_t z) const;
-    Chunk* GetChunkGlobalPos(int32_t x, int32_t y, int32_t z) const;
+    Chunk* GetChunk(int x, int y, int z) const;
+    Chunk* GetChunkGlobalPos(int x, int y, int z) const;
 
-    ChunkColumn* GetChunkColumn(uint16_t x, uint16_t z) const;
-    ChunkColumn* GetChunkColumnGlobalPos(int32_t x, int32_t z) const;
+    ChunkColumn* GetChunkColumn(int x, int z) const;
+    ChunkColumn* GetChunkColumnGlobalPos(int x, int z) const;
 
-    bool CheckChunkColumn(uint16_t x, uint16_t z) const;
-    bool CheckChunkColumnGlobalPos(int32_t x, int32_t z) const;
+    bool CheckChunkColumn(int x, int z) const;
+    bool CheckChunkColumnGlobalPos(int x, int z) const;
 
     uint64_t access_count_ = 0;
 };

@@ -1,13 +1,22 @@
 #pragma once
 #include "../World.h"
-#include "../WorldParameters.h"
-#include "WorldLoader.h"
-#include <concurrent_unordered_set.h>
-#include <exception>
 #include <mutex>
+#include <memory>
 #include <stack>
-//Provides a way for the world to be interacted like summoning entities and what chunks are updated and what chunks needs updates
+#include <vector>
+
+#include "../../Typenames.h"
+
+// Provides a way for the world to be interacted like summoning entities and what chunks are updated and what chunks needs updates
 // TODO: IMPORTANT FIX LIGHT UPDATE 
+
+class WorldLoader;
+class WorldCollusionDetector;
+class Chunk;
+class ChunkLightingContainer;
+
+struct WorldParameters;
+struct EntityProperty;
 
 class WorldInteractions {
 private:
@@ -18,16 +27,12 @@ private:
     std::vector<ChunkPos> light_updates_;
 public:
     WorldLoader* worldLoader_ = nullptr;
-    WorldParameters settings_;
-    WorldCollusionDetector collusions_;
+    std::unique_ptr<WorldParameters> settings_;
+    std::unique_ptr<WorldCollusionDetector> collusions_;
 
-    WorldInteractions() {
+    WorldInteractions();
 
-    }
-
-    WorldInteractions(World* w, WorldParameters parameters) {
-        init(w, parameters);
-    }
+    WorldInteractions(World* w, WorldParameters parameters);
 
     void UseTallGeneration();
 

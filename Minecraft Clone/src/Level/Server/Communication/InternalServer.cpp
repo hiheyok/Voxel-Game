@@ -1,4 +1,10 @@
 #include "InternalServer.h"
+#include "../Server.h"
+#include "../../Chunk/ChunkPos/ChunkPos.h"
+#include "../../Entity/Mobs/Player.h"
+#include "../../Entity/Properties/EntityProperties.h"
+#include "../../Event/Event.h"
+#include "../../../Core/Options/Option.h"
 
 void InternalServer::startInternalServer(Player* p) {
     server = new Server();
@@ -54,7 +60,7 @@ std::vector<EntityProperty> InternalServer::GetUpdatedEntities() {
     return server->GetUpdatedEntities();
 }
 
-std::vector<EntityUUID>  InternalServer::GetRemovedEntities() {
+std::vector<EntityUUID> InternalServer::GetRemovedEntities() {
     return server->GetRemovedEntities();
 }
 

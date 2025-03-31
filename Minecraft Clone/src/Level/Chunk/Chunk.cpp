@@ -1,5 +1,8 @@
 #include "Chunk.h"
 
+Chunk::Chunk() = default;
+Chunk::~Chunk() = default;
+
 void Chunk::UpdateGen() {
     for (int side = 0; side < 6; side++) {
         int axis_ = side >> 1;

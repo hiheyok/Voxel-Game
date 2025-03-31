@@ -27,15 +27,15 @@ public:
 
     Chunk* GetChunk(int heightLevel) const;
 
-    int16_t FindSurfaceHeight(uint8_t x, uint8_t z, uint8_t startingChunk = 31) const;
+    int16_t FindSurfaceHeight(int x, int z, int startingChunk = 31) const;
 
     /*
     Input is the y axis where the chunk is located at and the x and z block position relative to the chunk
     */
 
-    int16_t FindSurfaceHeightSingleChunk(uint8_t height, uint8_t x, uint8_t z) const;
+    int16_t FindSurfaceHeightSingleChunk(int height, int x, int z) const;
 
-    void UpdateHeightmapSingleBlock(int height, BlockID block, uint8_t x, uint8_t y, uint8_t z);
+    void UpdateHeightmapSingleBlock(int height, BlockID block, int x, int y, int z);
 
     void UpdateHeightmap(int height);
 }; 

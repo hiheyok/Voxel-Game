@@ -48,8 +48,7 @@ void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, unsigned int id,
     str.seekg(0, std::ios::end);
 
     if (str.str().size() != 0) {
-        std::cout << str.str() << '\n';
-        g_logger.LogError("Window::glDebugOutput", str.str());
+        g_logger.LogWarn("Window::glDebugOutput", str.str());
     }
 
 }

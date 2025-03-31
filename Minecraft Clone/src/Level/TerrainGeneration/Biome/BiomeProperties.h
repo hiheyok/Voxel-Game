@@ -12,7 +12,7 @@ public:
     float temperature = 0.5F;
     float rainfall = 0.5F;
     int waterColor = 16777215;
-    bool enableSnow;
+    bool enableSnow = false;
     bool enableRain = true;
 
     BiomeProperties(std::string biomeNameIn) : biomeName(biomeNameIn) {}

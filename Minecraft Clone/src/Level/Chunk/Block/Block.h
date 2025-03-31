@@ -1,40 +1,39 @@
 #pragma once
 #include <vector>
-#include "Texture/BlockTexture.h"
+#include <string>
+#include <memory>
+
+#include "Texture/BlockTexture.h" // TODO: Remove this later
 #include "../../Typenames.h"
-#include "../../../RenderEngine/BlockModel/BlockModels.h"
-#include "../../Chunk/ChunkPos/ChunkPos.h"
 
 class Dimension;
+class BlockTexture;
+
+namespace Model {
+    struct BlockModel;
+}
 
 struct BlockType {
 
-    BlockType(bool transparent, bool solid, bool fluid) {
-        transparency_ = transparent;
-        is_solid_ = solid;
-        is_fluid_ = fluid;
-    }
+    BlockType(bool transparent, bool solid, bool fluid);
 
-    BlockType() {
+    BlockType();
 
-    }
-
-    bool is_fluid_ = NULL;
-    bool transparency_ = NULL;
-    bool is_solid_ = NULL;
+    bool is_fluid_ = false;
+    bool transparency_ = false;
+    bool is_solid_ = false;
 };
 
 struct Block {
-    virtual ~Block() {
-        // Clean();
-    }
+    BlockID id_ = NULL;
+    std::unique_ptr<Model::BlockModel> block_model_data_ = nullptr;
+    std::unique_ptr<BlockTexture> texture_ = nullptr;
+    std::unique_ptr<BlockType> properties_ = nullptr;
+
+    std::string block_name_ = "";
+
+    Block();
+    virtual ~Block();
 
     virtual void Tick(const BlockPos& pos, Dimension* currentWorld) = 0;
-
-    BlockID id_ = NULL;
-    std::unique_ptr<BlockType> properties_ = nullptr;
-    std::unique_ptr<BlockTexture> texture_ = nullptr;
-
-    std::unique_ptr<ModelV2::BlockModelV2> block_model_data_ = nullptr;
-    std::string block_name_ = "";
 };

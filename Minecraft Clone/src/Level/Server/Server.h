@@ -1,16 +1,36 @@
 #pragma once
-#include "../Level.h"
-#include "../Timer/Timer.h"
-#include "../../Utils/Clock.h"
 #include <thread>
-#include "../../Core/Options/Option.h"
+#include <vector>
+#include <glm/vec3.hpp>
+
+#include "../Typenames.h"
+
+// TODO: Currently default to main dimension for now (change this later)
+class ClientInterface;
+class InternalInterface;
+class Timer;
+class Level;
+class Chunk;
+class Entity;
+
+struct Ray;
+struct EntityProperty;
+
+namespace Event {
+    struct Event;
+}
 
 struct ServerSettings {
-    int gen_thread_count_ = 8;
-    int light_engine_thread_count_ = 2;
-    int tick_rate_ = 20;
-    int horizontal_ticking_distance_ = 10;
-    int vertical_ticking_distance_ = 8;
+    size_t gen_thread_count_ = 8;
+    size_t light_engine_thread_count_ = 2;
+    size_t tick_rate_ = 20;
+    size_t horizontal_ticking_distance_ = 10;
+    size_t vertical_ticking_distance_ = 8;
+
+    ServerSettings() = default;
+    ServerSettings(const ServerSettings&) = default;
+    ServerSettings(ServerSettings&&) = default;
+    ~ServerSettings() = default;
 };
 
 //This manages the input/output system of the world
@@ -19,30 +39,29 @@ class Server {
 private:
     bool stop_ = true; // TODO: Rename
     std::thread main_server_loop_;
-    Timer time_; // TODO: Rename
+    std::unique_ptr<Timer> time_; // TODO: Rename
     double mspt_ = 0.0;
 public:
-    Level level_;
+    std::unique_ptr<Level> level_ = nullptr;
+    std::unique_ptr<ServerSettings> settings_ = nullptr;
+    ClientInterface* client_interface_ = nullptr;
 
-    ServerSettings settings_;
-
-    Server() {
-
-    }
+    Server();
+    ~Server();
 
     size_t GetChunkCount();
 
-    double GetMSPT();// TODO: Rename
+    double GetMSPT();
 
     Timer* GetTimer();
 
-    std::vector<EntityProperty> GetUpdatedEntities();// TODO: Rename
+    std::vector<EntityProperty> GetUpdatedEntities();
 
-    std::vector<EntityUUID> GetRemovedEntities();// TODO: Rename
+    std::vector<EntityUUID> GetRemovedEntities();
 
     bool CheckEntityOnGround(EntityUUID id);
 
-    void Join(Entity& entity);// TODO: Rename
+    void Join(Entity& entity);
 
     std::vector<ChunkPos> GetUpdatedChunkPos();
 
@@ -63,4 +82,8 @@ public:
     void Tick();
 
     void SendEvent(const Event::Event& event);
+
+    void SetInternalConnection(InternalInterface* conn);
+
+    void ProcessPacket();
 };

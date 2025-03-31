@@ -1,5 +1,5 @@
 #include "DebugSecond.h"
-
+DebugWorldSecond::DebugWorldSecond() = default;
 
 void DebugWorldSecond::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
     chunk->SetBlock(g_blocks.COBBLESTONE, 8, 8, 8);

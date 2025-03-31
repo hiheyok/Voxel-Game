@@ -15,6 +15,6 @@ struct WorldRenderInfo {
 
     size_t amount_of_mesh_generated_ = 1;
 
-    int horizontal_render_distance_ = 16;
-    int vertical_render_distance_ = 16;
+    size_t horizontal_render_distance_ = 16;
+    size_t vertical_render_distance_ = 16;
 };

@@ -1,4 +1,5 @@
 #include "MultiEntityRender.h"
+#include "../Camera/camera.h"
 
 size_t MultiEntityRenderer::GetNumEntityRendered() {
     return num_entity_rendered_;

@@ -3,9 +3,7 @@
 
 class MathWorld : public WorldGenerator {
 public:
-    MathWorld() {
-
-    }
+    MathWorld();
 
     void Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) override;
 };

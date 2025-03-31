@@ -1,5 +1,5 @@
 #include "DebugPositioning.h"
-
+DebugPositioning::DebugPositioning() = default;
 
 void DebugPositioning::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
     // Red -> x

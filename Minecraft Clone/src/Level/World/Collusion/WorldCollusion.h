@@ -1,17 +1,17 @@
 #pragma once
 #include <glm/vec3.hpp>
-#include "../WorldDataAccess.h"
-#include "../../../Utils/Math/Ray/Ray.h"
-#include "../../Entity/Entity.h"
+
+class ChunkMap;
+
+struct Entity;
+struct Ray;
 
 class WorldCollusionDetector {
 private:
-    WorldAccess* world_;
+    ChunkMap* world_;
 
 public:
-    void Initialize(WorldAccess* w) {
-        world_ = w;
-    }
+    void Initialize(ChunkMap* w);
 
     bool CheckRayIntersection(Ray& ray);
 
