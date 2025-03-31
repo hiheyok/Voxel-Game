@@ -12,18 +12,13 @@ namespace Model {
 }
 
 class BlockList{
-private:
-    FastHashMap<std::string, BlockID> block_id_name_data_;
-    int block_type_count_ = 0;
-
-    void InitializeBlockModels();
-    void AddAssets(std::string namespaceIn);
 public:
+    FastHashMap<std::string, BlockID> block_id_name_data_;
+
     std::vector<Block*> block_type_data_;
     std::vector<Model::BlockModel> block_model_data_;
 
     std::unique_ptr<TextureAtlas> block_texture_atlas_;
-
 
     BlockID AIR = RegisterBlock("minecraft:air", new MaterialNone(), true, false, false);
     BlockID NULL_BLOCK = RegisterBlock("minecraft:null", new MaterialNone(), false, false, false);
@@ -372,7 +367,11 @@ public:
     const Model::BlockModel& GetBlockModelDereferenced(BlockID id);
 
     BlockID RegisterBlock(std::string blockName, Material* material, bool transparency, bool solid, bool isFluid);
+private:
+    int block_type_count_ = 0;
 
+    void InitializeBlockModels();
+    void AddAssets(std::string namespaceIn);
 } ;
 
 extern BlockList g_blocks;

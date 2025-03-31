@@ -4,6 +4,7 @@
 #include "../../Utils/Clock.h"
 #include "../../Core/Options/Option.h"
 #include "../../Level/Server/Communication/InternalServer.h"
+#include "../../Level/Timer/Timer.h"
 #include "../../RenderEngine/ChunkRenderer/Mesh/ChunkMeshingV2.h"
 #include "../../RenderEngine/ChunkRenderer/TerrainRenderer.h"
 
@@ -12,8 +13,9 @@ static thread_local Mesh::ChunkMeshData chunkMesher;
 WorldRender::WorldRender() : 
     player_{std::make_unique<PlayerPOV>()},
     renderer_{std::make_unique<TerrainRenderer>()} {
-
 }
+
+WorldRender::~WorldRender() = default;
 
 void WorldRender::SetRotation(glm::dvec2 rotation) {
     player_->SetRotation(rotation);

@@ -11,40 +11,9 @@ class Chunk;
 struct Cuboid;
 struct BlockFace;
 
+// TODO: refactor this
+
 namespace Mesh {
-    struct CompactBooleanData {
-
-        void InsertBit(size_t index) {
-            size_t NumIndex = index >> 6;
-            size_t Index = index & 0b111111;
-
-            data[NumIndex] |= (0b1LL << Index);
-
-        }
-
-        bool Getbit(size_t index) const {
-            size_t NumIndex = index >> 6;
-            size_t Index = index & 0b111111;
-            return (data[NumIndex] >> Index) & 0b1;
-        }
-
-        void InsertBitPos(uint16_t x, uint16_t y, uint16_t z) {
-            InsertBit((x << 8) + (y << 4) + z);
-        }
-
-        bool GetBitPos(uint16_t x, uint16_t y, uint16_t z) const {
-            return Getbit((x << 8) + (y << 4) + z);
-        }
-
-        void clear() {
-            for (int i = 0; i < 64; i++) {
-                data[i] = 0;
-            }
-        }
-
-        uint64_t data[4 * 16]{};
-    };
-
     struct ChunkVertexData {
         ChunkVertexData() {
 
@@ -108,8 +77,6 @@ namespace Mesh {
         inline glm::u8vec4 getAO(uint8_t direction, int x, int y, int z);
 
         //To check if a block had been used in the Greedy Meshing Algorithm
-        CompactBooleanData boolean_map_;
-
         const uint64_t BUFFER_SIZE_STEP = 262144;
 
         Chunk* chunk_;

@@ -1,12 +1,20 @@
 #pragma once
 #include <vector>
-#include "EntityRenderCache.h"
-#include "../OpenGL/Buffers/Buffer.h"
-#include "../OpenGL/Shader/Shader.h"
-#include "../../Client/Render/PlayerPOV.h"
-#include "../../Level/Entity/Type/EntityType.h"
-#include "../../Level/Entity/Entities.h"
-#include "../../Client/Profiler/PerformanceProfiler.h"
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include "../../Level/Typenames.h"
+
+class Buffer;
+class VertexArray;
+class EntityModel;
+class Shader;
+class PerformanceProfiler;
+class Camera;
+class PlayerPOV;
+
+struct EntityRenderCache;
+struct EntityProperty;
+struct GLFWwindow;
 
 class MultiEntityRenderer {
 private:
@@ -15,22 +23,20 @@ private:
     std::vector<unsigned int> entity_indices_;
 
     FastHashMap<EntityTypeID, EntityModel> entity_cached_models_;
-
     FastHashMap<EntityTypeID, size_t> entity_element_index_;
     FastHashMap<EntityTypeID, size_t> entity_element_size_;
 
-    EntityRenderCache renderable_entities_;
+    std::unique_ptr<EntityRenderCache> renderable_entities_;
+    std::unique_ptr<Shader> shader_;
 
-    Shader shader_;
-
-    PlayerPOV player_;
+    std::unique_ptr<PlayerPOV> player_;
     Camera* camera_;
     GLFWwindow* window_;
 
-    Buffer vbo_;
-    Buffer ebo_;
-    Buffer ssbo_pos_, ssbo_vel_, ssbo_acc_;
-    VertexArray vao_;
+    std::unique_ptr<Buffer> vbo_;
+    std::unique_ptr<Buffer> ebo_;
+    std::unique_ptr<Buffer> ssbo_pos_, ssbo_vel_, ssbo_acc_;
+    std::unique_ptr<VertexArray> vao_;
 
     std::vector<float> position_arr_;
     std::vector<float> velocity_arr_;
@@ -45,6 +51,9 @@ public:
 
     int vertical_render_distance_ = 16;
     int horizontal_render_distance_ = 16;
+
+    MultiEntityRenderer();
+    ~MultiEntityRenderer();
 
     void Clean();
 

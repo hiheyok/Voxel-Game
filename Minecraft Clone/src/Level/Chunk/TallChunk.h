@@ -5,6 +5,7 @@ struct TallChunk {
     std::vector<std::unique_ptr<Chunk>> chunk_sub_column_;
 
     TallChunk();
+    ~TallChunk();
 
     void SetPosition(int x, int y, int z);
 

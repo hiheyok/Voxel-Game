@@ -98,3 +98,30 @@ std::vector<float> RenderableFont::GetBackgroundVertices() {
 
     return out;
 }
+
+void RenderableFont::setBackgroundPadding(float H, float W) {
+    background_height_padding_ = H;
+    background_width_padding_ = W;
+}
+
+void RenderableFont::SetText(std::string str) {
+    render_text_ = str;
+}
+
+void RenderableFont::AddBackground(glm::vec3 color, float alpha) { //add background
+    background_ = true;
+    background_color_ = color;
+    background_alpha_ = alpha;
+}
+
+void RenderableFont::FontSize(float size) {
+    font_size_ = size;
+}
+
+void RenderableFont::SetColor(glm::vec3 clr) {
+    color_ = clr;
+}
+
+void RenderableFont::SetPosition(glm::vec2 pos) {
+    position_ = pos;
+}

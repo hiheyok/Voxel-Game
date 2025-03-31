@@ -1,11 +1,8 @@
 #pragma once
-
+#include <vector>
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/vec2.hpp>
-#include "../Utils/LogUtils.h"
-#include "../Client/IO/IO.h"
-#include <vector>
 
 #include "../Client/IO/IO.h"
 
@@ -24,9 +21,7 @@ public:
     void Refresh();
     void PollInputs();
     GLFWwindow* GetWindow();
-
 protected:
-
     bool WindowCloseCheck();
     void DisableCursor();
     void EnableCursor();

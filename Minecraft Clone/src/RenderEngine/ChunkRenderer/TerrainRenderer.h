@@ -1,13 +1,18 @@
 #pragma once
-#include  "Mesh/ChunkMeshingV2.h"
-#include "../Camera/camera.h"
-#include "Batch/ChunkBatch.h"
-#include "../OpenGL/Shader/Shader.h"
-#include "../../Core/Options/Option.h"
-#include "../../Level/Timer/Timer.h"
+#include <memory>
 
-#include <concurrent_vector.h>
-#include <mutex>
+#include "../../Level/Typenames.h"
+
+class Timer;
+class Camera;
+class Shader;
+class ChunkDrawBatch;
+
+struct GLFWwindow;
+
+namespace Mesh {
+    struct ChunkVertexData;
+}
 
 class TerrainRenderer {
 private:
@@ -31,17 +36,12 @@ private:
     FastHashMap<ChunkPos, int> chunk_batch_transparent_lookup_; //f: ChunkPos -> TransparentBatchIndex
 
     GLFWwindow* window_ = nullptr;
-    Shader cubic_shader_;
+    std::unique_ptr<Shader> cubic_shader_;
     Camera* camera_;
-    Timer time_;
+    std::unique_ptr<Timer> time_;
 public:
-    TerrainRenderer() : chunk_solid_batches_{ 0 },
-        chunk_batch_solid_lookup_{ 0 },
-        chunk_transparent_batches_{ 0 },
-        chunk_batch_transparent_lookup_{ 0 },
-        camera_{ nullptr } {
-
-    }
+    TerrainRenderer();
+    ~TerrainRenderer();
 
     void Initialize(GLFWwindow* window_, Camera* camera_);
 
@@ -74,7 +74,5 @@ public:
     void Cleanup();
 
     size_t amountOfMeshGenerated = 1;
-
-
 };
 

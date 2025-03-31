@@ -1,6 +1,7 @@
-#include "ChunkBatch.h"
-
 #include <iterator>
+
+#include "ChunkBatch.h"
+#include "../../OpenGL/Buffers/BufferStorage.h"
 #include "../../../Level/Timer/Timer.h"
 
 void ChunkDrawBatch::SetupBuffers() {
@@ -21,10 +22,10 @@ void ChunkDrawBatch::SetupBuffers() {
     ibo_.SetMaxSize((size_t)(max_buffer_size_ / 100));
     ibo_.InitializeData();
 
-    memory_pool_.buffer_.Bind();
+    memory_pool_.buffer_->Bind();
     array_.EnableAttriPTR(0, 1, GL_FLOAT, GL_FALSE, 2, 0);
     array_.EnableAttriPTR(1, 1, GL_FLOAT, GL_FALSE, 2, 1);
-    memory_pool_.buffer_.Unbind();
+    memory_pool_.buffer_->Unbind();
     array_.Unbind();
 
     ssbo_.SetMaxSize((size_t)(max_buffer_size_ / 100));
@@ -40,7 +41,7 @@ void ChunkDrawBatch::Reset() {
 }
 
 void ChunkDrawBatch::Cleanup() {
-    memory_pool_.buffer_.Delete();
+    memory_pool_.buffer_->Delete();
     ibo_.Delete();
     ssbo_.Delete();
     array_.~VertexArray();
@@ -167,7 +168,7 @@ void ChunkDrawBatch::SetMaxSize(size_t size) {
 void ChunkDrawBatch::Bind() {
     array_.Bind();
     ibo_.Bind();
-    memory_pool_.buffer_.Bind();
+    memory_pool_.buffer_->Bind();
     ssbo_.Bind();
     ssbo_.BindBase(2);
 }
@@ -176,7 +177,7 @@ void ChunkDrawBatch::Unbind() {
     ssbo_.UnbindBase(2);
     ssbo_.Unbind();
     ibo_.Unbind();
-    memory_pool_.buffer_.Unbind();
+    memory_pool_.buffer_->Unbind();
     array_.Unbind();
 }
 
@@ -229,13 +230,13 @@ void ChunkDrawBatch::Defrager(size_t iterations) {
 
         // --- Perform the GPU Copy ---
         // 1. Copy from main buffer to staging buffer
-        if (reservedBlock.size_ > memory_pool_.stagging_buffer_.GetMaxSize()) {
+        if (reservedBlock.size_ > memory_pool_.stagging_buffer_->GetMaxSize()) {
             g_logger.LogError("Defrager", "Chunk size too large for staging buffer! Skipping defrag for this block."); // TODO: Fix this later 
             // Need to re-add the chunk info we just removed, or handle this state
             // Re-adding is complex, maybe just log and accept fragmentation for this block.
             continue;
         }
-        memory_pool_.buffer_.CopyTo(memory_pool_.stagging_buffer_, reservedBlock.offset_, 0, reservedBlock.size_);
+        memory_pool_.buffer_->CopyTo(memory_pool_.stagging_buffer_.get(), reservedBlock.offset_, 0, reservedBlock.size_);
 
         // 2. *** INSERT MEMORY BARRIER ***
         glMemoryBarrier(GL_ALL_BARRIER_BITS); // Or GL_COPY_WRITE_BARRIER_BIT or GL_ALL_BARRIER_BITS

@@ -1,4 +1,5 @@
 #pragma once
-#include "Texture.h"
+
+class RawTextureData;
 
 RawTextureData GetImageData(const char* path);

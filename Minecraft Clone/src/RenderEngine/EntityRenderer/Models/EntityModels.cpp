@@ -99,3 +99,53 @@ Model::ModelData Model::RectangularPrism::GetVertices() {
 
     return model;
 }
+
+Model::RectangularPrism::RectangularPrism(float x, float y, float z) {
+    size_.x = x;
+    size_.y = y;
+    size_.z = z;
+}
+
+Model::RectangularPrism::RectangularPrism(glm::vec3 size, glm::vec3 offset) {
+    size_ = size;
+    offset_ = offset;
+}
+
+Model::RectangularPrism* EntityModel::AddRectangle(glm::vec3 size, glm::vec3 offset) {
+    shapes_.emplace_back(size, offset);
+    return &shapes_.back();
+}
+
+Model::ModelData EntityModel::GetVertices() {
+
+    Model::ModelData model;
+
+    for (Model::RectangularPrism& shape : shapes_) {
+        Model::ModelData SubModel = shape.GetVertices();
+
+        size_t CurrentIndex = model.vertices_count_;
+
+        for (size_t i = 0; i < SubModel.vertices_.size(); i++) {
+            if ((i % 5) < 3) {
+                model.vertices_.push_back(SubModel.vertices_[i] + shape.offset_[i % 5]);
+            }
+            else {
+                model.vertices_.push_back(SubModel.vertices_[i]);
+            }
+
+        }
+
+        for (size_t i = 0; i < SubModel.indices_.size(); i++) {
+            model.indices_.push_back(static_cast<uint32_t>(SubModel.indices_[i] + CurrentIndex));
+        }
+
+        model.vertices_count_ += SubModel.vertices_count_;
+
+    }
+
+    return model;
+}
+
+void EntityModel::Clear() {
+    shapes_.clear();
+}

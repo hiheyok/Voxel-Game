@@ -8,6 +8,8 @@ class Camera;
 class PlayerPOV {
 public:
     PlayerPOV();
+    ~PlayerPOV();
+
     void SetPosition(glm::vec3 pos);
     void SetRotation(glm::vec2 rot);
     void SetFOV(float fov);

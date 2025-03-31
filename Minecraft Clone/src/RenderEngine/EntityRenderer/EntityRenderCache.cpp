@@ -1,4 +1,5 @@
 #include "EntityRenderCache.h"
+#include "../../Level/Entity/Entity.h"
 
 void EntityRenderCache::AddEntity(EntityProperty& entity) {
     entity_container_[entity.entity_uuid_] = entity;

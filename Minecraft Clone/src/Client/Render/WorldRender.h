@@ -21,6 +21,7 @@ namespace Mesh {
 class WorldRender : public WorldRenderInfo {
 public:
     WorldRender();
+    ~WorldRender();
 
     void SetRotation(glm::dvec2 rotation);
 

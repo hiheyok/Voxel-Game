@@ -1,8 +1,8 @@
 #pragma once
-#include "../Camera/camera.h"
+
+class Camera;
 
 class CFrustum {
-
 public:
 
     // Call this every time the camera moves to update the frustum
@@ -18,7 +18,6 @@ public:
     bool CubeInFrustum(float x, float y, float z, float size) const;
 
 private:
-
     // This holds the A B C and D values for each side of our frustum.
     float frustum_[6][4];
 };

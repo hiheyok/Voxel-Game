@@ -9,6 +9,7 @@
 #include "../../../Utils/MathHelper.h"
 #include "../../../Level/Chunk/Chunk.h"
 #include "../../OpenGL/Buffers/Buffer.h"
+#include "../../OpenGL/Buffers/VertexArray.h"
 #include "../MemoryPool/ChunkMemoryPool.h"
 #include <list>
 #include <map>
@@ -34,6 +35,9 @@ private:
 
     Buffer transfer_buffer_;
 public:
+    ChunkDrawBatch() = default;
+    ChunkDrawBatch(const ChunkDrawBatch&) = delete;
+    ChunkDrawBatch(ChunkDrawBatch&&) = default;
 
     void SetupBuffers();
 

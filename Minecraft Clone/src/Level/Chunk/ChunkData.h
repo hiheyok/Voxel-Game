@@ -13,10 +13,6 @@
 
 
 class ChunkContainer {
-private:
-    std::atomic<bool> in_use_ = false;
-
-    Palette block_storage_;
 public:
     ChunkPos position_;
     std::vector<SetBlockRelative> outside_block_to_place_[6]{};
@@ -44,6 +40,10 @@ public:
     ChunkContainer* GetNeighbor(unsigned int side) const;
     
     void SetPosition(int x, int y, int z);
+private:
+    std::atomic<bool> in_use_ = false;
+
+    Palette block_storage_;
 };
 
 #endif

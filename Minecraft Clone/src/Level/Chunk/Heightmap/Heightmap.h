@@ -8,9 +8,6 @@ heightmap for chunk column 32 * 16 = 512 blocks columns 9 bits per column
 */
 
 class Heightmap {
-private:
-    std::vector<uint16_t> data_;
-    bool is_init_ = false;
 public:
     Heightmap();
     ~Heightmap();
@@ -23,4 +20,7 @@ public:
     void Clear();
 
     std::vector<uint16_t> GetData() const;
+private:
+    std::vector<uint16_t> data_;
+    bool is_init_ = false;
 };

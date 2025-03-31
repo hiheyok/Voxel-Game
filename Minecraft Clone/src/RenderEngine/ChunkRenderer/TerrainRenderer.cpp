@@ -1,16 +1,26 @@
 #include "TerrainRenderer.h"
-
-
+#include "Batch/ChunkBatch.h"
+#include "Mesh/ChunkMeshingV2.h"
+#include "../Camera/camera.h"
 #include "../Frustum/frustum.h"
 #include "../OpenGL/Texture/Texture.h"
 #include "../OpenGL/Texture/Types/TextureAtlas.h"
 #include "../OpenGL/Buffers/Buffer.h"
+#include "../OpenGL/Shader/Shader.h"
+#include "../../Core/Options/Option.h"
+#include "../../Level/Timer/Timer.h"
 #include "../../Utils/MathHelper.h"
 
-#include <unordered_map>
-#include <deque>
-#include <queue>
+TerrainRenderer::TerrainRenderer() : chunk_solid_batches_{ 0 },
+    chunk_batch_solid_lookup_{ 0 },
+    chunk_transparent_batches_{ 0 },
+    chunk_batch_transparent_lookup_{ 0 },
+    camera_{ nullptr },
+    time_{ std::make_unique<Timer>() },
+    cubic_shader_{ std::make_unique<Shader>()}
+ {}
 
+TerrainRenderer::~TerrainRenderer() = default;
 
 void TerrainRenderer::Initialize(GLFWwindow* window, Camera* camera) {
     window_ = window;
@@ -18,7 +28,7 @@ void TerrainRenderer::Initialize(GLFWwindow* window, Camera* camera) {
     SetupShaders();
     LoadAssets();
 
-    time_.Set();
+    time_->Set();
 
     CreateNewSolidBatch();
     CreateNewTransparentBatch();
@@ -64,7 +74,7 @@ void TerrainRenderer::Render() {
 
     for (ChunkDrawBatch& DrawBatch : chunk_solid_batches_) {
         DrawBatch.Bind();
-        cubic_shader_.Use();
+        cubic_shader_->Use();
         DrawBatch.Draw();
         DrawBatch.Unbind();
     }
@@ -73,7 +83,7 @@ void TerrainRenderer::Render() {
 
     for (ChunkDrawBatch& DrawBatch : chunk_transparent_batches_) {
         DrawBatch.Bind();
-        cubic_shader_.Use();
+        cubic_shader_->Use();
         DrawBatch.Draw();
         DrawBatch.Unbind();
     }
@@ -107,21 +117,21 @@ void TerrainRenderer::Update() {
     int x = width;
     int y = height;
     glm::mat4 projection = glm::perspective(glm::radians(camera_->fov_), (float)x / (float)y, 0.1f, 1000000.0f);
-    cubic_shader_.Use();
+    cubic_shader_->Use();
 
     float clrMultiplier = 1.4f;
 
-    cubic_shader_.SetMat4("view", view);
-    cubic_shader_.SetMat4("model", model);
-    cubic_shader_.SetMat4("projection", projection);
-    cubic_shader_.SetFloat("RenderDistance", (float)(horizontal_render_distance_ * 16));
-    cubic_shader_.SetFloat("VerticalRenderDistance", (float)(vertical_render_distance_ * 16));
-    cubic_shader_.SetVec3("camPos", camera_->position_);
-    cubic_shader_.SetVec3("tintColor",  glm::vec3(0.40828402 * clrMultiplier, 0.5917159 * clrMultiplier, 0.2781065 * clrMultiplier));
-    cubic_shader_.SetInt("TextureAimIndex", TextureAminationIndex);
+    cubic_shader_->SetMat4("view", view);
+    cubic_shader_->SetMat4("model", model);
+    cubic_shader_->SetMat4("projection", projection);
+    cubic_shader_->SetFloat("RenderDistance", (float)(horizontal_render_distance_ * 16));
+    cubic_shader_->SetFloat("VerticalRenderDistance", (float)(vertical_render_distance_ * 16));
+    cubic_shader_->SetVec3("camPos", camera_->position_);
+    cubic_shader_->SetVec3("tintColor",  glm::vec3(0.40828402 * clrMultiplier, 0.5917159 * clrMultiplier, 0.2781065 * clrMultiplier));
+    cubic_shader_->SetInt("TextureAimIndex", TextureAminationIndex);
 
-    if (time_.GetTimePassed_ms() > 100) {
-        time_.Set();
+    if (time_->GetTimePassed_ms() > 100) {
+        time_->Set();
         TextureAminationIndex++;
 
         if (TextureAminationIndex == (1 << 15)) {
@@ -137,7 +147,7 @@ void TerrainRenderer::setSettings(uint32_t renderDistance, uint32_t verticalRend
 }
 
 void TerrainRenderer::LoadAssets() {
-    cubic_shader_.BindTexture2D(0, g_blocks.block_texture_atlas_->get(), "BlockTexture");
+    cubic_shader_->BindTexture2D(0, g_blocks.block_texture_atlas_->get(), "BlockTexture");
 }
 
 void TerrainRenderer::AddChunk(const ChunkPos& pos, const std::vector<uint32_t>& data, std::vector<ChunkDrawBatch>& batchType, FastHashMap<ChunkPos, int>& lookUpMap) {
@@ -237,11 +247,11 @@ void TerrainRenderer::Cleanup() {
 }
 
 void TerrainRenderer::SetupShaders() {
-    cubic_shader_.Init("assets/shaders/vert.glsl", "assets/shaders/frag.glsl");
+    cubic_shader_->Init("assets/shaders/vert.glsl", "assets/shaders/frag.glsl");
 }
 
 void TerrainRenderer::CreateNewSolidBatch() {
-    chunk_solid_batches_.emplace_back();
+    chunk_solid_batches_.push_back(ChunkDrawBatch());
     size_t i = chunk_solid_batches_.size() - 1;
     chunk_solid_batches_[i].SetMaxSize(g_app_options.solid_buffer_size_);
     chunk_solid_batches_[i].SetupBuffers();

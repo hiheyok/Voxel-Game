@@ -1,22 +1,25 @@
 #pragma once
-#include "MultiEntityRender.h"
-#include "../../Level/Timer/Timer.h"
 #include <thread>
+#include <memory>
+
+class Timer;
+class Dimension;
+class MultiEntityRenderer;
 
 class EntityRendererUpdater {
-    MultiEntityRenderer* renderer_;
-    Dimension* dimension_;
-
-    bool stop_ = true;
-
-    void UpdaterThread();
-
-    std::thread update_thread_;
-
-    Timer* server_time_;
 public:
     EntityRendererUpdater();
+    ~EntityRendererUpdater();
     void SetEntityRenderer(MultiEntityRenderer* render, Timer* time);
     void Start(Dimension* dimension);
     void Stop();
+private:
+    void UpdaterThread();
+
+    MultiEntityRenderer* renderer_;
+    Dimension* dimension_;
+    Timer* server_time_;
+
+    bool stop_ = true;
+    std::thread update_thread_;
 };

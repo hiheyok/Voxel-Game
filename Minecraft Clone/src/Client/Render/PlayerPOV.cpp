@@ -5,6 +5,8 @@ PlayerPOV::PlayerPOV() : camera_{ std::make_unique<Camera>() }{
 
 }
 
+PlayerPOV::~PlayerPOV() = default;
+
 void PlayerPOV::SetPosition(glm::vec3 pos) {
     camera_->position_ = pos;
 }

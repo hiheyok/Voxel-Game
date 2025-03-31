@@ -54,8 +54,8 @@ void MainPlayer::Initialize(GLFWwindow* win, InternalServer* server) {
             glm::vec2(1,1));
     }
 
-    gui_index_ = player_gui_->AddGUI("PlayerGUI", hotbar);
-    item_gui_index_ = player_gui_->AddGUI("Itembar", itemBar);
+    gui_index_ = player_gui_->AddGUI("PlayerGUI", std::move(hotbar));
+    item_gui_index_ = player_gui_->AddGUI("Itembar", std::move(itemBar));
     internal_server_ = server;
 }
 

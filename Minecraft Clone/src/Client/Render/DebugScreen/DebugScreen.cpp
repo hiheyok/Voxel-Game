@@ -3,6 +3,8 @@
 
 #include "DebugScreen.h"
 #include "../../../RenderEngine/GUI/TextRenderer.h"
+#include "../../../RenderEngine/GUI/Font.h"
+
 DebugScreen::DebugScreen() : renderer_{std::make_unique<TextRenderer>() } {
 }
 

@@ -4,10 +4,7 @@
 #include "../../Typenames.h"
 
 class ChunkLightingContainer { //Contains all lighting infomation for solid blocks
-private:
-    uint64_t data_[256]{}; //x z y
 public:
-
     static const unsigned char MaxLightLevel = 15;
     ChunkPos position_;
 
@@ -25,5 +22,6 @@ public:
     void ResetLighting();
 
     void ResetLightingCustom(uint8_t lvl);
-
+private:
+    uint64_t data_[256]{}; //x z y
 };

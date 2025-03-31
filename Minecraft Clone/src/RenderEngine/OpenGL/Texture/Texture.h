@@ -1,55 +1,27 @@
 #pragma once
 
+#include <string>
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
-#include "../../../Utils/stb_image.h"
-#include "../../../Utils/LogUtils.h"
 
-class RawTextureData { //mem leak
+
+class RawTextureData {
 public:
+    RawTextureData();
 
-    RawTextureData() {
+    RawTextureData(const char* path);
 
-    }
+    void Erase();
 
-    RawTextureData(const char* path) {
-        Load(path);
-    }
+    void Load(const char* path);
 
-    void Erase() { stbi_image_free(data_); }
-    void Load(const char* path) {
-        image_path_ = path;
-        data_ = stbi_load(path, &width_, &height_, &format_, 0);
+    unsigned char operator[](int index);
 
-        switch (format_) {
-        case 1:
-            format_ = GL_RED;
-            break;
-        case 2:
-            format_ = GL_RG;
-            break;
-        case 3:
-            format_ = GL_RGB;
-            break;
-        case 4:
-            format_ = GL_RGBA;
-            break;
-        default:
-            Erase();
-            g_logger.LogWarn("RawTextureData::Load", "Image invalid format");
-        }
-    }
-    unsigned char operator[](int index) {
-        return data_[index];
-    }
+    void Reload();
 
-    void Reload() {
-        Erase();
-        Load(image_path_);
-    }
-    int width_ = NULL;
-    int height_ = NULL;
-    int format_ = NULL;
+    int width_ = 0;
+    int height_ = 0;
+    int format_ = 0;
     unsigned char* data_ = nullptr;
 private:
     const char* image_path_ = nullptr;
@@ -57,28 +29,18 @@ private:
 
 class Texture {
 public:
-    Texture() = default;
+    Texture();
 
-    void Gen() {
-        glGenTextures(1, &texture_id_);
-    }
+    void Gen();
 
-    virtual bool Load(RawTextureData data) {
-        (void)data;
-        return false;
-    }
+    virtual bool Load(RawTextureData data);
 
-    virtual bool Load(std::string file) {
-        (void)file;
-        return false;
-    }
+    virtual bool Load(std::string file);
 
-    GLuint get() {
-        return texture_id_;
-    }
+    GLuint get();
 
-    GLuint texture_id_ = NULL;
-    size_t width_ = NULL;
-    size_t height_ = NULL;
-    int format_ = NULL;
+    GLuint texture_id_ = 0;
+    size_t width_ = 0;
+    size_t height_ = 0;
+    int format_ = 0;
 };

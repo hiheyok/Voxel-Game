@@ -5,6 +5,8 @@ TallChunk::TallChunk() {
     for (int i = 0; i < 16; i++) chunk_sub_column_[i] = std::make_unique<Chunk>();
 }
 
+TallChunk::~TallChunk() = default;
+
 void TallChunk::SetPosition(int x, int y, int z) { // confusing y -> tall chunk pos
     y = y * 16;
     for (int i = 0; i < 16; i++) {

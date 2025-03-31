@@ -1,10 +1,16 @@
 #include "EntityRenderUpdate.h"
+#include "MultiEntityRender.h"
 #include "../../Utils/Clock.h"
+#include "../../Level/Timer/Timer.h"
 #include "../../Level/Dimension/Dimension.h"
 
-EntityRendererUpdater::EntityRendererUpdater() : stop_{ true }, dimension_{ nullptr } {
-
+EntityRendererUpdater::EntityRendererUpdater() : 
+    stop_{ true },
+    dimension_{ nullptr },
+    server_time_{ nullptr } {
 }
+
+EntityRendererUpdater::~EntityRendererUpdater() = default;
 
 void EntityRendererUpdater::SetEntityRenderer(MultiEntityRenderer* render, Timer* time) {
     renderer_ = render;
