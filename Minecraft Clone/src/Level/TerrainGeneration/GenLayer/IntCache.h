@@ -2,71 +2,57 @@
 #include <vector>
 #include <string>
 #include <mutex>
+#include <array>
+#include <memory>
 
 class IntCache {
-private:
-    static int intCacheSize;
-    static std::vector<int*> freeSmallArrays;
-    static std::vector<int*> inUseSmallArrays;
-    static std::vector<int*> freeLargeArrays;
-    static std::vector<int*> inUseLargeArrays;
-
 public:
     static int* getIntCache(int size) {
-        std::lock_guard<std::mutex> lock(mutex);  // Add mutex lock for thread safety
-
         if (size <= 256) {
             if (freeSmallArrays.empty()) {
-                int* array = new int[256];
-                inUseSmallArrays.push_back(array);
-                return array;
+                inUseSmallArrays.push_back(std::make_unique<int[]>(256));
+                return inUseSmallArrays.back().get();
             }
             else {
-                int* array = freeSmallArrays.back();
+                std::unique_ptr<int[]> array = std::move(freeSmallArrays.back());
                 freeSmallArrays.pop_back();
-                inUseSmallArrays.push_back(array);
-                return array;
+                inUseSmallArrays.push_back(std::move(array));
+                return inUseSmallArrays.back().get();
             }
         }
         else if (size > intCacheSize) {
             intCacheSize = size; //add memory deallocators
             freeLargeArrays.clear();
             inUseLargeArrays.clear();
-            int* array = new int[intCacheSize];
-            inUseLargeArrays.push_back(array);
-            return array;
+            inUseLargeArrays.push_back(std::make_unique<int[]>(intCacheSize));
+            return inUseLargeArrays.back().get();
         }
         else if (freeLargeArrays.empty()) {
-            int* array = new int[intCacheSize];
-            inUseLargeArrays.push_back(array);
-            return array;
+            inUseLargeArrays.push_back(std::make_unique<int[]>(intCacheSize));
+            return inUseLargeArrays.back().get();
         }
         else {
-            int* array = freeLargeArrays.back();
+            std::unique_ptr<int[]> array = std::move(freeLargeArrays.back());
             freeLargeArrays.pop_back();
-            inUseLargeArrays.push_back(array);
-            return array;
+            inUseLargeArrays.push_back(std::move(array));
+            return inUseLargeArrays.back().get();
         }
     }
 
     static void resetIntCache() {
-        std::lock_guard<std::mutex> lock(mutex);  // Add mutex lock for thread safety
-
         if (!freeLargeArrays.empty()) {
-            delete[] freeLargeArrays.back();
             freeLargeArrays.pop_back();
         }
 
         if (!freeSmallArrays.empty()) {
-            delete[] freeSmallArrays.back();
             freeSmallArrays.pop_back();
         }
 
-        for (auto array : inUseLargeArrays) {
-            freeLargeArrays.push_back(array);
+        for (auto& array : inUseLargeArrays) {
+            freeLargeArrays.push_back(std::move(array));
         }
-        for (auto array : inUseSmallArrays) {
-            freeSmallArrays.push_back(array);
+        for (auto& array : inUseSmallArrays) {
+            freeSmallArrays.push_back(std::move(array));
         }
 
         inUseLargeArrays.clear();
@@ -74,8 +60,6 @@ public:
     }
 
     static std::string getCacheSizes() {
-        std::lock_guard<std::mutex> lock(mutex);  // Add mutex lock for thread safety
-
         return "cache: " + std::to_string(freeLargeArrays.size()) +
             ", tcache: " + std::to_string(freeSmallArrays.size()) +
             ", allocated: " + std::to_string(inUseLargeArrays.size()) +
@@ -83,13 +67,16 @@ public:
     }
 
 private:
-    static std::mutex mutex; // Add mutex for thread safety
+    static thread_local int intCacheSize;
+    static thread_local std::vector<std::unique_ptr<int[]>> freeSmallArrays;
+    static thread_local std::vector<std::unique_ptr<int[]>> inUseSmallArrays;
+    static thread_local std::vector<std::unique_ptr<int[]>> freeLargeArrays;
+    static thread_local std::vector<std::unique_ptr<int[]>> inUseLargeArrays;
 };
 
 // Initialize static variables
-inline int IntCache::intCacheSize = 256;
-inline std::vector<int*> IntCache::freeSmallArrays;
-inline std::vector<int*> IntCache::inUseSmallArrays;
-inline std::vector<int*> IntCache::freeLargeArrays;
-inline std::vector<int*> IntCache::inUseLargeArrays;
-inline std::mutex IntCache::mutex;
+inline thread_local int IntCache::intCacheSize = 256;
+inline thread_local std::vector<std::unique_ptr<int[]>> IntCache::freeSmallArrays;
+inline thread_local std::vector<std::unique_ptr<int[]>> IntCache::inUseSmallArrays;
+inline thread_local std::vector<std::unique_ptr<int[]>> IntCache::freeLargeArrays;
+inline thread_local std::vector<std::unique_ptr<int[]>> IntCache::inUseLargeArrays;
