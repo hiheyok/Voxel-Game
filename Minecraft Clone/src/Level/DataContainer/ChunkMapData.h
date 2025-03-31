@@ -1,9 +1,11 @@
 #pragma once
 #include <vector>
-#include "../Chunk/Chunk.h"
-#include "../Chunk/ChunkColumn.h"
+#include <memory>
 
-typedef unsigned long long int RegionID;
+#include "../Typenames.h"
+
+class ChunkColumn;
+class Chunk;
 
 struct Region { //32x32x32 Chunk Region
     //ChunkColumn* region_[32 * 32]{ nullptr };

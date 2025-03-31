@@ -28,7 +28,7 @@ void Fluid::Tick(const BlockPos& pos, Dimension* currentWorld) {
 
         currentWorld->TickUsed(g_event_handler.BlockPlace, pos);
 
-        Event::BlockEvent blockEvent{ newPos, g_blocks.WATER, g_event_handler.BlockPlace };
+        BlockEvent blockEvent{ newPos, g_blocks.WATER, g_event_handler.BlockPlace };
         currentWorld->event_manager_.AddEvent(blockEvent);
 
     }

@@ -44,7 +44,7 @@ BlockID WorldInteraction::GetBlock(Ray ray, Dimension* dimension) {
 
 void WorldInteraction::BreakBlock(Ray ray, Dimension* dimension) {
     if (dimension->world_interactions_.collusions_->CheckRayIntersection(ray)) {
-        Event::BlockEvent breakBlock;
+        BlockEvent breakBlock;
         breakBlock.block_= g_blocks.AIR;
         breakBlock.pos_ = BlockPos{ (int)floor(ray.end_point_.x),
                                     (int)floor(ray.end_point_.y),
@@ -63,7 +63,7 @@ void WorldInteraction::PlaceBlock(Ray ray, BlockID block, Dimension* dimension) 
 
         placePos[(int)floor(BounceSurface >> 1)] += (BounceSurface & 0b1) - ((BounceSurface + 1) & 0b1); //Offsets block location to be placed by 1 block
 
-        Event::BlockEvent placeBlock;
+        BlockEvent placeBlock;
 
         placeBlock.block_ = block;
         placeBlock.pos_ = BlockPos{ placePos.x, placePos.y, placePos.z };

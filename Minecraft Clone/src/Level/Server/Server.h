@@ -16,9 +16,7 @@ class Entity;
 struct Ray;
 struct EntityProperty;
 
-namespace Event {
-    struct Event;
-}
+struct Event;
 
 struct ServerSettings {
     size_t gen_thread_count_ = 8;
@@ -81,7 +79,7 @@ public:
 
     void Tick();
 
-    void SendEvent(const Event::Event& event);
+    void SendEvent(const Event& event);
 
     void SetInternalConnection(InternalInterface* conn);
 

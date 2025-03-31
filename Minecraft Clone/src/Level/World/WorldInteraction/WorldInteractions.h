@@ -1,5 +1,4 @@
 #pragma once
-#include "../World.h"
 #include <mutex>
 #include <memory>
 #include <stack>
@@ -10,12 +9,14 @@
 // Provides a way for the world to be interacted like summoning entities and what chunks are updated and what chunks needs updates
 // TODO: IMPORTANT FIX LIGHT UPDATE 
 
+class World;
 class WorldLoader;
 class WorldCollusionDetector;
 class Chunk;
 class ChunkLightingContainer;
 
 struct WorldParameters;
+struct Entity;
 struct EntityProperty;
 
 class WorldInteractions {

@@ -1,6 +1,7 @@
 #include <exception>
 
 #include "WorldDataAccess.h"
+#include "../Chunk/ChunkColumn.h"
 #include "../DataContainer/ChunkMapData.h"
 #include "../DataContainer/EntityContainer.h"
 

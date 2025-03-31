@@ -76,7 +76,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)Minecraft Clone</OutDir>
+    <OutDir>$(SolutionDir)Minecraft Clone\build</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)Minecraft Clone\build</OutDir>
+    <TargetName>$(ProjectName)_debug</TargetName>
+    <IntDir>$(Platform)\$(Configuration)</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -110,9 +115,9 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);GLEW_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <FloatingPointModel>Fast</FloatingPointModel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -121,12 +126,14 @@
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <StructMemberAlignment>8Bytes</StructMemberAlignment>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)bin\lib\x64;$(SolutionDir)Minecraft Clone\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32s.lib;glew32.lib;glfw3.lib;opengl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)bin\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;glfw3.lib;opengl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,9 +142,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);GLEW_STATIC</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <FloatingPointModel>Fast</FloatingPointModel>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -156,14 +163,16 @@
       <PGOUsePreTrainedModel>false</PGOUsePreTrainedModel>
       <SupportJustMyCode>true</SupportJustMyCode>
       <ControlFlowGuard>Guard</ControlFlowGuard>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)bin\lib\x64;$(SolutionDir)Minecraft Clone\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32s.lib;glew32.lib;glfw3.lib;opengl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)bin\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32s.lib;glfw3.lib;opengl32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -181,10 +190,22 @@
     <ClCompile Include="src\Core\Options\Option.cpp" />
     <ClCompile Include="src\Core\Registry\ResourceLocation.cpp" />
     <ClCompile Include="src\FileManager\Files.cpp" />
+    <ClCompile Include="src\Level\Chunk\Block\Texture\BlockTexture.cpp" />
+    <ClCompile Include="src\Level\Chunk\Block\Type\DefaultBlock.cpp" />
+    <ClCompile Include="src\Level\Chunk\Block\Type\Dirt.cpp" />
+    <ClCompile Include="src\Level\Chunk\Block\Type\Fluid.cpp" />
+    <ClCompile Include="src\Level\Chunk\Block\Type\Grass.cpp" />
+    <ClCompile Include="src\Level\Chunk\Block\Type\GravityBlock.cpp" />
     <ClCompile Include="src\Level\Chunk\ChunkColumn.cpp" />
     <ClCompile Include="src\Level\Chunk\ChunkPos\ChunkPos.cpp" />
     <ClCompile Include="src\Level\Chunk\Heightmap\Heightmap.cpp" />
+    <ClCompile Include="src\Level\Chunk\Lighting\ChunkLighting.cpp" />
+    <ClCompile Include="src\Level\Chunk\Palette.cpp" />
     <ClCompile Include="src\Level\Chunk\TallChunk.cpp" />
+    <ClCompile Include="src\Level\DataContainer\EntityContainer.cpp" />
+    <ClCompile Include="src\Level\Entity\Type\FallingBlock.cpp" />
+    <ClCompile Include="src\Level\Entity\Type\Hostile.cpp" />
+    <ClCompile Include="src\Level\Entity\Type\Passive.cpp" />
     <ClCompile Include="src\Level\Event\EventHandler.cpp" />
     <ClCompile Include="src\Level\Event\EventSystem.cpp" />
     <ClCompile Include="src\Level\Item\Inventory\Inventory.cpp" />
@@ -194,13 +215,16 @@
     <ClCompile Include="src\Level\Level.cpp" />
     <ClCompile Include="src\Level\LevelLoader.cpp" />
     <ClCompile Include="src\Level\Lighting\LightEngine.cpp" />
-    <ClCompile Include="src\Level\Server\Communication\InternalServer.cpp" />
+    <ClCompile Include="src\Level\Server\Communication\InternalServer.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\Level\Server\Server.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Biome\BiomeProperties.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugPositioning\DebugPositioning.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugSecond\DebugSecond.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\Debug\Debug.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\FastTerrain\FastTerrain.cpp" />
+    <ClCompile Include="src\Level\TerrainGeneration\Generators\Generator.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\GeneratorType.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\Math\MainWorld.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\Minecraft\MinecraftTerrain.cpp" />
@@ -220,12 +244,11 @@
     <ClCompile Include="src\Level\World\WorldInteraction\WorldInteractions.cpp" />
     <ClCompile Include="src\Level\World\WorldInteraction\WorldLoader.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Utils\Math\Matrix.cpp" />
-    <ClCompile Include="src\Utils\Math\Vector\Vec.cpp" />
     <ClCompile Include="src\RenderEngine\BlockModel\BlockModels.cpp" />
     <ClCompile Include="src\RenderEngine\BlockModel\ModelLoader.cpp" />
     <ClCompile Include="src\RenderEngine\Camera\camera.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRenderer\Batch\ChunkBatch.cpp" />
+    <ClCompile Include="src\RenderEngine\ChunkRenderer\MemoryPool\ChunkMemoryPool.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshingV2.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRenderer\TerrainRenderer.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRenderer\EntityRenderCache.cpp" />
@@ -236,10 +259,21 @@
     <ClCompile Include="src\RenderEngine\Frustum\frustum.cpp" />
     <ClCompile Include="src\RenderEngine\GUI\GUI.cpp" />
     <ClCompile Include="src\RenderEngine\GUI\Font.cpp" />
+    <ClCompile Include="src\RenderEngine\GUI\GUIObject.cpp" />
+    <ClCompile Include="src\RenderEngine\GUI\GUISet.cpp" />
+    <ClCompile Include="src\RenderEngine\GUI\TextRenderer.cpp" />
+    <ClCompile Include="src\RenderEngine\ItemRender\BlockItemRender.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Buffers\Buffer.cpp" />
+    <ClCompile Include="src\RenderEngine\OpenGL\Buffers\BufferStorage.cpp" />
+    <ClCompile Include="src\RenderEngine\OpenGL\Buffers\VertexArray.cpp" />
+    <ClCompile Include="src\RenderEngine\OpenGL\Framebuffer\Framebuffer.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\OpenGL.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\Shader.cpp" />
-    <ClCompile Include="src\RenderEngine\OpenGL\Texture\ImagerLoader.cpp" />
+    <ClCompile Include="src\RenderEngine\OpenGL\Texture\ImageLoader.cpp" />
+    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Texture.cpp" />
+    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\Texture2D.cpp" />
+    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\TextureArray.cpp" />
+    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\TextureAtlas.cpp" />
     <ClCompile Include="src\RenderEngine\Window.cpp" />
     <ClCompile Include="src\Utils\Containers\BitStorage.cpp" />
     <ClCompile Include="src\Utils\Math\Probability\Probability.cpp" />
@@ -264,6 +298,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Client\Client.h" />
+    <ClInclude Include="src\Client\ClientLevel\ClientCache.h" />
+    <ClInclude Include="src\Client\ClientLevel\ClientLevel.h" />
+    <ClInclude Include="src\Client\ClientLevel\Entity\ClientEntities.h" />
+    <ClInclude Include="src\Client\ClientLevel\Interface\IClientLevel.h" />
     <ClInclude Include="src\Client\Communication\ServerInteraction.h" />
     <ClInclude Include="src\Client\IO\IO.h" />
     <ClInclude Include="src\Client\IO\KEY_CODE.h" />
@@ -278,8 +316,10 @@
     <ClInclude Include="src\Core\Registry\Registry.h" />
     <ClInclude Include="src\Core\Registry\ResourceLocation.h" />
     <ClInclude Include="src\FileManager\Files.h" />
+    <ClInclude Include="src\Level\Chunk\Block\Type\DefaultBlock.h" />
     <ClInclude Include="src\Level\Chunk\ChunkPos\ChunkPos.h" />
     <ClInclude Include="src\Level\Chunk\Heightmap\Heightmap.h" />
+    <ClInclude Include="src\Level\Chunk\Palette.h" />
     <ClInclude Include="src\Level\Chunk\TallChunk.h" />
     <ClInclude Include="src\Level\Dimension\Dimension.h" />
     <ClInclude Include="src\Level\Dimension\DimensionProperties.h" />
@@ -288,6 +328,10 @@
     <ClInclude Include="src\Level\LevelLoader.h" />
     <ClInclude Include="src\Level\Lighting\LightEngine.h" />
     <ClInclude Include="src\Level\Server\Communication\InternalServer.h" />
+    <ClInclude Include="src\Level\Server\Interfaces\ClientInterface.h" />
+    <ClInclude Include="src\Level\Server\Interfaces\InternalInterface.h" />
+    <ClInclude Include="src\Level\Server\Interfaces\ServerInterface.h" />
+    <ClInclude Include="src\Level\Server\Networking\Packet.h" />
     <ClInclude Include="src\Level\Server\Server.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\Biome.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeProperties.h" />
@@ -345,7 +389,12 @@
     <ClInclude Include="src\Level\World\WorldInteraction\WorldInteractions.h" />
     <ClInclude Include="src\Level\World\WorldInteraction\WorldLoader.h" />
     <ClInclude Include="src\Level\World\WorldParameters.h" />
-    <ClInclude Include="src\Utils\Math\Vector\Vec.h" />
+    <ClInclude Include="src\RenderEngine\OpenGL\Buffers\BufferStorage.h" />
+    <ClInclude Include="src\RenderEngine\OpenGL\Buffers\VertexArray.h" />
+    <ClInclude Include="src\Utils\Containers\ConcurrentQueue.h" />
+    <ClInclude Include="src\Utils\Containers\N2BitVector.h" />
+    <ClInclude Include="src\Utils\Containers\NBitVector.h" />
+    <ClInclude Include="src\Utils\Containers\robin_hood.h" />
     <ClInclude Include="src\RenderEngine\BlockModel\ModelLoader.h" />
     <ClInclude Include="src\RenderEngine\BlockModel\RectangularModel.h" />
     <ClInclude Include="src\RenderEngine\BlockModel\BlockModels.h" />
@@ -370,7 +419,6 @@
     <ClInclude Include="src\Client\Player\MainPlayer.h" />
     <ClInclude Include="src\Client\Render\PlayerPOV.h" />
     <ClInclude Include="src\Client\Render\WorldRender.h" />
-    <ClInclude Include="src\Utils\Math\Matrix.h" />
     <ClInclude Include="src\RenderEngine\Camera\camera.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Batch\ChunkBatch.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\BakedChunkMesh.h" />
@@ -421,14 +469,12 @@
     <ClInclude Include="src\Utils\MathHelper.h" />
     <ClInclude Include="src\Level\Chunk\Block\Type\Grass.h" />
     <ClInclude Include="src\Utils\Math\Ray\Ray.h" />
-    <ClInclude Include="src\Utils\Containers\skaHashmap.h" />
     <ClInclude Include="src\Utils\stb_image.h" />
     <ClInclude Include="src\Level\Chunk\Block\Block.h" />
     <ClInclude Include="src\Level\Chunk\Block\Blocks.h" />
     <ClInclude Include="src\Level\Chunk\Block\Texture\BlockTexture.h" />
     <ClInclude Include="src\Level\Chunk\Chunk.h" />
     <ClInclude Include="src\Level\Chunk\ChunkData.h" />
-    <ClInclude Include="src\Level\DataContainer\BlockData.h" />
     <ClInclude Include="src\Level\DataContainer\ChunkMapData.h" />
     <ClInclude Include="src\Level\Entity\Entities.h" />
     <ClInclude Include="src\RenderEngine\EntityRenderer\Models\EntityModel.h" />

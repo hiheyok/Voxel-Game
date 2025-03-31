@@ -10,8 +10,6 @@ class Chunk;
 
 struct WorldAccess;
 
-
-
 class LightingEngine {
 public:
     void Generate(std::vector<ChunkPos> IDs);

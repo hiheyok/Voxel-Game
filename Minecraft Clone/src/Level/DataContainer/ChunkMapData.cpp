@@ -1,5 +1,6 @@
 #include "ChunkMapData.h"
-
+#include "../Chunk/Chunk.h"
+#include "../Chunk/ChunkColumn.h"
 
 bool ChunkMap::EraseChunk(const ChunkPos& pos) { 
     const std::unique_ptr<Region>& reg = GetRegion(pos);

@@ -7,6 +7,7 @@
 #include "Render/WorldRender.h"
 #include "../Core/Options/Option.h"
 #include "../Level/Chunk/Block/Blocks.h"
+#include "../Level/Item/Items.h"
 #include "../Level/Item/ItemTextureAtlas.h"
 #include "../Level/Entity/Entities.h"
 #include "../Level/Timer/Timer.h"
@@ -30,10 +31,7 @@ Client::Client() :
     text_render_{ std::make_unique<TextRenderer>() },
     debug_screen_{ std::make_unique<DebugScreen>() },
     main_player_{ std::make_unique<MainPlayer>() },
-    profiler_{ new PerformanceProfiler()}
-{
-
-}
+    profiler_{ new PerformanceProfiler()} { }
 
 Client::~Client() = default;
 

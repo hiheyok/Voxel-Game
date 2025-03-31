@@ -1,10 +1,10 @@
 #pragma once
-#include "../Chunk/Chunk.h"
-#include "../../Utils/FastNoiseLite.h"
-#include "../TerrainGeneration/Generators/GeneratorType.h"
-#include <deque>
 #include <memory>
+#include "../Typenames.h"
+#include "../../Utils/FastNoiseLite.h"
 #include "../../Utils/ThreadPool.h"
+
+class Chunk;
 
 class ChunkGeneration {
 public:

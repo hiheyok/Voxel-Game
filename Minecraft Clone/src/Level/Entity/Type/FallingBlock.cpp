@@ -35,14 +35,14 @@ void FallingBlock::Tick(Entity* entity, Dimension* dimension) {
     entity->is_dirty_ = true;
 
     if (collideWithGround) {
-        Event::BlockEvent addBlock{ BlockPos{
+        BlockEvent addBlock{ BlockPos{
                                         (int)entity->properties_.position_.x,
                                         (int)entity->properties_.position_.y,
                                         (int)entity->properties_.position_.z},
                                     g_blocks.SAND, g_event_handler.BlockPlace };
         dimension->event_manager_.AddEvent(addBlock);
 
-        Event::EntityEvent removeEntity;
+        EntityEvent removeEntity;
         removeEntity.id_ = g_event_handler.RemoveEntity;
         removeEntity.entity_uuid_ = entity->properties_.entity_uuid_;
         removeEntity.unique_id_ = 50;

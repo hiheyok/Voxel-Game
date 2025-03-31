@@ -102,7 +102,7 @@ void Server::Tick() {
     level_->main_world_->world_interactions_.worldLoader_->Load();
 }
 
-void Server::SendEvent(const Event::Event& pEventIn) {
+void Server::SendEvent(const Event& pEventIn) {
     level_->main_world_->event_manager_.AddEvent(pEventIn);
 }
 

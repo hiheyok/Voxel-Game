@@ -8,17 +8,14 @@
 class InternalServer;
 
 struct EntityProperty;
+struct Event;
 struct Ray;
-
-namespace Event {
-    struct Event;
-}
 
 class ServerInteraction {
 public:
     void AssignServer(InternalServer* server);
     bool CheckCollusion(Ray& ray);
-    void SendEvent(Event::Event event);
+    void SendEvent(Event event);
     BlockID GetBlock(const BlockPos& pos);
     std::vector<EntityUUID> GetRemovedEntities();
     std::vector<EntityProperty> GetUpdatedEntities();

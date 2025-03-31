@@ -69,25 +69,25 @@ public:
     }
 
     void EventTick() {
-        std::unique_ptr<std::vector<Event::Event>>& EventQueue = event_manager_.GetQueue();
+        std::unique_ptr<std::vector<Event>>& EventQueue = event_manager_.GetQueue();
 
         for (size_t i = 0; i < EventQueue->size(); i++) {
-            const Event::Event& e = EventQueue->at(i);
+            const Event& e = EventQueue->at(i);
             switch (e.type_) {
-            case Event::NULL_EVENT:
+            case NULL_EVENT:
                 break;
-            case Event::BLOCK_EVENT:
+            case BLOCK_EVENT:
             {
-                const Event::BlockEvent& blockEvent = std::get<Event::BlockEvent>(e.event_data_);
+                const BlockEvent& blockEvent = std::get<BlockEvent>(e.event_data_);
                 if (CheckTickUsed(blockEvent.id_, blockEvent.pos_)) {
                     continue;
                 }
                 TickUsed(blockEvent.id_, blockEvent.pos_);
                 break;
             }
-            case Event::ENTITY_EVENT:
+            case ENTITY_EVENT:
             {
-                const Event::EntityEvent& entityEvent = std::get<Event::EntityEvent>(e.event_data_);
+                const EntityEvent& entityEvent = std::get<EntityEvent>(e.event_data_);
                 if ((entityEvent.unique_id_ != 0) && CheckTickUsed(entityEvent.unique_id_, entityEvent.pos_)) {
                     continue;
                 }

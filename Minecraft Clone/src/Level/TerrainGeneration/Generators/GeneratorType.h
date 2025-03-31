@@ -1,8 +1,9 @@
 #pragma once
-#include "Generators.h"
 #include <vector>
-#include "../../../Utils/LogUtils.h"
+#include "Generators.h"
+#include "../../Typenames.h"
 
+class WorldGenerator;
 
 class GeneratorType {
 private:

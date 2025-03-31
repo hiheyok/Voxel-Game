@@ -3,6 +3,7 @@
 #include "WorldInteractions.h"
 #include "WorldLoader.h"
 #include "../Collusion/WorldCollusion.h"
+#include "../World.h"
 #include "../WorldParameters.h"
 #include "../../Chunk/Chunk.h"
 #include "../../Chunk/Lighting/ChunkLighting.h"

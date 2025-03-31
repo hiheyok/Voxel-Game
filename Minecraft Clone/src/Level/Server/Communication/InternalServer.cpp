@@ -72,6 +72,6 @@ BlockID InternalServer::GetBlock(const BlockPos& pos) {
     return server->GetBlock(pos);
 }
 
-void InternalServer::SendEvent(Event::Event eventIn) {
+void InternalServer::SendEvent(Event eventIn) {
     server->SendEvent(eventIn);
 }

@@ -2,9 +2,6 @@
 
 #include "Type/EntityType.h"
 
-#include <deque>
-
-
 enum EntityTypeEnums {
     ENTITY_PASSIVE, ENTITY_HOSTILE, ENTITY_FALLING_BLOCK
 };

@@ -31,7 +31,7 @@ void GrassBlock::Tick(const BlockPos& pos, Dimension* currentWorld) {
         return;
     }
 
-    Event::BlockEvent grassSpread{ pos, g_blocks.GRASS, g_event_handler.BlockTick };
+    BlockEvent grassSpread{ pos, g_blocks.GRASS, g_event_handler.BlockTick };
     currentWorld->event_manager_.AddEvent(grassSpread);
 }
 
@@ -77,7 +77,7 @@ bool GrassBlock::GrassSpreadTick(Dimension* currentWorld, const BlockPos& pos) {
                 //Chance it spread
                 if (TestProbability(properties_.spread_chance_)) {
 
-                    Event::BlockEvent blockEvent{ newPos,g_blocks.GRASS, g_event_handler.BlockPlace };
+                    BlockEvent blockEvent{ newPos,g_blocks.GRASS, g_event_handler.BlockPlace };
                     currentWorld->event_manager_.AddEvent(blockEvent);
 
                     continue;

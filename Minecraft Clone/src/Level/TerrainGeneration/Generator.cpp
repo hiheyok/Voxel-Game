@@ -1,8 +1,6 @@
 #include "Generator.h"
-#include "../Chunk/ChunkPos/ChunkPos.h"
-#include "../../Utils/Clock.h"
 #include "Generators/GeneratorType.h"
-#include <concurrent_unordered_set.h>
+#include "../Chunk/Chunk.h"
 
 std::vector<std::unique_ptr<Chunk>> ChunkGeneration::GetOutput() {
     std::vector<std::unique_ptr<Chunk>> output;

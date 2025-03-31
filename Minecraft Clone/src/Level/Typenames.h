@@ -6,6 +6,7 @@
 typedef unsigned int EventID;
 typedef unsigned short int BlockID;
 typedef unsigned long long int EntityUUID; //UUID
+typedef unsigned long long int RegionID;
 typedef unsigned short EntityTypeID;
 typedef unsigned int ItemID;
 typedef uint64_t WorldGeneratorID;

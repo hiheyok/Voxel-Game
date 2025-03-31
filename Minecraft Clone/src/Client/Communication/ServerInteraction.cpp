@@ -9,7 +9,7 @@ void ServerInteraction::AssignServer(InternalServer* server) { //Default  to  in
 bool ServerInteraction::CheckCollusion(Ray& ray) {
     return server_->CheckRayIntersection(ray);
 }
-void ServerInteraction::SendEvent(Event::Event event) {
+void ServerInteraction::SendEvent(Event event) {
     server_->SendEvent(event);
 }
 

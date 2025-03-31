@@ -11,10 +11,7 @@ class Server;
 
 struct Ray;
 struct EntityProperty;
-
-namespace Event {
-    struct Event;
-}
+struct Event;
 
 class InternalServer {
 private:
@@ -50,6 +47,6 @@ public:
 
     BlockID GetBlock(const BlockPos& pos);
 
-    void SendEvent(Event::Event pEventIn);
+    void SendEvent(Event pEventIn);
 
 };

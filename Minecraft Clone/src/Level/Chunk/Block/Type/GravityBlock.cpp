@@ -9,8 +9,8 @@ void GravityBlock::Tick(const BlockPos& pos, Dimension* currentWorld) {
     bool isBlockSupported = g_blocks.GetBlockType(currentWorld->world_interactions_.GetBlock(belowPos))->properties_->is_solid_;
 
     if (!isBlockSupported) {
-        Event::BlockEvent destroyBlock{ pos, g_blocks.AIR, g_event_handler.BlockPlace };
-        Event::EntityEvent summonSand;
+        BlockEvent destroyBlock{ pos, g_blocks.AIR, g_event_handler.BlockPlace };
+        EntityEvent summonSand;
 
         summonSand.id_ = g_event_handler.SummonEntity;
         summonSand.pos_ = pos;

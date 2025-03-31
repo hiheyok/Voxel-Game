@@ -1,9 +1,6 @@
 #pragma once
 #include "Properties/EntityProperties.h"
 #include "../Typenames.h"
-#include "../Item/Inventory/EntityInventory.h"
-
-extern int AmountEntityDestroy;
 
 class Dimension;
 

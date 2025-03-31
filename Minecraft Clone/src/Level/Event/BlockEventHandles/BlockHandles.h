@@ -1,11 +1,8 @@
 #pragma once
-#include "../../Chunk/Block/Block.h"
 
 class Dimension;
 
-namespace Event {
-    struct BlockEvent;
-};
+struct BlockEvent;
 
-void HandlePlaceBlock(const Event::BlockEvent&, Dimension* dimension);
-void HandleBlockTick(const Event::BlockEvent&, Dimension* dimension);
+void HandlePlaceBlock(const BlockEvent&, Dimension* dimension);
+void HandleBlockTick(const BlockEvent&, Dimension* dimension);

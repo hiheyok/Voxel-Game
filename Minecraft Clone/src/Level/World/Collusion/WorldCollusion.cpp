@@ -1,4 +1,6 @@
 #include "WorldCollusion.h"
+#include "../../Chunk/Block/Block.h"
+#include "../../Chunk/Block/Blocks.h"
 #include "../../DataContainer/ChunkMapData.h"
 #include "../../Entity/Entity.h"
 #include "../../Entity/Entities.h"
