@@ -1,7 +1,10 @@
 #include "RenderEngine/OpenGL/Buffers/BufferStorage.h"
+#include "RenderEngine/OpenGL/Shader/ComputeShader.h"
 #include "Utils/LogUtils.h"
 
-BufferStorage::BufferStorage() = default; // Add default constructor
+BufferStorage::BufferStorage() : 
+    copy_shader_{ std::make_unique<ComputeShader>("assets/shaders/Buffers/CopyData.glsl") },
+    move_shader_{ std::make_unique<ComputeShader>("assets/shaders/Buffers/MoveData.glsl") } {}
 
 BufferStorage::~BufferStorage() {
     if (buffer_storage_id_ != 0) {
@@ -117,11 +120,17 @@ void BufferStorage::CopyFrom(BufferStorage* sourceBuffer, size_t readOffset, siz
         g_logger.LogError("BufferStorage::CopyFrom", "CopyFrom exceeds buffer bounds.");
         return;
     }
-    glBindBuffer(GL_COPY_READ_BUFFER, sourceBuffer->buffer_storage_id_);
-    glBindBuffer(GL_COPY_WRITE_BUFFER, buffer_storage_id_);
-    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, readOffset, writeOffset, size);
-    glBindBuffer(GL_COPY_READ_BUFFER, 0);
-    glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+
+    copy_shader_->BindBufferAsSSBO(sourceBuffer->buffer_storage_id_, 0);
+    copy_shader_->BindBufferAsSSBO(buffer_storage_id_, 1);
+    copy_shader_->SetInt("srcOffset", readOffset / sizeof(unsigned int));
+    copy_shader_->SetInt("dstOffset", writeOffset / sizeof(unsigned int));
+    copy_shader_->SetInt("copySize", size / sizeof(unsigned int));
+    copy_shader_->DispatchCompute((int)ceil((double)size / WORK_GROUP_SIZE / sizeof(unsigned int)), 1, 1);
+    copy_shader_->BindBufferAsSSBO(0, 0);
+    copy_shader_->BindBufferAsSSBO(0, 1);
+
+    copy_shader_->SSBOMemoryBarrier();
 }
 
 void BufferStorage::CopyTo(BufferStorage* destinationBuffer, size_t readOffset, size_t writeOffset, size_t size) {
@@ -133,11 +142,36 @@ void BufferStorage::CopyTo(BufferStorage* destinationBuffer, size_t readOffset, 
         g_logger.LogError("BufferStorage::CopyTo", "CopyTo exceeds buffer bounds.");
         return;
     }
-    glBindBuffer(GL_COPY_READ_BUFFER, buffer_storage_id_);
-    glBindBuffer(GL_COPY_WRITE_BUFFER, destinationBuffer->buffer_storage_id_);
-    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, readOffset, writeOffset, size);
-    glBindBuffer(GL_COPY_READ_BUFFER, 0);
-    glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+    copy_shader_->BindBufferAsSSBO(buffer_storage_id_, 0);
+    copy_shader_->BindBufferAsSSBO(destinationBuffer->buffer_storage_id_, 1);
+    copy_shader_->SetInt("srcOffset", readOffset / sizeof(unsigned int));
+    copy_shader_->SetInt("dstOffset", writeOffset / sizeof(unsigned int));
+    copy_shader_->SetInt("copySize", size / sizeof(unsigned int));
+    copy_shader_->DispatchCompute((int)ceil((double)size / WORK_GROUP_SIZE / sizeof(unsigned int)), 1, 1);
+    copy_shader_->BindBufferAsSSBO(0, 0);
+    copy_shader_->BindBufferAsSSBO(0, 1);
+
+    copy_shader_->SSBOMemoryBarrier();
+}
+
+void BufferStorage::MoveData(size_t readOffset, size_t writeOffset, size_t size) {
+    if (buffer_storage_id_ == 0) {
+        g_logger.LogError("BufferStorage::MoveData", "Attempted MoveData with uninitialized buffer(s).");
+        return;
+    }
+    if (readOffset + size > max_size_ || writeOffset + size >max_size_) {
+        g_logger.LogError("BufferStorage::MoveData", "MoveData exceeds buffer bounds.");
+        return;
+    }
+
+    move_shader_->BindBufferAsSSBO(buffer_storage_id_, 0);
+    move_shader_->SetInt("srcOffset", readOffset / sizeof(unsigned int));
+    move_shader_->SetInt("dstOffset", writeOffset / sizeof(unsigned int));
+    move_shader_->SetInt("copySize", size / sizeof(unsigned int));
+    move_shader_->DispatchCompute((int)ceil((double)size / WORK_GROUP_SIZE / sizeof(unsigned int)), 1, 1);
+    move_shader_->BindBufferAsSSBO(0, 0);
+
+    move_shader_->SSBOMemoryBarrier();
 }
 
 bool BufferStorage::IsInitialized() const { return buffer_storage_id_ != 0; }

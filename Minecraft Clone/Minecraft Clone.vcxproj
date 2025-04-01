@@ -266,6 +266,7 @@
     <ClCompile Include="src\RenderEngine\OpenGL\Buffers\VertexArray.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Framebuffer\Framebuffer.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\OpenGL.cpp" />
+    <ClCompile Include="src\RenderEngine\OpenGL\Shader\ComputeShader.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\Shader.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Texture\ImageLoader.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Texture\Texture.cpp" />
@@ -390,6 +391,7 @@
     <ClInclude Include="src\Level\World\WorldParameters.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Buffers\BufferStorage.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Buffers\VertexArray.h" />
+    <ClInclude Include="src\RenderEngine\OpenGL\Shader\ComputeShader.h" />
     <ClInclude Include="src\Utils\Containers\ConcurrentQueue.h" />
     <ClInclude Include="src\Utils\Containers\N2BitVector.h" />
     <ClInclude Include="src\Utils\Containers\NBitVector.h" />

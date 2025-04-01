@@ -357,6 +357,9 @@
     <ClCompile Include="src\RenderEngine\ChunkRenderer\MemoryPool\ChunkMemoryPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\RenderEngine\OpenGL\Shader\ComputeShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Level\Chunk\Chunk.h">
@@ -984,6 +987,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Chunk\ChunkRawData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\OpenGL\Shader\ComputeShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

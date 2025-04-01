@@ -222,35 +222,23 @@ void ChunkDrawBatch::Defrager(size_t iterations) {
         }
         else {
             g_logger.LogError("Defrager", "Chunk Pos not found in render_list_offset_lookup_ during defrag!");
-            // This indicates a potential inconsistency, skip this defrag step
             continue;
         }
-        // Delete logic needs the size from the offset lookup or reservedBlock
         memory_pool_.DeleteChunk(pos); // This calls DeallocateSpace internally
 
-        // --- Perform the GPU Copy ---
-        // 1. Copy from main buffer to staging buffer
         if (reservedBlock.size_ > memory_pool_.stagging_buffer_->GetMaxSize()) {
             g_logger.LogError("Defrager", "Chunk size too large for staging buffer! Skipping defrag for this block."); // TODO: Fix this later 
-            // Need to re-add the chunk info we just removed, or handle this state
-            // Re-adding is complex, maybe just log and accept fragmentation for this block.
             continue;
         }
         memory_pool_.buffer_->CopyTo(memory_pool_.stagging_buffer_.get(), reservedBlock.offset_, 0, reservedBlock.size_);
 
-        // 2. *** INSERT MEMORY BARRIER ***
-        glMemoryBarrier(GL_ALL_BARRIER_BITS); // Or GL_COPY_WRITE_BARRIER_BIT or GL_ALL_BARRIER_BITS
-
-        // 3. Add chunk back at the new location (copies from staging buffer)
         ChunkMemoryPoolOffset newMemoryPoolBlockData = memory_pool_.AddChunkStaggingBuffer(pos, freeMemoryBlock.offset_, reservedBlock.size_);
 
         if (newMemoryPoolBlockData.mem_offset_ == std::numeric_limits<size_t>::max()) {
             g_logger.LogError("Defrager", "Failed to re-add chunk from staging buffer during defrag!");
-            // State is potentially inconsistent here, might need recovery logic
             continue;
         }
 
-        // --- Update render list with new offset ---
         render_list_[newMemoryPoolBlockData.mem_offset_] = newMemoryPoolBlockData;
         render_list_offset_lookup_[pos] = newMemoryPoolBlockData.mem_offset_;
 

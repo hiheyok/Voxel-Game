@@ -80,13 +80,12 @@ void WorldRender::Update(std::vector<ChunkPos> updatedChunks) {
         build_time_ += mesh_add_queue_.back()->time_;
         renderer_->AddChunk(std::move(mesh_add_queue_.back()));
         mesh_add_queue_.pop_back();
+        renderer_->Defrag(2);
     }
 
     LoadChunkMultiToRenderer(updatedChunks);
 
-    if (updateAmount < chunkUpdateLimit) {
-        renderer_->Defrag(1);
-    }
+    renderer_->Defrag(1);
 
     renderer_->Update();
     renderer_->PrepareRenderer();
