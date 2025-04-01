@@ -5,7 +5,6 @@
 
 #include "Core/Typenames.h"
 
-// TODO: Currently default to main dimension for now (change this later)
 class ClientInterface;
 class InternalInterface;
 class Timer;
@@ -60,9 +59,9 @@ public:
     // This will cause the player to join and return a uuid for the player
     EntityUUID SetInternalConnection(InternalInterface* conn);
 private:
-    bool stop_ = true; // TODO: Rename
+    bool stop_ = true;
     std::thread main_server_loop_;
-    std::unique_ptr<Timer> time_; // TODO: Rename
+    std::unique_ptr<Timer> time_;
     double mspt_ = 0.0;
 
     void ProcessPacket();

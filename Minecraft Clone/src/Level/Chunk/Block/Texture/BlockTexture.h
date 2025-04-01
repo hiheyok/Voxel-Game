@@ -2,6 +2,9 @@
 
 class BlockTexture {
 public:
+    BlockTexture();
+    ~BlockTexture();
+
     void SetFaceFront(int texId);
     void SetFaceBack(int texId);
     void SetFaceWest(int texId);

@@ -11,9 +11,8 @@ ChunkContainer::ChunkContainer(const ChunkRawData& data) {
     position_ = data.pos_;
 }
 
-// TODO: Make this readable and safe
 BlockID ChunkContainer::GetBlock(int x, int y, int z) const {
-    if (!((x | y | z) >> 4)) { //check if it is in the chunk
+    if (!((x | y | z) >> 4)) {
         return block_storage_.GetBlock(x, y, z);
     }
 

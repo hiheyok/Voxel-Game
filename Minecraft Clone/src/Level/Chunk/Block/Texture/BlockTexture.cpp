@@ -1,6 +1,9 @@
 #include "BlockTexture.h"
 #include "Core/Typenames.h"
 
+BlockTexture::BlockTexture() = default;
+BlockTexture::~BlockTexture() = default;
+
 void BlockTexture::SetFaceFront(int texId) {
     texture_index_[FRONT] = texId;
 }

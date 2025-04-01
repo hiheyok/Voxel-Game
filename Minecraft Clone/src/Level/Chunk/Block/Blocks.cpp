@@ -154,7 +154,7 @@ void BlockList::InitializeBlockModels()  {
     }
 
 
-    for (int i = 0; i < block_type_data_.size(); i++) {
+    for (size_t i = 0; i < block_type_data_.size(); i++) {
         Model::BlockModel model;
 
         if (block_type_data_[i]->block_model_data_ != NULL) {

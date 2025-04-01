@@ -134,8 +134,6 @@ void Server::ProcessPlayerPackets(ClientInterface* receiver) {
     }
 }
 
-// TODO: Add some caching stuff to allow for multiple players
-
 void Server::SendPacket() {
     if (client_interface_ == nullptr) return;
     SendEntityUpdatePacket(client_interface_);

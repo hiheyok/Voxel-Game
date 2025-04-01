@@ -17,7 +17,5 @@ struct GrassBlock : Block {
 
     bool GrassDestroyTick(Dimension* currentWorld, const BlockPos& pos);
 
-    //return true if there is no exposed dirt blocks surrounding it
-    // TODO: refactor code
     bool GrassSpreadTick(Dimension* currentWorld, const BlockPos& pos);
 };

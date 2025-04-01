@@ -14,7 +14,7 @@ void BitStorage3D::Initialize(int x, int y, int z) { //Set Sizes
 }
 
 void BitStorage3D::ClearBit(int x, int y, int z) {
-    int index = sx_ * (sy_ * sz_) + sy_ * (sz_)+sz_;
+    int index = x * (sy_ * sz_) + y * (sz_) + z;
 
     size_t NumIndex = index >> 6;
     size_t Index = index & 0b111111;
@@ -29,7 +29,7 @@ void BitStorage3D::Clear() {
 }
 
 void BitStorage3D::SetBit(int x, int y, int z) {
-    int index = sx_ * (sy_ * sz_) + sy_ * (sz_)+sz_;
+    int index = x * (sy_ * sz_) + y * (sz_) + z;
 
     size_t NumIndex = index >> 6;
     size_t Index = index & 0b111111;
@@ -42,7 +42,7 @@ void BitStorage3D::SetBit(int* pos) {
 }
 
 bool BitStorage3D::GetBit(int x, int y, int z) {
-    int index = sx_ * (sy_ * sz_) + sy_ * (sz_)+sz_;
+    int index = x * (sy_ * sz_) + y  * (sz_) + z;
 
     size_t numIndex = index >> 6;
     size_t bitIndex = index & 0b111111;

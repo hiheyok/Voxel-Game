@@ -49,8 +49,6 @@ public:
     WorldGeneratorID GetGeneratorType() {
         return generator_type_;
     }
-    
-    // TODO: Use custom block classd
 
     bool CheckTickUsed(EventID id, const BlockPos& pos) {//temp sol
         return tick_usage_[id].count(pos);

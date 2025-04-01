@@ -148,7 +148,6 @@ void WorldLoader::loadSurroundedMovedEntityChunk() {
 
 void WorldLoader::loadSpawnChunks() {
     if (world == nullptr) throw std::exception("World is not initialized. Couldn't set spawn chunks");
-    return;
     for (long long int x = -settings_->spawn_chunk_horizontal_radius_; x <= settings_->spawn_chunk_horizontal_radius_; x++) {
         for (long long int z = -settings_->spawn_chunk_horizontal_radius_; z <= settings_->spawn_chunk_horizontal_radius_; z++) {
             for (long long int y = -settings_->spawn_chunk_vertical_radius_; y <= settings_->spawn_chunk_vertical_radius_; y++) {

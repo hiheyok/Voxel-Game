@@ -14,7 +14,6 @@ namespace Model {
 }
 
 struct BlockType {
-
     BlockType(bool transparent, bool solid, bool fluid);
 
     BlockType();
@@ -25,15 +24,15 @@ struct BlockType {
 };
 
 struct Block {
-    BlockID id_ = NULL;
-    std::unique_ptr<Model::BlockModel> block_model_data_ = nullptr;
-    std::unique_ptr<BlockTexture> texture_ = nullptr;
-    std::unique_ptr<BlockType> properties_ = nullptr;
+    Block();
+    ~Block();
+
+    BlockID id_ = 0;
+    std::unique_ptr<Model::BlockModel> block_model_data_;
+    std::unique_ptr<BlockTexture> texture_;
+    std::unique_ptr<BlockType> properties_;
 
     std::string block_name_ = "";
-
-    Block();
-    virtual ~Block();
 
     virtual void Tick(const BlockPos& pos, Dimension* currentWorld) = 0;
 };

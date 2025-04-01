@@ -5,8 +5,6 @@
 bool ChunkMap::EraseChunk(const ChunkPos& pos) { 
     const std::unique_ptr<Region>& reg = GetRegion(pos);
 
-    // TODO: Fix me
-
     if (reg != nullptr) {
         reg->EraseChunkGlobalPos(pos.x, pos.y, pos.z);
         return true;
@@ -16,7 +14,6 @@ bool ChunkMap::EraseChunk(const ChunkPos& pos) {
 
 
 bool ChunkMap::SetBlockGlobal(BlockID block, const BlockPos& pos) {
-    // TODO: Make it so BlockPos has a method to convert to chunk position location
     ChunkPos chunkPos = pos >> 4;
     BlockPos localPos = pos & 0b1111;
 
@@ -64,7 +61,6 @@ BlockID ChunkMap::GetBlockGlobal(const BlockPos& pos) const {
 
     const std::unique_ptr<Region>& reg = GetRegion(chunkPos);
 
-    // TODO: Fix me
     Chunk* chunk = reg->GetChunkGlobalPos(chunkPos.x, chunkPos.y, chunkPos.z);
 
     if (chunk == nullptr) {
@@ -128,7 +124,6 @@ void ChunkMap::InsertChunk(std::unique_ptr<Chunk> chunk) {
 }
 
 bool ChunkMap::CheckRegion(const ChunkPos& pos) const {
-    // TODO: Use a different class for region pos 
     RegionPos regPos = pos >> 5;
 
     FastHashMap<RegionPos, std::unique_ptr<Region>>::const_iterator it = live_region_.find(regPos);
@@ -142,7 +137,6 @@ bool ChunkMap::CheckRegion(const ChunkPos& pos) const {
 }
 
 const std::unique_ptr<Region>& ChunkMap::GetRegion(const ChunkPos& pos) const {
-    // TODO: Use a different class for region pos 
     RegionPos regPos = pos >> 5;
 
     FastHashMap<RegionPos, std::unique_ptr<Region>>::const_iterator it = live_region_.find(regPos);

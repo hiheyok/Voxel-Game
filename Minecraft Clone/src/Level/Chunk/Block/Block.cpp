@@ -1,6 +1,7 @@
 #include "Level/Chunk/Block/Block.h"
 #include "RenderEngine/BlockModel/BlockModels.h"
-
+Block::~Block() = default;
+Block::Block() = default;
 BlockType::BlockType(bool transparent, bool solid, bool fluid) {
     transparency_ = transparent;
     is_solid_ = solid;
@@ -9,5 +10,3 @@ BlockType::BlockType(bool transparent, bool solid, bool fluid) {
 
 BlockType::BlockType() = default;
 
-Block::Block() = default;
-Block::~Block() = default;
