@@ -9,7 +9,12 @@ public:
     ChunkPos position_;
 
     ChunkLightingContainer();
+    ChunkLightingContainer(const ChunkLightingContainer&);
+    ChunkLightingContainer(ChunkLightingContainer&&);
     ~ChunkLightingContainer();
+
+    ChunkLightingContainer& operator=(const ChunkLightingContainer&) = default;
+    ChunkLightingContainer& operator=(ChunkLightingContainer&&) = default;
 
     uint64_t* getData();
 

@@ -17,10 +17,6 @@ public:
         player_action_queue_.Push(action);
     }
 
-    void SendBlockAction(const Packet::BlockAction& action) override {
-        block_action_queue_.Push(action);
-    }
-
     bool IsConnected() {
         return is_connected_;
     }
@@ -43,16 +39,8 @@ public:
         block_update_queue_.Push(update);
     }
 
-    void SendEntitySpawns(const Packet::EntitySpawn& entitySpawn) {
-        entity_spawn_queue_.Push(entitySpawn);
-    }
-
     void SendEntityUpdate(const Packet::EntityUpdate& update) {
         entity_update_queue_.Push(update);
-    }
-
-    void SendEntityDespawns(const Packet::EntityDespawn& entityDespawn) {
-        entity_despawn_queue_.Push(entityDespawn);
     }
 
     void SendChunkUpdates(const Packet::ChunkUpdateData& update) {

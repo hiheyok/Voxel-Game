@@ -20,8 +20,8 @@ struct EntityProperty {
 
     bool is_chunk_loader_ = false;
 
-    EntityUUID entity_uuid_ = NULL;
-    EntityTypeID type_ = NULL; //State what type of entity is it. Zombie? Human??
+    EntityUUID entity_uuid_ = 0;
+    EntityTypeID type_ = 0; //State what type of entity is it. Zombie? Human??
 
     bool operator==(const EntityProperty& other) {
         return entity_uuid_ == other.entity_uuid_;

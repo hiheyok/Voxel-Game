@@ -34,11 +34,6 @@ struct ServerSettings {
 //This manages the input/output system of the world
 //This also manages the ticking system
 class Server {
-private:
-    bool stop_ = true; // TODO: Rename
-    std::thread main_server_loop_;
-    std::unique_ptr<Timer> time_; // TODO: Rename
-    double mspt_ = 0.0;
 public:
     std::unique_ptr<Level> level_ = nullptr;
     std::unique_ptr<ServerSettings> settings_ = nullptr;
@@ -82,6 +77,15 @@ public:
     void SendEvent(const Event& event);
 
     void SetInternalConnection(InternalInterface* conn);
+private:
+    bool stop_ = true; // TODO: Rename
+    std::thread main_server_loop_;
+    std::unique_ptr<Timer> time_; // TODO: Rename
+    double mspt_ = 0.0;
 
     void ProcessPacket();
+    void ProcessPlayerPackets(ClientInterface* receiver);
+    void SendPacket();
+    void SendEntityUpdatePacket(ClientInterface* receiver);
+    void SendChunkUpdatePacket(ClientInterface* receiver);
 };

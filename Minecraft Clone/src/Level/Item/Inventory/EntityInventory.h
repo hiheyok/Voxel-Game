@@ -10,6 +10,5 @@ public:
 
     int right_hand_slot_ = 0;
     int left_hand_slot_ = 0;
-
 private:
 };

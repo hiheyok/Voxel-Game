@@ -20,6 +20,11 @@ public:
 
     NBitVector(int numElements, int bitWidth);
     NBitVector(int bitWidth);
+    NBitVector();
+    NBitVector(const NBitVector&);
+    NBitVector(NBitVector&&);
+    NBitVector& operator=(const NBitVector&);
+    NBitVector& operator=(NBitVector&&);
     ~NBitVector();
 
     StorageBit Get(size_t idx) const;
@@ -30,6 +35,21 @@ public:
     template <typename T>
     void Set(size_t idx, T val);
 };
+
+template<typename StorageBit>
+NBitVector<StorageBit>::NBitVector() = default;
+
+template<typename StorageBit>
+NBitVector<StorageBit>::NBitVector(const NBitVector&) = default;
+
+template<typename StorageBit>
+NBitVector<StorageBit>::NBitVector(NBitVector&&) = default;
+
+template<typename StorageBit>
+NBitVector<StorageBit>& NBitVector<StorageBit>::operator=(const NBitVector<StorageBit>&) = default;
+
+template<typename StorageBit>
+NBitVector<StorageBit>& NBitVector<StorageBit>::operator=(NBitVector<StorageBit>&&) = default;
 
 template<typename StorageBit>
 template <typename T>

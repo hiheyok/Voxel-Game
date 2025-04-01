@@ -39,7 +39,7 @@ EntityTypeID EntitiesList::RegisterEntity(std::string EntityName, EntityTypeEnum
     newEntity->id_ = ID;
 
     entity_type_list_.emplace_back(newEntity);
-    EntityNameID[EntityName] = ID;
+    entity_name_id_[EntityName] = ID;
 
     return ID;
 
@@ -52,7 +52,7 @@ void EntitiesList::InitializeModels() {
     json data = json::parse(file);
 
     for (auto& b : data.items()) {
-        EntityTypeID entityType = EntityNameID[b.key()];
+        EntityTypeID entityType = entity_name_id_[b.key()];
 
         json::iterator d = b.value().begin();
 

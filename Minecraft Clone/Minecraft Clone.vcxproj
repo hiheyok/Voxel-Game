@@ -318,6 +318,7 @@
     <ClInclude Include="src\FileManager\Files.h" />
     <ClInclude Include="src\Level\Chunk\Block\Type\DefaultBlock.h" />
     <ClInclude Include="src\Level\Chunk\ChunkPos\ChunkPos.h" />
+    <ClInclude Include="src\Level\Chunk\ChunkRawData.h" />
     <ClInclude Include="src\Level\Chunk\Heightmap\Heightmap.h" />
     <ClInclude Include="src\Level\Chunk\Palette.h" />
     <ClInclude Include="src\Level\Chunk\TallChunk.h" />
@@ -331,7 +332,11 @@
     <ClInclude Include="src\Level\Server\Interfaces\ClientInterface.h" />
     <ClInclude Include="src\Level\Server\Interfaces\InternalInterface.h" />
     <ClInclude Include="src\Level\Server\Interfaces\ServerInterface.h" />
+    <ClInclude Include="src\Level\Server\Networking\BlockUpdate.h" />
+    <ClInclude Include="src\Level\Server\Networking\ChunkUpdate.h" />
+    <ClInclude Include="src\Level\Server\Networking\EntityUpdate.h" />
     <ClInclude Include="src\Level\Server\Networking\Packet.h" />
+    <ClInclude Include="src\Level\Server\Networking\PlayerAction.h" />
     <ClInclude Include="src\Level\Server\Server.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\Biome.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeProperties.h" />

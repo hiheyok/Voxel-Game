@@ -20,17 +20,10 @@ public:
         set(static_cast<int>(px), static_cast<int>(py), static_cast<int>(pz));
     }
 
-    ChunkPos(const ChunkPos& m) {
-        x = m.x;
-        y = m.y;
-        z = m.z;
-    }
-
-    ChunkPos() {
-        x = 0;
-        y = 0;
-        z = 0;
-    }
+    ChunkPos() = default;
+    ChunkPos(const ChunkPos& m) = default;
+    ~ChunkPos() = default;
+    ChunkPos(ChunkPos&&) = default;
 
     void set(int px, int py, int pz) {
         x = px;

@@ -10,7 +10,7 @@
 #include "ChunkPos/ChunkPos.h"
 #include "Palette.h"
 
-
+struct ChunkRawData;
 
 class ChunkContainer {
 public:
@@ -33,6 +33,9 @@ public:
 
     void SetBlock(BlockID block, int x, int y, int z);
     void SetBlockUnsafe(BlockID block, int x, int y, int z);
+
+    ChunkRawData GetRawData();
+    ChunkLightingContainer GetLightData();
 
     void Use();
     void Unuse();

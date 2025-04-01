@@ -45,6 +45,10 @@ std::vector<ChunkPos> WorldInteractions::GetUpdatedChunkPos() {
     return chunkIDs;
 }
 
+std::vector<ChunkPos> WorldInteractions::GetUpdatedLightPos() {
+    return {};
+}
+
 std::vector<ChunkPos> WorldInteractions::GetRequestedLightUpdates() {
     std::lock_guard<std::mutex> lock{ updated_chunk_lock_ };
     std::vector<ChunkPos> pos = std::move(light_updates_);
@@ -53,6 +57,10 @@ std::vector<ChunkPos> WorldInteractions::GetRequestedLightUpdates() {
         requested_light_update_[p].second = SIZE_MAX;
     }
     return pos;
+}
+
+std::vector<EntityProperty> WorldInteractions::GetSpawnedEntities() {
+    return {};
 }
 
 std::vector<EntityProperty> WorldInteractions::GetUpdatedEntities() {

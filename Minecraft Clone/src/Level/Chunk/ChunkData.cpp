@@ -1,4 +1,5 @@
 #include "ChunkData.h"
+#include "ChunkRawData.h"
 
 static const int NeighborOffset[6] = {
       -16, 16,-16, 16,-16, 16
@@ -80,4 +81,12 @@ void ChunkContainer::Use() {
 
 void ChunkContainer::Unuse() {
     in_use_ = false;
+}
+
+ChunkRawData ChunkContainer::GetRawData() {
+    return ChunkRawData{ block_storage_, *lighting_.get(), position_ };
+}
+
+ChunkLightingContainer ChunkContainer::GetLightData() {
+    return ChunkLightingContainer{ *lighting_.get() };
 }

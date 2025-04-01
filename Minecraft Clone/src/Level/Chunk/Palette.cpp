@@ -6,6 +6,7 @@ Palette::Palette() : current_bit_width_{ MIN_BIT_WIDTH }, data_{ CHUNK_SIZE_3D, 
 
 Palette::~Palette() = default;
 Palette::Palette(Palette&&) noexcept = default;
+Palette::Palette(const Palette&) noexcept = default;
 Palette& Palette::operator=(const Palette&) = default;
 Palette& Palette::operator=(Palette&&) noexcept = default;
 

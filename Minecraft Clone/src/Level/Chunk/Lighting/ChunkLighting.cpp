@@ -4,6 +4,10 @@ ChunkLightingContainer::ChunkLightingContainer() {
     ResetLighting();
 }
 
+ChunkLightingContainer::ChunkLightingContainer(ChunkLightingContainer&&) = default;
+ChunkLightingContainer::ChunkLightingContainer(const ChunkLightingContainer&) = default;
+
+
 ChunkLightingContainer::~ChunkLightingContainer() = default;
 
 uint64_t* ChunkLightingContainer::getData() {

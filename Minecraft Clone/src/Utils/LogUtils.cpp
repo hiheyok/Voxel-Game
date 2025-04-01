@@ -91,7 +91,7 @@ void LogUtils::LogError(std::string subtype, std::string message) {
     log.message_ = message;
     log.time_ = std::chrono::system_clock::now();
     log.subtype_ = subtype;
-    log.r_time_ = (std::chrono::high_resolution_clock::now() - init_time_).count();
+     log.r_time_ = (std::chrono::high_resolution_clock::now() - init_time_).count();
     std::lock_guard<std::mutex> lock{ mutex_ };
     logs_.emplace_back(log);
     cv_.notify_one();

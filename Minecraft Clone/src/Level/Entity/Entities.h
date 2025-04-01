@@ -9,7 +9,7 @@ enum EntityTypeEnums {
 class EntitiesList {
 private:
     int entity_type_count_ = 0;
-    FastHashMap<std::string, EntityTypeID> EntityNameID;
+    FastHashMap<std::string, EntityTypeID> entity_name_id_;
 public:
     EntitiesList();
 

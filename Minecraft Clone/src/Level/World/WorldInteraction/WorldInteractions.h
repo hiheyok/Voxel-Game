@@ -42,12 +42,13 @@ public:
     void summonEntity(Entity& entity);
 
     std::vector<ChunkPos> GetUpdatedChunkPos();
+    std::vector<ChunkPos> GetUpdatedLightPos();
 
     std::vector<ChunkPos> GetRequestedLightUpdates();
 
-    std::vector<EntityProperty> GetUpdatedEntities(); // TODO: Rename
-
-    std::vector<EntityUUID> GetRemovedEntities(); // TODO: Rename
+    std::vector<EntityProperty> GetSpawnedEntities();
+    std::vector<EntityProperty> GetUpdatedEntities();
+    std::vector<EntityUUID> GetRemovedEntities();
 
     void RequestLightUpdate(const ChunkPos& pos);
 

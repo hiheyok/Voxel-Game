@@ -14,6 +14,7 @@ public:
     Palette();
     ~Palette();
     Palette(Palette&&) noexcept;
+    Palette(const Palette&) noexcept;
     Palette& operator=(const Palette&);
     Palette& operator=(Palette&&) noexcept;
 
