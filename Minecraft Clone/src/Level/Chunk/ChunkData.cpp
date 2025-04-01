@@ -5,6 +5,12 @@ static const int NeighborOffset[6] = {
       -16, 16,-16, 16,-16, 16
 };
 
+ChunkContainer::ChunkContainer(const ChunkRawData& data) {
+    lighting_ = std::make_unique<ChunkLightingContainer>(data.lighting_data_);
+    block_storage_ = data.chunk_data_;
+    position_ = data.pos_;
+}
+
 // TODO: Make this readable and safe
 BlockID ChunkContainer::GetBlock(int x, int y, int z) const {
     if (!((x | y | z) >> 4)) { //check if it is in the chunk

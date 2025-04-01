@@ -30,20 +30,20 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <EnableASAN>true</EnableASAN>
     <EnableFuzzer>true</EnableFuzzer>
@@ -51,7 +51,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseIntelIPP1A>Dynamic_Library</UseIntelIPP1A>
@@ -177,7 +177,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Client\Client.cpp" />
-    <ClCompile Include="src\Client\Communication\ServerInteraction.cpp" />
     <ClCompile Include="src\Client\IO\IO.cpp" />
     <ClCompile Include="src\Client\Player\MainPlayer.cpp" />
     <ClCompile Include="src\Client\Player\PlayerMovement.cpp" />
@@ -215,9 +214,6 @@
     <ClCompile Include="src\Level\Level.cpp" />
     <ClCompile Include="src\Level\LevelLoader.cpp" />
     <ClCompile Include="src\Level\Lighting\LightEngine.cpp" />
-    <ClCompile Include="src\Level\Server\Communication\InternalServer.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="src\Level\Server\Server.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Biome\BiomeProperties.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugPositioning\DebugPositioning.cpp" />
@@ -301,8 +297,6 @@
     <ClInclude Include="src\Client\ClientLevel\ClientCache.h" />
     <ClInclude Include="src\Client\ClientLevel\ClientLevel.h" />
     <ClInclude Include="src\Client\ClientLevel\Entity\ClientEntities.h" />
-    <ClInclude Include="src\Client\ClientLevel\Interface\IClientLevel.h" />
-    <ClInclude Include="src\Client\Communication\ServerInteraction.h" />
     <ClInclude Include="src\Client\IO\IO.h" />
     <ClInclude Include="src\Client\IO\KEY_CODE.h" />
     <ClInclude Include="src\Client\Player.h" />
@@ -328,7 +322,6 @@
     <ClInclude Include="src\Level\Level.h" />
     <ClInclude Include="src\Level\LevelLoader.h" />
     <ClInclude Include="src\Level\Lighting\LightEngine.h" />
-    <ClInclude Include="src\Level\Server\Communication\InternalServer.h" />
     <ClInclude Include="src\Level\Server\Interfaces\ClientInterface.h" />
     <ClInclude Include="src\Level\Server\Interfaces\InternalInterface.h" />
     <ClInclude Include="src\Level\Server\Interfaces\ServerInterface.h" />

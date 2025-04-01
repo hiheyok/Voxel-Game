@@ -52,7 +52,7 @@ bool ChunkMap::CheckChunk(const ChunkPos& pos) const {
     return reg->CheckChunkGlobalPos(pos.x, pos.y, pos.z);
 }
 
-BlockID ChunkMap::GetBlockGlobal(const BlockPos& pos) {
+BlockID ChunkMap::GetBlockGlobal(const BlockPos& pos) const {
     //c[3] is the position of the chunk
     //l[3] is the local position of a block inside a chunk
 

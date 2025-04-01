@@ -24,6 +24,7 @@ private:
     World* world = nullptr;
     std::mutex updated_chunk_lock_;
     FastHashSet<ChunkPos> updated_chunk_;
+    FastHashSet<ChunkPos> updated_lighting_pos_;
     FastHashMap<ChunkPos, std::pair<int, size_t>> requested_light_update_; // pair<y height, index in update vector>
     std::vector<ChunkPos> light_updates_;
 public:
@@ -38,8 +39,6 @@ public:
     void UseTallGeneration();
 
     void init(World* w, WorldParameters parameters);
-
-    void summonEntity(Entity& entity);
 
     std::vector<ChunkPos> GetUpdatedChunkPos();
     std::vector<ChunkPos> GetUpdatedLightPos();
@@ -72,7 +71,5 @@ public:
 
     Entity* GetEntity(EntityUUID id);
 
-    void AddEntity(Entity& entity);
-
-    void AddEntity(Entity* entity);
+    EntityUUID AddEntity(std::unique_ptr<Entity> entity);
 };

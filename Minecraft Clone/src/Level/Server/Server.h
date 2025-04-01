@@ -11,11 +11,10 @@ class InternalInterface;
 class Timer;
 class Level;
 class Chunk;
-class Entity;
 
+struct Entity;
 struct Ray;
 struct EntityProperty;
-
 struct Event;
 
 struct ServerSettings {
@@ -48,24 +47,6 @@ public:
 
     Timer* GetTimer();
 
-    std::vector<EntityProperty> GetUpdatedEntities();
-
-    std::vector<EntityUUID> GetRemovedEntities();
-
-    bool CheckEntityOnGround(EntityUUID id);
-
-    void Join(Entity& entity);
-
-    std::vector<ChunkPos> GetUpdatedChunkPos();
-
-    Chunk* GetChunk(const ChunkPos& id);
-
-    BlockID GetBlock(const BlockPos& pos);
-
-    bool GetRayIntersection(Ray& ray);
-
-    glm::vec3 GetEntityCollusionTime(EntityUUID entity);
-
     void StartServer(ServerSettings serverSettings);
 
     void Stop();
@@ -76,7 +57,8 @@ public:
 
     void SendEvent(const Event& event);
 
-    void SetInternalConnection(InternalInterface* conn);
+    // This will cause the player to join and return a uuid for the player
+    EntityUUID SetInternalConnection(InternalInterface* conn);
 private:
     bool stop_ = true; // TODO: Rename
     std::thread main_server_loop_;

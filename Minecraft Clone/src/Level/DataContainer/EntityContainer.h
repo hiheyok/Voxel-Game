@@ -1,5 +1,7 @@
 #pragma once
 #include <mutex>
+#include <memory>
+#include <vector>
 
 #include "../Typenames.h"
 
@@ -10,24 +12,25 @@ struct EntityProperty;
 
 class EntityContainer { //Manages all entities in world
 public:
-    void AddEntities(Entity& e);
-
-    void AddEntities(Entity* e);
+    EntityContainer();
+    ~EntityContainer();
+    EntityUUID AddEntity(std::unique_ptr<Entity> e);
+    void RemoveEntity(EntityUUID entityId);
 
     int GetEntityCount() const;
 
-    FastHashMap<EntityUUID, EntityProperty> ClientGetEntityUpdate();
+    std::vector<EntityProperty> GetSpawnedEntities();
+    std::vector<EntityProperty> GetUpdatedEntities();
+    std::vector<EntityUUID> GetRemovedEntities();
 
-    void RemoveEntity(EntityUUID entityId);
-
-    FastHashSet<EntityUUID> getRemovedEntities();
-
-    Entity* GetEntity(EntityUUID entityId);
+    Entity* GetEntity(EntityUUID entityId) const;
 
     void Tick(Dimension* dimension);
 private:
-    FastHashMap<EntityUUID, Entity*> entities_;
+    FastHashMap<EntityUUID, std::unique_ptr<Entity>> entities_;
     FastHashSet<EntityUUID> removed_entity_;
+    FastHashSet<EntityUUID> spawned_entity_;
+
     std::mutex entity_lock_;
     EntityUUID unique_id_ = 0;
     int entity_count_ = 0;

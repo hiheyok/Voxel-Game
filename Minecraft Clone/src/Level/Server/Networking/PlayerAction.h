@@ -6,8 +6,8 @@
 
 namespace PlayerPacket {
 
-    enum PlayerPacketType {
-        GET_ITEM, DESTROY_BLOCK, PlACE_BLOCK, MOVE
+    enum PacketType {
+        GET_ITEM, DESTROY_BLOCK, PLACE_BLOCK, MOVE
     };
 
     struct PlayerGetItem {

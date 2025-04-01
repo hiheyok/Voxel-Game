@@ -17,7 +17,7 @@ public:
         player_action_queue_.Push(action);
     }
 
-    bool IsConnected() {
+    bool IsConnected() const override {
         return is_connected_;
     }
 

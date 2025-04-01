@@ -3,5 +3,4 @@
 
 struct ClientLevel {
     ClientCache cache;
-
 };

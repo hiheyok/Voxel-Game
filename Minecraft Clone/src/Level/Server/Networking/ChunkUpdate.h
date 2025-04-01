@@ -4,6 +4,11 @@
 #include "../../Typenames.h"
 
 namespace ChunkUpdatePacket {
+
+    enum PacketType {
+        ADD_CHUNK, LIGHT_UPDATE, DELETE_CHUNK
+    };
+
     struct AddChunk {
         ChunkRawData chunk_;
     };

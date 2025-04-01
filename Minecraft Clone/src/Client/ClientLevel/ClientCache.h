@@ -1,6 +1,7 @@
 #pragma once
-#include "../../Level/DataContainer/ChunkMapData.h"
 #include "Entity/ClientEntities.h"
+#include "../../Level/Chunk/Chunk.h"
+#include "../../Level/DataContainer/ChunkMapData.h"
 #include "../../Level/World/Collusion/WorldCollusion.h"
 
 class ClientCache {
@@ -24,5 +25,9 @@ public:
 
     Chunk* GetChunk(ChunkPos pos) const {
         return chunk_cache_.GetChunk(pos);
+    }
+
+    BlockID GetBlock(BlockPos pos) const {
+        return chunk_cache_.GetBlockGlobal(pos);
     }
 };

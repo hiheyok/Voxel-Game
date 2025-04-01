@@ -2,16 +2,16 @@
 
 class Player;
 class UserInputs;
-class InternalServer;
+class ClientCache;
 
 class PlayerMovement {
 public:
-    void Update(Player* player, const UserInputs& inputs, InternalServer* world);
+    void Update(Player* player, const UserInputs& inputs, ClientCache* world);
 private:
     float VelocityMovementCurve(float current, float max, float delta);
 
     void RotatePlayer(Player* player, const UserInputs& inputs);
-    void MovePlayer(Player* player, const UserInputs& inputs, InternalServer* server);
+    void MovePlayer(Player* player, const UserInputs& inputs, ClientCache* server);
     void MoveRelative(Player* player, float strafe, float up, float forward, float friction);
 
     bool enable_collusion_ = false;

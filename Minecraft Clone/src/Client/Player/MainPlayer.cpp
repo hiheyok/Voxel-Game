@@ -8,21 +8,22 @@
 #include "../../Level/Item/ItemTextureAtlas.h"
 #include "../../Level/Entity/Mobs/Player.h"
 #include "../../Level/Entity/Properties/EntityProperties.h"
+#include "../../Level/Server/Interfaces/ServerInterface.h"
 #include "../../RenderEngine/GUI/GUI.h"
 #include "../../RenderEngine/GUI/GUISet.h"
 
 
 MainPlayer::MainPlayer() : 
     player_{std::make_unique<Player>()},
-    movement_{std::make_unique<PlayerMovement>()},
-    interactions_{ std::make_unique<WorldInteraction>() },
+    movement_{ std::make_unique<PlayerMovement>() },
+    interactions_{std::make_unique<WorldInteraction>()},
     player_gui_{std::make_unique<GUI>()} {
 
 }
 
 MainPlayer::~MainPlayer() = default;
 
-void MainPlayer::Initialize(GLFWwindow* win, InternalServer* server) {
+void MainPlayer::Initialize(GLFWwindow* win, ServerInterface* interface, ClientCache* cache) {
     player_gui_->Initialize(win);
 
     float ItemViewRelativeSize = 0.85f;
@@ -56,7 +57,8 @@ void MainPlayer::Initialize(GLFWwindow* win, InternalServer* server) {
 
     gui_index_ = player_gui_->AddGUI("PlayerGUI", std::move(hotbar));
     item_gui_index_ = player_gui_->AddGUI("Itembar", std::move(itemBar));
-    internal_server_ = server;
+    internal_interface_ = interface;
+    client_cache_ = cache;
 }
 
 void MainPlayer::RenderGUIs() {
@@ -87,10 +89,10 @@ void MainPlayer::PrepareGUIs() {
     player_gui_->PrepareRenderer();
 }
 
-void MainPlayer::Update(UserInputs inputs, Dimension* dimension) {
+void MainPlayer::Update(UserInputs inputs) {
     InventoryUpdate(inputs);
-    interactions_->Interact(player_.get(), inputs, dimension);
-    movement_->Update(player_.get(), inputs, internal_server_);
+    interactions_->Interact(player_.get(), inputs, internal_interface_, client_cache_);
+    movement_->Update(player_.get(), inputs, client_cache_);
     PrepareGUIs();
 }
 
@@ -106,7 +108,7 @@ void MainPlayer::SetPlayerPosition(float x, float y, float z) {
     player_->properties_.position_ = glm::vec3(x, y, z);
 }
 
-void MainPlayer::InventoryUpdate(UserInputs inputs) {
+void MainPlayer::InventoryUpdate(const UserInputs& inputs) {
     int Direction = 0;
 
     switch (inputs.mouse_.scroll_direction_) {

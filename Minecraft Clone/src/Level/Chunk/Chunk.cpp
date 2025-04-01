@@ -2,6 +2,7 @@
 
 Chunk::Chunk() = default;
 Chunk::~Chunk() = default;
+Chunk::Chunk(const ChunkRawData& data) : ChunkContainer{ data } {}
 
 void Chunk::UpdateGen() {
     for (int side = 0; side < 6; side++) {

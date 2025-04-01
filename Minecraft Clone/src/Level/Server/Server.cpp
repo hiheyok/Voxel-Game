@@ -27,42 +27,6 @@ Timer* Server::GetTimer() {
     return time_.get();
 }
 
-std::vector<EntityProperty> Server::GetUpdatedEntities() {
-    return level_->main_world_->world_interactions_.GetUpdatedEntities();
-}
-
-std::vector<EntityUUID> Server::GetRemovedEntities() {
-    return level_->main_world_->world_interactions_.GetRemovedEntities();
-}
-
-bool Server::CheckEntityOnGround(EntityUUID id) {
-    return level_->main_world_->world_interactions_.collusions_->isEntityOnGround(level_->main_world_->world_interactions_.GetEntity(id));
-}
-
-void Server::Join(Entity& entity) {
-    level_->main_world_->world_interactions_.summonEntity(entity);
-}
-
-std::vector<ChunkPos> Server::GetUpdatedChunkPos() {
-    return level_->main_world_->world_interactions_.GetUpdatedChunkPos();
-}
-
-Chunk* Server::GetChunk(const ChunkPos& pos) {
-    return level_->main_world_->world_interactions_.GetChunk(pos);
-}
-
-BlockID Server::GetBlock(const BlockPos& pos) { //Include dimension in parameter later
-    return level_->main_world_->world_interactions_.GetBlock(pos);
-}
-
-bool Server::GetRayIntersection(Ray& ray) { //Include dimension in paramter later
-    return level_->main_world_->world_interactions_.collusions_->CheckRayIntersection(ray);
-}
-
-glm::vec3 Server::GetEntityCollusionTime(EntityUUID entity) {
-    return level_->main_world_->world_interactions_.collusions_->GetTimeTillCollusion(level_->main_world_->world_interactions_.GetEntity(entity));
-}
-
 void Server::StartServer(ServerSettings serverSettings) {
     level_ = std::make_unique<Level>();
     level_->Start(static_cast<int>(serverSettings.gen_thread_count_), static_cast<int>(serverSettings.light_engine_thread_count_));
@@ -87,6 +51,8 @@ void Server::Loop() {
 
         Tick();
 
+        SendPacket();
+
         mspt_ = time_->GetTimePassed_ms();
         double timeLeft = (1000.0 / (double)settings_->tick_rate_) - mspt_;
 
@@ -104,12 +70,16 @@ void Server::Tick() {
     level_->main_world_->world_interactions_.worldLoader_->Load();
 }
 
-void Server::SendEvent(const Event& pEventIn) {
-    level_->main_world_->event_manager_.AddEvent(pEventIn);
+void Server::SendEvent(const Event& eventIn) {
+    level_->main_world_->event_manager_.AddEvent(eventIn);
 }
 
-void Server::SetInternalConnection(InternalInterface* interface) {
+EntityUUID Server::SetInternalConnection(InternalInterface* interface) {
     client_interface_ = static_cast<ClientInterface*>(interface);
+    std::unique_ptr<Player> player = std::make_unique<Player>();
+    EntityUUID uuid = level_->main_world_->world_interactions_.AddEntity(std::move(player));
+    interface->SetPlayerUUID(uuid);
+    return uuid;
 }
 
 void Server::ProcessPacket() {
@@ -145,7 +115,7 @@ void Server::ProcessPlayerPackets(ClientInterface* receiver) {
                 level_->main_world_->world_interactions_.SetBlock(g_blocks.AIR, destroyblock.pos_);
             }
             break;
-        case PlayerPacket::PlACE_BLOCK:
+        case PlayerPacket::PLACE_BLOCK:
             {
                 const PlayerPacket::PlayerPlaceBlock& placeBlock = std::get<PlayerPacket::PlayerPlaceBlock>(packet.packet_);
                 level_->main_world_->world_interactions_.SetBlock(placeBlock.block_, placeBlock.pos_);
@@ -220,6 +190,4 @@ void Server::SendChunkUpdatePacket(ClientInterface* receiver) {
         packet.light_ = data;
         receiver->SendChunkUpdates(packet);
     }
-
-    // Removed chunks later (unloading stuff)
 }

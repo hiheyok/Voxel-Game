@@ -28,14 +28,6 @@ void WorldInteractions::init(World* w, WorldParameters parameters) {
     collusions_->Initialize(w->chunk_container_.get());
 }
 
-void WorldInteractions::summonEntity(Entity& entity) {
-    if (world == nullptr) throw std::exception("Cannot summon entity. World is null");
-    world->entities_->AddEntities(entity);
-
-    if (entity.properties_.is_chunk_loader_)
-        worldLoader_->AddEntityChunkLoader(entity.properties_.entity_uuid_);
-}
-
 std::vector<ChunkPos> WorldInteractions::GetUpdatedChunkPos() {
     std::lock_guard<std::mutex> lock{ updated_chunk_lock_ };
     std::vector<ChunkPos> chunkIDs = {};
@@ -46,7 +38,10 @@ std::vector<ChunkPos> WorldInteractions::GetUpdatedChunkPos() {
 }
 
 std::vector<ChunkPos> WorldInteractions::GetUpdatedLightPos() {
-    return {};
+    std::lock_guard<std::mutex> lock{ updated_chunk_lock_ };
+    std::vector<ChunkPos> out(updated_lighting_pos_.begin(), updated_lighting_pos_.end());
+    updated_lighting_pos_.clear();
+    return out;
 }
 
 std::vector<ChunkPos> WorldInteractions::GetRequestedLightUpdates() {
@@ -60,25 +55,15 @@ std::vector<ChunkPos> WorldInteractions::GetRequestedLightUpdates() {
 }
 
 std::vector<EntityProperty> WorldInteractions::GetSpawnedEntities() {
-    return {};
+    return world->entities_->GetSpawnedEntities();
 }
 
 std::vector<EntityProperty> WorldInteractions::GetUpdatedEntities() {
-    FastHashMap<EntityUUID, EntityProperty> m = world->entities_->ClientGetEntityUpdate();
-    std::vector<EntityProperty> properties = {};
-
-    for (const auto& e : m) {
-        properties.push_back(e.second);
-    }
-
-    return properties;
+    return world->entities_->GetUpdatedEntities();
 }
 
 std::vector<EntityUUID> WorldInteractions::GetRemovedEntities() {
-    FastHashSet<EntityUUID> m = world->entities_->getRemovedEntities();
-    std::vector<EntityUUID> ids = {};
-    ids.insert(ids.end(), m.begin(), m.end());
-    return ids;
+    return world->entities_->GetRemovedEntities();
 }
 
 void WorldInteractions::RequestLightUpdate(const ChunkPos& pos) {
@@ -132,8 +117,8 @@ void WorldInteractions::UpdateLighting(std::unique_ptr<ChunkLightingContainer> c
     worldLoader_->ReplaceLightInfomation(std::move(chunkLighting));
 
     std::lock_guard<std::mutex> lock{ updated_chunk_lock_ };
-    if (!updated_chunk_.count(pos)) {
-        updated_chunk_.insert(pos);
+    if (!updated_lighting_pos_.count(pos)) {
+        updated_lighting_pos_.insert(pos);
     }
     pos.y /= 32;
 
@@ -153,8 +138,8 @@ void WorldInteractions::UpdateLighting(std::vector<std::unique_ptr<ChunkLighting
     while (!chunkToUpdate.empty()) {
         ChunkPos pos = chunkToUpdate.top();
         chunkToUpdate.pop();
-        if (!updated_chunk_.count(pos)) {
-            updated_chunk_.insert(pos);
+        if (!updated_lighting_pos_.count(pos)) {
+            updated_lighting_pos_.insert(pos);
         }
         pos.y /= 32;
         // TODO: Fix this with Chunk Column ID
@@ -294,10 +279,14 @@ Entity* WorldInteractions::GetEntity(EntityUUID id) {
     return world->entities_->GetEntity(id);
 }
 
-void WorldInteractions::AddEntity(Entity& entity) {
-    world->entities_->AddEntities(entity);
-}
+EntityUUID WorldInteractions::AddEntity(std::unique_ptr<Entity> entity) {
+    if (world == nullptr) throw std::exception("Cannot summon entity. World is null");
 
-void WorldInteractions::AddEntity(Entity* entity) {
-    world->entities_->AddEntities(entity);
+    bool isChunkLoader = entity->properties_.is_chunk_loader_;
+    EntityUUID uuid = world->entities_->AddEntity(std::move(entity));
+
+    if (isChunkLoader)
+        worldLoader_->AddEntityChunkLoader(uuid);
+
+    return uuid;
 }

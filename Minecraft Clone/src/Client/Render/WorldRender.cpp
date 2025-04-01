@@ -1,9 +1,9 @@
 ﻿#include "WorldRender.h"
 
+#include "../ClientLevel/ClientCache.h"
 #include "../Render/PlayerPOV.h"
 #include "../../Utils/Clock.h"
 #include "../../Core/Options/Option.h"
-#include "../../Level/Server/Communication/InternalServer.h"
 #include "../../Level/Timer/Timer.h"
 #include "../../RenderEngine/ChunkRenderer/Mesh/ChunkMeshingV2.h"
 #include "../../RenderEngine/ChunkRenderer/TerrainRenderer.h"
@@ -31,7 +31,7 @@ void WorldRender::Render() {
 }
 
 void WorldRender::LoadChunkToRenderer(ChunkPos chunk) {
-    if (server_->GetChunk(chunk) != nullptr) {
+    if (cache_->GetChunk(chunk) != nullptr) {
         mesh_thread_pool_->SubmitTask(chunk);
     }
 
@@ -43,7 +43,7 @@ void WorldRender::LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks) {
 
 
 std::unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(const ChunkPos& pos) {
-    Chunk* chunk = WorldRender::server_->GetChunk(pos);
+    Chunk* chunk = WorldRender::cache_->GetChunk(pos);
 
     Timer timer;
     chunkMesher.Reset();
@@ -64,7 +64,7 @@ std::unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(const ChunkPos& pos) 
     return data;
 }
 
-void WorldRender::Update() {
+void WorldRender::Update(std::vector<ChunkPos> updatedChunks) {
     
     const int chunkUpdateLimit = 4000;
     int updateAmount = 0;
@@ -83,7 +83,7 @@ void WorldRender::Update() {
         mesh_add_queue_.pop_back();
     }
 
-    LoadChunkMultiToRenderer(server_->GetUpdatedChunks());
+    LoadChunkMultiToRenderer(updatedChunks);
 
     if (updateAmount < chunkUpdateLimit) {
         renderer_->Defrag(1);
@@ -99,7 +99,7 @@ void WorldRender::Stop() {
     renderer_->Cleanup();
 }
 
-void WorldRender::Start(GLFWwindow* window, InternalServer* server, PerformanceProfiler* profiler) {
+void WorldRender::Start(GLFWwindow* window, ClientCache* cache, PerformanceProfiler* profiler) {
     horizontal_render_distance_ = g_app_options.horizontal_render_distance_;
     vertical_render_distance_ = g_app_options.vertical_render_distance_;
 
@@ -110,7 +110,7 @@ void WorldRender::Start(GLFWwindow* window, InternalServer* server, PerformanceP
         WorldRender::Worker>>(threadCount, "Mesher", 250);
 
     window_ = window;
-    WorldRender::server_ = server;
+    WorldRender::cache_ = cache;
 
     renderer_->Initialize(window_, player_->GetCamera());
     renderer_->LoadAssets();

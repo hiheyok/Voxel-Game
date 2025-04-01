@@ -8,7 +8,7 @@
 #include "../../Level/Typenames.h"
 
 class TerrainRenderer;
-class InternalServer;
+class ClientCache;
 class PerformanceProfiler;
 class PlayerPOV;
 
@@ -31,19 +31,19 @@ public:
 
     void LoadChunkToRenderer(ChunkPos chunk);
 
-    void LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks);
 
-    void Start(GLFWwindow* window, InternalServer* server, PerformanceProfiler* profiler);
+    void Start(GLFWwindow* window, ClientCache* cache, PerformanceProfiler* profiler);
 
     void Stop();
 
-    void Update();
+    void Update(std::vector<ChunkPos> updatedChunks);
 
     size_t GetQueuedSize();
 
     std::unique_ptr<TerrainRenderer> renderer_;
     PerformanceProfiler* profiler_;
 private:
+    void LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks);
     static std::unique_ptr<Mesh::ChunkVertexData> Worker(const ChunkPos& pos);
     
     std::unique_ptr<ThreadPool<ChunkPos, std::unique_ptr<Mesh::ChunkVertexData>, WorldRender::Worker>> mesh_thread_pool_;
@@ -51,7 +51,7 @@ private:
 
     std::unique_ptr<PlayerPOV> player_;
     GLFWwindow* window_;
-    static InternalServer* server_;
+    static ClientCache* cache_;
 };
 
-inline InternalServer* WorldRender::server_ = nullptr;
+inline ClientCache* WorldRender::cache_ = nullptr;

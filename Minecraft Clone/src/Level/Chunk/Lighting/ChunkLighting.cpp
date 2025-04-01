@@ -10,11 +10,11 @@ ChunkLightingContainer::ChunkLightingContainer(const ChunkLightingContainer&) = 
 
 ChunkLightingContainer::~ChunkLightingContainer() = default;
 
-uint64_t* ChunkLightingContainer::getData() {
+const uint64_t* ChunkLightingContainer::getData() const {
     return data_;
 }
 
-void ChunkLightingContainer::ReplaceData(uint64_t* src) {
+void ChunkLightingContainer::ReplaceData(const uint64_t* src) {
     memcpy(data_, src, sizeof(uint64_t) * 256);
 }
 

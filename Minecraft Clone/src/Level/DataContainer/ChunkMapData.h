@@ -41,7 +41,7 @@ public:
 
     bool CheckChunk(const ChunkPos& pos) const;
 
-    BlockID GetBlockGlobal(const BlockPos& pos);
+    BlockID GetBlockGlobal(const BlockPos& pos) const;
 
     bool SetBlockGlobal(BlockID block, const BlockPos& pos);
 

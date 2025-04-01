@@ -16,9 +16,9 @@ public:
     ChunkLightingContainer& operator=(const ChunkLightingContainer&) = default;
     ChunkLightingContainer& operator=(ChunkLightingContainer&&) = default;
 
-    uint64_t* getData();
+    const uint64_t* getData() const;
 
-    void ReplaceData(uint64_t* src);
+    void ReplaceData(const uint64_t* src);
 
     void EditLight(int x, int y, int z, unsigned char LightingInfo);
 

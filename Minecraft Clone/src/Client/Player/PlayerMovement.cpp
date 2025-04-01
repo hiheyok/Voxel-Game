@@ -1,22 +1,21 @@
 #include <glm/vec3.hpp>
 #include <glm/geometric.hpp>
 #include <cmath>
-
 #include "PlayerMovement.h"
+#include "../ClientLevel/ClientCache.h"
 #include "../IO/IO.h"
 #include "../IO/KEY_CODE.h"
 #include "../../Level/Entity/Mobs/Player.h"
-#include "../../Level/Server/Communication/InternalServer.h"
 #include "../../Utils/Math/vectorOperations.h"
 
-void PlayerMovement::Update(Player* player, const UserInputs& inputs, InternalServer* server) {
+void PlayerMovement::Update(Player* player, const UserInputs& inputs, ClientCache* clientWorld) {
 
     if (inputs.CheckKeyPress(KEY_C)) {
         enable_collusion_ = !enable_collusion_;
     }
 
     RotatePlayer(player, inputs);
-    MovePlayer(player, inputs, server);
+    MovePlayer(player, inputs, clientWorld);
 }
 
 float PlayerMovement::VelocityMovementCurve(float current, float max, float delta) {
@@ -66,7 +65,7 @@ void PlayerMovement::MoveRelative(Player* player, float strafe, float up, float 
     }
 }
 
-void PlayerMovement::MovePlayer(Player* player, const UserInputs& inputs, InternalServer* server) {
+void PlayerMovement::MovePlayer(Player* player, const UserInputs& inputs, ClientCache* clientWorld) {
 
     glm::vec3 front(
         cos(player->properties_.rotation_.x * 0.0174533) * cos(player->properties_.rotation_.y * 0.0174533),
@@ -107,7 +106,7 @@ void PlayerMovement::MovePlayer(Player* player, const UserInputs& inputs, Intern
     }
 
 
-    if (inputs.CheckKey(KEY_SPACE) && (server->CheckPlayerOnGround() && enable_collusion_)) {
+    if (inputs.CheckKey(KEY_SPACE) && (clientWorld->collusion_manager_.isEntityOnGround(player) && enable_collusion_)) {
         player->properties_.velocity_.y += velocity * 4000;
     }
 
@@ -122,7 +121,7 @@ void PlayerMovement::MovePlayer(Player* player, const UserInputs& inputs, Intern
 
         player->properties_.velocity_.y += gravity;
 
-        glm::vec3 time = server->GetPlayerCollusionTimes();
+        glm::vec3 time = clientWorld->collusion_manager_.GetTimeTillCollusion(player);
 
         if ((time.x != -1.) && (time.x <= inputs.delta_)) {
             player->properties_.velocity_.x = 0;

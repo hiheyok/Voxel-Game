@@ -23,6 +23,8 @@ public:
     ChunkContainer() {
         lighting_ = std::make_unique<ChunkLightingContainer>();
     }
+
+    ChunkContainer(const ChunkRawData&);
     
     void SetNeighbor(ChunkContainer* neighbor, unsigned int side);
 

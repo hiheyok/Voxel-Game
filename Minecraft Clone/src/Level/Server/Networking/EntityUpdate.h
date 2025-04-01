@@ -6,6 +6,10 @@
 #include "../../Item/ItemStack.h"
 
 namespace EntityUpdatePacket {
+    enum PacketType {
+        ENTITY_SPAWN, ENTITY_MOVE, ENTITY_INVENTORY_UPDATE, ENTITY_DESPAWN
+    };
+
     struct EntitySpawn {
         EntitySpawn() = default;
         EntityProperty properties_;

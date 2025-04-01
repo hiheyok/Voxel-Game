@@ -234,9 +234,6 @@
     <ClCompile Include="src\Level\Server\Server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Server\Communication\InternalServer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Level\Lighting\LightEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -280,9 +277,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugPositioning\DebugPositioning.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Client\Communication\ServerInteraction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Level\Chunk\TallChunk.cpp">
@@ -752,9 +746,6 @@
     <ClInclude Include="src\Level\Server\Server.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Server\Communication\InternalServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Level\LevelLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -923,9 +914,6 @@
     <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureAtlas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Client\Communication\ServerInteraction.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Client\Profiler\PerformanceProfiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -963,9 +951,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Client\ClientLevel\Entity\ClientEntities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Client\ClientLevel\Interface\IClientLevel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Server\Interfaces\ServerInterface.h">

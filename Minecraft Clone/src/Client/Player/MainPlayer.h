@@ -1,12 +1,12 @@
 #pragma once
 #include <memory>
 
-class InternalServer;
+class ClientCache;
+class ServerInterface;
+class WorldInteraction;
 class UserInputs;
-class Dimension;
 class PlayerMovement;
 class Player;
-class WorldInteraction;
 class GUI;
 
 struct GLFWwindow;
@@ -19,9 +19,9 @@ public:
     MainPlayer();
     ~MainPlayer();
 
-    void Initialize(GLFWwindow* win, InternalServer* server);
+    void Initialize(GLFWwindow* win, ServerInterface* server, ClientCache* cache);
 
-    void Update(UserInputs inputs, Dimension* dimension);
+    void Update(UserInputs inputs);
 
     EntityProperty GetEntityProperties();
 
@@ -34,13 +34,14 @@ public:
 private:
 
     void PrepareGUIs();
-    void InventoryUpdate(UserInputs inputs);
+    void InventoryUpdate(const UserInputs& inputs);
 
     std::unique_ptr<PlayerMovement> movement_;
     std::unique_ptr<WorldInteraction> interactions_;
     std::unique_ptr<GUI> player_gui_;
 
-    InternalServer* internal_server_ = nullptr;
+    ClientCache* client_cache_ = nullptr;
+    ServerInterface* internal_interface_ = nullptr;
 
     size_t gui_index_ = 0;
     size_t item_gui_index_ = 0;

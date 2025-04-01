@@ -2,53 +2,71 @@
 #include "../Entity/Entity.h"
 #include "../Entity/Properties/EntityProperties.h"
 
-void EntityContainer::AddEntities(Entity& e) {
-    e.properties_.entity_uuid_ = unique_id_;
-    entities_.emplace(unique_id_, &e);
-    unique_id_++;
-    entity_count_++;
-}
+EntityContainer::EntityContainer() = default;
+EntityContainer::~EntityContainer() = default;
 
-void EntityContainer::AddEntities(Entity* e) {
+EntityUUID EntityContainer::AddEntity(std::unique_ptr<Entity> e) {
     e->properties_.entity_uuid_ = unique_id_;
-    entities_.emplace(unique_id_, e);
+    spawned_entity_.insert(unique_id_);
+    entities_.emplace(unique_id_, std::move(e));
     unique_id_++;
     entity_count_++;
+    return unique_id_ - 1;
 }
 
 int EntityContainer::GetEntityCount() const {
     return entity_count_;
 }
 
-FastHashMap<EntityUUID, EntityProperty> EntityContainer::ClientGetEntityUpdate() { //change this to past on a vector later
-    FastHashMap<EntityUUID, EntityProperty> updatedData;
+std::vector<EntityProperty> EntityContainer::GetSpawnedEntities() {
+    std::lock_guard<std::mutex> lock{ entity_lock_ };
+    std::vector<EntityProperty> out;
+
+    for (const auto& entity : spawned_entity_) {
+        out.push_back(GetEntity(entity)->properties_);
+    }
+    spawned_entity_.clear();
+    return out;
+}
+
+std::vector<EntityProperty> EntityContainer::GetUpdatedEntities() { //change this to past on a vector later
+    std::lock_guard<std::mutex> lock{ entity_lock_ };
+    std::vector<EntityProperty> out;
+
     for (auto& entity : entities_) {
         if (entity.second->is_dirty_) {
             entity.second->is_dirty_ = false;
-            updatedData.emplace(entity.second->properties_.entity_uuid_, entity.second->properties_);
+            out.emplace_back(entity.second->properties_);
         }
     }
 
-    return updatedData;
+    return out;
 }
 
+std::vector<EntityUUID> EntityContainer::GetRemovedEntities() {
+    std::lock_guard<std::mutex> lock{ entity_lock_ };
+    std::vector<EntityUUID> out(removed_entity_.begin(), removed_entity_.end());
+    removed_entity_.clear();
+    return out;
+}
+
+
 void EntityContainer::RemoveEntity(EntityUUID entityId) {
-    delete entities_[entityId];
     entities_.erase(entityId);
     std::lock_guard<std::mutex> lock{ entity_lock_ };
     removed_entity_.emplace(entityId);
     entity_count_--;
 }
 
-FastHashSet<EntityUUID> EntityContainer::getRemovedEntities() {
-    std::lock_guard<std::mutex> lock{ entity_lock_ };
-    return std::move(removed_entity_);
-}
 
-Entity* EntityContainer::GetEntity(EntityUUID entityId) {
-    if (entities_.count(entityId))
-        return entities_[entityId];
-    return nullptr;
+Entity* EntityContainer::GetEntity(EntityUUID entityId) const {
+    const auto& it = entities_.find(entityId);
+    if (it == entities_.end()) {
+        return nullptr;
+    }
+    else {
+        return it->second.get();
+    }
 }
 
 void EntityContainer::Tick(Dimension* dimension) {
