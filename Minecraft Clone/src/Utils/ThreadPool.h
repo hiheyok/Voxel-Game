@@ -6,7 +6,7 @@
 #include <string>
 #include <atomic>
 
-#include "LogUtils.h"
+#include "Utils/LogUtils.h"
 
 /*
 * Takes in a function (the func that the worker runs)

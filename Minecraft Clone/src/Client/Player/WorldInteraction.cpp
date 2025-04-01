@@ -1,15 +1,15 @@
 #include <glm/geometric.hpp>
 #include <glm/vec3.hpp>
 
-#include "WorldInteraction.h"
-#include "../ClientLevel/ClientCache.h"
-#include "../IO/IO.h"
-#include "../IO/KEY_CODE.h"
-#include "../../Level/Entity/Mobs/Player.h"
-#include "../../Level//Server/Interfaces/ServerInterface.h"
-#include "../../Level/Server/Networking/PlayerAction.h"
-#include "../../Utils/Math/vectorOperations.h"
-#include "../../Utils/Math/Ray/Ray.h"
+#include "Client/Player/WorldInteraction.h"
+#include "Client/ClientLevel/ClientCache.h"
+#include "Client/IO/IO.h"
+#include "Client/IO/KEY_CODE.h"
+#include "Level/Entity/Mobs/Player.h"
+#include "Level//Server/Interfaces/ServerInterface.h"
+#include "Level/Server/Networking/PlayerAction.h"
+#include "Utils/Math/vectorOperations.h"
+#include "Utils/Math/Ray/Ray.h"
 
 void WorldInteraction::Interact(Player* player, const UserInputs& inputs, ServerInterface* interface, ClientCache* cache) {
     Ray ray;

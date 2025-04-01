@@ -3,7 +3,7 @@
 #include <vector>
 #include <glm/vec2.hpp>
 
-#include "../Generator.h"
+#include "Level/TerrainGeneration/Generators/Generator.h"
 
 class FastNoiseLite;
 

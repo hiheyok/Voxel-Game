@@ -2,7 +2,7 @@
 #include <vector>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
-#include "../../Level/Typenames.h"
+#include "Core/Typenames.h"
 
 class Buffer;
 class VertexArray;

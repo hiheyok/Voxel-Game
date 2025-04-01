@@ -1,6 +1,6 @@
 #include "FallingBlock.h"
-#include "../../Dimension/Dimension.h"
-#include "../../Entity/Entity.h"
+#include "Level/Dimension/Dimension.h"
+#include "Level/Entity/Entity.h"
 
 void FallingBlock::Tick(Entity* entity, Dimension* dimension) {
     //    std::cout << entity->Properties.Velocity.y << "\n";

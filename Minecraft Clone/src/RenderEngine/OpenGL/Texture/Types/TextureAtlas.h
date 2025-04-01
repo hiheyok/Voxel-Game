@@ -1,8 +1,9 @@
 #pragma once
-#include "../Texture.h"
 #include <vector>
 #include <optional>
 #include <cctype>
+
+#include "RenderEngine/OpenGL/Texture/Texture.h"
 
 class TextureAtlas : public Texture {
 public:

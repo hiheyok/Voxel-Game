@@ -1,7 +1,8 @@
 #pragma once
 #include <vector>
-#include "../Utils/Containers/robin_hood.h"
-#include "Chunk/ChunkPos/ChunkPos.h"
+#include "Utils/Containers/robin_hood.h"
+#include "Utils/LogUtils.h"
+#include "Level/Chunk/ChunkPos/ChunkPos.h"
 
 typedef unsigned int EventID;
 typedef unsigned short int BlockID;

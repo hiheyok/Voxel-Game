@@ -1,10 +1,8 @@
-#include "Entities.h"
-
-#include "Type/Types.h"
-
 #include <fstream>
 #include <nlohmann/json.hpp>
-#include <iostream>
+
+#include "Level/Entity/Entities.h"
+#include "Level/Entity/Type/Types.h"
 
 using json = nlohmann::json;
 

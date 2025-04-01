@@ -3,7 +3,7 @@
 #include <iostream>
 #include <stack>
 
-#include "../../Level/Typenames.h"
+#include "Core/Typenames.h"
 
 class PerformanceProfiler {
 public:

@@ -1,4 +1,4 @@
-#include "JavaRandom.h"
+#include "Level/TerrainGeneration/Random/JavaRandom.h"
 
 void JavaRandom::SetSeed(int64_t seed) {
     rseed_ = (seed ^ 0x5DEECE66DLL) & ((1LL << 48) - 1);

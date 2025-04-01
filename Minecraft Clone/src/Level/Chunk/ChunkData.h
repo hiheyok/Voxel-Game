@@ -4,11 +4,12 @@
 #define CHUNKDATA_H
 
 #include <glm/vec3.hpp>
-#include "../TerrainGeneration/Structures/Structure.h"
-#include "Lighting/ChunkLighting.h"
-#include "../Typenames.h"
-#include "ChunkPos/ChunkPos.h"
-#include "Palette.h"
+
+#include "Core/Typenames.h"
+#include "Level/TerrainGeneration/Structures/Structure.h"
+#include "Level/Chunk/Lighting/ChunkLighting.h"
+#include "Level/Chunk/ChunkPos/ChunkPos.h"
+#include "Level/Chunk/Palette.h"
 
 struct ChunkRawData;
 

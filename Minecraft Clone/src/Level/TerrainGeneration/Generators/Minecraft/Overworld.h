@@ -1,13 +1,13 @@
 #pragma once
-#include "../../Random/JavaRandom.h"
-#include "../../Noisemaps/NoiseOctave.h"
-#include "../../Noisemaps/MinecraftNoiseGeneratorPerlin.h"
-#include "../../Noisemaps/TerrainParameters.h"
-#include "../../../Chunk/Chunk.h"
-#include "../../../Chunk/TallChunk.h"
-#include "../../../Chunk/Heightmap/Heightmap.h"
-#include "../../../Chunk/ChunkColumn.h"
-#include "../../Biome/Biome.h"
+#include "Level/TerrainGeneration/Random/JavaRandom.h"
+#include "Level/TerrainGeneration/Noisemaps/NoiseOctave.h"
+#include "Level/TerrainGeneration/Noisemaps/MinecraftNoiseGeneratorPerlin.h"
+#include "Level/TerrainGeneration/Noisemaps/TerrainParameters.h"
+#include "Level/Chunk/Chunk.h"
+#include "Level/Chunk/TallChunk.h"
+#include "Level/Chunk/Heightmap/Heightmap.h"
+#include "Level/Chunk/ChunkColumn.h"
+#include "Level/TerrainGeneration/Biome/Biome.h"
 
 // TODO: Fix me
 

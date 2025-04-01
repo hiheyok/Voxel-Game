@@ -1,7 +1,6 @@
-#include "PerformanceProfiler.h"
-
-#include "../../Level/Timer/Timer.h"
-#include "../../FileManager/Files.h"
+#include "Client/Profiler/PerformanceProfiler.h"
+#include "Level/Timer/Timer.h"
+#include "FileManager/Files.h"
 
 PerformanceProfiler::PerformanceProfiler() {
     initial_time_ = std::chrono::high_resolution_clock::now();

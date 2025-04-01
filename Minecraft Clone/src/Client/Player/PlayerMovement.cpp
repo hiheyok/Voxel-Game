@@ -1,12 +1,12 @@
 #include <glm/vec3.hpp>
 #include <glm/geometric.hpp>
 #include <cmath>
-#include "PlayerMovement.h"
-#include "../ClientLevel/ClientCache.h"
-#include "../IO/IO.h"
-#include "../IO/KEY_CODE.h"
-#include "../../Level/Entity/Mobs/Player.h"
-#include "../../Utils/Math/vectorOperations.h"
+#include "Client/Player/PlayerMovement.h"
+#include "Client/ClientLevel/ClientCache.h"
+#include "Client/IO/IO.h"
+#include "Client/IO/KEY_CODE.h"
+#include "Level/Entity/Mobs/Player.h"
+#include "Utils/Math/vectorOperations.h"
 
 void PlayerMovement::Update(Player* player, const UserInputs& inputs, ClientCache* clientWorld) {
 

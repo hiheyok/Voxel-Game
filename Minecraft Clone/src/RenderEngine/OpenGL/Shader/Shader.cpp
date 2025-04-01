@@ -1,5 +1,5 @@
-#include "Shader.h"
-#include "../../../Utils/LogUtils.h"
+#include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "Utils/LogUtils.h"
 
 void Shader::Init(const char* vertexPath, const char* fragmentPath, const char* geometryPath)
 {

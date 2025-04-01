@@ -3,7 +3,7 @@
 #include <vector>
 #include <glm/vec3.hpp>
 
-#include "../Typenames.h"
+#include "Core/Typenames.h"
 
 // TODO: Currently default to main dimension for now (change this later)
 class ClientInterface;

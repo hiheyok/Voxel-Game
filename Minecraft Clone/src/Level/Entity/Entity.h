@@ -1,6 +1,6 @@
 #pragma once
-#include "Properties/EntityProperties.h"
-#include "../Typenames.h"
+#include "Level/Entity/Properties/EntityProperties.h"
+#include "Core/Typenames.h"
 
 class Dimension;
 

@@ -1,13 +1,13 @@
-#include "../Level/Chunk/Block/Blocks.h"
-#include "../Level/Entity/Entities.h"
-#include "../Level/Item/Items.h"
-#include "../Utils/LogUtils.h"
+#include "Level/Chunk/Block/Blocks.h"
+#include "Level/Entity/Entities.h"
+#include "Level/Item/Items.h"
+#include "Utils/LogUtils.h"
 #include "Initializer.h"
-#include "../Level/Item/ItemTextureAtlas.h"
-#include "../Level/Entity/Entity.h"
-#include "../Level/TerrainGeneration/Generators/GeneratorType.h"
-#include "Options/Option.h"
-#include "../Level/TerrainGeneration/Biome/BiomeProvider.h"
+#include "Level/Item/ItemTextureAtlas.h"
+#include "Level/Entity/Entity.h"
+#include "Level/TerrainGeneration/Generators/GeneratorType.h"
+#include "Core/Options/Option.h"
+#include "Level/TerrainGeneration/Biome/BiomeProvider.h"
 
 LogUtils g_logger;
 Options g_app_options;

@@ -1,12 +1,12 @@
 #include <glm/vec3.hpp>
 
-#include "WorldLoader.h"
-#include "../World.h"
-#include "../WorldParameters.h"
-#include "../../Chunk/Lighting/ChunkLighting.h"
-#include "../../Chunk/ChunkColumn.h"
-#include "../../Entity/Entity.h"
-#include "../../DataContainer/EntityContainer.h"
+#include "Level/World/WorldInteraction/WorldLoader.h"
+#include "Level/World/World.h"
+#include "Level/World/WorldParameters.h"
+#include "Level/Chunk/Lighting/ChunkLighting.h"
+#include "Level/Chunk/ChunkColumn.h"
+#include "Level/Entity/Entity.h"
+#include "Level/DataContainer/EntityContainer.h"
 
 using namespace glm;
 

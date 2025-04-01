@@ -1,9 +1,9 @@
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "DebugScreen.h"
-#include "../../../RenderEngine/GUI/TextRenderer.h"
-#include "../../../RenderEngine/GUI/Font.h"
+#include "Client/Render/DebugScreen/DebugScreen.h"
+#include "RenderEngine/GUI/TextRenderer.h"
+#include "RenderEngine/GUI/Font.h"
 
 DebugScreen::DebugScreen() : renderer_{std::make_unique<TextRenderer>() } {
 }

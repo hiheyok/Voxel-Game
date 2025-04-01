@@ -1,11 +1,11 @@
-#include "Window.h"
+#include "RenderEngine/Window.h"
 
 #include <iostream>
 #include <sstream>
 #include <string>
 
-#include "../Utils/LogUtils.h"
-#include "../Client/IO/KEY_CODE.h"
+#include "Utils/LogUtils.h"
+#include "Client/IO/KEY_CODE.h"
 
 void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity, GLsizei length, const char* message, const void* userParam) {
     (void)userParam;

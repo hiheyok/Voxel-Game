@@ -1,7 +1,7 @@
-#include "GravityBlock.h"
-#include "../../../Dimension/Dimension.h"
-#include "../../../Event/EventHandler.h"
-#include "../../../Entity/Entities.h"
+#include "Level/Chunk/Block/Type/GravityBlock.h"
+#include "Level/Dimension/Dimension.h"
+#include "Level/Event/EventHandler.h"
+#include "Level/Entity/Entities.h"
 
 void GravityBlock::Tick(const BlockPos& pos, Dimension* currentWorld) {
     BlockPos belowPos = pos;

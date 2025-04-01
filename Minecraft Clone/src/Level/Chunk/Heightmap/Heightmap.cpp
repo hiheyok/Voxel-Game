@@ -1,6 +1,4 @@
-#include "Heightmap.h"
-#include <new> 
-#include <iostream>
+#include "Level/Chunk/Heightmap/Heightmap.h"
 
 Heightmap::Heightmap() = default;
 Heightmap::~Heightmap() = default;

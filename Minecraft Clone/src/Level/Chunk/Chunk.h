@@ -1,5 +1,5 @@
 #pragma once
-#include "ChunkData.h"
+#include "Level/Chunk/ChunkData.h"
 
 struct ChunkRawData;
 

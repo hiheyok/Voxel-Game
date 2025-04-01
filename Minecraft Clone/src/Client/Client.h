@@ -1,5 +1,5 @@
 #pragma once
-#include "../RenderEngine/Window.h"
+#include "RenderEngine/Window.h"
 
 class MainPlayer;
 class WorldRender;

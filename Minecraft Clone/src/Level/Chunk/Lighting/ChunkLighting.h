@@ -1,7 +1,7 @@
 #pragma once
 #include <cctype>
 
-#include "../../Typenames.h"
+#include "Core/Typenames.h"
 
 class ChunkLightingContainer { //Contains all lighting infomation for solid blocks
 public:

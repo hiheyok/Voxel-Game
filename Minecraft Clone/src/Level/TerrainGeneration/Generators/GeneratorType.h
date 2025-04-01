@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
-#include "Generators.h"
-#include "../../Typenames.h"
+#include "Level/TerrainGeneration/Generators/Generators.h"
+#include "Core/Typenames.h"
 
 class WorldGenerator;
 

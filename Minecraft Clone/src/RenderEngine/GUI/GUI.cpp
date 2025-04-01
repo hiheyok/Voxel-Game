@@ -1,13 +1,13 @@
-#include "GUI.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "GUIObject.h"
-#include "GUISet.h"
-#include "../OpenGL/Buffers/Buffer.h"
-#include "../OpenGL/Buffers/VertexArray.h"
-#include "../OpenGL/Shader/Shader.h"
-#include "../../Utils/LogUtils.h"
+#include "RenderEngine/GUI/GUI.h"
+#include "RenderEngine/GUI/GUIObject.h"
+#include "RenderEngine/GUI/GUISet.h"
+#include "RenderEngine/OpenGL/Buffers/Buffer.h"
+#include "RenderEngine/OpenGL/Buffers/VertexArray.h"
+#include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "Utils/LogUtils.h"
 
 GUI::GUI() : shader_{ std::make_unique<Shader>() }, guis_{} {};
 GUI::~GUI() = default;

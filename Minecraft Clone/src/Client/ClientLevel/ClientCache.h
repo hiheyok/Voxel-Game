@@ -1,8 +1,8 @@
 #pragma once
 #include "Entity/ClientEntities.h"
-#include "../../Level/Chunk/Chunk.h"
-#include "../../Level/DataContainer/ChunkMapData.h"
-#include "../../Level/World/Collusion/WorldCollusion.h"
+#include "Level/Chunk/Chunk.h"
+#include "Level/DataContainer/ChunkMapData.h"
+#include "Level/World/Collusion/WorldCollusion.h"
 
 class ClientCache {
 private:

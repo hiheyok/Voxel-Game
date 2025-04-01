@@ -1,8 +1,9 @@
 #pragma once
 #include <vector>
-#include "../Typenames.h"
-#include "../../Utils/Containers/NBitVector.h"
-#include "Block/Blocks.h"
+
+#include "Core/Typenames.h"
+#include "Utils/Containers/NBitVector.h"
+#include "Level/Chunk/Block/Blocks.h"
 /*
 * The palette class is used to store the block data in a compressed state in a chunk
 * Each chunk has up to 4096 unique blocks so it attempts to store it in up to 12 bits per blocks

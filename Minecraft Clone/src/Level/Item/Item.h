@@ -1,7 +1,7 @@
 #pragma once
-#include "../Typenames.h"
-
 #include <string>
+
+#include "Core/Typenames.h"
 
 class RawTextureData;
 

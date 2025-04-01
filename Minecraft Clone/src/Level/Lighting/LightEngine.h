@@ -1,8 +1,8 @@
 #pragma once
 #include <memory>
 
-#include "../../Utils/ThreadPool.h"
-#include "../Typenames.h"
+#include "Utils/ThreadPool.h"
+#include "Core/Typenames.h"
 
 class ChunkLightingContainer;
 class Heightmap;

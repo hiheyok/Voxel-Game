@@ -1,6 +1,6 @@
-#include "GeneratorType.h"
-#include "Generators.h"
-#include "../../../Utils/LogUtils.h"
+#include "Level/TerrainGeneration/Generators/GeneratorType.h"
+#include "Level/TerrainGeneration/Generators/Generators.h"
+#include "Utils/LogUtils.h"
 
 WorldGeneratorID GeneratorType::RegisterWorldGenerator(WorldGenerator* Gen) {
     generator_list_.push_back(Gen);

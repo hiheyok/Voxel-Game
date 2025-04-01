@@ -1,5 +1,5 @@
-#include "BlockMaterial.h"
-#include "../Type/BlockTypes.h"
+#include "Level/Chunk/Block/Material/BlockMaterial.h"
+#include "Level/Chunk/Block/Type/BlockTypes.h"
 
 Material::~Material() = default;
 

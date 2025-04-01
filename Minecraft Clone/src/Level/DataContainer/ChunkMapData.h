@@ -2,7 +2,7 @@
 #include <vector>
 #include <memory>
 
-#include "../Typenames.h"
+#include "Core/Typenames.h"
 
 class ChunkColumn;
 class Chunk;

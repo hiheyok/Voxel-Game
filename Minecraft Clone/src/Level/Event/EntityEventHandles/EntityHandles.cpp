@@ -1,11 +1,11 @@
 #include <memory>
 
-#include "EntityHandles.h"
-#include "../../Event/Event.h"
-#include "../../Entity/Entity.h"
-#include "../../Entity/Entities.h"
-#include "../../Chunk/Block/Block.h"
-#include "../../../Level/Dimension/Dimension.h"
+#include "Level/Event/EntityEventHandles/EntityHandles.h"
+#include "Level/Event/Event.h"
+#include "Level/Entity/Entity.h"
+#include "Level/Entity/Entities.h"
+#include "Level/Chunk/Block/Block.h"
+#include "Level/Dimension/Dimension.h"
 
 void HandleEntityTick(const EntityEvent& e, Dimension* dimension) { //prob useless
     Entity* entity = dimension->world_interactions_.GetEntity(e.entity_type_);

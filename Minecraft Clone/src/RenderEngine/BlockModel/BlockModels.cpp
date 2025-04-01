@@ -1,6 +1,6 @@
-#include "BlockModels.h"
-#include "../../Level/typenames.h"
-#include "../../Utils/LogUtils.h"
+#include "RenderEngine/BlockModel/BlockModels.h"
+#include "Core/Typenames.h"
+#include "Utils/LogUtils.h"
 
 void Model::BlockModel::AddDisplay(BlockDisplay display, DisplayPosition position) {
     display_[position] = display;

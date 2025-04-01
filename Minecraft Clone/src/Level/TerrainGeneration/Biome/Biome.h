@@ -1,11 +1,10 @@
 #pragma once
-#include "../../../Core/Registry/Registry.h"
-#include "../../../Core/Registry/ResourceLocation.h"
-#include "BiomeProperties.h"
-#include "../../Chunk/TallChunk.h"
-
-#include "../Noisemaps/MinecraftNoiseGeneratorPerlin.h"
-#include "../Noisemaps/TerrainParameters.h"
+#include "Core/Registry/Registry.h"
+#include "Core/Registry/ResourceLocation.h"
+#include "Level/Chunk/TallChunk.h"
+#include "Level/TerrainGeneration/Biome/BiomeProperties.h"
+#include "Level/TerrainGeneration/Noisemaps/MinecraftNoiseGeneratorPerlin.h"
+#include "Level/TerrainGeneration/Noisemaps/TerrainParameters.h"
 
 class Biome {
 private:

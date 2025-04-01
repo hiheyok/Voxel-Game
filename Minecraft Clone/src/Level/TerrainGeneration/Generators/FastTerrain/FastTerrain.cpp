@@ -1,5 +1,5 @@
-#include "FastTerrain.h"
-#include "../../../../Utils/FastNoiseLite.h"
+#include "Level/TerrainGeneration/Generators/FastTerrain/FastTerrain.h"
+#include "Utils/FastNoiseLite.h"
 
 FastTerrain::FastTerrain() :noise_{std::make_unique<FastNoiseLite>()} {
     noise_->SetNoiseType(noise_->NoiseType_OpenSimplex2);

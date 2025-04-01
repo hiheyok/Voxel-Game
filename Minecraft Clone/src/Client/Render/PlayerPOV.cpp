@@ -1,5 +1,5 @@
 #include "PlayerPOV.h"
-#include "../../RenderEngine/Camera/camera.h"
+#include "RenderEngine/Camera/camera.h"
 
 PlayerPOV::PlayerPOV() : camera_{ std::make_unique<Camera>() }{
 

@@ -1,6 +1,6 @@
 #pragma once
-#include "../../../Level/Typenames.h"
-#include "../../../Level/Entity/Entity.h"
+#include "Core/Typenames.h"
+#include "Level/Entity/Entity.h"
 
 class ClientEntities {
 private:

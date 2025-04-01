@@ -1,7 +1,6 @@
 #pragma once
-#include "Item.h"
-#include "../Chunk/Block/Blocks.h"
-
+#include "Level/Item/Item.h"
+#include "Level/Chunk/Block/Blocks.h"
 
 class ItemList{
 private:

@@ -1,13 +1,13 @@
-#include "MultiEntityRender.h"
-#include "EntityRenderCache.h"
-#include "../Camera/camera.h"
-#include "../OpenGL/Buffers/Buffer.h"
-#include "../OpenGL/Buffers/VertexArray.h"
-#include "../OpenGL/Shader/Shader.h"
-#include "../../Client/Render/PlayerPOV.h"
-#include "../../Level/Entity/Type/EntityType.h"
-#include "../../Level/Entity/Entities.h"
-#include "../../Client/Profiler/PerformanceProfiler.h"
+#include "RenderEngine/EntityRenderer/MultiEntityRender.h"
+#include "RenderEngine/EntityRenderer/EntityRenderCache.h"
+#include "RenderEngine/Camera/camera.h"
+#include "RenderEngine/OpenGL/Buffers/Buffer.h"
+#include "RenderEngine/OpenGL/Buffers/VertexArray.h"
+#include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "Client/Render/PlayerPOV.h"
+#include "Client/Profiler/PerformanceProfiler.h"
+#include "Level/Entity/Type/EntityType.h"
+#include "Level/Entity/Entities.h"
 
 MultiEntityRenderer::MultiEntityRenderer() : 
     vbo_{ std::make_unique<Buffer>() },

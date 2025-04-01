@@ -1,5 +1,5 @@
-#include "VertexArray.h"
-#include "../../../Utils/LogUtils.h"
+#include "RenderEngine/OpenGL/Buffers/VertexArray.h"
+#include "Utils/LogUtils.h"
 
 void VertexArray::Delete() {
     glDeleteVertexArrays(1, &array_id_);

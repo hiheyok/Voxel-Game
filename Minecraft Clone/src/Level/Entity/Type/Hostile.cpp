@@ -1,6 +1,6 @@
-#include "Hostile.h"
-#include "../../Dimension/Dimension.h"
-#include "../../Entity/Entity.h"
+#include "Level/Entity/Type/Hostile.h"
+#include "Level/Dimension/Dimension.h"
+#include "Level/Entity/Entity.h"
 
 void Hostile::Tick(Entity* entity, Dimension* dimension) {
     (void)entity;

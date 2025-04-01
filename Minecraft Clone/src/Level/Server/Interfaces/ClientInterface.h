@@ -1,8 +1,7 @@
 #pragma once
-#include "../../../Utils/Containers/ConcurrentQueue.h"
-#include "../Networking/Packet.h"
-
-#include "../../Typenames.h"
+#include "Core/Typenames.h"
+#include "Level/Server/Networking/Packet.h"
+#include "Utils/Containers/ConcurrentQueue.h"
 
 /*
 * Abstraction for server to client interfacing

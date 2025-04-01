@@ -1,5 +1,5 @@
 #pragma once
-#include "../../Typenames.h"
+#include "Core/Typenames.h"
 
 namespace BlockUpdatePacket {
     struct BlockUpdate {

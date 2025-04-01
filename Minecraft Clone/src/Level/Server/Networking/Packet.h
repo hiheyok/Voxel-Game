@@ -1,10 +1,10 @@
 #pragma once
 #include <variant>
 
-#include "PlayerAction.h"
-#include "EntityUpdate.h"
-#include "BlockUpdate.h"
-#include "ChunkUpdate.h"
+#include "Level/Server/Networking/PlayerAction.h"
+#include "Level/Server/Networking/EntityUpdate.h"
+#include "Level/Server/Networking/BlockUpdate.h"
+#include "Level/Server/Networking/ChunkUpdate.h"
 
 namespace Packet {
 

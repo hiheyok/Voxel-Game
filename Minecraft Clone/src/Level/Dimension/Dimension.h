@@ -1,14 +1,14 @@
 #pragma once
-#include "DimensionProperties.h"
-#include "../DataContainer/EntityContainer.h"
-#include "../Event/EventSystem.h"
-#include "../Event/EventHandler.h"
-#include "../TerrainGeneration/Generator.h"
-#include "../TerrainGeneration/Generators/GeneratorType.h"
-#include "../World/World.h"
-#include "../World/WorldInteraction/WorldInteractions.h"
-#include "../World/WorldParameters.h"
-#include "../../Core/Options/Option.h"
+#include "Level/Dimension/DimensionProperties.h"
+#include "Level/DataContainer/EntityContainer.h"
+#include "Level/Event/EventSystem.h"
+#include "Level/Event/EventHandler.h"
+#include "Level/TerrainGeneration/Generator.h"
+#include "Level/TerrainGeneration/Generators/GeneratorType.h"
+#include "Level/World/World.h"
+#include "Level/World/WorldInteraction/WorldInteractions.h"
+#include "Level/World/WorldParameters.h"
+#include "Core/Options/Option.h"
 
 class Dimension {
 private:

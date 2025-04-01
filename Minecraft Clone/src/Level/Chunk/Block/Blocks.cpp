@@ -1,15 +1,14 @@
-#include "Blocks.h"
-#include "Type/BlockTypes.h"
-#include <nlohmann/json.hpp>
-#include "../../../FileManager/Files.h"
-#include <fstream>
-#include "../../../RenderEngine/BlockModel/ModelLoader.h"
-#include "../../../RenderEngine/BlockModel/BlockModels.h"
-#include <iostream>
-#include <sys/types.h>
 #include <filesystem>
+#include <nlohmann/json.hpp>
+#include <fstream>
 #include <string>
-#include "../../../RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
+
+#include "Level/Chunk/Block/Blocks.h"
+#include "Level/Chunk/Block/Type/BlockTypes.h"
+#include "FileManager/Files.h"
+#include "RenderEngine/BlockModel/ModelLoader.h"
+#include "RenderEngine/BlockModel/BlockModels.h"
+#include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
 
 // TODO : Implement model caching
 using json = nlohmann::json;

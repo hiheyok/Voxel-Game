@@ -1,12 +1,12 @@
 #include <exception>
 
-#include "TextRenderer.h"
-#include "Font.h"
-#include "../OpenGL/Shader/Shader.h"
-#include "../OpenGL/Buffers/Buffer.h"
-#include "../OpenGL/Buffers/VertexArray.h"
-#include "../OpenGL/Texture/Types/Texture2D.h"
-#include "../../Utils/LogUtils.h"
+#include "RenderEngine/GUI/TextRenderer.h"
+#include "RenderEngine/GUI/Font.h"
+#include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "RenderEngine/OpenGL/Buffers/Buffer.h"
+#include "RenderEngine/OpenGL/Buffers/VertexArray.h"
+#include "RenderEngine/OpenGL/Texture/Types/Texture2D.h"
+#include "Utils/LogUtils.h"
 
 TextRenderer::TextRenderer() :
     font_shader_{ std::make_unique<Shader>() },

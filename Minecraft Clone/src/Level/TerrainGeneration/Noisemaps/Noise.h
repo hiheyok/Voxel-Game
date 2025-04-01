@@ -1,6 +1,6 @@
 #pragma once
-#include "../../../Utils/FastNoiseLite.h"
-#include "../Random/JavaRandom.h"
+#include "Utils/FastNoiseLite.h"
+#include "Level/TerrainGeneration/Random/JavaRandom.h"
 
 class NoiseGenerator {
 private:

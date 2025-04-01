@@ -1,7 +1,7 @@
-#include "Grass.h"
-#include "../../../Dimension/Dimension.h"
-#include "../../../Event/EventHandler.h"
-#include "../../../../Utils/Math/Probability/Probability.h"
+#include "Level/Chunk/Block/Type/Grass.h"
+#include "Level/Dimension/Dimension.h"
+#include "Level/Event/EventHandler.h"
+#include "Utils/Math/Probability/Probability.h"
 
 void GrassBlock::Tick(const BlockPos& pos, Dimension* currentWorld) {
     //Checks if ticking block changes 

@@ -4,7 +4,7 @@
 #include <glm/vec3.hpp>
 #include <glm/ext.hpp>
 
-#include "../../../Level/Typenames.h"
+#include "Core/Typenames.h"
 
 class Chunk;
 

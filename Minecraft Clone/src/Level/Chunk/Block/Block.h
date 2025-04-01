@@ -3,8 +3,8 @@
 #include <string>
 #include <memory>
 
-#include "Texture/BlockTexture.h" // TODO: Remove this later
-#include "../../Typenames.h"
+#include "Level/Chunk/Block/Texture/BlockTexture.h" // TODO: Remove this later
+#include "Core/Typenames.h"
 
 class Dimension;
 class BlockTexture;

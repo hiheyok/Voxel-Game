@@ -1,7 +1,8 @@
 #pragma once
-#include "../../Chunk/Chunk.h"
-#include "../../Chunk/TallChunk.h"
 #include <glm/vec3.hpp>
+
+#include "Level/Chunk/Chunk.h"
+#include "Level/Chunk/TallChunk.h"
 
 // TODO: Fix me later
 

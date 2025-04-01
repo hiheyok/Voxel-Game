@@ -1,6 +1,6 @@
-#include "Fluid.h"
-#include "../../../../Level/Dimension/Dimension.h"
-#include "../../../Event/EventHandler.h"
+#include "Level/Chunk/Block/Type/Fluid.h"
+#include "Level/Dimension/Dimension.h"
+#include "Level/Event/EventHandler.h"
 
 void Fluid::Tick(const BlockPos& pos, Dimension* currentWorld) {
     for (int side = 0; side < 6; side++) {

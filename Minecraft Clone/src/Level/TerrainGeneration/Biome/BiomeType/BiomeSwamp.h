@@ -1,5 +1,5 @@
 #pragma once
-#include "../Biome.h"
+#include "Level/TerrainGeneration/Biome/Biome.h"
 
 class BiomeSwamp : public Biome {
 public:

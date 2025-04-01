@@ -1,5 +1,5 @@
 #pragma once
-#include "EntityType.h"
+#include "Level/Entity/Type/EntityType.h"
 
 class Entity;
 class Dimension;

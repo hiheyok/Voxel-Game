@@ -1,8 +1,8 @@
-#include "MinecraftTerrain.h"
-#include "../../Noisemaps/Noisemap.h"
-#include "../../Noisemaps/TerrainParameters.h"
-#include "Overworld.h"
-#include "../../Biome/BiomeProvider.h"
+#include "Level/TerrainGeneration/Generators/Minecraft/MinecraftTerrain.h"
+#include "Level/TerrainGeneration/Noisemaps/Noisemap.h"
+#include "Level/TerrainGeneration/Noisemaps/TerrainParameters.h"
+#include "Level/TerrainGeneration/Generators/Minecraft/Overworld.h"
+#include "Level/TerrainGeneration/Biome/BiomeProvider.h"
 
 MinecraftTerrain::MinecraftTerrain() :
     noisemaps_{ std::make_unique<NoiseMaps1122>() },

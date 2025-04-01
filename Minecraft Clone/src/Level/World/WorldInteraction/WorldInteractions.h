@@ -4,7 +4,7 @@
 #include <stack>
 #include <vector>
 
-#include "../../Typenames.h"
+#include "Core/Typenames.h"
 
 // Provides a way for the world to be interacted like summoning entities and what chunks are updated and what chunks needs updates
 // TODO: IMPORTANT FIX LIGHT UPDATE 

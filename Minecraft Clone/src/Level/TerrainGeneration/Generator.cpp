@@ -1,6 +1,6 @@
-#include "Generator.h"
-#include "Generators/GeneratorType.h"
-#include "../Chunk/Chunk.h"
+#include "Level/TerrainGeneration/Generator.h"
+#include "Level/TerrainGeneration/Generators/GeneratorType.h"
+#include "Level/Chunk/Chunk.h"
 
 std::vector<std::unique_ptr<Chunk>> ChunkGeneration::GetOutput() {
     std::vector<std::unique_ptr<Chunk>> output;

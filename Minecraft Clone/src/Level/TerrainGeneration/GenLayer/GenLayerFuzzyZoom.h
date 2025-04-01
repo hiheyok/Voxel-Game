@@ -1,7 +1,7 @@
 #pragma once
-#include "GenLayer.h"
-#include "IntCache.h"
-#include "GenLayerZoom.h"
+#include "Level/TerrainGeneration/GenLayer/GenLayer.h"
+#include "Level/TerrainGeneration/GenLayer/IntCache.h"
+#include "Level/TerrainGeneration/GenLayer/GenLayerZoom.h"
 
 class GenLayerFuzzyZoom : public GenLayerZoom {
 public:

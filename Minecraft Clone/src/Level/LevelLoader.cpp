@@ -1,8 +1,8 @@
-#include "LevelLoader.h"
-#include "TerrainGeneration/Generator.h"
-#include "Lighting/LightEngine.h"
-#include "TerrainGeneration/Biome/Biomes.h"
-#include "TerrainGeneration/Biome/BiomeProvider.h"
+#include "Level/LevelLoader.h"
+#include "Level/TerrainGeneration/Generator.h"
+#include "Level/Lighting/LightEngine.h"
+#include "Level/TerrainGeneration/Biome/Biomes.h"
+#include "Level/TerrainGeneration/Biome/BiomeProvider.h"
 
 LevelLoader::LevelLoader() : 
     world_generator_{ std::make_unique<ChunkGeneration>() },

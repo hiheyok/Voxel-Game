@@ -4,7 +4,7 @@
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "../../Level/Typenames.h"
+#include "Core/Typenames.h"
 
 class Buffer;
 class VertexArray;

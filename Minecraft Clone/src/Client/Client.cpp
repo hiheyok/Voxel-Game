@@ -1,32 +1,32 @@
 ﻿#include <chrono>
-#include "Client.h"
+#include "Client/Client.h"
 #include "ClientLevel/ClientCache.h"
 #include "ClientLevel/ClientLevel.h"
 #include "Player/MainPlayer.h"
 #include "Profiler/PerformanceProfiler.h"
 #include "Render/DebugScreen/DebugScreen.h"
 #include "Render/WorldRender.h"
-#include "../Core/Options/Option.h"
-#include "../Level/Chunk/Block/Blocks.h"
-#include "../Level/Chunk/Chunk.h"
-#include "../Level/Item/Items.h"
-#include "../Level/Item/ItemTextureAtlas.h"
-#include "../Level/Entity/Entities.h"
-#include "../Level/Entity/Mobs/Player.h"
-#include "../Level/Timer/Timer.h"
-#include "../Level/Server/Server.h"
-#include "../Level/Server/Interfaces/InternalInterface.h"
-#include "../Level/Server/Networking/PlayerAction.h"
-#include "../Level/Server/Networking/ChunkUpdate.h"
-#include "../Level/Server/Networking/Packet.h"
-#include "../Level/LevelLoader.h"
-#include "../Level/Level.h"
-#include "../RenderEngine/ChunkRenderer/TerrainRenderer.h"
-#include "../RenderEngine/EntityRenderer/MultiEntityRender.h"
-#include "../RenderEngine/EntityRenderer/EntityRenderUpdate.h"
-#include "../RenderEngine/GUI/TextRenderer.h"
-#include "../RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
-#include "../Utils/LogUtils.h"
+#include "Core/Options/Option.h"
+#include "Level/Chunk/Block/Blocks.h"
+#include "Level/Chunk/Chunk.h"
+#include "Level/Item/Items.h"
+#include "Level/Item/ItemTextureAtlas.h"
+#include "Level/Entity/Entities.h"
+#include "Level/Entity/Mobs/Player.h"
+#include "Level/Timer/Timer.h"
+#include "Level/Server/Server.h"
+#include "Level/Server/Interfaces/InternalInterface.h"
+#include "Level/Server/Networking/PlayerAction.h"
+#include "Level/Server/Networking/ChunkUpdate.h"
+#include "Level/Server/Networking/Packet.h"
+#include "Level/LevelLoader.h"
+#include "Level/Level.h"
+#include "RenderEngine/ChunkRenderer/TerrainRenderer.h"
+#include "RenderEngine/EntityRenderer/MultiEntityRender.h"
+#include "RenderEngine/EntityRenderer/EntityRenderUpdate.h"
+#include "RenderEngine/GUI/TextRenderer.h"
+#include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
+#include "Utils/LogUtils.h"
 
 Client::Client() : 
     server_{ std::make_unique<Server>() },
@@ -86,11 +86,6 @@ void Client::Initialize() {
     DisableCursor();
     InitializeGameContent();
     InitializeServerCom();
-    
-
-    
-
-    
 
     //entity_updater_->SetEntityRenderer(entity_render_.get(), server_->GetTickClock());
     //entity_updater_->Start(server_->server->level_->main_world_.get());
@@ -151,7 +146,6 @@ void Client::Render() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     framebuffer_->UnbindFBO();
-
     framebuffer_->Render();
 
     main_player_->RenderGUIs();

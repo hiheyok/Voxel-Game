@@ -1,11 +1,9 @@
 #pragma once
-#include <unordered_map>
 #include <vector>
 #include <glm/vec3.hpp>
-#include <stack>
-#include "../../../Level/Chunk/ChunkPos/ChunkPos.h"
-#include <iostream>
-#include "../../../Level/Typenames.h"
+
+#include "Core/Typenames.h"
+#include "Level/Chunk/ChunkPos/ChunkPos.h"
 struct DrawCommandIndirect {
     unsigned int  count_;
     unsigned int  instance_count_;

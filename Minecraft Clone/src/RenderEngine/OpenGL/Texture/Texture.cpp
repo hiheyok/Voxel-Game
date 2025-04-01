@@ -1,6 +1,6 @@
-#include "Texture.h"
-#include "../../../Utils/stb_image.h"
-#include "../../../Utils/LogUtils.h"
+#include "RenderEngine/OpenGL/Texture/Texture.h"
+#include "Utils/stb_image.h"
+#include "Utils/LogUtils.h"
 
 RawTextureData::RawTextureData() = default;
 

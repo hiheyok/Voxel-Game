@@ -1,5 +1,5 @@
 #pragma once
-#include "../Dimension.h"
+#include "Level/Dimension/Dimension.h"
 
 class OverworldDimension : public Dimension {
 public:

@@ -1,19 +1,20 @@
 #pragma once
-#include <gl/glew.h>
-#include <GLFW/glfw3.h>
-
-#include "RenderCommandBuffer.h"
-#include "../../../Utils/LogUtils.h"
-#include "../../Camera/camera.h"
-#include "../../Frustum/frustum.h"
-#include "../../../Utils/MathHelper.h"
-#include "../../../Level/Chunk/Chunk.h"
-#include "../../OpenGL/Buffers/Buffer.h"
-#include "../../OpenGL/Buffers/VertexArray.h"
-#include "../MemoryPool/ChunkMemoryPool.h"
 #include <list>
 #include <map>
 #include <array>
+#include <gl/glew.h>
+#include <GLFW/glfw3.h>
+
+
+#include "Level/Chunk/Chunk.h"
+#include "RenderEngine/Camera/camera.h"
+#include "RenderEngine/ChunkRenderer/Batch/RenderCommandBuffer.h"
+#include "RenderEngine/Frustum/frustum.h"
+#include "RenderEngine/OpenGL/Buffers/Buffer.h"
+#include "RenderEngine/OpenGL/Buffers/VertexArray.h"
+#include "RenderEngine/ChunkRenderer/MemoryPool/ChunkMemoryPool.h"
+#include "Utils/LogUtils.h"
+#include "Utils/MathHelper.h"
 
 class ChunkDrawBatch {
 private:

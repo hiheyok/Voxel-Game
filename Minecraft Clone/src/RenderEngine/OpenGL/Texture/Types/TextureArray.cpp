@@ -1,6 +1,6 @@
-#include "TextureArray.h"
-#include "../ImageLoader.h"
-#include "../../../../Utils/LogUtils.h"
+#include "RenderEngine/OpenGL/Texture/Types/TextureArray.h"
+#include "RenderEngine/OpenGL/Texture/ImageLoader.h"
+#include "Utils/LogUtils.h"
 
 void TextureArray::UploadToGPU() {
     GLsizei mipLevelCount = 4;

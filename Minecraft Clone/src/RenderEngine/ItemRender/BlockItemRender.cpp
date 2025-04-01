@@ -1,13 +1,13 @@
 #include "BlockitemRender.h"
-#include "../Camera/camera.h"
-#include "../OpenGL/Buffers/Buffer.h"
-#include "../OpenGL/Buffers/VertexArray.h"
-#include "../OpenGL/Shader/Shader.h"
-#include "../OpenGL/Texture/Types/TextureAtlas.h"
-#include "../BlockModel/BlockModels.h"
-#include "../../Level/Chunk/Block/Block.h"
-#include "../../Level/Chunk/Block/Blocks.h"
-#include "../../Level/Item/Item.h"
+#include "RenderEngine/Camera/camera.h"
+#include "RenderEngine/OpenGL/Buffers/Buffer.h"
+#include "RenderEngine/OpenGL/Buffers/VertexArray.h"
+#include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
+#include "RenderEngine/BlockModel/BlockModels.h"
+#include "Level/Chunk/Block/Block.h"
+#include "Level/Chunk/Block/Blocks.h"
+#include "Level/Item/Item.h"
 
 BlockItemRender::BlockItemRender() : 
     vao_{ std::make_unique<VertexArray>()},

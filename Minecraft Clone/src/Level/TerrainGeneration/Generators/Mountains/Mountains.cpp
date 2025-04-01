@@ -1,5 +1,5 @@
-#include "Mountains.h"
-#include "../../../../Utils/FastNoiseLite.h"
+#include "Level/TerrainGeneration/Generators/Mountains/Mountains.h"
+#include "Utils/FastNoiseLite.h"
 
 MountainGenerator::MountainGenerator() : noise_{std::make_unique<FastNoiseLite>()} {
     noise_->SetNoiseType(noise_->NoiseType_OpenSimplex2);
@@ -150,28 +150,6 @@ void MountainGenerator::GenerateDecor(const ChunkPos& pos, Chunk* chunk) {
             }
         }
     }
-
-    //Cube 
-
-    int xSize = 316;
-    int ySize = 100;
-    int zSize = 316;
-
-    int xOffset = 0;
-    int yOffset = 160;
-    int zOffset = 0;
-
-    /*for (int x = 0 + Position.x; x < 16 + Position.x; x++) {
-        for (int z = 0 + Position.z; z < 16 + Position.z; z++) {
-            for (int y = 0 + Position.y; y < 16 + Position.y; y++) {
-                if (((x - xOffset) >= 0) && ((x - xOffset) < xSize) &&
-                    ((y - yOffset) >= 0) && ((y - yOffset) < ySize) &&
-                    ((z - zOffset) >= 0) && ((z - zOffset) < zSize)) {
-                    chunk->SetBlock(Blocks.SAND, x - Position.x, y - Position.y, z - Position.z);
-                }
-            }
-        }
-    }*/
 
 
     int radius = 40;

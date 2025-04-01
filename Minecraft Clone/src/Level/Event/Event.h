@@ -1,9 +1,9 @@
 #pragma once
 #include <variant>
 
-#include "../Entity/Entity.h"
-#include "../Typenames.h"
-#include "../Chunk/ChunkPos/ChunkPos.h"
+#include "Level/Entity/Entity.h"
+#include "Core/Typenames.h"
+#include "Level/Chunk/ChunkPos/ChunkPos.h"
 
 
 constexpr size_t MAX_EVENT_SIZE = 32;

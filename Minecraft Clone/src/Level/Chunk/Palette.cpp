@@ -1,4 +1,4 @@
-#include "Palette.h"
+#include "Level/Chunk/Palette.h"
 
 Palette::Palette() : current_bit_width_{ MIN_BIT_WIDTH }, data_{ CHUNK_SIZE_3D, current_bit_width_ } {
     palette_entries_.emplace_back(g_blocks.AIR, static_cast<uint16_t>(CHUNK_SIZE_3D));

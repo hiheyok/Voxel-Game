@@ -1,4 +1,5 @@
-#include "Superflat.h"
+#include "Level/TerrainGeneration/Generators/Superflat/Superflat.h"
+
 SuperflatWorld::SuperflatWorld() = default;
 
 void SuperflatWorld::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {

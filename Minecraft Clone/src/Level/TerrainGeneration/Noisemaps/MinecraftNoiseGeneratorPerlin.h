@@ -1,5 +1,5 @@
 #pragma once
-#include "MinecraftNoiseGeneratorSimplex.h"
+#include "Level/TerrainGeneration/Noisemaps/MinecraftNoiseGeneratorSimplex.h"
 
 //copy paste mc src ported to c++
 

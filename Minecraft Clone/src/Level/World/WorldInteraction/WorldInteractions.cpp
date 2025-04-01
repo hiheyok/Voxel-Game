@@ -1,14 +1,14 @@
 #include <exception>
 
-#include "WorldInteractions.h"
-#include "WorldLoader.h"
-#include "../Collusion/WorldCollusion.h"
-#include "../World.h"
-#include "../WorldParameters.h"
-#include "../../Chunk/Chunk.h"
-#include "../../Chunk/Lighting/ChunkLighting.h"
-#include "../../DataContainer/EntityContainer.h"
-#include "../../Entity/Entity.h"
+#include "Level/World/WorldInteraction/WorldInteractions.h"
+#include "Level/World/WorldInteraction/WorldLoader.h"
+#include "Level/World/Collusion/WorldCollusion.h"
+#include "Level/World/World.h"
+#include "Level/World/WorldParameters.h"
+#include "Level/Chunk/Chunk.h"
+#include "Level/Chunk/Lighting/ChunkLighting.h"
+#include "Level/DataContainer/EntityContainer.h"
+#include "Level/Entity/Entity.h"
 
 WorldInteractions::WorldInteractions() = default;
 

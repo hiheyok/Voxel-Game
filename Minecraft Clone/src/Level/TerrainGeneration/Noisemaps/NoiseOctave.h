@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
-#include "Noise.h"
-#include "MinecraftNoiseGenerator.h"
+#include "Level/TerrainGeneration/Noisemaps/Noise.h"
+#include "Level/TerrainGeneration/Noisemaps/MinecraftNoiseGenerator.h"
 
 class NoiseOctave {
 

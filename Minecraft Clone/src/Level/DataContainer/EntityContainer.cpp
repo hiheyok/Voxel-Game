@@ -1,6 +1,6 @@
-#include "EntityContainer.h"
-#include "../Entity/Entity.h"
-#include "../Entity/Properties/EntityProperties.h"
+#include "Level/DataContainer/EntityContainer.h"
+#include "Level/Entity/Entity.h"
+#include "Level/Entity/Properties/EntityProperties.h"
 
 EntityContainer::EntityContainer() = default;
 EntityContainer::~EntityContainer() = default;

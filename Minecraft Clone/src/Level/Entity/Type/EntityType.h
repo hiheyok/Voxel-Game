@@ -1,9 +1,9 @@
 #pragma once
-#include "../../Typenames.h"
-#include "../Collusion/Hitbox.h"
-#include "../../../RenderEngine/EntityRenderer/Models/EntityModel.h"
-#include "../Entity.h"
-#include "../../../RenderEngine/OpenGL/Texture/Types/Texture2D.h"
+#include "Core/Typenames.h"
+#include "Level/Entity/Collusion/Hitbox.h"
+#include "Level/Entity/Entity.h"
+#include "RenderEngine/EntityRenderer/Models/EntityModel.h"
+#include "RenderEngine/OpenGL/Texture/Types/Texture2D.h"
 
 class Dimension;
 

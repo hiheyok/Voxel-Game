@@ -2,10 +2,10 @@
 #include <stdarg.h>
 #include <variant>
 
-#include "Event.h"
-#include "../Chunk/Block/Block.h"
-#include "BlockEventHandles/BlockHandles.h"
-#include "EntityEventHandles/EntityHandles.h"
+#include "Level/Chunk/Block/Block.h"
+#include "Level/Event/Event.h"
+#include "Level/Event/BlockEventHandles/BlockHandles.h"
+#include "Level/Event/EntityEventHandles/EntityHandles.h"
 
 class EventHandler {
 public:

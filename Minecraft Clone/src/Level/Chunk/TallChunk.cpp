@@ -1,4 +1,4 @@
-#include "TallChunk.h"
+#include "Level/Chunk/TallChunk.h"
 
 TallChunk::TallChunk() {
     chunk_sub_column_.resize(16);

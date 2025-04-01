@@ -1,8 +1,8 @@
 #pragma once
 #include <memory>
-#include "../Typenames.h"
-#include "../../Utils/FastNoiseLite.h"
-#include "../../Utils/ThreadPool.h"
+#include "Core/Typenames.h"
+#include "Utils/FastNoiseLite.h"
+#include "Utils/ThreadPool.h"
 
 class Chunk;
 

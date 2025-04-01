@@ -1,5 +1,5 @@
-#include "Buffer.h"
-#include "../../../Utils/LogUtils.h"
+#include "RenderEngine/OpenGL/Buffers/Buffer.h"
+#include "Utils/LogUtils.h"
 
 unsigned int Buffer::GetID() {
     return buffer_id_;

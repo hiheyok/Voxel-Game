@@ -1,5 +1,5 @@
 #pragma once
-#include "../../../../Level/Chunk/Chunk.h"
+#include "Level/Chunk/Chunk.h"
 
 
 class ChunkOcculsionData {

@@ -1,4 +1,4 @@
-#include "MinecraftNoiseGeneratorPerlin.h"
+#include "Level/TerrainGeneration/Noisemaps/MinecraftNoiseGeneratorPerlin.h"
 
 double NoiseGeneratorPerlin::getValue(double p_151601_1_, double p_151601_3_) {
     double d0 = 0.0;

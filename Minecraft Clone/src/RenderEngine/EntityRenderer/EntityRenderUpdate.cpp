@@ -1,8 +1,8 @@
-#include "EntityRenderUpdate.h"
-#include "MultiEntityRender.h"
-#include "../../Utils/Clock.h"
-#include "../../Level/Timer/Timer.h"
-#include "../../Level/Dimension/Dimension.h"
+#include "RenderEngine/EntityRenderer/EntityRenderUpdate.h"
+#include "RenderEngine/EntityRenderer/MultiEntityRender.h"
+#include "Utils/Clock.h"
+#include "Level/Timer/Timer.h"
+#include "Level/Dimension/Dimension.h"
 
 EntityRendererUpdater::EntityRendererUpdater() : 
     stop_{ true },

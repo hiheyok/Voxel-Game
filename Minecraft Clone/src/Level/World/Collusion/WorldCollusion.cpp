@@ -1,12 +1,12 @@
-#include "WorldCollusion.h"
-#include "../../Chunk/Block/Block.h"
-#include "../../Chunk/Block/Blocks.h"
-#include "../../DataContainer/ChunkMapData.h"
-#include "../../Entity/Entity.h"
-#include "../../Entity/Entities.h"
-#include "../../Entity/Collusion/Hitbox.h"
-#include "../../../Utils/Math/vectorOperations.h"
-#include "../../../Utils/Math/Ray/Ray.h"
+#include "Level/World/Collusion/WorldCollusion.h"
+#include "Level/Chunk/Block/Block.h"
+#include "Level/Chunk/Block/Blocks.h"
+#include "Level/DataContainer/ChunkMapData.h"
+#include "Level/Entity/Entity.h"
+#include "Level/Entity/Entities.h"
+#include "Level/Entity/Collusion/Hitbox.h"
+#include "Utils/Math/vectorOperations.h"
+#include "Utils/Math/Ray/Ray.h"
 
 void WorldCollusionDetector::Initialize(ChunkMap* w) {
     world_ = w;

@@ -1,4 +1,5 @@
-#include "DebugPositioning.h"
+#include "Level/TerrainGeneration/Generators/DebugPositioning/DebugPositioning.h"
+
 DebugPositioning::DebugPositioning() = default;
 
 void DebugPositioning::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {

@@ -1,7 +1,7 @@
 #pragma once
 #include <glm/vec2.hpp>
 
-#include "../../Level/Typenames.h"
+#include "Core/Typenames.h"
 
 struct MouseInputs {
     enum ButtonState {

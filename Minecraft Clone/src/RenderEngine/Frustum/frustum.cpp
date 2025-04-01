@@ -9,9 +9,8 @@
 //        $Description:    Demonstrates checking if shapes are in view         //
 //                                                                         //
 //***********************************************************************//
-#define _CRTDBG_MAP_ALLOC
-#include "../Camera/camera.h"
-#include "frustum.h"
+#include "RenderEngine/Camera/camera.h"
+#include "RenderEngine/Frustum/frustum.h"
 #include <cmath>
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>

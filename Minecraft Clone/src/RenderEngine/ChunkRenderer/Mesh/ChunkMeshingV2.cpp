@@ -1,8 +1,9 @@
-#include "ChunkMeshingV2.h"
-#include "../../BlockModel/BlockModels.h"
-#include "../../../Level/Chunk/Chunk.h"
-#include "../../../Level/Chunk/Block/Blocks.h"
 #include <cstdint>
+
+#include "ChunkMeshingV2.h"
+#include "RenderEngine/BlockModel/BlockModels.h"
+#include "Level/Chunk/Chunk.h"
+#include "Level/Chunk/Block/Blocks.h"
 
 constexpr int POSITION_OFFSET = 16;
 

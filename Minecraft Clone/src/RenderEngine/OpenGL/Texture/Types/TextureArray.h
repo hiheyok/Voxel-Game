@@ -1,5 +1,5 @@
 #pragma once
-#include "../Texture.h"
+#include "RenderEngine/OpenGL/Texture/Texture.h"
 #include <vector>
 #include <optional>
 

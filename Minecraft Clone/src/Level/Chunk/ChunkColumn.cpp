@@ -1,4 +1,4 @@
-#include "ChunkColumn.h"
+#include "Level/Chunk/ChunkColumn.h"
 
 Heightmap& ChunkColumn::GetHeightmap() {
     return column_heightmap_;

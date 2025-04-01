@@ -1,12 +1,11 @@
-﻿#include "WorldRender.h"
-
-#include "../ClientLevel/ClientCache.h"
-#include "../Render/PlayerPOV.h"
-#include "../../Utils/Clock.h"
-#include "../../Core/Options/Option.h"
-#include "../../Level/Timer/Timer.h"
-#include "../../RenderEngine/ChunkRenderer/Mesh/ChunkMeshingV2.h"
-#include "../../RenderEngine/ChunkRenderer/TerrainRenderer.h"
+﻿#include "Client/Render/WorldRender.h"
+#include "Client/ClientLevel/ClientCache.h"
+#include "Client/Render/PlayerPOV.h"
+#include "Utils/Clock.h"
+#include "Core/Options/Option.h"
+#include "Level/Timer/Timer.h"
+#include "RenderEngine/ChunkRenderer/Mesh/ChunkMeshingV2.h"
+#include "RenderEngine/ChunkRenderer/TerrainRenderer.h"
 
 static thread_local Mesh::ChunkMeshData chunkMesher;
 

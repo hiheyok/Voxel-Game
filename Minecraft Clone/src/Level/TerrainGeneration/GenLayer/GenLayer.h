@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "../Biome/Biomes.h"
+#include "Level/TerrainGeneration/Biome/Biomes.h"
 
 class GenLayer {
 public:

@@ -1,4 +1,4 @@
-#include "GUIObject.h"
+#include "RenderEngine/GUI/GUIObject.h"
 
 GUIElement::GUIElement() = default;
 

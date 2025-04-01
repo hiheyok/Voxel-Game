@@ -1,11 +1,10 @@
 #pragma once
 
 #include <sys/stat.h>
-#include <direct.h>
+#include <direct.h> // TODO: Look into direct.h later make sure its cpp standard
 #include <fstream>
 #include <string>
 #include <vector>
-#include <sstream>
 
 std::vector<std::string> Tokenize(std::string str, char divider);
 

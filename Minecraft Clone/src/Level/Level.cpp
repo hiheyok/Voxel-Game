@@ -1,7 +1,7 @@
-#include "Level.h"
-#include "LevelLoader.h"
-#include "Dimension/Dimensions/Overworld.h"
-#include "World/WorldInteraction/WorldLoader.h"
+#include "Level/Level.h"
+#include "Level/LevelLoader.h"
+#include "Level/Dimension/Dimensions/Overworld.h"
+#include "Level/World/WorldInteraction/WorldLoader.h"
 
 Level::Level() = default;
 

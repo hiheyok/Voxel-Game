@@ -2,8 +2,8 @@
 #include <memory>
 #include <vector>
 
-#include "../../Typenames.h"
-#include "Material/BlockMaterial.h"
+#include "Core/Typenames.h"
+#include "Level/Chunk/Block/Material/BlockMaterial.h"
 
 class TextureAtlas;
 

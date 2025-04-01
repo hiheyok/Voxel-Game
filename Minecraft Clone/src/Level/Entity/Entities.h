@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Type/EntityType.h"
+#include "Level/Entity/Type/EntityType.h"
 
 enum EntityTypeEnums {
     ENTITY_PASSIVE, ENTITY_HOSTILE, ENTITY_FALLING_BLOCK

@@ -1,9 +1,9 @@
 #pragma once
 #include <glm/vec3.hpp>
 
-#include "../../Typenames.h"
-#include "../../Entity/Properties/EntityProperties.h"
-#include "../../Item/ItemStack.h"
+#include "Core/Typenames.h"
+#include "Level/Entity/Properties/EntityProperties.h"
+#include "Level/Item/ItemStack.h"
 
 namespace EntityUpdatePacket {
     enum PacketType {

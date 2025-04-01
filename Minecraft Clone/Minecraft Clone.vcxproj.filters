@@ -84,9 +84,6 @@
     <ClCompile Include="src\Level\Chunk\Block\Blocks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Collusion\CollusionTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Level\Event\BlockEventHandles\BlockHandles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -545,7 +542,7 @@
     <ClInclude Include="src\Level\Event\EntityEventHandles\EntityHandles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Typenames.h">
+    <ClInclude Include="src\Core\Typenames.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Entity\Type\Types.h">

@@ -1,5 +1,5 @@
-#include "BufferStorage.h"
-#include "../../../Utils/LogUtils.h"
+#include "RenderEngine/OpenGL/Buffers/BufferStorage.h"
+#include "Utils/LogUtils.h"
 
 BufferStorage::BufferStorage() = default; // Add default constructor
 

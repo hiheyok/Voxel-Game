@@ -1,5 +1,5 @@
 #include "Overworld.h"
-#include "../../Biome/BiomeProvider.h"
+#include "Level/TerrainGeneration/Biome/BiomeProvider.h"
 
 void OverworldGenerator::GenerateChunk(int x, int z, TallChunk* chunk) {
     rand.SetSeed((long long)x * 341873128712LL + (long long)z * 132897987541LL);

@@ -1,8 +1,8 @@
 #pragma once
 #include <glm/vec3.hpp>
 
-#include "../../Item/ItemStack.h"
-#include "../../Typenames.h"
+#include "Level/Item/ItemStack.h"
+#include "Core/Typenames.h"
 
 namespace PlayerPacket {
 

@@ -1,4 +1,4 @@
-#include "Noisemap.h"
+#include "Level/TerrainGeneration/Noisemaps/Noisemap.h"
 
 void NoiseMapTypes::Initialize(int32_t SEED) {
     IslandLayer4096.SetNoiseType(IslandLayer4096.NoiseType_OpenSimplex2);

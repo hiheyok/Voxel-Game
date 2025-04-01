@@ -1,9 +1,9 @@
-#include "GUISet.h"
-#include "GUIObject.h"
-#include "../OpenGL/Shader/Shader.h"
-#include "../OpenGL/Buffers/Buffer.h"
-#include "../OpenGL/Buffers/VertexArray.h"
-#include "../OpenGL/Texture/Types/Texture2D.h"
+#include "RenderEngine/GUI/GUISet.h"
+#include "RenderEngine/GUI/GUIObject.h"
+#include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "RenderEngine/OpenGL/Buffers/Buffer.h"
+#include "RenderEngine/OpenGL/Buffers/VertexArray.h"
+#include "RenderEngine/OpenGL/Texture/Types/Texture2D.h"
 
 GUISet::GUISet() : gui_texture_{ std::make_unique<Texture2D>()} {}
 GUISet::~GUISet() = default;

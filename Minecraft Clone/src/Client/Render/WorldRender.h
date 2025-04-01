@@ -4,8 +4,8 @@
 #include <glm/vec3.hpp>
 
 #include "WorldRenderInfo.h"
-#include "../../Utils/ThreadPool.h"
-#include "../../Level/Typenames.h"
+#include "Utils/ThreadPool.h"
+#include "Core/Typenames.h"
 
 class TerrainRenderer;
 class ClientCache;

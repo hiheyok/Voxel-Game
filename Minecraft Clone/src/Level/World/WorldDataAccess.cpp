@@ -1,9 +1,9 @@
 #include <exception>
 
 #include "WorldDataAccess.h"
-#include "../Chunk/ChunkColumn.h"
-#include "../DataContainer/ChunkMapData.h"
-#include "../DataContainer/EntityContainer.h"
+#include "Level/Chunk/ChunkColumn.h"
+#include "Level/DataContainer/ChunkMapData.h"
+#include "Level/DataContainer/EntityContainer.h"
 
 WorldAccess::WorldAccess() :
     chunk_container_{ std::make_unique<ChunkMap>() },

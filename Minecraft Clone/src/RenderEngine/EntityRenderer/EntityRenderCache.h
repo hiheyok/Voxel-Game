@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../Level/Typenames.h"
+#include "Core/Typenames.h"
 
 struct EntityProperty;
 

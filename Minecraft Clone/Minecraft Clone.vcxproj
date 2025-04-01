@@ -77,11 +77,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)Minecraft Clone\build</OutDir>
+    <IncludePath>$(IncludePath);$(ProjectDir)src</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)Minecraft Clone\build</OutDir>
     <TargetName>$(ProjectName)_debug</TargetName>
     <IntDir>$(Platform)\$(Configuration)</IntDir>
+    <IncludePath>$(IncludePath);$(ProjectDir)src</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -275,7 +277,6 @@
     <ClCompile Include="src\Utils\Math\Probability\Probability.cpp" />
     <ClCompile Include="src\Level\Chunk\Block\Blocks.cpp" />
     <ClCompile Include="src\Level\Chunk\Block\Material\BlockMaterial.cpp" />
-    <ClCompile Include="src\Level\Collusion\CollusionTest.cpp" />
     <ClCompile Include="src\Level\Entity\Entity.cpp" />
     <ClCompile Include="src\Level\Entity\Entities.cpp" />
     <ClCompile Include="src\Level\Event\BlockEventHandles\BlockHandles.cpp" />
@@ -500,7 +501,7 @@
     <ClInclude Include="src\Level\TerrainGeneration\Generators\Generator.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Random\JavaRandom.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Structures\Structure.h" />
-    <ClInclude Include="src\Level\Typenames.h" />
+    <ClInclude Include="src\Core\Typenames.h" />
     <ClInclude Include="src\Utils\ThreadPool.h" />
   </ItemGroup>
   <ItemGroup>

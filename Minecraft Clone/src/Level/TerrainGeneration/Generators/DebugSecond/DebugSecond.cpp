@@ -1,4 +1,4 @@
-#include "DebugSecond.h"
+#include "Level/TerrainGeneration/Generators/DebugSecond/DebugSecond.h"
 DebugWorldSecond::DebugWorldSecond() = default;
 
 void DebugWorldSecond::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {

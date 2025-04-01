@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-#include "Typenames.h"
+#include "Core/Typenames.h"
 
 class ChunkGeneration;
 class LightingEngine;

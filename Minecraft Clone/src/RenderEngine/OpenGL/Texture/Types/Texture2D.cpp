@@ -1,5 +1,5 @@
-#include "Texture2D.h"
-#include "../../../../Utils/LogUtils.h"
+#include "RenderEngine/OpenGL/Texture/Types/Texture2D.h"
+#include "Utils/LogUtils.h"
 
 Texture2D::Texture2D(RawTextureData data) {
     Gen();

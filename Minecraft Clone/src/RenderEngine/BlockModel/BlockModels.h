@@ -3,7 +3,7 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <string>
-#include "../../Level/Typenames.h"
+#include "Core/Typenames.h"
 
 #define EAST 0x01
 #define WEST 0x02

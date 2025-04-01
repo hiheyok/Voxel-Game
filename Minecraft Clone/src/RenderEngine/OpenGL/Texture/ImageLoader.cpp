@@ -1,7 +1,7 @@
-#include "ImageLoader.h"
-#include "Texture.h"
-#include "../../../Utils/stb_image.h"
-#include "../../../Utils/LogUtils.h"
+#include "RenderEngine/OpenGL/Texture/ImageLoader.h"
+#include "RenderEngine/OpenGL/Texture/Texture.h"
+#include "Utils/stb_image.h"
+#include "Utils/LogUtils.h"
 
 RawTextureData GetImageData(const char* path) {
     RawTextureData data;

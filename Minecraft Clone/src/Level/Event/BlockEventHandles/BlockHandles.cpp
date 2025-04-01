@@ -1,8 +1,8 @@
-#include "BlockHandles.h"
-#include "../EventHandler.h"
-#include "../../Chunk/Block/Block.h"
-#include "../../Chunk/Block/Type/Dirt.h"
-#include "../../../Level/Dimension/Dimension.h"
+#include "Level/Event/BlockEventHandles/BlockHandles.h"
+#include "Level/Event/EventHandler.h"
+#include "Level/Chunk/Block/Block.h"
+#include "Level/Chunk/Block/Type/Dirt.h"
+#include "Level/Dimension/Dimension.h"
 
 void UpdateSurrounding(const BlockEvent& blockEvent, Dimension* dimension) {
     for (int side = 0; side < 6;  side++) {

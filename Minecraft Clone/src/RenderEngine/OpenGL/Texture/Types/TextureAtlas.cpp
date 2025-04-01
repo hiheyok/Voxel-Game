@@ -1,6 +1,6 @@
-#include "TextureAtlas.h"
-#include "../ImageLoader.h"
-#include "../../../../Utils/LogUtils.h"
+#include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
+#include "RenderEngine/OpenGL/Texture/ImageLoader.h"
+#include "Utils/LogUtils.h"
 
 void TextureAtlas::UploadToGPU() {
     // GLsizei mipLevelcount_ = 4;

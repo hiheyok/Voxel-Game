@@ -3,13 +3,13 @@ template <class T>
 class FixedFIFOQueue {
 public:
     FixedFIFOQueue();
-    FixedFIFOQueue(uint64_t size);
+    FixedFIFOQueue(unsigned long long size);
     ~FixedFIFOQueue();
 
     FixedFIFOQueue(FixedFIFOQueue&& q) = delete;
     FixedFIFOQueue(const FixedFIFOQueue& q) = delete;
 
-    void setSize(uint64_t size);
+    void setSize(unsigned long long size);
     void push(const T& obj);
 
     T get();
@@ -22,10 +22,10 @@ private:
     T* buffer_ = nullptr;
     bool is_initialized_ = false;
 
-    uint64_t start_ptr_ = 0;
-    uint64_t end_ptr_ = 0;
-    uint64_t queue_size_ = 0;
-    uint64_t element_count_ = 0;
+    unsigned long long start_ptr_ = 0;
+    unsigned long long end_ptr_ = 0;
+    unsigned long long queue_size_ = 0;
+    unsigned long long element_count_ = 0;
 };
 
 template <class T>
@@ -37,12 +37,12 @@ inline FixedFIFOQueue<T>::~FixedFIFOQueue() {
 }
 
 template <class T>
-inline FixedFIFOQueue<T>::FixedFIFOQueue(uint64_t size) {
-    setSize(size); 
+inline FixedFIFOQueue<T>::FixedFIFOQueue(unsigned long long size) {
+    setSize(size);
 }
 
 template <class T>
-inline void FixedFIFOQueue<T>::setSize(uint64_t size) {
+inline void FixedFIFOQueue<T>::setSize(unsigned long long size) {
     if (is_initialized_) delete[] buffer_;
     queue_size_ = size;
     buffer_ = new T[queue_size_];

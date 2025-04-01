@@ -1,5 +1,5 @@
 #include "BlockTexture.h"
-#include "../../../Typenames.h"
+#include "Core/Typenames.h"
 
 void BlockTexture::SetFaceFront(int texId) {
     texture_index_[FRONT] = texId;

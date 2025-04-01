@@ -1,7 +1,7 @@
 #pragma once
-#include "GenLayer.h"
-#include "IntCache.h"
-#include "../Biome/Biomes.h"
+#include "Level/TerrainGeneration/GenLayer/GenLayer.h"
+#include "Level/TerrainGeneration/GenLayer/IntCache.h"
+#include "Level/TerrainGeneration/Biome/Biomes.h"
 
 class GenLayerRiverMix : public GenLayer {
 private:

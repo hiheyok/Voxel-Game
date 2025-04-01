@@ -1,4 +1,5 @@
-#include "MathWorld.h"
+#include "Level/TerrainGeneration/Generators/Math/MathWorld.h"
+
 MathWorld::MathWorld() = default;
 
 void MathWorld::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {

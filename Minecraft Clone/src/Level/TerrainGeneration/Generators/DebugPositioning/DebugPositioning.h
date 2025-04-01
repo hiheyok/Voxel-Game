@@ -1,5 +1,5 @@
 #pragma once
-#include "../Generator.h"
+#include "Level/TerrainGeneration/Generators/Generator.h"
 
 class DebugPositioning : public WorldGenerator {
 public:

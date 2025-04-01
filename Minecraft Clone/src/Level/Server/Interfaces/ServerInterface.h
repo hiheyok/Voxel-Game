@@ -1,9 +1,9 @@
 #pragma once
-#include <vector>
-#include "../../../Utils/Containers/ConcurrentQueue.h"
-#include "../Networking/Packet.h"
 #include <string>
+#include <vector>
 
+#include "Utils/Containers/ConcurrentQueue.h"
+#include "Level/Server/Networking/Packet.h"
 /*
 * Abstraction for client to server interfacing
 */

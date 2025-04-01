@@ -1,5 +1,5 @@
 #pragma once
-#include "../../../Utils/FastNoiseLite.h"
+#include "Utils/FastNoiseLite.h"
 
 class NoiseMapTypes {
 public:

@@ -1,6 +1,6 @@
 #pragma once
-#include "../GenLayer/CombineLayers.h"
-#include <concurrent_unordered_map.h>
+#include "Level/TerrainGeneration/GenLayer/CombineLayers.h"
+#include <concurrent_unordered_map.h> // TODO: Change this maybe use thread_local
 //mc src
 inline std::mutex g_biome_lock;
 

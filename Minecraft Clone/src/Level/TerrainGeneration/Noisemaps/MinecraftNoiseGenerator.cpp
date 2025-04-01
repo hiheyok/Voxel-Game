@@ -1,4 +1,4 @@
-#include "MinecraftNoiseGenerator.h"
+#include "Level/TerrainGeneration/Noisemaps/MinecraftNoiseGenerator.h"
 
 static constexpr const double GRAD_X[16] = { 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, -1.0, 0.0 };
 static constexpr const double GRAD_Y[16] = { 1.0, 1.0, -1.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0 };

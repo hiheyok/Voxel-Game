@@ -1,5 +1,5 @@
-#include "Block.h"
-#include "../../../RenderEngine/BlockModel/BlockModels.h"
+#include "Level/Chunk/Block/Block.h"
+#include "RenderEngine/BlockModel/BlockModels.h"
 
 BlockType::BlockType(bool transparent, bool solid, bool fluid) {
     transparency_ = transparent;

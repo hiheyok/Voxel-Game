@@ -3,14 +3,14 @@
 #include "MainPlayer.h"
 #include "PlayerMovement.h"
 #include "WorldInteraction.h"
-#include "../IO/IO.h"
-#include "../IO/KEY_CODE.h"
-#include "../../Level/Item/ItemTextureAtlas.h"
-#include "../../Level/Entity/Mobs/Player.h"
-#include "../../Level/Entity/Properties/EntityProperties.h"
-#include "../../Level/Server/Interfaces/ServerInterface.h"
-#include "../../RenderEngine/GUI/GUI.h"
-#include "../../RenderEngine/GUI/GUISet.h"
+#include "Client/IO/IO.h"
+#include "Client/IO/KEY_CODE.h"
+#include "Level/Item/ItemTextureAtlas.h"
+#include "Level/Entity/Mobs/Player.h"
+#include "Level/Entity/Properties/EntityProperties.h"
+#include "Level/Server/Interfaces/ServerInterface.h"
+#include "RenderEngine/GUI/GUI.h"
+#include "RenderEngine/GUI/GUISet.h"
 
 
 MainPlayer::MainPlayer() : 
@@ -123,7 +123,6 @@ void MainPlayer::InventoryUpdate(const UserInputs& inputs) {
     }
 
     int currentInventorySlot = player_->entity_inventory_.right_hand_slot_;
-    // int MaxInventorySize = m_Player.m_EntityInventory.GetSlotCount();
 
     if (currentInventorySlot + Direction == 9) {
         currentInventorySlot = 0;

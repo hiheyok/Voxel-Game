@@ -1,9 +1,9 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
-#include "ModelLoader.h"
-#include "../../FileManager/Files.h"
-#include "../../Utils/LogUtils.h"
+#include "RenderEngine/BlockModel/ModelLoader.h"
+#include "FileManager/Files.h"
+#include "Utils/LogUtils.h"
 
 const std::string DEFAULT_NAMESPACE = "minecraft";
 

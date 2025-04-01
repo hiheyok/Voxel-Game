@@ -1,5 +1,5 @@
 #pragma once
-#include "../Texture.h"
+#include "RenderEngine/OpenGL/Texture/Texture.h"
 
 class Texture2D : public Texture {
 public:

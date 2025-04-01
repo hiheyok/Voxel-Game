@@ -2,7 +2,7 @@
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
 
-#include "../../Typenames.h"
+#include "Core/Typenames.h"
 
 struct EntityProperty {
     EntityProperty() = default;
@@ -32,7 +32,7 @@ namespace std {
     template <>
     struct hash<EntityProperty> {
         size_t operator ()(const EntityProperty& e) const {
-            return hash<EntityTypeID>{}(e.entity_uuid_);
+            return hash<EntityUUID>{}(e.entity_uuid_);
         }
     };
     

@@ -1,5 +1,5 @@
-#include "ChunkHandles.h"
-#include "../EventHandler.h"
+#include "Level/Event/ChunkEventHandles/ChunkHandles.h"
+#include "Level/Event/EventHandler.h"
 
 void UpdateLighting(const ChunkEvent& chunkEvent) {
 

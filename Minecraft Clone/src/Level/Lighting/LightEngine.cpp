@@ -1,10 +1,10 @@
-#include "LightEngine.h"
-#include "../../Utils/Containers/FIFOQueue.h"
-#include "../Chunk/Chunk.h"
-#include "../Chunk/ChunkColumn.h"
-#include "../Chunk/Heightmap/Heightmap.h"
-#include "../Chunk/Lighting/ChunkLighting.h"
-#include "../World/WorldDataAccess.h"
+#include "Utils/Containers/FIFOQueue.h"
+#include "Level/Chunk/Chunk.h"
+#include "Level/Chunk/ChunkColumn.h"
+#include "Level/Chunk/Heightmap/Heightmap.h"
+#include "Level/Chunk/Lighting/ChunkLighting.h"
+#include "Level/Lighting/LightEngine.h"
+#include "Level/World/WorldDataAccess.h"
 
 
 static thread_local FixedFIFOQueue<uint16_t> FIFOQueues;

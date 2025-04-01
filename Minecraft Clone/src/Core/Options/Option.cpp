@@ -1,6 +1,6 @@
-#include "Option.h"
-#include "../../FileManager/Files.h"
-#include "../../Utils/LogUtils.h"
+#include "Core/Options/Option.h"
+#include "FileManager/Files.h"
+#include "Utils/LogUtils.h"
 
 Options::Options() {
     SetOptionNameTable();

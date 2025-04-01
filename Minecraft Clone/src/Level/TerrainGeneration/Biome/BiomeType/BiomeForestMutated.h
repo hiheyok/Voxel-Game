@@ -1,6 +1,6 @@
 #pragma once
-#include "../Biome.h"
-#include "BiomeForest.h"
+#include "Level/TerrainGeneration/Biome/Biome.h"
+#include "Level/TerrainGeneration/Biome/BiomeType/BiomeForest.h"
 
 class BiomeForestMutated : public BiomeForest {
 public:

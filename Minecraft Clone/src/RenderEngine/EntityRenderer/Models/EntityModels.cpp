@@ -1,7 +1,5 @@
-
-#include "EntityModel.h"
-#include <iostream>
-#include "../../../Level/Typenames.h"
+#include "RenderEngine/EntityRenderer/Models/EntityModel.h"
+#include "Core/Typenames.h"
 
 Model::ModelData Model::RectangularPrism::GetVertices() {
     ModelData model;

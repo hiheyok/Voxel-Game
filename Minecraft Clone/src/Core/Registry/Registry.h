@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <string>
 #include <exception>
-#include "../../Level/Typenames.h"
+#include "Core/Typenames.h"
 
 template <class K, class V> 
 class Registry {

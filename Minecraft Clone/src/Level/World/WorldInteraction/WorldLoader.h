@@ -2,7 +2,7 @@
 #include <mutex>
 #include <memory>
 
-#include "../../Typenames.h"
+#include "Core/Typenames.h"
 
 class World;
 class Chunk;

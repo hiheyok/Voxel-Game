@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "../../Level/Typenames.h"
+#include "Core/Typenames.h"
 
 class VertexArray;
 class Buffer;

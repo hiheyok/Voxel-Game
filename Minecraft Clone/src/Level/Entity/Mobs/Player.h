@@ -1,6 +1,6 @@
 #pragma once
-#include "../Type/EntityType.h"
-#include "../../Item/Inventory/EntityInventory.h"
+#include "Level/Entity/Entity.h"
+#include "Level/Item/Inventory/EntityInventory.h"
 
 class Player : public Entity {
 public:

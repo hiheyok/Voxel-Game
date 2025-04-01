@@ -1,6 +1,6 @@
-#include "Framebuffer.h"
-#include "../Shader/Shader.h"
-#include "../../../Utils/LogUtils.h"
+#include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
+#include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "Utils/LogUtils.h"
 
 TexturedFrameBuffer::TexturedFrameBuffer() : 
     screen_{ std::make_unique<Shader>() } {

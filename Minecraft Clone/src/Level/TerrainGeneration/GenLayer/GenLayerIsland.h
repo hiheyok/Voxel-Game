@@ -1,6 +1,6 @@
 #pragma once
-#include "GenLayer.h"
-#include "IntCache.h"
+#include "Level/TerrainGeneration/GenLayer/GenLayer.h"
+#include "Level/TerrainGeneration/GenLayer/IntCache.h"
 
 class GenLayerIsland : public GenLayer {
 private:

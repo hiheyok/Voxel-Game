@@ -1,10 +1,10 @@
 #pragma once
-#include "Chunk.h"
-#include "Lighting/ChunkLighting.h"
-#include "../../Utils/Containers/BitStorage.h"
-#include "Heightmap/Heightmap.h"
 #include <glm/vec2.hpp>
-#include <intrin.h>
+
+#include "Level/Chunk/Chunk.h"
+#include "Level/Chunk/Lighting/ChunkLighting.h"
+#include "Utils/Containers/BitStorage.h"
+#include "Level/Chunk/Heightmap/Heightmap.h"
 
 // TODO: Rework this refactor ChunkColumnPos system
 class ChunkColumn { //Helps with stuff like lighting

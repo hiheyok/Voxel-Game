@@ -1,5 +1,5 @@
-#include "ChunkMemoryPool.h"
-#include "../../OpenGL/Buffers/BufferStorage.h"
+#include "RenderEngine/ChunkRenderer/MemoryPool/ChunkMemoryPool.h"
+#include "RenderEngine/OpenGL/Buffers/BufferStorage.h"
 
 using namespace MemoryManagement;
 

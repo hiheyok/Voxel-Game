@@ -2,7 +2,7 @@
 #include <memory>
 #include <glm/vec3.hpp>
 
-#include "../Generator.h"
+#include "Level/TerrainGeneration/Generators/Generator.h"
 
 
 class NoiseMaps1122;

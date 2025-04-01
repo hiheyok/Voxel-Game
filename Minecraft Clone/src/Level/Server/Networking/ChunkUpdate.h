@@ -1,7 +1,7 @@
 #pragma once
-#include "../../Chunk/ChunkRawData.h"
-#include "../../Chunk/Lighting/ChunkLighting.h"
-#include "../../Typenames.h"
+#include "Level/Chunk/ChunkRawData.h"
+#include "Level/Chunk/Lighting/ChunkLighting.h"
+#include "Core/Typenames.h"
 
 namespace ChunkUpdatePacket {
 

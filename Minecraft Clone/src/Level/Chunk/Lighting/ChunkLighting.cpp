@@ -1,4 +1,4 @@
-#include "ChunkLighting.h"
+#include "Level/Chunk/Lighting/ChunkLighting.h"
 
 ChunkLightingContainer::ChunkLightingContainer() {
     ResetLighting();

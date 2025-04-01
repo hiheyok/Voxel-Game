@@ -1,7 +1,7 @@
 #pragma once
 #include "ServerInterface.h"
-#include "../../../Utils/LogUtils.h"
-#include "../../../Utils/Containers/ConcurrentQueue.h"
+#include "Utils/LogUtils.h"
+#include "Utils/Containers/ConcurrentQueue.h"
 #include "ClientInterface.h"
 
 //

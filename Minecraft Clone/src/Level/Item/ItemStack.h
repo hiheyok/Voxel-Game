@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Item.h"
+#include "Level/Item/Item.h"
 
 class ItemStack { //Contains additional properties of item such as item count enchantments, etc
 public:

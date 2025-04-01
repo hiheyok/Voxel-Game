@@ -7,7 +7,7 @@
 #include <string>
 #include <fstream>
 
-#include "../../../Level/Typenames.h"
+#include "Core/Typenames.h"
 
 class Shader {
 public:

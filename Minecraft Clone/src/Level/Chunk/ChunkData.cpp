@@ -1,5 +1,5 @@
-#include "ChunkData.h"
-#include "ChunkRawData.h"
+#include "Level/Chunk/ChunkData.h"
+#include "Level/Chunk/ChunkRawData.h"
 
 static const int NeighborOffset[6] = {
       -16, 16,-16, 16,-16, 16

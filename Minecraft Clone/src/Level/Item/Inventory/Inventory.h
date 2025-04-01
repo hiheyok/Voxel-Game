@@ -1,9 +1,9 @@
 #pragma once
-#include "../../Typenames.h"
-#include "../../Chunk/Block/Blocks.h"
-#include "../ItemStack.h"
-#include <unordered_map>
 #include <vector>
+
+#include "Core/Typenames.h"
+#include "Level/Chunk/Block/Blocks.h"
+#include "Level/Item/ItemStack.h"
 
 class Inventory {
 public:

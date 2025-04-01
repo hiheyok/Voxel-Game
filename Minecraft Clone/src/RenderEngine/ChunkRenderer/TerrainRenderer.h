@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-#include "../../Level/Typenames.h"
+#include "Core/Typenames.h"
 
 class Timer;
 class Camera;

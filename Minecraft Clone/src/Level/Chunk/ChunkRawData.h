@@ -1,6 +1,6 @@
 #pragma once
-#include "Palette.h"
-#include "Lighting/ChunkLighting.h"
+#include "Level/Chunk/Palette.h"
+#include "Level/Chunk/Lighting/ChunkLighting.h"
 
 struct ChunkRawData {
     Palette chunk_data_;

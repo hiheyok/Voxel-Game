@@ -1,6 +1,6 @@
 #pragma once
-#include "../Biome.h"
 #include <cmath>
+#include "Level/TerrainGeneration/Biome/Biome.h"
 
 class BiomeMesa : public Biome {
 private:

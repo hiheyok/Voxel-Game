@@ -1,5 +1,5 @@
-#include "Item.h"
-#include "../../RenderEngine/OpenGL/Texture/Texture.h"
+#include "Level/Item/Item.h"
+#include "RenderEngine/OpenGL/Texture/Texture.h"
 
 BlockID Item::GetBlock() const {
     return properties_.block_;

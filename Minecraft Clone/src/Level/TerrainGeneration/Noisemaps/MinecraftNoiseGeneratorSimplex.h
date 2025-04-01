@@ -1,5 +1,5 @@
 #pragma once
-#include "../Random/JavaRandom.h"
+#include "Level/TerrainGeneration/Random/JavaRandom.h"
 #include <cmath>
 #include <vector>
 

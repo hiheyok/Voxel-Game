@@ -1,5 +1,5 @@
-#include "Entity.h"
-#include "Entities.h"
+#include "Level/Entity/Entity.h"
+#include "Level/Entity/Entities.h"
 
 Entity::Entity() {
 
