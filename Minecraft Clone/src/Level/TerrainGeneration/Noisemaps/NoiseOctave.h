@@ -9,7 +9,7 @@ private:
 
     static int64_t lfloor(double value);
 
-    int octaves = NULL;
+    int octaves = 0;
     std::vector<NoiseGeneratorImproved> generatorCollection;
 public:
     NoiseOctave(JavaRandom& seed, int octavesIn) {

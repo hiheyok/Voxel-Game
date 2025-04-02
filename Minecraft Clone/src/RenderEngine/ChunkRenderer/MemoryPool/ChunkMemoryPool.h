@@ -22,7 +22,7 @@ namespace MemoryManagement {
 
     struct MemoryBlock {
         MemoryBlock() {};
-        MemoryBlock(size_t memOffset, size_t memSize) : offset_(memOffset), size_(memSize){}
+        MemoryBlock(size_t memOffset, size_t memSize) : offset_(memOffset), size_(memSize) {}
 
         size_t offset_ = NULL;
         size_t size_ = NULL;
@@ -78,7 +78,7 @@ namespace MemoryManagement {
 
     private:
         size_t pool_size_ = 0;
-        
+
         std::multimap<size_t, size_t> sorted_mem_sizes_; // BlockSize, BlockOffset
         FastHashMap<size_t, std::multimap<size_t, size_t>::iterator> sorted_mem_sizes_iterators; // Offset, iterator
     };

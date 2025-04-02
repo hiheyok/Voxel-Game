@@ -95,7 +95,7 @@ void LogUtils::LogError(std::string subtype, std::string message) {
     std::lock_guard<std::mutex> lock{ mutex_ };
     logs_.emplace_back(log);
     cv_.notify_one();
-    throw std::runtime_error(subtype + " - " + message);
+     throw std::runtime_error(subtype + " - " + message);
 }
 
 void LogUtils::LogWarn(std::string subtype, std::string message) {

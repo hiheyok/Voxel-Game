@@ -10,8 +10,8 @@ private:
     int bit_width_ = 0;
     int num_elements_ = 0;
 
-    static constexpr const size_t storage_bits_ = sizeof(StorageBit) * 8;
-    static constexpr const StorageBit all_ones_ = ~(static_cast<StorageBit>(0));
+    static constexpr const size_t kStorageBits = sizeof(StorageBit) * 8;
+    static constexpr const StorageBit kAllOnes = ~(static_cast<StorageBit>(0));
     StorageBit all_ones_bit_width_;
 
     std::pair<StorageBit, StorageBit> GetMask(size_t idx) const;
@@ -59,8 +59,8 @@ void NBitVector<StorageBit>::Set(size_t idx, T val) {
 
     StorageBit data = static_cast<StorageBit>(val);
 
-    size_t vectorIndex = bit_width_ * idx / storage_bits_;
-    size_t integerIndex = (bit_width_ * idx) % storage_bits_;
+    size_t vectorIndex = bit_width_ * idx / kStorageBits;
+    size_t integerIndex = (bit_width_ * idx) % kStorageBits;
 
     const auto [mask, overflowMask] = GetMask(integerIndex);
 
@@ -72,7 +72,7 @@ void NBitVector<StorageBit>::Set(size_t idx, T val) {
 
     if (overflowMask != 0) {
         data_[vectorIndex + 1] &= ~overflowMask;
-        data_[vectorIndex + 1] |= data >> (storage_bits_ - integerIndex);
+        data_[vectorIndex + 1] |= data >> (kStorageBits - integerIndex);
     }
 }
 
@@ -84,8 +84,8 @@ StorageBit NBitVector<StorageBit>::Get(size_t idx) const {
 
 template<typename StorageBit>
 StorageBit NBitVector<StorageBit>::GetUnsafe(size_t idx) const {
-    size_t vectorIndex = bit_width_ * idx / storage_bits_;
-    size_t integerIndex = (bit_width_ * idx) % storage_bits_;
+    size_t vectorIndex = bit_width_ * idx / kStorageBits;
+    size_t integerIndex = (bit_width_ * idx) % kStorageBits;
 
     const auto [mask, overflowMask] = GetMask(integerIndex);
 
@@ -94,7 +94,7 @@ StorageBit NBitVector<StorageBit>::GetUnsafe(size_t idx) const {
     // If it overlap with the next bit extract the next bit too
     if (overflowMask != 0) {
         StorageBit dataNext = data_[vectorIndex + 1] & overflowMask;
-        dataNext <<= (storage_bits_ - integerIndex);
+        dataNext <<= (kStorageBits - integerIndex);
         data |= dataNext;
     }
 
@@ -103,14 +103,14 @@ StorageBit NBitVector<StorageBit>::GetUnsafe(size_t idx) const {
 
 template<typename StorageBit>
 NBitVector<StorageBit>::NBitVector(int numElements, int bitWidth) : bit_width_{ bitWidth }, num_elements_{ numElements } {
-    if (bitWidth > storage_bits_) throw std::runtime_error("Bit width is too wide.");
-    data_.resize(numElements * bitWidth / storage_bits_ + 1);
-    all_ones_bit_width_ = ~(all_ones_ << bit_width_);
+    if (bitWidth > kStorageBits) throw std::runtime_error("Bit width is too wide.");
+    data_.resize(numElements * bitWidth / kStorageBits + 1);
+    all_ones_bit_width_ = ~(kAllOnes << bit_width_);
 }
 
 template<typename StorageBit>
 NBitVector<StorageBit>::NBitVector(int bitWidth) : bit_width_{ bitWidth } {
-    all_ones_bit_width_ = ~(all_ones_ << bit_width_);
+    all_ones_bit_width_ = ~(kAllOnes << bit_width_);
 }
 
 template<typename StorageBit>
@@ -123,7 +123,7 @@ template <typename T>
 void NBitVector<StorageBit>::Append(T val) {
     if (val >= (1 << bit_width_)) throw std::runtime_error("Invalid number. Wrong size");
     num_elements_++;
-    if (num_elements_ * bit_width_ / storage_bits_ >= data_.size()) {
+    if (num_elements_ * bit_width_ / kStorageBits >= data_.size()) {
         data_.push_back(static_cast<StorageBit>(0));
     }
 
@@ -135,7 +135,7 @@ std::pair<StorageBit, StorageBit> NBitVector<StorageBit>::GetMask(size_t integer
     StorageBit mask = all_ones_bit_width_ << integerIndex;
     StorageBit overflowMask = 0;
 
-    overflowMask |= (storage_bits_ - integerIndex < bit_width_) * (all_ones_bit_width_ >> (storage_bits_ - integerIndex));
+    overflowMask |= (kStorageBits - integerIndex < bit_width_) * (all_ones_bit_width_ >> (kStorageBits - integerIndex));
 
     return { mask, overflowMask };
 }

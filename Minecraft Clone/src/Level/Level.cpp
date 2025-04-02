@@ -27,6 +27,6 @@ void Level::updateDimensions() {
 
     //Updated Light Info
     level_loader_->SendRequestedLightUpdates(std::move(main_world_->world_interactions_.GetRequestedLightUpdates()));
-    std::vector<std::unique_ptr<ChunkLightingContainer>> lighting = level_loader_->GetLightingInfomation();
+    std::vector<std::unique_ptr<LightStorage>> lighting = level_loader_->GetLightingInfomation();
     main_world_->world_interactions_.UpdateLighting(std::move(lighting));
 }

@@ -11,31 +11,6 @@
 #include "Core/Options/Option.h"
 
 class Dimension {
-private:
-    World* world_;
-    DimensionProperties properties_;
-    WorldParameters world_settings_;
-    
-    FastHashMap<int, FastHashSet<ChunkPos>> tick_usage_;
-
-protected:
-    WorldGeneratorID generator_type_;
-
-    void Start(DimensionProperties properties) {
-        world_ = new World;
-        world_->Initialize();
-        properties_ = properties;
-        world_settings_.horizontal_ticking_distance_ = g_app_options.horizontal_render_distance_;
-        world_settings_.vertical_ticking_distance_ = g_app_options.vertical_render_distance_;
-
-        world_interactions_.init(world_, world_settings_);
-
-
-        if (g_generators.GetGenerator(generator_type_)->use_tall_chunks_) {
-            world_interactions_.UseTallGeneration();
-        }
-        
-    }
 public:
     WorldInteractions world_interactions_;
     EventSystem event_manager_;
@@ -111,4 +86,28 @@ public:
 
         world_->entities_->Tick(this);
     }
+protected:
+    WorldGeneratorID generator_type_;
+
+    void Start(DimensionProperties properties) {
+        world_ = std::make_unique<World>();
+        world_->Initialize();
+        properties_ = properties;
+        world_settings_.horizontal_ticking_distance_ = g_app_options.horizontal_render_distance_;
+        world_settings_.vertical_ticking_distance_ = g_app_options.vertical_render_distance_;
+
+        world_interactions_.init(world_.get(), world_settings_);
+
+        if (g_generators.GetGenerator(generator_type_)->use_tall_chunks_) {
+            world_interactions_.UseTallGeneration();
+        }
+    }
+private:
+    std::unique_ptr<World> world_;
+    DimensionProperties properties_;
+    WorldParameters world_settings_;
+
+    FastHashMap<int, FastHashSet<ChunkPos>> tick_usage_;
+
+    
 };

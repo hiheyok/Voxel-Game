@@ -1,6 +1,6 @@
 #pragma once
 #include "Level/Chunk/ChunkRawData.h"
-#include "Level/Chunk/Lighting/ChunkLighting.h"
+#include "Level/Chunk/Lighting/LightStorage.h"
 #include "Core/Typenames.h"
 
 namespace ChunkUpdatePacket {
@@ -14,7 +14,7 @@ namespace ChunkUpdatePacket {
     };
 
     struct LightUpdate {
-        ChunkLightingContainer light_;
+        LightStorage light_;
     };
 
     struct DeleteChunk {

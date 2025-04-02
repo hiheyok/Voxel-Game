@@ -49,7 +49,7 @@ private:
     }
 
     constexpr static size_t GetIndex(int x, int y, int z) {
-        return x * CHUNK_DIM * CHUNK_DIM + y * CHUNK_DIM + z;
+        return x * kChunkDim * kChunkDim + y * kChunkDim + z;
     }
 
     void Shrink();

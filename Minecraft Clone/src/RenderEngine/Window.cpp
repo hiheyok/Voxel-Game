@@ -173,6 +173,14 @@ void Window::PollInputs() {
     glfwPollEvents();
 }
 
+WindowProperties& Window::GetProperties() {
+    return properties_;
+}
+
+UserInputs& Window::GetUserInputs() {
+    return inputs_;
+}
+
 void Window::DisableCursor() {
     glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }

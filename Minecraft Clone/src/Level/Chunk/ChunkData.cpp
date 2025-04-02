@@ -5,10 +5,8 @@ static const int NeighborOffset[6] = {
       -16, 16,-16, 16,-16, 16
 };
 
-ChunkContainer::ChunkContainer(const ChunkRawData& data) {
-    lighting_ = std::make_unique<ChunkLightingContainer>(data.lighting_data_);
-    block_storage_ = data.chunk_data_;
-    position_ = data.pos_;
+ChunkContainer::ChunkContainer(const ChunkRawData& data) : lighting_{std::make_unique<LightStorage>()} {
+    SetData(data);
 }
 
 BlockID ChunkContainer::GetBlock(int x, int y, int z) const {
@@ -88,10 +86,16 @@ void ChunkContainer::Unuse() {
     in_use_ = false;
 }
 
+void ChunkContainer::SetData(const ChunkRawData& data) {
+    lighting_->ReplaceData(data.lighting_data_.getData());
+    block_storage_ = data.chunk_data_;
+    position_ = data.pos_;
+}
+
 ChunkRawData ChunkContainer::GetRawData() {
     return ChunkRawData{ block_storage_, *lighting_.get(), position_ };
 }
 
-ChunkLightingContainer ChunkContainer::GetLightData() {
-    return ChunkLightingContainer{ *lighting_.get() };
+LightStorage ChunkContainer::GetLightData() {
+    return LightStorage{ *lighting_.get() };
 }

@@ -13,7 +13,7 @@ class World;
 class WorldLoader;
 class WorldCollusionDetector;
 class Chunk;
-class ChunkLightingContainer;
+class LightStorage;
 
 struct WorldParameters;
 struct Entity;
@@ -27,6 +27,7 @@ private:
     FastHashSet<ChunkPos> updated_lighting_pos_;
     FastHashMap<ChunkPos, std::pair<int, size_t>> requested_light_update_; // pair<y height, index in update vector>
     std::vector<ChunkPos> light_updates_;
+    std::vector<std::pair<BlockID, BlockPos>> block_updates_;
 public:
     WorldLoader* worldLoader_ = nullptr;
     std::unique_ptr<WorldParameters> settings_;
@@ -55,9 +56,9 @@ public:
 
     void Update();
 
-    void UpdateLighting(std::unique_ptr<ChunkLightingContainer> chunkLighting);
+    void UpdateLighting(std::unique_ptr<LightStorage> chunkLighting);
 
-    void UpdateLighting(std::vector<std::unique_ptr<ChunkLightingContainer>> chunkLighting);
+    void UpdateLighting(std::vector<std::unique_ptr<LightStorage>> chunkLighting);
 
     void AddChunk(std::unique_ptr<Chunk> chunk);
 

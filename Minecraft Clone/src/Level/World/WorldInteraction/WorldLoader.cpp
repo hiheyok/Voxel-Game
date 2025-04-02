@@ -3,7 +3,7 @@
 #include "Level/World/WorldInteraction/WorldLoader.h"
 #include "Level/World/World.h"
 #include "Level/World/WorldParameters.h"
-#include "Level/Chunk/Lighting/ChunkLighting.h"
+#include "Level/Chunk/Lighting/LightStorage.h"
 #include "Level/Chunk/ChunkColumn.h"
 #include "Level/Entity/Entity.h"
 #include "Level/DataContainer/EntityContainer.h"
@@ -63,11 +63,16 @@ bool WorldLoader::RequestLoad(const ChunkPos& pos) {
     if (tall_generation_)
         p.y /= 16;
 
-    if (generating_chunk_.count(p))
-        return false;
+    {
+        std::lock_guard<std::mutex> otherLock{ other_lock_ };
+        if (generating_chunk_.count(p))
+            return false;
 
-    //Request chunk
-    generating_chunk_.insert(p);
+        //Request chunk
+        generating_chunk_.insert(p);
+    }
+
+    
 
     std::lock_guard<std::mutex> lock{ lock_ };
     chunk_request_.push_back(p);
@@ -169,7 +174,7 @@ WorldAccess* WorldLoader::GetWorld() const {
 }
 
 //TODO: Fix me
-void WorldLoader::ReplaceLightInfomation(std::unique_ptr<ChunkLightingContainer> lighting) {
+void WorldLoader::ReplaceLightInfomation(std::unique_ptr<LightStorage> lighting) {
     ChunkColumn* col = world->GetColumn(lighting->position_);
     int y = lighting->position_.y & 0b11111;
     if (col == nullptr) return; //fix this nullptr
@@ -212,7 +217,10 @@ void WorldLoader::Load() {
 void WorldLoader::AddChunk(std::unique_ptr<Chunk> chunk) {
     const ChunkPos& pos = chunk->position_;
 
-    if (generating_chunk_.count(pos)) generating_chunk_.erase(pos);
+    {
+        std::lock_guard<std::mutex> otherLock{ other_lock_ };
+        if (generating_chunk_.count(pos)) generating_chunk_.erase(pos);
+    }
 
     world->SetChunk(std::move(chunk));
 }

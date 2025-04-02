@@ -20,16 +20,18 @@ public:
     void Start();
     void Refresh();
     void PollInputs();
+    WindowProperties& GetProperties();
+    UserInputs& GetUserInputs();
     GLFWwindow* GetWindow();
+
+    void RenderSolid();
+    void RenderLines();
 protected:
     bool WindowCloseCheck();
     void DisableCursor();
     void EnableCursor();
     
     void UpdateWindowName(std::string name);
-
-    void RenderSolid();
-    void RenderLines();
 
     void MousePositionCallback(double xpos, double ypos);
     void MouseButtonCallback(int button, int action);

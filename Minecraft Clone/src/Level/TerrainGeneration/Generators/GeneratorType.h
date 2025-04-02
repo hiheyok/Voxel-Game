@@ -7,11 +7,8 @@ class WorldGenerator;
 
 class GeneratorType {
 private:
-
     std::vector<WorldGenerator*> generator_list_ = {};
-
     WorldGeneratorID RegisterWorldGenerator(WorldGenerator* Gen);
-
 public:
     WorldGeneratorID DEBUG = RegisterWorldGenerator(new DebugWorld());
     WorldGeneratorID DEBUG_2 = RegisterWorldGenerator(new DebugWorldSecond());

@@ -7,7 +7,7 @@
 
 #include "Core/Typenames.h"
 #include "Level/TerrainGeneration/Structures/Structure.h"
-#include "Level/Chunk/Lighting/ChunkLighting.h"
+#include "Level/Chunk/Lighting/LightStorage.h"
 #include "Level/Chunk/ChunkPos/ChunkPos.h"
 #include "Level/Chunk/Palette.h"
 
@@ -18,11 +18,11 @@ public:
     ChunkPos position_;
     std::vector<SetBlockRelative> outside_block_to_place_[6]{};
     ChunkContainer* neighbors_[6]{ nullptr };
-    std::unique_ptr<ChunkLightingContainer> lighting_;
+    std::unique_ptr<LightStorage> lighting_;
     std::atomic<bool> is_empty_ = true;
 
     ChunkContainer() {
-        lighting_ = std::make_unique<ChunkLightingContainer>();
+        lighting_ = std::make_unique<LightStorage>();
     }
 
     ChunkContainer(const ChunkRawData&);
@@ -37,8 +37,9 @@ public:
     void SetBlock(BlockID block, int x, int y, int z);
     void SetBlockUnsafe(BlockID block, int x, int y, int z);
 
+    void SetData(const ChunkRawData& data);
     ChunkRawData GetRawData();
-    ChunkLightingContainer GetLightData();
+    LightStorage GetLightData();
 
     void Use();
     void Unuse();

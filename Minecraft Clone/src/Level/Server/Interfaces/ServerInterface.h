@@ -8,11 +8,7 @@
 * Abstraction for client to server interfacing
 */
 class ServerInterface {
-protected:
-    // Server -> Client queues
-    ConcurrentQueue<Packet::BlockUpdate> block_update_queue_;
-    ConcurrentQueue<Packet::EntityUpdate> entity_update_queue_;
-    ConcurrentQueue<Packet::ChunkUpdateData> chunk_update_queue_;
+
 public:
     virtual ~ServerInterface() = default;
 
@@ -41,5 +37,15 @@ public:
         return prevSize != outUpdates.size();
     }
 
-    
+    EntityUUID GetPlayerUUID() const {
+        return client_player_uuid_;
+    }
+
+protected:
+    // Server -> Client queues
+    ConcurrentQueue<Packet::BlockUpdate> block_update_queue_;
+    ConcurrentQueue<Packet::EntityUpdate> entity_update_queue_;
+    ConcurrentQueue<Packet::ChunkUpdateData> chunk_update_queue_;
+
+    EntityUUID client_player_uuid_;
 };

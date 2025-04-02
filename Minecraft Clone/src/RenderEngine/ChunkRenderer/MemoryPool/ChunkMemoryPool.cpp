@@ -327,4 +327,3 @@ void ChunkGPUMemoryPool::Update() {
         statistics_.fragmentation_rate_ = (double)statistics_.memory_usage_ / (double)statistics_.full_memory_usage_;
     }
 }
-

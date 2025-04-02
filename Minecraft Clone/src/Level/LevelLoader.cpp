@@ -42,7 +42,7 @@ void LevelLoader::SendRequestedLightUpdates(std::vector<ChunkColumnPos> requeste
     light_engine_->Generate(std::move(requestedLight));
 }
 
-std::vector<std::unique_ptr<ChunkLightingContainer>> LevelLoader::GetLightingInfomation() {
+std::vector<std::unique_ptr<LightStorage>> LevelLoader::GetLightingInfomation() {
     return light_engine_->GetOutput();
 }
 

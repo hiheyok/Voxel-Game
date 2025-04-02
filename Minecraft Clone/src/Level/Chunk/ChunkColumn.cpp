@@ -4,7 +4,7 @@ Heightmap& ChunkColumn::GetHeightmap() {
     return column_heightmap_;
 }
 
-void ChunkColumn::ReplaceLightContainer(int y, std::unique_ptr<ChunkLightingContainer> c) {
+void ChunkColumn::ReplaceLightContainer(int y, std::unique_ptr<LightStorage> c) {
     if (column_[y] == nullptr) {
         throw std::exception("Couldn't place lighting");
     }

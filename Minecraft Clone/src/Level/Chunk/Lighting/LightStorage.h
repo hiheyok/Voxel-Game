@@ -3,18 +3,18 @@
 
 #include "Core/Typenames.h"
 
-class ChunkLightingContainer { //Contains all lighting infomation for solid blocks
+class LightStorage { //Contains all lighting infomation for solid blocks
 public:
     static const unsigned char MaxLightLevel = 15;
     ChunkPos position_;
 
-    ChunkLightingContainer();
-    ChunkLightingContainer(const ChunkLightingContainer&);
-    ChunkLightingContainer(ChunkLightingContainer&&);
-    ~ChunkLightingContainer();
+    LightStorage();
+    LightStorage(const LightStorage&);
+    LightStorage(LightStorage&&);
+    ~LightStorage();
 
-    ChunkLightingContainer& operator=(const ChunkLightingContainer&) = default;
-    ChunkLightingContainer& operator=(ChunkLightingContainer&&) = default;
+    LightStorage& operator=(const LightStorage&) = default;
+    LightStorage& operator=(LightStorage&&) = default;
 
     const uint64_t* getData() const;
 

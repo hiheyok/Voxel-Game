@@ -65,6 +65,8 @@ void WorldInteraction::PlaceBlock(Ray ray, BlockID block, ServerInterface* inter
 
         glm::ivec3 placePos = floor(ray.end_point_);
 
+        g_logger.LogDebug("WorldInteraction::PlaceBlock", std::to_string(placePos.y));
+
         placePos[(int)floor(BounceSurface >> 1)] += (BounceSurface & 0b1) - ((BounceSurface + 1) & 0b1); //Offsets block location to be placed by 1 block
         PlayerPacket::PlayerPlaceBlock packet;
         packet.block_ = block;

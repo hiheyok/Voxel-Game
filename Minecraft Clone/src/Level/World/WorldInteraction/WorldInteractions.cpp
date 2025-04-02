@@ -6,7 +6,7 @@
 #include "Level/World/World.h"
 #include "Level/World/WorldParameters.h"
 #include "Level/Chunk/Chunk.h"
-#include "Level/Chunk/Lighting/ChunkLighting.h"
+#include "Level/Chunk/Lighting/LightStorage.h"
 #include "Level/DataContainer/EntityContainer.h"
 #include "Level/Entity/Entity.h"
 
@@ -110,7 +110,7 @@ void WorldInteractions::Update() {
     worldLoader_->Load();
 }
 
-void WorldInteractions::UpdateLighting(std::unique_ptr<ChunkLightingContainer> chunkLighting) {
+void WorldInteractions::UpdateLighting(std::unique_ptr<LightStorage> chunkLighting) {
     ChunkPos pos = chunkLighting->position_;
 
     world->GetColumn(chunkLighting->position_);
@@ -125,7 +125,7 @@ void WorldInteractions::UpdateLighting(std::unique_ptr<ChunkLightingContainer> c
     requested_light_update_.erase(pos);
 }
 
-void WorldInteractions::UpdateLighting(std::vector<std::unique_ptr<ChunkLightingContainer>> chunkLighting) {
+void WorldInteractions::UpdateLighting(std::vector<std::unique_ptr<LightStorage>> chunkLighting) {
     std::stack<ChunkPos> chunkToUpdate;
 
     for (auto& chunk : chunkLighting) {
@@ -261,7 +261,7 @@ void WorldInteractions::SetBlock(BlockID b, const BlockPos& bpos) {
         RequestLightUpdate(pos);
     }
     catch (std::exception& e) {
-        g_logger.LogError("WorldInteractions::SetBlock", e.what());
+        g_logger.LogWarn("WorldInteractions::SetBlock", e.what());
     }
 }
 

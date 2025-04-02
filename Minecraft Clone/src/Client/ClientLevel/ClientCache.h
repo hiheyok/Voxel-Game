@@ -1,33 +1,35 @@
 #pragma once
-#include "Entity/ClientEntities.h"
+#include "Client/ClientLevel/ChunkCache/ClientChunkCache.h"
+#include "Client/ClientLevel/ChunkCache/ClientCollusionDetector.h"
+#include "Client/ClientLevel/Entity/ClientEntities.h"
 #include "Level/Chunk/Chunk.h"
-#include "Level/DataContainer/ChunkMapData.h"
-#include "Level/World/Collusion/WorldCollusion.h"
 
 class ClientCache {
 private:
-    ChunkMap chunk_cache_;
+    ClientChunkCache chunk_cache_;
 public:
     ClientEntities entities_;
-    WorldCollusionDetector collusion_manager_;
+    ClientCollusionDetector collusion_manager_;
 
-    ClientCache() {
-        collusion_manager_.Initialize(&chunk_cache_);
-    }
+    ClientCache() : collusion_manager_{&chunk_cache_ } {}
 
     void AddChunk(std::unique_ptr<Chunk> chunk) {
         chunk_cache_.InsertChunk(std::move(chunk));
     }
 
-    void EraseChunk(ChunkPos pos) {
+    void EraseChunk(const ChunkPos& pos) {
         chunk_cache_.EraseChunk(pos);
     }
 
-    Chunk* GetChunk(ChunkPos pos) const {
+    Chunk* GetChunk(const ChunkPos& pos) const {
         return chunk_cache_.GetChunk(pos);
     }
 
-    BlockID GetBlock(BlockPos pos) const {
-        return chunk_cache_.GetBlockGlobal(pos);
+    BlockID GetBlock(const BlockPos& pos) const {
+        return chunk_cache_.GetBlock(pos);
+    }
+    
+    bool CheckChunk(const ChunkPos& pos) const {
+        return chunk_cache_.CheckChunk(pos);
     }
 };

@@ -207,42 +207,25 @@ void ChunkDrawBatch::Defrager(size_t iterations) {
 
         size_t freeSpaceOffset = freeMemoryBlock.offset_;
 
-        const auto& reserveIt = memory_pool_.memory_pool_.reserved_memory_blocks_.getIterator(freeMemoryBlock.size_ + freeMemoryBlock.offset_);
+        std::map<size_t, MemoryManagement::MemoryBlock>::const_iterator Reserve = memory_pool_.memory_pool_.reserved_memory_blocks_.getIterator(freeMemoryBlock.size_ + freeMemoryBlock.offset_);
 
-        const MemoryManagement::MemoryBlock& reservedBlock = reserveIt->second;
+        MemoryManagement::MemoryBlock reservedBlock = Reserve->second;
 
         ChunkPos pos = memory_pool_.memory_chunk_offsets_[reservedBlock.offset_];
 
-        // --- Temporarily remove from render list & pool ---
-       // (Slightly inefficient to lookup again, but safer)
-        if (render_list_offset_lookup_.count(pos)) {
-            size_t render_list_offset = render_list_offset_lookup_[pos];
-            render_list_.erase(render_list_offset);
-            render_list_offset_lookup_.erase(pos);
-        }
-        else {
-            g_logger.LogError("Defrager", "Chunk Pos not found in render_list_offset_lookup_ during defrag!");
-            continue;
-        }
-        memory_pool_.DeleteChunk(pos); // This calls DeallocateSpace internally
+        DeleteChunkVertices(pos);
 
-        if (reservedBlock.size_ > memory_pool_.stagging_buffer_->GetMaxSize()) {
-            g_logger.LogError("Defrager", "Chunk size too large for staging buffer! Skipping defrag for this block."); // TODO: Fix this later 
-            continue;
-        }
         memory_pool_.buffer_->CopyTo(memory_pool_.stagging_buffer_.get(), reservedBlock.offset_, 0, reservedBlock.size_);
 
-        ChunkMemoryPoolOffset newMemoryPoolBlockData = memory_pool_.AddChunkStaggingBuffer(pos, freeMemoryBlock.offset_, reservedBlock.size_);
+        //Add chunk back
 
-        if (newMemoryPoolBlockData.mem_offset_ == std::numeric_limits<size_t>::max()) {
-            g_logger.LogError("Defrager", "Failed to re-add chunk from staging buffer during defrag!");
-            continue;
-        }
+        ChunkMemoryPoolOffset memoryPoolBlockData = memory_pool_.AddChunkStaggingBuffer(pos, freeSpaceOffset, reservedBlock.size_);
 
-        render_list_[newMemoryPoolBlockData.mem_offset_] = newMemoryPoolBlockData;
-        render_list_offset_lookup_[pos] = newMemoryPoolBlockData.mem_offset_;
-
-        update_commands_ = true; // Mark commands need regeneration
+        render_list_[memoryPoolBlockData.mem_offset_] = memoryPoolBlockData;
+        render_list_offset_lookup_[pos] = memoryPoolBlockData.mem_offset_;
+        //	CommandBuffer.AddDrawCommand(DrawCommandIndirect(memoryPoolBlockData.mem_size_ >> 3, 1, memoryPoolBlockData.mem_offset_ >> 3, 0), pos.x, pos.y, pos.z);
+        amount_of_chunks_++;
+        update_commands_ = true;
     }
 }
 

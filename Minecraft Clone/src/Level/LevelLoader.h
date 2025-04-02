@@ -5,7 +5,7 @@
 
 class ChunkGeneration;
 class LightingEngine;
-class ChunkLightingContainer;
+class LightStorage;
 class Chunk;
 
 struct WorldAccess;
@@ -32,7 +32,7 @@ public:
 
     void SendRequestedLightUpdates(std::vector<ChunkColumnPos> requestedLight);
 
-    std::vector<std::unique_ptr<ChunkLightingContainer>> GetLightingInfomation();
+    std::vector<std::unique_ptr<LightStorage>> GetLightingInfomation();
 
     size_t GetLightEngineQueueSize();
 };

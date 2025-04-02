@@ -2,7 +2,7 @@
 #include "Level/Chunk/Chunk.h"
 #include "Level/Chunk/ChunkColumn.h"
 #include "Level/Chunk/Heightmap/Heightmap.h"
-#include "Level/Chunk/Lighting/ChunkLighting.h"
+#include "Level/Chunk/Lighting/LightStorage.h"
 #include "Level/Lighting/LightEngine.h"
 #include "Level/World/WorldDataAccess.h"
 
@@ -28,13 +28,13 @@ inline void UnpackLightNode(uint16_t node, uint8_t& x, uint8_t& y, uint8_t& z, u
     light = (node >> 12) & 0xF;
 }
 
-void LightingEngine::IncreaseLightLevel(std::unique_ptr<ChunkLightingContainer>& container, uint8_t lvl, int x, int y, int z) {
+void LightingEngine::IncreaseLightLevel(std::unique_ptr<LightStorage>& container, uint8_t lvl, int x, int y, int z) {
     uint8_t curr = container->GetLighting(x, y, z);
     if (curr < lvl)
         container->EditLight(x, y, z, lvl);
 }
 
-void LightingEngine::LightSpreadSky(Chunk* chunk, std::unique_ptr<ChunkLightingContainer>& container, const Heightmap& heightmap, int ChunkHeight, int x, int y, int z) {
+void LightingEngine::LightSpreadSky(Chunk* chunk, std::unique_ptr<LightStorage>& container, const Heightmap& heightmap, int ChunkHeight, int x, int y, int z) {
     FIFOQueues.resetData();
     FIFOQueues.push(PackLightNode(x, y, z, 15));
 
@@ -102,7 +102,7 @@ void LightingEngine::LightSpreadSky(Chunk* chunk, std::unique_ptr<ChunkLightingC
     }
 }
 
-void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<ChunkLightingContainer>& light, const Heightmap& heightmap, int chunkHeight) {
+void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<LightStorage>& light, const Heightmap& heightmap, int chunkHeight) {
     for (int x = 0; x < 16; x++) {
         for (int z = 0; z < 16; z++) {
             int h = heightmap.Get(x, z) - chunkHeight; // it will try to find pivot points
@@ -115,11 +115,11 @@ void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<ChunkLigh
     }
 }
 
-std::vector<std::unique_ptr<ChunkLightingContainer>> LightingEngine::Worker(const ChunkPos& pos) {
+std::vector<std::unique_ptr<LightStorage>> LightingEngine::Worker(const ChunkPos& pos) {
     if (!FIFOQueues.IsInitialized())
         FIFOQueues.setSize(LightingEngine::DEFAULT_FIFO_QUEUE_SIZE);
 
-    std::vector<std::unique_ptr<ChunkLightingContainer>> out;
+    std::vector<std::unique_ptr<LightStorage>> out;
     ChunkColumn* col = LightingEngine::world_->GetColumn(pos);
 
     if (col == nullptr) return out;
@@ -136,7 +136,7 @@ std::vector<std::unique_ptr<ChunkLightingContainer>> LightingEngine::Worker(cons
             continue;
 
 
-        std::unique_ptr<ChunkLightingContainer> lighting = std::make_unique<ChunkLightingContainer>();
+        std::unique_ptr<LightStorage> lighting = std::make_unique<LightStorage>();
         lighting->ResetLightingCustom(4);
         lighting->position_.set(pos.x, columnYLevel + i, pos.z);
 
@@ -152,8 +152,8 @@ void LightingEngine::Generate(std::vector<ChunkPos> tasks) {
     lighting_thread_pool_->SubmitTask(tasks);
 }
 
-std::vector<std::unique_ptr<ChunkLightingContainer>> LightingEngine::GetOutput() {
-    std::vector<std::unique_ptr<ChunkLightingContainer>> out;
+std::vector<std::unique_ptr<LightStorage>> LightingEngine::GetOutput() {
+    std::vector<std::unique_ptr<LightStorage>> out;
     for (auto& lights : lighting_thread_pool_->GetOutput()) {
         out.insert(out.end(),
             std::make_move_iterator(lights.begin()),
@@ -168,7 +168,7 @@ void LightingEngine::Stop() {
 
 void LightingEngine::Start(int lightEngineThreadsCount, WorldAccess* w) {
     lighting_thread_pool_ = std::make_unique<ThreadPool<ChunkPos,
-        std::vector<std::unique_ptr<ChunkLightingContainer>>,
+        std::vector<std::unique_ptr<LightStorage>>,
         LightingEngine::Worker>>(lightEngineThreadsCount, "Light Engine", 100);
 
     LightingEngine::world_ = w;

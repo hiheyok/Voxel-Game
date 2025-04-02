@@ -1,7 +1,7 @@
 #include "Level/Chunk/Palette.h"
 
-Palette::Palette() : current_bit_width_{ MIN_BIT_WIDTH }, data_{ CHUNK_SIZE_3D, current_bit_width_ } {
-    palette_entries_.emplace_back(g_blocks.AIR, static_cast<uint16_t>(CHUNK_SIZE_3D));
+Palette::Palette() : current_bit_width_{ MIN_BIT_WIDTH }, data_{ kChunkSize3D, current_bit_width_ } {
+    palette_entries_.emplace_back(g_blocks.AIR, static_cast<uint16_t>(kChunkSize3D));
 }
 
 Palette::~Palette() = default;
@@ -12,7 +12,7 @@ Palette& Palette::operator=(Palette&&) noexcept = default;
 
 void Palette::Shrink() {
     int newBitWidth = GetBitWidth(unique_blocks_count_);
-    NBitVector<StorageBit> newData(CHUNK_SIZE_3D, newBitWidth);
+    NBitVector<StorageBit> newData(kChunkSize3D, newBitWidth);
 
     // Repack
 
@@ -29,7 +29,7 @@ void Palette::Shrink() {
         curr++;
     }
 
-    for (int i = 0; i < CHUNK_SIZE_3D; ++i) {
+    for (int i = 0; i < kChunkSize3D; ++i) {
         PaletteIndex currVal = static_cast<PaletteIndex>(data_.Get(i));
         PaletteIndex newVal = newPaletteIndex[currVal];
         newData.Set(i, newVal);
@@ -44,9 +44,9 @@ void Palette::Shrink() {
 
 void Palette::Grow() {
     int newBitWidth = GetBitWidth(unique_blocks_count_);
-    NBitVector<StorageBit> newData(CHUNK_SIZE_3D, newBitWidth);
+    NBitVector<StorageBit> newData(kChunkSize3D, newBitWidth);
     current_bit_width_ = newBitWidth;
-    for (int i = 0; i < CHUNK_SIZE_3D; ++i) {
+    for (int i = 0; i < kChunkSize3D; ++i) {
         newData.Set(i, data_.Get(i));
     }
 
@@ -95,7 +95,7 @@ Palette::PaletteIndex Palette::GetOrAddPaletteIndex(BlockID block) {
 }
 
 BlockID Palette::GetBlock(int x, int y, int z) const {
-    if (x < 0 || x >= CHUNK_DIM || y < 0 || y >= CHUNK_DIM || z < 0 || z >= CHUNK_DIM) {
+    if (x < 0 || x >= kChunkDim || y < 0 || y >= kChunkDim || z < 0 || z >= kChunkDim) {
         throw std::out_of_range("Palette::GetBlock - Invalid palette index");
     }
 
@@ -112,7 +112,7 @@ BlockID Palette::GetBlockUnsafe(int x, int y, int z) const {
 }
 
 void Palette::SetBlock(BlockID block, int x, int y, int z) {
-    if (x < 0 || x >= CHUNK_DIM || y < 0 || y >= CHUNK_DIM || z < 0 || z >= CHUNK_DIM) {
+    if (x < 0 || x >= kChunkDim || y < 0 || y >= kChunkDim || z < 0 || z >= kChunkDim) {
         throw std::out_of_range("Palette::GetBlock - Invalid palette index");
     }
 

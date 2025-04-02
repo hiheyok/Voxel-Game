@@ -107,7 +107,7 @@ void Server::ProcessPlayerPackets(ClientInterface* receiver) {
                 inventoryUpdate.slot_ = getItem.slot_;
                 inventoryUpdate.uuid = receiver->GetPlayerUUID();
                 receiver->SendEntityUpdate(inventoryUpdate);
-            }
+        }
             break;
         case PlayerPacket::DESTROY_BLOCK:
             {
@@ -119,7 +119,7 @@ void Server::ProcessPlayerPackets(ClientInterface* receiver) {
             {
                 const PlayerPacket::PlayerPlaceBlock& placeBlock = std::get<PlayerPacket::PlayerPlaceBlock>(packet.packet_);
                 level_->main_world_->world_interactions_.SetBlock(placeBlock.block_, placeBlock.pos_);
-            }
+        }
             break;
         case PlayerPacket::MOVE:
             {
@@ -128,7 +128,7 @@ void Server::ProcessPlayerPackets(ClientInterface* receiver) {
                 e->properties_.acceleration_ = movePlayer.acc_;
                 e->properties_.velocity_ = movePlayer.vel_;
                 e->properties_.position_ = movePlayer.pos_;
-            }
+        }
             break;
         }
     }
@@ -182,7 +182,7 @@ void Server::SendChunkUpdatePacket(ClientInterface* receiver) {
 
     for (const auto& pos : updatedLights) {
         ChunkContainer* chunk = level_->main_world_->world_interactions_.GetChunk(pos);
-        ChunkLightingContainer data = chunk->GetLightData();
+        LightStorage data = chunk->GetLightData();
 
         ChunkUpdatePacket::LightUpdate packet;
         packet.light_ = data;

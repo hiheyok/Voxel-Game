@@ -2,7 +2,7 @@
 #include <glm/vec2.hpp>
 
 #include "Level/Chunk/Chunk.h"
-#include "Level/Chunk/Lighting/ChunkLighting.h"
+#include "Level/Chunk/Lighting/LightStorage.h"
 #include "Utils/Containers/BitStorage.h"
 #include "Level/Chunk/Heightmap/Heightmap.h"
 
@@ -13,7 +13,7 @@ public:
 
     Heightmap& GetHeightmap();
 
-    void ReplaceLightContainer(int y, std::unique_ptr<ChunkLightingContainer> c);
+    void ReplaceLightContainer(int y, std::unique_ptr<LightStorage> c);
 
     ChunkColumn();
 

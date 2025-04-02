@@ -37,6 +37,10 @@ inline constexpr int NY = 0x03;
 inline constexpr int PZ = 0x04;
 inline constexpr int NZ = 0x05;
 
-inline constexpr int CHUNK_DIM = 16;
-inline constexpr int CHUNK_SIZE_2D = CHUNK_DIM * CHUNK_DIM;
-inline constexpr int CHUNK_SIZE_3D = CHUNK_SIZE_2D * CHUNK_DIM;
+inline constexpr int kChunkDim = 16;
+inline constexpr int kChunkSize2D = kChunkDim * kChunkDim;
+inline constexpr int kChunkSize3D = kChunkSize2D * kChunkDim;
+
+inline constexpr int kRegionDim = 32;
+inline constexpr int kRegionSize2D = kRegionDim * kRegionDim;
+inline constexpr int kRegionSize3D = kRegionSize2D * kRegionDim;
