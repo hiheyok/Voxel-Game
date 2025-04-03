@@ -1,7 +1,5 @@
 #pragma once
-#include <unordered_map>
 #include <string>
-#include <exception>
 #include "Core/Typenames.h"
 
 template <class K, class V> 
@@ -20,7 +18,7 @@ private:
 template <class K, class V>
 inline V Registry<K, V>::GetValue(K key) {
     if (!hashmap_.count(key)) {
-        throw std::exception("Cannot return value because key doesn't exist");
+        g_logger.LogError("Registry<K, V>::GetValue", "Cannot return value because key doesn't exist");
     }
     return hashmap_[key];
 }
@@ -28,7 +26,7 @@ inline V Registry<K, V>::GetValue(K key) {
 template <class K, class V>
 inline K Registry<K,V>::GetKey(int id) {
     if (!get_key_by_id_.count(id)) {
-        throw std::exception("Cannot return key because ID doesn't exist");
+        g_logger.LogError("Registry<K, V>::GetKey", "Cannot return key because ID doesn't exist");
     }
     return get_key_by_id_[id];
 }
@@ -36,7 +34,7 @@ inline K Registry<K,V>::GetKey(int id) {
 template <class K, class V>
 inline int Registry<K, V>::GetId(K key) {
     if (!get_id_by_key_.count(key)) {
-        throw std::exception("Cannot return ID because key doesn't exist");
+        g_logger.LogError("Registry<K, V>::GetId", "Cannot return ID because key doesn't exist");
     }
     return get_id_by_key_[key];
 }

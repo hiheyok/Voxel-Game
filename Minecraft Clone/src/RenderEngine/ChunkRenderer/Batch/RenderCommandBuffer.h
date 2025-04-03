@@ -278,7 +278,7 @@ namespace CMDGraph {
                     return NY;
                 }
             }
-            throw std::exception("Error");
+            g_logger.LogError("CommandPtr::GetSideLocation", "Error");
         }
     };
 }

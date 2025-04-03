@@ -2,7 +2,7 @@
 #include "Level/Chunk/Heightmap/Heightmap.h"
 
 Heightmap::Heightmap() {
-    data_.resize(256);
+    data_.fill(-1);
 }
 Heightmap::~Heightmap() = default;
 
@@ -15,5 +15,5 @@ int16_t Heightmap::Get(int x, int z) const {
 }
 
 void Heightmap::Clear() {
-    data_.clear();
+    data_.fill(-1);
 }

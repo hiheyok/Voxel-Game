@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <stdexcept>
-#include <exception>
 // TODO: Add precomputed mask for all instances
 template <typename StorageBit = unsigned long long>
 class NBitVector {
@@ -54,8 +53,10 @@ NBitVector<StorageBit>& NBitVector<StorageBit>::operator=(NBitVector<StorageBit>
 template<typename StorageBit>
 template <typename T>
 void NBitVector<StorageBit>::Set(size_t idx, T val) {
-    if (static_cast<size_t>(val) >= (1ULL << bit_width_)) throw std::runtime_error("Invalid number. Wrong size");
-    if (idx >= num_elements_) throw std::out_of_range("Index out of range");
+    if (static_cast<size_t>(val) >= (1ULL << bit_width_))
+        g_logger.LogError("NBitVector<StorageBit>::Set","Invalid number. Wrong size" );
+    if (idx >= num_elements_)
+        g_logger.LogError("NBitVector<StorageBit>::Set", "Index out of range");
 
     StorageBit data = static_cast<StorageBit>(val);
 
@@ -78,7 +79,8 @@ void NBitVector<StorageBit>::Set(size_t idx, T val) {
 
 template<typename StorageBit>
 StorageBit NBitVector<StorageBit>::Get(size_t idx) const {
-    if (idx >= num_elements_) throw std::out_of_range("Index out of range");
+    if (idx >= num_elements_)
+        g_logger.LogError("NBitVector<StorageBit>::Get", "Index out of range");
     return GetUnsafe(idx);
 }
 
@@ -103,7 +105,9 @@ StorageBit NBitVector<StorageBit>::GetUnsafe(size_t idx) const {
 
 template<typename StorageBit>
 NBitVector<StorageBit>::NBitVector(int numElements, int bitWidth) : bit_width_{ bitWidth }, num_elements_{ numElements } {
-    if (bitWidth > kStorageBits) throw std::runtime_error("Bit width is too wide.");
+    if (bitWidth > kStorageBits)
+        g_logger.LogError("NBitVector<StorageBit>::NBitVector", "Bit width is too wide.");
+
     data_.resize(numElements * bitWidth / kStorageBits + 1);
     all_ones_bit_width_ = ~(kAllOnes << bit_width_);
 }
@@ -121,7 +125,9 @@ NBitVector<StorageBit>::~NBitVector() {
 template<typename StorageBit>
 template <typename T>
 void NBitVector<StorageBit>::Append(T val) {
-    if (val >= (1 << bit_width_)) throw std::runtime_error("Invalid number. Wrong size");
+    if (val >= (1 << bit_width_))
+        g_logger.LogError("NBitVector<StorageBit>::Append", "Invalid number. Wrong size");
+
     num_elements_++;
     if (num_elements_ * bit_width_ / kStorageBits >= data_.size()) {
         data_.push_back(static_cast<StorageBit>(0));

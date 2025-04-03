@@ -1,15 +1,15 @@
 #pragma once
 #include <glm/vec3.hpp>
 
-class ClientChunkCache;
+class ChunkMap;
 
 struct Entity;
 struct Ray;
 
-class ClientCollusionDetector {
+class CollusionDetector {
 public:
-    ClientCollusionDetector(ClientChunkCache* cache);
-    ~ClientCollusionDetector();
+    CollusionDetector(ChunkMap* cache);
+    ~CollusionDetector();
 
     bool CheckRayIntersection(Ray& ray);
 
@@ -19,5 +19,5 @@ public:
 
     bool isEntityOnGround(Entity* entity);
 private:
-    ClientChunkCache* cache_;
+    ChunkMap* cache_;
 };

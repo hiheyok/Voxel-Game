@@ -10,10 +10,10 @@ class Chunk;
 * Simple chunk storage for the client
 */
 
-class ClientRegion {
+class Region {
 public:
-    ClientRegion();
-    ~ClientRegion();
+    Region();
+    ~Region();
 
     Chunk* GetChunk(const ChunkPos& pos) const;
     void InsertChunk(std::unique_ptr<Chunk> chunk);

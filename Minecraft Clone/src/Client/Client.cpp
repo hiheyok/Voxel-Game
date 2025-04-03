@@ -132,7 +132,7 @@ void Client::Update() {
 
     if (inputs_.CheckKeyPress(GLFW_KEY_P)) {
         profiler_->LoadCache();
-        profiler_->print();
+        profiler_->Print();
     }
 
     if (inputs_.CheckKey(GLFW_KEY_ESCAPE)) {

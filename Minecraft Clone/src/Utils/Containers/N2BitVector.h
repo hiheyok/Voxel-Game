@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
-#include <stdexcept>
-#include <exception>
+#include "Utils/LogUtils.h"
 // For sizes of base 2
 template <typename StorageBit = unsigned long long>
 class N2BitVector {
@@ -34,9 +33,10 @@ public:
 template<typename StorageBit>
 template <typename T>
 void N2BitVector<StorageBit>::Set(size_t idx, T val) {
-    if (val >= (1 << bit_width_)) throw std::runtime_error("Invalid number. Wrong size");
-    if (idx >= num_elements_) throw std::out_of_range("Index out of range");
-
+    if (static_cast<size_t>(val) >= (1ULL << bit_width_))
+        g_logger.LogError("N2BitVector<StorageBit>::Set", "Invalid number. Wrong size");
+    if (idx >= num_elements_)
+        g_logger.LogError("N2BitVector<StorageBit>::Set", "Index out of range");
     StorageBit data = static_cast<StorageBit>(val);
 
     size_t vectorIndex = bit_width_ * idx / storage_bits_;
@@ -51,7 +51,8 @@ void N2BitVector<StorageBit>::Set(size_t idx, T val) {
 
 template<typename StorageBit>
 StorageBit N2BitVector<StorageBit>::Get(size_t idx) const {
-    if (idx >= num_elements_) throw std::out_of_range("Index out of range");
+    if (idx >= num_elements_)
+        g_logger.LogError("N2BitVector<StorageBit>::Get", "Index out of range");
     return GetUnsafe(idx);
 }
 
@@ -67,8 +68,10 @@ StorageBit N2BitVector<StorageBit>::GetUnsafe(size_t idx) const {
 
 template<typename StorageBit>
 N2BitVector<StorageBit>::N2BitVector(int numElements, int bitWidth) : bit_width_{ bitWidth }, num_elements_{ numElements } {
-    if (bitWidth > storage_bits_) throw std::runtime_error("Bit width is too wide.");
-    if ((bitWidth & (bitWidth - 1)) != 0) throw std::runtime_error("Bit width is not base 2");
+    if (bitWidth > storage_bits_)
+        g_logger.LogError("N2BitVector<StorageBit>::NBitVector", "Bit width is too wide.");
+    if ((bitWidth & (bitWidth - 1)) != 0)
+        g_logger.LogError("N2BitVector<StorageBit>::NBitVector", "Bit width is not base 2");
     data_.resize(numElements * bitWidth / storage_bits_ + 1);
     all_ones_bit_width_ = ~(all_ones_ << bit_width_);
 }
@@ -86,7 +89,8 @@ N2BitVector<StorageBit>::~N2BitVector() {
 template<typename StorageBit>
 template <typename T>
 void N2BitVector<StorageBit>::Append(T val) {
-    if (val >= (1 << bit_width_)) throw std::runtime_error("Invalid number. Wrong size");
+    if (val >= (1 << bit_width_))
+        g_logger.LogError("N2BitVector<StorageBit>::Append", "Invalid number. Wrong size");
     num_elements_++;
     if (num_elements_ * bit_width_ / storage_bits_ >= data_.size()) {
         data_.push_back(static_cast<StorageBit>(0));

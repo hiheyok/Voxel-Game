@@ -5,7 +5,7 @@
 
 #include <cmath>
 #include <iostream>
-#include <xhash>
+#include <functional>
 #include <cctype>
 #include <string>
 

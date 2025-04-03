@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <array>
 /*
 
 heightmap for chunk column 32 * 16 = 512 blocks columns 9 bits per column
@@ -18,5 +19,5 @@ public:
 
     void Clear();
 private:
-    std::vector<char> data_;
+    std::array<char, 256> data_;
 };

@@ -80,7 +80,7 @@ void Window::Start() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window_ = glfwCreateWindow(properties_.window_size_x_, properties_.window_size_y_, "1.2.0A (DEV)", NULL, NULL);
+    window_ = glfwCreateWindow(properties_.window_size_x_, properties_.window_size_y_, "1.2.0A (DEV)", 0, 0);
 
     glfwMakeContextCurrent(window_);
 

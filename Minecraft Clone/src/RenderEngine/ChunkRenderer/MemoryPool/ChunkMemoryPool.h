@@ -8,8 +8,8 @@
 class BufferStorage;
 
 struct ChunkMemoryPoolOffset {
-    size_t mem_offset_ = NULL;
-    size_t mem_size_ = NULL;
+    size_t mem_offset_ = 0;
+    size_t mem_size_ = 0;
     ChunkPos position_;
 
     ChunkMemoryPoolOffset();
@@ -24,8 +24,8 @@ namespace MemoryManagement {
         MemoryBlock() {};
         MemoryBlock(size_t memOffset, size_t memSize) : offset_(memOffset), size_(memSize) {}
 
-        size_t offset_ = NULL;
-        size_t size_ = NULL;
+        size_t offset_ = 0;
+        size_t size_ = 0;
     };
 
     class BlockManagement {

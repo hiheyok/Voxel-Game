@@ -3,7 +3,7 @@
 
 void VertexArray::Delete() {
     glDeleteVertexArrays(1, &array_id_);
-    array_id_ = NULL;
+    array_id_ = 0;
 }
 
 void VertexArray::Bind() {

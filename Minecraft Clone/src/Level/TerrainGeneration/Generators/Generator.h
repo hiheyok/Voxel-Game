@@ -19,13 +19,13 @@ public:
     virtual void Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
         (void)pos;
         (void)chunk;
-        throw std::exception("Don't use");
+        g_logger.LogError("WorldGenerator::Generate", "Don't use");
     }
     // TODO: Use custom tall chunk positioning
     virtual void GenerateTall(const ChunkPos& pos, std::unique_ptr<TallChunk>& chunk) {
         (void)pos;
         (void)chunk;
-        throw std::exception("Don't use");
+        g_logger.LogError("WorldGenerator::GenerateTall", "Don't use");
     }
 
     bool use_tall_chunks_ = false;

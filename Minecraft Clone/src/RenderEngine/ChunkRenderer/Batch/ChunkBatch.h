@@ -22,7 +22,7 @@ private:
     CFrustum frustum_;
     Buffer ibo_, ssbo_;
     VertexArray array_;
-    size_t max_buffer_size_ = NULL;
+    size_t max_buffer_size_ = 0;
 
     bool update_commands_ = false;
 

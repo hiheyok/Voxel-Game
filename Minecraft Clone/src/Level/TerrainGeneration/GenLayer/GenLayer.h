@@ -29,7 +29,7 @@ public:
         (void)areaWidth;
         (void)areaY;
         (void)areaX;
-        throw std::exception("no");
+        g_logger.LogError("GenLayer::getInts", "Don't use this");
     }
 
     void initChunkSeed(long long val1, long long val2) {

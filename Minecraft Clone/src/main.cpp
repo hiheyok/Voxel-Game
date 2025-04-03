@@ -17,7 +17,7 @@
 int main() {
     
     stbi_set_flip_vertically_on_load(true);
-    srand(static_cast<unsigned int>(time(NULL)));//Set rng seed
+    srand(static_cast<unsigned int>(time(0)));//Set rng seed
 
     Initialize();
 

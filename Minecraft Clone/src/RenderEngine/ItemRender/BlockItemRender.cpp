@@ -56,7 +56,7 @@ void BlockItemRender::Initialize() {
 }
 
 void BlockItemRender::RenderBlock(Item item) {
-    if (g_blocks.GetBlockType(item.GetBlock())->block_model_data_ == NULL) {
+    if (g_blocks.GetBlockType(item.GetBlock())->block_model_data_ == 0) {
         return;
     }
 

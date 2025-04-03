@@ -1,13 +1,13 @@
-#include "Client/ClientLevel/ChunkCache/ClientRegion.h"
 #include "Level/Chunk/Chunk.h"
+#include "Level/Container/Region.h"
 
-ClientRegion::ClientRegion() {
+Region::Region() {
     region_data_.resize(kRegionSize3D);
 }
 
-ClientRegion::~ClientRegion() = default;
+Region::~Region() = default;
 
-Chunk* ClientRegion::GetChunk(const ChunkPos& pos) const {
+Chunk* Region::GetChunk(const ChunkPos& pos) const {
     ChunkPos localChunkPos = pos & (kRegionDim - 1);
     int idx = localChunkPos.x * kRegionSize2D + localChunkPos.y * kRegionDim + localChunkPos.z;
     if (!CheckChunk(pos)) {
@@ -16,13 +16,13 @@ Chunk* ClientRegion::GetChunk(const ChunkPos& pos) const {
     return region_data_[idx].get();
 }
 
-bool ClientRegion::CheckChunk(const ChunkPos& pos) const {
+bool Region::CheckChunk(const ChunkPos& pos) const {
     ChunkPos localChunkPos = pos & (kRegionDim - 1);
     int idx = localChunkPos.x * kRegionSize2D + localChunkPos.y * kRegionDim + localChunkPos.z;
     return region_data_[idx] != nullptr;
 }
 
-void ClientRegion::InsertChunk(std::unique_ptr<Chunk> chunk) {
+void Region::InsertChunk(std::unique_ptr<Chunk> chunk) {
     const ChunkPos& pos = chunk->position_;
     ChunkPos localChunkPos = pos & (kRegionDim - 1);
     int idx = localChunkPos.x * kRegionSize2D + localChunkPos.y * kRegionDim + localChunkPos.z;
@@ -34,7 +34,7 @@ void ClientRegion::InsertChunk(std::unique_ptr<Chunk> chunk) {
     region_data_[idx] = std::move(chunk);
 }
 
-void ClientRegion::EraseChunk(const ChunkPos& pos) {
+void Region::EraseChunk(const ChunkPos& pos) {
     ChunkPos localChunkPos = pos & (kRegionDim - 1);
     int idx = localChunkPos.x * kRegionSize2D + localChunkPos.y * kRegionDim + localChunkPos.z;
     if (region_data_[idx] == nullptr) {
@@ -46,6 +46,6 @@ void ClientRegion::EraseChunk(const ChunkPos& pos) {
     }
 }
 
-int ClientRegion::GetChunkCount() const {
+int Region::GetChunkCount() const {
     return chunk_count_;
 }

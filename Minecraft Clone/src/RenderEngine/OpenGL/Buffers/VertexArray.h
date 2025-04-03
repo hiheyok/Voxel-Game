@@ -16,5 +16,5 @@ public:
 
     void EnableAttriPTR(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, int subIndex);
 private:
-    unsigned int array_id_ = NULL;
+    unsigned int array_id_ = 0;
 };

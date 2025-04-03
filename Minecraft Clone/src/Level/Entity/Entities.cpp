@@ -27,7 +27,7 @@ EntityTypeID EntitiesList::RegisterEntity(std::string EntityName, EntityTypeEnum
     }
 
     if (newEntity == nullptr) {
-        throw std::exception("Error!");
+        g_logger.LogError("RegisterEntity", "Error!");
     }
 
     newEntity->entity_name_ = EntityName;

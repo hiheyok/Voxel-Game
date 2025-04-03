@@ -1,8 +1,8 @@
 #include <glm/vec2.hpp>
 
-#include "MainPlayer.h"
-#include "PlayerMovement.h"
-#include "WorldInteraction.h"
+#include "Client/Player/MainPlayer.h"
+#include "Client/Player/PlayerMovement.h"
+#include "Client/Player/WorldInteraction.h"
 #include "Client/IO/IO.h"
 #include "Client/IO/KEY_CODE.h"
 #include "Level/Item/ItemTextureAtlas.h"

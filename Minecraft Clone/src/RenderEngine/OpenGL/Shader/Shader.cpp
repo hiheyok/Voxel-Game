@@ -1,3 +1,5 @@
+#include <sstream>
+
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "Utils/LogUtils.h"
 
@@ -51,12 +53,12 @@ void Shader::Init(const char* vertexPath, const char* fragmentPath, const char* 
     unsigned int vertex, fragment;
     // vertex shader
     vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 1, &vShaderCode, NULL);
+    glShaderSource(vertex, 1, &vShaderCode, 0);
     glCompileShader(vertex);
     CheckCompileErrors(vertex, "Vertex");
     // fragment Shader
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 1, &fShaderCode, NULL);
+    glShaderSource(fragment, 1, &fShaderCode, 0);
     glCompileShader(fragment);
     CheckCompileErrors(fragment, "Fragment");
     // if geometry shader is given, compile geometry shader
@@ -65,7 +67,7 @@ void Shader::Init(const char* vertexPath, const char* fragmentPath, const char* 
     {
         const char* gShaderCode = geometryCode.c_str();
         geometry = glCreateShader(GL_GEOMETRY_SHADER);
-        glShaderSource(geometry, 1, &gShaderCode, NULL);
+        glShaderSource(geometry, 1, &gShaderCode, 0);
         glCompileShader(geometry);
         CheckCompileErrors(geometry, "Geometry");
     }
@@ -193,7 +195,7 @@ void Shader::CheckCompileErrors(GLuint shader, std::string type_) {
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success)
         {
-            glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+            glGetShaderInfoLog(shader, 1024, 0, infoLog);
             g_logger.LogError("Shader::CheckCompileErrors", "Failed to compile" + type_ + " Shader: \n" + std::string(infoLog) + "\n");
         }
     }
@@ -202,7 +204,7 @@ void Shader::CheckCompileErrors(GLuint shader, std::string type_) {
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if (!success)
         {
-            glGetProgramInfoLog(shader, 1024, NULL, infoLog);
+            glGetProgramInfoLog(shader, 1024, 0, infoLog);
             g_logger.LogError("Shader::CheckCompileErrors", "Failed to link Shader Program: \n" + std::string(infoLog) + "\n");
         }
     }

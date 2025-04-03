@@ -22,6 +22,6 @@ public:
     void Set();
 
 private:
-    std::chrono::steady_clock::time_point first_;
+    std::chrono::high_resolution_clock::time_point first_;
 
 };

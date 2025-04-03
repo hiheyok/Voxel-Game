@@ -1,6 +1,6 @@
 #pragma once
 #include "Level/TerrainGeneration/GenLayer/CombineLayers.h"
-#include <concurrent_unordered_map.h> // TODO: Change this maybe use thread_local
+#include "Core/Typenames.h"
 //mc src
 inline std::mutex g_biome_lock;
 
@@ -9,7 +9,7 @@ private:
     static std::vector<GenLayer*> genBiomes;
     static std::vector<GenLayer*> biomeIndexLayer;
     static ChunkGeneratorSettings* settings_;
-    static concurrency::concurrent_unordered_map<size_t, size_t> ThreadGenIndex;
+    static FastHashMap<size_t, size_t> ThreadGenIndex;
     static long long biomeProviderSeed;
 public:
     BiomeProvider() {
@@ -19,7 +19,7 @@ public:
     BiomeProvider(long long seed, ChunkGeneratorSettings* settingsIn) {
         (void)seed;
         (void)settingsIn;
-        throw std::exception("Not used");
+        g_logger.LogError("BiomeProvider::BiomeProvider", "Don't use this");
     }
 
     static void init(long long seed, ChunkGeneratorSettings* settingsIn) {
@@ -76,4 +76,4 @@ inline std::vector<GenLayer*> BiomeProvider::genBiomes = std::vector<GenLayer*>(
 inline std::vector<GenLayer*> BiomeProvider::biomeIndexLayer = std::vector<GenLayer*>();
 inline ChunkGeneratorSettings* BiomeProvider::settings_ = nullptr;
 inline long long BiomeProvider::biomeProviderSeed = 0;
-inline concurrency::concurrent_unordered_map<size_t, size_t> BiomeProvider::ThreadGenIndex = concurrency::concurrent_unordered_map<size_t, size_t>();
+inline FastHashMap<size_t, size_t> BiomeProvider::ThreadGenIndex = FastHashMap<size_t, size_t>();

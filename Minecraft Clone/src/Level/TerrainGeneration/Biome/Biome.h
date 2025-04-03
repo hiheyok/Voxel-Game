@@ -51,7 +51,7 @@ public:
 
     static int getIdForBiome(Biome* biome) {
         if (!BiomeIDs.count(biome)) {
-            throw std::exception("Invalid biome");
+            g_logger.LogError("Biome::getIdForBiome", "Invalid bioem");
         }
         return BiomeIDs[biome];
     }

@@ -31,9 +31,9 @@ void Buffer::Unbind() {
 
 void Buffer::Delete() {
     glDeleteBuffers(1, &buffer_id_);
-    buffer_id_ = NULL;
-    max_size_ = NULL;
-    type_ = NULL;
+    buffer_id_ = 0;
+    max_size_ = 0;
+    type_ = 0;
 }
 
 void Buffer::SetMaxSize(size_t maxSize) {

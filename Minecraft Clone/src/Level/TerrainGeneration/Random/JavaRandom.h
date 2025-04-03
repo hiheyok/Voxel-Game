@@ -1,6 +1,5 @@
 #pragma once
 #include <random>
-#include <exception>
 
 class JavaRandom {
 private:
@@ -10,7 +9,7 @@ private:
     int64_t serial_version_uid_ = 3905348978240129619L;
 
 public:
-    JavaRandom() : JavaRandom{static_cast<uint64_t>(time(NULL))} {
+    JavaRandom() : JavaRandom{static_cast<uint64_t>(time(0))} {
     }
 
     JavaRandom(uint64_t seed) {

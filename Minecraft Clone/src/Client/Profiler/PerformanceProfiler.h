@@ -24,7 +24,7 @@ public:
 
     void LoadCache();
 
-    void print();
+    void Print();
 
     void CondenseCache();
 
@@ -53,6 +53,6 @@ private:
     };
 
     PerformanceTree root_{"root"};
-    std::chrono::steady_clock::time_point initial_time_;
+    std::chrono::high_resolution_clock::time_point initial_time_;
 
 };

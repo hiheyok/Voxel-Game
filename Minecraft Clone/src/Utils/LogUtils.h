@@ -15,8 +15,8 @@ inline constexpr int LOG_TYPE_ERROR = 0x02;
 inline constexpr int LOG_TYPE_WARN = 0x03;
 
 struct LogData {
-    int type_ = NULL;
-    int thread = NULL;
+    int type_ = 0;
+    int thread = 0;
     std::string message_;
     std::string subtype_;
     std::chrono::system_clock::time_point time_;

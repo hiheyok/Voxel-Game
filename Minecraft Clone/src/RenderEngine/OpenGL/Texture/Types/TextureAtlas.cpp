@@ -21,7 +21,7 @@ void TextureAtlas::SetSize(int width, int height) {
     width_ = width;
     height_ = height;
 
-    texture_atlas_data_.resize(width_ * height_ * color_space_, NULL);
+    texture_atlas_data_.resize(width_ * height_ * color_space_, 0);
 }
 
 void TextureAtlas::SetPixel(uint8_t r, uint8_t  g, uint8_t b, uint8_t a, size_t w, size_t h) {

@@ -167,6 +167,7 @@
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -179,9 +180,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Client\Client.cpp" />
-    <ClCompile Include="src\Client\ClientLevel\ChunkCache\ClientChunkCache.cpp" />
-    <ClCompile Include="src\Client\ClientLevel\ChunkCache\ClientCollusionDetector.cpp" />
-    <ClCompile Include="src\Client\ClientLevel\ChunkCache\ClientRegion.cpp" />
+    <ClCompile Include="src\Level\Container\ChunkMap.cpp" />
+    <ClCompile Include="src\Level\World\Collusion\CollusionDetector.cpp" />
+    <ClCompile Include="src\Level\Container\Region.cpp" />
     <ClCompile Include="src\Client\ClientPlay.cpp" />
     <ClCompile Include="src\Client\IO\IO.cpp" />
     <ClCompile Include="src\Client\Player\MainPlayer.cpp" />
@@ -206,7 +207,7 @@
     <ClCompile Include="src\Level\Chunk\Lighting\LightStorage.cpp" />
     <ClCompile Include="src\Level\Chunk\Palette.cpp" />
     <ClCompile Include="src\Level\Chunk\TallChunk.cpp" />
-    <ClCompile Include="src\Level\DataContainer\EntityContainer.cpp" />
+    <ClCompile Include="src\Level\Container\EntityContainer.cpp" />
     <ClCompile Include="src\Level\Entity\Type\FallingBlock.cpp" />
     <ClCompile Include="src\Level\Entity\Type\Hostile.cpp" />
     <ClCompile Include="src\Level\Entity\Type\Passive.cpp" />
@@ -239,7 +240,6 @@
     <ClCompile Include="src\Level\TerrainGeneration\Noisemaps\NoiseOctave.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Random\JavaRandom.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Structures\Structure.cpp" />
-    <ClCompile Include="src\Level\World\Collusion\WorldCollusion.cpp" />
     <ClCompile Include="src\Level\World\World.cpp" />
     <ClCompile Include="src\Level\World\WorldDataAccess.cpp" />
     <ClCompile Include="src\Level\World\WorldInteraction\WorldInteractions.cpp" />
@@ -293,16 +293,15 @@
     <ClCompile Include="src\Level\Chunk\Block\Block.cpp" />
     <ClCompile Include="src\Level\Chunk\Chunk.cpp" />
     <ClCompile Include="src\Level\Chunk\ChunkData.cpp" />
-    <ClCompile Include="src\Level\DataContainer\ChunkMapData.cpp" />
     <ClCompile Include="src\Level\Timer\Timer.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Client\Client.h" />
-    <ClInclude Include="src\Client\ClientLevel\ChunkCache\ClientCollusionDetector.h" />
-    <ClInclude Include="src\Client\ClientLevel\ChunkCache\ClientRegion.h" />
+    <ClInclude Include="src\Level\World\Collusion\CollusionDetector.h" />
+    <ClInclude Include="src\Level\Container\Region.h" />
     <ClInclude Include="src\Client\ClientLevel\ClientCache.h" />
-    <ClInclude Include="src\Client\ClientLevel\ChunkCache\ClientChunkCache.h" />
+    <ClInclude Include="src\Level\Container\ChunkMap.h" />
     <ClInclude Include="src\Client\ClientLevel\ClientLevel.h" />
     <ClInclude Include="src\Client\ClientLevel\Entity\ClientEntities.h" />
     <ClInclude Include="src\Client\ClientPlay.h" />
@@ -391,7 +390,6 @@
     <ClInclude Include="src\Level\TerrainGeneration\GenLayer\IntCache.h" />
     <ClInclude Include="src\Level\TerrainGeneration\MapGen\MapGenBase.h" />
     <ClInclude Include="src\Level\TerrainGeneration\MapGen\MapGenCaves.h" />
-    <ClInclude Include="src\Level\World\Collusion\WorldCollusion.h" />
     <ClInclude Include="src\Level\World\World.h" />
     <ClInclude Include="src\Level\World\WorldDataAccess.h" />
     <ClInclude Include="src\Level\World\WorldInteraction\WorldInteractions.h" />
@@ -454,7 +452,7 @@
     <ClInclude Include="src\Level\Chunk\Block\Type\Dirt.h" />
     <ClInclude Include="src\Level\Chunk\Block\Type\Fluid.h" />
     <ClInclude Include="src\Level\Chunk\Block\Type\GravityBlock.h" />
-    <ClInclude Include="src\Level\DataContainer\EntityContainer.h" />
+    <ClInclude Include="src\Level\Container\EntityContainer.h" />
     <ClInclude Include="src\Level\Entity\Properties\EntityProperties.h" />
     <ClInclude Include="src\Level\Entity\Type\FallingBlock.h" />
     <ClInclude Include="src\Level\Entity\Type\Hostile.h" />
@@ -483,7 +481,6 @@
     <ClInclude Include="src\Level\Chunk\Block\Texture\BlockTexture.h" />
     <ClInclude Include="src\Level\Chunk\Chunk.h" />
     <ClInclude Include="src\Level\Chunk\ChunkData.h" />
-    <ClInclude Include="src\Level\DataContainer\ChunkMapData.h" />
     <ClInclude Include="src\Level\Entity\Entities.h" />
     <ClInclude Include="src\RenderEngine\EntityRenderer\Models\EntityModel.h" />
     <ClInclude Include="src\Level\Entity\Type\EntityType.h" />

@@ -1,18 +1,17 @@
-#include "Level/World/Collusion/WorldCollusion.h"
+#include "Level/Container/ChunkMap.h"
 #include "Level/Chunk/Block/Block.h"
 #include "Level/Chunk/Block/Blocks.h"
-#include "Level/DataContainer/ChunkMapData.h"
 #include "Level/Entity/Entity.h"
 #include "Level/Entity/Entities.h"
 #include "Level/Entity/Collusion/Hitbox.h"
+#include "Level/World/Collusion/CollusionDetector.h"
 #include "Utils/Math/vectorOperations.h"
 #include "Utils/Math/Ray/Ray.h"
 
-void WorldCollusionDetector::Initialize(ChunkMap* w) {
-    world_ = w;
-}
+CollusionDetector::CollusionDetector(ChunkMap* cache) : cache_{cache} {}
+CollusionDetector::~CollusionDetector() = default;
 
-float WorldCollusionDetector::GetDistanceUntilCollusionSingleDirection(glm::vec3 origin, int direction, int distanceTest) {
+float CollusionDetector::GetDistanceUntilCollusionSingleDirection(glm::vec3 origin, int direction, int distanceTest) {
     float displacement = 0;
 
     glm::ivec3 flooredPos(floor(origin.x), floor(origin.y), floor(origin.z));
@@ -33,7 +32,7 @@ float WorldCollusionDetector::GetDistanceUntilCollusionSingleDirection(glm::vec3
 
         flooredPos[axis_] += move * (int)(i != 0);
 
-        BlockID b = world_->GetBlock(BlockPos{ flooredPos.x, flooredPos.y, flooredPos.z });
+        BlockID b = cache_->GetBlock(BlockPos{ flooredPos.x, flooredPos.y, flooredPos.z });
 
         if (g_blocks.GetBlockType(b)->properties_->is_solid_) {
             return (float)i + displacement - 1.f;
@@ -43,7 +42,7 @@ float WorldCollusionDetector::GetDistanceUntilCollusionSingleDirection(glm::vec3
     return -1.f;
 }
 
-glm::dvec3 WorldCollusionDetector::GetTimeTillCollusion(Entity* entity) {
+glm::dvec3 CollusionDetector::GetTimeTillCollusion(Entity* entity) {
     AABB hitbox = g_entity_list.GetEntity(entity->properties_.type_)->GetHitbox();
 
     glm::vec3 hitboxStart = entity->properties_.position_ - (hitbox.size_ / 2.f);
@@ -125,7 +124,7 @@ glm::dvec3 WorldCollusionDetector::GetTimeTillCollusion(Entity* entity) {
     return leastTime;
 }
 
-bool WorldCollusionDetector::CheckRayIntersection(Ray& ray) {
+bool CollusionDetector::CheckRayIntersection(Ray& ray) {
 
     //Direction with magnitude
     glm::vec3 delta = ray.direction_;
@@ -158,8 +157,8 @@ bool WorldCollusionDetector::CheckRayIntersection(Ray& ray) {
 
     while (iterations < maxIterations) {
         iterations++;
-        
-        BlockID b = world_->GetBlock(BlockPos{ blockPos.x, blockPos.y, blockPos.z });
+
+        BlockID b = cache_->GetBlock(BlockPos{ blockPos.x, blockPos.y, blockPos.z });
 
         if (g_blocks.GetBlockType(b)->properties_->is_solid_) {
 
@@ -195,7 +194,7 @@ bool WorldCollusionDetector::CheckRayIntersection(Ray& ray) {
     return false;
 }
 
-bool WorldCollusionDetector::isEntityOnGround(Entity* entity) {
+bool CollusionDetector::isEntityOnGround(Entity* entity) {
     AABB hitbox = g_entity_list.GetEntity(entity->properties_.type_)->GetHitbox();
 
     glm::vec3 hitboxStart = entity->properties_.position_ - (hitbox.size_ / 2.f);

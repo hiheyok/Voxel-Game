@@ -26,8 +26,8 @@ struct ChunkEvent {
 
 struct EntityEvent {
     BlockPos pos_{ 0,0,0 };
-    EntityTypeID entity_type_ = NULL;
-    EntityUUID entity_uuid_ = NULL;
+    EntityTypeID entity_type_ = 0;
+    EntityUUID entity_uuid_ = 0;
     EventID id_ = 0;
     char unique_id_ = 0;
 };

@@ -11,7 +11,7 @@
 
 class World;
 class WorldLoader;
-class WorldCollusionDetector;
+class CollusionDetector;
 class Chunk;
 class LightStorage;
 
@@ -25,15 +25,14 @@ private:
     std::mutex updated_chunk_lock_;
     FastHashSet<ChunkPos> updated_chunk_;
     FastHashSet<ChunkPos> updated_lighting_pos_;
-    FastHashSet<ChunkPos> requested_light_update_; // pair<y height, index in update vector>
-    std::vector<ChunkPos> light_updates_;
     std::vector<std::pair<BlockID, BlockPos>> block_updates_;
 public:
-    WorldLoader* worldLoader_ = nullptr;
+    std::unique_ptr<WorldLoader> worldLoader_;
     std::unique_ptr<WorldParameters> settings_;
-    std::unique_ptr<WorldCollusionDetector> collusions_;
+    std::unique_ptr<CollusionDetector> collusions_;
 
     WorldInteractions();
+    ~WorldInteractions();
 
     WorldInteractions(World* w, WorldParameters parameters);
 
@@ -50,13 +49,9 @@ public:
     std::vector<EntityProperty> GetUpdatedEntities();
     std::vector<EntityUUID> GetRemovedEntities();
 
-    void RequestLightUpdate(const ChunkPos& pos);
-
     void KillEntity(EntityUUID id);
 
     void Update();
-
-    void UpdateLighting(std::unique_ptr<LightStorage> chunkLighting);
 
     void UpdateLighting(std::vector<std::unique_ptr<LightStorage>> chunkLighting);
 

@@ -138,9 +138,8 @@ void ClientPlay::UpdateChunks() {
         }
         break;
         case ChunkUpdatePacket::DELETE_CHUNK:
-            // Doesn't exist right now
             // TODO: Implement later
-            throw std::exception("dont call me");
+            g_logger.LogError("ClientPlay::UpdateChunks", "Don't call me");
             break;
         case ChunkUpdatePacket::LIGHT_UPDATE:
         {
@@ -169,12 +168,9 @@ void ClientPlay::UpdateChunks() {
 
     for (const auto& light : updateLightPackets) {
         const LightStorage& l = light.light_;
-        if (!client_level_->cache.CheckChunk(l.position_)) {
-            continue;
-        }
 
         chunkToUpdateRender.insert(l.position_);
-        client_level_->cache.GetChunk(l.position_)->lighting_->ReplaceData(l.getData());
+        client_level_->cache.GetChunk(l.position_)->lighting_->ReplaceData(l.GetData());
     }
 
     std::vector<ChunkPos> toUpdate(chunkToUpdateRender.begin(), chunkToUpdateRender.end());

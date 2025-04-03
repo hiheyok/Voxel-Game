@@ -11,7 +11,7 @@
 
 class Shader {
 public:
-    unsigned int shader_id_ = NULL;
+    unsigned int shader_id_ = 0;
 
     void Init(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
 

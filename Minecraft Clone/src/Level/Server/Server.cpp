@@ -2,6 +2,7 @@
 #include "Core/Interfaces/ClientInterface.h"
 #include "Core/Interfaces/InternalInterface.h"
 #include "Level/Chunk/ChunkPos/ChunkPos.h"
+#include "Level/Chunk/ChunkData.h"
 #include "Level/Dimension/Dimension.h"
 #include "Level/Entity/Properties/EntityProperties.h"
 #include "Level/Entity/Mobs/Player.h"

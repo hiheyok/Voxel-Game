@@ -50,7 +50,7 @@ static int ConvertStringFaceToIndex(const std::string& str) {
     }
     else {
         g_logger.LogError("ConvertStringFaceToIndex", "Unknown direction: " + str);
-        return NULL;
+        return 0;
     }
 
 }

@@ -176,7 +176,7 @@ std::string LogUtils::FormatString(std::string in, ...) {
     va_end(args);
 
     std::string out(buffer_);
-    memset(buffer_, NULL, out.size());
+    memset(buffer_, 0, out.size());
     return out;
 }
 

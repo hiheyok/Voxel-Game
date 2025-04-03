@@ -1,13 +1,14 @@
 #pragma once
-#include "Client/ClientLevel/ChunkCache/ClientChunkCache.h"
-#include "Client/ClientLevel/ChunkCache/ClientCollusionDetector.h"
-#include "Client/ClientLevel/Entity/ClientEntities.h"
+#include "Level/Container/ChunkMap.h"
+#include "Level/Container/Region.h"
 #include "Level/Chunk/Chunk.h"
+#include "Level/World/Collusion/CollusionDetector.h"
+#include "Client/ClientLevel/Entity/ClientEntities.h"
 
 class ClientCache {
 public:
     ClientEntities entities_;
-    ClientCollusionDetector collusion_manager_;
+    CollusionDetector collusion_manager_;
 
     ClientCache() : collusion_manager_{&chunk_cache_ } {}
 
@@ -31,5 +32,5 @@ public:
         return chunk_cache_.CheckChunk(pos);
     }
 private:
-    ClientChunkCache chunk_cache_;
+    ChunkMap chunk_cache_;
 };

@@ -92,19 +92,19 @@ void BlockList::InitializeBlockModels()  {
     //Bake all of the texture variables next
 
     for (auto& block : block_type_data_) {
-        if (block->block_model_data_ == NULL) continue;
+        if (block->block_model_data_ == 0) continue;
         block->block_model_data_->FlattenVariables();
     }
 
     //Bake all rotations into the UV
     for (auto& block : block_type_data_) {
-        if (block->block_model_data_ == NULL) continue;
+        if (block->block_model_data_ == 0) continue;
         block->block_model_data_->BakeTextureRotation();
     }
 
     //Generate all the textures now
     for (auto& block  : block_type_data_) {
-        if (block->block_model_data_ == NULL) continue;
+        if (block->block_model_data_ == 0) continue;
 
         for (auto& element : block->block_model_data_->elements_) {
             for (int i = 0; i < 6; i++) {
@@ -157,7 +157,7 @@ void BlockList::InitializeBlockModels()  {
     for (size_t i = 0; i < block_type_data_.size(); i++) {
         Model::BlockModel model;
 
-        if (block_type_data_[i]->block_model_data_ != NULL) {
+        if (block_type_data_[i]->block_model_data_ != 0) {
             model = *block_type_data_[i]->block_model_data_;
         }
         model.texture_variable_.clear();

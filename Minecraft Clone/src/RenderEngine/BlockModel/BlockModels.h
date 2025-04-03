@@ -28,8 +28,8 @@ struct BlockFace {
     std::string reference_texture_ = ""; // variables starts with #
     int cull_face_ = -1;
     int tint_index_ = -1;
-    size_t texture_id_ = NULL;
-    size_t texture_count_ = NULL; //For amination purposes.
+    size_t texture_id_ = 0;
+    size_t texture_count_ = 0; //For amination purposes.
     unsigned int rotation_ = 0;
     bool has_transparency_ = false;
     bool is_see_through_ = false;

@@ -1,6 +1,6 @@
 #pragma once
 #include "Level/Dimension/DimensionProperties.h"
-#include "Level/DataContainer/EntityContainer.h"
+#include "Level/Container/EntityContainer.h"
 #include "Level/Event/EventSystem.h"
 #include "Level/Event/EventHandler.h"
 #include "Level/TerrainGeneration/Generator.h"
@@ -71,7 +71,7 @@ public:
                 break;
             }
             default:
-                throw std::exception("Not handled yet!");
+                g_logger.LogError("Dimension::EventTick", "Not handled yet!");
             }
 
             g_event_handler.ExecuteEvent(e, this);

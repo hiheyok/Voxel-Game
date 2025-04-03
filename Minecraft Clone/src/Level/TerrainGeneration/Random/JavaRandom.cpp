@@ -1,4 +1,5 @@
 #include "Level/TerrainGeneration/Random/JavaRandom.h"
+#include "Utils/LogUtils.h"
 
 void JavaRandom::SetSeed(int64_t seed) {
     rseed_ = (seed ^ 0x5DEECE66DLL) & ((1LL << 48) - 1);
@@ -12,7 +13,7 @@ int JavaRandom::Next(int bits) {
 
 int JavaRandom::NextInt(int n) {
     if (n <= 0)
-        throw std::exception("n must be positive");
+        g_logger.LogError("JavaRandom", "n must be positive");
     if ((n & (-n)) == n) //n is power of 2
         return (int)((n * (int64_t)Next(31)) >> 31);
     int bits, val;

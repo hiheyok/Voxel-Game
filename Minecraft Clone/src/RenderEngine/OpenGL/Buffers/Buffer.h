@@ -37,7 +37,7 @@ public:
 
     void CopyTo(Buffer& destination, size_t offset, size_t desOffset, size_t size);
 
-    size_t max_size_ = NULL;
-    unsigned int buffer_id_ = NULL;
-    unsigned int type_ = NULL, usage_ = NULL;
+    size_t max_size_ = 0;
+    unsigned int buffer_id_ = 0;
+    unsigned int type_ = 0, usage_ = 0;
 };

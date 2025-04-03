@@ -183,7 +183,7 @@ void ComputeShader::CheckCompileError(GLuint shader) {
     glGetProgramiv(shader, GL_LINK_STATUS, &success);
     if (!success)
     {
-        glGetProgramInfoLog(shader, 1024, NULL, infoLog);
+        glGetProgramInfoLog(shader, 1024, 0, infoLog);
         g_logger.LogError("ComputeShader::CheckCompileError", "Failed to link Shader Program: \n" + std::string(infoLog) + "\n");
     }
 }

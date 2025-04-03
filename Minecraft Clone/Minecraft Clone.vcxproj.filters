@@ -72,9 +72,6 @@
     <ClCompile Include="src\RenderEngine\ChunkRenderer\Batch\ChunkBatch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\DataContainer\ChunkMapData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\RenderEngine\ChunkRenderer\TerrainRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -139,9 +136,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\GUI\Font.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Level\World\Collusion\WorldCollusion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Level\World\WorldDataAccess.cpp">
@@ -315,7 +309,7 @@
     <ClCompile Include="src\Level\Chunk\Palette.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\DataContainer\EntityContainer.cpp">
+    <ClCompile Include="src\Level\Container\EntityContainer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\OpenGL\Texture\Texture.cpp">
@@ -357,13 +351,13 @@
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\ComputeShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Client\ClientLevel\ChunkCache\ClientRegion.cpp">
+    <ClCompile Include="src\Level\Container\Region.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Client\ClientLevel\ChunkCache\ClientChunkCache.cpp">
+    <ClCompile Include="src\Level\Container\ChunkMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Client\ClientLevel\ChunkCache\ClientCollusionDetector.cpp">
+    <ClCompile Include="src\Level\World\Collusion\CollusionDetector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Client\ClientPlay.cpp">
@@ -396,9 +390,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Utils\stb_image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\DataContainer\ChunkMapData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\Window.h">
@@ -533,7 +524,7 @@
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Occulsion\Data\OcculsionDataManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\DataContainer\EntityContainer.h">
+    <ClInclude Include="src\Level\Container\EntityContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Entity\Type\Passive.h">
@@ -729,9 +720,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\World\WorldDataAccess.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\World\Collusion\WorldCollusion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Dimension\DimensionProperties.h">
@@ -998,13 +986,13 @@
     <ClInclude Include="src\RenderEngine\OpenGL\Shader\ComputeShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Client\ClientLevel\ChunkCache\ClientChunkCache.h">
+    <ClInclude Include="src\Level\Container\ChunkMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Client\ClientLevel\ChunkCache\ClientRegion.h">
+    <ClInclude Include="src\Level\Container\Region.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Client\ClientLevel\ChunkCache\ClientCollusionDetector.h">
+    <ClInclude Include="src\Level\World\Collusion\CollusionDetector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Client\ClientPlay.h">

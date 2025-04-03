@@ -1,11 +1,11 @@
 #include "Core/Registry/ResourceLocation.h"
 #include "FileManager/Files.h"
-
+#include "Utils/LogUtils.h"
 void ResourceLocation::SetResourceLocation(std::string name) {
     std::vector<std::string> tokens = Tokenize(name, ':');
 
     if (tokens.size() != 2) {
-        throw std::exception("Invalid resource location");
+        g_logger.LogError("ResourceLocation::SetResourceLocation", "Invalid resource location");
     }
 
     namespace_ = tokens[0];

@@ -63,7 +63,7 @@ void PerformanceProfiler::LoadCache() {
     time_pass_cache_.clear();
 }
 
-void PerformanceProfiler::print() {
+void PerformanceProfiler::Print() {
     root_.print();
 }
 

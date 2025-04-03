@@ -9,6 +9,7 @@ static const int NeighborOffset[6] = {
 ChunkContainer::ChunkContainer() : 
     lighting_{ std::make_unique<LightStorage>() },
     heightmap_{ std::make_unique<Heightmap>() } {
+    lighting_->position_ = position_;
 }
 
 ChunkContainer::~ChunkContainer() = default;
@@ -68,6 +69,7 @@ void ChunkContainer::SetBlockUnsafe(BlockID block, int x, int y, int z) {
 
 void ChunkContainer::SetPosition(int x, int y, int z) {
     position_.set(x, y, z);
+    lighting_->position_.set(x, y, z);
 }
 
 ChunkContainer* ChunkContainer::GetNeighbor(unsigned int side) const {
@@ -94,7 +96,7 @@ void ChunkContainer::Unuse() {
 }
 
 void ChunkContainer::SetData(const ChunkRawData& data) {
-    lighting_->ReplaceData(data.lighting_data_.getData());
+    lighting_->ReplaceData(data.lighting_data_.GetData());
     block_storage_ = data.chunk_data_;
     position_ = data.pos_;
 }
@@ -118,10 +120,16 @@ void ChunkContainer::UpdateHeightMap() {
 void ChunkContainer::UpdateHeightMap(int x, int z) {
     // Check chunk above first, if the heightmap above is > -1, it means that there are block above
     // -1 indicate theirs nothing in the column
+    bool updateBottom = heightmap_->Get(x, z) == -1 && neighbors_[NY] != nullptr;
+    \
     if (neighbors_[PY] != nullptr && neighbors_[PY]->heightmap_->Get(x, z) != -1) {
         if (heightmap_->Get(x, z) != 16) {
             heightmap_->Edit(x, z, 16);
             light_dirty_ = true;
+
+            if (updateBottom) {
+                neighbors_[NY]->UpdateHeightMap(x, z);
+            }
         }
     }
     else {
@@ -132,12 +140,19 @@ void ChunkContainer::UpdateHeightMap(int x, int z) {
             }
         }
 
-        heightmap_->Edit(x, z, i);
-        light_dirty_ = true;
+        if (heightmap_->Get(x, z) != i) {
+            heightmap_->Edit(x, z, i);
+            light_dirty_ = true;
+        }
+
+        if (i != -1 && updateBottom) {
+            neighbors_[NY]->UpdateHeightMap(x, z);
+        }
     }
 }
 
 bool ChunkContainer::CheckLightDirty() {
+    bool isDirty = light_dirty_;
     light_dirty_ = false;
-    return light_dirty_;
+    return isDirty;
 }

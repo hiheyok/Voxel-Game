@@ -10,7 +10,7 @@ LightStorage::LightStorage(const LightStorage&) = default;
 
 LightStorage::~LightStorage() = default;
 
-const uint64_t* LightStorage::getData() const {
+const uint64_t* LightStorage::GetData() const {
     return data_;
 }
 

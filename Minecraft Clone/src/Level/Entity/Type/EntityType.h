@@ -28,7 +28,7 @@ public:
 
     virtual void Tick(Entity* entity, Dimension* dimension) = 0;
 
-    EntityTypeID id_ = NULL;
+    EntityTypeID id_ = 0;
 
     EntityModel render_model_;
 

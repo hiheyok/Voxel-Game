@@ -6,7 +6,7 @@
 #include "Level/World/WorldParameters.h"
 #include "Level/Chunk/Lighting/LightStorage.h"
 #include "Level/Entity/Entity.h"
-#include "Level/DataContainer/EntityContainer.h"
+#include "Level/Container/EntityContainer.h"
 
 using namespace glm;
 
@@ -15,8 +15,8 @@ WorldLoader::WorldLoader(World* w, WorldParameters p) : settings_{ std::make_uni
 void WorldLoader::loadSummonEntitySurrounding(EntityUUID uuid) {
     Entity* e = world->entities_->GetEntity(uuid);
 
-    if (e == nullptr) throw std::exception(std::string("Entity with UUID " + std::to_string(uuid) + " not found").c_str());
-
+    if (e == nullptr)
+        g_logger.LogError("WorldLoader::loadSummonEntitySurrounding", std::string("Entity with UUID " + std::to_string(uuid) + " not found"));
     vec3 pos = e->properties_.position_ / 16.f;
     // vec3 velocity = e->Properties.Velocity;
 
@@ -57,7 +57,7 @@ void WorldLoader::loadSummonEntitySurrounding(EntityUUID uuid) {
 
 bool WorldLoader::RequestLoad(const ChunkPos& pos) {
     ChunkPos p = pos;
-    if (world->GetChunk(p) != nullptr)
+    if (world->CheckChunk(p))
         return false;
 
     if (tall_generation_)
@@ -89,7 +89,8 @@ void WorldLoader::loadSurroundedMovedEntityChunk() {
     for (const auto& e : entity_chunk_loaders_) {
         Entity* entity = world->entities_->GetEntity(e);
 
-        if (entity == nullptr) throw std::exception(std::string("Entity with UUID " + std::to_string(e) + " not found").c_str());
+        if (entity == nullptr)
+            g_logger.LogError("WorldLoader::loadSurroundedMovedEntityChunk", std::string("Entity with UUID " + std::to_string(e) + " not found"));
 
         int x = static_cast<int>(entity->properties_.position_.x / 16.f);
         int y = static_cast<int>(entity->properties_.position_.y / 16.f);
@@ -152,7 +153,8 @@ void WorldLoader::loadSurroundedMovedEntityChunk() {
 }
 
 void WorldLoader::loadSpawnChunks() {
-    if (world == nullptr) throw std::exception("World is not initialized. Couldn't set spawn chunks");
+    if (world == nullptr)
+        g_logger.LogError("WorldLoader::loadSpawnChunks", "World is not initialized. Couldn't set spawn chunks");
     for (long long int x = -settings_->spawn_chunk_horizontal_radius_; x <= settings_->spawn_chunk_horizontal_radius_; x++) {
         for (long long int z = -settings_->spawn_chunk_horizontal_radius_; z <= settings_->spawn_chunk_horizontal_radius_; z++) {
             for (long long int y = -settings_->spawn_chunk_vertical_radius_; y <= settings_->spawn_chunk_vertical_radius_; y++) {
@@ -177,7 +179,7 @@ WorldAccess* WorldLoader::GetWorld() const {
 void WorldLoader::ReplaceLightInfomation(std::unique_ptr<LightStorage> lighting) {
     const ChunkPos& pos = lighting->position_;
     Chunk* chunk = world->GetChunk(pos);
-    chunk->lighting_->ReplaceData(lighting->getData());
+    chunk->lighting_->ReplaceData(lighting->GetData());
 }
 
 std::vector<ChunkPos> WorldLoader::GetRequestedChunks() {
@@ -197,7 +199,7 @@ void WorldLoader::AddEntityChunkLoader(EntityUUID uuid) {
 
 void WorldLoader::DeleteEntityChunkLoader(EntityUUID uuid) {
     if (!entity_chunk_loaders_.count(uuid))
-        throw std::exception(std::string("Could not find entity with UUID " + std::to_string(uuid)).c_str());
+        g_logger.LogError("WorldLoader::DeleteEntityChunkLoader", std::string("Could not find entity with UUID " + std::to_string(uuid)));
 
     entity_chunk_loaders_.erase(uuid);
 }

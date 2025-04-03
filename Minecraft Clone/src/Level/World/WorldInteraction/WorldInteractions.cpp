@@ -2,15 +2,17 @@
 
 #include "Level/World/WorldInteraction/WorldInteractions.h"
 #include "Level/World/WorldInteraction/WorldLoader.h"
-#include "Level/World/Collusion/WorldCollusion.h"
+#include "Level/World/Collusion/CollusionDetector.h"
 #include "Level/World/World.h"
 #include "Level/World/WorldParameters.h"
 #include "Level/Chunk/Chunk.h"
 #include "Level/Chunk/Lighting/LightStorage.h"
-#include "Level/DataContainer/EntityContainer.h"
+#include "Level/Container/EntityContainer.h"
+#include "Level/Container/ChunkMap.h"
 #include "Level/Entity/Entity.h"
 
 WorldInteractions::WorldInteractions() = default;
+WorldInteractions::~WorldInteractions() = default;
 
 WorldInteractions::WorldInteractions(World* w, WorldParameters parameters) {
     init(w, parameters);
@@ -23,9 +25,8 @@ void WorldInteractions::UseTallGeneration() {
 void WorldInteractions::init(World* w, WorldParameters parameters) {
     world = w;
     settings_ = std::make_unique<WorldParameters>(parameters);
-    collusions_ = std::make_unique<WorldCollusionDetector>();
-    worldLoader_ = new WorldLoader(w, parameters);
-    collusions_->Initialize(w->chunk_container_.get());
+    worldLoader_ = std::make_unique<WorldLoader>(w, parameters);
+    collusions_ = std::make_unique<CollusionDetector>(w->chunk_container_.get());
 }
 
 std::vector<ChunkPos> WorldInteractions::GetUpdatedChunkPos() {
@@ -45,9 +46,15 @@ std::vector<ChunkPos> WorldInteractions::GetUpdatedLightPos() {
 }
 
 std::vector<ChunkPos> WorldInteractions::GetRequestedLightUpdates() {
-    std::lock_guard<std::mutex> lock{ updated_chunk_lock_ };
-    std::vector<ChunkPos> pos = std::move(light_updates_);
-    light_updates_.clear();
+    std::vector<Chunk*> chunks = world->chunk_container_->GetAllChunks();
+    std::vector<ChunkPos> pos;
+
+    for (const auto& chunk : chunks) {
+        if (chunk->CheckLightDirty()) {
+            pos.push_back(chunk->position_);
+        }
+    }
+
     return pos;
 }
 
@@ -63,15 +70,6 @@ std::vector<EntityUUID> WorldInteractions::GetRemovedEntities() {
     return world->entities_->GetRemovedEntities();
 }
 
-void WorldInteractions::RequestLightUpdate(const ChunkPos& pos) {
-    std::lock_guard<std::mutex> lock{ updated_chunk_lock_ };
-
-    if (!requested_light_update_.count(pos)) {
-        requested_light_update_.insert(pos);
-        light_updates_.push_back(pos);
-    }
-}
-
 void WorldInteractions::KillEntity(EntityUUID id) {
     world->entities_->RemoveEntity(id);
     if (worldLoader_->CheckEntityExistChunkLoader(id)) {
@@ -81,19 +79,6 @@ void WorldInteractions::KillEntity(EntityUUID id) {
 
 void WorldInteractions::Update() {
     worldLoader_->Load();
-}
-
-void WorldInteractions::UpdateLighting(std::unique_ptr<LightStorage> chunkLighting) {
-    ChunkPos pos = chunkLighting->position_;
-
-    worldLoader_->ReplaceLightInfomation(std::move(chunkLighting));
-
-    std::lock_guard<std::mutex> lock{ updated_chunk_lock_ };
-    if (!updated_lighting_pos_.count(pos)) {
-        updated_lighting_pos_.insert(pos);
-    }
-
-    requested_light_update_.erase(pos);
 }
 
 void WorldInteractions::UpdateLighting(std::vector<std::unique_ptr<LightStorage>> chunkLighting) {
@@ -112,9 +97,6 @@ void WorldInteractions::UpdateLighting(std::vector<std::unique_ptr<LightStorage>
         if (!updated_lighting_pos_.count(pos)) {
             updated_lighting_pos_.insert(pos);
         }
-
-        requested_light_update_.erase(pos);
-
     }
 }
 
@@ -124,7 +106,6 @@ void WorldInteractions::AddChunk(std::unique_ptr<Chunk> chunk) {
     const ChunkPos& position = chunk->position_;
 
     world->SetChunk(std::move(chunk));
-    RequestLightUpdate(position);
     chunkToUpdate.push(position);
 
     //Update neighbor chunks
@@ -170,7 +151,6 @@ void WorldInteractions::AddChunks(std::vector<std::unique_ptr<Chunk>> chunks) {
                 duplicatedInputs.insert(neighborPos);
             }
         }
-        RequestLightUpdate(position);
         world->SetChunk(std::move(chunk));
     }
 
@@ -226,9 +206,6 @@ void WorldInteractions::SetBlock(BlockID b, const BlockPos& bpos) {
             if (!updated_chunk_.count(p))
                 updated_chunk_.insert(p);
         }
-
-
-        RequestLightUpdate(pos);
     }
     catch (std::exception& e) {
         g_logger.LogWarn("WorldInteractions::SetBlock", e.what());
@@ -250,8 +227,8 @@ Entity* WorldInteractions::GetEntity(EntityUUID id) {
 }
 
 EntityUUID WorldInteractions::AddEntity(std::unique_ptr<Entity> entity) {
-    if (world == nullptr) throw std::exception("Cannot summon entity. World is null");
-
+    if (world == nullptr)
+        g_logger.LogError("WorldInteractions::AddEntity", "Cannot summon entity. World is null");
     bool isChunkLoader = entity->properties_.is_chunk_loader_;
     EntityUUID uuid = world->entities_->AddEntity(std::move(entity));
 
