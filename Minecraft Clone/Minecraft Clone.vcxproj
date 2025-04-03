@@ -181,6 +181,7 @@
   <ItemGroup>
     <ClCompile Include="src\Client\Client.cpp" />
     <ClCompile Include="src\Level\Container\ChunkMap.cpp" />
+    <ClCompile Include="src\Level\TerrainGeneration\GenLayer\IntCache.cpp" />
     <ClCompile Include="src\Level\World\Collusion\CollusionDetector.cpp" />
     <ClCompile Include="src\Level\Container\Region.cpp" />
     <ClCompile Include="src\Client\ClientPlay.cpp" />
@@ -271,6 +272,7 @@
     <ClCompile Include="src\RenderEngine\OpenGL\OpenGL.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\ComputeShader.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\Shader.cpp" />
+    <ClCompile Include="src\RenderEngine\OpenGL\Shader\ShaderInterface.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Texture\ImageLoader.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Texture\Texture.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\Texture2D.cpp" />
@@ -398,6 +400,7 @@
     <ClInclude Include="src\RenderEngine\OpenGL\Buffers\BufferStorage.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Buffers\VertexArray.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Shader\ComputeShader.h" />
+    <ClInclude Include="src\RenderEngine\OpenGL\Shader\ShaderInterface.h" />
     <ClInclude Include="src\Utils\Containers\ConcurrentQueue.h" />
     <ClInclude Include="src\Utils\Containers\N2BitVector.h" />
     <ClInclude Include="src\Utils\Containers\NBitVector.h" />

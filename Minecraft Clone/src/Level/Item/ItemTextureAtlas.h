@@ -39,7 +39,7 @@ public:
     Texture2D atlas_;
 
     FastHashMap<ItemID, size_t> offsets_;
-    
+    ItemTextureAtlas();
     void Initialize(int atlasItemSize, int individualItemSize);
 
     void AddItem(Item item);

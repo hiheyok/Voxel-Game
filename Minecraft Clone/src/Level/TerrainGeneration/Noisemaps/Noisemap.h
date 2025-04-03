@@ -3,7 +3,7 @@
 
 class NoiseMapTypes {
 public:
-    void Initialize(int32_t SEED);
+    void Initialize(int SEED);
 
     template <typename T> float GetNoise(T x, T y, T z, int Octaves, float zoom_);
 
@@ -18,7 +18,7 @@ private:
 
     FastNoiseLite OctaveNoise;
 
-    int32_t SEED_OFFSET = 0x93496;
+    int SEED_OFFSET = 0x93496;
 };
 
 class NoiseMaps1122 {

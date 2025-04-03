@@ -17,7 +17,9 @@ MultiEntityRenderer::MultiEntityRenderer() :
     ssbo_acc_{ std::make_unique<Buffer>() },
     vao_{ std::make_unique<VertexArray>() },
     player_{ std::make_unique<PlayerPOV>() },
-    shader_{ std::make_unique<Shader>() },
+    shader_{ std::make_unique<Shader>(
+        "assets/shaders/Entity/MultiEntityVert.glsl", 
+        "assets/shaders/Entity/MultiEntityFrag.glsl") },
     renderable_entities_{ std::make_unique<EntityRenderCache>() } {}
 
 MultiEntityRenderer::~MultiEntityRenderer() = default;
@@ -50,8 +52,6 @@ void MultiEntityRenderer::Initialize(PerformanceProfiler* pProfilerIn) {
         profiler_ = pProfilerIn;
 
     }
-
-    shader_->Init("assets/shaders/Entity/MultiEntityVert.glsl", "assets/shaders/Entity/MultiEntityFrag.glsl");
     camera_ = player_->GetCamera();
 
     //Initialize Buffers

@@ -9,8 +9,12 @@
 #include "Utils/LogUtils.h"
 
 TextRenderer::TextRenderer() :
-    font_shader_{ std::make_unique<Shader>() },
-    background_shader_{ std::make_unique<Shader>() },
+    font_shader_{ std::make_unique<Shader>(
+        "assets/shaders/Font/FontVert.glsl", 
+        "assets/shaders/Font/FontFrag.glsl") },
+    background_shader_{ std::make_unique<Shader>(
+        "assets/shaders/Font/FontBackgroundVert.glsl", 
+        "assets/shaders/Font/FontBackgroundFrag.glsl") },
     vbo_{ std::make_unique<Buffer>() },
     background_vbo_{ std::make_unique<Buffer>() },
     vao_{ std::make_unique<VertexArray>() },
@@ -21,10 +25,6 @@ TextRenderer::~TextRenderer() = default;
 
 
 void TextRenderer::InitializeTextRenderer(GLFWwindow* w) {
-    //Initialize shaders
-    font_shader_->Init("assets/shaders/Font/FontVert.glsl", "assets/shaders/Font/FontFrag.glsl");
-    background_shader_->Init("assets/shaders/Font/FontBackgroundVert.glsl", "assets/shaders/Font/FontBackgroundFrag.glsl");
-
     //Setup buffer for text rendering
     vbo_->GenBuffer();
     vao_->GenArray();

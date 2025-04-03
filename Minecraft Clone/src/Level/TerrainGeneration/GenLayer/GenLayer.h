@@ -30,6 +30,7 @@ public:
         (void)areaY;
         (void)areaX;
         g_logger.LogError("GenLayer::getInts", "Don't use this");
+        return {};
     }
 
     void initChunkSeed(long long val1, long long val2) {

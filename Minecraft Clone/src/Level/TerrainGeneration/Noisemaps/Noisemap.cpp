@@ -1,6 +1,6 @@
 #include "Level/TerrainGeneration/Noisemaps/Noisemap.h"
 
-void NoiseMapTypes::Initialize(int32_t SEED) {
+void NoiseMapTypes::Initialize(int SEED) {
     IslandLayer4096.SetNoiseType(IslandLayer4096.NoiseType_OpenSimplex2);
     IslandLayer4096.SetFrequency(1.f / 256.f);
     IslandLayer4096.SetSeed(SEED);

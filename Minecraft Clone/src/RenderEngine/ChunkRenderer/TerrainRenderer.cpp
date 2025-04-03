@@ -17,7 +17,9 @@ TerrainRenderer::TerrainRenderer() : chunk_solid_batches_{ 0 },
     chunk_batch_transparent_lookup_{ 0 },
     camera_{ nullptr },
     time_{ std::make_unique<Timer>() },
-    cubic_shader_{ std::make_unique<Shader>()}
+    cubic_shader_{ std::make_unique<Shader>(
+        "assets/shaders/vert.glsl", 
+        "assets/shaders/frag.glsl")}
  {}
 
 TerrainRenderer::~TerrainRenderer() = default;
@@ -25,7 +27,6 @@ TerrainRenderer::~TerrainRenderer() = default;
 void TerrainRenderer::Initialize(GLFWwindow* window, Camera* camera) {
     window_ = window;
     camera_ = camera;
-    SetupShaders();
     LoadAssets();
 
     time_->Set();
@@ -244,10 +245,6 @@ void TerrainRenderer::Cleanup() {
 
     chunk_transparent_batches_.clear();
     chunk_batch_transparent_lookup_.clear();
-}
-
-void TerrainRenderer::SetupShaders() {
-    cubic_shader_->Init("assets/shaders/vert.glsl", "assets/shaders/frag.glsl");
 }
 
 void TerrainRenderer::CreateNewSolidBatch() {

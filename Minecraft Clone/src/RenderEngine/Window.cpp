@@ -49,7 +49,7 @@ void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, unsigned int id,
     str.seekg(0, std::ios::end);
 
     if (str.str().size() != 0) {
-        g_logger.LogWarn("Window::glDebugOutput", str.str());
+        g_logger.LogError("Window::glDebugOutput", str.str());
     }
 
 }
@@ -62,10 +62,9 @@ bool Window::WindowCloseCheck() {
     return glfwWindowShouldClose(window_);
 }
 
-void Window::Start() {
-
+Window::Window() {
     if (properties_.initialized_) {
-        g_logger.LogError("Window::Start","Already initialized");
+        g_logger.LogError("Window::Start", "Already initialized");
         return;
     }
 
@@ -92,7 +91,7 @@ void Window::Start() {
         return;
     }
     else {
-        g_logger.LogInfo("Window::Start","Created GLFW Window");
+        g_logger.LogInfo("Window::Start", "Created GLFW Window");
     }
 
     glfwSetWindowUserPointer(window_, this);
@@ -120,9 +119,10 @@ void Window::Start() {
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
+
     glfwSwapInterval(0);
 }
+Window::~Window() = default;
 
 void Window::MousePositionCallback(double xpos, double ypos) {
     inputs_.mouse_.displacement_ = glm::dvec2(xpos, ypos) - inputs_.mouse_.position_;

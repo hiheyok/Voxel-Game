@@ -73,10 +73,3 @@ private:
     static thread_local std::vector<std::unique_ptr<int[]>> freeLargeArrays;
     static thread_local std::vector<std::unique_ptr<int[]>> inUseLargeArrays;
 };
-
-// Initialize static variables
-inline thread_local int IntCache::intCacheSize = 256;
-inline thread_local std::vector<std::unique_ptr<int[]>> IntCache::freeSmallArrays;
-inline thread_local std::vector<std::unique_ptr<int[]>> IntCache::inUseSmallArrays;
-inline thread_local std::vector<std::unique_ptr<int[]>> IntCache::freeLargeArrays;
-inline thread_local std::vector<std::unique_ptr<int[]>> IntCache::inUseLargeArrays;

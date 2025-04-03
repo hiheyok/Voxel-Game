@@ -4,6 +4,7 @@
 #include "Level/World/WorldInteraction/WorldLoader.h"
 
 Level::Level() = default;
+Level::~Level() = default;
 
 void Level::Start(int worldGenThreadCount, int light_engine_thread_count_) {
     DimensionProperties properties;

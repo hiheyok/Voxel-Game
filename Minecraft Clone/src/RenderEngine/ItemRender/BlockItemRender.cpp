@@ -13,13 +13,12 @@ BlockItemRender::BlockItemRender() :
     vao_{ std::make_unique<VertexArray>()},
     ebo_{ std::make_unique<Buffer>() },
     vbo_{ std::make_unique<Buffer>() },
-    shader_{ std::make_unique<Shader>() },
     camera_{ std::make_unique<Camera>() } {
 }
 BlockItemRender::~BlockItemRender() = default;
 
 void BlockItemRender::Initialize() {
-    shader_->Init("assets/shaders/ItemRender/BlockModelVert.glsl", "assets/shaders/ItemRender/BlockModelFrag.glsl");
+    shader_ = std::make_unique<Shader>("assets/shaders/ItemRender/BlockModelVert.glsl", "assets/shaders/ItemRender/BlockModelFrag.glsl");
 
     ebo_->SetType(GL_ELEMENT_ARRAY_BUFFER);
     ebo_->SetUsage(GL_STATIC_DRAW);

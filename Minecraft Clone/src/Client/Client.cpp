@@ -67,7 +67,6 @@ void Client::InitializeGameContent() {
 }
 
 void Client::Initialize() {
-    Start();
     DisableCursor();
     InitializeGameContent();
 

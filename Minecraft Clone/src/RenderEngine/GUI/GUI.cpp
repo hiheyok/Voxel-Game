@@ -9,12 +9,15 @@
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "Utils/LogUtils.h"
 
-GUI::GUI() : shader_{ std::make_unique<Shader>() }, guis_{} {};
+GUI::GUI() : 
+    shader_{ std::make_unique<Shader>(
+        "assets/shaders/GUI/GUIVert.glsl", 
+        "assets/shaders/GUI/GUIFrag.glsl") }, 
+    guis_{} {};
 GUI::~GUI() = default;
 
 void GUI::Initialize(GLFWwindow* win) {
     window_ = win;
-    shader_->Init("assets/shaders/GUI/GUIVert.glsl", "assets/shaders/GUI/GUIFrag.glsl");
 }
 
 size_t GUI::AddGUI(std::string Name, GUISet set) {

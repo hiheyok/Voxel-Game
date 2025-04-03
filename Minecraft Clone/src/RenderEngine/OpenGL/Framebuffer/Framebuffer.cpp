@@ -2,15 +2,12 @@
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "Utils/LogUtils.h"
 
-TexturedFrameBuffer::TexturedFrameBuffer() : 
-    screen_{ std::make_unique<Shader>() } {
-}
-
+TexturedFrameBuffer::TexturedFrameBuffer() = default;
 TexturedFrameBuffer::~TexturedFrameBuffer() = default;
 
 void TexturedFrameBuffer::GenBuffer(GLint x, GLint y, float muti, GLuint format) {
+    screen_ = std::make_unique<Shader>("assets/shaders/screen/vert.glsl", "assets/shaders/screen/frag.glsl");
 
-    screen_->Init("assets/shaders/screen/vert.glsl", "assets/shaders/screen/frag.glsl");
     screen_->SetVec2("Resolution", glm::vec2((x), (y)));
 
     sy = y;

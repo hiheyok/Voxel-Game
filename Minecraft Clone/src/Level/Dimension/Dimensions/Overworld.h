@@ -3,7 +3,7 @@
 
 class OverworldDimension : public Dimension {
 public:
-    OverworldDimension() : Dimension(g_generators.MOUNTAINS) {}
+    OverworldDimension() : Dimension(g_generators.MINECRAFT) {}
 
     void Tick() override {
 

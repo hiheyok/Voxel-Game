@@ -63,9 +63,12 @@ void ItemTextureAtlas::StitchTexture(size_t index, ItemID ItemID) {
     glDisable(GL_BLEND);
     atlas_framebuffer_.UnbindFBO();
 }
+ItemTextureAtlas::ItemTextureAtlas() : 
+    stitching_shader_{} {};
 
 void ItemTextureAtlas::Initialize(int atlasItemSize, int individualItemSize) {
-    stitching_shader_.Init("assets/shaders/ItemRender/AtlasStitchVert.glsl", "assets/shaders/ItemRender/AtlasStitchFrag.glsl");
+    stitching_shader_ = Shader("assets/shaders/ItemRender/AtlasStitchVert.glsl",
+        "assets/shaders/ItemRender/AtlasStitchFrag.glsl");
 
     individual_size_ = individualItemSize;
     atlas_size_ = atlasItemSize;

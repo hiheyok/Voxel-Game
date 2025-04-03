@@ -18,8 +18,6 @@ class TerrainRenderer {
 private:
     void AddChunk(const ChunkPos& pos, const std::vector<uint32_t>& data, std::vector<ChunkDrawBatch>& BatchType, FastHashMap<ChunkPos, int>& LookUpMap);
 
-    void SetupShaders();
-
     void CreateNewSolidBatch();
 
     void CreateNewTransparentBatch();

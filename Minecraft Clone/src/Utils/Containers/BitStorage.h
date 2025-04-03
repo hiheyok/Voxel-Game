@@ -17,6 +17,6 @@ public:
 
     void Clear();
 private:
-    std::vector<uint64_t> map_;
+    std::vector<unsigned long long> map_;
     int sx_ = 0, sy_ = 0, sz_ = 0;
 };

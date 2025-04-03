@@ -135,7 +135,7 @@ static CuboidRotationInfo getRotationalData(json JsonData) {
                 rotationInfo.axis_ = 2;
             }
             else {
-                g_logger.LogError("getRotationalData", "Unknown rotational axis: " + attribute.value());
+                g_logger.LogError("getRotationalData", "Unknown rotational axis: " + static_cast<std::string>(attribute.value()));
             }
             
         }

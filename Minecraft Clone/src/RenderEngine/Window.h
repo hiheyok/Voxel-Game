@@ -17,7 +17,9 @@ struct WindowProperties {
 
 class Window {
 public:
-    void Start();
+    Window();
+    ~Window();
+
     void Refresh();
     void PollInputs();
     WindowProperties& GetProperties();
