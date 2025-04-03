@@ -5,8 +5,6 @@
 #include "Level/Chunk/Chunk.h"
 
 class ClientCache {
-private:
-    ClientChunkCache chunk_cache_;
 public:
     ClientEntities entities_;
     ClientCollusionDetector collusion_manager_;
@@ -32,4 +30,6 @@ public:
     bool CheckChunk(const ChunkPos& pos) const {
         return chunk_cache_.CheckChunk(pos);
     }
+private:
+    ClientChunkCache chunk_cache_;
 };

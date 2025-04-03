@@ -3,10 +3,6 @@
 #include "Level/Entity/Entity.h"
 
 class ClientEntities {
-private:
-    FastHashMap<EntityUUID, EntityProperty> entities_;
-    FastHashSet<EntityUUID> changed_entities_;
-    FastHashSet<EntityUUID> removed_entities_;
 public:
 
     void AddEntity(EntityProperty entityProperty) {
@@ -91,4 +87,8 @@ public:
     size_t GetChangedEntityCount() const {
         return changed_entities_.size();
     }
+private:
+    FastHashMap<EntityUUID, EntityProperty> entities_;
+    FastHashSet<EntityUUID> changed_entities_;
+    FastHashSet<EntityUUID> removed_entities_;
 };

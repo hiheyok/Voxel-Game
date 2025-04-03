@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Typenames.h"
-#include "Level/Server/Networking/Packet.h"
+#include "Core/Networking/Packet.h"
+#include "Core/Stats/ServerStats.h"
 #include "Utils/Containers/ConcurrentQueue.h"
 
 /*
@@ -12,6 +13,7 @@ public:
     virtual void SendBlockUpdate(const Packet::BlockUpdate& update) = 0;
     virtual void SendEntityUpdate(const Packet::EntityUpdate& update) = 0;
     virtual void SendChunkUpdates(const Packet::ChunkUpdateData& update) = 0;
+    virtual void SendServerStats(const ServerStats& stats) = 0;
 
     ClientInterface() = default;
 

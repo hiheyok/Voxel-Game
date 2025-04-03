@@ -8,7 +8,7 @@
 #include "Level/Item/ItemTextureAtlas.h"
 #include "Level/Entity/Mobs/Player.h"
 #include "Level/Entity/Properties/EntityProperties.h"
-#include "Level/Server/Interfaces/ServerInterface.h"
+#include "Core/Interfaces/ServerInterface.h"
 #include "RenderEngine/GUI/GUI.h"
 #include "RenderEngine/GUI/GUISet.h"
 

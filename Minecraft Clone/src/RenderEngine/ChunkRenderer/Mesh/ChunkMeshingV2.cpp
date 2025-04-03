@@ -15,6 +15,10 @@ constexpr int textureBitOffset = 10; // 18 bits
 constexpr int blockShadingBitOffset = 28; // 4 bits
 #define PROFILE_DEBUG
 
+Mesh::ChunkMeshData::ChunkMeshData() {
+    chunk_cache_.fill(g_blocks.AIR);
+}
+
 void Mesh::ChunkMeshData::Reset() {
     if (vertices_buffer_.size() != BUFFER_SIZE_STEP) {
         vertices_buffer_.resize(BUFFER_SIZE_STEP, 0);
@@ -27,7 +31,7 @@ void Mesh::ChunkMeshData::Reset() {
     transparent_face_count_ = 0;
     solid_face_count_ = 0;
 
-    memset(chunk_cache_, NULL, 18 * 18 * 18 * sizeof(BlockID));
+    chunk_cache_.fill(g_blocks.AIR);
 }
 
 void Mesh::ChunkMeshData::GenerateCache() {
@@ -46,7 +50,9 @@ void Mesh::ChunkMeshData::GenerateCache() {
         int axis = side >> 1;
         int direction = side & 0b1;
 
-        if (chunk_->neighbors_[side] == nullptr) {
+        ChunkContainer* neighbor = chunk_->neighbors_[side];
+
+        if (neighbor == nullptr) {
             continue;
         }
 
@@ -61,7 +67,8 @@ void Mesh::ChunkMeshData::GenerateCache() {
                 localPos[(axis + 1) % 3] = u + 1;
                 localPos[(axis + 2) % 3] = v + 1;
 
-                chunk_cache_[localPos[0] * 18 * 18 + localPos[2] * 18 + localPos[1]] = chunk_->neighbors_[side]->GetBlockUnsafe(pos[0], pos[1], pos[2]);
+                BlockID block = neighbor->GetBlockUnsafe(pos[0], pos[1], pos[2]);
+                SetCachedBlockID(block, localPos[0] - 1, localPos[1] - 1, localPos[2] - 1);
             }
         }
     }

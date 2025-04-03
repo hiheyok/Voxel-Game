@@ -279,9 +279,6 @@
     <ClCompile Include="src\Level\Chunk\TallChunk.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Chunk\ChunkColumn.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Level\Entity\Type\Hostile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -309,7 +306,7 @@
     <ClCompile Include="src\Level\Chunk\Block\Type\DefaultBlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Chunk\Lighting\ChunkLighting.cpp">
+    <ClCompile Include="src\Level\Chunk\Lighting\LightStorage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Level\TerrainGeneration\Generators\Generator.cpp">
@@ -358,6 +355,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\ComputeShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Client\ClientLevel\ChunkCache\ClientRegion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Client\ClientLevel\ChunkCache\ClientChunkCache.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Client\ClientLevel\ChunkCache\ClientCollusionDetector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Client\ClientPlay.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -674,9 +683,6 @@
     <ClInclude Include="src\Core\Registry\ResourceLocation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Chunk\ChunkColumn.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Level\TerrainGeneration\Noisemaps\NoiseOctave.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -698,7 +704,7 @@
     <ClInclude Include="src\Level\TerrainGeneration\Generators\Minecraft\Overworld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Chunk\Lighting\ChunkLighting.h">
+    <ClInclude Include="src\Level\Chunk\Lighting\LightStorage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Event\ChunkEventHandles\ChunkHandles.h">
@@ -953,19 +959,19 @@
     <ClInclude Include="src\Client\ClientLevel\Entity\ClientEntities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Server\Interfaces\ServerInterface.h">
+    <ClInclude Include="src\Core\Interfaces\ServerInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Server\Networking\Packet.h">
+    <ClInclude Include="src\Core\Networking\Packet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Server\Interfaces\InternalInterface.h">
+    <ClInclude Include="src\Core\Interfaces\InternalInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Utils\Containers\ConcurrentQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Server\Interfaces\ClientInterface.h">
+    <ClInclude Include="src\Core\Interfaces\ClientInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\OpenGL\Buffers\BufferStorage.h">
@@ -974,22 +980,37 @@
     <ClInclude Include="src\RenderEngine\OpenGL\Buffers\VertexArray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Server\Networking\PlayerAction.h">
+    <ClInclude Include="src\Core\Networking\PlayerAction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Server\Networking\EntityUpdate.h">
+    <ClInclude Include="src\Core\Networking\EntityUpdate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Server\Networking\BlockUpdate.h">
+    <ClInclude Include="src\Core\Networking\BlockUpdate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Server\Networking\ChunkUpdate.h">
+    <ClInclude Include="src\Core\Networking\ChunkUpdate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Chunk\ChunkRawData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\OpenGL\Shader\ComputeShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Client\ClientLevel\ChunkCache\ClientChunkCache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Client\ClientLevel\ChunkCache\ClientRegion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Client\ClientLevel\ChunkCache\ClientCollusionDetector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Client\ClientPlay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Stats\ServerStats.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

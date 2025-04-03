@@ -1,23 +1,17 @@
+#include "Core//Typenames.h"
 #include "Level/Chunk/Heightmap/Heightmap.h"
 
-Heightmap::Heightmap() = default;
+Heightmap::Heightmap() {
+    data_.resize(256);
+}
 Heightmap::~Heightmap() = default;
 
 void Heightmap::Edit(int x, int z, int height) {
-    data_[x * 16 + z] = height;
+    data_[x * kChunkDim + z] =  height;
 }
 
-uint16_t Heightmap::Get(int x, int z) const {
-    return data_[x * 16 + z];
-}
-
-std::vector<uint16_t> Heightmap::GetData() const {
-    return data_;
-}
-
-void Heightmap::Init() {
-    data_.resize(256);
-    is_init_ = true;
+int16_t Heightmap::Get(int x, int z) const {
+    return data_[x * kChunkDim + z];
 }
 
 void Heightmap::Clear() {

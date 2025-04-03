@@ -1,7 +1,7 @@
 #include <exception>
 
 #include "WorldDataAccess.h"
-#include "Level/Chunk/ChunkColumn.h"
+#include "Level/Chunk/Chunk.h"
 #include "Level/DataContainer/ChunkMapData.h"
 #include "Level/DataContainer/EntityContainer.h"
 
@@ -13,11 +13,11 @@ WorldAccess::WorldAccess() :
 WorldAccess::~WorldAccess() = default;
 
 BlockID WorldAccess::GetBlock(const BlockPos& pos) {
-    return chunk_container_->GetBlockGlobal(pos);
+    return chunk_container_->GetBlock(pos);
 }
 
 void WorldAccess::SetBlock(BlockID block, const BlockPos& pos) {
-    if (!chunk_container_->SetBlockGlobal(block, pos)) {
+    if (!chunk_container_->SetBlock(block, pos)) {
         throw std::exception("Tried to place block outside of the world");
     }
 }
@@ -32,13 +32,4 @@ Chunk* WorldAccess::GetChunk(const ChunkPos& pos) const {
 
 bool WorldAccess::CheckChunk(const ChunkPos& pos) const {
     return chunk_container_->GetChunk(pos) != nullptr;
-}
-
-Heightmap& WorldAccess::GetColumnHeightmap(const ChunkColumnPos& v) const {
-    ChunkColumn* col = chunk_container_->GetColumn(v);
-    return col->GetHeightmap();
-}
-
-ChunkColumn* WorldAccess::GetColumn(const ChunkPos& v) const {
-    return chunk_container_->GetColumn(v);
 }

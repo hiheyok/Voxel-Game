@@ -6,15 +6,16 @@
 #include "Client/Render/DebugScreen/DebugScreen.h"
 #include "Client/Render/WorldRender.h"
 #include "Client/IO/IO.h"
+#include "Client/Render/DebugScreen/DebugScreen.h"
 #include "Core/Options/Option.h"
 #include "Level/Chunk/Block/Blocks.h"
 #include "Level/Chunk/Chunk.h"
 #include "Level/Entity/Entities.h"
 #include "Level/Entity/Mobs/Player.h"
-#include "Level/Server/Interfaces/ServerInterface.h"
-#include "Level/Server/Networking/PlayerAction.h"
-#include "Level/Server/Networking/ChunkUpdate.h"
-#include "Level/Server/Networking/Packet.h"
+#include "Core/Interfaces/ServerInterface.h"
+#include "Core/Networking/PlayerAction.h"
+#include "Core/Networking/ChunkUpdate.h"
+#include "Core/Networking/Packet.h"
 #include "RenderEngine/ChunkRenderer/TerrainRenderer.h"
 #include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
 #include "RenderEngine/Window.h"
@@ -25,11 +26,14 @@ ClientPlay::ClientPlay(ServerInterface* interface, Window* window, PerformancePr
     main_player_{ std::make_unique<MainPlayer>() },
     framebuffer_{ std::make_unique<TexturedFrameBuffer>() },
     client_level_{ std::make_unique<ClientLevel>() },
+    debug_screen_{ std::make_unique<DebugScreen>() },
     terrain_render_{ std::make_unique<WorldRender>() } {
 
     main_player_->Initialize(window->GetWindow(), interface_, &client_level_->cache);
     main_player_->SetPlayerPosition(0., 50, 0.);
     main_player_->SetPlayerRotation(-135.f, -30.);
+
+    debug_screen_->Initialize(window->GetWindow());
 
     // Send server update on player position
     PlayerPacket::PlayerMove packet;
@@ -64,6 +68,7 @@ void ClientPlay::Render(Window* window) {
     framebuffer_->Render();
 
     main_player_->RenderGUIs();
+    debug_screen_->Render();
 }
 
 void ClientPlay::Update(Window* window) {
@@ -86,12 +91,40 @@ void ClientPlay::Update(Window* window) {
     entity_render_->SetTimePastTick(server_->GetTickClock()->GetTimePassed_s());
     entity_render_->Update();*/
 
-    // Poll all of the chunk packets
 
+    UpdateChunks();
+
+    // Send player pos update
+
+    PlayerPacket::PlayerMove playerMove;
+    playerMove.acc_ = main_player_->player_->properties_.acceleration_;
+    playerMove.vel_ = main_player_->player_->properties_.velocity_;
+    playerMove.pos_ = main_player_->player_->properties_.position_;
+
+    interface_->SendPlayerAction(playerMove);
+
+    UpdateDebugStats();
+}
+
+void ClientPlay::UpdateDebugStats() {
+    ServerStats stats = interface_->GetServerStats();
+
+    debug_screen_->EditText("Stat1", "VRAM Usage: " + std::to_string((double)terrain_render_->renderer_->getVRAMUsageFull() / 1000000.0) + " MB");
+    debug_screen_->EditText("Stat2", "XYZ: " + std::to_string(main_player_->GetEntityProperties().position_.x) + "/" + std::to_string(main_player_->GetEntityProperties().position_.y) + "/" + std::to_string(main_player_->GetEntityProperties().position_.z));
+    debug_screen_->EditText("Stat3", "Velocity XYZ: " + std::to_string(main_player_->GetEntityProperties().velocity_.x) + "/" + std::to_string(main_player_->GetEntityProperties().velocity_.y) + "/" + std::to_string(main_player_->GetEntityProperties().velocity_.z));
+    debug_screen_->EditText("Stat4", "VRAM Fragmentation Rate: " + std::to_string(terrain_render_->renderer_->getFragmentationRate() * 100) + "%");
+    debug_screen_->EditText("Stat5", "FPS: " + std::to_string(1.0 / frametime_));
+    debug_screen_->EditText("Stat6", "Mesh Stats (ms) Total/S0/S1/S2: " + std::to_string(terrain_render_->build_time_ / 1000.f) + "/" + std::to_string(terrain_render_->build_stage_0_ / 1000.f) + "/" + std::to_string(terrain_render_->build_stage_1_ / 1000.f) + "/" + std::to_string(terrain_render_->build_stage_2_ / 1000.f));
+    debug_screen_->EditText("Stat7", "Mesh Engine Queued: " + std::to_string(terrain_render_->GetQueuedSize()));
+    debug_screen_->EditText("Stat8", "Event Queue Size: N/A");
+    debug_screen_->EditText("Stat9", "Server Tick (MSPT): " + std::to_string(stats.mspt_));
+    debug_screen_->EditText("Stat10", "Chunk Count: " + std::to_string(stats.chunk_count_));
+    debug_screen_->Update();
+}
+
+void ClientPlay::UpdateChunks() {
     std::vector<Packet::ChunkUpdateData> packets;
     interface_->PollChunkUpdates(packets);
-
-    // Process Add chunk first then light packets
 
     std::vector<ChunkUpdatePacket::AddChunk> addChunkPackets;
     std::vector<ChunkUpdatePacket::LightUpdate> updateLightPackets;
@@ -123,11 +156,14 @@ void ClientPlay::Update(Window* window) {
     for (const auto& chunk : addChunkPackets) {
         const ChunkRawData& data = chunk.chunk_;
         chunkToUpdateRender.insert(data.pos_);
-        std::unique_ptr<Chunk> newChunk = std::make_unique<Chunk>(data);
-        if (client_level_->cache.CheckChunk(newChunk->position_)) {
-            client_level_->cache.EraseChunk(newChunk->position_);
+        if (client_level_->cache.CheckChunk(data.pos_)) {
+            ChunkContainer* c = client_level_->cache.GetChunk(data.pos_);
+            c->SetData(data);
         }
-        client_level_->cache.AddChunk(std::move(newChunk));
+        else {
+            std::unique_ptr<Chunk> newChunk = std::make_unique<Chunk>(data);
+            client_level_->cache.AddChunk(std::move(newChunk));
+        }
     }
 
 
@@ -143,13 +179,4 @@ void ClientPlay::Update(Window* window) {
 
     std::vector<ChunkPos> toUpdate(chunkToUpdateRender.begin(), chunkToUpdateRender.end());
     terrain_render_->Update(toUpdate);
-
-    // Send player pos update
-
-    PlayerPacket::PlayerMove playerMove;
-    playerMove.acc_ = main_player_->player_->properties_.acceleration_;
-    playerMove.vel_ = main_player_->player_->properties_.velocity_;
-    playerMove.pos_ = main_player_->player_->properties_.position_;
-
-    interface_->SendPlayerAction(playerMove);
 }

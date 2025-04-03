@@ -56,9 +56,9 @@ public:
         return ChunkPos{ x * other, y * other, z * other };
     }
 
-    template <typename T> 
+    template <typename T> // Division will floor the nums 
     ChunkPos operator/(const T& other) const {
-        return ChunkPos{ x / other, y / other, z / other };
+        return ChunkPos{ floor((double)x / other), floor((double)y / other), floor((double)z / other) };
     }
 
     template <typename T>
@@ -167,6 +167,10 @@ public:
         h ^= static_cast<size_t>(z);
         h *= 16777619u;
         return h;
+    }
+
+    operator std::string() const {
+        return "[" + std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z) + "]";
     }
 };
 

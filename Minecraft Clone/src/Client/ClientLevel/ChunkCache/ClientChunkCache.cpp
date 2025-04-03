@@ -9,10 +9,20 @@ ClientChunkCache::~ClientChunkCache() = default;
 void ClientChunkCache::EraseChunk(const ChunkPos& pos) {
     RegionPos regPos = pos / kRegionDim;
     ClientRegion* reg = GetRegion(regPos);
-    if (reg != nullptr) {
-        reg->EraseChunk(pos);
+
+    for (int axis_ = 0; axis_ < 3; axis_++) {
+        for (int face = 0; face < 2; face++) {
+            ChunkPos posNeighbor = pos;
+            posNeighbor.incrementSide(axis_ * 2 + face, 1);
+
+            if (CheckChunk(posNeighbor)) {
+                GetChunk(posNeighbor)->SetNeighbor(nullptr, axis_ * 2 - face + 1);
+            }
+        }
     }
-    
+
+    reg->EraseChunk(pos);
+
     // Delete region if it is empty
     if (reg->GetChunkCount() == 0) {
         DeleteRegion(regPos);
@@ -39,21 +49,12 @@ void ClientChunkCache::SetBlock(BlockID block, const BlockPos& pos) {
     }
 }
 
-bool ClientChunkCache::CheckChunk(const ChunkPos& pos) const {
-    RegionPos regPos = pos / kRegionDim;
-    if (!CheckRegion(regPos)) return g_blocks.AIR;
-    ClientRegion* reg = GetRegion(regPos);
-
-    return reg->CheckChunk(pos);
-}
-
 BlockID ClientChunkCache::GetBlock(const BlockPos& pos) const {
     ChunkPos chunkPos = pos / kChunkDim;
+    BlockPos localBlockPos = pos & (kChunkDim - 1);
     RegionPos regPos = chunkPos / kRegionDim;
 
     if (!CheckRegion(regPos)) return g_blocks.AIR;
-
-    BlockPos localBlockPos = pos & (kChunkDim - 1);
 
     ClientRegion* reg = GetRegion(regPos);
 
@@ -66,6 +67,14 @@ BlockID ClientChunkCache::GetBlock(const BlockPos& pos) const {
     return chunk->GetBlock(localBlockPos.x, localBlockPos.y, localBlockPos.z);
 }
 
+bool ClientChunkCache::CheckChunk(const ChunkPos& pos) const {
+    RegionPos regPos = pos / kRegionDim;
+    if (!CheckRegion(regPos)) return g_blocks.AIR;
+    ClientRegion* reg = GetRegion(regPos);
+
+    return reg->CheckChunk(pos);
+}
+
 Chunk* ClientChunkCache::GetChunk(const ChunkPos& pos) const {
     RegionPos regPos = pos / kRegionDim;
     if (!CheckRegion(regPos)) return nullptr;
@@ -76,10 +85,6 @@ Chunk* ClientChunkCache::GetChunk(const ChunkPos& pos) const {
 
 void ClientChunkCache::InsertChunk(std::unique_ptr<Chunk> chunk) {
     const ChunkPos& pos = chunk->position_;
-
-    int x = pos.x;
-    int y = pos.y;
-    int z = pos.z;
 
     RegionPos regPos = pos / kRegionDim;
 

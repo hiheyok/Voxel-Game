@@ -1,11 +1,19 @@
 #include "Level/Chunk/ChunkData.h"
 #include "Level/Chunk/ChunkRawData.h"
+#include "Level/Chunk/Heightmap/Heightmap.h"
 
 static const int NeighborOffset[6] = {
       -16, 16,-16, 16,-16, 16
 };
 
-ChunkContainer::ChunkContainer(const ChunkRawData& data) : lighting_{std::make_unique<LightStorage>()} {
+ChunkContainer::ChunkContainer() : 
+    lighting_{ std::make_unique<LightStorage>() },
+    heightmap_{ std::make_unique<Heightmap>() } {
+}
+
+ChunkContainer::~ChunkContainer() = default;
+
+ChunkContainer::ChunkContainer(const ChunkRawData& data) : ChunkContainer() {
     SetData(data);
 }
 
@@ -55,7 +63,6 @@ void ChunkContainer::SetBlock(BlockID block, int x, int y, int z) {
 
 void ChunkContainer::SetBlockUnsafe(BlockID block, int x, int y, int z) {
     block_storage_.SetBlockUnsafe(block, (uint32_t)x, (uint32_t)y, (uint32_t)z);
-
     is_empty_ = false;
 }
 
@@ -98,4 +105,39 @@ ChunkRawData ChunkContainer::GetRawData() {
 
 LightStorage ChunkContainer::GetLightData() {
     return LightStorage{ *lighting_.get() };
+}
+
+void ChunkContainer::UpdateHeightMap() {
+    for (int x = 0; x < 16; ++x) {
+        for (int z = 0; z < 16; ++z) {
+            UpdateHeightMap(x, z);
+        }
+    }
+}
+
+void ChunkContainer::UpdateHeightMap(int x, int z) {
+    // Check chunk above first, if the heightmap above is > -1, it means that there are block above
+    // -1 indicate theirs nothing in the column
+    if (neighbors_[PY] != nullptr && neighbors_[PY]->heightmap_->Get(x, z) != -1) {
+        if (heightmap_->Get(x, z) != 16) {
+            heightmap_->Edit(x, z, 16);
+            light_dirty_ = true;
+        }
+    }
+    else {
+        int i = 15;
+        for (; i >= 0; --i) {
+            if (GetBlockUnsafe(x, i, z) != g_blocks.AIR) {
+                break;
+            }
+        }
+
+        heightmap_->Edit(x, z, i);
+        light_dirty_ = true;
+    }
+}
+
+bool ChunkContainer::CheckLightDirty() {
+    light_dirty_ = false;
+    return light_dirty_;
 }

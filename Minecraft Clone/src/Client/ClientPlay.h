@@ -11,6 +11,7 @@ class WorldRender;
 class UserInputs;
 class ClientLevel;
 class PerformanceProfiler;
+class DebugScreen;
 class Window;
 
 struct WindowProperties;
@@ -23,10 +24,15 @@ public:
 
     void Update(Window* window);
     void Render(Window* window);
-private:
     ServerInterface* interface_;
     std::unique_ptr<MainPlayer> main_player_;
     std::unique_ptr<WorldRender> terrain_render_;
     std::unique_ptr<TexturedFrameBuffer> framebuffer_;
+    std::unique_ptr<DebugScreen> debug_screen_;
     std::unique_ptr<ClientLevel> client_level_;
+
+    double frametime_ = 1;
+private:
+    void UpdateDebugStats();
+    void UpdateChunks();
 };

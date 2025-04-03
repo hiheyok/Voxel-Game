@@ -2,11 +2,13 @@
 #include <GLFW/glfw3.h>
 
 #include "Client/Render/DebugScreen/DebugScreen.h"
+#include "Level/Timer/Timer.h"
 #include "RenderEngine/GUI/TextRenderer.h"
 #include "RenderEngine/GUI/Font.h"
 
-DebugScreen::DebugScreen() : renderer_{std::make_unique<TextRenderer>() } {
-}
+DebugScreen::DebugScreen() : 
+    renderer_{ std::make_unique<TextRenderer>() },
+    timer_{ std::make_unique<Timer>() } {}
 
 DebugScreen::~DebugScreen() = default;
 
@@ -15,7 +17,14 @@ void DebugScreen::Render() {
 }
 
 void DebugScreen::Update() {
-    renderer_->ConstructBuffer();
+    if (timer_->GetTimePassed_ms() > update_rate_) {
+        renderer_->ConstructBuffer();
+        timer_->Set();
+    }
+}
+
+void DebugScreen::SetUpdateRate(int rate) {
+    update_rate_ = rate;
 }
 
 void DebugScreen::EditText(std::string name, const char* c) {

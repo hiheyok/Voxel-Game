@@ -25,7 +25,7 @@ private:
     std::mutex updated_chunk_lock_;
     FastHashSet<ChunkPos> updated_chunk_;
     FastHashSet<ChunkPos> updated_lighting_pos_;
-    FastHashMap<ChunkPos, std::pair<int, size_t>> requested_light_update_; // pair<y height, index in update vector>
+    FastHashSet<ChunkPos> requested_light_update_; // pair<y height, index in update vector>
     std::vector<ChunkPos> light_updates_;
     std::vector<std::pair<BlockID, BlockPos>> block_updates_;
 public:

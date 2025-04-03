@@ -14,13 +14,9 @@ public:
 
     void Edit(int x, int z, int height);
 
-    uint16_t Get(int x, int z) const;
+    int16_t Get(int x, int z) const;
 
-    void Init();
     void Clear();
-
-    std::vector<uint16_t> GetData() const;
 private:
-    std::vector<uint16_t> data_;
-    bool is_init_ = false;
+    std::vector<char> data_;
 };

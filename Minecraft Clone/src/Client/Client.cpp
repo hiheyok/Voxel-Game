@@ -14,10 +14,10 @@
 #include "Level/Entity/Mobs/Player.h"
 #include "Level/Timer/Timer.h"
 #include "Level/Server/Server.h"
-#include "Level/Server/Interfaces/InternalInterface.h"
-#include "Level/Server/Networking/PlayerAction.h"
-#include "Level/Server/Networking/ChunkUpdate.h"
-#include "Level/Server/Networking/Packet.h"
+#include "Core/Interfaces/InternalInterface.h"
+#include "Core/Networking/PlayerAction.h"
+#include "Core/Networking/ChunkUpdate.h"
+#include "Core/Networking/Packet.h"
 #include "Level/LevelLoader.h"
 #include "Level/Level.h"
 #include "RenderEngine/ChunkRenderer/TerrainRenderer.h"
@@ -32,7 +32,6 @@ Client::Client() :
     entity_render_{ std::make_unique<MultiEntityRenderer>() },
     entity_updater_{ std::make_unique<EntityRendererUpdater>() },
     text_render_{ std::make_unique<TextRenderer>() },
-    debug_screen_{ std::make_unique<DebugScreen>() },
     internal_interface_{ std::make_unique<InternalInterface>() },
     
     profiler_{ new PerformanceProfiler()} { }
@@ -78,8 +77,6 @@ void Client::Initialize() {
     //entity_updater_->SetEntityRenderer(entity_render_.get(), server_->GetTickClock());
     //entity_updater_->Start(server_->server->level_->main_world_.get());
 
-
-    debug_screen_->Initialize(GetWindow());
 }
 
 void Client::run() {
@@ -97,24 +94,12 @@ void Client::Cleanup() {
     glfwDestroyWindow(GetWindow());
 }
 
-void Client::SetDebugScreen() {
-    debug_screen_->EditText("Stat5", "FPS: " + std::to_string(1.0 / frametime_));
-    debug_screen_->EditText("Stat8", "Event Queue Size: N/A");
-    debug_screen_->EditText("Stat9", "Server Tick (MSPT): " + std::to_string(server_->GetMSPT()));
-    debug_screen_->EditText("Stat10","Chunk Count: " + std::to_string(server_->GetChunkCount()));
-    debug_screen_->Update();
-}
-
 void Client::Render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     client_play_->Render(this);
-    debug_screen_->Render();
 }
 
 void Client::GameLoop() {
-
-    Timer time;
 
     while (!WindowCloseCheck()) {
         Timer FrametimeTracker;
@@ -126,14 +111,8 @@ void Client::GameLoop() {
         Refresh();
         profiler_->ProfileStop("root/refresh");
         frametime_ = FrametimeTracker.GetTimePassed_s();
-
+        client_play_->frametime_ = frametime_;
         inputs_.delta_ = frametime_;
-
-        if (time.GetTimePassed_ms() > 50) {
-            SetDebugScreen();
-            time.Set();
-        }
-        
     }
 }
 

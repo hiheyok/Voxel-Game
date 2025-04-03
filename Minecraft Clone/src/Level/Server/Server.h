@@ -40,12 +40,6 @@ public:
     Server();
     ~Server();
 
-    size_t GetChunkCount();
-
-    double GetMSPT();
-
-    Timer* GetTimer();
-
     void StartServer(ServerSettings serverSettings);
 
     void Stop();
@@ -69,4 +63,5 @@ private:
     void SendPacket();
     void SendEntityUpdatePacket(ClientInterface* receiver);
     void SendChunkUpdatePacket(ClientInterface* receiver);
+    void SendServerStats(ClientInterface* receiver);
 };

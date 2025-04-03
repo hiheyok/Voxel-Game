@@ -6,8 +6,8 @@
 #include "Client/IO/IO.h"
 #include "Client/IO/KEY_CODE.h"
 #include "Level/Entity/Mobs/Player.h"
-#include "Level//Server/Interfaces/ServerInterface.h"
-#include "Level/Server/Networking/PlayerAction.h"
+#include "Core/Interfaces/ServerInterface.h"
+#include "Core/Networking/PlayerAction.h"
 #include "Utils/Math/vectorOperations.h"
 #include "Utils/Math/Ray/Ray.h"
 

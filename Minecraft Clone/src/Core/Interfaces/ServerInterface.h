@@ -3,7 +3,8 @@
 #include <vector>
 
 #include "Utils/Containers/ConcurrentQueue.h"
-#include "Level/Server/Networking/Packet.h"
+#include "Core/Networking/Packet.h"
+#include "Core/Stats/ServerStats.h"
 /*
 * Abstraction for client to server interfacing
 */
@@ -37,6 +38,10 @@ public:
         return prevSize != outUpdates.size();
     }
 
+    ServerStats GetServerStats() {
+        return server_stats_;
+    }
+
     EntityUUID GetPlayerUUID() const {
         return client_player_uuid_;
     }
@@ -47,5 +52,6 @@ protected:
     ConcurrentQueue<Packet::EntityUpdate> entity_update_queue_;
     ConcurrentQueue<Packet::ChunkUpdateData> chunk_update_queue_;
 
+    ServerStats server_stats_;
     EntityUUID client_player_uuid_;
 };

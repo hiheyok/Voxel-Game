@@ -1,6 +1,5 @@
 #include "Utils/Containers/FIFOQueue.h"
 #include "Level/Chunk/Chunk.h"
-#include "Level/Chunk/ChunkColumn.h"
 #include "Level/Chunk/Heightmap/Heightmap.h"
 #include "Level/Chunk/Lighting/LightStorage.h"
 #include "Level/Lighting/LightEngine.h"
@@ -9,7 +8,7 @@
 
 static thread_local FixedFIFOQueue<uint16_t> FIFOQueues;
 
-constexpr int8_t DIRECTION_OFFSETS[6][3] = {
+constexpr const int8_t DIRECTION_OFFSETS[6][3] = {
     {-1, 0, 0}, {1, 0, 0},  // X: Left, Right
     {0, -1, 0}, {0, 1, 0},  // Y: Down, Up
     {0, 0, -1}, {0, 0, 1}   // Z: Back, Front
@@ -34,14 +33,20 @@ void LightingEngine::IncreaseLightLevel(std::unique_ptr<LightStorage>& container
         container->EditLight(x, y, z, lvl);
 }
 
-void LightingEngine::LightSpreadSky(Chunk* chunk, std::unique_ptr<LightStorage>& container, const Heightmap& heightmap, int ChunkHeight, int x, int y, int z) {
+void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<LightStorage>& light) {
+    const Heightmap& heightmap = *chunk->heightmap_.get();
     FIFOQueues.resetData();
-    FIFOQueues.push(PackLightNode(x, y, z, 15));
 
-    if (container->GetLighting(x, y, z) >= 15)
-        return;
+    for (int x = 0; x < kChunkDim; x++) {
+        for (int z = 0; z < kChunkDim; z++) {
+            int h = heightmap.Get(x, z); // it will try to find pivot points
 
-    int i = 0;
+            if (h == kChunkDim)
+                continue;
+
+            FIFOQueues.push(PackLightNode(x, kChunkDim - 1, z, 15));
+        }
+    }
 
     while (!FIFOQueues.IsEmpty()) {
         //Get node
@@ -50,20 +55,19 @@ void LightingEngine::LightSpreadSky(Chunk* chunk, std::unique_ptr<LightStorage>&
 
         UnpackLightNode(node, nodeX, nodeY, nodeZ, nodeLight);
 
-        i++;
         int currNX = nodeX;
-        int currNY = nodeY + ChunkHeight;
+        int currNY = nodeY;
         int currNZ = nodeZ;
 
         if (heightmap.Get(currNX, currNZ) <= currNY) {
             nodeLight = 15;
         }
 
-        if (container->GetLighting(nodeX, nodeY, nodeZ) >= nodeLight) {
+        if (light->GetLighting(nodeX, nodeY, nodeZ) >= nodeLight) {
             continue;
         }
         //Set node light level
-        IncreaseLightLevel(container, nodeLight, nodeX, nodeY, nodeZ);
+        IncreaseLightLevel(light, nodeLight, nodeX, nodeY, nodeZ);
 
         if (chunk->GetBlockUnsafe(nodeX, nodeY, nodeZ) != g_blocks.AIR) {
             continue;
@@ -91,7 +95,7 @@ void LightingEngine::LightSpreadSky(Chunk* chunk, std::unique_ptr<LightStorage>&
                 continue;
 
             //Check if the light level is more or less
-            int currLvl = container->GetLighting(nx, ny, nz);
+            int currLvl = light->GetLighting(nx, ny, nz);
 
             if (currLvl + 2 > newLight)
                 continue;
@@ -100,19 +104,7 @@ void LightingEngine::LightSpreadSky(Chunk* chunk, std::unique_ptr<LightStorage>&
 
         }
     }
-}
 
-void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<LightStorage>& light, const Heightmap& heightmap, int chunkHeight) {
-    for (int x = 0; x < 16; x++) {
-        for (int z = 0; z < 16; z++) {
-            int h = heightmap.Get(x, z) - chunkHeight; // it will try to find pivot points
-
-            if (h >= 16)
-                continue;
-
-            LightSpreadSky(chunk, light, heightmap, chunkHeight, x, 15, z);
-        }
-    }
 }
 
 std::vector<std::unique_ptr<LightStorage>> LightingEngine::Worker(const ChunkPos& pos) {
@@ -120,30 +112,19 @@ std::vector<std::unique_ptr<LightStorage>> LightingEngine::Worker(const ChunkPos
         FIFOQueues.setSize(LightingEngine::DEFAULT_FIFO_QUEUE_SIZE);
 
     std::vector<std::unique_ptr<LightStorage>> out;
-    ChunkColumn* col = LightingEngine::world_->GetColumn(pos);
+    Chunk* chunk = LightingEngine::world_->GetChunk(pos);
+    if (chunk == nullptr) return out;
 
-    if (col == nullptr) return out;
+    Heightmap heightmap = *chunk->heightmap_;
 
-    const Heightmap& heightmap = world_->GetColumnHeightmap(pos);
+    std::unique_ptr<LightStorage> lighting = std::make_unique<LightStorage>();
+    lighting->ResetLightingCustom(4);
+    lighting->position_.set(pos.x, pos.y, pos.z);
 
-    int relativeChunkHeight = pos.y & 0b11111;
-    int columnYLevel = pos.y - relativeChunkHeight;
+    WorkOnChunkSkylight(chunk, lighting);
 
-    for (int i = 0; i <= relativeChunkHeight; i++) {
-        if (!col->light_dirty_[i])
-            continue;
-        if (col->GetChunk(i) == nullptr)
-            continue;
+    out.push_back(std::move(lighting));
 
-
-        std::unique_ptr<LightStorage> lighting = std::make_unique<LightStorage>();
-        lighting->ResetLightingCustom(4);
-        lighting->position_.set(pos.x, columnYLevel + i, pos.z);
-
-        WorkOnChunkSkylight(col->GetChunk(i), lighting, heightmap, i * 16);
-
-        out.push_back(std::move(lighting));
-    }
 
     return out;
 }

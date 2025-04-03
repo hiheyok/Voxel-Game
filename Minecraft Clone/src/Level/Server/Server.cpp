@@ -1,6 +1,6 @@
 #include "Server.h"
-#include "Interfaces/ClientInterface.h"
-#include "Interfaces/InternalInterface.h"
+#include "Core/Interfaces/ClientInterface.h"
+#include "Core/Interfaces/InternalInterface.h"
 #include "Level/Chunk/ChunkPos/ChunkPos.h"
 #include "Level/Dimension/Dimension.h"
 #include "Level/Entity/Properties/EntityProperties.h"
@@ -14,18 +14,6 @@
 
 Server::Server() = default;
 Server::~Server() = default;
-
-size_t Server::GetChunkCount() {
-    return level_->level_loader_->GetChunkCount();
-}
-
-double Server::GetMSPT() {
-    return mspt_;
-}
-
-Timer* Server::GetTimer() {
-    return time_.get();
-}
 
 void Server::StartServer(ServerSettings serverSettings) {
     level_ = std::make_unique<Level>();
@@ -111,8 +99,8 @@ void Server::ProcessPlayerPackets(ClientInterface* receiver) {
             break;
         case PlayerPacket::DESTROY_BLOCK:
             {
-                const PlayerPacket::PlayerDestroyBlock& destroyblock = std::get<PlayerPacket::PlayerDestroyBlock>(packet.packet_);
-                level_->main_world_->world_interactions_.SetBlock(g_blocks.AIR, destroyblock.pos_);
+                const PlayerPacket::PlayerDestroyBlock& destroyBlock = std::get<PlayerPacket::PlayerDestroyBlock>(packet.packet_);
+                level_->main_world_->world_interactions_.SetBlock(g_blocks.AIR, destroyBlock.pos_);
             }
             break;
         case PlayerPacket::PLACE_BLOCK:
@@ -138,6 +126,7 @@ void Server::SendPacket() {
     if (client_interface_ == nullptr) return;
     SendEntityUpdatePacket(client_interface_);
     SendChunkUpdatePacket(client_interface_);
+    SendServerStats(client_interface_);
 }
 
 void Server::SendEntityUpdatePacket(ClientInterface* receiver) {
@@ -188,4 +177,12 @@ void Server::SendChunkUpdatePacket(ClientInterface* receiver) {
         packet.light_ = data;
         receiver->SendChunkUpdates(packet);
     }
+}
+
+void Server::SendServerStats(ClientInterface* receiver) {
+    ServerStats stats;
+    stats.chunk_count_ = level_->level_loader_->GetChunkCount();
+    stats.mspt_ = mspt_;
+    stats.event_queued_ = 0;
+    receiver->SendServerStats(stats);
 }

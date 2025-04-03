@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <array>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/ext.hpp>
@@ -33,9 +34,7 @@ namespace Mesh {
 
     class ChunkMeshData {
     public:
-        ChunkMeshData() {
-
-        }
+        ChunkMeshData();
 
         void SetChunk(Chunk* pChunk);
 
@@ -81,6 +80,6 @@ namespace Mesh {
 
         Chunk* chunk_;
 
-        BlockID chunk_cache_[18 * 18 * 18 * 3]{NULL}; // Use multiple copies of chunk in different ordering to optimize cache hits
+        std::array<BlockID, 18 * 18 * 18 * 3> chunk_cache_;
     };
 }

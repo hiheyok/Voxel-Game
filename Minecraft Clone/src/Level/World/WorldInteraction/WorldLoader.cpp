@@ -1,10 +1,10 @@
 #include <glm/vec3.hpp>
 
+#include "Level/Chunk/Chunk.h"
 #include "Level/World/WorldInteraction/WorldLoader.h"
 #include "Level/World/World.h"
 #include "Level/World/WorldParameters.h"
 #include "Level/Chunk/Lighting/LightStorage.h"
-#include "Level/Chunk/ChunkColumn.h"
 #include "Level/Entity/Entity.h"
 #include "Level/DataContainer/EntityContainer.h"
 
@@ -175,11 +175,9 @@ WorldAccess* WorldLoader::GetWorld() const {
 
 //TODO: Fix me
 void WorldLoader::ReplaceLightInfomation(std::unique_ptr<LightStorage> lighting) {
-    ChunkColumn* col = world->GetColumn(lighting->position_);
-    int y = lighting->position_.y & 0b11111;
-    if (col == nullptr) return; //fix this nullptr
-
-    col->ReplaceLightContainer(y, std::move(lighting));
+    const ChunkPos& pos = lighting->position_;
+    Chunk* chunk = world->GetChunk(pos);
+    chunk->lighting_->ReplaceData(lighting->getData());
 }
 
 std::vector<ChunkPos> WorldLoader::GetRequestedChunks() {

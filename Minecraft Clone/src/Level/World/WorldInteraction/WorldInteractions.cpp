@@ -48,9 +48,6 @@ std::vector<ChunkPos> WorldInteractions::GetRequestedLightUpdates() {
     std::lock_guard<std::mutex> lock{ updated_chunk_lock_ };
     std::vector<ChunkPos> pos = std::move(light_updates_);
     light_updates_.clear();
-    for (const ChunkPos& p : pos) {
-        requested_light_update_[p].second = SIZE_MAX;
-    }
     return pos;
 }
 
@@ -67,36 +64,12 @@ std::vector<EntityUUID> WorldInteractions::GetRemovedEntities() {
 }
 
 void WorldInteractions::RequestLightUpdate(const ChunkPos& pos) {
-    ChunkColumnPos columnPos = pos;
-    columnPos.y /= 32;
-    int y = pos.y & 31;
-
     std::lock_guard<std::mutex> lock{ updated_chunk_lock_ };
 
-    if (requested_light_update_.count(pos)) {
-        auto& info = requested_light_update_[pos];
-
-        int currY = info.first;
-        size_t index = info.second;
-
-        if (currY < y) {
-            if (index == SIZE_MAX) {
-                info.second = light_updates_.size();
-                light_updates_.push_back(pos);
-            }
-            else {
-                info.first = y;
-                light_updates_[index].y = y;
-            }
-        }
-    }
-    else {
-        requested_light_update_.emplace(columnPos, std::pair<int, size_t>{y, light_updates_.size()});
+    if (!requested_light_update_.count(pos)) {
+        requested_light_update_.insert(pos);
         light_updates_.push_back(pos);
     }
-
-
-
 }
 
 void WorldInteractions::KillEntity(EntityUUID id) {
@@ -113,14 +86,12 @@ void WorldInteractions::Update() {
 void WorldInteractions::UpdateLighting(std::unique_ptr<LightStorage> chunkLighting) {
     ChunkPos pos = chunkLighting->position_;
 
-    world->GetColumn(chunkLighting->position_);
     worldLoader_->ReplaceLightInfomation(std::move(chunkLighting));
 
     std::lock_guard<std::mutex> lock{ updated_chunk_lock_ };
     if (!updated_lighting_pos_.count(pos)) {
         updated_lighting_pos_.insert(pos);
     }
-    pos.y /= 32;
 
     requested_light_update_.erase(pos);
 }
@@ -141,8 +112,7 @@ void WorldInteractions::UpdateLighting(std::vector<std::unique_ptr<LightStorage>
         if (!updated_lighting_pos_.count(pos)) {
             updated_lighting_pos_.insert(pos);
         }
-        pos.y /= 32;
-        // TODO: Fix this with Chunk Column ID
+
         requested_light_update_.erase(pos);
 
     }

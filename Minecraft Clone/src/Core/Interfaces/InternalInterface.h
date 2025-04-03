@@ -35,15 +35,19 @@ public:
 
     // Server -> Client
 
-    void SendBlockUpdate(const Packet::BlockUpdate& update) {
+    void SendBlockUpdate(const Packet::BlockUpdate& update) override {
         block_update_queue_.Push(update);
     }
 
-    void SendEntityUpdate(const Packet::EntityUpdate& update) {
+    void SendEntityUpdate(const Packet::EntityUpdate& update) override {
         entity_update_queue_.Push(update);
     }
 
-    void SendChunkUpdates(const Packet::ChunkUpdateData& update) {
+    void SendChunkUpdates(const Packet::ChunkUpdateData& update) override {
         chunk_update_queue_.Push(update);
+    }
+
+    void SendServerStats(const ServerStats& stats) override {
+        server_stats_ = stats;
     }
 };

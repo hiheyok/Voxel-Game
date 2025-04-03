@@ -7,7 +7,6 @@ class WorldRender;
 class MultiEntityRenderer;
 class EntityRendererUpdater;
 class TextRenderer;
-class DebugScreen;
 class PerformanceProfiler;
 class InternalInterface;
 class ClientLevel;
@@ -25,7 +24,6 @@ private:
     void Update();
     void Cleanup();
     void Render();
-    void SetDebugScreen();
     void InitializeServerCom();
     void InitializeGameContent();
 
@@ -38,6 +36,5 @@ private:
     std::unique_ptr<MultiEntityRenderer> entity_render_;
     std::unique_ptr<EntityRendererUpdater> entity_updater_;
     std::unique_ptr<TextRenderer> text_render_;
-    std::unique_ptr<DebugScreen> debug_screen_;
     PerformanceProfiler* profiler_;
 };

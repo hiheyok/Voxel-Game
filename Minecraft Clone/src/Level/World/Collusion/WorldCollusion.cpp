@@ -33,7 +33,7 @@ float WorldCollusionDetector::GetDistanceUntilCollusionSingleDirection(glm::vec3
 
         flooredPos[axis_] += move * (int)(i != 0);
 
-        BlockID b = world_->GetBlockGlobal(BlockPos{ flooredPos.x, flooredPos.y, flooredPos.z });
+        BlockID b = world_->GetBlock(BlockPos{ flooredPos.x, flooredPos.y, flooredPos.z });
 
         if (g_blocks.GetBlockType(b)->properties_->is_solid_) {
             return (float)i + displacement - 1.f;
@@ -159,7 +159,7 @@ bool WorldCollusionDetector::CheckRayIntersection(Ray& ray) {
     while (iterations < maxIterations) {
         iterations++;
         
-        BlockID b = world_->GetBlockGlobal(BlockPos{ blockPos.x, blockPos.y, blockPos.z });
+        BlockID b = world_->GetBlock(BlockPos{ blockPos.x, blockPos.y, blockPos.z });
 
         if (g_blocks.GetBlockType(b)->properties_->is_solid_) {
 

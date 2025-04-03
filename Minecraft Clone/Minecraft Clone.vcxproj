@@ -45,8 +45,8 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
-    <EnableASAN>true</EnableASAN>
-    <EnableFuzzer>true</EnableFuzzer>
+    <EnableASAN>false</EnableASAN>
+    <EnableFuzzer>false</EnableFuzzer>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -125,7 +125,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <UseProcessorExtensions>None</UseProcessorExtensions>
-      <ControlFlowGuard>Guard</ControlFlowGuard>
+      <ControlFlowGuard>false</ControlFlowGuard>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <StructMemberAlignment>8Bytes</StructMemberAlignment>
       <UndefinePreprocessorDefinitions>
@@ -179,6 +179,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Client\Client.cpp" />
+    <ClCompile Include="src\Client\ClientLevel\ChunkCache\ClientChunkCache.cpp" />
+    <ClCompile Include="src\Client\ClientLevel\ChunkCache\ClientCollusionDetector.cpp" />
+    <ClCompile Include="src\Client\ClientLevel\ChunkCache\ClientRegion.cpp" />
+    <ClCompile Include="src\Client\ClientPlay.cpp" />
     <ClCompile Include="src\Client\IO\IO.cpp" />
     <ClCompile Include="src\Client\Player\MainPlayer.cpp" />
     <ClCompile Include="src\Client\Player\PlayerMovement.cpp" />
@@ -197,10 +201,9 @@
     <ClCompile Include="src\Level\Chunk\Block\Type\Fluid.cpp" />
     <ClCompile Include="src\Level\Chunk\Block\Type\Grass.cpp" />
     <ClCompile Include="src\Level\Chunk\Block\Type\GravityBlock.cpp" />
-    <ClCompile Include="src\Level\Chunk\ChunkColumn.cpp" />
     <ClCompile Include="src\Level\Chunk\ChunkPos\ChunkPos.cpp" />
     <ClCompile Include="src\Level\Chunk\Heightmap\Heightmap.cpp" />
-    <ClCompile Include="src\Level\Chunk\Lighting\ChunkLighting.cpp" />
+    <ClCompile Include="src\Level\Chunk\Lighting\LightStorage.cpp" />
     <ClCompile Include="src\Level\Chunk\Palette.cpp" />
     <ClCompile Include="src\Level\Chunk\TallChunk.cpp" />
     <ClCompile Include="src\Level\DataContainer\EntityContainer.cpp" />
@@ -296,9 +299,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Client\Client.h" />
+    <ClInclude Include="src\Client\ClientLevel\ChunkCache\ClientCollusionDetector.h" />
+    <ClInclude Include="src\Client\ClientLevel\ChunkCache\ClientRegion.h" />
     <ClInclude Include="src\Client\ClientLevel\ClientCache.h" />
+    <ClInclude Include="src\Client\ClientLevel\ChunkCache\ClientChunkCache.h" />
     <ClInclude Include="src\Client\ClientLevel\ClientLevel.h" />
     <ClInclude Include="src\Client\ClientLevel\Entity\ClientEntities.h" />
+    <ClInclude Include="src\Client\ClientPlay.h" />
     <ClInclude Include="src\Client\IO\IO.h" />
     <ClInclude Include="src\Client\IO\KEY_CODE.h" />
     <ClInclude Include="src\Client\Player.h" />
@@ -307,6 +314,7 @@
     <ClInclude Include="src\Client\Render\DebugScreen\DebugScreen.h" />
     <ClInclude Include="src\Client\Profiler\PerformanceProfiler.h" />
     <ClInclude Include="src\Client\Render\WorldRenderInfo.h" />
+    <ClInclude Include="src\Core\Stats\ServerStats.h" />
     <ClInclude Include="src\Core\Initializer.h" />
     <ClInclude Include="src\Core\Options\Option.h" />
     <ClInclude Include="src\Core\Registry\Registry.h" />
@@ -324,14 +332,14 @@
     <ClInclude Include="src\Level\Level.h" />
     <ClInclude Include="src\Level\LevelLoader.h" />
     <ClInclude Include="src\Level\Lighting\LightEngine.h" />
-    <ClInclude Include="src\Level\Server\Interfaces\ClientInterface.h" />
-    <ClInclude Include="src\Level\Server\Interfaces\InternalInterface.h" />
-    <ClInclude Include="src\Level\Server\Interfaces\ServerInterface.h" />
-    <ClInclude Include="src\Level\Server\Networking\BlockUpdate.h" />
-    <ClInclude Include="src\Level\Server\Networking\ChunkUpdate.h" />
-    <ClInclude Include="src\Level\Server\Networking\EntityUpdate.h" />
-    <ClInclude Include="src\Level\Server\Networking\Packet.h" />
-    <ClInclude Include="src\Level\Server\Networking\PlayerAction.h" />
+    <ClInclude Include="src\Core\Interfaces\ClientInterface.h" />
+    <ClInclude Include="src\Core\Interfaces\InternalInterface.h" />
+    <ClInclude Include="src\Core\Interfaces\ServerInterface.h" />
+    <ClInclude Include="src\Core\Networking\BlockUpdate.h" />
+    <ClInclude Include="src\Core\Networking\ChunkUpdate.h" />
+    <ClInclude Include="src\Core\Networking\EntityUpdate.h" />
+    <ClInclude Include="src\Core\Networking\Packet.h" />
+    <ClInclude Include="src\Core\Networking\PlayerAction.h" />
     <ClInclude Include="src\Level\Server\Server.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\Biome.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeProperties.h" />
@@ -411,8 +419,7 @@
     <ClInclude Include="src\RenderEngine\ItemRender\BlockItemRender.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureAtlas.h" />
     <ClInclude Include="src\Utils\Containers\BitStorage.h" />
-    <ClInclude Include="src\Level\Chunk\ChunkColumn.h" />
-    <ClInclude Include="src\Level\Chunk\Lighting\ChunkLighting.h" />
+    <ClInclude Include="src\Level\Chunk\Lighting\LightStorage.h" />
     <ClInclude Include="src\Level\Entity\Mobs\Player.h" />
     <ClInclude Include="src\Level\Event\ChunkEventHandles\ChunkHandles.h" />
     <ClInclude Include="src\Level\Item\Inventory\EntityInventory.h" />

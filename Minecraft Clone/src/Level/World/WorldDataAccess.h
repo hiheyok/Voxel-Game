@@ -6,7 +6,6 @@
 class ChunkMap;
 class EntityContainer;
 class Heightmap;
-class ChunkColumn;
 class Chunk;
 
 struct WorldAccess {
@@ -25,8 +24,4 @@ struct WorldAccess {
     Chunk* GetChunk(const ChunkPos& ID) const;
 
     bool CheckChunk(const ChunkPos& ID) const;
-    
-    Heightmap& GetColumnHeightmap(const ChunkColumnPos& v) const;
-
-    ChunkColumn* GetColumn(const ChunkPos& v) const;
 };

@@ -6,7 +6,6 @@
 #include "Level/Chunk/Chunk.h"
 #include "Level/Chunk/TallChunk.h"
 #include "Level/Chunk/Heightmap/Heightmap.h"
-#include "Level/Chunk/ChunkColumn.h"
 #include "Level/TerrainGeneration/Biome/Biome.h"
 
 // TODO: Fix me
