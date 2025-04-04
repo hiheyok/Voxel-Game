@@ -126,9 +126,9 @@ void BufferStorage::CopyFrom(BufferStorage* sourceBuffer, size_t readOffset, siz
     copy_shader_->SetInt("srcOffset", readOffset / sizeof(unsigned int));
     copy_shader_->SetInt("dstOffset", writeOffset / sizeof(unsigned int));
     copy_shader_->SetInt("copySize", size / sizeof(unsigned int));
-    copy_shader_->DispatchCompute((int)ceil((double)size / WORK_GROUP_SIZE / sizeof(unsigned int)), 1, 1);
-    copy_shader_->BindBufferAsSSBO(0, 0);
-    copy_shader_->BindBufferAsSSBO(0, 1);
+    copy_shader_->DispatchCompute((int)ceil((double)size / kWorkGroupSize / sizeof(unsigned int)), 1, 1);
+    //copy_shader_->BindBufferAsSSBO(0, 0);
+    //copy_shader_->BindBufferAsSSBO(0, 1);
 
     copy_shader_->SSBOMemoryBarrier();
 }
@@ -147,9 +147,9 @@ void BufferStorage::CopyTo(BufferStorage* destinationBuffer, size_t readOffset, 
     copy_shader_->SetInt("srcOffset", readOffset / sizeof(unsigned int));
     copy_shader_->SetInt("dstOffset", writeOffset / sizeof(unsigned int));
     copy_shader_->SetInt("copySize", size / sizeof(unsigned int));
-    copy_shader_->DispatchCompute((int)ceil((double)size / WORK_GROUP_SIZE / sizeof(unsigned int)), 1, 1);
-    copy_shader_->BindBufferAsSSBO(0, 0);
-    copy_shader_->BindBufferAsSSBO(0, 1);
+    copy_shader_->DispatchCompute((int)ceil((double)size / kWorkGroupSize / sizeof(unsigned int)), 1, 1);
+    //copy_shader_->BindBufferAsSSBO(0, 0);
+    //copy_shader_->BindBufferAsSSBO(0, 1);
 
     copy_shader_->SSBOMemoryBarrier();
 }
@@ -168,8 +168,7 @@ void BufferStorage::MoveData(size_t readOffset, size_t writeOffset, size_t size)
     move_shader_->SetInt("srcOffset", readOffset / sizeof(unsigned int));
     move_shader_->SetInt("dstOffset", writeOffset / sizeof(unsigned int));
     move_shader_->SetInt("copySize", size / sizeof(unsigned int));
-    move_shader_->DispatchCompute((int)ceil((double)size / WORK_GROUP_SIZE / sizeof(unsigned int)), 1, 1);
-    move_shader_->BindBufferAsSSBO(0, 0);
+    move_shader_->DispatchCompute((int)ceil((double)size / kWorkGroupSize / sizeof(unsigned int)), 1, 1);
 
     move_shader_->SSBOMemoryBarrier();
 }

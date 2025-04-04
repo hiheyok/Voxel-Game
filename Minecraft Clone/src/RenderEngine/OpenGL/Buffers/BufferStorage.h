@@ -32,7 +32,7 @@ public:
     size_t GetMaxSize() const;
 
 private:
-    static constexpr const int WORK_GROUP_SIZE = 512;
+    static constexpr const int kWorkGroupSize = 512;
     unsigned int buffer_storage_id_ = 0;
     uint64_t max_size_ = 0;
     GLenum target_ = 0;

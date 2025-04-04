@@ -1,3 +1,5 @@
+#include <limits>
+
 #include "Level/Container/ChunkMap.h"
 #include "Level/Container/Region.h"
 #include "Level/Chunk/Chunk.h"
@@ -190,7 +192,7 @@ Region* ChunkMap::GetRegion(const RegionPos& pos) const {
 
 Region* ChunkMap::GetRegionUncheck(const RegionPos& pos) const {
     // First try to find region in the cache 
-    size_t minUsageCount = SIZE_MAX;
+    size_t minUsageCount = std::numeric_limits<size_t>::max();
     int minIdx = -1;
 
     for (int i = 0; i < region_cache_.size(); ++i) {

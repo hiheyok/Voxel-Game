@@ -315,6 +315,23 @@ ChunkMemoryPoolOffset ChunkGPUMemoryPool::AddChunkStaggingBuffer(ChunkPos pos, u
     return chunkMemoryBlock;
 }
 
+
+ChunkMemoryPoolOffset ChunkGPUMemoryPool::AddChunkMove(ChunkPos pos, uint64_t blockOffset, uint64_t blockSize) { //assumes vertices.size() != 0
+    ChunkMemoryPoolOffset chunkMemoryBlock;
+    chunkMemoryBlock.mem_offset_ = blockOffset;
+    chunkMemoryBlock.mem_size_ = blockSize;
+    chunkMemoryBlock.position_ = pos;
+
+    memory_pool_.AllocateSpace(blockOffset, blockSize);
+
+    chunk_memory_offsets_[pos] = chunkMemoryBlock;
+    memory_chunk_offsets_[blockOffset] = pos;
+
+    statistics_.memory_usage_ += blockSize;
+    Update();
+    return chunkMemoryBlock;
+}
+
 void ChunkGPUMemoryPool::Update() {
     if (memory_pool_.reserved_memory_blocks_.size() == 0) {
         return;

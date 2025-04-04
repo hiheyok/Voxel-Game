@@ -108,6 +108,7 @@ public:
     bool CheckChunk(ChunkPos pos) const;
 
     ChunkMemoryPoolOffset AddChunkStaggingBuffer(ChunkPos pos, uint64_t blockOffset, uint64_t blockSize);
+    ChunkMemoryPoolOffset AddChunkMove(ChunkPos pos, uint64_t blockOffset, uint64_t blockSize);
 
     void Update();
 

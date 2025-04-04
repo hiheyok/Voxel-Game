@@ -1,4 +1,5 @@
 #include <iterator>
+#include <cmath>
 
 #include "RenderEngine/ChunkRenderer/Batch/ChunkBatch.h"
 #include "RenderEngine/OpenGL/Buffers/BufferStorage.h"
@@ -197,12 +198,12 @@ void ChunkDrawBatch::Defrager(size_t iterations) {
     iterations = std::min(iterations, fragmentCount - 1);
 
     while (i < iterations) {
+        
         i++;
-
         if (memory_pool_.memory_pool_.free_memory_blocks_.size() == 1) {
             return;
         }
-
+        Timer time;
         MemoryManagement::MemoryBlock freeMemoryBlock = memory_pool_.memory_pool_.free_memory_blocks_.begin()->second;
 
         size_t freeSpaceOffset = freeMemoryBlock.offset_;
@@ -210,16 +211,20 @@ void ChunkDrawBatch::Defrager(size_t iterations) {
         std::map<size_t, MemoryManagement::MemoryBlock>::const_iterator Reserve = memory_pool_.memory_pool_.reserved_memory_blocks_.getIterator(freeMemoryBlock.size_ + freeMemoryBlock.offset_);
 
         MemoryManagement::MemoryBlock reservedBlock = Reserve->second;
-
         ChunkPos pos = memory_pool_.memory_chunk_offsets_[reservedBlock.offset_];
-
         DeleteChunkVertices(pos);
 
-        memory_pool_.buffer_->CopyTo(memory_pool_.stagging_buffer_.get(), reservedBlock.offset_, 0, reservedBlock.size_);
+        //Overlap check
+        ChunkMemoryPoolOffset memoryPoolBlockData;
+        if (abs((int)freeMemoryBlock.offset_ - (int)reservedBlock.offset_) < (int)reservedBlock.size_) { // If it overlap, use the stagging buffer
+            memory_pool_.buffer_->CopyTo(memory_pool_.stagging_buffer_.get(), reservedBlock.offset_, 0, reservedBlock.size_);
+            memoryPoolBlockData = memory_pool_.AddChunkStaggingBuffer(pos, freeSpaceOffset, reservedBlock.size_);
+        } else {
+            memory_pool_.buffer_->MoveData(reservedBlock.offset_, freeMemoryBlock.offset_, reservedBlock.size_);
+            memoryPoolBlockData = memory_pool_.AddChunkMove(pos, freeSpaceOffset, reservedBlock.size_);
+        }
 
-        //Add chunk back
-
-        ChunkMemoryPoolOffset memoryPoolBlockData = memory_pool_.AddChunkStaggingBuffer(pos, freeSpaceOffset, reservedBlock.size_);
+       
 
         render_list_[memoryPoolBlockData.mem_offset_] = memoryPoolBlockData;
         render_list_offset_lookup_[pos] = memoryPoolBlockData.mem_offset_;

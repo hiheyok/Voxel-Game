@@ -16,14 +16,10 @@ void Chunk::UpdateGen() {
             continue;
         }
 
-        std::vector<SetBlockRelative> blocks = neighbors_[side]->outside_block_to_place_[axis_ * 2 + (!face)];
-
-        neighbors_[side]->outside_block_to_place_[axis_ * 2 + (!face)].clear();
-
-        for (int i = 0; i < blocks.size(); i++) {
-            SetBlock(blocks[i].block_, blocks[i].x_, blocks[i].y_, blocks[i].z_);
+        for (const auto& block : neighbors_[side]->outside_block_to_place_[axis_ * 2 + (!face)]) {
+            SetBlock(block.block_, block.x_, block.y_, block.z_);
         }
 
-        blocks.clear();
+        neighbors_[side]->outside_block_to_place_[axis_ * 2 + (!face)].clear();
     }
 }
