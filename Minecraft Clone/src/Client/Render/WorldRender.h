@@ -20,17 +20,12 @@ namespace Mesh {
 
 class WorldRender : public WorldRenderInfo {
 public:
-    WorldRender();
+    WorldRender(PlayerPOV* player);
     ~WorldRender();
-
-    void SetRotation(glm::dvec2 rotation);
-
-    void SetPosition(glm::dvec3 position);
 
     void Render();
 
     void LoadChunkToRenderer(ChunkPos chunk);
-
 
     void Start(GLFWwindow* window, ClientCache* cache, PerformanceProfiler* profiler);
 
@@ -49,7 +44,7 @@ private:
     std::unique_ptr<ThreadPool<ChunkPos, std::unique_ptr<Mesh::ChunkVertexData>, WorldRender::Worker>> mesh_thread_pool_;
     std::vector<std::unique_ptr<Mesh::ChunkVertexData>> mesh_add_queue_;
 
-    std::unique_ptr<PlayerPOV> player_;
+    PlayerPOV* player_;
     GLFWwindow* window_;
     static ClientCache* cache_;
 };

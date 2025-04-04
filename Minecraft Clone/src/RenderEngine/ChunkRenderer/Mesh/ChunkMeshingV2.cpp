@@ -84,10 +84,7 @@ void Mesh::ChunkMeshData::GenerateMesh() {
         return;
     }
 
-    chunk_->Use();
     GenerateCache();
-    chunk_->Unuse();
-    
     GenerateFaceCollection();
 }
 

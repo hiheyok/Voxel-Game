@@ -8,7 +8,7 @@
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "Core/Options/Option.h"
-#include "Level/Timer/Timer.h"
+#include "Utils/Timer/Timer.h"
 #include "Utils/MathHelper.h"
 
 TerrainRenderer::TerrainRenderer() : chunk_solid_batches_{ 0 },

@@ -63,7 +63,7 @@
     <ClCompile Include="src\Client\Render\WorldRender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Client\Render\PlayerPOV.cpp">
+    <ClCompile Include="src\Client\Player\PlayerPOV.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Level\TerrainGeneration\Generator.cpp">
@@ -75,7 +75,7 @@
     <ClCompile Include="src\RenderEngine\ChunkRenderer\TerrainRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Timer\Timer.cpp">
+    <ClCompile Include="src\Utils\Timer\Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Level\Chunk\Block\Blocks.cpp">
@@ -124,9 +124,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\EntityRenderer\MultiEntityRender.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RenderEngine\EntityRenderer\EntityRenderUpdate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\GUI\GUI.cpp">
@@ -452,7 +449,7 @@
     <ClInclude Include="src\Utils\Math\Ray\Ray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Client\Render\PlayerPOV.h">
+    <ClInclude Include="src\Client\Player\PlayerPOV.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Entity\Entities.h">
@@ -488,7 +485,7 @@
     <ClInclude Include="src\Level\Chunk\Block\Type\Grass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Timer\Timer.h">
+    <ClInclude Include="src\Utils\Timer\Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Utils\Math\vectorOperations.h">
@@ -600,9 +597,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Entity\Mobs\Player.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RenderEngine\EntityRenderer\EntityRenderUpdate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\GUI\GUIObject.h">

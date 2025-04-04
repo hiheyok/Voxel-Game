@@ -15,6 +15,8 @@ public:
     virtual void SendChunkUpdates(const Packet::ChunkUpdateData& update) = 0;
     virtual void SendServerStats(const ServerStats& stats) = 0;
 
+    virtual void SendTimeLastTick() = 0;
+
     ClientInterface() = default;
 
     bool PollClientPlayerAction(std::vector<Packet::PlayerAction>& playerAction) {

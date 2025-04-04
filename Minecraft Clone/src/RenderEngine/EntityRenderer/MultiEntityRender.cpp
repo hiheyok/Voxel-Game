@@ -4,39 +4,39 @@
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
-#include "Client/Render/PlayerPOV.h"
+#include "Client/Player/PlayerPOV.h"
 #include "Client/Profiler/PerformanceProfiler.h"
 #include "Level/Entity/Type/EntityType.h"
 #include "Level/Entity/Entities.h"
 
-MultiEntityRenderer::MultiEntityRenderer() : 
+MultiEntityRender::MultiEntityRender(PlayerPOV* player) : 
     vbo_{ std::make_unique<Buffer>() },
     ebo_{ std::make_unique<Buffer>() },
     ssbo_pos_{ std::make_unique<Buffer>() },
     ssbo_vel_{ std::make_unique<Buffer>() },
     ssbo_acc_{ std::make_unique<Buffer>() },
     vao_{ std::make_unique<VertexArray>() },
-    player_{ std::make_unique<PlayerPOV>() },
+    player_{player},
     shader_{ std::make_unique<Shader>(
         "assets/shaders/Entity/MultiEntityVert.glsl", 
         "assets/shaders/Entity/MultiEntityFrag.glsl") },
     renderable_entities_{ std::make_unique<EntityRenderCache>() } {}
 
-MultiEntityRenderer::~MultiEntityRenderer() = default;
+MultiEntityRender::~MultiEntityRender() = default;
 
-size_t MultiEntityRenderer::GetNumEntityRendered() {
+size_t MultiEntityRender::GetNumEntityRendered() {
     return num_entity_rendered_;
 }
 
-void MultiEntityRenderer::AddEntity(EntityProperty& entity) {
+void MultiEntityRender::InsertEntity(const EntityProperty& entity) {
     renderable_entities_->AddEntity(entity);
 }
 
-void MultiEntityRenderer::RemoveEntity(EntityUUID entityUUID) {
+void MultiEntityRender::RemoveEntity(EntityUUID entityUUID) {
     renderable_entities_->RemoveEntity(entityUUID);
 }
 
-void MultiEntityRenderer::Clean() {
+void MultiEntityRender::Clean() {
     vbo_->Delete();
     ebo_->Delete();
     ssbo_pos_->Delete();
@@ -45,14 +45,13 @@ void MultiEntityRenderer::Clean() {
     vao_->Delete();
 }
 
-void MultiEntityRenderer::Initialize(PerformanceProfiler* pProfilerIn) {
+void MultiEntityRender::Initialize(PerformanceProfiler* pProfilerIn) {
     for (int i = 0; i < g_entity_list.entity_type_list_.size(); i++) {
         EntityModel model = g_entity_list.entity_type_list_[i]->render_model_;
         entity_cached_models_[i] = model;
         profiler_ = pProfilerIn;
 
     }
-    camera_ = player_->GetCamera();
 
     //Initialize Buffers
 
@@ -116,18 +115,18 @@ void MultiEntityRenderer::Initialize(PerformanceProfiler* pProfilerIn) {
 
 }
 
-void MultiEntityRenderer::SetTimePastTick(double t) {
+void MultiEntityRender::SetTimePastTick(double t) {
     time_past_tick_ = t;
 }
 
-void MultiEntityRenderer::SetupCall() {
+void MultiEntityRender::SetupCall() {
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
     glDisable(GL_CULL_FACE);
 }
 
-void MultiEntityRenderer::Render() {
+void MultiEntityRender::Render() {
     profiler_->ProfileStart("root/render/entity");
     SetupCall();
 
@@ -193,33 +192,23 @@ void MultiEntityRenderer::Render() {
 
 }
 
-void MultiEntityRenderer::SetRotation(glm::dvec2 rotation_) {
-    player_->SetRotation(rotation_);
-}
-
-void MultiEntityRenderer::SetPosition(glm::dvec3 position) {
-    player_->SetPosition(position);
-}
-
-void MultiEntityRenderer::SetWindow(GLFWwindow* win) {
+void MultiEntityRender::SetWindow(GLFWwindow* win) {
     window_ = win;
 }
 
 
-void MultiEntityRenderer::Update() {
+void MultiEntityRender::Update() {
     profiler_->ProfileStart("root/update/entity");
     int width, height;
 
     glfwGetWindowSize(window_, &width, &height);
     glm::mat4 model = glm::mat4(1.f);
 
-    camera_->screen_res_ = glm::vec2(width, height);
-
-    glm::mat4 view = camera_->GetViewMatrix();
+    glm::mat4 view = player_->GetCamera()->GetViewMatrix();
 
     int x = width;
     int y = height;
-    glm::mat4 projection = glm::perspective(glm::radians(camera_->fov_), (float)x / (float)y, 0.1f, 1000000.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(player_->GetCamera()->fov_), (float)x / (float)y, 0.1f, 1000000.0f);
 
     shader_->Use();
     shader_->SetMat4("view", view);
@@ -227,12 +216,12 @@ void MultiEntityRenderer::Update() {
     shader_->SetMat4("projection", projection);
     shader_->SetFloat("RenderDistance", (float)(horizontal_render_distance_ * 16));
     shader_->SetFloat("VerticalRenderDistance", (float)(vertical_render_distance_ * 16));
-    shader_->SetVec3("camPos", camera_->position_);
+    shader_->SetVec3("camPos", player_->GetPosition());
     shader_->SetFloat("TimeDelta", static_cast<float>(time_past_tick_));
     profiler_->ProfileStop("root/update/entity");
 }
 
-void MultiEntityRenderer::Reload() {
+void MultiEntityRender::Reload() {
 
     //reset gpu data
     vbo_->Delete();

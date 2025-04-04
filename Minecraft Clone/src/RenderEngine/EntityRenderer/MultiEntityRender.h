@@ -16,7 +16,7 @@ struct EntityRenderCache;
 struct EntityProperty;
 struct GLFWwindow;
 
-class MultiEntityRenderer {
+class MultiEntityRender {
 private:
 
     std::vector<float> entity_vertices_;
@@ -29,8 +29,7 @@ private:
     std::unique_ptr<EntityRenderCache> renderable_entities_;
     std::unique_ptr<Shader> shader_;
 
-    std::unique_ptr<PlayerPOV> player_;
-    Camera* camera_;
+    PlayerPOV* player_;
     GLFWwindow* window_;
 
     std::unique_ptr<Buffer> vbo_;
@@ -52,14 +51,14 @@ public:
     int vertical_render_distance_ = 16;
     int horizontal_render_distance_ = 16;
 
-    MultiEntityRenderer();
-    ~MultiEntityRenderer();
+    MultiEntityRender(PlayerPOV*);
+    ~MultiEntityRender();
 
     void Clean();
 
     size_t GetNumEntityRendered();
 
-    void AddEntity(EntityProperty& entity);
+    void InsertEntity(const EntityProperty& entity);
 
     void RemoveEntity(EntityUUID EntityUUID);
 
@@ -70,10 +69,6 @@ public:
     void SetupCall();
 
     void Render();
-
-    void SetRotation(glm::dvec2 rotation_);
-
-    void SetPosition(glm::dvec3 position);
 
     void SetWindow(GLFWwindow* win);
 

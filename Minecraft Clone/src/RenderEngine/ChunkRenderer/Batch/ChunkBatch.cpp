@@ -2,7 +2,7 @@
 
 #include "RenderEngine/ChunkRenderer/Batch/ChunkBatch.h"
 #include "RenderEngine/OpenGL/Buffers/BufferStorage.h"
-#include "Level/Timer/Timer.h"
+#include "Utils/Timer/Timer.h"
 
 void ChunkDrawBatch::SetupBuffers() {
     memory_pool_.Allocate(max_buffer_size_);

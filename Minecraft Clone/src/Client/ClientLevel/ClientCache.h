@@ -31,6 +31,20 @@ public:
     bool CheckChunk(const ChunkPos& pos) const {
         return chunk_cache_.CheckChunk(pos);
     }
+
+    void InsertEntity(const EntityProperty& entity) {
+        entities_.InsertEntity(entity);
+    }
+
+    void UpdateEntity(const EntityProperty& entity) {
+        entities_.UpdateEntity(entity);
+    }
+
+    void RemoveEntity(const EntityUUID& uuid) {
+        entities_.RemoveEntity(uuid);
+    }
+
+
 private:
     ChunkMap chunk_cache_;
 };

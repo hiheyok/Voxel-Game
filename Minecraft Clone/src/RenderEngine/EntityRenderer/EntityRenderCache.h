@@ -5,7 +5,7 @@
 struct EntityProperty;
 
 struct EntityRenderCache { // stores all entity to be rendered
-    void AddEntity(EntityProperty& entity);
+    void AddEntity(const EntityProperty& entity);
     void RemoveEntity(EntityUUID entityUUID);
     FastHashMap<EntityTypeID, FastHashMap<EntityUUID, EntityProperty>>& GetEntitiesTypeSeparated();
 

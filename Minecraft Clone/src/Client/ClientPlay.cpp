@@ -6,7 +6,6 @@
 #include "Client/Render/DebugScreen/DebugScreen.h"
 #include "Client/Render/WorldRender.h"
 #include "Client/IO/IO.h"
-#include "Client/Render/DebugScreen/DebugScreen.h"
 #include "Core/Options/Option.h"
 #include "Level/Chunk/Block/Blocks.h"
 #include "Level/Chunk/Chunk.h"
@@ -17,6 +16,7 @@
 #include "Core/Networking/ChunkUpdate.h"
 #include "Core/Networking/Packet.h"
 #include "RenderEngine/ChunkRenderer/TerrainRenderer.h"
+#include "RenderEngine/EntityRenderer/MultiEntityRender.h"
 #include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
 #include "RenderEngine/Window.h"
 #include "Utils/LogUtils.h"
@@ -27,13 +27,16 @@ ClientPlay::ClientPlay(ServerInterface* interface, Window* window, PerformancePr
     framebuffer_{ std::make_unique<TexturedFrameBuffer>() },
     client_level_{ std::make_unique<ClientLevel>() },
     debug_screen_{ std::make_unique<DebugScreen>() },
-    terrain_render_{ std::make_unique<WorldRender>() } {
+    entity_render_{ std::make_unique<MultiEntityRender>(main_player_->GetPlayerPOV()) },
+    terrain_render_{ std::make_unique<WorldRender>(main_player_->GetPlayerPOV()) } {
 
     main_player_->Initialize(window->GetWindow(), interface_, &client_level_->cache);
     main_player_->SetPlayerPosition(0., 50, 0.);
     main_player_->SetPlayerRotation(-135.f, -30.);
 
     debug_screen_->Initialize(window->GetWindow());
+    entity_render_->Initialize(profiler);
+    entity_render_->SetWindow(window->GetWindow());
 
     // Send server update on player position
     PlayerPacket::PlayerMove packet;
@@ -58,6 +61,7 @@ void ClientPlay::Render(Window* window) {
 
     // entity_render_->Render();
     terrain_render_->Render();
+    entity_render_->Render();
 
     if (!window->GetProperties().draw_solid_)
         window->RenderSolid();
@@ -79,20 +83,18 @@ void ClientPlay::Update(Window* window) {
         framebuffer_->GenBuffer(window->GetProperties().window_size_x_, window->GetProperties().window_size_y_, (float)g_app_options.graphics_scale_);
     }
 
+    if (window->GetUserInputs().CheckKeyPress(GLFW_KEY_R)) {
+        entity_render_->Reload();
+    }
+
 
     main_player_->Update(window->GetUserInputs());
 
-    terrain_render_->SetPosition(main_player_->GetEntityProperties().position_);
-    terrain_render_->SetRotation(main_player_->GetEntityProperties().rotation_);
-
-    /*entity_render_->SetPosition(main_player_->GetEntityProperties().position_);
-    entity_render_->SetRotation(main_player_->GetEntityProperties().rotation_);
-
-    entity_render_->SetTimePastTick(server_->GetTickClock()->GetTimePassed_s());
-    entity_render_->Update();*/
-
+    entity_render_->SetTimePastTick(interface_->time.GetTimePassed_s());
+    entity_render_->Update();
 
     UpdateChunks();
+    UpdateEntities();
 
     // Send player pos update
 
@@ -175,4 +177,71 @@ void ClientPlay::UpdateChunks() {
 
     std::vector<ChunkPos> toUpdate(chunkToUpdateRender.begin(), chunkToUpdateRender.end());
     terrain_render_->Update(toUpdate);
+}
+
+void ClientPlay::UpdateEntities() {
+    std::vector<EntityProperty> spawnedEntities;
+    std::vector<EntityProperty> updatedEntities;
+    std::vector<EntityUUID> despawnedEntities;
+
+    std::vector<Packet::EntityUpdate> packets;
+
+    interface_->PollEntityUpdates(packets);
+    //g_logger.LogDebug("ClientPlay::UpdateEntities", std::to_string(packets.size()));
+
+    for (const auto& packet : packets) {
+        switch (packet.type_) {
+        case EntityUpdatePacket::ENTITY_DESPAWN:
+        {
+            const EntityUpdatePacket::EntityDespawn& data = std::get<EntityUpdatePacket::EntityDespawn>(packet.packet_);
+            despawnedEntities.push_back(data.uuid_);
+            //g_logger.LogDebug("ClientPlay::UpdateEntities", "Updated entity");
+            break;
+        }
+        case EntityUpdatePacket::ENTITY_INVENTORY_UPDATE:
+        {
+            const EntityUpdatePacket::EntityInventoryUpdate& data = std::get<EntityUpdatePacket::EntityInventoryUpdate>(packet.packet_);
+            // N/A
+            break;
+        }
+        case EntityUpdatePacket::ENTITY_MOVE:
+        {
+            const EntityUpdatePacket::EntityMove& data = std::get<EntityUpdatePacket::EntityMove>(packet.packet_);
+            updatedEntities.push_back(data.properties_);
+            //g_logger.LogDebug("ClientPlay::UpdateEntities", "Updated entity");
+            break;
+        }
+        case EntityUpdatePacket::ENTITY_SPAWN:
+        {
+            const EntityUpdatePacket::EntitySpawn& data = std::get<EntityUpdatePacket::EntitySpawn>(packet.packet_);
+            spawnedEntities.push_back(data.properties_);
+            //g_logger.LogDebug("ClientPlay::UpdateEntities", "Updated entity");
+            break;
+        }
+        default:
+            g_logger.LogDebug("ClientPlay::UpdateEntities", "Default");
+
+        }
+    }
+
+    for (const auto& entity : spawnedEntities) {
+        client_level_->cache.InsertEntity(entity);
+    }
+
+    for (const auto& entity : updatedEntities) {
+        client_level_->cache.UpdateEntity(entity);
+    }
+
+    for (const auto& entity : despawnedEntities) {
+        client_level_->cache.RemoveEntity(entity);
+    }
+
+    // Insert it to the renderer now
+    for (const auto& entity : client_level_->cache.entities_.GetChangedEntities()) {
+        entity_render_->InsertEntity(entity);
+    }
+
+    for (const auto& entity : client_level_->cache.entities_.GetRemovedEntitiesUUID()) {
+        entity_render_->RemoveEntity(entity);
+    }
 }

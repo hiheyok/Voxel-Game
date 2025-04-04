@@ -9,7 +9,7 @@
 #include "Level/Level.h"
 #include "Level/LevelLoader.h"
 #include "Level/World/WorldInteraction/WorldLoader.h"
-#include "Level/Timer/Timer.h"
+#include "Utils/Timer/Timer.h"
 #include "Utils/Clock.h"
 #include "Utils/Math/Ray/Ray.h"
 
@@ -101,13 +101,21 @@ void Server::ProcessPlayerPackets(ClientInterface* receiver) {
         case PlayerPacket::DESTROY_BLOCK:
             {
                 const PlayerPacket::PlayerDestroyBlock& destroyBlock = std::get<PlayerPacket::PlayerDestroyBlock>(packet.packet_);
-                level_->main_world_->world_interactions_.SetBlock(g_blocks.AIR, destroyBlock.pos_);
+                BlockEvent blockEvent;
+                blockEvent.block_ = g_blocks.AIR; 
+                blockEvent.id_ = g_event_handler.BlockPlace;
+                blockEvent.pos_ = destroyBlock.pos_;
+                level_->main_world_->event_manager_.AddEvent(blockEvent);
             }
             break;
         case PlayerPacket::PLACE_BLOCK:
             {
                 const PlayerPacket::PlayerPlaceBlock& placeBlock = std::get<PlayerPacket::PlayerPlaceBlock>(packet.packet_);
-                level_->main_world_->world_interactions_.SetBlock(placeBlock.block_, placeBlock.pos_);
+                BlockEvent blockEvent;
+                blockEvent.block_ = placeBlock.block_;
+                blockEvent.id_ = g_event_handler.BlockPlace;
+                blockEvent.pos_ = placeBlock.pos_;
+                level_->main_world_->event_manager_.AddEvent(blockEvent);
         }
             break;
         case PlayerPacket::MOVE:
@@ -128,12 +136,17 @@ void Server::SendPacket() {
     SendEntityUpdatePacket(client_interface_);
     SendChunkUpdatePacket(client_interface_);
     SendServerStats(client_interface_);
+    client_interface_->SendTimeLastTick();
 }
 
 void Server::SendEntityUpdatePacket(ClientInterface* receiver) {
     std::vector<EntityProperty> spawnedEntities = level_->main_world_->world_interactions_.GetSpawnedEntities();
     std::vector<EntityProperty> entityUpdated = level_->main_world_->world_interactions_.GetUpdatedEntities();
     std::vector<EntityUUID> entityDespawned = level_->main_world_->world_interactions_.GetRemovedEntities();
+
+   /* g_logger.LogDebug("Server::SendEntityUpdatePacket", std::to_string(spawnedEntities.size()));
+    g_logger.LogDebug("Server::SendEntityUpdatePacket", std::to_string(entityUpdated.size()));
+    g_logger.LogDebug("Server::SendEntityUpdatePacket", std::to_string(entityDespawned.size()));*/
 
     // Work on spawn entities
     for (const auto& entity : spawnedEntities) {
@@ -143,7 +156,7 @@ void Server::SendEntityUpdatePacket(ClientInterface* receiver) {
     }
 
     // Work on updated entities
-    for (const auto& entity : spawnedEntities) {
+    for (const auto& entity : entityUpdated) {
         EntityUpdatePacket::EntityMove packet;
         packet.properties_ = entity;
         receiver->SendEntityUpdate(packet);
@@ -163,6 +176,7 @@ void Server::SendChunkUpdatePacket(ClientInterface* receiver) {
 
     for (const auto& pos : updatedChunks) {
         ChunkContainer* chunk = level_->main_world_->world_interactions_.GetChunk(pos);
+        if (chunk == nullptr) continue; // TODO: Fix this later
         ChunkRawData data = chunk->GetRawData();
 
         ChunkUpdatePacket::AddChunk packet;

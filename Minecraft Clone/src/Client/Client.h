@@ -4,8 +4,6 @@
 class ClientPlay;
 class MainPlayer;
 class WorldRender;
-class MultiEntityRenderer;
-class EntityRendererUpdater;
 class TextRenderer;
 class PerformanceProfiler;
 class InternalInterface;
@@ -33,8 +31,6 @@ private:
     std::unique_ptr<ClientPlay> client_play_;
     std::unique_ptr<Server> server_;
     std::unique_ptr<InternalInterface> internal_interface_;
-    std::unique_ptr<MultiEntityRenderer> entity_render_;
-    std::unique_ptr<EntityRendererUpdater> entity_updater_;
     std::unique_ptr<TextRenderer> text_render_;
     PerformanceProfiler* profiler_;
 };

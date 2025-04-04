@@ -20,8 +20,11 @@ public:
     void EraseChunk(const ChunkPos& pos);
     bool CheckChunk(const ChunkPos& pos) const;
     int GetChunkCount() const;
-
+    void IncrementUsage();
+    size_t GetUsageCount() const;
+    void ResetUsageCount();
 private:
     int chunk_count_;
+    int usage_; // use for finding region with the most usage and caching them for faster access
     std::vector<std::unique_ptr<Chunk>> region_data_;
 };

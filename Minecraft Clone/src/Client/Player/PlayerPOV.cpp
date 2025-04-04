@@ -1,4 +1,4 @@
-#include "PlayerPOV.h"
+#include "Client/Player/PlayerPOV.h"
 #include "RenderEngine/Camera/camera.h"
 
 PlayerPOV::PlayerPOV() : camera_{ std::make_unique<Camera>() }{
@@ -16,6 +16,10 @@ void PlayerPOV::SetRotation(glm::vec2 rot) {
     camera_->pitch_ = rot.y;
 
     camera_->updateCameraVectors();
+}
+
+glm::vec3 PlayerPOV::GetPosition() const {
+    return camera_->position_;
 }
 
 void PlayerPOV::SetFOV(float fov) {

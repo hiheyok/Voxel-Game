@@ -13,6 +13,7 @@ class ClientLevel;
 class PerformanceProfiler;
 class DebugScreen;
 class Window;
+class MultiEntityRender;
 
 struct WindowProperties;
 struct GLFWwindow;
@@ -30,9 +31,11 @@ public:
     std::unique_ptr<TexturedFrameBuffer> framebuffer_;
     std::unique_ptr<DebugScreen> debug_screen_;
     std::unique_ptr<ClientLevel> client_level_;
+    std::unique_ptr<MultiEntityRender> entity_render_;
 
     double frametime_ = 1;
 private:
     void UpdateDebugStats();
     void UpdateChunks();
+    void UpdateEntities();
 };

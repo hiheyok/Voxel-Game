@@ -42,10 +42,6 @@ public:
     ChunkRawData GetRawData();
     LightStorage GetLightData();
 
-    void Use();
-    void Unuse();
-
-    
     void SetPosition(int x, int y, int z);
 
     void UpdateHeightMap();

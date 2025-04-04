@@ -5,6 +5,7 @@
 #include "Utils/Containers/ConcurrentQueue.h"
 #include "Core/Networking/Packet.h"
 #include "Core/Stats/ServerStats.h"
+#include "Utils/Timer/Timer.h"
 /*
 * Abstraction for client to server interfacing
 */
@@ -46,6 +47,7 @@ public:
         return client_player_uuid_;
     }
 
+    Timer time;
 protected:
     // Server -> Client queues
     ConcurrentQueue<Packet::BlockUpdate> block_update_queue_;

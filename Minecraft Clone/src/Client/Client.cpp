@@ -12,7 +12,7 @@
 #include "Level/Item/ItemTextureAtlas.h"
 #include "Level/Entity/Entities.h"
 #include "Level/Entity/Mobs/Player.h"
-#include "Level/Timer/Timer.h"
+#include "Utils/Timer/Timer.h"
 #include "Level/Server/Server.h"
 #include "Core/Interfaces/InternalInterface.h"
 #include "Core/Networking/PlayerAction.h"
@@ -22,18 +22,14 @@
 #include "Level/Level.h"
 #include "RenderEngine/ChunkRenderer/TerrainRenderer.h"
 #include "RenderEngine/EntityRenderer/MultiEntityRender.h"
-#include "RenderEngine/EntityRenderer/EntityRenderUpdate.h"
 #include "RenderEngine/GUI/TextRenderer.h"
 #include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
 #include "Utils/LogUtils.h"
 
 Client::Client() : 
     server_{ std::make_unique<Server>() },
-    entity_render_{ std::make_unique<MultiEntityRenderer>() },
-    entity_updater_{ std::make_unique<EntityRendererUpdater>() },
     text_render_{ std::make_unique<TextRenderer>() },
     internal_interface_{ std::make_unique<InternalInterface>() },
-    
     profiler_{ new PerformanceProfiler()} { }
 
 Client::~Client() = default;
@@ -90,7 +86,6 @@ void Client::Cleanup() {
     g_logger.Stop();
     //entity_updater_->Stop();
     g_blocks.CleanUp();
-    glfwDestroyWindow(GetWindow());
 }
 
 void Client::Render() {
@@ -99,7 +94,6 @@ void Client::Render() {
 }
 
 void Client::GameLoop() {
-
     while (!WindowCloseCheck()) {
         Timer FrametimeTracker;
 
@@ -123,10 +117,6 @@ void Client::Update() {
     }
     if (inputs_.CheckKey(GLFW_KEY_G)) {
         properties_.draw_solid_ = true;
-    }
-
-    if (inputs_.CheckKeyPress(GLFW_KEY_R)) {
-        entity_render_->Reload();
     }
 
     if (inputs_.CheckKeyPress(GLFW_KEY_P)) {

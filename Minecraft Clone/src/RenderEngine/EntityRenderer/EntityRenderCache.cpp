@@ -1,7 +1,7 @@
 #include "RenderEngine/EntityRenderer/EntityRenderCache.h"
 #include "Level/Entity/Entity.h"
 
-void EntityRenderCache::AddEntity(EntityProperty& entity) {
+void EntityRenderCache::AddEntity(const EntityProperty& entity) {
     entity_container_[entity.entity_uuid_] = entity;
     entity_separated_[entity.type_][entity.entity_uuid_] = entity;
 }

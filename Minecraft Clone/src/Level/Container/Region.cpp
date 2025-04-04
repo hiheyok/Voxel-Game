@@ -49,3 +49,15 @@ void Region::EraseChunk(const ChunkPos& pos) {
 int Region::GetChunkCount() const {
     return chunk_count_;
 }
+
+void Region::IncrementUsage() {
+    usage_++;
+}
+
+size_t Region::GetUsageCount() const {
+    return usage_;
+}
+
+void Region::ResetUsageCount() {
+    usage_ = 0;
+}

@@ -12,6 +12,9 @@ public:
 
     void SetPosition(glm::vec3 pos);
     void SetRotation(glm::vec2 rot);
+
+    glm::vec3 GetPosition() const;
+
     void SetFOV(float fov);
 
     Camera* GetCamera();

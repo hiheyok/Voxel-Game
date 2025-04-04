@@ -6,6 +6,7 @@ class ServerInterface;
 class WorldInteraction;
 class UserInputs;
 class PlayerMovement;
+class PlayerPOV;
 class Player;
 class GUI;
 
@@ -21,12 +22,14 @@ public:
 
     void Initialize(GLFWwindow* win, ServerInterface* server, ClientCache* cache);
 
-    void Update(UserInputs inputs);
+    void Update(const UserInputs& inputs);
 
     EntityProperty GetEntityProperties();
 
     void SetPlayerRotation(float x, float y);
     void SetPlayerPosition(float x, float y, float z);
+
+    PlayerPOV* GetPlayerPOV();
 
     void RenderGUIs();
 
@@ -38,6 +41,7 @@ private:
 
     std::unique_ptr<PlayerMovement> movement_;
     std::unique_ptr<WorldInteraction> interactions_;
+    std::unique_ptr<PlayerPOV> player_pov_;
     std::unique_ptr<GUI> player_gui_;
 
     ClientCache* client_cache_ = nullptr;
@@ -47,5 +51,5 @@ private:
     size_t item_gui_index_ = 0;
     size_t slot_index_ = 0;
 
-    float hotbar_size_ = 0.135;
+    constexpr const static float kHotbarSize = 0.135f;
 };

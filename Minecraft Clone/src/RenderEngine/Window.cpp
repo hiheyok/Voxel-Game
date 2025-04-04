@@ -122,7 +122,9 @@ Window::Window() {
 
     glfwSwapInterval(0);
 }
-Window::~Window() = default;
+Window::~Window() {
+    glfwDestroyWindow(GetWindow());
+}
 
 void Window::MousePositionCallback(double xpos, double ypos) {
     inputs_.mouse_.displacement_ = glm::dvec2(xpos, ypos) - inputs_.mouse_.position_;

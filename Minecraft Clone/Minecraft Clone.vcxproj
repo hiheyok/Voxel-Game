@@ -191,7 +191,7 @@
     <ClCompile Include="src\Client\Player\WorldInteraction.cpp" />
     <ClCompile Include="src\Client\Render\DebugScreen\DebugScreen.cpp" />
     <ClCompile Include="src\Client\Profiler\PerformanceProfiler.cpp" />
-    <ClCompile Include="src\Client\Render\PlayerPOV.cpp" />
+    <ClCompile Include="src\Client\Player\PlayerPOV.cpp" />
     <ClCompile Include="src\Client\Render\WorldRender.cpp" />
     <ClCompile Include="src\Core\Initializer.cpp" />
     <ClCompile Include="src\Core\Options\Option.cpp" />
@@ -257,7 +257,6 @@
     <ClCompile Include="src\RenderEngine\EntityRenderer\Models\EntityModels.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRenderer\MultiEntityRender.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRenderer\MultiEntityRender.h" />
-    <ClCompile Include="src\RenderEngine\EntityRenderer\EntityRenderUpdate.cpp" />
     <ClCompile Include="src\RenderEngine\Frustum\frustum.cpp" />
     <ClCompile Include="src\RenderEngine\GUI\GUI.cpp" />
     <ClCompile Include="src\RenderEngine\GUI\Font.cpp" />
@@ -295,7 +294,7 @@
     <ClCompile Include="src\Level\Chunk\Block\Block.cpp" />
     <ClCompile Include="src\Level\Chunk\Chunk.cpp" />
     <ClCompile Include="src\Level\Chunk\ChunkData.cpp" />
-    <ClCompile Include="src\Level\Timer\Timer.cpp" />
+    <ClCompile Include="src\Utils\Timer\Timer.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generator.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -411,7 +410,6 @@
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Batch\RenderCommandBuffer.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\MemoryPool\ChunkMemoryPool.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshingV2.h" />
-    <ClInclude Include="src\RenderEngine\EntityRenderer\EntityRenderUpdate.h" />
     <ClInclude Include="src\RenderEngine\GUI\GUI.h" />
     <ClInclude Include="src\RenderEngine\GUI\GUIObject.h" />
     <ClInclude Include="src\RenderEngine\GUI\GUISet.h" />
@@ -426,7 +424,7 @@
     <ClInclude Include="src\Level\Item\Inventory\EntityInventory.h" />
     <ClInclude Include="src\Level\Item\Inventory\Inventory.h" />
     <ClInclude Include="src\Client\Player\MainPlayer.h" />
-    <ClInclude Include="src\Client\Render\PlayerPOV.h" />
+    <ClInclude Include="src\Client\Player\PlayerPOV.h" />
     <ClInclude Include="src\Client\Render\WorldRender.h" />
     <ClInclude Include="src\RenderEngine\Camera\camera.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Batch\ChunkBatch.h" />
@@ -489,7 +487,7 @@
     <ClInclude Include="src\Level\Entity\Type\EntityType.h" />
     <ClInclude Include="src\Level\Entity\Entity.h" />
     <ClInclude Include="src\Level\Entity\Collusion\Hitbox.h" />
-    <ClInclude Include="src\Level\Timer\Timer.h" />
+    <ClInclude Include="src\Utils\Timer\Timer.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Generator.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Generators\DebugSecond\DebugSecond.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Generators\FastTerrain\FastTerrain.h" />

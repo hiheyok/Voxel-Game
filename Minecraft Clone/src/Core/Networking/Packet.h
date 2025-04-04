@@ -48,7 +48,7 @@ namespace Packet {
         EntityUpdate(const T& packet) {
             packet_ = packet;
             if constexpr (std::is_same_v<T, EntityUpdatePacket::EntityDespawn>) {
-                type_ = EntityUpdatePacket::ENTITY_SPAWN;
+                type_ = EntityUpdatePacket::ENTITY_DESPAWN;
             }
             else if constexpr (std::is_same_v<T, EntityUpdatePacket::EntityInventoryUpdate>) {
                 type_ = EntityUpdatePacket::ENTITY_INVENTORY_UPDATE;

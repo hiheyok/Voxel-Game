@@ -22,5 +22,7 @@ void HandleEntitySummon(const EntityEvent& e, Dimension* dimension) {
 }
 
 void HandleRemoveEntity(const EntityEvent& e, Dimension* dimension) {
-    dimension->world_interactions_.KillEntity(e.entity_uuid_);
+    if (dimension->world_interactions_.GetEntity(e.entity_uuid_) != nullptr) {
+        dimension->world_interactions_.KillEntity(e.entity_uuid_);
+    }
 }

@@ -50,4 +50,8 @@ public:
     void SendServerStats(const ServerStats& stats) override {
         server_stats_ = stats;
     }
+
+    void SendTimeLastTick() override {
+        time.Set();
+    }
 };

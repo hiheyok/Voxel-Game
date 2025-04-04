@@ -33,9 +33,9 @@ private:
     std::vector<ChunkDrawBatch> chunk_transparent_batches_;
     FastHashMap<ChunkPos, int> chunk_batch_transparent_lookup_; //f: ChunkPos -> TransparentBatchIndex
 
+    Camera* camera_;
     GLFWwindow* window_ = nullptr;
     std::unique_ptr<Shader> cubic_shader_;
-    Camera* camera_;
     std::unique_ptr<Timer> time_;
 public:
     TerrainRenderer();

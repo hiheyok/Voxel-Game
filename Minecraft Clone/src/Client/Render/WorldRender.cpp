@@ -1,28 +1,20 @@
 ﻿#include "Client/Render/WorldRender.h"
 #include "Client/ClientLevel/ClientCache.h"
-#include "Client/Render/PlayerPOV.h"
+#include "Client/Player/PlayerPOV.h"
 #include "Utils/Clock.h"
 #include "Core/Options/Option.h"
-#include "Level/Timer/Timer.h"
+#include "Utils/Timer/Timer.h"
 #include "RenderEngine/ChunkRenderer/Mesh/ChunkMeshingV2.h"
 #include "RenderEngine/ChunkRenderer/TerrainRenderer.h"
 
 static thread_local Mesh::ChunkMeshData chunkMesher;
 
-WorldRender::WorldRender() : 
-    player_{std::make_unique<PlayerPOV>()},
+WorldRender::WorldRender(PlayerPOV* player) : 
+    player_{player},
     renderer_{std::make_unique<TerrainRenderer>()} {
 }
 
 WorldRender::~WorldRender() = default;
-
-void WorldRender::SetRotation(glm::dvec2 rotation) {
-    player_->SetRotation(rotation);
-}
-
-void WorldRender::SetPosition(glm::dvec3 position) {
-    player_->SetPosition(position);
-}
 
 void WorldRender::Render() {
     renderer_->RenderSky();

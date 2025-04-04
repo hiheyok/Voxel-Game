@@ -19,10 +19,6 @@ using FastHashMap = robin_hood::unordered_flat_map<K, V, _Hash>;
 template <class V, class _Hash = robin_hood::hash<V>>
 using FastHashSet = robin_hood::unordered_flat_set<V, _Hash>;
 
-template <class T>
-using FastVector = std::vector<T>;
-
-
 inline constexpr int FRONT = 0x00;
 inline constexpr int BACK = 0x01;
 inline constexpr int TOP = 0x02;

@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <utility>
 
 class Chunk;
 class Region;
@@ -21,13 +22,17 @@ public:
     std::vector<Chunk*> GetAllChunks() const;
 private:
     Region* GetRegion(const RegionPos& pos) const;
-    bool CheckRegion(const RegionPos& pos) const;
-    void CreateRegion(const RegionPos& pos);
+    Region* GetRegionUncheck(const RegionPos& pos) const;
+    bool CheckRegion(const RegionPos& pos, bool checkCache = true) const;
+    Region* CreateRegion(const RegionPos& pos);
     void DeleteRegion(const RegionPos& pos);
 
     bool heightmap_update_ = false;
 
+    constexpr const static int kRegionCacheSize = 16;
+
     std::vector<Chunk*> chunks_;
     FastHashMap<ChunkPos, size_t> chunks_idx_;
     FastHashMap<RegionPos, std::unique_ptr<Region>> regions_;
+    mutable std::vector<std::pair<RegionPos, Region*>> region_cache_;
 };

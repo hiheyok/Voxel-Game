@@ -86,15 +86,6 @@ void ChunkContainer::ClearNeighbors() {
     }
 }
 
-void ChunkContainer::Use() {
-    while (in_use_) {};
-    in_use_ = true;
-}
-
-void ChunkContainer::Unuse() {
-    in_use_ = false;
-}
-
 void ChunkContainer::SetData(const ChunkRawData& data) {
     lighting_->ReplaceData(data.lighting_data_.GetData());
     block_storage_ = data.chunk_data_;
@@ -120,35 +111,33 @@ void ChunkContainer::UpdateHeightMap() {
 void ChunkContainer::UpdateHeightMap(int x, int z) {
     // Check chunk above first, if the heightmap above is > -1, it means that there are block above
     // -1 indicate theirs nothing in the column
-    bool updateBottom = heightmap_->Get(x, z) == -1 && neighbors_[NY] != nullptr;
-    \
-    if (neighbors_[PY] != nullptr && neighbors_[PY]->heightmap_->Get(x, z) != -1) {
-        if (heightmap_->Get(x, z) != 16) {
-            heightmap_->Edit(x, z, 16);
-            light_dirty_ = true;
+    ChunkContainer* chunkAbove = neighbors_[PY];
 
-            if (updateBottom) {
-                neighbors_[NY]->UpdateHeightMap(x, z);
-            }
-        }
-    }
-    else {
-        int i = 15;
-        for (; i >= 0; --i) {
+    int newHeight = -1; // -1 is the default height if there is no blocks in the column
+    int oldHeight = heightmap_->Get(x, z);
+    
+    if (neighbors_[PY] != nullptr && neighbors_[PY]->heightmap_->Get(x, z) != -1) {
+        newHeight = kChunkDim;
+    } else {
+        for (int i = 15; i >= 0; --i) {
             if (GetBlockUnsafe(x, i, z) != g_blocks.AIR) {
+                newHeight = i;
                 break;
             }
         }
+    }
 
-        if (heightmap_->Get(x, z) != i) {
-            heightmap_->Edit(x, z, i);
-            light_dirty_ = true;
-        }
-
-        if (i != -1 && updateBottom) {
-            neighbors_[NY]->UpdateHeightMap(x, z);
+    if (newHeight != oldHeight) {
+        light_dirty_ = true;
+        heightmap_->Edit(x, z, newHeight);
+    
+        ChunkContainer* chunkBottom = neighbors_[NY];
+        if (chunkBottom != nullptr && (oldHeight == -1 || newHeight == -1)) {
+            chunkBottom->UpdateHeightMap(x, z);
         }
     }
+
+
 }
 
 bool ChunkContainer::CheckLightDirty() {
