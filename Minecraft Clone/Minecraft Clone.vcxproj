@@ -221,7 +221,7 @@
     <ClCompile Include="src\Level\Level.cpp" />
     <ClCompile Include="src\Level\LevelLoader.cpp" />
     <ClCompile Include="src\Level\Lighting\LightEngine.cpp" />
-    <ClCompile Include="src\Level\Server\Server.cpp" />
+    <ClCompile Include="src\Server\Server.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Biome\BiomeProperties.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugPositioning\DebugPositioning.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugSecond\DebugSecond.cpp" />
@@ -340,7 +340,7 @@
     <ClInclude Include="src\Core\Networking\EntityUpdate.h" />
     <ClInclude Include="src\Core\Networking\Packet.h" />
     <ClInclude Include="src\Core\Networking\PlayerAction.h" />
-    <ClInclude Include="src\Level\Server\Server.h" />
+    <ClInclude Include="src\Server\Server.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\Biome.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeProperties.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeProvider.h" />

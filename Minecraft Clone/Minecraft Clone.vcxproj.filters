@@ -219,7 +219,7 @@
     <ClCompile Include="src\Level\TerrainGeneration\Biome\BiomeProperties.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Server\Server.cpp">
+    <ClCompile Include="src\Server\Server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Level\Lighting\LightEngine.cpp">
@@ -737,7 +737,7 @@
     <ClInclude Include="src\Level\Dimension\Dimensions\Overworld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Server\Server.h">
+    <ClInclude Include="src\Server\Server.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\LevelLoader.h">
