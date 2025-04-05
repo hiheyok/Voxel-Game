@@ -36,7 +36,7 @@ namespace MemoryManagement {
 
         void Delete(std::map<size_t, MemoryBlock>::const_iterator it);
 
-        std::map<size_t, MemoryBlock>::const_iterator getIterator(size_t offset) const;
+        std::map<size_t, MemoryBlock>::const_iterator GetIterator(size_t offset) const;
 
         std::map<size_t, MemoryBlock>::const_iterator begin() const;
 

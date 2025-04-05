@@ -27,7 +27,7 @@ void BlockManagement::Delete(std::map<size_t, MemoryBlock>::const_iterator it) {
     mem_blocks_iterators_.erase(offset);
 }
 
-std::map<size_t, MemoryBlock>::const_iterator BlockManagement::getIterator(size_t offset) const {
+std::map<size_t, MemoryBlock>::const_iterator BlockManagement::GetIterator(size_t offset) const {
     if (mem_blocks_iterators_.count(offset)) {
         const auto& it = mem_blocks_iterators_.find(offset);
         return it->second;
@@ -84,7 +84,7 @@ void MemoryPoolManager::AllocateSpace(size_t memOffset, size_t memSize) { //Assu
 
     reserved_memory_blocks_.Add(MemoryBlock{ memOffset, memSize });
 
-    std::map<size_t, MemoryBlock>::const_iterator left = free_memory_blocks_.getIterator(memOffset);
+    std::map<size_t, MemoryBlock>::const_iterator left = free_memory_blocks_.GetIterator(memOffset);
 
     MemoryBlock current = left->second;
 
@@ -116,8 +116,7 @@ void MemoryPoolManager::DeallocateSpace(size_t MemOffset, size_t MemSize) {
 
     if (rightBlockFree == free_memory_blocks_.end()) {
         isFreeBlockRight = false;
-    }
-    else {
+    } else {
         if (rightBlockFree->second.offset_ != MemOffset + MemSize) {
             isFreeBlockRight = false;
         }
@@ -125,8 +124,7 @@ void MemoryPoolManager::DeallocateSpace(size_t MemOffset, size_t MemSize) {
 
     if (leftBlockFree == free_memory_blocks_.end()) {
         isFreeBlockLeft = false;
-    }
-    else {
+    } else {
         if (leftBlockFree->second.offset_ + leftBlockFree->second.size_ != MemOffset) {
             isFreeBlockLeft = false;
         }
@@ -136,15 +134,13 @@ void MemoryPoolManager::DeallocateSpace(size_t MemOffset, size_t MemSize) {
 
     if (isFreeBlockRight) {
         memoryRight = rightBlockFree->second.offset_ + rightBlockFree->second.size_;
-    }
-    else {
+    } else {
         memoryRight = MemOffset + MemSize;
     }
 
     if (isFreeBlockLeft) {
         memoryLeft = leftBlockFree->second.offset_;
-    }
-    else {
+    } else {
         memoryLeft = MemOffset;
     }
 
@@ -164,7 +160,6 @@ void MemoryPoolManager::DeallocateSpace(size_t MemOffset, size_t MemSize) {
         sorted_mem_sizes_iterators.erase(rightBlockFree->first);
         free_memory_blocks_.Delete(rightBlockFree);
     }
-
 
     //Add Free Space
     free_memory_blocks_.Add(MemoryBlock(freeMemoryOffset, freeMemorySize));
@@ -228,7 +223,6 @@ void ChunkGPUMemoryPool::Allocate(size_t memoryPoolSize) {
         return;
     }
 
-
     size_t stagingSize = 10000000;
     stagging_buffer_->Create(GL_COPY_WRITE_BUFFER, stagingSize, true, nullptr); // Dynamic for potential reuse
     if (!stagging_buffer_->IsInitialized()) {
@@ -261,9 +255,9 @@ ChunkMemoryPoolOffset ChunkGPUMemoryPool::AddChunk(const std::vector<uint32_t>& 
     size_t blockSize = vertices.size() * sizeof(uint32_t);
     size_t blockOffset = memory_pool_.FindFreeSpace(blockSize);
 
-    if (blockOffset == ULLONG_MAX) { //Check if it is out of space
+    if (blockOffset == std::numeric_limits<size_t>::max()) { //Check if it is out of space
         g_logger.LogError("ChunkGPUMemoryPool::AddChunk", "Out of space!");
-        return ChunkMemoryPoolOffset{ ULLONG_MAX, ULLONG_MAX };
+        return ChunkMemoryPoolOffset{ std::numeric_limits<size_t>::max(), std::numeric_limits<size_t>::max() };
     }
 
     ChunkMemoryPoolOffset chunkMemoryBlock;
@@ -290,7 +284,7 @@ ChunkMemoryPoolOffset ChunkGPUMemoryPool::GetChunkMemoryPoolOffset(ChunkPos pos)
     if (it != chunk_memory_offsets_.end()) {
         return it->second;
     }
-    return ChunkMemoryPoolOffset{ ULLONG_MAX, ULLONG_MAX, pos };
+    return ChunkMemoryPoolOffset{ std::numeric_limits<size_t>::max(), std::numeric_limits<size_t>::max(), pos };
 }
 
 bool ChunkGPUMemoryPool::CheckChunk(ChunkPos pos) const {

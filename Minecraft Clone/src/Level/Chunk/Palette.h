@@ -30,8 +30,8 @@ private:
     using PaletteIndex = uint16_t;
     using StorageBit = uint64_t;
 
-    static constexpr int MIN_BIT_WIDTH = 1; // Minimum bits
-    static constexpr int MAX_BIT_WIDTH = 12;
+    static const constexpr int kMinBitWidth = 1; // Minimum bits
+    static const constexpr int kMaxBitWidth = 12;
 
     int current_bit_width_;
     int unique_blocks_count_ = 1; // Initialize with only air blocks
@@ -45,7 +45,7 @@ private:
 
     constexpr static int GetBitWidth(unsigned int n) {
         int bitWidth = std::bit_width(n);
-        return std::max(bitWidth, MIN_BIT_WIDTH);
+        return std::max(bitWidth, kMinBitWidth);
     }
 
     constexpr static size_t GetIndex(int x, int y, int z) {

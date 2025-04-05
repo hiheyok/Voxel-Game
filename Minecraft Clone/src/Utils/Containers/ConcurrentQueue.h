@@ -16,6 +16,7 @@ public:
 
     void PopAll(std::vector<T>& out) {
         std::unique_lock<std::mutex> lock{ mutex_ };
+        out.reserve(out.size() + queue_.size());
         while (!queue_.empty()) {
             out.push_back(std::move(queue_.front()));
             queue_.pop();

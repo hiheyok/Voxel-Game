@@ -16,61 +16,40 @@
 #include "Utils/LogUtils.h"
 #include "Utils/MathHelper.h"
 
+class Shader;
+
 class ChunkDrawBatch {
 public:
-    ChunkDrawBatch() = default;
+    ChunkDrawBatch();
     ChunkDrawBatch(const ChunkDrawBatch&) = delete;
-    ChunkDrawBatch(ChunkDrawBatch&&) = default;
+    ChunkDrawBatch(ChunkDrawBatch&&);
+    ~ChunkDrawBatch();
 
     void SetupBuffers();
-
     void Reset();
-
     void GenDrawCommands(int RenderDistance, int verticalRenderDistance);
-
     bool AddChunkVertices(const std::vector<uint32_t>& Data, const ChunkPos& pos);
-
     void DeleteChunkVertices(const ChunkPos& ID);
-
     void SetMaxSize(size_t size);
-
-    void Draw();
-
-    void Bind();
-
-    void Unbind();
-
-    void Cleanup();
-
-    void Defrager(size_t iterations);
-
+    void Draw(Shader* shader);
+    void Defrag(size_t iterations);
     void UpdateCommandBufferSize();
 
-    void ErrorCheck();
-
     Camera* camera = nullptr; // TODO: Rename
-
-    std::map<size_t, ChunkMemoryPoolOffset> render_list_; //f: Offset -> RenderInfo
-
+    FastHashMap<size_t, size_t> render_list_;
     double debug_time_ = 0.0;
-
     ChunkGPUMemoryPool memory_pool_;
 private:
-    ChunkDrawCommandBuffer command_buffer_;
+    void Bind();
+    void Unbind();
+
+    std::vector<ChunkMemoryPoolOffset> render_list_arr_;
     CFrustum frustum_;
     Buffer ibo_, ssbo_;
     VertexArray array_;
     size_t max_buffer_size_ = 0;
-
-    bool update_commands_ = false;
-
-    FastHashMap<ChunkPos, size_t> render_list_offset_lookup_; //f: ChunkPos  -> Offset
     std::vector<GLint> chunk_shader_pos_;
-
     std::vector<DrawCommandIndirect> draw_commands_;
-
-    size_t amount_of_chunks_ = 0;
     size_t amount_of_chunks_being_rendered_ = 0;
-
-    Buffer transfer_buffer_;
+    bool update_commands_ = false;
 };

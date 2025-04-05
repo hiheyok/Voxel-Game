@@ -15,11 +15,29 @@ namespace Mesh {
 }
 
 class TerrainRenderer {
+public:
+    TerrainRenderer();
+    ~TerrainRenderer();
+
+    void Initialize(GLFWwindow* window_, Camera* camera_);
+    void PrepareRenderer();
+    void SetupCallSolid();
+    void SetupCallTransparent();
+    void RenderSky();
+    void Render();
+    void Defrag(int iterations);
+    void Update();
+    void SetSettings(uint32_t RenderDistance, uint32_t verticalRenderDistance, float fov_);
+    void LoadAssets();
+    void AddChunk(std::unique_ptr<Mesh::ChunkVertexData> MeshData);
+    double GetDebugTime();
+    double GetFragmentationRate();
+    size_t GetVRAMUsageFull();
+
+    size_t amountOfMeshGenerated = 1;
 private:
     void AddChunk(const ChunkPos& pos, const std::vector<uint32_t>& data, std::vector<ChunkDrawBatch>& BatchType, FastHashMap<ChunkPos, int>& LookUpMap);
-
     void CreateNewSolidBatch();
-
     void CreateNewTransparentBatch();
 
     int horizontal_render_distance_ = 16;
@@ -37,40 +55,5 @@ private:
     GLFWwindow* window_ = nullptr;
     std::unique_ptr<Shader> cubic_shader_;
     std::unique_ptr<Timer> time_;
-public:
-    TerrainRenderer();
-    ~TerrainRenderer();
-
-    void Initialize(GLFWwindow* window_, Camera* camera_);
-
-    void PrepareRenderer();
-
-    void SetupCallSolid();
-
-    void SetupCallTransparent();
-
-    void RenderSky();
-
-    void Render();
-
-    void Defrag(int iterations);
-
-    void Update();
-
-    void setSettings(uint32_t RenderDistance, uint32_t verticalRenderDistance, float fov_);
-
-    void LoadAssets();
-
-    void AddChunk(std::unique_ptr<Mesh::ChunkVertexData> MeshData);
-
-    double getDebugTime();
-
-    double getFragmentationRate();
-
-    size_t getVRAMUsageFull();
-
-    void Cleanup();
-
-    size_t amountOfMeshGenerated = 1;
 };
 

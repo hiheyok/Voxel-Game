@@ -86,7 +86,6 @@ void WorldRender::Update(std::vector<ChunkPos> updatedChunks) {
 
 void WorldRender::Stop() {
     mesh_thread_pool_->Stop();
-    renderer_->Cleanup();
 }
 
 void WorldRender::Start(GLFWwindow* window, ClientCache* cache, PerformanceProfiler* profiler) {
@@ -104,7 +103,7 @@ void WorldRender::Start(GLFWwindow* window, ClientCache* cache, PerformanceProfi
 
     renderer_->Initialize(window_, player_->GetCamera());
     renderer_->LoadAssets();
-    renderer_->setSettings(horizontal_render_distance_, vertical_render_distance_, 90);
+    renderer_->SetSettings(horizontal_render_distance_, vertical_render_distance_, 90);
 
     profiler_ = profiler;
 }
