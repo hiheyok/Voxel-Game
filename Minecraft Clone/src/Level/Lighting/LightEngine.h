@@ -10,7 +10,7 @@ class Chunk;
 
 struct WorldAccess;
 
-class LightingEngine {
+class LightEngine {
 public:
     void Generate(std::vector<ChunkPos> IDs);
 
@@ -25,17 +25,15 @@ public:
     size_t GetQueueSize();
 
 private:
-    static std::unique_ptr<LightStorage> Worker(const ChunkPos& pos);
+    std::unique_ptr<LightStorage> Worker(const ChunkPos& pos);
 
-    std::unique_ptr<ThreadPool<ChunkPos, std::unique_ptr<LightStorage>, LightingEngine::Worker>> lighting_thread_pool_;
-    static WorldAccess* world_;
+    std::unique_ptr<ThreadPool<ChunkPos, std::unique_ptr<LightStorage>>> lighting_thread_pool_;
+    WorldAccess* world_;
 
-    static void IncreaseLightLevel(std::unique_ptr<LightStorage>& container, uint8_t lvl, int x, int y, int z);
+    void IncreaseLightLevel(std::unique_ptr<LightStorage>& container, uint8_t lvl, int x, int y, int z);
 
-    static void WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<LightStorage>& light);
+    void WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<LightStorage>& light);
 
-    static std::unique_ptr<LightStorage> SkyLighting(const ChunkPos& id);
+    std::unique_ptr<LightStorage> SkyLighting(const ChunkPos& id);
     const static size_t DEFAULT_FIFO_QUEUE_SIZE = 32768;
 };
-
-inline WorldAccess* LightingEngine::world_ = nullptr;

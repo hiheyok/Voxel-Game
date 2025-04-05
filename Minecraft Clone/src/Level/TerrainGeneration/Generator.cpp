@@ -13,8 +13,13 @@ std::vector<std::unique_ptr<Chunk>> ChunkGeneration::GetOutput() {
 
 void ChunkGeneration::Start(int threadCount, long long int worldSeedIn) {
     gen_pool_ = std::make_unique<ThreadPool<std::pair<ChunkPos, WorldGeneratorID>,
-        std::vector<std::unique_ptr<Chunk>>,
-        ChunkGeneration::Worker>>(threadCount, "World Generator", 100);
+        std::vector<std::unique_ptr<Chunk>>>>(
+            threadCount, 
+            "World Generator", 
+            [this](const std::pair<ChunkPos, WorldGeneratorID>& input)->std::vector<std::unique_ptr<Chunk>> {
+                return Worker(input);
+            },
+            100);
 
     WorldGenerator::SetSeed(worldSeedIn);
 }

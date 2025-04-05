@@ -6,7 +6,7 @@
 
 LevelLoader::LevelLoader() : 
     world_generator_{ std::make_unique<ChunkGeneration>() },
-    light_engine_{ std::make_unique<LightingEngine>() } {
+    light_engine_{ std::make_unique<LightEngine>() } {
 
 }
 LevelLoader::~LevelLoader() = default;

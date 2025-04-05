@@ -198,7 +198,7 @@ void ShaderInterface::SetMat4(const std::string& name, const glm::mat4& mat) {
 
 void ShaderInterface::BindTexture2D(GLuint index, GLuint img, const std::string& name) {
     SetInt(name, index);
-
+    Use();
     glActiveTexture(GL_TEXTURE0 + index);
     glBindTexture(GL_TEXTURE_2D, img);
 
@@ -206,7 +206,7 @@ void ShaderInterface::BindTexture2D(GLuint index, GLuint img, const std::string&
 
 void ShaderInterface::BindTextureArray2D(GLuint index, GLuint img, const std::string& name) {
     SetInt(name, index);
-
+    Use();
     glActiveTexture(GL_TEXTURE0 + index);
     glBindTexture(GL_TEXTURE_2D_ARRAY, img);
 }
@@ -242,8 +242,7 @@ void ShaderInterface::CheckCompileErrors(GLuint shader, std::string type) {
             glGetShaderInfoLog(shader, 1024, 0, infoLog);
             g_logger.LogError("Shader::CheckCompileErrors", "Failed to compile" + type + " Shader: \n" + std::string(infoLog) + "\n");
         }
-    }
-    else {
+    } else {
         glGetProgramiv(shader, GL_LINK_STATUS, &success);
         if (!success) {
             glGetProgramInfoLog(shader, 1024, 0, infoLog);

@@ -27,13 +27,13 @@ inline void UnpackLightNode(uint16_t node, uint8_t& x, uint8_t& y, uint8_t& z, u
     light = (node >> 12) & 0xF;
 }
 
-void LightingEngine::IncreaseLightLevel(std::unique_ptr<LightStorage>& container, uint8_t lvl, int x, int y, int z) {
+void LightEngine::IncreaseLightLevel(std::unique_ptr<LightStorage>& container, uint8_t lvl, int x, int y, int z) {
     uint8_t curr = container->GetLighting(x, y, z);
     if (curr < lvl)
         container->EditLight(x, y, z, lvl);
 }
 
-void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<LightStorage>& light) {
+void LightEngine::WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<LightStorage>& light) {
     const Heightmap& heightmap = *chunk->heightmap_.get();
     FIFOQueues.resetData();
 
@@ -110,11 +110,11 @@ void LightingEngine::WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<LightStor
     }
 }
 
-std::unique_ptr<LightStorage> LightingEngine::Worker(const ChunkPos& pos) {
+std::unique_ptr<LightStorage> LightEngine::Worker(const ChunkPos& pos) {
     if (!FIFOQueues.IsInitialized())
-        FIFOQueues.setSize(LightingEngine::DEFAULT_FIFO_QUEUE_SIZE);
+        FIFOQueues.setSize(LightEngine::DEFAULT_FIFO_QUEUE_SIZE);
 
-    Chunk* chunk = LightingEngine::world_->GetChunk(pos);
+    Chunk* chunk = world_->GetChunk(pos);
 
     Heightmap heightmap = *chunk->heightmap_;
 
@@ -127,31 +127,35 @@ std::unique_ptr<LightStorage> LightingEngine::Worker(const ChunkPos& pos) {
     return lighting;
 }
 
-void LightingEngine::Generate(std::vector<ChunkPos> tasks) {
+void LightEngine::Generate(std::vector<ChunkPos> tasks) {
     lighting_thread_pool_->SubmitTask(tasks);
 }
 
-std::vector<std::unique_ptr<LightStorage>> LightingEngine::GetOutput() {
+std::vector<std::unique_ptr<LightStorage>> LightEngine::GetOutput() {
     std::vector<std::unique_ptr<LightStorage>> out = lighting_thread_pool_->GetOutput();
     return out;
 }
 
-void LightingEngine::Stop() {
+void LightEngine::Stop() {
     lighting_thread_pool_->Stop();
 }
 
-void LightingEngine::Start(int lightEngineThreadsCount, WorldAccess* w) {
+void LightEngine::Start(int lightEngineThreadsCount, WorldAccess* w) {
     lighting_thread_pool_ = std::make_unique<ThreadPool<ChunkPos,
-        std::unique_ptr<LightStorage>,
-        LightingEngine::Worker>>(lightEngineThreadsCount, "Light Engine", 100);
+        std::unique_ptr<LightStorage>>>(lightEngineThreadsCount,
+            "Light Engine",
+            [this](const ChunkPos& input) -> std::unique_ptr<LightStorage> {
+                return Worker(input);
+            },
+            100);
 
-    LightingEngine::world_ = w;
+    world_ = w;
 }
 
-void LightingEngine::QueueChunk(const ChunkPos& pos) {
+void LightEngine::QueueChunk(const ChunkPos& pos) {
     lighting_thread_pool_->SubmitTask(pos);
 }
 
-size_t LightingEngine::GetQueueSize() {
+size_t LightEngine::GetQueueSize() {
     return lighting_thread_pool_->GetQueueSize();
 }

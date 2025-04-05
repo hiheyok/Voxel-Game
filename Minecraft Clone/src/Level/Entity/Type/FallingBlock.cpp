@@ -16,7 +16,7 @@ void FallingBlock::Tick(Entity* entity, Dimension* dimension) {
 
     int distanceCheck = (int)ceil(abs(entity->properties_.velocity_.y * mspt));
 
-    float collusionDistance = dimension->world_interactions_.collusions_->GetDistanceUntilCollusionSingleDirection(entity->properties_.position_, NY, distanceCheck + 1);
+    float collusionDistance = dimension->world_interactions_.collusions_->TraceSingleAxisCollision(entity->properties_.position_, NY, distanceCheck + 1);
 
     float timeTillCollusion = abs(collusionDistance / entity->properties_.velocity_.y);
 

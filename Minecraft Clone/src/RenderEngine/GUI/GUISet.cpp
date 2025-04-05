@@ -22,24 +22,24 @@ void GUISet::Clean() {
         ebo.Delete();
 }
 
-void GUISet::AddGUIElementNorm(std::string name, std::string text, glm::vec2 size, glm::vec2 position, glm::vec2 UV_P0, glm::vec2 UV_P1) {
+void GUISet::AddGUIElementNorm(std::string Name, std::string Text, glm::vec2 Size, glm::vec2 Position, glm::vec2 UV_P0, glm::vec2 UV_P1) {
 
     if (!is_initialized_) {
         Initialize();
         is_initialized_ = true;
     }
 
-    if (gui_element_index_.find(name) == gui_element_index_.end()) {
-        elements_.emplace_back(text, size, position);
+    if (gui_element_index_.find(Name) == gui_element_index_.end()) {
+        elements_.emplace_back(Text, Size, Position);
         elements_.back().buffer_index_ = AddRenderingObj();
         elements_.back().uv_p0_ = UV_P0;
         elements_.back().uv_p1_ = UV_P1;
-        gui_element_index_.emplace(name, static_cast<int>(elements_.size() - 1));
+        gui_element_index_.emplace(Name, static_cast<int>(elements_.size() - 1));
         num_of_renderable_objects_++;
         is_dirty_ = true;
     }
     else {
-        g_logger.LogError("GUISet::AddGUIElementNorm", "Element " + name + " already exist!");
+        g_logger.LogError("GUISet::AddGUIElementNorm", "Element " + Name + " already exist!");
     }
 }
 

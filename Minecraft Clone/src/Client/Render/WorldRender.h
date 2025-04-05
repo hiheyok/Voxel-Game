@@ -39,14 +39,12 @@ public:
     PerformanceProfiler* profiler_;
 private:
     void LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks);
-    static std::unique_ptr<Mesh::ChunkVertexData> Worker(const ChunkPos& pos);
+    std::unique_ptr<Mesh::ChunkVertexData> Worker(const ChunkPos& pos);
     
-    std::unique_ptr<ThreadPool<ChunkPos, std::unique_ptr<Mesh::ChunkVertexData>, WorldRender::Worker>> mesh_thread_pool_;
+    std::unique_ptr<ThreadPool<ChunkPos, std::unique_ptr<Mesh::ChunkVertexData>>> mesh_thread_pool_;
     std::vector<std::unique_ptr<Mesh::ChunkVertexData>> mesh_add_queue_;
 
     PlayerPOV* player_;
     GLFWwindow* window_;
-    static ClientCache* cache_;
+    ClientCache* cache_;
 };
-
-inline ClientCache* WorldRender::cache_ = nullptr;

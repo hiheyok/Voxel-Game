@@ -4,7 +4,7 @@
 #include "Core/Typenames.h"
 
 class ChunkGeneration;
-class LightingEngine;
+class LightEngine;
 class LightStorage;
 class Chunk;
 
@@ -15,7 +15,7 @@ class LevelLoader { //need to add save to disk later
 private:
     size_t count = 0; // TODO: Rename
     std::unique_ptr<ChunkGeneration> world_generator_; //Change this 
-    std::unique_ptr<LightingEngine> light_engine_;
+    std::unique_ptr<LightEngine> light_engine_;
 public:
     LevelLoader();
     ~LevelLoader();

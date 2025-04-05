@@ -11,7 +11,7 @@
 CollusionDetector::CollusionDetector(ChunkMap* cache) : cache_{cache} {}
 CollusionDetector::~CollusionDetector() = default;
 
-float CollusionDetector::GetDistanceUntilCollusionSingleDirection(glm::vec3 origin, int direction, int distanceTest) {
+float CollusionDetector::TraceSingleAxisCollision(glm::vec3 origin, int direction, int distanceTest) {
     float displacement = 0;
 
     glm::ivec3 flooredPos(floor(origin.x), floor(origin.y), floor(origin.z));
@@ -42,7 +42,7 @@ float CollusionDetector::GetDistanceUntilCollusionSingleDirection(glm::vec3 orig
     return -1.f;
 }
 
-glm::dvec3 CollusionDetector::GetTimeTillCollusion(Entity* entity) {
+glm::dvec3 CollusionDetector::ComputeCollisionTimes(Entity* entity) {
     AABB hitbox = g_entity_list.GetEntity(entity->properties_.type_)->GetHitbox();
 
     glm::vec3 hitboxStart = entity->properties_.position_ - (hitbox.size_ / 2.f);
@@ -100,7 +100,7 @@ glm::dvec3 CollusionDetector::GetTimeTillCollusion(Entity* entity) {
 
                 int direction = axis_ * 2 + (entity->properties_.velocity_[axis_] < 0); // The "+1" indicates that the direction is negative 
 
-                float distance = GetDistanceUntilCollusionSingleDirection(origin_, direction, (int)floor(leastDistance) + 2);
+                float distance = TraceSingleAxisCollision(origin_, direction, (int)floor(leastDistance) + 2);
 
                 if ((distance < leastDistance) && (distance != -1.f))
                     leastDistance = distance;
@@ -194,7 +194,7 @@ bool CollusionDetector::CheckRayIntersection(Ray& ray) {
     return false;
 }
 
-bool CollusionDetector::isEntityOnGround(Entity* entity) {
+bool CollusionDetector::IsEntityOnGround(Entity* entity) {
     AABB hitbox = g_entity_list.GetEntity(entity->properties_.type_)->GetHitbox();
 
     glm::vec3 hitboxStart = entity->properties_.position_ - (hitbox.size_ / 2.f);
@@ -225,7 +225,7 @@ bool CollusionDetector::isEntityOnGround(Entity* entity) {
             float distance = 0.f;
 
             //Set the distance to check to the previose least length from collusion to optimize searching
-            distance = GetDistanceUntilCollusionSingleDirection(origin, NY, (int)floor(leastLength) + 2);
+            distance = TraceSingleAxisCollision(origin, NY, (int)floor(leastLength) + 2);
 
             if (distance < leastLength) {
                 leastLength = distance;

@@ -13,10 +13,7 @@
 #include "Level/Entity/Entities.h"
 #include "Level/Entity/Mobs/Player.h"
 #include "Utils/Timer/Timer.h"
-#include "Level/Server/Server.h"
 #include "Core/Interfaces/InternalInterface.h"
-#include "Core/Networking/PlayerAction.h"
-#include "Core/Networking/ChunkUpdate.h"
 #include "Core/Networking/Packet.h"
 #include "Level/LevelLoader.h"
 #include "Level/Level.h"
@@ -25,6 +22,7 @@
 #include "RenderEngine/GUI/TextRenderer.h"
 #include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
 #include "Utils/LogUtils.h"
+#include "Server/Server.h"
 
 Client::Client() : 
     server_{ std::make_unique<Server>() },

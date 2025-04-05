@@ -1,4 +1,4 @@
-#include "Server.h"
+#include "Server/Server.h"
 #include "Core/Interfaces/ClientInterface.h"
 #include "Core/Interfaces/InternalInterface.h"
 #include "Level/Chunk/ChunkPos/ChunkPos.h"

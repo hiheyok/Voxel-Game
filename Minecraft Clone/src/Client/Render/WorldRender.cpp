@@ -95,8 +95,13 @@ void WorldRender::Start(GLFWwindow* window, ClientCache* cache, PerformanceProfi
     size_t threadCount = g_app_options.mesh_threads_;
 
     mesh_thread_pool_ = std::make_unique<ThreadPool<ChunkPos, 
-        std::unique_ptr<Mesh::ChunkVertexData>, 
-        WorldRender::Worker>>(threadCount, "Mesher", 250);
+        std::unique_ptr<Mesh::ChunkVertexData>>>(
+            threadCount, 
+            "Mesher", 
+            [this](const ChunkPos& input) -> std::unique_ptr<Mesh::ChunkVertexData> {
+                return Worker(input);
+            },
+            250);
 
     window_ = window;
     WorldRender::cache_ = cache;

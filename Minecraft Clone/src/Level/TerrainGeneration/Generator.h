@@ -22,9 +22,9 @@ private:
     /*
     * Worker submitting output as std::vector<Chunk*> to handle tall chunks with multiple sub chunks for now
     */
-    static std::vector<std::unique_ptr<Chunk>> Worker(const std::pair<ChunkPos, WorldGeneratorID>& task);
+    std::vector<std::unique_ptr<Chunk>> Worker(const std::pair<ChunkPos, WorldGeneratorID>& task);
 
-    std::unique_ptr<ThreadPool<std::pair<ChunkPos, WorldGeneratorID>, std::vector<std::unique_ptr<Chunk>>, ChunkGeneration::Worker>> gen_pool_;
+    std::unique_ptr<ThreadPool<std::pair<ChunkPos, WorldGeneratorID>, std::vector<std::unique_ptr<Chunk>>>> gen_pool_;
 
     bool stop_ = false;
     bool collect_ready_ = false;

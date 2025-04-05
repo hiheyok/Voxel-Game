@@ -106,7 +106,7 @@ void PlayerMovement::MovePlayer(Player* player, const UserInputs& inputs, Client
     }
 
 
-    if (inputs.CheckKey(KEY_SPACE) && (clientWorld->collusion_manager_.isEntityOnGround(player) && enable_collusion_)) {
+    if (inputs.CheckKey(KEY_SPACE) && (clientWorld->collusion_manager_.IsEntityOnGround(player) && enable_collusion_)) {
         player->properties_.velocity_.y += velocity * 4000;
     }
 
@@ -121,7 +121,7 @@ void PlayerMovement::MovePlayer(Player* player, const UserInputs& inputs, Client
 
         player->properties_.velocity_.y += gravity;
 
-        glm::vec3 time = clientWorld->collusion_manager_.GetTimeTillCollusion(player);
+        glm::vec3 time = clientWorld->collusion_manager_.ComputeCollisionTimes(player);
 
         if ((time.x != -1.) && (time.x <= inputs.delta_)) {
             player->properties_.velocity_.x = 0;

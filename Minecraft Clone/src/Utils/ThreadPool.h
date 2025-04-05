@@ -5,6 +5,7 @@
 #include <condition_variable>
 #include <string>
 #include <atomic>
+#include <functional>
 
 #include "Utils/LogUtils.h"
 
@@ -14,10 +15,10 @@
 * Can be fed in a templated input and it will provide an output
 */
 // TODO: Add dynamic thread allocation (should be easy)
-template <class TaskIn, class TaskOut, TaskOut (*Task)(const TaskIn&)>
+template <class TaskIn, class TaskOut>
 class ThreadPool {
 public:
-    ThreadPool(size_t threads, std::string type, size_t batchSize = SIZE_MAX);
+    ThreadPool(size_t threads, std::string type, std::function<TaskOut(TaskIn)> taskfunc, size_t batchSize = SIZE_MAX);
     ~ThreadPool();
 
     void Stop();
@@ -38,7 +39,7 @@ private:
     std::deque<std::condition_variable> worker_cv_;
     std::condition_variable scheduler_cv_;
     std::condition_variable output_cv_;
-    bool stop_;
+    std::atomic<bool> stop_;
     bool output_ready_;
 
     // Mutex
@@ -55,6 +56,9 @@ private:
     std::vector<std::vector<TaskOut>> worker_output_;
     size_t batch_size_;
 
+    // Task func
+    std::function<TaskOut(TaskIn) > task_func_;
+
     // Task Queued
     std::atomic<size_t> task_queued_;
 
@@ -63,8 +67,8 @@ private:
     void OutputManager();
 };
 
-template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-inline ThreadPool<TaskIn, TaskOut, Task>::ThreadPool(size_t threads, std::string type, size_t batchSize) :
+template <class TaskIn, class TaskOut>
+inline ThreadPool<TaskIn, TaskOut>::ThreadPool(size_t threads, std::string type, std::function<TaskOut(TaskIn)> taskFunc, size_t batchSize) :
     workers_{ threads },
     scheduler_{ &ThreadPool::Scheduler, this },
     output_manager_{ &ThreadPool::OutputManager, this },
@@ -78,26 +82,27 @@ inline ThreadPool<TaskIn, TaskOut, Task>::ThreadPool(size_t threads, std::string
     worker_task_{ threads },
     worker_output_{ threads },
     batch_size_{ batchSize },
+    task_func_{ taskFunc },
     task_queued_{ 0 } {
 
     for (size_t i = 0; i < threads; ++i) {
         workers_[i] = std::thread(&ThreadPool::Worker, this, i);
     }
 }
-
-template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-inline ThreadPool<TaskIn, TaskOut, Task>::~ThreadPool() {
-    if (!stop_)
+template <class TaskIn, class TaskOut>
+inline ThreadPool<TaskIn, TaskOut>::~ThreadPool() {
+    if (!stop_.load()) {
         Stop();
+    }
 }
 
-template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-inline void ThreadPool<TaskIn, TaskOut, Task>::Scheduler() {
+template <class TaskIn, class TaskOut>
+inline void ThreadPool<TaskIn, TaskOut>::Scheduler() {
     g_logger.LogDebug("ThreadPool::Scheduler", type_ + " Thread Pool | Started task scheduler");
 
     std::vector<TaskIn> internalTaskList;
 
-    while (!stop_) {
+    while (!stop_.load()) {
         {
             std::unique_lock<std::mutex> lock{ scheduler_lock_ };
 
@@ -143,14 +148,14 @@ inline void ThreadPool<TaskIn, TaskOut, Task>::Scheduler() {
     g_logger.LogDebug("ThreadPool::Scheduler", type_ + " Thread Pool | Shutting down task scheduler");
 }
 
-template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-inline void ThreadPool<TaskIn, TaskOut, Task>::Worker(int workerId) {
+template <class TaskIn, class TaskOut>
+inline void ThreadPool<TaskIn, TaskOut>::Worker(int workerId) {
     g_logger.LogDebug("ThreadPool::Worker", type_ + " Thread Pool | Started worker " + std::to_string(workerId));
     bool workingOnBatch = false;
     size_t batchIndex = 0;
     std::vector<TaskIn> workerTasks;
 
-    while (!stop_) {
+    while (!stop_.load()) {
         std::vector<TaskOut> output;
 
         // Collect task first
@@ -166,7 +171,7 @@ inline void ThreadPool<TaskIn, TaskOut, Task>::Worker(int workerId) {
         for (; !stop_ && i < std::min(workerTasks.size(), batchIndex + batch_size_); ++i) {
             if (stop_) break;
             const TaskIn& task = workerTasks[i];
-            TaskOut out = Task(task);
+            TaskOut out = task_func_(task);
             output.push_back(std::move(out));
         }
         
@@ -199,10 +204,10 @@ inline void ThreadPool<TaskIn, TaskOut, Task>::Worker(int workerId) {
     g_logger.LogDebug("ThreadPool::Worker", type_ + " Thread Pool | Shutting down worker " + std::to_string(workerId));
 }
 
-template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-inline void ThreadPool<TaskIn, TaskOut, Task>::OutputManager() {
+template <class TaskIn, class TaskOut>
+inline void ThreadPool<TaskIn, TaskOut>::OutputManager() {
     g_logger.LogDebug("ThreadPool::Worker", type_ + " Thread Pool | Started output manager");
-    while (!stop_) {
+    while (!stop_.load()) {
         // Waits for output
         {
             std::unique_lock<std::mutex> lock{ output_lock_ };
@@ -232,33 +237,33 @@ inline void ThreadPool<TaskIn, TaskOut, Task>::OutputManager() {
     g_logger.LogDebug("ThreadPool::Worker", type_ + " Thread Pool | Shutting down output manager");
 }
 
-template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-inline void ThreadPool<TaskIn, TaskOut, Task>::SubmitTask(const std::vector<TaskIn>& task) {
+template <class TaskIn, class TaskOut>
+inline void ThreadPool<TaskIn, TaskOut>::SubmitTask(const std::vector<TaskIn>& task) {
     std::lock_guard<std::mutex> lock{ scheduler_lock_ };
     task_queued_+=task.size();
     task_list_.insert(task_list_.end(), task.begin(), task.end());
     scheduler_cv_.notify_one();
 }
 
-template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-inline void ThreadPool<TaskIn, TaskOut, Task>::SubmitTask(const TaskIn& task) {
+template <class TaskIn, class TaskOut>
+inline void ThreadPool<TaskIn, TaskOut>::SubmitTask(const TaskIn& task) {
     std::lock_guard<std::mutex> lock{ scheduler_lock_ };
     task_list_.push_back(task);
     scheduler_cv_.notify_one();
     task_queued_++;
 }
 
-template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-inline std::vector<TaskOut> ThreadPool<TaskIn, TaskOut, Task>::GetOutput() {
+template <class TaskIn, class TaskOut>
+inline std::vector<TaskOut> ThreadPool<TaskIn, TaskOut>::GetOutput() {
     std::lock_guard<std::mutex> lock{ output_lock_ };
     std::vector<TaskOut> out = std::move(output_list_);
     task_queued_ -= out.size();
     return out;
 }
 
-template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-inline void ThreadPool<TaskIn, TaskOut, Task>::Stop() {
-    stop_ = true;
+template <class TaskIn, class TaskOut>
+inline void ThreadPool<TaskIn, TaskOut>::Stop() {
+    stop_.store(true);
     scheduler_.join();
     output_manager_.join();
 
@@ -275,7 +280,7 @@ inline void ThreadPool<TaskIn, TaskOut, Task>::Stop() {
     worker_output_.clear();
 }
 
-template <class TaskIn, class TaskOut, TaskOut(*Task)(const TaskIn&)>
-inline size_t ThreadPool<TaskIn, TaskOut, Task>::GetQueueSize() {
+template <class TaskIn, class TaskOut>
+inline size_t ThreadPool<TaskIn, TaskOut>::GetQueueSize() {
     return task_queued_.load();
 }
