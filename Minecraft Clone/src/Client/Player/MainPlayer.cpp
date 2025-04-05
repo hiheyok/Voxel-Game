@@ -86,7 +86,7 @@ void MainPlayer::PrepareGUIs() {
             player_gui_->EditGUISet(item_gui_index_).EditElementUVNorm(std::to_string(i), uv.uv_1_, uv.uv_2_);
         }
         else {
-            player_gui_->EditGUISet(item_gui_index_).EditElementUVNorm(std::to_string(i), glm::vec2(0.f,0.f), glm::vec2(0.f,0.f));
+            //player_gui_->EditGUISet(item_gui_index_).EditElementUVNorm(std::to_string(i), glm::vec2(0.f,0.f), glm::vec2(0.f,0.f));
         }
     }
 

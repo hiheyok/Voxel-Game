@@ -21,11 +21,11 @@ public:
 
     void InitializeTextRenderer(GLFWwindow* w);
 
-    void InsertFontObject(std::string name, RenderableFont font);
+    void InsertFontObject(const std::string& name, RenderableFont font);
 
-    void RemoveFontObject(std::string name);
+    void RemoveFontObject(const std::string& name);
 
-    void EditFontText(std::string name, std::string text);
+    void EditFontText(const std::string& name, const std::string& text);
 
     void ConstructBuffer();
 

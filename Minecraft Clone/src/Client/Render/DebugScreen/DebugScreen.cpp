@@ -27,11 +27,11 @@ void DebugScreen::SetUpdateRate(int rate) {
     update_rate_ = rate;
 }
 
-void DebugScreen::EditText(std::string name, const char* c) {
+void DebugScreen::EditText(const std::string& name, const char* c) {
     EditText(name, std::string(c));
 }
 
-void DebugScreen::EditText(std::string name, std::string text) {
+void DebugScreen::EditText(const std::string& name, const std::string& text) {
     renderer_->EditFontText(name, text);
 }
 

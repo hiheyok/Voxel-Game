@@ -66,7 +66,7 @@ void TextRenderer::InitializeTextRenderer(GLFWwindow* w) {
     g_logger.LogDebug("TextRenderer::InitializeTextRenderer", "Initialized font renderer");
 }
 
-void TextRenderer::InsertFontObject(std::string name, RenderableFont font) {
+void TextRenderer::InsertFontObject(const std::string& name, RenderableFont font) {
     if (font_map_.count(name)) {
         g_logger.LogError("TextRenderer::InsertFontObject", std::string("Font with the name " + name + " already exist!"));
     }
@@ -74,7 +74,7 @@ void TextRenderer::InsertFontObject(std::string name, RenderableFont font) {
     font_map_[name] = font;
 }
 
-void TextRenderer::RemoveFontObject(std::string name) {
+void TextRenderer::RemoveFontObject(const std::string& name) {
     if (!font_map_.count(name)) {
         g_logger.LogError("TextRenderer::RemoveFontObject", std::string("Font with the name " + name + " doesn't exist! Cannot remove."));
     }
@@ -82,7 +82,7 @@ void TextRenderer::RemoveFontObject(std::string name) {
     font_map_.erase(name);
 }
 
-void TextRenderer::EditFontText(std::string name, std::string text) {
+void TextRenderer::EditFontText(const std::string& name, const std::string& text) {
     font_map_[name].SetText(text);
 }
 

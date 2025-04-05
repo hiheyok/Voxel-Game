@@ -16,8 +16,8 @@ public:
     void Render();
     void Update();
     void SetUpdateRate(int rate);
-    void EditText(std::string name, const char* c);
-    void EditText(std::string name, std::string text);
+    void EditText(const std::string& name, const char* c);
+    void EditText(const std::string& name, const std::string& text);
     void Initialize(GLFWwindow* w);
 private:
     GLFWwindow* window_{ nullptr };

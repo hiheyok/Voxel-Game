@@ -5,7 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
-#include <fstream>
+#include <optional>
+#include <variant>
 
 #include "Core/Typenames.h"
 
@@ -51,6 +52,20 @@ public:
     unsigned int shader_id_ = 0;
 protected:
     FastHashMap<std::string, int> cache_;
+
+    // Value cache | Used to make sure to not update if the values are the same
+    FastHashMap<std::string, bool> cache_bool_;
+    FastHashMap<std::string, int> cache_int_;
+    FastHashMap<std::string, float> cache_float_;
+    FastHashMap<std::string, glm::vec2> cache_vec2_;
+    FastHashMap<std::string, glm::vec3> cache_vec3_;
+    FastHashMap<std::string, glm::vec4> cache_vec4_;
+    FastHashMap<std::string, glm::ivec2> cache_ivec2_;
+    FastHashMap<std::string, glm::ivec3> cache_ivec3_;
+    FastHashMap<std::string, glm::mat2> cache_mat2_;
+    FastHashMap<std::string, glm::mat3> cache_mat3_;
+    FastHashMap<std::string, glm::mat4> cache_mat4_;
+
     std::string ReadFile(std::string path);
 
     GLint GetUniformLocation(std::string name);

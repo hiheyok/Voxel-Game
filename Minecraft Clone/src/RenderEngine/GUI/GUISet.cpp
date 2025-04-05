@@ -22,24 +22,24 @@ void GUISet::Clean() {
         ebo.Delete();
 }
 
-void GUISet::AddGUIElementNorm(std::string Name, std::string Text, glm::vec2 Size, glm::vec2 Position, glm::vec2 UV_P0, glm::vec2 UV_P1) {
+void GUISet::AddGUIElementNorm(std::string name, std::string text, glm::vec2 size, glm::vec2 position, glm::vec2 UV_P0, glm::vec2 UV_P1) {
 
     if (!is_initialized_) {
         Initialize();
         is_initialized_ = true;
     }
 
-    if (gui_element_index_.find(Name) == gui_element_index_.end()) {
-        elements_.emplace_back(Text, Size, Position);
+    if (gui_element_index_.find(name) == gui_element_index_.end()) {
+        elements_.emplace_back(text, size, position);
         elements_.back().buffer_index_ = AddRenderingObj();
         elements_.back().uv_p0_ = UV_P0;
         elements_.back().uv_p1_ = UV_P1;
-        gui_element_index_.emplace(Name, static_cast<int>(elements_.size() - 1));
+        gui_element_index_.emplace(name, static_cast<int>(elements_.size() - 1));
         num_of_renderable_objects_++;
         is_dirty_ = true;
     }
     else {
-        g_logger.LogError("GUISet::AddGUIElementNorm", "Element " + Name + " already exist!");
+        g_logger.LogError("GUISet::AddGUIElementNorm", "Element " + name + " already exist!");
     }
 }
 
@@ -71,10 +71,14 @@ void GUISet::AddGUIElement(std::string name, std::string text, glm::vec2 size, g
 }
 
 void GUISet::EditElementPosition(std::string Name, glm::vec2 Position) {
-    if (gui_element_index_.find(Name) != gui_element_index_.end()) {
-        int Index = gui_element_index_[Name];
-        elements_[Index].location_ = Position;
-        is_dirty_ = true;
+    auto it = gui_element_index_.find(Name);
+
+    if (it != gui_element_index_.end()) {
+        int idx = it->second;
+        if (elements_[idx].location_ != Position) {
+            elements_[idx].location_ = Position;
+            is_dirty_ = true;
+        }
     }
     else {
         g_logger.LogError("GUISet::EditElementPosition", "Element " + Name + " doesn't exist!");
@@ -82,11 +86,15 @@ void GUISet::EditElementPosition(std::string Name, glm::vec2 Position) {
 }
 
 void GUISet::EditElementUVNorm(std::string Name, glm::vec2 UV0, glm::vec2 UV1) {
-    if (gui_element_index_.find(Name) != gui_element_index_.end()) {
-        int Index = gui_element_index_[Name];
-        elements_[Index].uv_p0_ = UV0;
-        elements_[Index].uv_p1_ = UV1;
-        is_dirty_ = true;
+    auto it = gui_element_index_.find(Name);
+    
+    if (it != gui_element_index_.end()) {
+        int idx = it->second;
+        if (elements_[idx].uv_p0_ != UV0 || elements_[idx].uv_p1_ != UV1) {
+            elements_[idx].uv_p0_ = UV0;
+            elements_[idx].uv_p1_ = UV1;
+            is_dirty_ = true;
+        }
     }
     else {
         g_logger.LogError("GUISet::EditElementUVNorm", "Element " + Name + " doesn't exist!");
