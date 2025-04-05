@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Minecraft Clone/src/lineCounter.exe
+/Minecraft Clone/src/Total.txt
