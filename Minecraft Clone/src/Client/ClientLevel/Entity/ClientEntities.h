@@ -8,12 +8,11 @@ public:
     void InsertEntity(const EntityProperty& entityProperty) {
         const EntityUUID& uuid = entityProperty.entity_uuid_;
 
-        if (entities_.count(uuid)) {
+        if (entity_idx_.count(uuid)) {
             g_logger.LogError("ClientEntities::InsertEntity", "Tried to insert already existing entity.");
             return;
         }
 
-        entities_[uuid] = entityProperty;
         changed_entities_.emplace(uuid, changed_entities_list_.size());
         changed_entities_list_.push_back(entityProperty);
 
@@ -33,17 +32,17 @@ public:
 
     void UpdateEntity(const EntityProperty& entityProperty) {
         const EntityUUID& uuid = entityProperty.entity_uuid_;
-
-        if (!entities_.count(uuid)) {
+        auto it = entity_idx_.find(uuid);
+        if (it == entity_idx_.end()) {
             g_logger.LogError("ClientEntities::ChangeEntity", "Tried to change entity that doesn't exist.");
             return;
         }
-        entities_[uuid] = entityProperty;
-        if (changed_entities_.contains(uuid)) {
-            size_t idx = changed_entities_[uuid];
+        all_entities_[it->second] = entityProperty;
+        auto changedIt = changed_entities_.find(uuid);
+        if (changedIt != changed_entities_.end()) {
+            size_t idx = changedIt->second;
             changed_entities_list_[idx] = entityProperty;
-        }
-        else {
+        } else {
             changed_entities_.emplace(uuid, changed_entities_list_.size());
             changed_entities_list_.push_back(entityProperty);
         }
@@ -51,30 +50,30 @@ public:
     }
 
     EntityProperty GetEntity(const EntityUUID& uuid) const {
-        if (!entities_.contains(uuid)) {
+        const auto& it = entity_idx_.find(uuid);
+        if (it != entity_idx_.end()) {
             g_logger.LogError("ClientEntities::GetEntity", "Tried to get entity that doesn't exist.");
         }
-
-        const auto& it = entities_.find(uuid);
-        return it->second;
+        return all_entities_[it->second];
     }
 
     void RemoveEntity(const EntityUUID& uuid) {
-        if (!entities_.count(uuid)) {
+        auto it = entity_idx_.find(uuid);
+        if (it == entity_idx_.end()) {
             g_logger.LogError("ClientEntities::RemoveEntity", "Tried to remove entity that doesn't exist.");
         }
 
-        entities_.erase(uuid);
-
-        size_t idx = entity_idx_[uuid];
+        size_t idx = it->second;
         entity_idx_[all_entities_.back().entity_uuid_] = idx;
         std::swap(all_entities_[idx], all_entities_.back());
-        entity_idx_.erase(uuid);
+        entity_idx_.erase(it);
         all_entities_.pop_back();
 
-        if (changed_entities_.contains(uuid)) {
-            changed_entities_.erase(uuid);
+        auto changedIt = changed_entities_.find(uuid);
+        if (changedIt != changed_entities_.end()) {
+            changed_entities_.erase(changedIt);
         }
+
         removed_entities_.emplace(uuid, removed_entities_list_.size());
         removed_entities_list_.push_back(uuid);
     }
@@ -98,14 +97,13 @@ public:
     }
 
     size_t GetEntityCount() const {
-        return entities_.size();
+        return all_entities_.size();
     }
 
     size_t GetChangedEntityCount() const {
         return changed_entities_.size();
     }
 private:
-    FastHashMap<EntityUUID, EntityProperty> entities_;
     FastHashMap<EntityUUID, size_t> changed_entities_;
     std::vector<EntityProperty> changed_entities_list_;
     FastHashMap<EntityUUID, size_t> removed_entities_;

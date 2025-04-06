@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "Core/Typenames.h"
-
 class Dimension;
 
 struct Entity;
@@ -24,10 +23,10 @@ public:
     std::vector<EntityUUID> GetRemovedEntities();
 
     Entity* GetEntity(EntityUUID entityId) const;
-
     void Tick(Dimension* dimension);
 private:
-    FastHashMap<EntityUUID, std::unique_ptr<Entity>> entities_;
+    FastHashMap<EntityUUID, size_t> entities_idx_;
+    std::vector<std::unique_ptr<Entity>> entities_;
     FastHashSet<EntityUUID> removed_entity_;
     FastHashSet<EntityUUID> spawned_entity_;
 

@@ -8,7 +8,8 @@ EntityContainer::~EntityContainer() = default;
 EntityUUID EntityContainer::AddEntity(std::unique_ptr<Entity> e) {
     e->properties_.entity_uuid_ = unique_id_;
     spawned_entity_.insert(unique_id_);
-    entities_.emplace(unique_id_, std::move(e));
+    entities_idx_.emplace(unique_id_, entities_.size());
+    entities_.push_back(std::move(e));
     unique_id_++;
     entity_count_++;
     return unique_id_ - 1;
@@ -32,11 +33,12 @@ std::vector<EntityProperty> EntityContainer::GetSpawnedEntities() {
 std::vector<EntityProperty> EntityContainer::GetUpdatedEntities() { //change this to past on a vector later
     std::lock_guard<std::mutex> lock{ entity_lock_ };
     std::vector<EntityProperty> out;
+    out.reserve(entities_idx_.size());
 
     for (auto& entity : entities_) {
-        if (entity.second->is_dirty_) {
-            entity.second->is_dirty_ = false;
-            out.emplace_back(entity.second->properties_);
+        if (entity->is_dirty_) {
+            entity->is_dirty_ = false;
+            out.emplace_back(entity->properties_);
         }
     }
 
@@ -52,7 +54,15 @@ std::vector<EntityUUID> EntityContainer::GetRemovedEntities() {
 
 
 void EntityContainer::RemoveEntity(EntityUUID entityId) {
-    entities_.erase(entityId);
+    auto it = entities_idx_.find(entityId);
+    if (it == entities_idx_.end()) {
+        g_logger.LogError("EntityContainer::RemoveEntity", "Tried to remove entity that doesn't exist!");
+    }
+    size_t removeIdx = it->second;
+    entities_idx_[entities_.back()->properties_.entity_uuid_] = removeIdx;
+    std::swap(entities_.back(), entities_[removeIdx]);
+    entities_idx_.erase(it);
+    entities_.pop_back();
     std::lock_guard<std::mutex> lock{ entity_lock_ };
     removed_entity_.emplace(entityId);
     entity_count_--;
@@ -60,17 +70,16 @@ void EntityContainer::RemoveEntity(EntityUUID entityId) {
 
 
 Entity* EntityContainer::GetEntity(EntityUUID entityId) const {
-    const auto& it = entities_.find(entityId);
-    if (it == entities_.end()) {
+    const auto& it = entities_idx_.find(entityId);
+    if (it == entities_idx_.end()) {
         return nullptr;
-    }
-    else {
-        return it->second.get();
+    } else {
+        return entities_[it->second].get();
     }
 }
 
 void EntityContainer::Tick(Dimension* dimension) {
     for (auto& entity : entities_) {
-        entity.second->Tick(dimension);
+        entity->Tick(dimension);
     }
 }

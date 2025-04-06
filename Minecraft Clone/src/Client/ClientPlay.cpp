@@ -34,6 +34,7 @@ ClientPlay::ClientPlay(ServerInterface* interface, Window* window, PerformancePr
     main_player_->SetPlayerRotation(-135.f, -30.);
 
     debug_screen_->Initialize(window->GetWindow());
+    debug_screen_->SetUpdateRate(200);
     entity_render_->Initialize(profiler);
     entity_render_->SetWindow(window->GetWindow());
 

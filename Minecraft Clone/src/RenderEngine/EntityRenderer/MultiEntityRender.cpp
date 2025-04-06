@@ -46,6 +46,8 @@ void MultiEntityRender::Clean() {
 }
 
 void MultiEntityRender::Initialize(PerformanceProfiler* pProfilerIn) {
+    constexpr const static int kMaxEntityCount = 10000000;
+
     for (int i = 0; i < g_entity_list.entity_type_list_.size(); i++) {
         EntityModel model = g_entity_list.entity_type_list_[i]->render_model_;
         entity_cached_models_[i] = model;
@@ -90,17 +92,17 @@ void MultiEntityRender::Initialize(PerformanceProfiler* pProfilerIn) {
 
     ssbo_pos_->SetType(GL_SHADER_STORAGE_BUFFER);
     ssbo_pos_->SetUsage(GL_DYNAMIC_COPY);
-    ssbo_pos_->SetMaxSize(3000000);
+    ssbo_pos_->SetMaxSize(kMaxEntityCount);
     ssbo_pos_->InitializeData();
 
     ssbo_vel_->SetType(GL_SHADER_STORAGE_BUFFER);
     ssbo_vel_->SetUsage(GL_DYNAMIC_COPY);
-    ssbo_vel_->SetMaxSize(3000000);
+    ssbo_vel_->SetMaxSize(kMaxEntityCount);
     ssbo_vel_->InitializeData();
 
     ssbo_acc_->SetType(GL_SHADER_STORAGE_BUFFER);
     ssbo_acc_->SetUsage(GL_DYNAMIC_COPY);
-    ssbo_acc_->SetMaxSize(3000000);
+    ssbo_acc_->SetMaxSize(kMaxEntityCount);
     ssbo_acc_->InitializeData();
 
     vbo_->Bind();
@@ -109,9 +111,9 @@ void MultiEntityRender::Initialize(PerformanceProfiler* pProfilerIn) {
     vbo_->Unbind();
     vao_->Unbind();
 
-    position_arr_.resize(3000000);
-    velocity_arr_.resize(3000000);
-    acceleration_arr_.resize(3000000);
+    position_arr_.resize(kMaxEntityCount);
+    velocity_arr_.resize(kMaxEntityCount);
+    acceleration_arr_.resize(kMaxEntityCount);
 
 }
 

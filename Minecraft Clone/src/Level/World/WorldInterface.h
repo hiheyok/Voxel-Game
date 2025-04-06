@@ -11,7 +11,7 @@ class Chunk;
 
 struct Entity;
 
-// Allows for write only
+// Allows for read only
 class WorldInterface {
 public:
     WorldInterface();

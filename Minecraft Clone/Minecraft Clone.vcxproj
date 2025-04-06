@@ -398,6 +398,7 @@
     <ClInclude Include="src\RenderEngine\OpenGL\Shader\ComputeShader.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Shader\ShaderInterface.h" />
     <ClInclude Include="src\Utils\Containers\ConcurrentQueue.h" />
+    <ClInclude Include="src\Utils\Containers\HashMapVector.h" />
     <ClInclude Include="src\Utils\Containers\N2BitVector.h" />
     <ClInclude Include="src\Utils\Containers\NBitVector.h" />
     <ClInclude Include="src\Utils\Containers\robin_hood.h" />

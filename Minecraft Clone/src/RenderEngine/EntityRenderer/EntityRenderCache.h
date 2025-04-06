@@ -9,7 +9,6 @@ struct EntityRenderCache { // stores all entity to be rendered
     void RemoveEntity(EntityUUID entityUUID);
     FastHashMap<EntityTypeID, std::vector<EntityProperty>>& GetEntitiesTypeSeparated();
 
-    FastHashMap<EntityUUID, EntityProperty> entity_container_;
+    FastHashMap<EntityUUID, std::pair<size_t, EntityTypeID>> entity_idx_;
     FastHashMap<EntityTypeID, std::vector<EntityProperty>> entity_separated_;
-    FastHashMap<EntityUUID, size_t> entity_idx_;
 };

@@ -2,30 +2,33 @@
 #include "Level/Entity/Entity.h"
 
 void EntityRenderCache::AddEntity(const EntityProperty& entity) {
-    entity_container_[entity.entity_uuid_] = entity;
+    const EntityTypeID& type = entity.type_;
+    const EntityUUID& uuid = entity.entity_uuid_;
 
-    if (entity_idx_.contains(entity.entity_uuid_)) {
-        size_t idx = entity_idx_[entity.entity_uuid_];
-        entity_separated_[entity.type_][idx] = entity;
+    auto it = entity_idx_.find(uuid);
+    if (it != entity_idx_.end()) {
+        size_t idx = it->second.first;
+        entity_separated_[type][idx] = entity;
     } else {
-        entity_idx_[entity.entity_uuid_] = entity_separated_[entity.type_].size();
-        entity_separated_[entity.type_].push_back(entity);
+        entity_idx_[uuid] = { entity_separated_[type].size(), type };
+        entity_separated_[type].push_back(entity);
     }
 }
 
 void EntityRenderCache::RemoveEntity(EntityUUID entityUUID) {
-    if (!entity_idx_.contains(entityUUID)) {
+    const auto& it = entity_idx_.find(entityUUID);
+
+    if (it == entity_idx_.end()) {
         g_logger.LogError("EntityRenderCache::RemoveEntity", "Attempted to removed entity that doesn't exist!");
     }
 
-    EntityProperty e = entity_container_[entityUUID];
-    size_t idx = entity_idx_[entityUUID];
+    const auto& [idx, type] = it->second;
+    EntityProperty e = entity_separated_[type][idx];
     auto& container = entity_separated_[e.type_];
-    entity_idx_[container.back().entity_uuid_] = idx;
+    entity_idx_[container.back().entity_uuid_] = {idx , type};
     std::swap(container[idx], container.back());
     container.pop_back();
-    
-    entity_container_.erase(entityUUID);
+    entity_idx_.erase(it);
 }
 
 FastHashMap<EntityTypeID, std::vector<EntityProperty>>& EntityRenderCache::GetEntitiesTypeSeparated() {

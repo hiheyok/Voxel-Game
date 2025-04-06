@@ -143,10 +143,6 @@ void Server::SendEntityUpdatePacket(ClientInterface* receiver) {
     std::vector<EntityProperty> entityUpdated = level_->main_world_->world_updater_->GetUpdatedEntities();
     std::vector<EntityUUID> entityDespawned = level_->main_world_->world_updater_->GetRemovedEntities();
 
-   /* g_logger.LogDebug("Server::SendEntityUpdatePacket", std::to_string(spawnedEntities.size()));
-    g_logger.LogDebug("Server::SendEntityUpdatePacket", std::to_string(entityUpdated.size()));
-    g_logger.LogDebug("Server::SendEntityUpdatePacket", std::to_string(entityDespawned.size()));*/
-
     // Work on spawn entities
     for (const auto& entity : spawnedEntities) {
         EntityUpdatePacket::EntitySpawn packet;
