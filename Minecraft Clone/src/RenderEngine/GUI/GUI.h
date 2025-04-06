@@ -5,15 +5,17 @@
 
 class GUISet;
 class Shader;
+class Window;
 
 struct GLFWwindow;
 
 class GUI {
 public:
-    GUI();
+    GUI(Window* win);
+    GUI(const GUI&) = delete;
+    GUI(GUI&&);
     ~GUI();
 
-    void Initialize(GLFWwindow* win);
     size_t AddGUI(std::string Name, GUISet set);
     GUISet& EditGUISet(size_t GUIIndex);
     void PrepareRenderer();
@@ -25,5 +27,5 @@ private:
 
     std::vector<GUISet> guis_;
     std::unique_ptr<Shader> shader_;
-    GLFWwindow* window_ = nullptr;
+    Window* window_;
 };

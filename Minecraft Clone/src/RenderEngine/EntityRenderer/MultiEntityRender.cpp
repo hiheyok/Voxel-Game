@@ -132,13 +132,11 @@ void MultiEntityRender::Render() {
 
     size_t n = 0;
 
-    for (auto& entityarr : renderable_entities_->entity_separated_) {
+    for (const auto& entityarr : renderable_entities_->entity_separated_) {
         //Fill SSBO POS data
 
         size_t i = 0;
-        for (auto& e : entityarr.second) {
-            EntityProperty properties = e.second;
-
+        for (const auto& properties : entityarr.second) {
             position_arr_[(i * 3 + 0)] = properties.position_.x;
             position_arr_[(i * 3 + 1)] = properties.position_.y;
             position_arr_[(i * 3 + 2)] = properties.position_.z;

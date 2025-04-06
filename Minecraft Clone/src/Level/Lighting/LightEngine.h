@@ -7,18 +7,17 @@
 class LightStorage;
 class Heightmap;
 class Chunk;
-
-struct WorldAccess;
+class WorldInterface;
 
 class LightEngine {
 public:
-    void Generate(std::vector<ChunkPos> IDs);
+    void Generate(const std::vector<ChunkPos>& IDs);
 
     std::vector<std::unique_ptr<LightStorage>> GetOutput();
 
     void Stop();
 
-    void Start(int lightEngineThreadsCount, WorldAccess* w);
+    void Start(int lightEngineThreadsCount, WorldInterface* w);
 
     void QueueChunk(const ChunkPos& pos);
 
@@ -28,7 +27,7 @@ private:
     std::unique_ptr<LightStorage> Worker(const ChunkPos& pos);
 
     std::unique_ptr<ThreadPool<ChunkPos, std::unique_ptr<LightStorage>>> lighting_thread_pool_;
-    WorldAccess* world_;
+    WorldInterface* world_;
 
     void IncreaseLightLevel(std::unique_ptr<LightStorage>& container, uint8_t lvl, int x, int y, int z);
 

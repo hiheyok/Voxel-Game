@@ -7,18 +7,18 @@
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "RenderEngine/Window.h"
 #include "Utils/LogUtils.h"
 
-GUI::GUI() : 
+GUI::GUI(Window* win) : 
     shader_{ std::make_unique<Shader>(
         "assets/shaders/GUI/GUIVert.glsl", 
-        "assets/shaders/GUI/GUIFrag.glsl") }, 
+        "assets/shaders/GUI/GUIFrag.glsl") },
+    window_{ win },
     guis_{} {};
-GUI::~GUI() = default;
 
-void GUI::Initialize(GLFWwindow* win) {
-    window_ = win;
-}
+GUI::GUI(GUI&&) = default;
+GUI::~GUI() = default;
 
 size_t GUI::AddGUI(std::string Name, GUISet set) {
     guis_.push_back(std::move(set));
@@ -62,7 +62,7 @@ void GUI::SetupDrawCalls() {
 void GUI::Update() {
 
     int Height, Width;
-    glfwGetWindowSize(window_, &Width, &Height);
+    glfwGetWindowSize(window_->GetWindow(), &Width, &Height);
 
     shader_->Use();
     shader_->SetFloat("AspectRatio", ((float)Height) / ((float)Width));

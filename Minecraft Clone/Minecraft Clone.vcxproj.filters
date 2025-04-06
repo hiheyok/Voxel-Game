@@ -135,13 +135,10 @@
     <ClCompile Include="src\RenderEngine\GUI\Font.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\World\WorldDataAccess.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Level\World\World.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\World\WorldInteraction\WorldLoader.cpp">
+    <ClCompile Include="src\Level\World\WorldUpdater.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Registry\ResourceLocation.cpp">
@@ -162,13 +159,7 @@
     <ClCompile Include="src\Utils\Containers\BitStorage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\LevelLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Level\Level.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Level\World\WorldInteraction\WorldInteractions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Level\TerrainGeneration\Structures\Structure.cpp">
@@ -354,7 +345,7 @@
     <ClCompile Include="src\Level\Container\ChunkMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\World\Collusion\CollusionDetector.cpp">
+    <ClCompile Include="src\Level\World\CollusionDetector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Client\ClientPlay.cpp">
@@ -364,6 +355,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\ShaderInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Dimension\Dimension.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\World\WorldInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -719,28 +716,19 @@
     <ClInclude Include="src\Level\World\World.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\World\WorldDataAccess.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Level\Dimension\DimensionProperties.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\World\WorldInteraction\WorldInteractions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\World\WorldParameters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\World\WorldInteraction\WorldLoader.h">
+    <ClInclude Include="src\Level\World\WorldUpdater.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Dimension\Dimensions\Overworld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Server\Server.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\LevelLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Lighting\LightEngine.h">
@@ -992,7 +980,7 @@
     <ClInclude Include="src\Level\Container\Region.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\World\Collusion\CollusionDetector.h">
+    <ClInclude Include="src\Level\World\CollusionDetector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Client\ClientPlay.h">
@@ -1002,6 +990,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\OpenGL\Shader\ShaderInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\World\WorldInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

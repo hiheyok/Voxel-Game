@@ -2,7 +2,7 @@
 #include "Level/Container/ChunkMap.h"
 #include "Level/Container/Region.h"
 #include "Level/Chunk/Chunk.h"
-#include "Level/World/Collusion/CollusionDetector.h"
+#include "Level/World/CollusionDetector.h"
 #include "Client/ClientLevel/Entity/ClientEntities.h"
 
 class ClientCache {

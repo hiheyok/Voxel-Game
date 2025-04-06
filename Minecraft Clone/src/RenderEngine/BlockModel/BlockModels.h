@@ -43,7 +43,7 @@ struct BlockFace {
 
 struct BlockDisplay { //Positions {thirdperson_righthand, thirdperson_lefthand, firstperson_righthand, firstperson_lefthand, gui, head, ground, or fixed}
     //fixed = item frame
-    DisplayPosition position; // TODO: Rename this
+    DisplayPosition position_;
     glm::vec3 rotation_ = glm::vec3(0.f, 0.f, 0.f);
     glm::vec3 translation_ = glm::vec3(0.f, 0.f, 0.f);
     glm::vec3 scale_ = glm::vec3(0.f, 0.f, 0.f);

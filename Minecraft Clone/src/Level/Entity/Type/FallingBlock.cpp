@@ -10,13 +10,13 @@ void FallingBlock::Tick(Entity* entity, Dimension* dimension) {
 
     //Logger.LogInfo("Sand", std::to_string(entity->Properties.Position.y));
 
-    entity->properties_.acceleration_.y = -dimension->world_interactions_.settings_->gravity_;
+    entity->properties_.acceleration_.y = -dimension->world_->parameters.gravity_;
 
     entity->properties_.velocity_ += entity->properties_.acceleration_ * mspt;
 
     int distanceCheck = (int)ceil(abs(entity->properties_.velocity_.y * mspt));
 
-    float collusionDistance = dimension->world_interactions_.collusions_->TraceSingleAxisCollision(entity->properties_.position_, NY, distanceCheck + 1);
+    float collusionDistance = dimension->collusion_detector_->TraceSingleAxisCollision(entity->properties_.position_, NY, distanceCheck + 1);
 
     float timeTillCollusion = abs(collusionDistance / entity->properties_.velocity_.y);
 

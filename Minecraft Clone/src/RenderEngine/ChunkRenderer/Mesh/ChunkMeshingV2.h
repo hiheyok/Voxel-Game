@@ -16,14 +16,9 @@ struct BlockFace;
 
 namespace Mesh {
     struct ChunkVertexData {
-        ChunkVertexData() {
+        ChunkVertexData() = default;
 
-        }
-
-        ~ChunkVertexData() {
-            solidVertices.clear();
-            transparentVertices.clear();
-        }
+        ~ChunkVertexData() = default;
 
         std::vector<uint32_t> solidVertices;
         std::vector<uint32_t> transparentVertices;
@@ -66,17 +61,17 @@ namespace Mesh {
         inline bool CompareBlockSideUnsafe(int x, int y, int z, uint8_t side, BlockID b);
 
         //Add faces to the mesh
-        inline void AddFacetoMesh(const BlockFace& face, uint8_t axis_, glm::ivec3 from_, glm::ivec3 to_, bool allowAO, int x, int y, int z);
+        inline void AddFaceToMesh(const BlockFace& face, uint8_t axis_, glm::ivec3 from_, glm::ivec3 to_, bool allowAO, int x, int y, int z);
 
         inline const BlockID& GetCachedBlockID(int x, int y, int z) const;
         inline const BlockID& GetCachedBlockID(int* pos) const;
         inline void SetCachedBlockID(BlockID b, int x, int y, int z);
 
 
-        inline glm::u8vec4 getAO(uint8_t direction, int x, int y, int z);
+        inline glm::u8vec4 GetAO(uint8_t direction, int x, int y, int z);
 
         //To check if a block had been used in the Greedy Meshing Algorithm
-        const uint64_t BUFFER_SIZE_STEP = 262144;
+        constexpr const static uint64_t kBufferStepSize = 262144;
 
         Chunk* chunk_;
 

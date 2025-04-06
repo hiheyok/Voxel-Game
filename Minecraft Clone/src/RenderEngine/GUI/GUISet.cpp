@@ -9,26 +9,7 @@ GUISet::GUISet() : gui_texture_{ std::make_unique<Texture2D>()} {}
 GUISet::~GUISet() = default;
 GUISet::GUISet(GUISet&& other) = default;
 
-void GUISet::Initialize() {
-
-}
-
-void GUISet::Clean() {
-    for (auto& vao : vaos_)
-        vao.Delete();
-    for (auto& vbo : vbos_)
-        vbo.Delete();
-    for (auto& ebo : ebos_)
-        ebo.Delete();
-}
-
 void GUISet::AddGUIElementNorm(std::string Name, std::string Text, glm::vec2 Size, glm::vec2 Position, glm::vec2 UV_P0, glm::vec2 UV_P1) {
-
-    if (!is_initialized_) {
-        Initialize();
-        is_initialized_ = true;
-    }
-
     if (gui_element_index_.find(Name) == gui_element_index_.end()) {
         elements_.emplace_back(Text, Size, Position);
         elements_.back().buffer_index_ = AddRenderingObj();
@@ -44,12 +25,6 @@ void GUISet::AddGUIElementNorm(std::string Name, std::string Text, glm::vec2 Siz
 }
 
 void GUISet::AddGUIElement(std::string name, std::string text, glm::vec2 size, glm::vec2 position, glm::vec2 UV_P0, glm::vec2 UV_P1) {
-
-    if (!is_initialized_) {
-        Initialize();
-        is_initialized_ = true;
-    }
-
     UV_P0.x = UV_P0.x / (float)gui_texture_->width_;
     UV_P1.x = UV_P1.x / (float)gui_texture_->width_;
 
@@ -118,7 +93,6 @@ void GUISet::PrepareRenderer() {
     is_dirty_ = false;
 
     for (auto& e : elements_) {
-
         GUIElement::GUIVertices GUIData = e.GetVertices();
         size_t BufferIndex = e.buffer_index_;
         vbos_[BufferIndex].InsertData(GUIData.vertices_.size() * sizeof(float), GUIData.vertices_.data(), GL_STATIC_DRAW);
@@ -157,4 +131,3 @@ size_t GUISet::AddRenderingObj() {
     vbo_size_.emplace_back(0);
     return vaos_.size() - 1;
 }
-

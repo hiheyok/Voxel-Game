@@ -20,7 +20,7 @@ class Shader;
 
 class ChunkDrawBatch {
 public:
-    ChunkDrawBatch();
+    ChunkDrawBatch(size_t maxSize);
     ChunkDrawBatch(const ChunkDrawBatch&) = delete;
     ChunkDrawBatch(ChunkDrawBatch&&);
     ~ChunkDrawBatch();
@@ -30,12 +30,11 @@ public:
     void GenDrawCommands(int RenderDistance, int verticalRenderDistance);
     bool AddChunkVertices(const std::vector<uint32_t>& Data, const ChunkPos& pos);
     void DeleteChunkVertices(const ChunkPos& ID);
-    void SetMaxSize(size_t size);
     void Draw(Shader* shader);
     void Defrag(size_t iterations);
     void UpdateCommandBufferSize();
 
-    Camera* camera = nullptr; // TODO: Rename
+    Camera* camera_ = nullptr;
     FastHashMap<size_t, size_t> render_list_;
     double debug_time_ = 0.0;
     ChunkGPUMemoryPool memory_pool_;

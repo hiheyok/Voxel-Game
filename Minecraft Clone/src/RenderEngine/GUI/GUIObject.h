@@ -12,9 +12,8 @@ struct GUIElement {
     };
 
     GUIElement();
-
+    ~GUIElement();
     GUIElement(std::string text, glm::vec2 size, glm::vec2 location);
-
     GUIVertices GetVertices();
 
     std::string text_ = "";

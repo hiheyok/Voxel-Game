@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <array>
 
 #include "ChunkMeshingV2.h"
 #include "RenderEngine/BlockModel/BlockModels.h"
@@ -20,12 +21,12 @@ Mesh::ChunkMeshData::ChunkMeshData() {
 }
 
 void Mesh::ChunkMeshData::Reset() {
-    if (vertices_buffer_.size() != BUFFER_SIZE_STEP) {
-        vertices_buffer_.resize(BUFFER_SIZE_STEP, 0);
+    if (vertices_buffer_.size() != kBufferStepSize) {
+        vertices_buffer_.resize(kBufferStepSize, 0);
     }
 
-    if (transparent_vertices_buffer_.size() != BUFFER_SIZE_STEP) {
-        transparent_vertices_buffer_.resize(BUFFER_SIZE_STEP, 0);
+    if (transparent_vertices_buffer_.size() != kBufferStepSize) {
+        transparent_vertices_buffer_.resize(kBufferStepSize, 0);
     }
 
     transparent_face_count_ = 0;
@@ -92,7 +93,7 @@ void Mesh::ChunkMeshData::GenerateMesh() {
 void Mesh::ChunkMeshData::GenerateFaceCollection() {
     std::vector<uint8_t> faceVisibilityBack(4096, 0b00);
     std::vector<uint8_t> faceVisibility(4096, 0b00);
-    std::vector<uint8_t> usedBlock(16 * 16, 0b00);
+    std::array<uint8_t, 16 * 16> usedBlock{};
 
     for (int axis = 0; axis < 3; axis++) {
         int axisU = (axis + 2) % 3;
@@ -100,7 +101,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
         int pos[3]{ 0,0,0 };
 
         for (pos[axis] = 0; pos[axis] < 17; ++pos[axis]) {//Slice
-            memset(usedBlock.data(), 0x00, 16 * 16);
+            usedBlock.fill(0);
             for (pos[axisU] = 0; pos[axisU] < 16; ++pos[axisU]) {
                 for (pos[axisV] = 0; pos[axisV] < 16; ++pos[axisV]) {
 
@@ -227,7 +228,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
                             const Cuboid& element = currModel.elements_[i];
                             for (qPos[axisU] = pos[axisU]; qPos[axisU] < pos[axisU] + uLength; ++qPos[axisU]) {
                                 for (qPos[axisV] = pos[axisV]; qPos[axisV] < pos[axisV] + vLength; ++qPos[axisV]) {
-                                    AddFacetoMesh(element.faces_[axis * 2 + 1], axis * 2 + 1, element.from_, element.to_, currModel.ambient_occlusion_, qPos[0], qPos[1], qPos[2]);
+                                    AddFaceToMesh(element.faces_[axis * 2 + 1], axis * 2 + 1, element.from_, element.to_, currModel.ambient_occlusion_, qPos[0], qPos[1], qPos[2]);
                                 }
                             }
                         }
@@ -239,7 +240,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
                             const Cuboid& element = backModel.elements_[i];
                             for (qPos[axisU] = pos[axisU]; qPos[axisU] < pos[axisU] + uLength; ++qPos[axisU]) {
                                 for (qPos[axisV] = pos[axisV]; qPos[axisV] < pos[axisV] + vLength; ++qPos[axisV]) {
-                                    AddFacetoMesh(element.faces_[axis * 2], axis * 2, element.from_, element.to_, backModel.ambient_occlusion_, qPos[0], qPos[1], qPos[2]);
+                                    AddFaceToMesh(element.faces_[axis * 2], axis * 2, element.from_, element.to_, backModel.ambient_occlusion_, qPos[0], qPos[1], qPos[2]);
                                 }
                             }
                         }
@@ -262,7 +263,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
     }
 }
 
-inline void Mesh::ChunkMeshData::AddFacetoMesh(const BlockFace& face, uint8_t axis_, glm::ivec3 from_, glm::ivec3 to_, bool allowAO, int x, int y, int z) {
+inline void Mesh::ChunkMeshData::AddFaceToMesh(const BlockFace& face, uint8_t axis_, glm::ivec3 from_, glm::ivec3 to_, bool allowAO, int x, int y, int z) {
     uint8_t NN = 15, PN = 15, PP = 15, NP = 15;
     uint8_t direction = axis_ & 0b1;
     uint8_t facing = axis_ >> 1;
@@ -315,10 +316,10 @@ inline void Mesh::ChunkMeshData::AddFacetoMesh(const BlockFace& face, uint8_t ax
     uint64_t currIndex = face.has_transparency_ ? transparent_face_count_++ : solid_face_count_++;
 
     if (out.size() <= (currIndex + 1) * 12)
-        out.resize(out.size() + BUFFER_SIZE_STEP);
+        out.resize(out.size() + kBufferStepSize);
 
     //Get AO
-    glm::u8vec4 AO = allowAO ? getAO(axis_, x / 16, y / 16, z / 16) : glm::u8vec4{ 15, 15, 15, 15 };
+    glm::u8vec4 AO = allowAO ? GetAO(axis_, x / 16, y / 16, z / 16) : glm::u8vec4{ 15, 15, 15, 15 };
    
     PP = AO[0], PN = AO[1], NP = AO[2], NN = AO[3];
 
@@ -356,7 +357,7 @@ inline void Mesh::ChunkMeshData::SetCachedBlockID(BlockID b, int x, int y, int z
     chunk_cache_[(x + 1) * 18 * 18 + (z + 1) * 18 + (y + 1)] = b;
 }
 
-inline glm::u8vec4 Mesh::ChunkMeshData::getAO(uint8_t direction, int x, int y, int z) {
+inline glm::u8vec4 Mesh::ChunkMeshData::GetAO(uint8_t direction, int x, int y, int z) {
     const uint8_t AMBIENT_OCCLUSION_STRENGTH = 2;
     glm::ivec3 pos{x, y, z};
 

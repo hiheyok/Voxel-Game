@@ -12,22 +12,17 @@
 #include "Core/Interfaces/ServerInterface.h"
 #include "RenderEngine/GUI/GUI.h"
 #include "RenderEngine/GUI/GUISet.h"
+#include "RenderEngine/Window.h"
 
 
-MainPlayer::MainPlayer() : 
+MainPlayer::MainPlayer(Window* window, ServerInterface* interface, ClientCache* cache) :
     player_{std::make_unique<Player>()},
     movement_{ std::make_unique<PlayerMovement>() },
     interactions_{ std::make_unique<WorldInteraction>() },
-    player_pov_{std::make_unique<PlayerPOV>()},
-    player_gui_{std::make_unique<GUI>()} {
-
-}
-
-MainPlayer::~MainPlayer() = default;
-
-void MainPlayer::Initialize(GLFWwindow* win, ServerInterface* interface, ClientCache* cache) {
-    player_gui_->Initialize(win);
-
+    player_pov_{ std::make_unique<PlayerPOV>() },
+    player_gui_{ std::make_unique<GUI>(window) },
+    internal_interface_{ interface },
+    client_cache_{ cache } {
     float ItemViewRelativeSize = 0.85f;
 
     GUISet hotbar;
@@ -36,10 +31,10 @@ void MainPlayer::Initialize(GLFWwindow* win, ServerInterface* interface, ClientC
         glm::vec2(9.f * kHotbarSize * 1.0055555555f, kHotbarSize * 1.05f),
         glm::vec2(0.f, -1.f + kHotbarSize * 0.5f),
         glm::vec2(0.5f, 0.5f),
-        glm::vec2(181.5f,21.5f));
+        glm::vec2(181.5f, 21.5f));
 
     hotbar.AddGUIElement("Select", "",
-        glm::vec2(kHotbarSize * 1.1f,  kHotbarSize * 1.1f),
+        glm::vec2(kHotbarSize * 1.1f, kHotbarSize * 1.1f),
         glm::vec2(-kHotbarSize * 4.f, -1.f + kHotbarSize * 0.5f),
         glm::vec2(0.5f, 22.5f),
         glm::vec2(22.5f, 44.5f));
@@ -51,17 +46,17 @@ void MainPlayer::Initialize(GLFWwindow* win, ServerInterface* interface, ClientC
 
     for (int i = 0; i < 9; i++) {
         itemBar.AddGUIElementNorm(std::to_string(i), "",
-            glm::vec2(kHotbarSize* ItemViewRelativeSize, kHotbarSize * ItemViewRelativeSize),
+            glm::vec2(kHotbarSize * ItemViewRelativeSize, kHotbarSize * ItemViewRelativeSize),
             glm::vec2(kHotbarSize * (float)(i - 4), -1.f + kHotbarSize * 0.5f),
-            glm::vec2(0,0),
-            glm::vec2(1,1));
+            glm::vec2(0, 0),
+            glm::vec2(1, 1));
     }
 
     gui_index_ = player_gui_->AddGUI("PlayerGUI", std::move(hotbar));
     item_gui_index_ = player_gui_->AddGUI("Itembar", std::move(itemBar));
-    internal_interface_ = interface;
-    client_cache_ = cache;
 }
+
+MainPlayer::~MainPlayer() = default;
 
 PlayerPOV* MainPlayer::GetPlayerPOV() {
     return player_pov_.get();

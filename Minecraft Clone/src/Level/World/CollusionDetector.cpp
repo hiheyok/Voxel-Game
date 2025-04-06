@@ -4,7 +4,7 @@
 #include "Level/Entity/Entity.h"
 #include "Level/Entity/Entities.h"
 #include "Level/Entity/Collusion/Hitbox.h"
-#include "Level/World/Collusion/CollusionDetector.h"
+#include "Level/World/CollusionDetector.h"
 #include "Utils/Math/vectorOperations.h"
 #include "Utils/Math/Ray/Ray.h"
 

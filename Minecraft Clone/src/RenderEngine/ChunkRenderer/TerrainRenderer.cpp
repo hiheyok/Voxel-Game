@@ -11,10 +11,10 @@
 #include "Utils/Timer/Timer.h"
 #include "Utils/MathHelper.h"
 
-TerrainRenderer::TerrainRenderer() : chunk_solid_batches_{ 0 },
-    chunk_batch_solid_lookup_{ 0 },
-    chunk_transparent_batches_{ 0 },
-    chunk_batch_transparent_lookup_{ 0 },
+TerrainRenderer::TerrainRenderer() : chunk_solid_batches_{},
+    chunk_batch_solid_lookup_{},
+    chunk_transparent_batches_{},
+    chunk_batch_transparent_lookup_{},
     camera_{ nullptr },
     time_{ std::make_unique<Timer>() },
     cubic_shader_{ std::make_unique<Shader>(
@@ -22,12 +22,7 @@ TerrainRenderer::TerrainRenderer() : chunk_solid_batches_{ 0 },
         "assets/shaders/frag.glsl")}
  {}
 
-TerrainRenderer::~TerrainRenderer() {
-    chunk_solid_batches_.clear();
-    chunk_batch_solid_lookup_.clear();
-    chunk_transparent_batches_.clear();
-    chunk_batch_transparent_lookup_.clear();
-}
+TerrainRenderer::~TerrainRenderer() = default;
 
 void TerrainRenderer::Initialize(GLFWwindow* window, Camera* camera) {
     window_ = window;
@@ -228,17 +223,15 @@ size_t TerrainRenderer::GetVRAMUsageFull() {
 }
 
 void TerrainRenderer::CreateNewSolidBatch() {
-    chunk_solid_batches_.emplace_back();
+    chunk_solid_batches_.emplace_back(g_app_options.solid_buffer_size_);
     size_t i = chunk_solid_batches_.size() - 1;
-    chunk_solid_batches_[i].SetMaxSize(g_app_options.solid_buffer_size_);
     chunk_solid_batches_[i].SetupBuffers();
-    chunk_solid_batches_[i].camera = camera_;
+    chunk_solid_batches_[i].camera_ = camera_;
 }
 
 void TerrainRenderer::CreateNewTransparentBatch() {
-    chunk_transparent_batches_.emplace_back();
+    chunk_transparent_batches_.emplace_back(g_app_options.transparent_buffer_size_);
     size_t i = chunk_transparent_batches_.size() - 1;
-    chunk_transparent_batches_[i].SetMaxSize(g_app_options.transparent_buffer_size_);
     chunk_transparent_batches_[i].SetupBuffers();
-    chunk_transparent_batches_[i].camera = camera_;
+    chunk_transparent_batches_[i].camera_ = camera_;
 }

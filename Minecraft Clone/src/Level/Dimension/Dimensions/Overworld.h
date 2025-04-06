@@ -3,7 +3,8 @@
 
 class OverworldDimension : public Dimension {
 public:
-    OverworldDimension() : Dimension(g_generators.MOUNTAINS) {}
+    OverworldDimension(DimensionProperties properties) : 
+        Dimension(properties, g_generators.MOUNTAINS) {}
 
     void Tick() override {
 

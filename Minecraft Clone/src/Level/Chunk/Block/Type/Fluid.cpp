@@ -12,7 +12,7 @@ void Fluid::Tick(const BlockPos& pos, Dimension* currentWorld) {
             continue;
         }
 
-        BlockID block = currentWorld->world_interactions_.GetBlock(pos);
+        BlockID block = currentWorld->world_->GetBlock(pos);
 
         if (block != g_blocks.AIR) {
             continue;

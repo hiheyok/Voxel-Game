@@ -1,7 +1,7 @@
 #include <glm/vec3.hpp>
 
 #include "Level/Chunk/Chunk.h"
-#include "Level/World/WorldInteraction/WorldLoader.h"
+#include "Level/World/WorldUpdater.h"
 #include "Level/World/World.h"
 #include "Level/World/WorldParameters.h"
 #include "Level/Chunk/Lighting/LightStorage.h"
@@ -10,10 +10,10 @@
 
 using namespace glm;
 
-WorldLoader::WorldLoader(World* w, WorldParameters p) : settings_{ std::make_unique<WorldParameters>( p ) }, world{ w } {}
+WorldUpdater::WorldUpdater(World* w, WorldParameters p) : settings_{ std::make_unique<WorldParameters>( p ) }, world_{ w } {}
 
-void WorldLoader::loadSummonEntitySurrounding(EntityUUID uuid) {
-    Entity* e = world->entities_->GetEntity(uuid);
+void WorldUpdater::loadSummonEntitySurrounding(EntityUUID uuid) {
+    Entity* e = world_->GetEntity(uuid);
 
     if (e == nullptr)
         g_logger.LogError("WorldLoader::loadSummonEntitySurrounding", std::string("Entity with UUID " + std::to_string(uuid) + " not found"));
@@ -55,9 +55,9 @@ void WorldLoader::loadSummonEntitySurrounding(EntityUUID uuid) {
 
 }
 
-bool WorldLoader::RequestLoad(const ChunkPos& pos) {
+bool WorldUpdater::RequestLoad(const ChunkPos& pos) {
     ChunkPos p = pos;
-    if (world->CheckChunk(p))
+    if (world_->CheckChunk(p))
         return false;
 
     if (tall_generation_)
@@ -80,14 +80,14 @@ bool WorldLoader::RequestLoad(const ChunkPos& pos) {
 }
 
 //Only work on loading chunks for not. Unloading for later
-void WorldLoader::loadSurroundedMovedEntityChunk() {
+void WorldUpdater::loadSurroundedMovedEntityChunk() {
     std::vector<ivec3> centerPositionList = {};
     std::vector<vec3> centerVelocityList = {};
 
     //Get entity chunk position
 
     for (const auto& e : entity_chunk_loaders_) {
-        Entity* entity = world->entities_->GetEntity(e);
+        Entity* entity = world_->GetEntity(e);
 
         if (entity == nullptr)
             g_logger.LogError("WorldLoader::loadSurroundedMovedEntityChunk", std::string("Entity with UUID " + std::to_string(e) + " not found"));
@@ -152,8 +152,8 @@ void WorldLoader::loadSurroundedMovedEntityChunk() {
     }
 }
 
-void WorldLoader::loadSpawnChunks() {
-    if (world == nullptr)
+void WorldUpdater::loadSpawnChunks() {
+    if (world_ == nullptr)
         g_logger.LogError("WorldLoader::loadSpawnChunks", "World is not initialized. Couldn't set spawn chunks");
     for (long long int x = -settings_->spawn_chunk_horizontal_radius_; x <= settings_->spawn_chunk_horizontal_radius_; x++) {
         for (long long int z = -settings_->spawn_chunk_horizontal_radius_; z <= settings_->spawn_chunk_horizontal_radius_; z++) {
@@ -171,56 +171,161 @@ void WorldLoader::loadSpawnChunks() {
     is_spawn_chunks_loaded_ = true;
 }
 
-WorldAccess* WorldLoader::GetWorld() const {
-    return static_cast<WorldAccess*>(world);
-}
-
-//TODO: Fix me
-void WorldLoader::ReplaceLightInfomation(std::unique_ptr<LightStorage> lighting) {
-    const ChunkPos& pos = lighting->position_;
-    Chunk* chunk = world->GetChunk(pos);
-    chunk->lighting_->ReplaceData(lighting->GetData());
-}
-
-std::vector<ChunkPos> WorldLoader::GetRequestedChunks() {
-    std::lock_guard<std::mutex> lock{ lock_ };
-
-    std::vector<ChunkPos> tmp = std::move(chunk_request_);
-    chunk_request_.clear();
-
-    return tmp;
-
-}
-
-void WorldLoader::AddEntityChunkLoader(EntityUUID uuid) {
-    entity_chunk_loaders_.insert(uuid);
-    loadSummonEntitySurrounding(uuid);
-}
-
-void WorldLoader::DeleteEntityChunkLoader(EntityUUID uuid) {
+void WorldUpdater::DeleteEntityChunkLoader(EntityUUID uuid) {
     if (!entity_chunk_loaders_.count(uuid))
         g_logger.LogError("WorldLoader::DeleteEntityChunkLoader", std::string("Could not find entity with UUID " + std::to_string(uuid)));
 
     entity_chunk_loaders_.erase(uuid);
 }
 
-bool WorldLoader::CheckEntityExistChunkLoader(EntityUUID uuid) const {
+bool WorldUpdater::CheckEntityExistChunkLoader(EntityUUID uuid) const {
     return entity_chunk_loaders_.count(uuid);
 }
 
-void WorldLoader::Load() {
+void WorldUpdater::Load() {
     if (!is_spawn_chunks_loaded_) loadSpawnChunks();
 
     loadSurroundedMovedEntityChunk();
 }
 
-void WorldLoader::AddChunk(std::unique_ptr<Chunk> chunk) {
-    const ChunkPos& pos = chunk->position_;
 
-    {
-        std::lock_guard<std::mutex> otherLock{ other_lock_ };
-        if (generating_chunk_.count(pos)) generating_chunk_.erase(pos);
+
+// Getters
+
+std::vector<ChunkPos> WorldUpdater::GetUpdatedChunkPos() {
+    std::unique_lock<std::mutex> lock{ updated_chunk_lock_ };
+    std::vector<ChunkPos> out = std::move(updated_chunk_arr_);
+    updated_chunk_arr_.clear();
+    updated_chunk_.clear();
+    return out;
+}
+
+std::vector<ChunkPos> WorldUpdater::GetUpdatedLightPos() {
+    std::unique_lock<std::mutex> lock{ updated_light_lock_ };
+    std::vector<ChunkPos> out = std::move(updated_light_arr_);
+    updated_light_arr_.clear();
+    updated_light_.clear();
+    return out;
+}
+
+std::vector<ChunkPos> WorldUpdater::GetRequestedLightUpdates() {
+    std::vector<Chunk*> chunks = world_->GetAllChunks();
+    std::vector<ChunkPos> pos;
+
+    for (const auto& chunk : chunks) {
+        if (chunk->CheckLightDirty()) {
+            pos.push_back(chunk->position_);
+        }
+    }
+    return pos;
+}
+
+std::vector<ChunkPos> WorldUpdater::GetRequestedChunks() {
+    std::lock_guard<std::mutex> lock{ lock_ };
+    std::vector<ChunkPos> tmp = std::move(chunk_request_);
+    chunk_request_.clear();
+    return tmp;
+}
+
+std::vector<EntityProperty> WorldUpdater::GetSpawnedEntities() {
+    return world_->GetEntityContainer()->GetSpawnedEntities(); // TODO: Create some internal stuff to handle this in the chunk updater
+}
+
+std::vector<EntityProperty> WorldUpdater::GetUpdatedEntities() {
+    return world_->GetEntityContainer()->GetUpdatedEntities();
+}
+
+std::vector<EntityUUID> WorldUpdater::GetRemovedEntities() {
+    return world_->GetEntityContainer()->GetRemovedEntities();
+}
+// Setters 
+
+void WorldUpdater::SetBlock(const BlockID& block, const BlockPos& pos) {
+    world_->SetBlock(block, pos);
+
+    ChunkPos chunkPos = pos / kChunkDim;
+
+    std::unique_lock<std::mutex> lock{ updated_chunk_lock_ };
+    if (!updated_chunk_.contains(chunkPos)) {
+        updated_chunk_.insert(chunkPos);
+        updated_chunk_arr_.emplace_back(chunkPos);
+    }
+}
+
+void WorldUpdater::SetEntityChunkLoader(EntityUUID uuid) {
+    entity_chunk_loaders_.insert(uuid);
+    loadSummonEntitySurrounding(uuid);
+}
+
+void WorldUpdater::SetLight(std::unique_ptr<LightStorage> light) {
+    SetLight({ std::move(light) });
+}
+
+
+void WorldUpdater::SetChunk(std::unique_ptr<Chunk> chunk) {
+    SetChunk({std::move(chunk)});
+}
+
+void WorldUpdater::SetLight(std::vector<std::unique_ptr<LightStorage>> lights) {
+    std::vector<ChunkPos> updatedPos;
+    updatedPos.reserve(lights.size());
+
+    for (auto& light : lights) {
+        Chunk* chunk = world_->GetChunk(light->position_);
+        updatedPos.push_back(light->position_);
+        chunk->lighting_->ReplaceData(light->GetData());
+    }
+    
+    std::unique_lock<std::mutex> lock{ updated_light_lock_ };
+    for (const auto& pos : updatedPos) {
+        if (!updated_light_.contains(pos)) {
+            updated_light_.insert(pos);
+            updated_light_arr_.emplace_back(pos);
+
+            // Checks the side too 
+        }
+    }
+}
+
+void WorldUpdater::SetChunk(std::vector<std::unique_ptr<Chunk>> chunks) {
+    std::vector<ChunkPos> updatedPos;
+    updatedPos.reserve(chunks.size());
+
+    for (auto& chunk : chunks) {
+        updatedPos.push_back(chunk->position_);
+        world_->SetChunk(std::move(chunk));
     }
 
-    world->SetChunk(std::move(chunk));
+    std::unique_lock<std::mutex> lock{ updated_chunk_lock_ };
+    for (const auto& pos : updatedPos) {
+        if (!updated_chunk_.contains(pos)) {
+            updated_chunk_.insert(pos);
+            updated_chunk_arr_.emplace_back(pos);
+
+            for (int side = 0; side < 6; side++) {
+                ChunkPos neighborPos = pos;
+                neighborPos.incrementSide(side, 1);
+
+                if (world_->CheckChunk(neighborPos) && !updated_chunk_.contains(neighborPos)) {
+                    updated_chunk_arr_.push_back(neighborPos);
+                }
+            }
+        }
+    }
+}
+
+EntityUUID WorldUpdater::SetEntity(std::unique_ptr<Entity> entity) {
+    bool isChunkLoader = entity->properties_.is_chunk_loader_;
+    EntityUUID uuid = world_->SetEntity(std::move(entity));
+    if (isChunkLoader) {
+        SetEntityChunkLoader(uuid);
+    }
+    return uuid;
+}
+
+void WorldUpdater::KillEntity(const EntityUUID& uuid) {
+    world_->RemoveEntity(uuid);
+    if (CheckEntityExistChunkLoader(uuid)) {
+        DeleteEntityChunkLoader(uuid);
+    }
 }

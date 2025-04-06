@@ -61,6 +61,9 @@ namespace MemoryManagement {
 
     class MemoryPoolManager {
     public:
+        MemoryPoolManager();
+        ~MemoryPoolManager();
+
         void Initialize(size_t spaceAvailable);
 
         void AllocateSpace(size_t memOffset, size_t memSize);
@@ -92,12 +95,10 @@ namespace MemoryManagement {
 
 class ChunkGPUMemoryPool {
 public:
-    ChunkGPUMemoryPool();
+    ChunkGPUMemoryPool(size_t memoryPoolSize);
     ChunkGPUMemoryPool(const ChunkGPUMemoryPool&) = delete;
     ChunkGPUMemoryPool(ChunkGPUMemoryPool&&);
     ~ChunkGPUMemoryPool();
-    //TODO: Add some cleanup
-    void Allocate(size_t memoryPoolSize);
 
     void DeleteChunk(ChunkPos pos);
 

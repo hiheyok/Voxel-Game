@@ -72,6 +72,9 @@ size_t BlockManagement::GetFragmentCount() const {
 }
 
 // Other class
+MemoryPoolManager::MemoryPoolManager() = default;
+MemoryPoolManager::~MemoryPoolManager() = default;
+
 
 void MemoryPoolManager::Initialize(size_t spaceAvailable) {
     pool_size_ = spaceAvailable;
@@ -190,25 +193,9 @@ size_t MemoryPoolManager::GetReserveSpaceFragmentCount() const {
 // Other class
 ChunkGPUMemoryPool::ChunkGPUMemoryPool(ChunkGPUMemoryPool&&) = default;
 
-ChunkGPUMemoryPool::ChunkGPUMemoryPool() :
+ChunkGPUMemoryPool::ChunkGPUMemoryPool(size_t memoryPoolSize) :
     stagging_buffer_{ std::make_unique<BufferStorage>() },
     buffer_{ std::make_unique<BufferStorage>() } {
-}
-
-ChunkGPUMemoryPool::~ChunkGPUMemoryPool() = default;
-
-void ChunkGPUMemoryPool::Allocate(size_t memoryPoolSize) {
-    if (memory_pool_size_ != 0) {
-        g_logger.LogWarn("ChunkGPUMemoryPool::Allocate", "Allocate called on already allocated pool. Re-allocating.");
-
-        buffer_->Delete();
-        stagging_buffer_->Delete();
-        memory_pool_ = MemoryManagement::MemoryPoolManager(); // Re-create manager
-        chunk_memory_offsets_.clear();
-        memory_chunk_offsets_.clear();
-        statistics_ = MemoryManagement::MemoryPoolStatistics(); // Reset stats
-    }
-
     memory_pool_size_ = memoryPoolSize;
     if (memory_pool_size_ == 0) {
         g_logger.LogError("ChunkGPUMemoryPool::Allocate", "Attempted to allocate with zero size.");
@@ -233,7 +220,10 @@ void ChunkGPUMemoryPool::Allocate(size_t memoryPoolSize) {
     }
     memory_pool_.Initialize(memory_pool_size_);
     g_logger.LogInfo("ChunkGPUMemoryPool::Allocate", "Allocated GPU memory pool. Size: " + std::to_string(memory_pool_size_) + " bytes.");
+
 }
+
+ChunkGPUMemoryPool::~ChunkGPUMemoryPool() = default;
 
 void ChunkGPUMemoryPool::DeleteChunk(ChunkPos pos) {
     if (!chunk_memory_offsets_.count(pos)) {

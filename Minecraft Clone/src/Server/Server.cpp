@@ -7,8 +7,7 @@
 #include "Level/Entity/Properties/EntityProperties.h"
 #include "Level/Entity/Mobs/Player.h"
 #include "Level/Level.h"
-#include "Level/LevelLoader.h"
-#include "Level/World/WorldInteraction/WorldLoader.h"
+#include "Level/World/WorldUpdater.h"
 #include "Utils/Timer/Timer.h"
 #include "Utils/Clock.h"
 #include "Utils/Math/Ray/Ray.h"
@@ -56,7 +55,7 @@ void Server::Tick() {
     level_->main_world_->Tick();
     level_->main_world_->EventTick();
     level_->updateDimensions();
-    level_->main_world_->world_interactions_.worldLoader_->Load();
+    level_->main_world_->world_updater_->Load();
 }
 
 void Server::SendEvent(const Event& eventIn) {
@@ -66,7 +65,7 @@ void Server::SendEvent(const Event& eventIn) {
 EntityUUID Server::SetInternalConnection(InternalInterface* interface) {
     client_interface_ = static_cast<ClientInterface*>(interface);
     std::unique_ptr<Player> player = std::make_unique<Player>();
-    EntityUUID uuid = level_->main_world_->world_interactions_.AddEntity(std::move(player));
+    EntityUUID uuid = level_->main_world_->world_updater_->SetEntity(std::move(player));
     interface->SetPlayerUUID(uuid);
     return uuid;
 }
@@ -87,7 +86,7 @@ void Server::ProcessPlayerPackets(ClientInterface* receiver) {
             // Send packet to player
             {
                 const PlayerPacket::PlayerGetItem& getItem = std::get<PlayerPacket::PlayerGetItem>(packet.packet_);
-                Entity* e = level_->main_world_->world_interactions_.GetEntity(receiver->GetPlayerUUID());
+                Entity* e = level_->main_world_->world_->GetEntity(receiver->GetPlayerUUID());
                 Player* player = static_cast<Player*>(e);
                 player->entity_inventory_.SetSlot(getItem.slot_, getItem.item_);
 
@@ -121,7 +120,7 @@ void Server::ProcessPlayerPackets(ClientInterface* receiver) {
         case PlayerPacket::MOVE:
             {
                 const PlayerPacket::PlayerMove& movePlayer = std::get<PlayerPacket::PlayerMove>(packet.packet_);
-                Entity* e = level_->main_world_->world_interactions_.GetEntity(receiver->GetPlayerUUID());
+                Entity* e = level_->main_world_->world_->GetEntity(receiver->GetPlayerUUID());
                 e->properties_.acceleration_ = movePlayer.acc_;
                 e->properties_.velocity_ = movePlayer.vel_;
                 e->properties_.position_ = movePlayer.pos_;
@@ -140,9 +139,9 @@ void Server::SendPacket() {
 }
 
 void Server::SendEntityUpdatePacket(ClientInterface* receiver) {
-    std::vector<EntityProperty> spawnedEntities = level_->main_world_->world_interactions_.GetSpawnedEntities();
-    std::vector<EntityProperty> entityUpdated = level_->main_world_->world_interactions_.GetUpdatedEntities();
-    std::vector<EntityUUID> entityDespawned = level_->main_world_->world_interactions_.GetRemovedEntities();
+    std::vector<EntityProperty> spawnedEntities = level_->main_world_->world_updater_->GetSpawnedEntities();
+    std::vector<EntityProperty> entityUpdated = level_->main_world_->world_updater_->GetUpdatedEntities();
+    std::vector<EntityUUID> entityDespawned = level_->main_world_->world_updater_->GetRemovedEntities();
 
    /* g_logger.LogDebug("Server::SendEntityUpdatePacket", std::to_string(spawnedEntities.size()));
     g_logger.LogDebug("Server::SendEntityUpdatePacket", std::to_string(entityUpdated.size()));
@@ -171,11 +170,11 @@ void Server::SendEntityUpdatePacket(ClientInterface* receiver) {
 }
 
 void Server::SendChunkUpdatePacket(ClientInterface* receiver) {
-    std::vector<ChunkPos> updatedChunks = level_->main_world_->world_interactions_.GetUpdatedChunkPos();
-    std::vector<ChunkPos> updatedLights = level_->main_world_->world_interactions_.GetUpdatedLightPos();
+    std::vector<ChunkPos> updatedChunks = level_->main_world_->world_updater_->GetUpdatedChunkPos();
+    std::vector<ChunkPos> updatedLights = level_->main_world_->world_updater_->GetUpdatedLightPos();
 
     for (const auto& pos : updatedChunks) {
-        ChunkContainer* chunk = level_->main_world_->world_interactions_.GetChunk(pos);
+        ChunkContainer* chunk = level_->main_world_->world_->GetChunk(pos);
         if (chunk == nullptr) continue; // TODO: Fix this later
         ChunkRawData data = chunk->GetRawData();
 
@@ -185,7 +184,7 @@ void Server::SendChunkUpdatePacket(ClientInterface* receiver) {
     }
 
     for (const auto& pos : updatedLights) {
-        ChunkContainer* chunk = level_->main_world_->world_interactions_.GetChunk(pos);
+        ChunkContainer* chunk = level_->main_world_->world_->GetChunk(pos);
         LightStorage data = chunk->GetLightData();
 
         ChunkUpdatePacket::LightUpdate packet;
@@ -196,7 +195,7 @@ void Server::SendChunkUpdatePacket(ClientInterface* receiver) {
 
 void Server::SendServerStats(ClientInterface* receiver) {
     ServerStats stats;
-    stats.chunk_count_ = level_->level_loader_->GetChunkCount();
+    stats.chunk_count_ = 0;// level_->level_loader_->GetChunkCount(); TODO: Add chunk counter
     stats.mspt_ = mspt_;
     stats.event_queued_ = 0;
     receiver->SendServerStats(stats);

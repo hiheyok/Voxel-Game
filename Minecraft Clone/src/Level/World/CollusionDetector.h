@@ -12,11 +12,8 @@ public:
     ~CollusionDetector();
 
     bool CheckRayIntersection(Ray& ray);
-
     float TraceSingleAxisCollision(glm::vec3 Origin, int direction, int distanceTest);
-
     glm::dvec3 ComputeCollisionTimes(Entity* entity);
-
     bool IsEntityOnGround(Entity* entity);
 private:
     ChunkMap* cache_;

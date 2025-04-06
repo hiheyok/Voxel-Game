@@ -105,7 +105,6 @@ void PlayerMovement::MovePlayer(Player* player, const UserInputs& inputs, Client
         player->properties_.velocity_.y += -VelocityMovementCurve(Magnitude(player->properties_.velocity_), velocity, inputs.delta_);
     }
 
-
     if (inputs.CheckKey(KEY_SPACE) && (clientWorld->collusion_manager_.IsEntityOnGround(player) && enable_collusion_)) {
         player->properties_.velocity_.y += velocity * 4000;
     }

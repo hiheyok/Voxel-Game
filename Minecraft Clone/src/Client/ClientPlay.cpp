@@ -23,14 +23,13 @@
 
 ClientPlay::ClientPlay(ServerInterface* interface, Window* window, PerformanceProfiler* profiler) :
     interface_{interface},
-    main_player_{ std::make_unique<MainPlayer>() },
     framebuffer_{ std::make_unique<TexturedFrameBuffer>() },
     client_level_{ std::make_unique<ClientLevel>() },
+    main_player_{ std::make_unique<MainPlayer>(window, interface, &client_level_->cache) },
     debug_screen_{ std::make_unique<DebugScreen>() },
     entity_render_{ std::make_unique<MultiEntityRender>(main_player_->GetPlayerPOV()) },
     terrain_render_{ std::make_unique<WorldRender>(main_player_->GetPlayerPOV()) } {
 
-    main_player_->Initialize(window->GetWindow(), interface_, &client_level_->cache);
     main_player_->SetPlayerPosition(0., 50, 0.);
     main_player_->SetPlayerRotation(-135.f, -30.);
 

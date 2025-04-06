@@ -1,9 +1,20 @@
 #pragma once
-#include "Level/World/WorldDataAccess.h"
-#include "Level/World/Collusion/CollusionDetector.h"
+#include <memory>
 
-class World : public WorldAccess {
-private:
+#include "Level/World/CollusionDetector.h"
+#include "Level/World/WorldParameters.h"
+#include "Level/World/WorldInterface.h"
+
+class ChunkMap;
+class EntityContainer;
+
+class World : public WorldInterface {
 public:
-    void Initialize();
+    World();
+    ~World();
+
+    void SetChunk(std::unique_ptr<Chunk> chunk);
+    EntityUUID SetEntity(std::unique_ptr<Entity> entity);
+    void SetBlock(BlockID block, const BlockPos& pos);
+    void RemoveEntity(const EntityUUID& uuid);
 };

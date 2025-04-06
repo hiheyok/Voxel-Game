@@ -99,7 +99,7 @@ std::vector<float> RenderableFont::GetBackgroundVertices() {
     return out;
 }
 
-void RenderableFont::setBackgroundPadding(float H, float W) {
+void RenderableFont::SetBackgroundPadding(float H, float W) {
     background_height_padding_ = H;
     background_width_padding_ = W;
 }

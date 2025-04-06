@@ -5,7 +5,7 @@
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
 
-const float CharWidth[256]{
+constexpr const float CharWidth[256]{
         1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f,
         1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f, 1.000f,
         0.625f, 0.125f, 0.250f, 0.625f, 0.625f, 0.625f, 0.625f, 0.125f, 0.375f, 0.375f, 0.375f, 0.625f, 0.125f, 0.625f, 0.125f, 0.625f,
@@ -28,20 +28,14 @@ const float CharWidth[256]{
 
 class RenderableFont {
 public:
-    bool background_ = false;
-
-    void setBackgroundPadding(float H, float W);
-
+    void SetBackgroundPadding(float H, float W);
     void SetText(std::string str);
-
     void AddBackground(glm::vec3 color, float alpha);
-
     void FontSize(float size);
-
     void SetColor(glm::vec3 clr);
-
     void SetPosition(glm::vec2 pos);
 
+    bool background_ = false;
     std::vector<float> GetVertices(); //-1 - 1 coords
     std::vector<float> GetBackgroundVertices();
 private:

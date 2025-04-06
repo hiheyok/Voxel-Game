@@ -1,18 +1,19 @@
 #include "Level/Chunk/Block/Type/Grass.h"
 #include "Level/Dimension/Dimension.h"
 #include "Level/Event/EventHandler.h"
+#include "Level/World/WorldUpdater.h"
 #include "Utils/Math/Probability/Probability.h"
 
 void GrassBlock::Tick(const BlockPos& pos, Dimension* currentWorld) {
     //Checks if ticking block changes 
-    if (currentWorld->world_interactions_.GetBlock(pos) != g_blocks.GRASS) {
+    if (currentWorld->world_->GetBlock(pos) != g_blocks.GRASS) {
         return;
     }
 
     BlockPos newPos = pos;
     newPos.y += 1;
 
-    bool blockOnTopOfGrass = (currentWorld->world_interactions_.GetBlock(newPos) != g_blocks.AIR);
+    bool blockOnTopOfGrass = (currentWorld->world_->GetBlock(newPos) != g_blocks.AIR);
 
     bool isGrassDestroyed = false;
 
@@ -41,7 +42,7 @@ bool GrassBlock::GrassDestroyTick(Dimension* currentWorld, const BlockPos& pos) 
         return false;
     }
 
-    currentWorld->world_interactions_.SetBlock(g_blocks.DIRT, pos);
+    currentWorld->world_updater_->SetBlock(g_blocks.DIRT, pos);
 
     return true;
 }
@@ -63,13 +64,13 @@ bool GrassBlock::GrassSpreadTick(Dimension* currentWorld, const BlockPos& pos) {
                 newPos.z += z1;
 
                 //Checks if block is dirt
-                if (currentWorld->world_interactions_.GetBlock(newPos) != g_blocks.DIRT) {
+                if (currentWorld->world_->GetBlock(newPos) != g_blocks.DIRT) {
                     continue;
                 }
 
                 //Checks if there isnt any block above
                 newPos.y += 1;
-                if (currentWorld->world_interactions_.GetBlock(newPos) != g_blocks.AIR) {
+                if (currentWorld->world_->GetBlock(newPos) != g_blocks.AIR) {
                     continue;
                 }
                 newPos.y -= 1;

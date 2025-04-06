@@ -181,8 +181,9 @@
   <ItemGroup>
     <ClCompile Include="src\Client\Client.cpp" />
     <ClCompile Include="src\Level\Container\ChunkMap.cpp" />
+    <ClCompile Include="src\Level\Dimension\Dimension.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\GenLayer\IntCache.cpp" />
-    <ClCompile Include="src\Level\World\Collusion\CollusionDetector.cpp" />
+    <ClCompile Include="src\Level\World\CollusionDetector.cpp" />
     <ClCompile Include="src\Level\Container\Region.cpp" />
     <ClCompile Include="src\Client\ClientPlay.cpp" />
     <ClCompile Include="src\Client\IO\IO.cpp" />
@@ -219,8 +220,8 @@
     <ClCompile Include="src\Level\Item\ItemStack.cpp" />
     <ClCompile Include="src\Level\Item\ItemTextureAtlas.cpp" />
     <ClCompile Include="src\Level\Level.cpp" />
-    <ClCompile Include="src\Level\LevelLoader.cpp" />
     <ClCompile Include="src\Level\Lighting\LightEngine.cpp" />
+    <ClCompile Include="src\Level\World\WorldInterface.cpp" />
     <ClCompile Include="src\Server\Server.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Biome\BiomeProperties.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugPositioning\DebugPositioning.cpp" />
@@ -242,9 +243,7 @@
     <ClCompile Include="src\Level\TerrainGeneration\Random\JavaRandom.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Structures\Structure.cpp" />
     <ClCompile Include="src\Level\World\World.cpp" />
-    <ClCompile Include="src\Level\World\WorldDataAccess.cpp" />
-    <ClCompile Include="src\Level\World\WorldInteraction\WorldInteractions.cpp" />
-    <ClCompile Include="src\Level\World\WorldInteraction\WorldLoader.cpp" />
+    <ClCompile Include="src\Level\World\WorldUpdater.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\RenderEngine\BlockModel\BlockModels.cpp" />
     <ClCompile Include="src\RenderEngine\BlockModel\ModelLoader.cpp" />
@@ -299,7 +298,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Client\Client.h" />
-    <ClInclude Include="src\Level\World\Collusion\CollusionDetector.h" />
+    <ClInclude Include="src\Level\World\CollusionDetector.h" />
     <ClInclude Include="src\Level\Container\Region.h" />
     <ClInclude Include="src\Client\ClientLevel\ClientCache.h" />
     <ClInclude Include="src\Level\Container\ChunkMap.h" />
@@ -330,7 +329,6 @@
     <ClInclude Include="src\Level\Dimension\DimensionProperties.h" />
     <ClInclude Include="src\Level\Dimension\Dimensions\Overworld.h" />
     <ClInclude Include="src\Level\Level.h" />
-    <ClInclude Include="src\Level\LevelLoader.h" />
     <ClInclude Include="src\Level\Lighting\LightEngine.h" />
     <ClInclude Include="src\Core\Interfaces\ClientInterface.h" />
     <ClInclude Include="src\Core\Interfaces\InternalInterface.h" />
@@ -340,6 +338,7 @@
     <ClInclude Include="src\Core\Networking\EntityUpdate.h" />
     <ClInclude Include="src\Core\Networking\Packet.h" />
     <ClInclude Include="src\Core\Networking\PlayerAction.h" />
+    <ClInclude Include="src\Level\World\WorldInterface.h" />
     <ClInclude Include="src\Server\Server.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\Biome.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeProperties.h" />
@@ -392,9 +391,7 @@
     <ClInclude Include="src\Level\TerrainGeneration\MapGen\MapGenBase.h" />
     <ClInclude Include="src\Level\TerrainGeneration\MapGen\MapGenCaves.h" />
     <ClInclude Include="src\Level\World\World.h" />
-    <ClInclude Include="src\Level\World\WorldDataAccess.h" />
-    <ClInclude Include="src\Level\World\WorldInteraction\WorldInteractions.h" />
-    <ClInclude Include="src\Level\World\WorldInteraction\WorldLoader.h" />
+    <ClInclude Include="src\Level\World\WorldUpdater.h" />
     <ClInclude Include="src\Level\World\WorldParameters.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Buffers\BufferStorage.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Buffers\VertexArray.h" />

@@ -9,18 +9,17 @@ class PlayerMovement;
 class PlayerPOV;
 class Player;
 class GUI;
+class Window;
 
-struct GLFWwindow;
 struct EntityProperty;
 
 
 class MainPlayer {
 public:
 
-    MainPlayer();
+    MainPlayer(Window* window, ServerInterface* server, ClientCache* cache);
+    MainPlayer(const MainPlayer&) = delete;
     ~MainPlayer();
-
-    void Initialize(GLFWwindow* win, ServerInterface* server, ClientCache* cache);
 
     void Update(const UserInputs& inputs);
 

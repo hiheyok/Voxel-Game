@@ -6,7 +6,9 @@
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "Utils/Timer/Timer.h"
 
-ChunkDrawBatch::ChunkDrawBatch() = default;
+ChunkDrawBatch::ChunkDrawBatch(size_t maxSize) : 
+    max_buffer_size_{ maxSize },
+    memory_pool_{ maxSize } {}
 ChunkDrawBatch::ChunkDrawBatch(ChunkDrawBatch&&) = default;
 ChunkDrawBatch::~ChunkDrawBatch() {
     memory_pool_.buffer_->Delete();
@@ -20,8 +22,6 @@ ChunkDrawBatch::~ChunkDrawBatch() {
 }
 
 void ChunkDrawBatch::SetupBuffers() {
-    memory_pool_.Allocate(max_buffer_size_);
-
     ibo_.GenBuffer();
     ssbo_.GenBuffer();
     array_.GenArray();
@@ -66,9 +66,9 @@ void ChunkDrawBatch::GenDrawCommands(int renderDistance, int verticalRenderDista
     if (!update_commands_)
         return;
 
-    frustum_.CalculateFrustum(camera);
+    frustum_.CalculateFrustum(camera_);
 
-    glm::ivec3 position(floor(camera->position_.x / 16.f), floor(camera->position_.y / 16.f), floor(camera->position_.z / 16.f));
+    glm::ivec3 position(floor(camera_->position_.x / 16.f), floor(camera_->position_.y / 16.f), floor(camera_->position_.z / 16.f));
     
     int index = 1;
 
@@ -154,10 +154,6 @@ void ChunkDrawBatch::DeleteChunkVertices(const ChunkPos& id) {
         update_commands_ = true;
         
     }
-}
-
-void ChunkDrawBatch::SetMaxSize(size_t size) {
-    max_buffer_size_ = size;
 }
 
 void ChunkDrawBatch::Bind() {

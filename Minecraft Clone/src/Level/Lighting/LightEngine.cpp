@@ -3,8 +3,7 @@
 #include "Level/Chunk/Heightmap/Heightmap.h"
 #include "Level/Chunk/Lighting/LightStorage.h"
 #include "Level/Lighting/LightEngine.h"
-#include "Level/World/WorldDataAccess.h"
-
+#include "Level/World/WorldInterface.h"
 
 static thread_local FixedFIFOQueue<uint16_t> FIFOQueues;
 
@@ -127,7 +126,7 @@ std::unique_ptr<LightStorage> LightEngine::Worker(const ChunkPos& pos) {
     return lighting;
 }
 
-void LightEngine::Generate(std::vector<ChunkPos> tasks) {
+void LightEngine::Generate(const std::vector<ChunkPos>& tasks) {
     lighting_thread_pool_->SubmitTask(tasks);
 }
 
@@ -140,7 +139,7 @@ void LightEngine::Stop() {
     lighting_thread_pool_->Stop();
 }
 
-void LightEngine::Start(int lightEngineThreadsCount, WorldAccess* w) {
+void LightEngine::Start(int lightEngineThreadsCount, WorldInterface* w) {
     lighting_thread_pool_ = std::make_unique<ThreadPool<ChunkPos,
         std::unique_ptr<LightStorage>>>(lightEngineThreadsCount,
             "Light Engine",

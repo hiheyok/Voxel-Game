@@ -26,11 +26,11 @@ public:
     void Update(Window* window);
     void Render(Window* window);
     ServerInterface* interface_;
+    std::unique_ptr<ClientLevel> client_level_;
     std::unique_ptr<MainPlayer> main_player_;
     std::unique_ptr<WorldRender> terrain_render_;
     std::unique_ptr<TexturedFrameBuffer> framebuffer_;
     std::unique_ptr<DebugScreen> debug_screen_;
-    std::unique_ptr<ClientLevel> client_level_;
     std::unique_ptr<MultiEntityRender> entity_render_;
 
     double frametime_ = 1;

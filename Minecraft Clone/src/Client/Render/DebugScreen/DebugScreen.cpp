@@ -53,7 +53,7 @@ void DebugScreen::Initialize(GLFWwindow* w) {
         stat.SetText(std::string("N/A"));
         stat.SetPosition(glm::vec2(-1.f, 0.95f - 0.05f * i));
         stat.AddBackground(clr, a);
-        stat.setBackgroundPadding(0.005f, 0.0f);
+        stat.SetBackgroundPadding(0.005f, 0.0f);
         renderer_->InsertFontObject("Stat" + std::to_string(i), stat);
     }
 

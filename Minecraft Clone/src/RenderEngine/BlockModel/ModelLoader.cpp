@@ -252,28 +252,28 @@ static void ProcessModelDisplay(std::unique_ptr<Model::BlockModel>& model, json 
         }
 
         if (!strcmp(position.c_str(), "thirdperson_righthand")) {
-            display.position = DisplayPosition::thirdperson_righthand;
+            display.position_ = DisplayPosition::thirdperson_righthand;
         }
         else if (!strcmp(position.c_str(), "thirdperson_lefthand")) {
-            display.position = DisplayPosition::thirdperson_lefthand;
+            display.position_ = DisplayPosition::thirdperson_lefthand;
         }
         else if (!strcmp(position.c_str(), "firstperson_righthand")) {
-            display.position = DisplayPosition::firstperson_righthand;
+            display.position_ = DisplayPosition::firstperson_righthand;
         }
         else if (!strcmp(position.c_str(), "firstperson_lefthand")) {
-            display.position = DisplayPosition::firstperson_lefthand;
+            display.position_ = DisplayPosition::firstperson_lefthand;
         }
         else if (!strcmp(position.c_str(), "gui")) {
-            display.position = DisplayPosition::gui;
+            display.position_ = DisplayPosition::gui;
         }
         else if (!strcmp(position.c_str(), "head")) {
-            display.position = DisplayPosition::head;
+            display.position_ = DisplayPosition::head;
         }
         else if (!strcmp(position.c_str(), "ground")) {
-            display.position = DisplayPosition::ground;
+            display.position_ = DisplayPosition::ground;
         }
         else if (!strcmp(position.c_str(), "fixed")) {
-            display.position = DisplayPosition::fixed;
+            display.position_ = DisplayPosition::fixed;
         }
         else {
             g_logger.LogError("ProcessModelDisplay", "Unknown display position: " + position);
@@ -282,7 +282,7 @@ static void ProcessModelDisplay(std::unique_ptr<Model::BlockModel>& model, json 
 
         display.initialized_ = true;
 
-        model->AddDisplay(display, display.position);
+        model->AddDisplay(display, display.position_);
     }
 }
 
