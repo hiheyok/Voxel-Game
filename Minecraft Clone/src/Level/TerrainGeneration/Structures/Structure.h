@@ -1,6 +1,6 @@
 #pragma once
 #include <cctype>
-#include "Level/Chunk/Block/Block.h"
+#include "Level/Block/Block.h"
 
 struct SetBlockRelative {
     int8_t x_;
@@ -10,6 +10,7 @@ struct SetBlockRelative {
     BlockID block_;
 
     SetBlockRelative(BlockID block, int8_t x, int8_t y, int8_t z);
+    ~SetBlockRelative();
 
     void SetPos(int8_t x, int8_t y, int8_t z);
 };

@@ -1,20 +1,27 @@
 #include "Core/Registry/ResourceLocation.h"
 #include "FileManager/Files.h"
 #include "Utils/LogUtils.h"
-void ResourceLocation::SetResourceLocation(std::string name) {
-    std::vector<std::string> tokens = Tokenize(name, ':');
-
-    if (tokens.size() != 2) {
-        g_logger.LogError("ResourceLocation::SetResourceLocation", "Invalid resource location");
-    }
-
-    namespace_ = tokens[0];
-    path_ = tokens[1];
+ResourceLocation::ResourceLocation() = default;
+ResourceLocation::ResourceLocation(std::string path, std::string namespaceIn) {
+    if (namespaceIn == "") namespaceIn = std::string(kDefaultNamespace);
+    path_ = std::string(kAssetPath) + '/' + namespaceIn + '/' + path;
 }
 
-std::string ResourceLocation::GetPath() {
+ResourceLocation::~ResourceLocation() = default;
+
+ResourceLocation::ResourceLocation(ResourceLocation&&) = default;
+ResourceLocation::ResourceLocation(const ResourceLocation&) = default;
+
+void ResourceLocation::SetPath(std::string path, std::string namespaceIn) {
+    path_ = std::string(kAssetPath) + '/' + namespaceIn + '/' + path;
+}
+
+std::string ResourceLocation::GetPath() const {
     return path_;
 }
 
-ResourceLocation::ResourceLocation() {}
-ResourceLocation::ResourceLocation(std::string name) : path_(name) {}
+bool ResourceLocation::operator==(const ResourceLocation& other) const {
+    return GetPath() == other.GetPath();
+}
+
+ResourceLocation& ResourceLocation::operator=(const ResourceLocation&) = default;

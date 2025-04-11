@@ -1,5 +1,5 @@
 #include "Core/Typenames.h"
-#include "Level/Chunk/Block/Block.h"
+#include "Level/Block/Block.h"
 #include "Level/Item/Items.h"
 #include "Level/Item/Type/BlockItem.h"
 

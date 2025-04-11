@@ -1,6 +1,6 @@
 #include "Level/Container/ChunkMap.h"
-#include "Level/Chunk/Block/Block.h"
-#include "Level/Chunk/Block/Blocks.h"
+#include "Level/Block/Block.h"
+#include "Level/Block/Blocks.h"
 #include "Level/Entity/Entity.h"
 #include "Level/Entity/Entities.h"
 #include "Level/Entity/Collusion/Hitbox.h"

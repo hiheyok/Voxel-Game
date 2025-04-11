@@ -4,7 +4,7 @@
 #include "Level/World/WorldUpdater.h"
 #include "Level/World/World.h"
 #include "Level/World/WorldParameters.h"
-#include "Level/Chunk/Lighting/LightStorage.h"
+#include "Level/Light/LightStorage.h"
 #include "Level/Entity/Entity.h"
 #include "Level/Container/EntityContainer.h"
 

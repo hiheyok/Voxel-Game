@@ -1,6 +1,7 @@
 #include "Level/Chunk/ChunkData.h"
 #include "Level/Chunk/ChunkRawData.h"
 #include "Level/Chunk/Heightmap/Heightmap.h"
+#include "Level/TerrainGeneration/Structures/Structure.h"
 
 static const int NeighborOffset[6] = {
       -16, 16,-16, 16,-16, 16
@@ -8,11 +9,14 @@ static const int NeighborOffset[6] = {
 
 ChunkContainer::ChunkContainer() : 
     lighting_{ std::make_unique<LightStorage>() },
+    neighbors_{ 6 },
+    outside_block_to_place_{ 6 },
     heightmap_{ std::make_unique<Heightmap>() } {
     lighting_->position_ = position_;
 }
 
 ChunkContainer::~ChunkContainer() = default;
+ChunkContainer::ChunkContainer(ChunkContainer&&) = default;
 
 ChunkContainer::ChunkContainer(const ChunkRawData& data) : ChunkContainer() {
     SetData(data);

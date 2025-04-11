@@ -2,7 +2,7 @@
 #include "Core/Typenames.h"
 #include "Level/Entity/Collusion/Hitbox.h"
 #include "Level/Entity/Entity.h"
-#include "RenderEngine/EntityRenderer/Models/EntityModel.h"
+#include "RenderEngine/EntityRender/Models/EntityModel.h"
 #include "RenderEngine/OpenGL/Texture/Types/Texture2D.h"
 
 class Dimension;

@@ -29,7 +29,7 @@ private:
 
     bool heightmap_update_ = false;
 
-    constexpr const static int kRegionCacheSize = 16;
+    static constexpr int kRegionCacheSize = 16;
 
     std::vector<Chunk*> chunks_;
     FastHashMap<ChunkPos, size_t> chunks_idx_;

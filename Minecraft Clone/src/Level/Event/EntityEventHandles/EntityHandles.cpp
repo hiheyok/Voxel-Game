@@ -4,7 +4,7 @@
 #include "Level/Event/Event.h"
 #include "Level/Entity/Entity.h"
 #include "Level/Entity/Entities.h"
-#include "Level/Chunk/Block/Block.h"
+#include "Level/Block/Block.h"
 #include "Level/Dimension/Dimension.h"
 #include "Level/World/WorldUpdater.h"
 

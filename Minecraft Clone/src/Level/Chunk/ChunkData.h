@@ -4,29 +4,32 @@
 #define CHUNKDATA_H
 
 #include <glm/vec3.hpp>
+#include <vector>
 
 #include "Core/Typenames.h"
-#include "Level/TerrainGeneration/Structures/Structure.h"
-#include "Level/Chunk/Lighting/LightStorage.h"
-#include "Level/Chunk/ChunkPos/ChunkPos.h"
 #include "Level/Chunk/Palette.h"
+#include "Level/Light/LightStorage.h"
 
 class Heightmap;
+class LightStorage;
 
 struct ChunkRawData;
+struct SetBlockRelative;
 
 class ChunkContainer {
 public:
     ChunkPos position_;
-    std::vector<SetBlockRelative> outside_block_to_place_[6]{};
-    ChunkContainer* neighbors_[6]{ nullptr };
+    std::vector<ChunkContainer*> neighbors_;
+    std::vector<std::vector<SetBlockRelative>> outside_block_to_place_;
     std::unique_ptr<LightStorage> lighting_;
     std::unique_ptr<Heightmap> heightmap_;
-    std::atomic<bool> is_empty_ = true;
+    bool is_empty_ = true;
 
     ChunkContainer();
-    ~ChunkContainer();
+    virtual ~ChunkContainer();
     ChunkContainer(const ChunkRawData&);
+    ChunkContainer(ChunkContainer&&);
+    ChunkContainer(const ChunkContainer&) = delete;
     
     void SetNeighbor(ChunkContainer* neighbor, unsigned int side);
     ChunkContainer* GetNeighbor(unsigned int side) const;
@@ -51,7 +54,6 @@ public:
 
     bool CheckLightDirty();
 private:
-    std::atomic<bool> in_use_ = false;
     bool light_dirty_ = false;
     Palette block_storage_;
 };

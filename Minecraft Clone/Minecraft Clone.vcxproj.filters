@@ -24,7 +24,7 @@
     <ClCompile Include="src\Client\Client.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Chunk\Block\Block.cpp">
+    <ClCompile Include="src\Level\Block\Block.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Utils\LogUtils.cpp">
@@ -39,7 +39,7 @@
     <ClCompile Include="src\RenderEngine\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\Camera\camera.cpp">
+    <ClCompile Include="src\RenderEngine\Camera\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\Frustum\frustum.cpp">
@@ -69,16 +69,16 @@
     <ClCompile Include="src\Level\TerrainGeneration\Generator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\ChunkRenderer\Batch\ChunkBatch.cpp">
+    <ClCompile Include="src\RenderEngine\ChunkRender\Batch\ChunkBatch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\ChunkRenderer\TerrainRenderer.cpp">
+    <ClCompile Include="src\RenderEngine\ChunkRender\TerrainRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Utils\Timer\Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Chunk\Block\Blocks.cpp">
+    <ClCompile Include="src\Level\Block\Blocks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Level\Event\BlockEventHandles\BlockHandles.cpp">
@@ -87,10 +87,10 @@
     <ClCompile Include="src\Utils\Math\Probability\Probability.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Chunk\Block\Material\BlockMaterial.cpp">
+    <ClCompile Include="src\Level\Block\Material\BlockMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\EntityRenderer\Models\EntityModels.cpp">
+    <ClCompile Include="src\RenderEngine\EntityRender\Models\EntityModels.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Level\Entity\Entity.cpp">
@@ -102,7 +102,7 @@
     <ClCompile Include="src\Level\Event\EntityEventHandles\EntityHandles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\EntityRenderer\MultiEntityRender.h">
+    <ClCompile Include="src\RenderEngine\EntityRender\MultiEntityRender.h">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Initializer.cpp">
@@ -120,10 +120,10 @@
     <ClCompile Include="src\Client\Player\WorldInteraction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\EntityRenderer\EntityRenderCache.cpp">
+    <ClCompile Include="src\RenderEngine\EntityRender\EntityRenderCache.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\EntityRenderer\MultiEntityRender.cpp">
+    <ClCompile Include="src\RenderEngine\EntityRender\MultiEntityRender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\GUI\GUI.cpp">
@@ -213,7 +213,7 @@
     <ClCompile Include="src\Server\Server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Lighting\LightEngine.cpp">
+    <ClCompile Include="src\Level\Light\LightEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Level\Item\ItemTextureAtlas.cpp">
@@ -243,7 +243,7 @@
     <ClCompile Include="src\RenderEngine\BlockModel\BlockModels.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshingV2.cpp">
+    <ClCompile Include="src\RenderEngine\ChunkRender\Mesh\ChunkMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Level\TerrainGeneration\Generators\Debug\Debug.cpp">
@@ -270,25 +270,25 @@
     <ClCompile Include="src\Level\Entity\Type\Passive.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Chunk\Block\Texture\BlockTexture.cpp">
+    <ClCompile Include="src\Level\Block\Texture\BlockTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Chunk\Block\Type\GravityBlock.cpp">
+    <ClCompile Include="src\Level\Block\Type\GravityBlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Chunk\Block\Type\Grass.cpp">
+    <ClCompile Include="src\Level\Block\Type\Grass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Chunk\Block\Type\Fluid.cpp">
+    <ClCompile Include="src\Level\Block\Type\Fluid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Chunk\Block\Type\Dirt.cpp">
+    <ClCompile Include="src\Level\Block\Type\Dirt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Chunk\Block\Type\DefaultBlock.cpp">
+    <ClCompile Include="src\Level\Block\Type\DefaultBlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Chunk\Lighting\LightStorage.cpp">
+    <ClCompile Include="src\Level\Light\LightStorage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Level\TerrainGeneration\Generators\Generator.cpp">
@@ -333,7 +333,7 @@
     <ClCompile Include="src\RenderEngine\GUI\GUIObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\ChunkRenderer\MemoryPool\ChunkMemoryPool.cpp">
+    <ClCompile Include="src\RenderEngine\ChunkRender\MemoryPool\ChunkMemoryPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\ComputeShader.cpp">
@@ -363,6 +363,9 @@
     <ClCompile Include="src\Level\World\WorldInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Biome\Biome.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Level\Chunk\Chunk.h">
@@ -371,10 +374,10 @@
     <ClInclude Include="src\Client\Client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Chunk\Block\Block.h">
+    <ClInclude Include="src\Level\Block\Block.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Chunk\Block\Blocks.h">
+    <ClInclude Include="src\Level\Block\Blocks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Utils\LogUtils.h">
@@ -398,7 +401,7 @@
     <ClInclude Include="src\Level\Chunk\ChunkData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\Camera\camera.h">
+    <ClInclude Include="src\RenderEngine\Camera\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\BakedChunkMesh.h">
@@ -434,7 +437,7 @@
     <ClInclude Include="src\RenderEngine\OpenGL\OpenGL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Chunk\Block\Texture\BlockTexture.h">
+    <ClInclude Include="src\Level\Block\Texture\BlockTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Client\Player.h">
@@ -464,22 +467,22 @@
     <ClInclude Include="src\Level\TerrainGeneration\Generator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\EntityRenderer\Models\EntityModel.h">
+    <ClInclude Include="src\RenderEngine\EntityRender\Models\EntityModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\ChunkRenderer\Batch\ChunkBatch.h">
+    <ClInclude Include="src\RenderEngine\ChunkRender\Batch\ChunkBatch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\ChunkRenderer\TerrainRenderer.h">
+    <ClInclude Include="src\RenderEngine\ChunkRender\TerrainRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\TerrainGeneration\Structures\Structure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\ChunkRenderer\Occulsion\Graph\Graph.h">
+    <ClInclude Include="src\RenderEngine\ChunkRender\Occulsion\Graph\Graph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Chunk\Block\Type\Grass.h">
+    <ClInclude Include="src\Level\Block\Type\Grass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Utils\Timer\Timer.h">
@@ -497,10 +500,10 @@
     <ClInclude Include="src\Level\Event\EventHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Chunk\Block\Type\Dirt.h">
+    <ClInclude Include="src\Level\Block\Type\Dirt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Chunk\Block\Material\BlockMaterial.h">
+    <ClInclude Include="src\Level\Block\Material\BlockMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Event\BlockEventHandles\BlockHandles.h">
@@ -509,19 +512,19 @@
     <ClInclude Include="src\Utils\Math\Probability\Probability.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Chunk\Block\Type\Fluid.h">
+    <ClInclude Include="src\Level\Block\Type\Fluid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Chunk\Block\Type\BlockTypes.h">
+    <ClInclude Include="src\Level\Block\Type\BlockTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Entity\Properties\EntityProperties.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\ChunkRenderer\Occulsion\Data\OcculsionData.h">
+    <ClInclude Include="src\RenderEngine\ChunkRender\Occulsion\Data\OcculsionData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\ChunkRenderer\Occulsion\Data\OcculsionDataManager.h">
+    <ClInclude Include="src\RenderEngine\ChunkRender\Occulsion\Data\OcculsionDataManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Container\EntityContainer.h">
@@ -530,7 +533,7 @@
     <ClInclude Include="src\Level\Entity\Type\Passive.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\EntityRenderer\EntityRenderCache.h">
+    <ClInclude Include="src\RenderEngine\EntityRender\EntityRenderCache.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Entity\Type\FallingBlock.h">
@@ -539,7 +542,7 @@
     <ClInclude Include="src\Level\Entity\Type\Hostile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Chunk\Block\Type\GravityBlock.h">
+    <ClInclude Include="src\Level\Block\Type\GravityBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Event\EntityEventHandles\EntityHandles.h">
@@ -614,7 +617,7 @@
     <ClInclude Include="src\Utils\Containers\BitStorage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\ChunkRenderer\MemoryPool\ChunkMemoryPool.h">
+    <ClInclude Include="src\RenderEngine\ChunkRender\MemoryPool\ChunkMemoryPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\TerrainGeneration\Generators\Generator.h">
@@ -656,7 +659,7 @@
     <ClInclude Include="src\Core\Options\Option.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\ChunkRenderer\Batch\RenderCommandBuffer.h">
+    <ClInclude Include="src\RenderEngine\ChunkRender\Batch\RenderCommandBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\BlockModel\RectangularModel.h">
@@ -692,7 +695,7 @@
     <ClInclude Include="src\Level\TerrainGeneration\Generators\Minecraft\Overworld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Chunk\Lighting\LightStorage.h">
+    <ClInclude Include="src\Level\Light\LightStorage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Event\ChunkEventHandles\ChunkHandles.h">
@@ -731,7 +734,7 @@
     <ClInclude Include="src\Server\Server.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Lighting\LightEngine.h">
+    <ClInclude Include="src\Level\Light\LightEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\TerrainGeneration\Biome\Biome.h">
@@ -887,7 +890,7 @@
     <ClInclude Include="src\RenderEngine\BlockModel\ModelLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\ChunkMeshingV2.h">
+    <ClInclude Include="src\RenderEngine\ChunkRender\Mesh\ChunkMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\TerrainGeneration\Generators\Debug\Debug.h">
@@ -923,7 +926,7 @@
     <ClInclude Include="src\Utils\Containers\N2BitVector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Chunk\Block\Type\DefaultBlock.h">
+    <ClInclude Include="src\Level\Block\Type\DefaultBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Client\ClientLevel\ClientCache.h">

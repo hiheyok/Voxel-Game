@@ -1,8 +1,11 @@
 #pragma once
 #include <vector>
+#include <typeinfo>
+#include <functional>
 #include "Utils/Containers/robin_hood.h"
 #include "Utils/LogUtils.h"
 #include "Level/Chunk/ChunkPos/ChunkPos.h"
+#include "Core/Registry/ResourceLocation.h"
 
 typedef unsigned int EventID;
 typedef unsigned short int BlockID;
@@ -11,7 +14,6 @@ typedef unsigned long long int RegionID;
 typedef unsigned short EntityTypeID;
 typedef unsigned int ItemID;
 typedef uint64_t WorldGeneratorID;
-
  
 template <class K, class V, class _Hash = robin_hood::hash<K>>
 using FastHashMap = robin_hood::unordered_flat_map<K, V, _Hash>;
@@ -40,3 +42,10 @@ inline constexpr int kChunkSize3D = kChunkSize2D * kChunkDim;
 inline constexpr int kRegionDim = 32;
 inline constexpr int kRegionSize2D = kRegionDim * kRegionDim;
 inline constexpr int kRegionSize3D = kRegionSize2D * kRegionDim;
+
+inline constexpr long long kWorldSeed = 0;//;-501575345763903LL;//-501575345763903LL;//-1587754402LL
+
+template <typename Target, typename Base>
+bool instanceof(Base* obj) {
+    return dynamic_cast<Target*>(obj) != nullptr;
+}

@@ -1,5 +1,5 @@
 #include "Level/Dimension/Dimension.h"
-#include "Level/Lighting/LightEngine.h"
+#include "Level/Light/LightEngine.h"
 #include "Level/TerrainGeneration/Generator.h"
 #include "Level/World/WorldUpdater.h"
 
@@ -21,7 +21,6 @@ Dimension::Dimension(DimensionProperties properties, WorldGeneratorID generatorT
         world_updater_->tall_generation_ = true;
     }
 
-    constexpr const long long kWorldSeed = 0;//;-501575345763903LL;//-501575345763903LL;//-1587754402LL
 
     light_engine_->Start(g_app_options.light_engine_threads_, world_);
     chunk_generator_->Start(g_app_options.world_gen_threads_, kWorldSeed, generatorType);

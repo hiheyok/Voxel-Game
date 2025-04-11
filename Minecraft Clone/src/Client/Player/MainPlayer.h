@@ -50,5 +50,5 @@ private:
     size_t item_gui_index_ = 0;
     size_t slot_index_ = 0;
 
-    constexpr const static float kHotbarSize = 0.135f;
+    static constexpr float kHotbarSize = 0.135f;
 };

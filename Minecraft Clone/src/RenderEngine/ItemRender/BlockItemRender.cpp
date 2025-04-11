@@ -5,8 +5,8 @@
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
 #include "RenderEngine/BlockModel/BlockModels.h"
-#include "Level/Chunk/Block/Block.h"
-#include "Level/Chunk/Block/Blocks.h"
+#include "Level/Block/Block.h"
+#include "Level/Block/Blocks.h"
 #include "Level/Item/Item.h"
 
 BlockItemRender::BlockItemRender() : 
@@ -87,7 +87,7 @@ void BlockItemRender::SetCamera() {
     camera_->pitch_ = -35;
     camera_->yaw_ = -135;
 
-    camera_->updateCameraVectors();
+    camera_->UpdateCameraVectors();
 }
 
 void BlockItemRender::setDrawCalls() {

@@ -15,7 +15,7 @@ void PlayerPOV::SetRotation(glm::vec2 rot) {
     camera_->yaw_ = rot.x;
     camera_->pitch_ = rot.y;
 
-    camera_->updateCameraVectors();
+    camera_->UpdateCameraVectors();
 }
 
 glm::vec3 PlayerPOV::GetPosition() const {

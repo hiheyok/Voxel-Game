@@ -3,7 +3,7 @@
 
 #include "Core/Typenames.h"
 #include "Utils/Containers/NBitVector.h"
-#include "Level/Chunk/Block/Blocks.h"
+#include "Level/Block/Blocks.h"
 /*
 * The palette class is used to store the block data in a compressed state in a chunk
 * Each chunk has up to 4096 unique blocks so it attempts to store it in up to 12 bits per blocks
@@ -30,8 +30,8 @@ private:
     using PaletteIndex = uint16_t;
     using StorageBit = uint64_t;
 
-    static const constexpr int kMinBitWidth = 1; // Minimum bits
-    static const constexpr int kMaxBitWidth = 12;
+    static constexpr int kMinBitWidth = 1; // Minimum bits
+    static constexpr int kMaxBitWidth = 12;
 
     int current_bit_width_;
     int unique_blocks_count_ = 1; // Initialize with only air blocks
@@ -43,12 +43,12 @@ private:
     // BlockID -> Block, int_16 -> num of that block
     std::vector<std::pair<BlockID, int16_t>> palette_entries_;
 
-    constexpr static int GetBitWidth(unsigned int n) {
+    static constexpr int GetBitWidth(unsigned int n) {
         int bitWidth = std::bit_width(n);
         return std::max(bitWidth, kMinBitWidth);
     }
 
-    constexpr static size_t GetIndex(int x, int y, int z) {
+    static constexpr size_t GetIndex(int x, int y, int z) {
         return x * kChunkDim * kChunkDim + y * kChunkDim + z;
     }
 

@@ -94,7 +94,7 @@ bool TextureAtlas::AddTextureToAtlasHelper(RawTextureData* data, bool& transpare
 
     format_ = GL_RGBA;
     if (!data->data_) {
-        g_logger.LogError("TextureAtlas::_AddTextureToAtlas", "No texture");
+        g_logger.LogWarn("TextureAtlas::_AddTextureToAtlas", "No texture");
         return false;
     }
 
@@ -146,7 +146,7 @@ std::optional<RawTextureData> TextureAtlas::AddTextureToAtlas(std::string file, 
         data = tex;
         return data;
     }
-    g_logger.LogError("TextureAtlas::AddTextureToAtlas", "Unable to load: " + file);
+    g_logger.LogWarn("TextureAtlas::AddTextureToAtlas", "Unable to load: " + file);
     return data;
 }
 

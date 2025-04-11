@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Level/Chunk/Block/Blocks.h"
+#include "Level/Block/Blocks.h"
 #include "Level/Item/Item.h"
 
 class BlockItem : public Item {

@@ -9,8 +9,8 @@ private:
     int bit_width_ = 0;
     int num_elements_ = 0;
 
-    static constexpr const size_t kStorageBits = sizeof(StorageBit) * 8;
-    static constexpr const StorageBit kAllOnes = ~(static_cast<StorageBit>(0));
+    static constexpr size_t kStorageBits = sizeof(StorageBit) * 8;
+    static constexpr StorageBit kAllOnes = ~(static_cast<StorageBit>(0));
     StorageBit all_ones_bit_width_;
 
     std::pair<StorageBit, StorageBit> GetMask(size_t idx) const;
@@ -91,7 +91,7 @@ StorageBit NBitVector<StorageBit>::GetUnsafe(size_t idx) const {
 
     const auto [mask, overflowMask] = GetMask(integerIndex);
 
-    StorageBit data = (data_[vectorIndex] & mask) >> integerIndex;;
+    StorageBit data = (data_[vectorIndex] & mask) >> integerIndex;
 
     // If it overlap with the next bit extract the next bit too
     if (overflowMask != 0) {

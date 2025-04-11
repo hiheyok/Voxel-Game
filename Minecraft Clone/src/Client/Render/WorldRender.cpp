@@ -4,8 +4,8 @@
 #include "Utils/Clock.h"
 #include "Core/Options/Option.h"
 #include "Utils/Timer/Timer.h"
-#include "RenderEngine/ChunkRenderer/Mesh/ChunkMeshingV2.h"
-#include "RenderEngine/ChunkRenderer/TerrainRenderer.h"
+#include "RenderEngine/ChunkRender/Mesh/ChunkMesh.h"
+#include "RenderEngine/ChunkRender/TerrainRenderer.h"
 
 static thread_local Mesh::ChunkMeshData chunkMesher;
 

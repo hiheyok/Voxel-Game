@@ -5,7 +5,7 @@
 
 #include "Utils/LogUtils.h"
 #include "Client/Client.h"
-#include "Level/Chunk/Block/Blocks.h"
+#include "Level/Block/Blocks.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "Utils/stb_image.h"
 #include "Core/Initializer.h"

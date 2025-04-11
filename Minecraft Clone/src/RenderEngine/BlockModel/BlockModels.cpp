@@ -2,19 +2,63 @@
 #include "Core/Typenames.h"
 #include "Utils/LogUtils.h"
 
-void Model::BlockModel::AddDisplay(BlockDisplay display, DisplayPosition position) {
+// BlockFace struct
+
+BlockFace::BlockFace() = default;
+BlockFace::~BlockFace() = default;
+BlockFace::BlockFace(const BlockFace&) = default;
+BlockFace::BlockFace(BlockFace&&) = default;
+BlockFace& BlockFace::operator=(const BlockFace&) = default;
+
+// BlockDisplay struct
+
+BlockDisplay::BlockDisplay() = default;
+BlockDisplay::~BlockDisplay() = default;
+BlockDisplay::BlockDisplay(const BlockDisplay&) = default;
+BlockDisplay::BlockDisplay(BlockDisplay&&) = default;
+BlockDisplay& BlockDisplay::operator=(const BlockDisplay&) = default;
+
+// CuboidRotationInfo struct
+
+CuboidRotationInfo::CuboidRotationInfo() = default;
+CuboidRotationInfo::~CuboidRotationInfo() = default;
+CuboidRotationInfo::CuboidRotationInfo(const CuboidRotationInfo&) = default;
+CuboidRotationInfo::CuboidRotationInfo(CuboidRotationInfo&&) = default;
+CuboidRotationInfo& CuboidRotationInfo::operator=(const CuboidRotationInfo&) = default;
+
+// Cuboid struct
+
+Cuboid::Cuboid() = default;
+Cuboid::~Cuboid() = default;
+Cuboid::Cuboid(const Cuboid&) = default;
+Cuboid::Cuboid(Cuboid&&) = default;
+Cuboid& Cuboid::operator=(const Cuboid&) = default;
+
+void Cuboid::EditFace(int location, BlockFace f) {
+    faces_[location - 1] = f;
+}
+
+// BlockModel struct
+
+BlockModel::BlockModel() = default;
+BlockModel::~BlockModel() = default;
+BlockModel::BlockModel(const BlockModel&) = default;
+BlockModel::BlockModel(BlockModel&&) = default;
+BlockModel& BlockModel::operator=(const BlockModel&) = default;
+
+void BlockModel::AddDisplay(BlockDisplay display, DisplayPosition position) {
     display_[position] = display;
 }
 
-bool Model::BlockModel::CheckDisplay(DisplayPosition position) {
+bool BlockModel::CheckDisplay(DisplayPosition position) {
     return display_[position].initialized_;
 }
 
-void Model::BlockModel::AddElement(Cuboid element) {
+void BlockModel::AddElement(Cuboid element) {
     elements_.push_back(element);
 }
 
-void Model::BlockModel::GetVertices(std::vector<float>& vertices, std::vector<unsigned int>& indices) {
+void BlockModel::GetVertices(std::vector<float>& vertices, std::vector<unsigned int>& indices) {
     for (Cuboid& element : elements_) {
         glm::vec3 from = element.from_;
         glm::vec3 to = element.to_;
@@ -107,7 +151,7 @@ void Model::BlockModel::GetVertices(std::vector<float>& vertices, std::vector<un
     }
 }
 
-void Model::BlockModel::BakeTextureRotation() {
+void BlockModel::BakeTextureRotation() {
     for (Cuboid& element : elements_) {
         for (BlockFace& face : element.faces_) {
             if (face.reference_texture_.length() == 0) continue; //means not initialized
@@ -128,7 +172,7 @@ void Model::BlockModel::BakeTextureRotation() {
     }
 }
 
-void Model::BlockModel::FlattenVariables() {
+void BlockModel::FlattenVariables() {
     FastHashMap<std::string, std::string> variableMatcher{};
     FastHashSet<std::string> variableNames{};
     
@@ -185,3 +229,4 @@ void Model::BlockModel::FlattenVariables() {
         }
     }
 }
+

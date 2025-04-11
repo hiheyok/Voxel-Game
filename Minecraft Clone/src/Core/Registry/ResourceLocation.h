@@ -1,15 +1,34 @@
 #pragma once
 #include <string>
+#include <string_view>
+#include <functional>
 
-struct ResourceLocation {
-    const std::string namespace_divider_ = ":";
-    std::string default_namespace_ = "minecraft";
-    std::string path_ = "";
-    std::string namespace_ = "";
-
-    std::string GetPath();
-    void SetResourceLocation(std::string name);
-
+// Class used to store resource locations
+class ResourceLocation {
+public:
     ResourceLocation();
-    ResourceLocation(std::string name);
+    ResourceLocation(std::string path, std::string namespaceIn = std::string(kDefaultNamespace));
+    ~ResourceLocation();
+    ResourceLocation(ResourceLocation&&);
+    ResourceLocation(const ResourceLocation&);
+
+    void SetPath(std::string path, std::string namespaceIn = std::string(kDefaultNamespace));
+    std::string GetPath() const;
+    bool operator==(const ResourceLocation&) const;
+    ResourceLocation& operator=(const ResourceLocation&);
+private:
+    static constexpr std::string_view kNamespaceDivider = ":";
+    static constexpr std::string_view kDefaultNamespace = "minecraft";
+    static constexpr std::string_view kAssetPath = "./assets";
+
+    std::string path_ = "";
 };
+
+namespace std {
+    template <>
+    struct hash<ResourceLocation> {
+        size_t operator()(const ResourceLocation& obj) const {
+            return hash<string>{}(obj.GetPath());
+        }
+    };
+}

@@ -1,6 +1,6 @@
 //#pragma once
 //#include "MapGenBase.h"
-//#include "Level/Chunk/Block/Blocks.h"
+//#include "Level/Block/Blocks.h"
 //
 //class MapGenCaves : public MapGenBase
 //{

@@ -19,10 +19,10 @@ public:
 
     ClientInterface() = default;
 
-    bool PollClientPlayerAction(std::vector<Packet::PlayerAction>& playerAction) {
+    int PollClientPlayerAction(std::vector<Packet::PlayerAction>& playerAction) {
         size_t prevSize = playerAction.size();
         player_action_queue_.PopAll(playerAction);
-        return prevSize != playerAction.size();
+        return playerAction.size() - prevSize;
     }
 
     EntityUUID GetPlayerUUID() const { 

@@ -20,7 +20,7 @@ private:
 public:
     BiomeProperties biomeProperties;
 
-    static Registry<std::string, Biome*> REGISTRY;
+    static Registry<ResourceLocation, Biome*> REGISTRY;
     static FastHashMap<Biome*, int> BiomeIDs;
     static FastHashMap<int, Biome*> MUTATION_TO_BASE_ID_MAP;
     static NoiseGeneratorPerlin TEMPERATURE_NOISE;
@@ -37,7 +37,7 @@ public:
     };
 
     static void Register(int ID, std::string BiomeName, Biome* biome) {
-        REGISTRY.Register(ID, ResourceLocation(BiomeName).path_, biome);
+        REGISTRY.Register(ID, ResourceLocation(BiomeName), biome);
         BiomeIDs[biome] = ID;
         g_logger.LogDebug("Biome::Register", "Registered biome: " + BiomeName);
         if (biome->isMutation()) {
@@ -249,9 +249,3 @@ public:
 
 };
 
-inline Registry<std::string, Biome*> Biome::REGISTRY = Registry<std::string, Biome*>();
-inline FastHashMap<Biome*, int> Biome::BiomeIDs = FastHashMap<Biome*, int>();
-inline FastHashMap<int, Biome*> Biome::MUTATION_TO_BASE_ID_MAP = FastHashMap<int, Biome*>();
-
-inline NoiseGeneratorPerlin Biome::TEMPERATURE_NOISE = NoiseGeneratorPerlin(JavaRandom(1234L), 1);
-inline NoiseGeneratorPerlin Biome::GRASS_COLOR_NOISE = NoiseGeneratorPerlin(JavaRandom(2345L), 1);

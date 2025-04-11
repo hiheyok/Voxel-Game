@@ -9,8 +9,8 @@ private:
     int bit_width_ = 0;
     int num_elements_ = 0;
 
-    static constexpr const size_t storage_bits_ = sizeof(StorageBit) * 8;
-    static constexpr const StorageBit all_ones_ = ~(static_cast<StorageBit>(0));
+    static constexpr size_t storage_bits_ = sizeof(StorageBit) * 8;
+    static constexpr StorageBit all_ones_ = ~(static_cast<StorageBit>(0));
     StorageBit all_ones_bit_width_;
 
     StorageBit GetMask(int idx) const;

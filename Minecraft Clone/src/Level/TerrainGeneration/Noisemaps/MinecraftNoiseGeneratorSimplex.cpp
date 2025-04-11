@@ -1,6 +1,6 @@
 #include "MinecraftNoiseGeneratorSimplex.h"
 
-static constexpr const int grad3[12][3]{ {1, 1, 0}, { -1, 1, 0}, {1, -1, 0}, { -1, -1, 0}, {1, 0, 1}, { -1, 0, 1}, {1, 0, -1}, { -1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1} };
+static constexpr int grad3[12][3]{ {1, 1, 0}, { -1, 1, 0}, {1, -1, 0}, { -1, -1, 0}, {1, 0, 1}, { -1, 0, 1}, {1, 0, -1}, { -1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1} };
 
 int NoiseGeneratorSimplex::fastFloor(double value) {
     return value > 0.0 ? (int)value : (int)value - 1;

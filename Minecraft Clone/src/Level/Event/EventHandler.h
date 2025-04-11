@@ -2,7 +2,7 @@
 #include <stdarg.h>
 #include <variant>
 
-#include "Level/Chunk/Block/Block.h"
+#include "Level/Block/Block.h"
 #include "Level/Event/Event.h"
 #include "Level/Event/BlockEventHandles/BlockHandles.h"
 #include "Level/Event/EntityEventHandles/EntityHandles.h"

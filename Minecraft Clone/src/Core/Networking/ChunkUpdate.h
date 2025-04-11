@@ -1,6 +1,6 @@
 #pragma once
 #include "Level/Chunk/ChunkRawData.h"
-#include "Level/Chunk/Lighting/LightStorage.h"
+#include "Level/Light/LightStorage.h"
 #include "Core/Typenames.h"
 
 namespace ChunkUpdatePacket {

@@ -175,7 +175,7 @@ public:
 };
 
 namespace std {
-    template<>
+    template< >
     struct hash<ChunkPos> {
         size_t operator()(const ChunkPos& obj) const {
             return obj.hash();
