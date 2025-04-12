@@ -25,11 +25,11 @@ void GUISet::AddGUIElementNorm(std::string Name, std::string Text, glm::vec2 Siz
 }
 
 void GUISet::AddGUIElement(std::string name, std::string text, glm::vec2 size, glm::vec2 position, glm::vec2 UV_P0, glm::vec2 UV_P1) {
-    UV_P0.x = UV_P0.x / (float)gui_texture_->width_;
-    UV_P1.x = UV_P1.x / (float)gui_texture_->width_;
+    UV_P0.x = UV_P0.x / (float)gui_texture_->GetWidth();
+    UV_P1.x = UV_P1.x / (float)gui_texture_->GetWidth();
 
-    UV_P0.y = UV_P0.y / (float)gui_texture_->height_;
-    UV_P1.y = UV_P1.y / (float)gui_texture_->height_;
+    UV_P0.y = UV_P0.y / (float)gui_texture_->GetHeight();
+    UV_P1.y = UV_P1.y / (float)gui_texture_->GetHeight();
 
     if (gui_element_index_.find(name) == gui_element_index_.end()) {
         elements_.emplace_back(text, size, position);
@@ -77,13 +77,11 @@ void GUISet::EditElementUVNorm(std::string Name, glm::vec2 UV0, glm::vec2 UV1) {
 }
 
 void GUISet::SetGUITexture(std::string file) {
-    gui_texture_ = std::make_unique<Texture2D>(RawTextureData(file.c_str()));
+    gui_texture_ = std::make_unique<Texture2D>(RawTextureData(file));
 }
 
-void GUISet::SetGUITexture(GLuint texture_id_, size_t x, size_t y) {
-    gui_texture_->texture_id_ = texture_id_;
-    gui_texture_->width_ = x;
-    gui_texture_->height_ = y;
+void GUISet::SetGUITexture(GLuint textureId, size_t x, size_t y) {
+    gui_texture_->Set(textureId, y, x);
 }
 
 void GUISet::PrepareRenderer() {
@@ -104,7 +102,7 @@ size_t GUISet::GetNumRenderableObjects() const {
     return num_of_renderable_objects_;
 }
 GLuint GUISet::GetGUITextureID() const {
-    return gui_texture_->get();
+    return gui_texture_->Get();
 }
 
 size_t GUISet::AddRenderingObj() {

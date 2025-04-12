@@ -1,5 +1,4 @@
 #include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
-#include "RenderEngine/OpenGL/Texture/ImageLoader.h"
 #include "Utils/LogUtils.h"
 
 void TextureAtlas::UploadToGPU() {
@@ -14,7 +13,7 @@ void TextureAtlas::UploadToGPU() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 4);
 
-    g_logger.LogDebug("TextureAtlas::UploadToGPU", "Loaded 2D Texture: " + std::to_string(texture_id_));
+    g_logger.LogDebug("TextureAtlas::UploadToGPU", "Loaded Texture Atlas: " + std::to_string(texture_id_));
 }
 
 void TextureAtlas::SetSize(int width, int height) {
@@ -24,14 +23,14 @@ void TextureAtlas::SetSize(int width, int height) {
     texture_atlas_data_.resize(width_ * height_ * color_space_, 0);
 }
 
-void TextureAtlas::SetPixel(uint8_t r, uint8_t  g, uint8_t b, uint8_t a, size_t w, size_t h) {
+void TextureAtlas::SetPixel(int r, int  g, int b, int a, size_t w, size_t h) {
     texture_atlas_data_[w * color_space_ + h * color_space_ + 0] = r;
     texture_atlas_data_[w * color_space_ + h * color_space_ + 1] = g;
     texture_atlas_data_[w * color_space_ + h * color_space_ + 2] = b;
     texture_atlas_data_[w * color_space_ + h * color_space_ + 3] = a;
 }
 
-void TextureAtlas::AddData(std::vector<uint8_t> data, int format, bool& transparency, bool& isSeeThrough) { //assumes that all textures  are 16 x 16
+void TextureAtlas::AddData(std::vector<uint8_t> data, int format) { //assumes that all textures  are 16 x 16
     //Get offset to where to put the texture
     size_t widthTex = width_ / 16;
     //int heightTex = height / 16;
@@ -51,29 +50,12 @@ void TextureAtlas::AddData(std::vector<uint8_t> data, int format, bool& transpar
         break;
     case GL_RG:
         for (int index = 0; index < 16 * 16; index++) {
-            if ((data[(index * 2) + 1] != 255) && (data[(index * 2) + 1] != 0)) {
-                transparency = true;
-                isSeeThrough = true;
-            }
-
-            if (data[(index * 2) + 1] != 255) {
-                isSeeThrough = true;
-            }
-
             SetPixel(data[(index * 2)], data[(index * 2)], data[(index * 2)], data[(index * 2) + 1], widthIndexPixel + (index % 16), heightIndexPixel + width_ * (index / 16));
         }
         count_++;
         break;
     case GL_RGBA:
         for (int index = 0; index < 16 * 16; index++) {
-            if ((data[(index * 4) + 3] != 255) && (data[(index * 4) + 3] != 0)) {
-                transparency = true;
-                isSeeThrough = true;
-            }
-
-            if (data[(index * 4) + 3] != 255) {
-                isSeeThrough = true;
-            }
             SetPixel(data[(index * 4)], data[(index * 4) + 1], data[(index * 4) + 2], data[(index * 4) + 3], widthIndexPixel + (index % 16), heightIndexPixel + width_ * (index / 16));
         }
         count_++;
@@ -90,16 +72,15 @@ void TextureAtlas::AddData(std::vector<uint8_t> data, int format, bool& transpar
     }
 }
 
-bool TextureAtlas::AddTextureToAtlasHelper(RawTextureData* data, bool& transparency, bool& isSeeThrough) {
-
+bool TextureAtlas::AddTextureToAtlasHelper(RawTextureData* data) {
     format_ = GL_RGBA;
     if (!data->data_) {
-        g_logger.LogWarn("TextureAtlas::_AddTextureToAtlas", "No texture");
+        g_logger.LogWarn("TextureAtlas::AddTextureToAtlasHelper", "No texture");
         return false;
     }
 
     if (((data->width_ % 16) != 0) || ((data->height_ % 16) != 0)) {
-        g_logger.LogError("TextureAtlas::_AddTextureToAtlas", "Width or height doesn't match");
+        g_logger.LogError("TextureAtlas::AddTextureToAtlasHelper", "Width or height doesn't match");
         return false;
     }
 
@@ -110,11 +91,9 @@ bool TextureAtlas::AddTextureToAtlasHelper(RawTextureData* data, bool& transpare
 
     if (data->format_ == GL_RGBA) {
         colorSize = 4;
-    }
-    if (data->format_ == GL_RG) {
+    } else if (data->format_ == GL_RG) {
         colorSize = 2;
-    }
-    else if (data->format_ == GL_RED) {
+    } else if (data->format_ == GL_RED) {
         colorSize = 1;
     }
 
@@ -131,19 +110,19 @@ bool TextureAtlas::AddTextureToAtlasHelper(RawTextureData* data, bool& transpare
                 memcpy(buffer.data() + (h * cWidth), data->data_ + (h * data->width_ * colorSize + gx + gy), cWidth);
             }
 
-            AddData(buffer, data->format_, transparency, isSeeThrough);
+            AddData(buffer, data->format_);
         }
     }
 
     return true;
 }
 
-std::optional<RawTextureData> TextureAtlas::AddTextureToAtlas(std::string file, bool& transparency, bool& isSeeThrough) {
+std::optional<RawTextureData> TextureAtlas::AddTextureToAtlas(std::string file) {
     std::optional<RawTextureData> data;
-    RawTextureData tex = GetImageData(file.c_str());
-    if (AddTextureToAtlasHelper(&tex, transparency, isSeeThrough)) {
+    RawTextureData tex{ file };
+    if (AddTextureToAtlasHelper(&tex)) {
         g_logger.LogInfo("TextureAtlas::AddTextureToAtlas", "Loaded: " + file + " | Size: " + std::to_string(tex.height_) + ", " + std::to_string(tex.width_));
-        data = tex;
+        data = std::move(tex);
         return data;
     }
     g_logger.LogWarn("TextureAtlas::AddTextureToAtlas", "Unable to load: " + file);

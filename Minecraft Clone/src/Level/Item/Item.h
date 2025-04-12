@@ -21,8 +21,6 @@ public:
 
     BlockID GetBlock() const;
 
-    RawTextureData GetTexture() const;
-
     bool CheckIsBlockItem() const;
 
     ItemProperties properties_;

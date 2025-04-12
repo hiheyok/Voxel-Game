@@ -15,7 +15,20 @@ struct ItemUVMapping {
 };
 
 class ItemTextureAtlas {
-    Texture2D individual_item_;
+public:
+    FastHashMap<int, ItemUVMapping> items_uv_map_;
+    FastHashMap<ItemID, size_t> offsets_;
+
+    ItemTextureAtlas();
+    void Initialize(int atlasItemSize, int individualItemSize);
+    GLuint Get() const;
+    size_t GetHeight() const;
+    size_t GetWidth() const;
+
+    void AddItem(Item item);
+private:
+    void RenderBlockItem(Item item);
+    void StitchTexture(size_t index, ItemID ItemID);
 
     VertexArray vao_;
     Buffer ebo_;
@@ -27,22 +40,6 @@ class ItemTextureAtlas {
     int atlas_size_ = 0;
     TexturedFrameBuffer atlas_framebuffer_;
     TexturedFrameBuffer framebuffer_single_block_render_;
-
-    void RenderBlockItem(Item item);
-
-    void StitchTexture(size_t index, ItemID ItemID);
-
-    
-public:
-    FastHashMap<int, ItemUVMapping> items_uv_map_;
-    
-    Texture2D atlas_;
-
-    FastHashMap<ItemID, size_t> offsets_;
-    ItemTextureAtlas();
-    void Initialize(int atlasItemSize, int individualItemSize);
-
-    void AddItem(Item item);
 };
 
 extern ItemTextureAtlas g_item_atlas;

@@ -40,9 +40,9 @@ MainPlayer::MainPlayer(Window* window, ServerInterface* interface, ClientCache* 
         glm::vec2(22.5f, 44.5f));
 
     GUISet itemBar;
-    itemBar.SetGUITexture(g_item_atlas.atlas_.texture_id_,
-        g_item_atlas.atlas_.width_,
-        g_item_atlas.atlas_.height_);
+    itemBar.SetGUITexture(g_item_atlas.Get(),
+        g_item_atlas.GetWidth(),
+        g_item_atlas.GetHeight());
 
     for (int i = 0; i < 9; i++) {
         itemBar.AddGUIElementNorm(std::to_string(i), "",

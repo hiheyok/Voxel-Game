@@ -272,7 +272,6 @@
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\ComputeShader.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\Shader.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\ShaderInterface.cpp" />
-    <ClCompile Include="src\RenderEngine\OpenGL\Texture\ImageLoader.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Texture\Texture.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\Texture2D.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\TextureArray.cpp" />
@@ -340,6 +339,8 @@
     <ClInclude Include="src\Core\Networking\Packet.h" />
     <ClInclude Include="src\Core\Networking\PlayerAction.h" />
     <ClInclude Include="src\Level\World\WorldInterface.h" />
+    <ClInclude Include="src\RenderEngine\ChunkRender\BlockTextureAtlas.h" />
+    <ClInclude Include="src\RenderEngine\GUI\Item\ItemRender.h" />
     <ClInclude Include="src\Server\Server.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\Biome.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeProperties.h" />
@@ -439,7 +440,6 @@
     <ClInclude Include="src\RenderEngine\OpenGL\Framebuffer\Framebuffer.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\OpenGL.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Shader\Shader.h" />
-    <ClInclude Include="src\RenderEngine\OpenGL\Texture\ImageLoader.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Texture\Texture.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\Texture2D.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureArray.h" />

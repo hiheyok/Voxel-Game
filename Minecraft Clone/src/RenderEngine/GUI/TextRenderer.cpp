@@ -58,10 +58,9 @@ void TextRenderer::InitializeTextRenderer(GLFWwindow* w) {
     background_vbo_->Unbind();
 
     //Load textures
-    RawTextureData RawTexture;
-    RawTexture.Load("assets/minecraft/textures/font/ascii.png");
+    RawTextureData RawTexture{ "assets/minecraft/textures/font/ascii.png" };
     font_texture_->Load(RawTexture);
-    font_shader_->BindTexture2D(0, font_texture_->get(), "FontTexture");
+    font_shader_->BindTexture2D(0, font_texture_->Get(), "FontTexture");
     window_ = w;
     g_logger.LogDebug("TextRenderer::InitializeTextRenderer", "Initialized font renderer");
 }
@@ -116,7 +115,7 @@ void TextRenderer::ConstructBuffer() {
 
 void TextRenderer::Prepare() {
     font_shader_->Use();
-    font_shader_->BindTexture2D(0, font_texture_->get(), "FontTexture");
+    font_shader_->BindTexture2D(0, font_texture_->Get(), "FontTexture");
 
     int Height, Width;
     glfwGetWindowSize(window_, &Width, &Height);

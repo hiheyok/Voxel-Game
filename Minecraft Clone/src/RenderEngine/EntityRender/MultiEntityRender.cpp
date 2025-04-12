@@ -161,7 +161,7 @@ void MultiEntityRender::Render() {
         ssbo_vel_->InsertSubData(0, (i * 3) * sizeof(float), velocity_arr_.data());
         ssbo_acc_->InsertSubData(0, (i * 3) * sizeof(float), acceleration_arr_.data());
 
-        shader_->BindTexture2D(0, g_entity_list.entity_type_list_[entityarr.first]->texture_.get(), "EntityTexture");
+        shader_->BindTexture2D(0, g_entity_list.entity_type_list_[entityarr.first]->texture_.Get(), "EntityTexture");
         shader_->Use();
 
         vao_->Bind();

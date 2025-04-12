@@ -51,7 +51,7 @@ void BlockItemRender::Initialize() {
     shader_->SetMat4("projection", orthoProj);
 
 
-    shader_->BindTexture2D(0, g_blocks.block_texture_atlas_->get(), "BlockTexture");
+    shader_->BindTexture2D(0, g_blocks.block_texture_atlas_->Get(), "BlockTexture");
 }
 
 void BlockItemRender::RenderBlock(Item item) {
@@ -70,7 +70,7 @@ void BlockItemRender::RenderBlock(Item item) {
     camera_->screen_res_ = glm::vec2(16.f, 16.f);
 
     shader_->Use();
-    shader_->BindTexture2D(0, g_blocks.block_texture_atlas_->get(), "BlockTexture");
+    shader_->BindTexture2D(0, g_blocks.block_texture_atlas_->Get(), "BlockTexture");
     setDrawCalls();
     vao_->Bind();
     ebo_->Bind();

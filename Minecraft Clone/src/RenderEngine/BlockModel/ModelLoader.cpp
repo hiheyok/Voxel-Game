@@ -16,6 +16,7 @@ std::unique_ptr<BlockModel> ModelLoader::GetModel(const ResourceLocation& locati
     }
 
     std::unique_ptr<BlockModel> model = GetModelRecursive(location);
+    if (model == nullptr) return nullptr;
     std::reverse(model->elements_.begin(), model->elements_.end());
     CacheModel(location, model);
     return model;
@@ -35,7 +36,7 @@ std::unique_ptr<BlockModel> ModelLoader::GetModelRecursive(const ResourceLocatio
         JSONData = json::parse(file);
     }
     catch (const std::exception& e) {
-        g_logger.LogError("ModelLoader::GetModelRecursive", e.what());
+        g_logger.LogWarn("ModelLoader::GetModelRecursive", e.what());
         return nullptr;
     }
 
@@ -61,7 +62,9 @@ std::unique_ptr<BlockModel> ModelLoader::GetModelRecursive(const ResourceLocatio
                 model = std::make_unique<BlockModel>(*it->second);
             } else {
                 model = GetModelRecursive(parentLocation);
-                CacheModel(parentLocation, model);
+                if (model != nullptr) { // TODO: Debug how this return null in the first place
+                    CacheModel(parentLocation, model);
+                }
             }
             
             break;

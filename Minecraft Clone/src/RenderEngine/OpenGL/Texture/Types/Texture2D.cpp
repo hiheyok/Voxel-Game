@@ -1,14 +1,13 @@
 #include "RenderEngine/OpenGL/Texture/Types/Texture2D.h"
 #include "Utils/LogUtils.h"
 
-Texture2D::Texture2D(RawTextureData data) {
-    Gen();
+Texture2D::Texture2D(const RawTextureData& data) {
     Load(data);
 }
 
 Texture2D::Texture2D() = default;
 
-bool Texture2D::Load(RawTextureData data) {
+bool Texture2D::Load(const RawTextureData& data) {
     if (data.data_) {
         glBindTexture(GL_TEXTURE_2D, texture_id_);
         glTexImage2D(GL_TEXTURE_2D, 0, data.format_, data.width_, data.height_, 0, data.format_, GL_UNSIGNED_BYTE, data.data_);

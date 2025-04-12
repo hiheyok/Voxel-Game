@@ -11,13 +11,13 @@ public:
 
     void SetSize(int width, int height);
 
-    void SetPixel(uint8_t r, uint8_t  g, uint8_t b, uint8_t a, size_t w, size_t h);
+    void SetPixel(int r, int  g, int b, int a, size_t w, size_t h);
 
-    void AddData(std::vector<uint8_t> data, int format, bool& transparency, bool& isSeeThrough);
+    void AddData(std::vector<uint8_t> data, int format);
 
-    bool AddTextureToAtlasHelper(RawTextureData* data, bool& transparency, bool& isSeeThrough);
+    bool AddTextureToAtlasHelper(RawTextureData* data);
 
-    std::optional<RawTextureData> AddTextureToAtlas(std::string file, bool& transparency, bool& isSeeThrough);
+    std::optional<RawTextureData> AddTextureToAtlas(std::string file);
 
     size_t GetBlockCount() const;
 

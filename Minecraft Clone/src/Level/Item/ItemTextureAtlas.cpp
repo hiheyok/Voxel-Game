@@ -76,14 +76,6 @@ void ItemTextureAtlas::Initialize(int atlasItemSize, int individualItemSize) {
     atlas_framebuffer_.GenBuffer(atlas_size_, atlas_size_, 1, GL_RGBA);
     framebuffer_single_block_render_.GenBuffer(individual_size_, individual_size_, 2, GL_RGBA);
 
-    atlas_.width_ = atlas_size_;
-    atlas_.height_ = atlas_size_;
-    atlas_.texture_id_ = atlas_framebuffer_.texture_;
-
-    individual_item_.width_ = individual_size_;
-    individual_item_.height_ = individual_size_;
-    individual_item_.texture_id_ = framebuffer_single_block_render_.texture_;
-
     vbo_.SetType(GL_ARRAY_BUFFER);
     ebo_.SetType(GL_ELEMENT_ARRAY_BUFFER);
 
@@ -108,4 +100,16 @@ void ItemTextureAtlas::AddItem(Item item) {
     offsets_[item.properties_.id_] = offsets_.size();
     RenderBlockItem(item);
     StitchTexture(offsets_.size() - 1, item.properties_.id_);
+}
+
+GLuint ItemTextureAtlas::Get() const {
+    return atlas_framebuffer_.texture_;
+}
+
+size_t ItemTextureAtlas::GetHeight() const {
+    return atlas_size_;
+}
+
+size_t ItemTextureAtlas::GetWidth() const {
+    return atlas_size_;
 }

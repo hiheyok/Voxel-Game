@@ -139,7 +139,7 @@ void TerrainRenderer::SetSettings(uint32_t renderDistance, uint32_t verticalRend
 }
 
 void TerrainRenderer::LoadAssets() {
-    cubic_shader_->BindTexture2D(0, g_blocks.block_texture_atlas_->get(), "BlockTexture");
+    cubic_shader_->BindTexture2D(0, g_blocks.block_texture_atlas_->Get(), "BlockTexture");
 }
 
 void TerrainRenderer::AddChunk(const ChunkPos& pos, const std::vector<uint32_t>& data, std::vector<ChunkDrawBatch>& batchType, FastHashMap<ChunkPos, int>& lookUpMap) {

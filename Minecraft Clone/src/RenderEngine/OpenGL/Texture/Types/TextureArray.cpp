@@ -1,5 +1,4 @@
 #include "RenderEngine/OpenGL/Texture/Types/TextureArray.h"
-#include "RenderEngine/OpenGL/Texture/ImageLoader.h"
 #include "Utils/LogUtils.h"
 
 void TextureArray::UploadToGPU() {
@@ -111,14 +110,15 @@ bool TextureArray::AddTextureToArray(RawTextureData* data) {
 }
 std::optional<RawTextureData> TextureArray::AddTextureToArray(std::string file) {
     std::optional<RawTextureData> data;
-    RawTextureData tex = GetImageData(file.c_str());
+    RawTextureData tex{ file };
     if (AddTextureToArray(&tex)) {
         g_logger.LogInfo("TextureArray::AddTextureToArray", "Loaded: " + file + " | Size: " + std::to_string(tex.height_) + ", " + std::to_string(tex.width_));
-        data = tex;
+        data = std::move(tex);
+        return data;
+    } else {
+        g_logger.LogError("TextureArray::AddTextureToArray", "Unable to load: " + file);
         return data;
     }
-    g_logger.LogError("TextureArray::AddTextureToArray", "Unable to load: " + file);
-    return data;
 }
 
 int TextureArray::GetLayers() const {

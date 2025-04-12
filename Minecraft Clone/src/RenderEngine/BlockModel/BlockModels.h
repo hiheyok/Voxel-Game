@@ -37,8 +37,8 @@ struct BlockFace {
     size_t texture_id_ = 0;
     size_t texture_count_ = 0; //For amination purposes.
     unsigned int rotation_ = 0;
-    bool has_transparency_ = false;
-    bool is_see_through_ = false;
+    bool partially_transparent_pixel_ = false;
+    bool fully_transparent_pixel_ = false;
     glm::ivec4 uv_ = glm::ivec4(0, 0, 16, 16);
 
     glm::ivec2 uv_coord_nn{ 0, 0 };

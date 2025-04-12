@@ -313,9 +313,9 @@ inline void Mesh::ChunkMeshData::AddFaceToMesh(const BlockFace& face, uint8_t ax
     uint32_t norm = facing << NormBitOffset;
     uint32_t tint = (static_cast<uint32_t>(!!face.tint_index_)) << tintBitOffset;
 
-    std::vector<uint32_t>& out = face.has_transparency_ ? transparent_vertices_buffer_ : vertices_buffer_;
+    std::vector<uint32_t>& out = face.partially_transparent_pixel_ ? transparent_vertices_buffer_ : vertices_buffer_;
 
-    uint64_t currIndex = face.has_transparency_ ? transparent_face_count_++ : solid_face_count_++;
+    uint64_t currIndex = face.partially_transparent_pixel_ ? transparent_face_count_++ : solid_face_count_++;
 
     if (out.size() <= (currIndex + 1) * 12)
         out.resize(out.size() + kBufferStepSize);
@@ -475,8 +475,8 @@ inline bool Mesh::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int x, int y,
     for (int i = 0; i < model.elements_.size(); ++i) {
         const Cuboid& element = model.elements_[i];
         if (element.faces_[oppositeSide].cull_face_ != oppositeSide ||
-            element.faces_[oppositeSide].is_see_through_ ||
-            element.faces_[oppositeSide].has_transparency_ ||
+            element.faces_[oppositeSide].partially_transparent_pixel_ ||
+            element.faces_[oppositeSide].fully_transparent_pixel_ ||
             element.faces_[oppositeSide].reference_texture_.empty())
             continue; 
 

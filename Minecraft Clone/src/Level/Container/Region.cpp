@@ -1,7 +1,11 @@
 #include "Level/Chunk/Chunk.h"
 #include "Level/Container/Region.h"
 
+#include <exception>
+
 Region::Region() {
+    chunk_count_ = 0;
+    usage_ = 0;
     region_data_.resize(kRegionSize3D);
 }
 

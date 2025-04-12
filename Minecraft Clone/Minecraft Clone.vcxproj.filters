@@ -51,9 +51,6 @@
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\OpenGL\Texture\ImageLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\RenderEngine\OpenGL\OpenGL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -426,9 +423,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureArray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RenderEngine\OpenGL\Texture\ImageLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\OpenGL\Texture\Texture.h">
@@ -999,6 +993,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Utils\Containers\HashMapVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\GUI\Item\ItemRender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\ChunkRender\BlockTextureAtlas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

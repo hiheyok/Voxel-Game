@@ -9,7 +9,9 @@ ResourceLocation::ResourceLocation(std::string path, std::string namespaceIn) {
 
 ResourceLocation::~ResourceLocation() = default;
 
-ResourceLocation::ResourceLocation(ResourceLocation&&) = default;
+ResourceLocation::ResourceLocation(ResourceLocation&& other) noexcept {
+    *this = std::move(other);
+}
 ResourceLocation::ResourceLocation(const ResourceLocation&) = default;
 
 void ResourceLocation::SetPath(std::string path, std::string namespaceIn) {
@@ -25,3 +27,4 @@ bool ResourceLocation::operator==(const ResourceLocation& other) const {
 }
 
 ResourceLocation& ResourceLocation::operator=(const ResourceLocation&) = default;
+ResourceLocation& ResourceLocation::operator=(ResourceLocation&&) noexcept = default;
