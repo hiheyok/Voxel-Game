@@ -4,7 +4,8 @@
 #include <functional>
 #include "Utils/Containers/robin_hood.h"
 #include "Utils/LogUtils.h"
-#include "Level/Chunk/ChunkPos/ChunkPos.h"
+#include "Core/Position/ChunkPos.h"
+#include "Core/Position/Direction.h"
 #include "Core/Registry/ResourceLocation.h"
 
 typedef unsigned int EventID;

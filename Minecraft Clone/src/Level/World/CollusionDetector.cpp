@@ -60,18 +60,18 @@ glm::dvec3 CollusionDetector::ComputeCollisionTimes(Entity* entity) {
 
     float leastDistance = (float)searchDistance;
 
-    for (int axis_ = 0; axis_ < 3; axis_++) {
+    for (int axis = 0; axis < 3; axis++) {
 
         //0 = x; 1 = y; 2 = z
 
-        int u_axis = (axis_ + 1) % 3;
-        int v_axis = (axis_ + 2) % 3;
+        int u_axis = (axis + 1) % 3;
+        int v_axis = (axis + 2) % 3;
 
         for (int u = 0; u <= i_bound[u_axis]; u++) {
             for (int v = 0; v <= i_bound[v_axis]; v++) {
                 glm::ivec3 offset(0, 0, 0);
 
-                offset[axis_] = i_bound[axis_] * (entity->properties_.velocity_[axis_] >= 0);
+                offset[axis] = i_bound[axis] * (entity->properties_.velocity_[axis] >= 0);
                 offset[u_axis] = u;
                 offset[v_axis] = v;
 
@@ -95,10 +95,10 @@ glm::dvec3 CollusionDetector::ComputeCollisionTimes(Entity* entity) {
                 if (!IsPointOnHitboxSurface) //Checks if the origin is on the surface to optimize stuff
                     continue;
 
-                if (entity->properties_.velocity_[axis_] == 0.f) //First checks if the velocity isn't 0 because if it is 0, it's not moving in that axis so it's not going to collide in that direction
+                if (entity->properties_.velocity_[axis] == 0.f) //First checks if the velocity isn't 0 because if it is 0, it's not moving in that axis so it's not going to collide in that direction
                     continue;
 
-                int direction = axis_ * 2 + (entity->properties_.velocity_[axis_] < 0); // The "+1" indicates that the direction is negative 
+                int direction = axis * 2 + (entity->properties_.velocity_[axis] < 0); // The "+1" indicates that the direction is negative 
 
                 float distance = TraceSingleAxisCollision(origin_, direction, (int)floor(leastDistance) + 2);
 
@@ -108,15 +108,15 @@ glm::dvec3 CollusionDetector::ComputeCollisionTimes(Entity* entity) {
                 if (distance == -1.f) // -1.f means that it cannot find any blocks that could collide in that range (5)
                     continue;
 
-                float time = abs(distance / entity->properties_.velocity_[axis_]);// This gets the time it takes for the entity to travel that distance
+                float time = abs(distance / entity->properties_.velocity_[axis]);// This gets the time it takes for the entity to travel that distance
 
-                if (time < leastTime[axis_]) {
-                    leastTime[axis_] = time;
+                if (time < leastTime[axis]) {
+                    leastTime[axis] = time;
                     continue;
                 }
 
-                if (leastTime[axis_] == -1.f) //leasttime[axis] == -1.f means that a "time" value haven't been inputted yet
-                    leastTime[axis_] = time;
+                if (leastTime[axis] == -1.f) //leasttime[axis] == -1.f means that a "time" value haven't been inputted yet
+                    leastTime[axis] = time;
             }
         }
     }
@@ -166,9 +166,9 @@ bool CollusionDetector::CheckRayIntersection(Ray& ray) {
 
             ray.length_ = sqrtf(powf(ray.end_point_.x - ray.origin_.x, 2) + powf(ray.end_point_.y - ray.origin_.y, 2) + powf(ray.end_point_.z - ray.origin_.z, 2));
 
-            for (int axis_ = 0; axis_ < 3; axis_++) {
-                if (mask[axis_]) {
-                    ray.bounce_surface_ = delta[axis_] < 0 ? axis_ * 2 + 1 : axis_ * 2; //Set the surface it bounces off. + 1 means that the surface is behind, bottom, etc
+            for (int axis = 0; axis < 3; axis++) {
+                if (mask[axis]) {
+                    ray.bounce_surface_ = delta[axis] < 0 ? axis * 2 + 1 : axis * 2; //Set the surface it bounces off. + 1 means that the surface is behind, bottom, etc
                     return true;
                 }
             }

@@ -35,7 +35,7 @@ Cuboid::Cuboid(Cuboid&&) = default;
 Cuboid& Cuboid::operator=(const Cuboid&) = default;
 
 void Cuboid::EditFace(int location, BlockFace f) {
-    faces_[location - 1] = f;
+    faces_[location] = f;
 }
 
 // BlockModel struct
@@ -64,8 +64,8 @@ void BlockModel::GetVertices(std::vector<float>& vertices, std::vector<unsigned 
         glm::vec3 to = element.to_;
         from = from / 16.f;
         to = to / 16.f;
-        for (uint8_t i = 0; i < 6; i++) {
-            BlockFace face = element.faces_[i];
+        for (const auto& side : Directions()) {
+            BlockFace face = element.faces_[side];
             if (face.reference_texture_.length() == 0) continue;
 
             glm::vec2 uv0{ face.uv_.x,  face.uv_.y };
@@ -74,13 +74,13 @@ void BlockModel::GetVertices(std::vector<float>& vertices, std::vector<unsigned 
             uv0 = uv0 / 16.f;
             uv1 = uv1 / 16.f;
 
-            uint8_t axis_ = i >> 1;
+            uint8_t axis = side.GetAxis();
 
             uint32_t currIndex = static_cast<uint32_t>(vertices.size()) / 7;
 
-            switch (axis_) {
+            switch (axis) {
             case 0:
-                (i & 1) == 1 ?
+                side.IsNegative() ?
                     vertices.insert(vertices.end(),
                         {
                             from.x,    from.y, from.z,        uv1.x, uv0.y,    (float)face.texture_id_,    8.f,
@@ -99,7 +99,7 @@ void BlockModel::GetVertices(std::vector<float>& vertices, std::vector<unsigned 
                         );
                 break;
             case 1:
-                (i & 1) == 1 ?
+                side.IsNegative() ?
                     vertices.insert(vertices.end(),
                         {
                             from.x, from.y, from.z,        uv1.x, uv0.y,    (float)face.texture_id_,    15.f,
@@ -118,7 +118,7 @@ void BlockModel::GetVertices(std::vector<float>& vertices, std::vector<unsigned 
                         );
                 break;
             case 2:
-                (i & 1) == 1 ?
+                side.IsNegative() ?
                     vertices.insert(vertices.end(),
                         {
                             from.x, from.y, from.z,        uv1.x, uv0.y,    (float)face.texture_id_,    12.f,
@@ -139,7 +139,7 @@ void BlockModel::GetVertices(std::vector<float>& vertices, std::vector<unsigned 
 
             }
 
-            if ((i & 1) == 0) {
+            if (side.IsPositive()) {
                 indices.insert(indices.end(),
                     {
                         0 + currIndex, 1 + currIndex, 2 + currIndex,

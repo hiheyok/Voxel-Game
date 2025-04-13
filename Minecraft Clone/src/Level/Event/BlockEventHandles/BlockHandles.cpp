@@ -7,13 +7,11 @@
 #include "Level/World/WorldInterface.h"
 
 void UpdateSurrounding(const BlockEvent& blockEvent, Dimension* dimension) {
-    for (int side = 0; side < 6;  side++) {
-        BlockPos newPos = blockEvent.pos_;
-        newPos.incrementSide(side, 1);
-
+    for (const auto& offset : Directions()) {
+        BlockPos newPos = blockEvent.pos_ + offset;
         BlockID block = dimension->world_->GetBlock(newPos);
 
-        BlockEvent tickNeighbor{newPos, block, g_event_handler.BlockTick};
+        BlockEvent tickNeighbor{ newPos, block, g_event_handler.BlockTick };
         dimension->event_manager_.AddEvent(tickNeighbor);
     }
 

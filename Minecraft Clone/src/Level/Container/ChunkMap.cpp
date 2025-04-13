@@ -5,21 +5,18 @@
 #include "Level/Chunk/Chunk.h"
 #include "Level/Chunk/ChunkRawData.h"
 
-ChunkMap::ChunkMap(bool heightmapUpdate) : heightmap_update_{ heightmapUpdate } {};
+ChunkMap::ChunkMap(bool neighborUpdate, bool heightmapUpdate) : neighbor_update_{neighborUpdate}, heightmap_update_ { heightmapUpdate } {};
 ChunkMap::~ChunkMap() = default;
 
 void ChunkMap::EraseChunk(const ChunkPos& pos) {
     RegionPos regPos = pos / kRegionDim;
     Region* reg = GetRegion(regPos);
 
-    for (int axis_ = 0; axis_ < 3; axis_++) {
-        for (int face = 0; face < 2; face++) {
-            ChunkPos posNeighbor = pos;
-            posNeighbor.incrementSide(axis_ * 2 + face, 1);
+    for (const auto& offset : Directions()) {
+        ChunkPos neighborPos = pos + offset;
 
-            if (CheckChunk(posNeighbor)) {
-                GetChunk(posNeighbor)->SetNeighbor(nullptr, axis_ * 2 - face + 1);
-            }
+        if (CheckChunk(neighborPos)) {
+            GetChunk(neighborPos)->SetNeighbor(nullptr, offset.GetOppositeDirection());
         }
     }
 
@@ -118,14 +115,13 @@ void ChunkMap::InsertChunk(std::unique_ptr<Chunk> chunk) {
     }
 
 
-    for (int axis_ = 0; axis_ < 3; axis_++) {
-        for (int face = 0; face < 2; face++) {
-            ChunkPos posNeighbor = chunk->position_;
-            posNeighbor.incrementSide(axis_ * 2 + face, 1);
+    for (const auto& offset : Directions()) {
+        ChunkPos posNeighbor = chunk->position_ + offset;
 
-            if (CheckChunk(posNeighbor)) {
-                chunk->SetNeighbor(static_cast<ChunkContainer*>(GetChunk(posNeighbor)), axis_ * 2 + face);
-                GetChunk(posNeighbor)->SetNeighbor(static_cast<ChunkContainer*>(chunk.get()), axis_ * 2 - face + 1);
+        if (CheckChunk(posNeighbor)) {
+            chunk->SetNeighbor(static_cast<ChunkContainer*>(GetChunk(posNeighbor)), offset.GetDirection());
+            GetChunk(posNeighbor)->SetNeighbor(static_cast<ChunkContainer*>(chunk.get()), offset.GetOppositeDirection());
+            if (neighbor_update_) {
                 GetChunk(posNeighbor)->UpdateGen();
             }
         }

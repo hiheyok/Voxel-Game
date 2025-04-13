@@ -1,6 +1,6 @@
 #pragma once
 
-struct Block;
+class Block;
 
 enum MaterialType {
     MATERIAL_DIRT, MATERIAL_GRASS, MATERIAL_FLUID, MATERIAL_NONE, MATERIAL_GRAVITY

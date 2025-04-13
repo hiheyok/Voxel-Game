@@ -133,4 +133,4 @@ void EntitiesList::Initialize() {
 
 EntityType* EntitiesList::GetEntity(EntityTypeID id) {
     return entity_type_list_[id];
-}
+}    

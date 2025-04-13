@@ -1,7 +1,7 @@
 #include "Server/Server.h"
 #include "Core/Interfaces/ClientInterface.h"
 #include "Core/Interfaces/InternalInterface.h"
-#include "Level/Chunk/ChunkPos/ChunkPos.h"
+#include "Core/Position/ChunkPos.h"
 #include "Level/Chunk/ChunkData.h"
 #include "Level/Dimension/Dimension.h"
 #include "Level/Entity/Properties/EntityProperties.h"

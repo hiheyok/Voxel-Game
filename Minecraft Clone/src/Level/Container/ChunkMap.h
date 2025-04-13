@@ -9,7 +9,7 @@ class Region;
 
 class ChunkMap {
 public:
-    ChunkMap(bool heightmapUpdate = false);
+    ChunkMap(bool neighborUpdate = false, bool heightmapUpdate = false);
     ~ChunkMap();
 
     BlockID GetBlock(const BlockPos& pos) const;
@@ -28,6 +28,7 @@ private:
     void DeleteRegion(const RegionPos& pos);
 
     bool heightmap_update_ = false;
+    bool neighbor_update_ = false;
 
     static constexpr int kRegionCacheSize = 16;
 

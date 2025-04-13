@@ -8,6 +8,8 @@
 
 class Dimension;
 class BlockTexture;
+class BlockTextureAtlas;
+class ModelLoader;
 
 struct BlockModel;
 
@@ -21,9 +23,15 @@ struct BlockType {
     bool is_solid_ = false;
 };
 
-struct Block {
+class Block {
+public:
     Block();
     ~Block();
+
+    virtual void InitializeBlockModel(ModelLoader& modelLoader);
+    virtual void Tick(const BlockPos& pos, Dimension* currentWorld) = 0;
+
+    void InitializeTexture(BlockTextureAtlas& textureAtlas);
 
     BlockID id_ = 0;
     std::unique_ptr<BlockModel> block_model_data_;
@@ -31,6 +39,4 @@ struct Block {
     std::unique_ptr<BlockType> properties_;
 
     std::string block_name_ = "";
-
-    virtual void Tick(const BlockPos& pos, Dimension* currentWorld) = 0;
 };

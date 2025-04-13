@@ -14,9 +14,7 @@ class BlockList{
 public:
     FastHashMap<std::string, BlockID> block_id_name_data_;
     ModelLoader model_loader_;
-
     std::vector<Block*> block_type_data_;
-    std::vector<BlockModel> block_model_data_;
 
     std::unique_ptr<BlockTextureAtlas> block_texture_atlas_;
 
@@ -362,7 +360,7 @@ public:
 
     Block* GetBlockType(BlockID id);
 
-    const BlockModel& GetBlockModelDereferenced(BlockID id);
+    const BlockModel& GetBlockModel(BlockID id);
 
     BlockID RegisterBlock(std::string blockName, Material* material, bool transparency, bool solid, bool isFluid);
 private:

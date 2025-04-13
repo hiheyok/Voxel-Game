@@ -5,12 +5,12 @@
 #include <string>
 #include "Core/Typenames.h"
 
-#define EAST 0x01
-#define WEST 0x02
-#define UP 0x03
-#define DOWN 0x04
-#define SOUTH 0x05
-#define NORTH 0x06
+#define EAST 0x00
+#define WEST 0x01
+#define UP 0x02
+#define DOWN 0x03
+#define SOUTH 0x04
+#define NORTH 0x05
 
 enum DisplayPosition {
     thirdperson_righthand = 0,

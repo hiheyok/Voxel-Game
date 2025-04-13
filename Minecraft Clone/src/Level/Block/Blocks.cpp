@@ -73,58 +73,9 @@ void BlockList::InitializeBlockModels()  {
     //        AddAssets(name);
     //    }
 
-    //}
-    //catch (std::filesystem::filesystem_error& e) {
-    //    g_logger.LogError("File System", e.what());
-    //}
- 
-    //It will first go through the block models and create the models without loading the texture
-    for (const auto& [name, ID] : block_id_name_data_) {
-        auto tokens = Tokenize(name, ':');
-        std::unique_ptr<BlockModel> model = model_loader_.GetModel(ResourceLocation("models/block/" + tokens.back() + ".json", tokens.front()));
-        model->is_initialized_ = true;
-        model->FlattenVariables();
-        model->BakeTextureRotation();
-        GetBlockType(ID)->block_model_data_ = std::move(model);
-    }
-
-    //Generate all the textures now
     for (auto& block : block_type_data_) {
-        if (block->block_model_data_ == 0) continue;
-
-        for (auto& element : block->block_model_data_->elements_) {
-            for (int i = 0; i < 6; i++) {
-                const std::string& path = element.faces_[i].reference_texture_;
-                if (path.length() == 0) continue;
-
-                auto Tokens = Tokenize(path, ':');
-
-                //Load texture
-                ResourceLocation location{ "/textures/" + Tokens.front() + ".png" , Tokens.back() };
-
-                int textureId = block_texture_atlas_->AddBlockTexture(location);
-
-                if (textureId == -1) {
-                    g_logger.LogWarn("BlockList::InitializeBlockModels", "Unable to load texture.");
-                    continue;
-                }
-
-                element.faces_[i].texture_id_ = textureId;
-                element.faces_[i].texture_count_ = block_texture_atlas_->GetBlockTextureCount(location);
-                element.faces_[i].partially_transparent_pixel_ = block_texture_atlas_->IsTexturePartiallyTransparent(location);
-                element.faces_[i].fully_transparent_pixel_ = block_texture_atlas_->IsTextureFullyTransparent(location);
-            }
-        }
-    }
-
-    for (size_t i = 0; i < block_type_data_.size(); i++) {
-        BlockModel model;
-
-        if (block_type_data_[i]->block_model_data_ != nullptr) {
-            model = *block_type_data_[i]->block_model_data_;
-        }
-        model.texture_variable_.clear();
-        block_model_data_.emplace_back(model);
+        block->InitializeBlockModel(model_loader_);
+        block->InitializeTexture(*block_texture_atlas_);
     }
 }
 
@@ -152,6 +103,6 @@ Block* BlockList::GetBlockType(BlockID id) {
     return block_type_data_[id];
 }
 
-const BlockModel& BlockList::GetBlockModelDereferenced(BlockID id) {
-    return block_model_data_[id];
+const BlockModel& BlockList::GetBlockModel(BlockID id) {
+    return *block_type_data_[id]->block_model_data_;
 }

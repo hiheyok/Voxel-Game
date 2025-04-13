@@ -288,7 +288,7 @@ void ModelLoader::ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
                     bFace.reference_texture_ = texName + ":" + texNamespace;
                 }
             } else if (faceElements.key() == "cullface") {
-                bFace.cull_face_ = ConvertStringFaceToIndex(faceElements.value()) - 1;
+                bFace.cull_face_ = ConvertStringFaceToIndex(faceElements.value());
             } else if (faceElements.key() == "tintindex") {
                 bFace.tint_index_ = faceElements.value();
             } else if (faceElements.key() == "rotation") {

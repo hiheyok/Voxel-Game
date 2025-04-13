@@ -3,7 +3,7 @@
 #include "Level/Container/EntityContainer.h"
 
 WorldInterface::WorldInterface() :
-    chunks_{ std::make_unique<ChunkMap>(true) },
+    chunks_{ std::make_unique<ChunkMap>(true, true) },
     entities_{ std::make_unique<EntityContainer>() } {
     }
 

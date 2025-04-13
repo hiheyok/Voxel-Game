@@ -30,20 +30,20 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <EnableASAN>false</EnableASAN>
     <EnableFuzzer>false</EnableFuzzer>
@@ -51,7 +51,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseIntelIPP1A>Dynamic_Library</UseIntelIPP1A>
@@ -205,7 +205,7 @@
     <ClCompile Include="src\Level\Block\Type\Fluid.cpp" />
     <ClCompile Include="src\Level\Block\Type\Grass.cpp" />
     <ClCompile Include="src\Level\Block\Type\GravityBlock.cpp" />
-    <ClCompile Include="src\Level\Chunk\ChunkPos\ChunkPos.cpp" />
+    <ClCompile Include="src\Core\Position\ChunkPos.cpp" />
     <ClCompile Include="src\Level\Chunk\Heightmap\Heightmap.cpp" />
     <ClCompile Include="src\Level\Light\LightStorage.cpp" />
     <ClCompile Include="src\Level\Chunk\Palette.cpp" />
@@ -299,6 +299,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Client\Client.h" />
+    <ClInclude Include="src\Core\Position\Direction.h" />
     <ClInclude Include="src\Level\World\CollusionDetector.h" />
     <ClInclude Include="src\Level\Container\Region.h" />
     <ClInclude Include="src\Client\ClientLevel\ClientCache.h" />
@@ -321,7 +322,7 @@
     <ClInclude Include="src\Core\Registry\ResourceLocation.h" />
     <ClInclude Include="src\FileManager\Files.h" />
     <ClInclude Include="src\Level\Block\Type\DefaultBlock.h" />
-    <ClInclude Include="src\Level\Chunk\ChunkPos\ChunkPos.h" />
+    <ClInclude Include="src\Core\Position\ChunkPos.h" />
     <ClInclude Include="src\Level\Chunk\ChunkRawData.h" />
     <ClInclude Include="src\Level\Chunk\Heightmap\Heightmap.h" />
     <ClInclude Include="src\Level\Chunk\Palette.h" />

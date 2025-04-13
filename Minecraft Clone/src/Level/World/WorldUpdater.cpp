@@ -302,9 +302,8 @@ void WorldUpdater::SetChunk(std::vector<std::unique_ptr<Chunk>> chunks) {
             updated_chunk_.insert(pos);
             updated_chunk_arr_.emplace_back(pos);
 
-            for (int side = 0; side < 6; side++) {
-                ChunkPos neighborPos = pos;
-                neighborPos.incrementSide(side, 1);
+            for (const auto& offset : Directions()) {
+                ChunkPos neighborPos = pos + offset;
 
                 if (world_->CheckChunk(neighborPos) && !updated_chunk_.contains(neighborPos)) {
                     updated_chunk_arr_.push_back(neighborPos);

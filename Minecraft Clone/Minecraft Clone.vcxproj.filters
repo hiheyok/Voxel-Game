@@ -249,7 +249,7 @@
     <ClCompile Include="src\Client\Profiler\PerformanceProfiler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Chunk\ChunkPos\ChunkPos.cpp">
+    <ClCompile Include="src\Core\Position\ChunkPos.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugPositioning\DebugPositioning.cpp">
@@ -902,7 +902,7 @@
     <ClInclude Include="src\Utils\Containers\FIFOQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Chunk\ChunkPos\ChunkPos.h">
+    <ClInclude Include="src\Core\Position\ChunkPos.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\TerrainGeneration\Generators\DebugPositioning\DebugPositioning.h">
@@ -1002,6 +1002,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\ChunkRender\BlockTextureAtlas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Position\Direction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -71,25 +71,21 @@ void LightEngine::WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<LightStorage
         if (nodeLight == 0) continue;
 
         //Spread
-        for (int side = 0; side < 6; side++) {
-
-            int direction = side >> 1;
-            int face = side & 0b1; //1 = Front 0 = Back
-
-            if ((direction == 1) && (face == 1))
+        for (const auto& side : Directions()) {
+            if (side == Directions::kUp)
                 continue; //skip Up direction
 
             // Case to handle the down direction
-            if (direction == 1 && face == 0) {
+            if (side == Directions::kDown) {
                 if (nodeY != 0) {
                     FIFOQueues.push(PackLightNode(nodeX, nodeY - 1, nodeZ, nodeLight));
                 }
                 continue;
             }
 
-            uint8_t nx = nodeX + DIRECTION_OFFSETS[side][0];
-            uint8_t ny = nodeY + DIRECTION_OFFSETS[side][1];
-            uint8_t nz = nodeZ + DIRECTION_OFFSETS[side][2];
+            uint8_t nx = nodeX + DIRECTION_OFFSETS[side.GetDirection()][0];
+            uint8_t ny = nodeY + DIRECTION_OFFSETS[side.GetDirection()][1];
+            uint8_t nz = nodeZ + DIRECTION_OFFSETS[side.GetDirection()][2];
 
             int8_t newLight = nodeLight - 1;
 
@@ -104,7 +100,6 @@ void LightEngine::WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<LightStorage
                 continue;
 
             FIFOQueues.push(PackLightNode(nx, ny, nz, newLight));
-
         }
     }
 }

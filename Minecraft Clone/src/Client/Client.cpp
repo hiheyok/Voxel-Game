@@ -43,7 +43,6 @@ void Client::InitializeServerCom() {
     server_->StartServer(settings_);
     player_uuid_ = server_->SetInternalConnection(internal_interface_.get());
     client_play_ = std::make_unique<ClientPlay>(internal_interface_.get(), this, profiler_);
-
 }
 void Client::InitializeGameContent() {
     g_blocks.Initialize();

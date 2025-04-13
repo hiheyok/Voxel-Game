@@ -85,8 +85,8 @@ void ChunkContainer::SetNeighbor(ChunkContainer* Neighbor, unsigned int Side) {
 }
 
 void ChunkContainer::ClearNeighbors() {
-    for (int i = 0; i < 6; i++) {
-        neighbors_[i] = nullptr;
+    for (const auto& side : Directions()) {
+        neighbors_[side] = nullptr;
     }
 }
 

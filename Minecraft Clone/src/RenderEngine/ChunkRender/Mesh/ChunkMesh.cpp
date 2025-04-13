@@ -49,9 +49,9 @@ void Mesh::ChunkMeshData::GenerateCache() {
         }
     }
 
-    for (int side = 0; side < 6; side++) {
-        int axis = side >> 1;
-        int direction = side & 0b1;
+    for (const auto& side : Directions()) {
+        int axis = side.GetAxis();
+        int direction = side.GetDirection() & 0b1;
 
         ChunkContainer* neighbor = chunk_->neighbors_[side];
 
@@ -65,7 +65,7 @@ void Mesh::ChunkMeshData::GenerateCache() {
                 pos[axis] = direction * 15;
                 pos[(axis + 1) % 3] = u;
                 pos[(axis + 2) % 3] = v;
-                
+
                 localPos[axis] = 17 - 17 * direction;
                 localPos[(axis + 1) % 3] = u + 1;
                 localPos[(axis + 2) % 3] = v + 1;
@@ -119,8 +119,8 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
                     const BlockID& backBlock = GetCachedBlockID(pos[0], pos[1], pos[2]);
                     ++pos[axis];
 
-                    const BlockModel& currModel = g_blocks.GetBlockModelDereferenced(currBlock);
-                    const BlockModel& backModel = g_blocks.GetBlockModelDereferenced(backBlock);
+                    const BlockModel& currModel = g_blocks.GetBlockModel(currBlock);
+                    const BlockModel& backModel = g_blocks.GetBlockModel(backBlock);
 
                     bool blankCurrModel = !currModel.is_initialized_ || pos[axis] == 16;
                     bool blankBackModel = !backModel.is_initialized_ || pos[axis] == 0;
@@ -466,15 +466,14 @@ inline bool Mesh::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int x, int y,
     int p[3]{ x, y, z };
 
     p[axis_] += 1 - 2 * (side & 0b1);
-//    return getCachedBlockID(p[0], p[1], p[2]) == Blocks.AIR;
 
-    const BlockModel& model = g_blocks.GetBlockModelDereferenced(GetCachedBlockID(p[0], p[1], p[2]));
+    const BlockModel& model = g_blocks.GetBlockModel(GetCachedBlockID(p[0], p[1], p[2]));
 
     if (!model.is_initialized_) return true;
 
     for (int i = 0; i < model.elements_.size(); ++i) {
         const Cuboid& element = model.elements_[i];
-        if (element.faces_[oppositeSide].cull_face_ != oppositeSide ||
+        if (element.faces_[oppositeSide].cull_face_ != oppositeSide ||  // TODO: Replace and with OR  later after figuring out fluid rendering
             element.faces_[oppositeSide].partially_transparent_pixel_ ||
             element.faces_[oppositeSide].fully_transparent_pixel_ ||
             element.faces_[oppositeSide].reference_texture_.empty())

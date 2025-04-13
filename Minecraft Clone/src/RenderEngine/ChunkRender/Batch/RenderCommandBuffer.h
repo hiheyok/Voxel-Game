@@ -3,7 +3,7 @@
 #include <glm/vec3.hpp>
 
 #include "Core/Typenames.h"
-#include "Level/Chunk/ChunkPos/ChunkPos.h"
+#include "Core/Position/ChunkPos.h"
 struct DrawCommandIndirect {
     unsigned int  count_;
     unsigned int  instance_count_;
@@ -54,20 +54,20 @@ namespace CMDGraph {
         int visit_id_ = 0;
 
         CommandPtr() {
-            for (int i = 0; i < 6; i++) {
-                neighbor_[i] = nullptr;
+            for (const auto& side : Directions()) {
+                neighbor_[side] = nullptr;
             }
         }
 
         CommandPtr(DrawCommandIndirect cmd_) : cmd_(cmd_) {
-            for (int i = 0; i < 6; i++) {
-                neighbor_[i] = nullptr;
+            for (const auto& side : Directions()) {
+                neighbor_[side] = nullptr;
             }
         }
 
         CommandPtr(DrawCommandIndirect cmd_, ChunkPos pos) : cmd_(cmd_), position_(pos) {
-            for (int i = 0; i < 6; i++) {
-                neighbor_[i] = nullptr;
+            for (const auto& side : Directions()) {
+                neighbor_[side] = nullptr;
             }
         }
 
@@ -347,28 +347,28 @@ public:
 
         CMDGraph::CommandPtr* rootNeighbors[6]{nullptr};
 
-        for (int i = 0; i < 6; i++) {
-            rootNeighbors[i] = node->neighbor_[i];
+        for (const auto& side : Directions()) {
+            rootNeighbors[side] = node->neighbor_[side];
         }
         node->PrepareDelete();
         delete node;
 
-        for (int i = 0; i < 6; i++) {
-            if (rootNeighbors[i] == nullptr) {
+        for (const auto& side : Directions()) {
+            if (rootNeighbors[side] == nullptr) {
                 continue;
             }
 
-            distances[i] = rootNeighbors[i]->GetSquareDistance(current_position_);
+            distances[side] = rootNeighbors[side]->GetSquareDistance(current_position_);
         }
 
         float min = FLT_MAX;
 
-        for (int i = 0; i < 6; i++) {
-            if (distances[i] == 0.f) {
+        for (const auto& side : Directions()) {
+            if (distances[side] == 0.f) {
                 continue;
             }
 
-            min = std::min(min, distances[i]);
+            min = std::min(min, distances[side]);
         }
 
         if (min == FLT_MAX) {
@@ -376,9 +376,9 @@ public:
             return;
         }
 
-        for (int i = 0; i < 6; i++) {
-            if (distances[i] == min) {
-                root_ = rootNeighbors[i];
+        for (const auto& side : Directions()) {
+            if (distances[side] == min) {
+                root_ = rootNeighbors[side];
                 break;
             }
         }
@@ -410,7 +410,7 @@ public:
         commands_position_[depth].push_back(node->position_.z);
     //    CommandsLayer[depth].push_back(depth);
         count++;
-        for (int side = 0; side < 6; side++) {
+        for (const auto& side : Directions()) {
              TraverseTree(node->neighbor_[side], depth + 1);
         }
     }
@@ -424,17 +424,17 @@ private:
             return isCorrect;
         }
 
-        for (int i = 0; i < 6; i++) {
-            if (node->neighbor_[i] == nullptr) {
+        for (const auto& side : Directions()) {
+            if (node->neighbor_[side] == nullptr) {
                 continue;
             }
 
-            if (node->neighbor_[i]->neighbor_[CMDGraph::GetOppositeSide(i)] != node) {
+            if (node->neighbor_[side]->neighbor_[CMDGraph::GetOppositeSide(side)] != node) {
                 return false;
             }
             else {
-                if (node->neighbor_[i]->visit_id_ != current_node_visit_id_) {
-                    isCorrect = VerifyTree(node->neighbor_[i]);
+                if (node->neighbor_[side]->visit_id_ != current_node_visit_id_) {
+                    isCorrect = VerifyTree(node->neighbor_[side]);
                 }
                 
             }

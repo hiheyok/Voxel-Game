@@ -119,6 +119,9 @@ void RawTextureData::Reload() {
 
 Texture::Texture() {
     glGenTextures(1, &texture_id_);
+    if (texture_id_ == 0) {
+        g_logger.LogError("Texture::Texture", "Failed to generate texture.");
+    }
 }
 
 Texture::Texture(Texture&& other) noexcept {

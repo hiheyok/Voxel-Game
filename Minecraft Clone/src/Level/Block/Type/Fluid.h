@@ -11,6 +11,7 @@ struct FluidProperties {
 struct Fluid : Block {
 
     FluidProperties properties_;
-
+    // Use custom block model for fluids
+    void InitializeBlockModel(ModelLoader& modelLoader) override;
     void Tick(const BlockPos& pos, Dimension* currentWorld) override;
 };

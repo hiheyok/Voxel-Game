@@ -92,7 +92,7 @@ void MountainGenerator::GenerateEnvironment(const ChunkPos& pos, Chunk* chunk) {
 
                 if (y + pos.y < 34) {
                     if ((chunk->GetBlockUnsafe(x, y, z) == g_blocks.AIR)) {
-                        chunk->SetBlockUnsafe(g_blocks.BLUE_CONCRETE, x, y, z);
+                        chunk->SetBlockUnsafe(g_blocks.WATER, x, y, z);
                     }
 
                     if ((chunk->GetBlockUnsafe(x, y, z) == g_blocks.GRASS)) {
