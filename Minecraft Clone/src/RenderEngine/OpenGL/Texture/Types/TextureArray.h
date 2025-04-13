@@ -5,7 +5,7 @@
 
 class TextureArray : public Texture {
 public:
-    void UploadToGPU();
+    void LoadToGPU();
 
     void SetSize(int width, int height);
 

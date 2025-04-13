@@ -6,7 +6,7 @@
 #include "Level/Block/Material/BlockMaterial.h"
 #include "RenderEngine/BlockModel/ModelLoader.h"
 
-class TextureAtlas;
+class BlockTextureAtlas;
 
 struct BlockModel;
 
@@ -18,7 +18,7 @@ public:
     std::vector<Block*> block_type_data_;
     std::vector<BlockModel> block_model_data_;
 
-    std::unique_ptr<TextureAtlas> block_texture_atlas_;
+    std::unique_ptr<BlockTextureAtlas> block_texture_atlas_;
 
     BlockID AIR = RegisterBlock("minecraft:air", new MaterialNone(), true, false, false);
     BlockID NULL_BLOCK = RegisterBlock("minecraft:null", new MaterialNone(), false, false, false);
@@ -359,8 +359,6 @@ public:
 
     BlockList();
     ~BlockList();
-
-    void CleanUp();
 
     Block* GetBlockType(BlockID id);
 

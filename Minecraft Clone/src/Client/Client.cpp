@@ -82,7 +82,6 @@ void Client::Cleanup() {
     server_->Stop();
     g_logger.Stop();
     //entity_updater_->Stop();
-    g_blocks.CleanUp();
 }
 
 void Client::Render() {

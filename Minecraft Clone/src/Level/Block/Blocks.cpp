@@ -8,7 +8,7 @@
 #include "FileManager/Files.h"
 #include "RenderEngine/BlockModel/ModelLoader.h"
 #include "RenderEngine/BlockModel/BlockModels.h"
-#include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
+#include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
 
 // TODO : Implement model caching
 using json = nlohmann::json;
@@ -77,11 +77,6 @@ void BlockList::InitializeBlockModels()  {
     //catch (std::filesystem::filesystem_error& e) {
     //    g_logger.LogError("File System", e.what());
     //}
-
-    FastHashMap<std::string, size_t> textureIds;
-    FastHashMap<size_t, size_t> textureRepeatCount;
-    FastHashMap<size_t, bool> partialTransparency;
-    FastHashMap<size_t, bool> fullyTransparent;
  
     //It will first go through the block models and create the models without loading the texture
     for (const auto& [name, ID] : block_id_name_data_) {
@@ -94,7 +89,7 @@ void BlockList::InitializeBlockModels()  {
     }
 
     //Generate all the textures now
-    for (auto& block  : block_type_data_) {
+    for (auto& block : block_type_data_) {
         if (block->block_model_data_ == 0) continue;
 
         for (auto& element : block->block_model_data_->elements_) {
@@ -102,50 +97,30 @@ void BlockList::InitializeBlockModels()  {
                 const std::string& path = element.faces_[i].reference_texture_;
                 if (path.length() == 0) continue;
 
-                //Check if it is loaded already
-                if (textureIds.count(path)) {
-                    element.faces_[i].texture_id_ = textureIds[path];
-                    element.faces_[i].texture_count_ = textureRepeatCount[element.faces_[i].texture_id_];
-                    element.faces_[i].partially_transparent_pixel_ = partialTransparency[element.faces_[i].texture_id_];
-                    element.faces_[i].fully_transparent_pixel_ = fullyTransparent[element.faces_[i].texture_id_];
-                    continue; //Exits
-                }
-
                 auto Tokens = Tokenize(path, ':');
 
                 //Load texture
-                std::string TexFile = "assets/" + Tokens.back() + "/textures/" + Tokens.front() + ".png";
-                size_t numLayersBefore = block_texture_atlas_->GetBlockCount();
+                ResourceLocation location{ "/textures/" + Tokens.front() + ".png" , Tokens.back() };
 
-                std::optional<RawTextureData> d = block_texture_atlas_->AddTextureToAtlas(TexFile);
+                int textureId = block_texture_atlas_->AddBlockTexture(location);
 
-                if (!d.has_value()) {
-                    g_logger.LogWarn("BlockList::InitializeBlockModel", "Unable to load texture");
+                if (textureId == -1) {
+                    g_logger.LogWarn("BlockList::InitializeBlockModels", "Unable to load texture.");
                     continue;
                 }
 
-                bool partial = d->HasPartiallyTransparentPixels();
-                bool full = d->HasFullyTransparentPixels();
-
-                textureIds[path] = numLayersBefore + 1;
-                textureRepeatCount[numLayersBefore + 1] = block_texture_atlas_->GetBlockCount() - numLayersBefore;
-                partialTransparency[numLayersBefore + 1] = partial;
-                fullyTransparent[numLayersBefore + 1] = full;
-
-
-                element.faces_[i].texture_id_ = textureIds[path];
-                element.faces_[i].texture_count_ = textureRepeatCount[element.faces_[i].texture_id_];
-                element.faces_[i].partially_transparent_pixel_ = partial;
-                element.faces_[i].fully_transparent_pixel_ = full;
+                element.faces_[i].texture_id_ = textureId;
+                element.faces_[i].texture_count_ = block_texture_atlas_->GetBlockTextureCount(location);
+                element.faces_[i].partially_transparent_pixel_ = block_texture_atlas_->IsTexturePartiallyTransparent(location);
+                element.faces_[i].fully_transparent_pixel_ = block_texture_atlas_->IsTextureFullyTransparent(location);
             }
         }
     }
 
-
     for (size_t i = 0; i < block_type_data_.size(); i++) {
         BlockModel model;
 
-        if (block_type_data_[i]->block_model_data_ != 0) {
+        if (block_type_data_[i]->block_model_data_ != nullptr) {
             model = *block_type_data_[i]->block_model_data_;
         }
         model.texture_variable_.clear();
@@ -154,23 +129,18 @@ void BlockList::InitializeBlockModels()  {
 }
 
 void BlockList::Initialize() {
-    block_texture_atlas_ = std::make_unique<TextureAtlas>();
-    block_texture_atlas_->SetSize(16 * 512, 16 * 512);
+    int individualTexSize = 16;
+
+    block_texture_atlas_ = std::make_unique<BlockTextureAtlas>(512, 512, individualTexSize, individualTexSize);
 
     InitializeBlockModels();
 
-    block_texture_atlas_->UploadToGPU();
+    block_texture_atlas_->LoadToGPU();
 }
 
-BlockList::BlockList() : block_texture_atlas_{ std::make_unique<TextureAtlas>() } {
-
-}
+BlockList::BlockList() = default;
 
 BlockList::~BlockList() {
-    CleanUp();
-}
-
-void BlockList::CleanUp() {
     for (const auto& obj : block_type_data_) {
         delete obj;
     }

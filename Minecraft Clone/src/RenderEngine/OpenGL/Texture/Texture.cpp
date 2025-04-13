@@ -141,7 +141,7 @@ Texture& Texture::operator=(Texture&& other) noexcept {
 
 Texture::~Texture() {
     if (texture_id_ != 0) {
-        glDeleteTextures(1, &texture_id_);
+        //glDeleteTextures(1, &texture_id_);
     }
 }
 

@@ -1,7 +1,7 @@
 #include "RenderEngine/OpenGL/Texture/Types/TextureArray.h"
 #include "Utils/LogUtils.h"
 
-void TextureArray::UploadToGPU() {
+void TextureArray::LoadToGPU() {
     GLsizei mipLevelCount = 4;
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id_);
@@ -12,7 +12,7 @@ void TextureArray::UploadToGPU() {
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, static_cast<GLsizei>(width_), static_cast<GLsizei>(height_), layers_, GL_RGBA, GL_UNSIGNED_BYTE, array_data_.data());
     glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
-    g_logger.LogDebug("TextureArray::UploadToGPU", "Loaded Texture Array: " + std::to_string(texture_id_));
+    g_logger.LogDebug("TextureArray::LoadToGPU", "Loaded Texture Array: " + std::to_string(texture_id_));
 }
 
 void TextureArray::SetSize(int width, int height) {

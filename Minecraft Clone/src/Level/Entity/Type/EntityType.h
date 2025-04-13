@@ -32,7 +32,7 @@ public:
 
     EntityModel render_model_;
 
-    Texture2D texture_;
+    std::unique_ptr<Texture2D> texture_;
 
     std::string entity_name_;
 

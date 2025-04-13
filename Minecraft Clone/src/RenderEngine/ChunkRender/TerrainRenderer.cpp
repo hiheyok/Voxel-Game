@@ -1,6 +1,7 @@
-#include "RenderEngine/ChunkRender/TerrainRenderer.h"
 #include "RenderEngine/ChunkRender/Batch/ChunkBatch.h"
+#include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
 #include "RenderEngine/ChunkRender/Mesh/ChunkMesh.h"
+#include "RenderEngine/ChunkRender/TerrainRenderer.h"
 #include "RenderEngine/Camera/camera.h"
 #include "RenderEngine/Frustum/frustum.h"
 #include "RenderEngine/OpenGL/Texture/Texture.h"

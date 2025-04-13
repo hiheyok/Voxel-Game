@@ -20,8 +20,7 @@ bool Texture2D::Load(const RawTextureData& data) {
         width_ = data.width_;
         height_ = data.height_;
         return true;
-    }
-    else {
+    } else {
         g_logger.LogError("Texture2D::Load", "Image is not loaded");
         return false;
     }

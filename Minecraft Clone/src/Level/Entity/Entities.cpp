@@ -57,7 +57,7 @@ void EntitiesList::InitializeModels() {
         if (d.value().is_string()) {
             g_logger.LogInfo("EntitiesList::InitializeModels", "Entity: " + b.key() + " | Texture Loading: " + (std::string)d.value());
             RawTextureData TexData{ d.value() };
-            entity_type_list_[entityType]->texture_.Load(TexData);
+            entity_type_list_[entityType]->texture_ = std::make_unique<Texture2D>(TexData);
         }
 
         d++;
@@ -91,17 +91,17 @@ void EntitiesList::InitializeModels() {
 
                     std::string texSide = uvFace.value();
 
-                    if (!strcmp(texSide.c_str(), "FRONT"))
+                    if (texSide == "FRONT")
                         s = FRONT;
-                    if (!strcmp(texSide.c_str(), "BACK"))
+                    if (texSide == "BACK")
                         s = BACK;
-                    if (!strcmp(texSide.c_str(), "LEFT"))
+                    if (texSide == "LEFT")
                         s = LEFT;
-                    if (!strcmp(texSide.c_str(), "RIGHT"))
+                    if (texSide == "RIGHT")
                         s = RIGHT;
-                    if (!strcmp(texSide.c_str(), "TOP"))
+                    if (texSide == "TOP")
                         s = TOP;
-                    if (!strcmp(texSide.c_str(), "BOTTOM"))
+                    if (texSide == "BOTTOM")
                         s = BOTTOM;
 
                     uvFaces.push_back(s);

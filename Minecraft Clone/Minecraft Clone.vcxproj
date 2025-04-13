@@ -223,6 +223,7 @@
     <ClCompile Include="src\Level\Level.cpp" />
     <ClCompile Include="src\Level\Light\LightEngine.cpp" />
     <ClCompile Include="src\Level\World\WorldInterface.cpp" />
+    <ClCompile Include="src\RenderEngine\ChunkRender\BlockTextureAtlas.cpp" />
     <ClCompile Include="src\Server\Server.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Biome\BiomeProperties.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugPositioning\DebugPositioning.cpp" />

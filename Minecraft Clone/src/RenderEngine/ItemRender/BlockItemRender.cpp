@@ -5,6 +5,7 @@
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
 #include "RenderEngine/BlockModel/BlockModels.h"
+#include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
 #include "Level/Block/Block.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Item/Item.h"
