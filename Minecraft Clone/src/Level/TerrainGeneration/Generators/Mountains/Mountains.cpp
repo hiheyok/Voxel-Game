@@ -92,7 +92,7 @@ void MountainGenerator::GenerateEnvironment(const ChunkPos& pos, Chunk* chunk) {
 
                 if (y + pos.y < 34) {
                     if ((chunk->GetBlockUnsafe(x, y, z) == g_blocks.AIR)) {
-                        chunk->SetBlockUnsafe(g_blocks.WATER, x, y, z);
+                        chunk->SetBlockUnsafe(g_blocks.BLUE_CONCRETE, x, y, z);
                     }
 
                     if ((chunk->GetBlockUnsafe(x, y, z) == g_blocks.GRASS)) {
@@ -165,6 +165,20 @@ void MountainGenerator::GenerateDecor(const ChunkPos& pos, Chunk* chunk) {
                 //    SetBlock(Blocks.SAND, x - cx, y - cy, z - cz);
                 //}
             }
+        }
+    }
+
+    // Create a roof to test lighting 
+    if (pos.y != 16 * 5) return;
+    for (int x = 0 + pos.x; x < 16 + pos.x; x++) {
+        for (int z = 0 + pos.z; z < 16 + pos.z; z++) {
+            if ((x - 100) * (x - 100) + (z - 100) * (z - 100) <= 100 * 100) {
+                chunk->SetBlock(g_blocks.WHITE_CONCRETE, x - pos.x, 10, z - pos.z);
+            }
+
+            //if (y == 90) {
+            //    SetBlock(Blocks.SAND, x - cx, y - cy, z - cz);
+            //}             
         }
     }
 }

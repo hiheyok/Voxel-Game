@@ -36,10 +36,6 @@ struct DrawCommandIndirect {
 
 namespace CMDGraph {
 
-    static const int GetOppositeSide(int side) {
-        return ((side >> 1) * 2) + ((~side) & 0b1);
-    }
-
     const int NX = 0x00;
     const int PX = 0x01;
     const int NY = 0x02;
@@ -114,23 +110,23 @@ namespace CMDGraph {
             // Early exit if trying to set a neighbor to itself
             if (node == this) return;
 
-            if ((neighbor_[side] == nullptr) && (node->neighbor_[GetOppositeSide(side)] == nullptr)) {
+            if ((neighbor_[side] == nullptr) && (node->neighbor_[!side] == nullptr)) {
                 neighbor_[side] = node;
-                node->neighbor_[GetOppositeSide(side)] = this;
+                node->neighbor_[!side] = this;
                 return;
             }
 
             CommandPtr* p1 = this;
             CommandPtr* p2 = node;
             CommandPtr* p3 = neighbor_[side];
-            CommandPtr* p4 = node->neighbor_[GetOppositeSide(side)];
+            CommandPtr* p4 = node->neighbor_[!side];
 
             //Temp set to null
             neighbor_[side] = nullptr;
             if (p3 != nullptr) {
-                p3->neighbor_[GetOppositeSide(side)] = nullptr;
+                p3->neighbor_[!side] = nullptr;
             }
-            node->neighbor_[GetOppositeSide(side)] = nullptr;
+            node->neighbor_[!side] = nullptr;
             if (p4 != nullptr) {
                 p4->neighbor_[side] = nullptr;
             }
@@ -142,13 +138,13 @@ namespace CMDGraph {
                     p1->SetNeighbor(p4, side, depth + 1);
 
                     p4->neighbor_[side] = p2;
-                    p2->neighbor_[GetOppositeSide(side)] = p4;
+                    p2->neighbor_[!side] = p4;
                 }
                 else {
                     p1->SetNeighbor(p4, side_p4, depth + 1);
 
                     p1->neighbor_[side] = p2;
-                    p2->neighbor_[GetOppositeSide(side)] = p1;
+                    p2->neighbor_[!side] = p1;
                 }
                 return;
             }
@@ -163,7 +159,7 @@ namespace CMDGraph {
                     
                     //reconnects p3 and p1
                     p1->neighbor_[side] = p3;
-                    p3->neighbor_[GetOppositeSide(side)] = p1;
+                    p3->neighbor_[!side] = p1;
 
                     int side_p2 = p3->GetSideLocation(p2->position_);
                     p3->SetNeighbor(p2, side_p2, depth + 1);
@@ -171,7 +167,7 @@ namespace CMDGraph {
                 }
                 else {
                     p1->neighbor_[side] = p2; //no data lost occur here since if p4 is null, it implies p2 neighbor is null
-                    p2->neighbor_[GetOppositeSide(side)] = p1;
+                    p2->neighbor_[!side] = p1;
 
                     int side_p3 = p2->GetSideLocation(p3->position_);
                     p2->SetNeighbor(p3, side_p3, depth + 1);
@@ -189,14 +185,14 @@ namespace CMDGraph {
             if ((p1_distance_p3 <= p1_distance_p2) && (p1_distance_p3 <= p1_distance_p4)) {  // p3 is closest to p1 //OK
                 //reconnects p3 and p1
                 p1->neighbor_[side] = p3;
-                p3->neighbor_[GetOppositeSide(side)] = p1;
+                p3->neighbor_[!side] = p1;
 
                 //connect p4 to p3 at side p3_side_p4
                 int p3_side_p4 = p3->GetSideLocation(p4->position_);
                 p3->SetNeighbor(p4, p3_side_p4, depth + 1);
                 
                 p4->neighbor_[side] = p2;
-                p2->neighbor_[GetOppositeSide(side)] = p4;
+                p2->neighbor_[!side] = p4;
                 
 
                 return;
@@ -429,7 +425,7 @@ private:
                 continue;
             }
 
-            if (node->neighbor_[side]->neighbor_[CMDGraph::GetOppositeSide(side)] != node) {
+            if (node->neighbor_[side]->neighbor_[!side] != node) {
                 return false;
             }
             else {

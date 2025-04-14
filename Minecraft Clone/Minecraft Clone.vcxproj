@@ -30,20 +30,20 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <EnableASAN>false</EnableASAN>
     <EnableFuzzer>false</EnableFuzzer>
@@ -51,7 +51,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseIntelIPP1A>Dynamic_Library</UseIntelIPP1A>
@@ -199,7 +199,6 @@
     <ClCompile Include="src\Core\Options\Option.cpp" />
     <ClCompile Include="src\Core\Registry\ResourceLocation.cpp" />
     <ClCompile Include="src\FileManager\Files.cpp" />
-    <ClCompile Include="src\Level\Block\Texture\BlockTexture.cpp" />
     <ClCompile Include="src\Level\Block\Type\DefaultBlock.cpp" />
     <ClCompile Include="src\Level\Block\Type\Dirt.cpp" />
     <ClCompile Include="src\Level\Block\Type\Fluid.cpp" />
@@ -257,7 +256,7 @@
     <ClCompile Include="src\RenderEngine\EntityRender\EntityRenderCache.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRender\Models\EntityModels.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRender\MultiEntityRender.cpp" />
-    <ClCompile Include="src\RenderEngine\EntityRender\MultiEntityRender.h" />
+    <ClInclude Include="src\RenderEngine\EntityRender\MultiEntityRender.h" />
     <ClCompile Include="src\RenderEngine\Frustum\frustum.cpp" />
     <ClCompile Include="src\RenderEngine\GUI\GUI.cpp" />
     <ClCompile Include="src\RenderEngine\GUI\Font.cpp" />
@@ -480,7 +479,6 @@
     <ClInclude Include="src\Utils\stb_image.h" />
     <ClInclude Include="src\Level\Block\Block.h" />
     <ClInclude Include="src\Level\Block\Blocks.h" />
-    <ClInclude Include="src\Level\Block\Texture\BlockTexture.h" />
     <ClInclude Include="src\Level\Chunk\Chunk.h" />
     <ClInclude Include="src\Level\Chunk\ChunkData.h" />
     <ClInclude Include="src\Level\Entity\Entities.h" />

@@ -21,19 +21,19 @@ public:
     virtual void Disconnect() = 0;
     virtual void Update() = 0;
 
-    int PollBlockUpdates(std::vector<Packet::BlockUpdate>& outUpdates) {
+    size_t PollBlockUpdates(std::vector<Packet::BlockUpdate>& outUpdates) {
         size_t prevSize = outUpdates.size();
         block_update_queue_.PopAll(outUpdates);
         return outUpdates.size() - prevSize;
     }
 
-    int PollEntityUpdates(std::vector<Packet::EntityUpdate>& outUpdates) {
+    size_t PollEntityUpdates(std::vector<Packet::EntityUpdate>& outUpdates) {
         size_t prevSize = outUpdates.size();
         entity_update_queue_.PopAll(outUpdates);
         return outUpdates.size() - prevSize;
     }
 
-    int PollChunkUpdates(std::vector<Packet::ChunkUpdateData>& outUpdates) {
+    size_t PollChunkUpdates(std::vector<Packet::ChunkUpdateData>& outUpdates) {
         size_t prevSize = outUpdates.size();
         chunk_update_queue_.PopAll(outUpdates);
         return outUpdates.size() - prevSize;

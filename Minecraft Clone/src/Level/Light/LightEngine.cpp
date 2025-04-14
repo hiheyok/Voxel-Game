@@ -47,6 +47,46 @@ void LightEngine::WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<LightStorage
         }
     }
 
+    // Look at neighbors too
+
+    for (const auto& side : Directions()) {
+        if (side == Directions::kUp || side == Directions::kDown) continue;
+        ChunkContainer* neighbor = chunk->GetNeighbor(side);
+        if (neighbor == nullptr) {
+            continue;
+        }
+
+        LightStorage neighborLight = neighbor->GetLightData();
+
+        int axis = side.GetAxis();
+        int direction = side.GetDirection() & 0b1;
+        int orthoPos = (1 - direction) * (kChunkDim - 1);
+        int relativeNeighborPos = direction * (kChunkDim - 1);
+
+
+        for (int i = 0; i < kChunkDim; ++i) {
+            if (axis == Directions::kXAxis) {
+                int h = heightmap.Get(orthoPos, i);
+                if (h != kChunkDim) continue;
+            } else {
+                int h = heightmap.Get(i, orthoPos);
+                if (h != kChunkDim) continue;
+            }
+
+            for (int y = 0; y < kChunkDim; ++y) {
+                if (axis == Directions::kXAxis) {
+                    int lightLevel = neighborLight.GetLighting(relativeNeighborPos, y, i);
+                    if (lightLevel < 1) continue;
+                    FIFOQueues.push(PackLightNode(orthoPos, y, i, lightLevel - 1));
+                } else {
+                    int lightLevel = neighborLight.GetLighting(i, y, relativeNeighborPos);
+                    if (lightLevel < 1) continue;
+                    FIFOQueues.push(PackLightNode(i, y, orthoPos, lightLevel - 1));
+                }
+            }
+        }
+    }
+
     while (!FIFOQueues.IsEmpty()) {
         //Get node
         uint16_t node = FIFOQueues.get();
@@ -83,9 +123,9 @@ void LightEngine::WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<LightStorage
                 continue;
             }
 
-            uint8_t nx = nodeX + DIRECTION_OFFSETS[side.GetDirection()][0];
-            uint8_t ny = nodeY + DIRECTION_OFFSETS[side.GetDirection()][1];
-            uint8_t nz = nodeZ + DIRECTION_OFFSETS[side.GetDirection()][2];
+            uint8_t nx = nodeX + DIRECTION_OFFSETS[side][0];
+            uint8_t ny = nodeY + DIRECTION_OFFSETS[side][1];
+            uint8_t nz = nodeZ + DIRECTION_OFFSETS[side][2];
 
             int8_t newLight = nodeLight - 1;
 

@@ -22,7 +22,6 @@ BlockID BlockList::RegisterBlock(std::string blockName, Material* material, bool
 
     block->id_ = id;
     block->properties_ = std::make_unique<BlockType>(transparency, solid, isFluid);
-    block->texture_ = std::make_unique<BlockTexture>();
     block->block_name_ = blockName;
 
     block_type_data_.emplace_back(block);

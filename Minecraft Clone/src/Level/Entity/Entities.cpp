@@ -91,18 +91,19 @@ void EntitiesList::InitializeModels() {
 
                     std::string texSide = uvFace.value();
 
+                    // TODO: refactor FRONT BACK LEFT RIGHT TOP BOTTOM to new directions
                     if (texSide == "FRONT")
-                        s = FRONT;
+                        s = Directions::kEast;
                     if (texSide == "BACK")
-                        s = BACK;
+                        s = Directions::kWest;
                     if (texSide == "LEFT")
-                        s = LEFT;
+                        s = Directions::kNorth;
                     if (texSide == "RIGHT")
-                        s = RIGHT;
+                        s = Directions::kSouth;
                     if (texSide == "TOP")
-                        s = TOP;
+                        s = Directions::kUp;
                     if (texSide == "BOTTOM")
-                        s = BOTTOM;
+                        s = Directions::kDown;
 
                     uvFaces.push_back(s);
                 }

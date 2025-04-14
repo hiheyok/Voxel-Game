@@ -28,7 +28,7 @@ uint8_t LightStorage::GetLighting(int x, int y, int z) const {
 }
 
 void LightStorage::ResetLighting() {
-    memset((uint8_t*)data_, kMaxLightLevel | (kMaxLightLevel << 4), 256 * 8); //8 = sizeof uint64_t
+    memset((uint8_t*)data_, 0, 256 * 8); //8 = sizeof uint64_t
 }
 
 void LightStorage::ResetLightingCustom(uint8_t lvl) {

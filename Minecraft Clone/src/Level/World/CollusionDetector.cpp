@@ -225,7 +225,7 @@ bool CollusionDetector::IsEntityOnGround(Entity* entity) {
             float distance = 0.f;
 
             //Set the distance to check to the previose least length from collusion to optimize searching
-            distance = TraceSingleAxisCollision(origin, NY, (int)floor(leastLength) + 2);
+            distance = TraceSingleAxisCollision(origin, Directions::kDown , (int)floor(leastLength) + 2);
 
             if (distance < leastLength) {
                 leastLength = distance;

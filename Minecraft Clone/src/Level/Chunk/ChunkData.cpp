@@ -115,12 +115,12 @@ void ChunkContainer::UpdateHeightMap() {
 void ChunkContainer::UpdateHeightMap(int x, int z) {
     // Check chunk above first, if the heightmap above is > -1, it means that there are block above
     // -1 indicate theirs nothing in the column
-    ChunkContainer* chunkAbove = neighbors_[PY];
+    ChunkContainer* chunkAbove = neighbors_[Directions::kUp];
 
     int newHeight = -1; // -1 is the default height if there is no blocks in the column
     int oldHeight = heightmap_->Get(x, z);
     
-    if (neighbors_[PY] != nullptr && neighbors_[PY]->heightmap_->Get(x, z) != -1) {
+    if (chunkAbove != nullptr && chunkAbove->heightmap_->Get(x, z) != -1) {
         newHeight = kChunkDim;
     } else {
         for (int i = 15; i >= 0; --i) {
@@ -135,7 +135,7 @@ void ChunkContainer::UpdateHeightMap(int x, int z) {
         light_dirty_ = true;
         heightmap_->Edit(x, z, newHeight);
     
-        ChunkContainer* chunkBottom = neighbors_[NY];
+        ChunkContainer* chunkBottom = neighbors_[Directions::kDown];
         if (chunkBottom != nullptr && (oldHeight == -1 || newHeight == -1)) {
             chunkBottom->UpdateHeightMap(x, z);
         }
@@ -148,4 +148,8 @@ bool ChunkContainer::CheckLightDirty() {
     bool isDirty = light_dirty_;
     light_dirty_ = false;
     return isDirty;
+}
+
+void ChunkContainer::SetLightDirty() {
+    light_dirty_ = true;
 }

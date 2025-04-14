@@ -99,9 +99,6 @@
     <ClCompile Include="src\Level\Event\EntityEventHandles\EntityHandles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\EntityRender\MultiEntityRender.h">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Initializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -267,9 +264,6 @@
     <ClCompile Include="src\Level\Entity\Type\Passive.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Block\Texture\BlockTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Level\Block\Type\GravityBlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -432,9 +426,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\OpenGL\OpenGL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\Block\Texture\BlockTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Client\Player.h">
@@ -1006,6 +997,9 @@
     </ClInclude>
     <ClInclude Include="src\Core\Position\Direction.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\EntityRender\MultiEntityRender.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

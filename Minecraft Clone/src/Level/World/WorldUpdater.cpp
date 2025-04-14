@@ -15,8 +15,10 @@ WorldUpdater::WorldUpdater(World* w, WorldParameters p) : settings_{ std::make_u
 void WorldUpdater::loadSummonEntitySurrounding(EntityUUID uuid) {
     Entity* e = world_->GetEntity(uuid);
 
-    if (e == nullptr)
+    if (e == nullptr) {
         g_logger.LogError("WorldLoader::loadSummonEntitySurrounding", std::string("Entity with UUID " + std::to_string(uuid) + " not found"));
+        return;
+    }
     vec3 pos = e->properties_.position_ / 16.f;
     // vec3 velocity = e->Properties.Velocity;
 
@@ -270,8 +272,42 @@ void WorldUpdater::SetLight(std::vector<std::unique_ptr<LightStorage>> lights) {
     std::vector<ChunkPos> updatedPos;
     updatedPos.reserve(lights.size());
 
+    // TODO: add some optimizations to only update if it will affect the neighbors
     for (auto& light : lights) {
         Chunk* chunk = world_->GetChunk(light->position_);
+        
+        // Update neighbor side too
+        for (const auto& side : Directions()) {
+            if (side.GetAxis() == Directions::kYAxis) {
+                continue;
+            }
+            if (chunk->GetNeighbor(side) == nullptr) continue;
+
+            // Check if it should update the neighbor too
+            bool updateNeighbor = false;
+
+            int orthoPos = (kChunkDim - 1) * (~side.GetDirection() & 0b1);
+
+            for (int i = 0; i < kChunkDim && !updateNeighbor; ++i) {
+                for (int y = 0; y < kChunkDim && !updateNeighbor; ++y) {
+                    if (side.GetAxis() == Directions::kXAxis) {
+                        int currLight = chunk->lighting_->GetLighting(orthoPos, y, i);
+                        if (currLight != light->GetLighting(orthoPos, y, i)) {
+                            updateNeighbor = true;
+                        }
+                    } else {
+                        int currLight = chunk->lighting_->GetLighting(i, y, orthoPos);
+                        if (currLight != light->GetLighting(i, y, orthoPos)) {
+                            updateNeighbor = true;
+                        }
+                    }
+                }
+            }
+            
+            if (updateNeighbor) {
+                chunk->GetNeighbor(side)->SetLightDirty();
+            }
+        }
         updatedPos.push_back(light->position_);
         chunk->lighting_->ReplaceData(light->GetData());
     }

@@ -36,7 +36,7 @@ public:
         z = pz;
     }
 
-    constexpr void incrementSide(int side, int val) {
+    void incrementSide(int side, int val) {
         reinterpret_cast<int*>(this)[side >> 1] += (1 - 2 * (side & 1)) * val;
     }
 
@@ -150,7 +150,7 @@ public:
         z *= other;
     }
 
-    friend constexpr  std::ostream& operator<<(std::ostream& os, const ChunkPos& m) {
+    friend std::ostream& operator<<(std::ostream& os, const ChunkPos& m) {
         return os << '[' << m.x << ',' << m.y << ',' << m.z << ']';
     }
 

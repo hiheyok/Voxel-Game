@@ -13,12 +13,16 @@ inline constexpr int kNorthDirection = 0x05;
 // Use for offsets
 class Direction {
 public:
-    constexpr Direction(int x, int y, int z, int direction) :
+    constexpr Direction(int x, int y, int z, int direction) noexcept :
         pos_{ x, y, z },
-        direction_{ direction } {
-    };
+        direction_{ direction } {};
 
-    constexpr Direction(const Direction&) = default;
+    constexpr Direction(const Direction&) noexcept = default;
+    constexpr Direction(Direction&&) noexcept = default;
+    constexpr ~Direction() noexcept = default;
+
+    constexpr Direction& operator=(Direction&&) noexcept = default;
+    constexpr Direction& operator=(const Direction&) noexcept = default;
 
     friend constexpr ChunkPos operator+(const ChunkPos& m, const Direction& n) {
         return m + n.pos_;
@@ -26,6 +30,13 @@ public:
 
     constexpr bool operator==(const Direction& other) const {
         return other.direction_ == direction_ && other.pos_ == pos_;
+    }
+
+    constexpr Direction operator!() const {
+        Direction opposite{*this};
+        opposite.pos_ *= -1;
+        opposite.direction_ = GetOppositeDirection();
+        return opposite;
     }
 
     constexpr int GetDirection() const {
@@ -78,13 +89,17 @@ public:
     static constexpr Direction kDown{ 0, -1, 0, kDownDirection };
     static constexpr Direction kSouth{ 0, 0, 1, kSouthDirection };
     static constexpr Direction kNorth{ 0, 0, -1, kNorthDirection };
+
+    static constexpr int kXAxis = 0;
+    static constexpr int kYAxis = 1;
+    static constexpr int kZAxis = 2;
 private:
     static constexpr Direction kDirections[6]{ 
-        { 1, 0, 0, kEastDirection } , 
-        { -1, 0, 0, kWestDirection }, 
-        { 0, 1, 0, kUpDirection },
-        { 0, -1, 0, kDownDirection },
-        { 0, 0, 1, kSouthDirection },
-        { 0, 0, -1, kNorthDirection }
+        { 1 , 0 , 0 , kEastDirection } , 
+        { -1, 0 , 0 , kWestDirection }, 
+        { 0 , 1 , 0 , kUpDirection },
+        { 0 , -1, 0 , kDownDirection },
+        { 0 , 0 , 1 , kSouthDirection },
+        { 0 , 0 , -1, kNorthDirection }
     };
 };

@@ -16,7 +16,7 @@ void ChunkMap::EraseChunk(const ChunkPos& pos) {
         ChunkPos neighborPos = pos + offset;
 
         if (CheckChunk(neighborPos)) {
-            GetChunk(neighborPos)->SetNeighbor(nullptr, offset.GetOppositeDirection());
+            GetChunk(neighborPos)->SetNeighbor(nullptr, !offset);
         }
     }
 
@@ -29,7 +29,7 @@ void ChunkMap::EraseChunk(const ChunkPos& pos) {
     std::swap(chunks_[idx], chunks_.back());
     chunks_.pop_back();
 
-    ChunkContainer* bottomChunk = reg->GetChunk(pos)->GetNeighbor(NY);
+    ChunkContainer* bottomChunk = reg->GetChunk(pos)->GetNeighbor(Directions::kDown);
 
     reg->EraseChunk(pos);
 
@@ -119,8 +119,8 @@ void ChunkMap::InsertChunk(std::unique_ptr<Chunk> chunk) {
         ChunkPos posNeighbor = chunk->position_ + offset;
 
         if (CheckChunk(posNeighbor)) {
-            chunk->SetNeighbor(static_cast<ChunkContainer*>(GetChunk(posNeighbor)), offset.GetDirection());
-            GetChunk(posNeighbor)->SetNeighbor(static_cast<ChunkContainer*>(chunk.get()), offset.GetOppositeDirection());
+            chunk->SetNeighbor(static_cast<ChunkContainer*>(GetChunk(posNeighbor)), offset);
+            GetChunk(posNeighbor)->SetNeighbor(static_cast<ChunkContainer*>(chunk.get()), !offset);
             if (neighbor_update_) {
                 GetChunk(posNeighbor)->UpdateGen();
             }

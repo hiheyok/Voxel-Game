@@ -53,6 +53,7 @@ public:
     // Check light update request
 
     bool CheckLightDirty();
+    void SetLightDirty();
 private:
     bool light_dirty_ = false;
     Palette block_storage_;

@@ -110,15 +110,22 @@ void ClientPlay::Update(Window* window) {
 
 void ClientPlay::UpdateDebugStats() {
     ServerStats stats = interface_->GetServerStats();
+    glm::vec3 playerPos = main_player_->GetEntityProperties().position_;
+    BlockPos blockPos{ playerPos.x, playerPos.y, playerPos.z };
+    BlockPos relBlockPos = blockPos& (kChunkDim - 1);
+    int lightLvl = -1;
+    if (client_level_->cache.CheckChunk(blockPos / kChunkDim)) {
+        lightLvl = client_level_->cache.GetChunk(blockPos / kChunkDim)->lighting_->GetLighting(relBlockPos.x, relBlockPos.y, relBlockPos.z);
+    }
 
     debug_screen_->EditText("Stat1", "VRAM Usage: " + std::to_string((double)terrain_render_->renderer_->GetVRAMUsageFull() / 1000000.0) + " MB");
-    debug_screen_->EditText("Stat2", "XYZ: " + std::to_string(main_player_->GetEntityProperties().position_.x) + "/" + std::to_string(main_player_->GetEntityProperties().position_.y) + "/" + std::to_string(main_player_->GetEntityProperties().position_.z));
+    debug_screen_->EditText("Stat2", "XYZ: " + std::to_string(playerPos.x) + "/" + std::to_string(playerPos.y) + "/" + std::to_string(playerPos.z));
     debug_screen_->EditText("Stat3", "Velocity XYZ: " + std::to_string(main_player_->GetEntityProperties().velocity_.x) + "/" + std::to_string(main_player_->GetEntityProperties().velocity_.y) + "/" + std::to_string(main_player_->GetEntityProperties().velocity_.z));
     debug_screen_->EditText("Stat4", "VRAM Fragmentation Rate: " + std::to_string(terrain_render_->renderer_->GetFragmentationRate() * 100) + "%");
     debug_screen_->EditText("Stat5", "FPS: " + std::to_string(1.0 / frametime_));
     debug_screen_->EditText("Stat6", "Mesh Stats (ms) Total/S0/S1/S2: " + std::to_string(terrain_render_->build_time_ / 1000.f) + "/" + std::to_string(terrain_render_->build_stage_0_ / 1000.f) + "/" + std::to_string(terrain_render_->build_stage_1_ / 1000.f) + "/" + std::to_string(terrain_render_->build_stage_2_ / 1000.f));
     debug_screen_->EditText("Stat7", "Mesh Engine Queued: " + std::to_string(terrain_render_->GetQueuedSize()));
-    debug_screen_->EditText("Stat8", "Event Queue Size: N/A");
+    debug_screen_->EditText("Stat8", "Light Level: " + std::to_string(lightLvl));
     debug_screen_->EditText("Stat9", "Server Tick (MSPT): " + std::to_string(stats.mspt_));
     debug_screen_->EditText("Stat10", "Chunk Count: " + std::to_string(stats.chunk_count_));
     debug_screen_->Update();

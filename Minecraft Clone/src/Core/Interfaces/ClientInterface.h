@@ -19,7 +19,7 @@ public:
 
     ClientInterface() = default;
 
-    int PollClientPlayerAction(std::vector<Packet::PlayerAction>& playerAction) {
+    size_t PollClientPlayerAction(std::vector<Packet::PlayerAction>& playerAction) {
         size_t prevSize = playerAction.size();
         player_action_queue_.PopAll(playerAction);
         return playerAction.size() - prevSize;

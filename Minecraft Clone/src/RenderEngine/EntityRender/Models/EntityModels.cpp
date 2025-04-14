@@ -7,63 +7,63 @@ Model::ModelData Model::RectangularPrism::GetVertices() {
     model.vertices_.insert(model.vertices_.begin(), {
         //Front
         0.f,0.f,0.f,            // 0
-        uv_map_[FRONT].p1_.x,uv_map_[FRONT].p0_.y,
+        uv_map_[Directions::kEast].p1_.x,uv_map_[Directions::kEast].p0_.y,
         size_.x, 0.f,0.f,        // 1
-        uv_map_[FRONT].p0_.x,uv_map_[FRONT].p0_.y,
+        uv_map_[Directions::kEast].p0_.x,uv_map_[Directions::kEast].p0_.y,
         size_.x, size_.y, 0.f,    // 2
-        uv_map_[FRONT].p0_.x,uv_map_[FRONT].p1_.y,
+        uv_map_[Directions::kEast].p0_.x,uv_map_[Directions::kEast].p1_.y,
         0.f, size_.y, 0.f,        // 3
-        uv_map_[FRONT].p1_.x,uv_map_[FRONT].p1_.y,
+        uv_map_[Directions::kEast].p1_.x,uv_map_[Directions::kEast].p1_.y,
 
         //Back
         0.f,0.f,size_.z,            // 4
-        uv_map_[BACK].p1_.x,uv_map_[BACK].p0_.y,
+        uv_map_[Directions::kWest].p1_.x,uv_map_[Directions::kWest].p0_.y,
         size_.x, 0.f,size_.z,        // 5
-        uv_map_[BACK].p0_.x,uv_map_[BACK].p0_.y,
+        uv_map_[Directions::kWest].p0_.x,uv_map_[Directions::kWest].p0_.y,
         size_.x, size_.y, size_.z,    // 6
-        uv_map_[BACK].p0_.x,uv_map_[BACK].p1_.y,
+        uv_map_[Directions::kWest].p0_.x,uv_map_[Directions::kWest].p1_.y,
         0.f, size_.y, size_.z,    // 7
-        uv_map_[BACK].p1_.x,uv_map_[BACK].p1_.y,
+        uv_map_[Directions::kWest].p1_.x,uv_map_[Directions::kWest].p1_.y,
 
         //Right
         size_.x,0.f,0.f,            // 8
-        uv_map_[RIGHT].p1_.x,uv_map_[RIGHT].p0_.y,
+        uv_map_[Directions::kSouth].p1_.x,uv_map_[Directions::kSouth].p0_.y,
         size_.x,size_.y,0.f,        // 9
-        uv_map_[RIGHT].p1_.x,uv_map_[RIGHT].p1_.y,
+        uv_map_[Directions::kSouth].p1_.x,uv_map_[Directions::kSouth].p1_.y,
         size_.x,size_.y,size_.z,    // 10
-        uv_map_[RIGHT].p0_.x,uv_map_[RIGHT].p1_.y,
+        uv_map_[Directions::kSouth].p0_.x,uv_map_[Directions::kSouth].p1_.y,
         size_.x,0.f,size_.z,        // 11
-        uv_map_[RIGHT].p0_.x,uv_map_[RIGHT].p0_.y,
+        uv_map_[Directions::kSouth].p0_.x,uv_map_[Directions::kSouth].p0_.y,
 
         //Left
         0.f,0.f,0.f,            // 12
-        uv_map_[LEFT].p1_.x,uv_map_[LEFT].p0_.y,
+        uv_map_[Directions::kNorth].p1_.x,uv_map_[Directions::kNorth].p0_.y,
         0.f,size_.y,0.f,            // 13
-        uv_map_[LEFT].p1_.x,uv_map_[LEFT].p1_.y,
+        uv_map_[Directions::kNorth].p1_.x,uv_map_[Directions::kNorth].p1_.y,
         0.f,size_.y,size_.z,        // 14
-        uv_map_[LEFT].p0_.x,uv_map_[LEFT].p1_.y,
+        uv_map_[Directions::kNorth].p0_.x,uv_map_[Directions::kNorth].p1_.y,
         0.f,0.f,size_.z,            // 15
-        uv_map_[LEFT].p0_.x,uv_map_[LEFT].p0_.y,
+        uv_map_[Directions::kNorth].p0_.x,uv_map_[Directions::kNorth].p0_.y,
 
         //Top
         0.f,size_.y,0.f,            // 16
-        uv_map_[TOP].p1_.x,uv_map_[TOP].p0_.y,
+        uv_map_[Directions::kUp].p1_.x,uv_map_[Directions::kUp].p0_.y,
         size_.x,size_.y,0.f,        // 17
-        uv_map_[TOP].p0_.x,uv_map_[TOP].p0_.y,
+        uv_map_[Directions::kUp].p0_.x,uv_map_[Directions::kUp].p0_.y,
         size_.x,size_.y,size_.z,    // 18
-        uv_map_[TOP].p0_.x,uv_map_[TOP].p1_.y,
+        uv_map_[Directions::kUp].p0_.x,uv_map_[Directions::kUp].p1_.y,
         0.f,size_.y,size_.z,        // 19
-        uv_map_[TOP].p1_.x,uv_map_[TOP].p1_.y,
+        uv_map_[Directions::kUp].p1_.x,uv_map_[Directions::kUp].p1_.y,
 
         //Bottom
         0.f,0.f,0.f,            // 20
-        uv_map_[BOTTOM].p1_.x,uv_map_[BOTTOM].p0_.y,
+        uv_map_[Directions::kDown].p1_.x,uv_map_[Directions::kDown].p0_.y,
         size_.x,0.f,0.f,            // 21
-        uv_map_[BOTTOM].p0_.x,uv_map_[BOTTOM].p0_.y,
+        uv_map_[Directions::kDown].p0_.x,uv_map_[Directions::kDown].p0_.y,
         size_.x,0.f,size_.z,        // 22
-        uv_map_[BOTTOM].p0_.x,uv_map_[BOTTOM].p1_.y,
+        uv_map_[Directions::kDown].p0_.x,uv_map_[Directions::kDown].p1_.y,
         0.f,0.f,size_.z,            // 23
-        uv_map_[BOTTOM].p1_.x,uv_map_[BOTTOM].p1_.y
+        uv_map_[Directions::kDown].p1_.x,uv_map_[Directions::kDown].p1_.y
         });
 
 
