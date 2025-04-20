@@ -13,6 +13,8 @@ public:
     LightStorage& operator=(const LightStorage&) = default;
     LightStorage& operator=(LightStorage&&) = default;
 
+    bool operator==(const LightStorage&) const;
+
     const uint64_t* GetData() const;
 
     void ReplaceData(const uint64_t* src);

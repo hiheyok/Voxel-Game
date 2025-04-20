@@ -10,7 +10,7 @@ void Heightmap::Edit(int x, int z, int height) {
     data_[x * kChunkDim + z] =  height;
 }
 
-int16_t Heightmap::Get(int x, int z) const {
+int Heightmap::Get(int x, int z) const {
     return data_[x * kChunkDim + z];
 }
 

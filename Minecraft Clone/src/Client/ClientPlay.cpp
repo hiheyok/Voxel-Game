@@ -123,7 +123,13 @@ void ClientPlay::UpdateDebugStats() {
     debug_screen_->EditText("Stat3", "Velocity XYZ: " + std::to_string(main_player_->GetEntityProperties().velocity_.x) + "/" + std::to_string(main_player_->GetEntityProperties().velocity_.y) + "/" + std::to_string(main_player_->GetEntityProperties().velocity_.z));
     debug_screen_->EditText("Stat4", "VRAM Fragmentation Rate: " + std::to_string(terrain_render_->renderer_->GetFragmentationRate() * 100) + "%");
     debug_screen_->EditText("Stat5", "FPS: " + std::to_string(1.0 / frametime_));
-    debug_screen_->EditText("Stat6", "Mesh Stats (ms) Total/S0/S1/S2: " + std::to_string(terrain_render_->build_time_ / 1000.f) + "/" + std::to_string(terrain_render_->build_stage_0_ / 1000.f) + "/" + std::to_string(terrain_render_->build_stage_1_ / 1000.f) + "/" + std::to_string(terrain_render_->build_stage_2_ / 1000.f));
+    debug_screen_->EditText("Stat6", "Mesh Stats (ms) Total/S0/S1/S2: " + 
+        std::to_string(terrain_render_->build_time_ / 1000.f) + "/" + 
+        std::to_string(100.0 * terrain_render_->build_stage_0_ / terrain_render_->build_time_) + "/" +
+        std::to_string(100.0 * terrain_render_->build_stage_1_ / terrain_render_->build_time_) + "/" + 
+        std::to_string(terrain_render_->build_stage_2_ / 1000.f));
+    
+    
     debug_screen_->EditText("Stat7", "Mesh Engine Queued: " + std::to_string(terrain_render_->GetQueuedSize()));
     debug_screen_->EditText("Stat8", "Light Level: " + std::to_string(lightLvl));
     debug_screen_->EditText("Stat9", "Server Tick (MSPT): " + std::to_string(stats.mspt_));

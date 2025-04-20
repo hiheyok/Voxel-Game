@@ -1,12 +1,14 @@
-#include <cstdint>
+﻿#include <cstdint>
 #include <array>
 
 #include "RenderEngine/ChunkRender/Mesh/ChunkMesh.h"
 #include "RenderEngine/BlockModel/BlockModels.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Block/Block.h"
+#include "Level/Block/Type/Fluid.h"
 #include "Level/Chunk/Chunk.h"
 #include "Level/Light/LightStorage.h"
+#include "Utils/Timer/Timer.h"
 
 constexpr int POSITION_OFFSET = 16;
 
@@ -86,9 +88,12 @@ void Mesh::ChunkMeshData::GenerateMesh() {
     if (chunk_ == nullptr) {
         return;
     }
-
+    Timer time;
     GenerateCache();
+    cache_time_ = time.GetTimePassed_μs();
     GenerateFaceCollection();
+    greedy_time_ = time.GetTimePassed_μs() - cache_time_;
+
 }
 
 //Loops through all the blocks in the chunk and check if each block side is visible. If a block side is visible, it generates the quad and puts it in the cache
@@ -100,7 +105,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
     for (int axis = 0; axis < 3; axis++) {
         int axisU = (axis + 2) % 3;
         int axisV = (axis + 1) % 3;
-        int pos[3]{ 0,0,0 };
+        glm::ivec3 pos{ 0,0,0 };
 
         for (pos[axis] = 0; pos[axis] < 17; ++pos[axis]) {//Slice
             usedBlock.fill(0);
@@ -166,7 +171,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
                     int uLength = 1;
                     int vLength = 1;
 
-                    int qPos[3]{ pos[0], pos[1], pos[2] };
+                    glm::ivec3 qPos{ pos[0], pos[1], pos[2] };
 
                     for (qPos[axisV] = pos[axisV] + 1; qPos[axisV] < 16; ++qPos[axisV]) {
                         //Check if they are the same
@@ -265,7 +270,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
     }
 }
 
-inline void Mesh::ChunkMeshData::AddFaceToMesh(const BlockFace& face, uint8_t axis_, glm::ivec3 from_, glm::ivec3 to_, bool allowAO, int x, int y, int z) {
+void Mesh::ChunkMeshData::AddFaceToMesh(const BlockFace& face, uint8_t axis_, glm::ivec3 from_, glm::ivec3 to_, bool allowAO, int x, int y, int z) {
     uint8_t NN = 15, PN = 15, PP = 15, NP = 15;
     uint8_t direction = axis_ & 0b1;
     uint8_t facing = axis_ >> 1;
@@ -356,7 +361,8 @@ inline const BlockID& Mesh::ChunkMeshData::GetCachedBlockID(int* pos) const {
 }
 
 inline void Mesh::ChunkMeshData::SetCachedBlockID(BlockID b, int x, int y, int z) {
-    chunk_cache_[(x + 1) * 18 * 18 + (z + 1) * 18 + (y + 1)] = b;
+    chunk_cache_[(x + 1) * (kChunkDim + 2) * (kChunkDim + 2) + (z + 1) * (kChunkDim + 2) + (y + 1)] = b;
+    //is_fluid_.set((x + 1) * (kChunkDim + 2) * (kChunkDim + 2) + (z + 1) * (kChunkDim + 2) + (y + 1), g_blocks.GetBlockProperties(b).is_fluid_);
 }
 
 inline glm::u8vec4 Mesh::ChunkMeshData::GetAO(uint8_t direction, int x, int y, int z) {

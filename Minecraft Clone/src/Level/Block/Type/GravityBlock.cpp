@@ -3,6 +3,12 @@
 #include "Level/Event/EventHandler.h"
 #include "Level/Entity/Entities.h"
 
+GravityBlock::GravityBlock() {
+    properties_->is_solid_ = true;
+    properties_->transparency_ = false;
+    properties_->is_fluid_ = false;
+}
+
 void GravityBlock::Tick(const BlockPos& pos, Dimension* currentWorld) {
     BlockPos belowPos = pos;
     belowPos.y -= 1;

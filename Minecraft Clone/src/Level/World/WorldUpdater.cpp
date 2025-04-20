@@ -10,7 +10,9 @@
 
 using namespace glm;
 
-WorldUpdater::WorldUpdater(World* w, WorldParameters p) : settings_{ std::make_unique<WorldParameters>( p ) }, world_{ w } {}
+WorldUpdater::WorldUpdater(World* w, WorldParameters p) : 
+    settings_{ std::make_unique<WorldParameters>( p ) }, 
+    world_{ w } {}
 
 void WorldUpdater::loadSummonEntitySurrounding(EntityUUID uuid) {
     Entity* e = world_->GetEntity(uuid);
@@ -22,19 +24,19 @@ void WorldUpdater::loadSummonEntitySurrounding(EntityUUID uuid) {
     vec3 pos = e->properties_.position_ / 16.f;
     // vec3 velocity = e->Properties.Velocity;
 
-    ivec3 initalPos{ (int)pos.x, (int)pos.y, (int)pos.z };
+    ivec3 initial_pos{ (int)pos.x, (int)pos.y, (int)pos.z };
 
     // TODO: Use light engine FIFO 
-    std::deque<ivec3> FIFO;
+    std::deque<ivec3> fifo;
 
-    FIFO.push_back(initalPos);
-    while (!FIFO.empty()) {
+    fifo.push_back(initial_pos);
+    while (!fifo.empty()) {
 
-        ivec3 chunkPos = FIFO.front();
-        FIFO.pop_front();
+        ivec3 current_chunk_pos = fifo.front();
+        fifo.pop_front();
 
         //Gets relative position from the entity
-        ivec3 offset = initalPos - chunkPos;
+        ivec3 offset = initial_pos - current_chunk_pos;
 
         //Checks if it is in range
         if ((abs(offset.x) > settings_->horizontal_ticking_distance_) || (abs(offset.z) > settings_->horizontal_ticking_distance_))
@@ -42,16 +44,16 @@ void WorldUpdater::loadSummonEntitySurrounding(EntityUUID uuid) {
         if (abs(offset.y) > settings_->vertical_ticking_distance_)
             continue;
 
-        bool isSuccess = RequestLoad(ChunkPos{ chunkPos.x, chunkPos.y, chunkPos.z });
+        bool isSuccess = RequestLoad(ChunkPos{ current_chunk_pos.x, current_chunk_pos.y, current_chunk_pos.z });
         if (!isSuccess) continue;
 
         for (int side = 0; side < 6; side++) {
 
-            ivec3 newObj = chunkPos;
+            ivec3 neighbor_chunk_pos = current_chunk_pos;
 
-            newObj[side >> 1] += (side & 0b1) * 2 - 1;
+            neighbor_chunk_pos[side >> 1] += (side & 0b1) * 2 - 1;
 
-            FIFO.push_back(newObj);
+            fifo.push_back(neighbor_chunk_pos);
         }
     }
 
@@ -66,7 +68,7 @@ bool WorldUpdater::RequestLoad(const ChunkPos& pos) {
         p.y /= 16;
 
     {
-        std::lock_guard<std::mutex> otherLock{ other_lock_ };
+        std::lock_guard<std::mutex> other_lock{ other_lock_ };
         if (generating_chunk_.count(p))
             return false;
 
@@ -83,8 +85,8 @@ bool WorldUpdater::RequestLoad(const ChunkPos& pos) {
 
 //Only work on loading chunks for not. Unloading for later
 void WorldUpdater::loadSurroundedMovedEntityChunk() {
-    std::vector<ivec3> centerPositionList = {};
-    std::vector<vec3> centerVelocityList = {};
+    std::vector<ivec3> center_position_list;
+    std::vector<vec3> center_velocity_list;
 
     //Get entity chunk position
 
@@ -102,19 +104,19 @@ void WorldUpdater::loadSurroundedMovedEntityChunk() {
             continue;
         }
 
-        centerPositionList.emplace_back(x, y, z);
-        centerVelocityList.emplace_back(entity->properties_.velocity_);
+        center_position_list.emplace_back(x, y, z);
+        center_velocity_list.emplace_back(entity->properties_.velocity_);
     }
 
-    if (centerPositionList.empty()) return;
+    if (center_position_list.empty()) return;
 
     ivec3 axisTickingDistance{ settings_->horizontal_ticking_distance_, settings_->vertical_ticking_distance_, settings_->horizontal_ticking_distance_ };
 
-    int chunkPadding = 4;
+    int chunk_padding = 4;
 
-    for (size_t i = 0; i < centerPositionList.size(); i++) {
-        ivec3 pos = centerPositionList[i];
-        vec3 vel = centerVelocityList[i];
+    for (size_t i = 0; i < center_position_list.size(); i++) {
+        ivec3 pos = center_position_list[i];
+        vec3 vel = center_velocity_list[i];
 
         for (int j = 0; j < 3; j++) {
             int side = 0;
@@ -129,8 +131,8 @@ void WorldUpdater::loadSurroundedMovedEntityChunk() {
 
             if (side == 0) continue;
 
-            int uDistance = axisTickingDistance[(j + 1) % 3] + chunkPadding;
-            int vDistance = axisTickingDistance[(j + 2) % 3] + chunkPadding;
+            int uDistance = axisTickingDistance[(j + 1) % 3] + chunk_padding;
+            int vDistance = axisTickingDistance[(j + 2) % 3] + chunk_padding;
             int sideDistanceOffset = axisTickingDistance[j] + 1;
 
             for (int u = -uDistance; u <= uDistance; u++) {
@@ -146,10 +148,6 @@ void WorldUpdater::loadSurroundedMovedEntityChunk() {
                     if (!isSuccess) continue;
                 }
             }
-
-
-
-
         }
     }
 }
@@ -160,23 +158,18 @@ void WorldUpdater::loadSpawnChunks() {
     for (long long int x = -settings_->spawn_chunk_horizontal_radius_; x <= settings_->spawn_chunk_horizontal_radius_; x++) {
         for (long long int z = -settings_->spawn_chunk_horizontal_radius_; z <= settings_->spawn_chunk_horizontal_radius_; z++) {
             for (long long int y = -settings_->spawn_chunk_vertical_radius_; y <= settings_->spawn_chunk_vertical_radius_; y++) {
-                bool isSuccess = RequestLoad(ChunkPos{ x, y, z });
-
-                if (!isSuccess) {
+                if (!RequestLoad(ChunkPos{ x, y, z })) {
                     continue;
                 }
-
             }
         }
     }
-
     is_spawn_chunks_loaded_ = true;
 }
 
 void WorldUpdater::DeleteEntityChunkLoader(EntityUUID uuid) {
     if (!entity_chunk_loaders_.count(uuid))
         g_logger.LogError("WorldLoader::DeleteEntityChunkLoader", std::string("Could not find entity with UUID " + std::to_string(uuid)));
-
     entity_chunk_loaders_.erase(uuid);
 }
 
@@ -230,7 +223,7 @@ std::vector<ChunkPos> WorldUpdater::GetRequestedChunks() {
 }
 
 std::vector<EntityProperty> WorldUpdater::GetSpawnedEntities() {
-    return world_->GetEntityContainer()->GetSpawnedEntities(); // TODO: Create some internal stuff to handle this in the chunk updater
+    return world_->GetEntityContainer()->GetSpawnedEntities();
 }
 
 std::vector<EntityProperty> WorldUpdater::GetUpdatedEntities() {
@@ -244,7 +237,6 @@ std::vector<EntityUUID> WorldUpdater::GetRemovedEntities() {
 
 void WorldUpdater::SetBlock(const BlockID& block, const BlockPos& pos) {
     world_->SetBlock(block, pos);
-
     ChunkPos chunkPos = pos / kChunkDim;
 
     std::unique_lock<std::mutex> lock{ updated_chunk_lock_ };
@@ -276,18 +268,24 @@ void WorldUpdater::SetLight(std::vector<std::unique_ptr<LightStorage>> lights) {
     for (auto& light : lights) {
         Chunk* chunk = world_->GetChunk(light->position_);
         
+        // See if it will actually make some changes
+        if (*light == *chunk->lighting_) continue;
+
         // Update neighbor side too
         for (const auto& side : Directions()) {
             if (side.GetAxis() == Directions::kYAxis) {
                 continue;
             }
-            if (chunk->GetNeighbor(side) == nullptr) continue;
+            ChunkContainer* neighbor = chunk->GetNeighbor(side);
+            if (neighbor == nullptr) continue;
 
             // Check if it should update the neighbor too
             bool updateNeighbor = false;
 
             int orthoPos = (kChunkDim - 1) * (~side.GetDirection() & 0b1);
+            int relativePos = (kChunkDim - 1) * (side.GetDirection() & 0b1);
 
+            // Verify that it actually changed the side close to the neighboring chunk
             for (int i = 0; i < kChunkDim && !updateNeighbor; ++i) {
                 for (int y = 0; y < kChunkDim && !updateNeighbor; ++y) {
                     if (side.GetAxis() == Directions::kXAxis) {
@@ -303,7 +301,27 @@ void WorldUpdater::SetLight(std::vector<std::unique_ptr<LightStorage>> lights) {
                     }
                 }
             }
-            
+
+            // TODO: Then verify that it will produce changes in the neighbor side
+            for (int i = 0; i < kChunkDim && !updateNeighbor; ++i) {
+                for (int y = 0; y < kChunkDim && !updateNeighbor; ++y) {
+                    if (side.GetAxis() == Directions::kXAxis) {
+                        int currLight = chunk->lighting_->GetLighting(orthoPos, y, i);
+                        int neighborLight = neighbor->lighting_->GetLighting(relativePos, y, i);
+                        if (currLight != neighborLight - 1) {
+                            updateNeighbor = true;
+                        }
+                    }
+                    else {
+                        int currLight = chunk->lighting_->GetLighting(i, y, orthoPos);
+                        int neighborLight = neighbor->lighting_->GetLighting( i, y, relativePos);
+                        if (currLight != neighborLight - 1) {
+                            updateNeighbor = true;
+                        }
+                    }
+                }
+            }
+
             if (updateNeighbor) {
                 chunk->GetNeighbor(side)->SetLightDirty();
             }

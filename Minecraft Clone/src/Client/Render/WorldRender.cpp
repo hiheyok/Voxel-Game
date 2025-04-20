@@ -44,13 +44,16 @@ std::unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(const ChunkPos& pos) 
 
     //Transfer Infomation
     std::unique_ptr<Mesh::ChunkVertexData> data = std::make_unique<Mesh::ChunkVertexData>();
-    data->solidVertices.resize(chunkMesher.solid_face_count_ * 12);
-    data->transparentVertices.resize(chunkMesher.transparent_face_count_ * 12);
+    data->solid_vertices_.resize(chunkMesher.solid_face_count_ * 12);
+    data->transparent_vertices_.resize(chunkMesher.transparent_face_count_ * 12);
     data->position_ = pos;
-    data->time_ = time;
+    
+    build_stage_0_ += chunkMesher.greedy_time_;
+    build_stage_1_ += chunkMesher.cache_time_;
+    build_time_ += time;
 
-    memcpy(data->solidVertices.data(), chunkMesher.vertices_buffer_.data(), chunkMesher.solid_face_count_ * 12 * sizeof(uint32_t));
-    memcpy(data->transparentVertices.data(), chunkMesher.transparent_vertices_buffer_.data(), chunkMesher.transparent_face_count_ * 12 * sizeof(uint32_t));
+    memcpy(data->solid_vertices_.data(), chunkMesher.vertices_buffer_.data(), chunkMesher.solid_face_count_ * 12 * sizeof(uint32_t));
+    memcpy(data->transparent_vertices_.data(), chunkMesher.transparent_vertices_buffer_.data(), chunkMesher.transparent_face_count_ * 12 * sizeof(uint32_t));
 
     return data;
 }
@@ -69,7 +72,6 @@ void WorldRender::Update(std::vector<ChunkPos> updatedChunks) {
             break;
         }
         //profiler_->CombineCache(worker_output_[(uint64_t)workerId].front()->profiler);
-        build_time_ += mesh_add_queue_.back()->time_;
         renderer_->AddChunk(std::move(mesh_add_queue_.back()));
         mesh_add_queue_.pop_back();
         renderer_->Defrag(2);

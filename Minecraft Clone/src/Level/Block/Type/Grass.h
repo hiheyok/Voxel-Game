@@ -11,7 +11,9 @@ struct GrassProperties {
 
 struct GrassBlock : Block {
 
-    GrassProperties properties_;
+    GrassBlock();
+
+    GrassProperties grass_properties_;
 
     void Tick(const BlockPos& pos, Dimension* currentWorld) override;
 

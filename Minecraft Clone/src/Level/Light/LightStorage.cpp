@@ -9,6 +9,14 @@ LightStorage::LightStorage(const LightStorage&) = default;
 
 LightStorage::~LightStorage() = default;
 
+bool LightStorage::operator==(const LightStorage& other) const {
+    int len = kChunkSize3D * 4 / 64;
+    for (int i = 0; i < len; ++i) {
+        if (other.data_[i] != data_[i]) return false;
+    }
+    return true;
+}
+
 const uint64_t* LightStorage::GetData() const {
     return data_;
 }

@@ -111,40 +111,6 @@ BlockID Palette::GetBlockUnsafe(int x, int y, int z) const {
     return palette_entries_[idx].first;
 }
 
-/*
-// Inside SetBlock / SetBlockUnsafe after finding/adding the index:
-PaletteIndex idx = GetOrAddPaletteIndex(block);
-
-// Check if adding this block *will* require a resize *before* setting
-bool neededResize = false;
-if (palette_entries_[idx].second == 0) {
-     // This is a new unique block being added
-     int potentialNewBitWidth = GetBitWidth(unique_blocks_count_ + 1);
-     if (potentialNewBitWidth > current_bit_width_) {
-         // Preemptively grow if needed
-         Grow(); // Assumes Grow uses unique_blocks_count_ + 1 logic or similar
-         neededResize = true; // Mark that we grew
-     }
-}
-
-// Now update counts and data
-if (palette_entries_[idx].second++ == 0) {
-    unique_blocks_count_++;
-}
-palette_entries_[oldPaletteIdx].second--;
-if (palette_entries_[oldPaletteIdx].second == 0) {
-    unique_blocks_count_--;
-}
-
-data_.Set(GetIndex(x, y, z), idx); // Safe now if Grow happened
-
-// Handle potential Shrink if we didn't just Grow
-if (!neededResize) {
-     Resize(); // Check if shrinking is needed now
-}
-
-*/
-
 void Palette::SetBlock(BlockID block, int x, int y, int z) {
     if (x < 0 || x >= kChunkDim || y < 0 || y >= kChunkDim || z < 0 || z >= kChunkDim) {
         throw std::out_of_range("Palette::SetBlock - Invalid palette index");

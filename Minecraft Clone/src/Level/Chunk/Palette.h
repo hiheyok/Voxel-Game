@@ -30,19 +30,6 @@ private:
     using PaletteIndex = uint16_t;
     using StorageBit = uint64_t;
 
-    static constexpr int kMinBitWidth = 1; // Minimum bits
-    static constexpr int kMaxBitWidth = 12;
-
-    int current_bit_width_;
-    int unique_blocks_count_ = 1; // Initialize with only air blocks
-
-    int d1 = 0, d2 = 0;
-
-    NBitVector<StorageBit> data_;
-
-    // BlockID -> Block, int_16 -> num of that block
-    std::vector<std::pair<BlockID, int16_t>> palette_entries_;
-
     static constexpr int GetBitWidth(unsigned int n) {
         int bitWidth = std::bit_width(n);
         return std::max(bitWidth, kMinBitWidth);
@@ -59,4 +46,17 @@ private:
     void Resize();
 
     PaletteIndex GetOrAddPaletteIndex(BlockID block);
+
+    static constexpr int kMinBitWidth = 1; // Minimum bits
+    static constexpr int kMaxBitWidth = 12;
+
+    int current_bit_width_;
+    int unique_blocks_count_ = 1; // Initialize with only air blocks
+
+    int d1 = 0, d2 = 0;
+
+    NBitVector<StorageBit> data_;
+
+    // BlockID -> Block, int_16 -> num of that block
+    std::vector<std::pair<BlockID, int16_t>> palette_entries_;
 };

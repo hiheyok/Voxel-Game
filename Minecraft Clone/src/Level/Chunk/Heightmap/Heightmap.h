@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <array>
+#include "Core/Typenames.h"
 /*
 
 heightmap for chunk column 32 * 16 = 512 blocks columns 9 bits per column
@@ -15,9 +16,9 @@ public:
 
     void Edit(int x, int z, int height);
 
-    int16_t Get(int x, int z) const;
+    int Get(int x, int z) const;
 
     void Clear();
 private:
-    std::array<char, 256> data_;
+    std::array<char, kChunkSize2D> data_;
 };

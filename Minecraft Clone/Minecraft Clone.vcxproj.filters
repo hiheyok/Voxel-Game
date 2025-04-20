@@ -360,6 +360,12 @@
     <ClCompile Include="src\RenderEngine\ChunkRender\BlockTextureAtlas.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Level\Chunk\ChunkRawData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Block\Type\SolidBlock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Level\Chunk\Chunk.h">
@@ -1000,6 +1006,9 @@
     </ClInclude>
     <ClInclude Include="src\RenderEngine\EntityRender\MultiEntityRender.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Block\Type\SolidBlock.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

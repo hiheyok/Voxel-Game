@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <array>
+#include <bitset>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/ext.hpp>
@@ -11,19 +12,22 @@ class Chunk;
 
 struct Cuboid;
 struct BlockFace;
-
+struct BlockModel;
 // TODO: refactor this
 
 namespace Mesh {
     struct ChunkVertexData {
         ChunkVertexData() = default;
-
         ~ChunkVertexData() = default;
 
-        std::vector<uint32_t> solidVertices;
-        std::vector<uint32_t> transparentVertices;
+        std::vector<uint32_t> solid_vertices_;
+        std::vector<uint32_t> transparent_vertices_;
+        std::vector<uint32_t> fluid_vertices_buffer_;
+
         ChunkPos position_;
         size_t time_;
+        size_t greedy_time_;
+        size_t cache_time_;
     };
 
 
@@ -31,50 +35,61 @@ namespace Mesh {
     public:
         ChunkMeshData();
 
-        void SetChunk(Chunk* pChunk);
-
+        void SetChunk(Chunk* chunk);
         void Reset();
 
         //Mesh Vertices
-        std::vector<unsigned int> vertices_buffer_;
-        std::vector<unsigned int> transparent_vertices_buffer_;
+        std::vector<uint32_t> vertices_buffer_;
+        std::vector<uint32_t> transparent_vertices_buffer_;
+        std::vector<uint32_t> solid_fluid_vertices_buffer_;
+        std::vector<uint32_t> transparent_fluid_vertices_buffer_;
 
-        uint64_t transparent_face_count_ = 0;
-        uint64_t solid_face_count_ = 0;
+        size_t transparent_face_count_ = 0;
+        size_t solid_face_count_ = 0;
+        size_t solid_fluid_face_count_ = 0;
+        size_t transparent_fluid_face_count_ = 0;
+
+        size_t greedy_time_;
+        size_t cache_time_;
 
         //Generate the Mesh
         void GenerateMesh();
-
-        void GenerateCache();
-
     private:
-        
+        // Used to generate the cache
+        void GenerateCache();
 
         //Generates all the faces and puts them in the cache
         void GenerateFaceCollection();
 
-        //Check if the player can see the mesh
-        inline bool IsFaceVisible(const Cuboid& cube, int x, int y, int z, uint8_t side);
-        inline bool IsFaceVisibleUnsafe(const Cuboid& cube, int x, int y, int z, uint8_t side);
+        // Fluid mesh
+        void GenerateFluidMesh();
 
-        inline bool CompareBlockSide(int x, int y, int z, uint8_t side, BlockID b);
-        inline bool CompareBlockSideUnsafe(int x, int y, int z, uint8_t side, BlockID b);
+        //Check if the player can see the mesh
+        bool IsFaceVisible(const Cuboid& cube, int x, int y, int z, uint8_t side);
+        bool IsFaceVisibleUnsafe(const Cuboid& cube, int x, int y, int z, uint8_t side);
+
+        bool CompareBlockSide(int x, int y, int z, uint8_t side, BlockID b);
+        bool CompareBlockSideUnsafe(int x, int y, int z, uint8_t side, BlockID b);
 
         //Add faces to the mesh
-        inline void AddFaceToMesh(const BlockFace& face, uint8_t axis_, glm::ivec3 from_, glm::ivec3 to_, bool allowAO, int x, int y, int z);
+        void AddModelToMesh(const BlockModel& curr_model, const BlockModel& back_model, 
+            glm::ivec3 pos, int u_length, int v_length, bool curr_blank, bool back_blank, int axis);
+        void AddFaceToMesh(const BlockFace& face, uint8_t axis, glm::ivec3 from, glm::ivec3 to, bool allow_ao, int x, int y, int z);
 
-        inline const BlockID& GetCachedBlockID(int x, int y, int z) const;
-        inline const BlockID& GetCachedBlockID(int* pos) const;
-        inline void SetCachedBlockID(BlockID b, int x, int y, int z);
+        const BlockID& GetCachedBlockID(int x, int y, int z) const;
+        const BlockID& GetCachedBlockID(int* pos) const;
+        void SetCachedBlockID(BlockID b, int x, int y, int z);
 
 
-        inline glm::u8vec4 GetAO(uint8_t direction, int x, int y, int z);
+        glm::u8vec4 GetAO(uint8_t direction, int x, int y, int z);
 
         //To check if a block had been used in the Greedy Meshing Algorithm
         static constexpr uint64_t kBufferStepSize = 262144;
 
         Chunk* chunk_;
 
-        std::array<BlockID, 18 * 18 * 18 * 3> chunk_cache_;
+        // TODO: 3 x is to use cache locality for processing for each axis (haven't implemented yet)
+        std::array<BlockID, (kChunkDim + 2) * (kChunkDim + 2) * (kChunkDim + 2) * 3> chunk_cache_;
+        std::bitset<(kChunkDim + 2)* (kChunkDim + 2)* (kChunkDim + 2)> is_fluid_;
     };
 }

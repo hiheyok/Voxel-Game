@@ -19,7 +19,7 @@ MaterialFluid::MaterialFluid(int spreadRate) { //Spreadrate in ticks
 
 Block* MaterialFluid::BuildNewBlockType() {
     Fluid* fluid = new Fluid;
-    fluid->properties_.spread_rate_ = spread_;
+    fluid->fluid_properties_.spread_rate_ = spread_;
 
     return static_cast<Block*>(fluid);
 }
@@ -32,8 +32,8 @@ MaterialGrass::MaterialGrass(double spreadChance, double breakChance) {
 
 Block* MaterialGrass::BuildNewBlockType() {
     GrassBlock* grass = new GrassBlock;
-    grass->properties_.break_chance_ = break_chance_;
-    grass->properties_.spread_chance_ = spread_chance_;
+    grass->grass_properties_.break_chance_ = break_chance_;
+    grass->grass_properties_.spread_chance_ = spread_chance_;
 
     return static_cast<Block*>(grass);
 }

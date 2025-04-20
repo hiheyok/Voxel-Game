@@ -14,7 +14,7 @@ inline constexpr int kNorthDirection = 0x05;
 class Direction {
 public:
     constexpr Direction(int x, int y, int z, int direction) noexcept :
-        pos_{ x, y, z },
+        offset_{ x, y, z },
         direction_{ direction } {};
 
     constexpr Direction(const Direction&) noexcept = default;
@@ -25,16 +25,16 @@ public:
     constexpr Direction& operator=(const Direction&) noexcept = default;
 
     friend constexpr ChunkPos operator+(const ChunkPos& m, const Direction& n) {
-        return m + n.pos_;
+        return m + n.offset_;
     }
 
     constexpr bool operator==(const Direction& other) const {
-        return other.direction_ == direction_ && other.pos_ == pos_;
+        return other.direction_ == direction_ && other.offset_ == offset_;
     }
 
     constexpr Direction operator!() const {
         Direction opposite{*this};
-        opposite.pos_ *= -1;
+        opposite.offset_ *= -1;
         opposite.direction_ = GetOppositeDirection();
         return opposite;
     }
@@ -64,7 +64,7 @@ public:
     }
 
 private:
-    ChunkPos pos_;
+    ChunkPos offset_;
     int direction_;
 };
 

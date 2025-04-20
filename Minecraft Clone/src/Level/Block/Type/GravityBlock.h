@@ -5,6 +5,6 @@
 class Dimension;
 
 struct GravityBlock : Block {
-
+    GravityBlock();
     void Tick(const BlockPos& pos, Dimension* currentWorld) override;
 };

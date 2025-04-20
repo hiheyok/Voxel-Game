@@ -180,6 +180,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Client\Client.cpp" />
+    <ClCompile Include="src\Level\Block\Type\SolidBlock.cpp" />
+    <ClCompile Include="src\Level\Chunk\ChunkRawData.cpp" />
     <ClCompile Include="src\Level\Container\ChunkMap.cpp" />
     <ClCompile Include="src\Level\Dimension\Dimension.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Biome\Biome.cpp" />
@@ -256,6 +258,7 @@
     <ClCompile Include="src\RenderEngine\EntityRender\EntityRenderCache.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRender\Models\EntityModels.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRender\MultiEntityRender.cpp" />
+    <ClInclude Include="src\Level\Block\Type\SolidBlock.h" />
     <ClInclude Include="src\RenderEngine\EntityRender\MultiEntityRender.h" />
     <ClCompile Include="src\RenderEngine\Frustum\frustum.cpp" />
     <ClCompile Include="src\RenderEngine\GUI\GUI.cpp" />

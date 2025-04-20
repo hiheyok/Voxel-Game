@@ -4,6 +4,12 @@
 #include "Level/World/WorldUpdater.h"
 #include "Utils/Math/Probability/Probability.h"
 
+GrassBlock::GrassBlock() {
+    properties_->is_solid_ = true;
+    properties_->transparency_ = false;
+    properties_->is_fluid_ = false;
+}
+
 void GrassBlock::Tick(const BlockPos& pos, Dimension* currentWorld) {
     //Checks if ticking block changes 
     if (currentWorld->world_->GetBlock(pos) != g_blocks.GRASS) {
@@ -38,7 +44,7 @@ void GrassBlock::Tick(const BlockPos& pos, Dimension* currentWorld) {
 
 bool GrassBlock::GrassDestroyTick(Dimension* currentWorld, const BlockPos& pos) {
     //Chance it -doesn't break-
-    if (TestProbability(1 - properties_.break_chance_)) {
+    if (TestProbability(1 - grass_properties_.break_chance_)) {
         return false;
     }
 
@@ -76,7 +82,7 @@ bool GrassBlock::GrassSpreadTick(Dimension* currentWorld, const BlockPos& pos) {
                 newPos.y -= 1;
 
                 //Chance it spread
-                if (TestProbability(properties_.spread_chance_)) {
+                if (TestProbability(grass_properties_.spread_chance_)) {
 
                     BlockEvent blockEvent{ newPos,g_blocks.GRASS, g_event_handler.BlockPlace };
                     currentWorld->event_manager_.AddEvent(blockEvent);

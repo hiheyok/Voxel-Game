@@ -1,22 +1,11 @@
 #pragma once
 #include <vector>
+#include <array>
 #include <stdexcept>
 // TODO: Add precomputed mask for all instances
 template <typename StorageBit = unsigned long long>
 class NBitVector {
-private:
-    std::vector<StorageBit> data_;
-    int bit_width_ = 0;
-    int num_elements_ = 0;
-
-    static constexpr size_t kStorageBits = sizeof(StorageBit) * 8;
-    static constexpr StorageBit kAllOnes = ~(static_cast<StorageBit>(0));
-    StorageBit all_ones_bit_width_;
-
-    std::pair<StorageBit, StorageBit> GetMask(size_t idx) const;
-
 public:
-
     NBitVector(int numElements, int bitWidth);
     NBitVector(int bitWidth);
     NBitVector();
@@ -33,10 +22,46 @@ public:
 
     template <typename T>
     void Set(size_t idx, T val);
+private:
+    void ComputeMaskCache();
+
+    std::vector<StorageBit> data_;
+    int bit_width_ = 0;
+    int num_elements_ = 0;
+
+    static constexpr size_t kStorageBits = sizeof(StorageBit) * 8;
+    static constexpr StorageBit kAllOnes = ~(static_cast<StorageBit>(0));
+    StorageBit all_ones_bit_width_;
+
+    std::array<StorageBit, kStorageBits> mask_table_;
+    std::array<StorageBit, kStorageBits> overflow_table_;
 };
 
 template<typename StorageBit>
-NBitVector<StorageBit>::NBitVector() = default;
+NBitVector<StorageBit>::NBitVector() {
+    ComputeMaskCache();
+}
+
+template<typename StorageBit>
+NBitVector<StorageBit>::NBitVector(int numElements, int bitWidth) : bit_width_{ bitWidth }, num_elements_{ numElements } {
+    if (bitWidth > kStorageBits)
+        g_logger.LogError("NBitVector<StorageBit>::NBitVector", "Bit width is too wide.");
+
+    data_.resize(numElements * bitWidth / kStorageBits + 1);
+    all_ones_bit_width_ = ~(kAllOnes << bit_width_);
+    ComputeMaskCache();
+}
+
+template<typename StorageBit>
+NBitVector<StorageBit>::NBitVector(int bitWidth) : bit_width_{ bitWidth } {
+    all_ones_bit_width_ = ~(kAllOnes << bit_width_);
+    ComputeMaskCache();
+}
+
+template<typename StorageBit>
+NBitVector<StorageBit>::~NBitVector() {
+    data_.clear();
+}
 
 template<typename StorageBit>
 NBitVector<StorageBit>::NBitVector(const NBitVector&) = default;
@@ -63,18 +88,17 @@ void NBitVector<StorageBit>::Set(size_t idx, T val) {
     size_t vectorIndex = bit_width_ * idx / kStorageBits;
     size_t integerIndex = (bit_width_ * idx) % kStorageBits;
 
-    const auto [mask, overflowMask] = GetMask(integerIndex);
+    const StorageBit mask = mask_table_[integerIndex];
+    const StorageBit overflowMask = overflow_table_[integerIndex];
 
     // Clear data first
     data_[vectorIndex] &= ~mask;
     data_[vectorIndex] |= data << integerIndex;
 
     // Insert the left over if it overlaps
-
-    if (overflowMask != 0) {
-        data_[vectorIndex + 1] &= ~overflowMask;
-        data_[vectorIndex + 1] |= data >> (kStorageBits - integerIndex);
-    }
+    // If there is no overflow, overflow is 0 so it will do nothing to the data
+    data_[vectorIndex + 1] &= ~overflowMask;
+    data_[vectorIndex + 1] |= overflowMask & (data >> (kStorageBits - integerIndex));
 }
 
 template<typename StorageBit>
@@ -89,38 +113,22 @@ StorageBit NBitVector<StorageBit>::GetUnsafe(size_t idx) const {
     size_t vectorIndex = bit_width_ * idx / kStorageBits;
     size_t integerIndex = (bit_width_ * idx) % kStorageBits;
 
-    const auto [mask, overflowMask] = GetMask(integerIndex);
+    const StorageBit& mask = mask_table_[integerIndex];
+    const StorageBit& overflowMask = overflow_table_[integerIndex];
 
     StorageBit data = (data_[vectorIndex] & mask) >> integerIndex;
 
     // If it overlap with the next bit extract the next bit too
-    if (overflowMask != 0) {
-        StorageBit dataNext = data_[vectorIndex + 1] & overflowMask;
-        dataNext <<= (kStorageBits - integerIndex);
-        data |= dataNext;
-    }
+    // If the overflow mask is 0, it means that there is no overflow
+    // Because it is 0, it will set dataNext to 0 too and this will do nothing to the data
+    StorageBit dataNext = data_[vectorIndex + 1] & overflowMask;
+    dataNext <<= (kStorageBits - integerIndex);
+    data |= dataNext;
 
     return data;
 }
 
-template<typename StorageBit>
-NBitVector<StorageBit>::NBitVector(int numElements, int bitWidth) : bit_width_{ bitWidth }, num_elements_{ numElements } {
-    if (bitWidth > kStorageBits)
-        g_logger.LogError("NBitVector<StorageBit>::NBitVector", "Bit width is too wide.");
 
-    data_.resize(numElements * bitWidth / kStorageBits + 1);
-    all_ones_bit_width_ = ~(kAllOnes << bit_width_);
-}
-
-template<typename StorageBit>
-NBitVector<StorageBit>::NBitVector(int bitWidth) : bit_width_{ bitWidth } {
-    all_ones_bit_width_ = ~(kAllOnes << bit_width_);
-}
-
-template<typename StorageBit>
-NBitVector<StorageBit>::~NBitVector() {
-    data_.clear();
-}
 
 template<typename StorageBit>
 template <typename T>
@@ -137,11 +145,12 @@ void NBitVector<StorageBit>::Append(T val) {
 }
 
 template<typename StorageBit>
-std::pair<StorageBit, StorageBit> NBitVector<StorageBit>::GetMask(size_t integerIndex) const {
-    StorageBit mask = all_ones_bit_width_ << integerIndex;
-    StorageBit overflowMask = 0;
+void NBitVector<StorageBit>::ComputeMaskCache() {
+    for (size_t i = 0; i < kStorageBits; ++i) {
+        mask_table_[i] = all_ones_bit_width_ << i;
+        overflow_table_[i] = (kStorageBits - i < bit_width_)
+            ? (all_ones_bit_width_ >> (kStorageBits - i))
+            : 0;
+    }
 
-    overflowMask |= (kStorageBits - integerIndex < bit_width_) * (all_ones_bit_width_ >> (kStorageBits - integerIndex));
-
-    return { mask, overflowMask };
 }

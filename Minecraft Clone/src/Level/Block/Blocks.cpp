@@ -13,7 +13,7 @@
 // TODO : Implement model caching
 using json = nlohmann::json;
 
-BlockID BlockList::RegisterBlock(std::string blockName, Material* material, bool transparency, bool solid, bool isFluid) {
+BlockID BlockList::RegisterBlock(std::string blockName, Material* material) {
     BlockID id = static_cast<BlockID>(block_type_data_.size());
 
     Block* block = material->BuildNewBlockType();
@@ -21,10 +21,10 @@ BlockID BlockList::RegisterBlock(std::string blockName, Material* material, bool
     // MaterialType Type = material->type;
 
     block->id_ = id;
-    block->properties_ = std::make_unique<BlockType>(transparency, solid, isFluid);
     block->block_name_ = blockName;
 
     block_type_data_.emplace_back(block);
+    block_properties_.emplace_back(*block->properties_);
 
     block_id_name_data_[blockName] = id;
 
@@ -52,7 +52,7 @@ void BlockList::AddAssets(std::string namespaceIn) {
         }
 
         for (std::string& name : allOtherBlocks) {
-            RegisterBlock(name, new MaterialNone(), false, true, false);
+            RegisterBlock(name, new MaterialNone());
         }
 
     }
@@ -102,6 +102,10 @@ Block* BlockList::GetBlockType(BlockID id) {
     return block_type_data_[id];
 }
 
-const BlockModel& BlockList::GetBlockModel(BlockID id) {
+const BlockModel& BlockList::GetBlockModel(BlockID id) const {
     return *block_type_data_[id]->block_model_data_;
+}
+
+const BlockType& BlockList::GetBlockProperties(BlockID id) const {
+    return block_properties_[id];
 }

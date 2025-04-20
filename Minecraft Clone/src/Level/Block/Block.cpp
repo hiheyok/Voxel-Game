@@ -5,7 +5,9 @@
 #include "FileManager/Files.h"
 
 Block::~Block() = default;
-Block::Block() = default;
+Block::Block() {
+    properties_ = std::make_unique<BlockType>();
+}
 
 void Block::InitializeBlockModel(ModelLoader& modelLoader) {
     auto tokens = Tokenize(block_name_, ':');
@@ -25,10 +27,10 @@ void Block::InitializeTexture(BlockTextureAtlas& textureAtlas) {
             const std::string& path = element.faces_[side].reference_texture_;
             if (path.length() == 0) continue;
 
-            auto Tokens = Tokenize(path, ':');
+            auto tokens = Tokenize(path, ':');
 
             //Load texture
-            ResourceLocation location{ "/textures/" + Tokens.front() + ".png" , Tokens.back() };
+            ResourceLocation location{ "/textures/" + tokens.front() + ".png" , tokens.back() };
 
             int textureId = textureAtlas.AddBlockTexture(location);
 
@@ -43,13 +45,6 @@ void Block::InitializeTexture(BlockTextureAtlas& textureAtlas) {
             element.faces_[side].fully_transparent_pixel_ = textureAtlas.IsTextureFullyTransparent(location);
         }
     }
-}
-
-
-BlockType::BlockType(bool transparent, bool solid, bool fluid) {
-    transparency_ = transparent;
-    is_solid_ = solid;
-    is_fluid_ = fluid;
 }
 
 BlockType::BlockType() = default;
