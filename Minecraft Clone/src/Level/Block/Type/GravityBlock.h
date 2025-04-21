@@ -1,5 +1,5 @@
 #pragma once
-#include "../Block.h"
+#include "Level/Block/Block.h"
 #include "Core/Typenames.h"
 
 class Dimension;

@@ -4,10 +4,13 @@
 #include "Level/World/WorldUpdater.h"
 #include "Utils/Math/Probability/Probability.h"
 
-GrassBlock::GrassBlock() {
+GrassBlock::GrassBlock(double spread_chance, double break_chance) {
     properties_->is_solid_ = true;
     properties_->transparency_ = false;
     properties_->is_fluid_ = false;
+
+    grass_properties_.spread_chance_ = spread_chance;
+    grass_properties_.break_chance_ = break_chance;
 }
 
 void GrassBlock::Tick(const BlockPos& pos, Dimension* currentWorld) {

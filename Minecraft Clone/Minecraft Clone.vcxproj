@@ -180,6 +180,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Client\Client.cpp" />
+    <ClCompile Include="src\Level\Block\Type\AirBlock.cpp" />
     <ClCompile Include="src\Level\Block\Type\SolidBlock.cpp" />
     <ClCompile Include="src\Level\Chunk\ChunkRawData.cpp" />
     <ClCompile Include="src\Level\Container\ChunkMap.cpp" />
@@ -258,6 +259,7 @@
     <ClCompile Include="src\RenderEngine\EntityRender\EntityRenderCache.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRender\Models\EntityModels.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRender\MultiEntityRender.cpp" />
+    <ClInclude Include="src\Level\Block\Type\AirBlock.h" />
     <ClInclude Include="src\Level\Block\Type\SolidBlock.h" />
     <ClInclude Include="src\RenderEngine\EntityRender\MultiEntityRender.h" />
     <ClCompile Include="src\RenderEngine\Frustum\frustum.cpp" />
@@ -283,7 +285,6 @@
     <ClCompile Include="src\Utils\Containers\BitStorage.cpp" />
     <ClCompile Include="src\Utils\Math\Probability\Probability.cpp" />
     <ClCompile Include="src\Level\Block\Blocks.cpp" />
-    <ClCompile Include="src\Level\Block\Material\BlockMaterial.cpp" />
     <ClCompile Include="src\Level\Entity\Entity.cpp" />
     <ClCompile Include="src\Level\Entity\Entities.cpp" />
     <ClCompile Include="src\Level\Event\BlockEventHandles\BlockHandles.cpp" />
@@ -451,7 +452,6 @@
     <ClInclude Include="src\Utils\Containers\FIFOQueue.h" />
     <ClInclude Include="src\Utils\Math\Probability\Probability.h" />
     <ClInclude Include="src\Utils\Math\vectorOperations.h" />
-    <ClInclude Include="src\Level\Block\Material\BlockMaterial.h" />
     <ClInclude Include="src\Level\Block\Type\BlockTypes.h" />
     <ClInclude Include="src\Level\Block\Type\Dirt.h" />
     <ClInclude Include="src\Level\Block\Type\Fluid.h" />

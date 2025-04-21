@@ -214,8 +214,8 @@ void MultiEntityRender::Update() {
     shader_->SetMat4("view", view);
     shader_->SetMat4("model", model);
     shader_->SetMat4("projection", projection);
-    shader_->SetFloat("RenderDistance", (float)(horizontal_render_distance_ * 16));
-    shader_->SetFloat("VerticalRenderDistance", (float)(vertical_render_distance_ * 16));
+    shader_->SetFloat("RenderDistance", (float)(horizontal_render_distance_ * kChunkDim));
+    shader_->SetFloat("VerticalRenderDistance", (float)(vertical_render_distance_ * kChunkDim));
     shader_->SetVec3("camPos", player_->GetPosition());
     shader_->SetFloat("TimeDelta", static_cast<float>(time_past_tick_));
     profiler_->ProfileStop("root/update/entity");

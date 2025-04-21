@@ -43,9 +43,9 @@ void Mesh::ChunkMeshData::GenerateCache() {
     int pos[3]{ 0, 0, 0 };
     int localPos[3]{ 0, 0, 0 };
 
-    for (int x = 0; x < 16; x++) {
-        for (int z = 0; z < 16; z++) {
-            for (int y = 0; y < 16; ++y) {
+    for (int x = 0; x < kChunkDim; x++) {
+        for (int z = 0; z < kChunkDim; z++) {
+            for (int y = 0; y < kChunkDim; ++y) {
                 SetCachedBlockID(chunk_->GetBlockUnsafe(x, y, z), x, y, z);
             }
         }
@@ -61,8 +61,8 @@ void Mesh::ChunkMeshData::GenerateCache() {
             continue;
         }
 
-        for (int u = 0; u < 16; u++) {
-            for (int v = 0; v < 16; v++) {
+        for (int u = 0; u < kChunkDim; u++) {
+            for (int v = 0; v < kChunkDim; v++) {
 
                 pos[axis] = direction * 15;
                 pos[(axis + 1) % 3] = u;
@@ -100,17 +100,17 @@ void Mesh::ChunkMeshData::GenerateMesh() {
 void Mesh::ChunkMeshData::GenerateFaceCollection() {
     std::vector<uint8_t> faceVisibilityBack(4096, 0b00);
     std::vector<uint8_t> faceVisibility(4096, 0b00);
-    std::array<uint8_t, 16 * 16> usedBlock{};
+    std::array<uint8_t, kChunkSize2D> usedBlock{};
 
     for (int axis = 0; axis < 3; axis++) {
         int axisU = (axis + 2) % 3;
         int axisV = (axis + 1) % 3;
         glm::ivec3 pos{ 0,0,0 };
 
-        for (pos[axis] = 0; pos[axis] < 17; ++pos[axis]) {//Slice
+        for (pos[axis] = 0; pos[axis] <= kChunkDim; ++pos[axis]) {//Slice
             usedBlock.fill(0);
-            for (pos[axisU] = 0; pos[axisU] < 16; ++pos[axisU]) {
-                for (pos[axisV] = 0; pos[axisV] < 16; ++pos[axisV]) {
+            for (pos[axisU] = 0; pos[axisU] < kChunkDim; ++pos[axisU]) {
+                for (pos[axisV] = 0; pos[axisV] < kChunkDim; ++pos[axisV]) {
 
                     if (usedBlock[(pos[axisU] << 4) + pos[axisV]] != 0x00) {
                         pos[axisV] += usedBlock[(pos[axisU] << 4) + pos[axisV]] - 1; 
@@ -127,7 +127,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
                     const BlockModel& currModel = g_blocks.GetBlockModel(currBlock);
                     const BlockModel& backModel = g_blocks.GetBlockModel(backBlock);
 
-                    bool blankCurrModel = !currModel.is_initialized_ || pos[axis] == 16;
+                    bool blankCurrModel = !currModel.is_initialized_ || pos[axis] == kChunkDim;
                     bool blankBackModel = !backModel.is_initialized_ || pos[axis] == 0;
 
                     //Check if it is visible from the back and front
@@ -173,7 +173,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
 
                     glm::ivec3 qPos{ pos[0], pos[1], pos[2] };
 
-                    for (qPos[axisV] = pos[axisV] + 1; qPos[axisV] < 16; ++qPos[axisV]) {
+                    for (qPos[axisV] = pos[axisV] + 1; qPos[axisV] < kChunkDim; ++qPos[axisV]) {
                         //Check if they are the same
                         const BlockID& currBlock2 = GetCachedBlockID(qPos[0], qPos[1], qPos[2]);
                         --qPos[axis];
@@ -193,7 +193,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
                     qPos[1] = pos[1];
                     qPos[2] = pos[2];
 
-                    for (qPos[axisU] = pos[axisU] + 1; qPos[axisU] < 16; ++qPos[axisU]) {
+                    for (qPos[axisU] = pos[axisU] + 1; qPos[axisU] < kChunkDim; ++qPos[axisU]) {
                         bool isValid = true;
 
                         for (qPos[axisV] = pos[axisV]; qPos[axisV] < pos[axisV] + vLength; ++qPos[axisV]) {
@@ -257,9 +257,9 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
                     qPos[1] = pos[1];
                     qPos[2] = pos[2];
 
-                    if (vLength == 16 && uLength == 16) { //Skip entire layer
-                        pos[axisV] = 15;
-                        pos[axisU] = 15;
+                    if (vLength == kChunkDim && uLength == kChunkDim) { //Skip entire layer
+                        pos[axisV] = kChunkDim - 1;
+                        pos[axisU] = kChunkDim - 1 ;
                     }
                     else {
                         pos[axisV] += vLength - 1;
@@ -275,9 +275,9 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const BlockFace& face, uint8_t axis_, gl
     uint8_t direction = axis_ & 0b1;
     uint8_t facing = axis_ >> 1;
 
-    x *= 16;
-    y *= 16;
-    z *= 16;
+    x *= kChunkDim;
+    y *= kChunkDim;
+    z *= kChunkDim;
 
     glm::ivec3 P0{ x + from_[0] + POSITION_OFFSET, y + from_[1] + POSITION_OFFSET, z + from_[2] + POSITION_OFFSET };
     glm::ivec3 P1{ x + to_[0] + POSITION_OFFSET, y + to_[1] + POSITION_OFFSET, z + to_[2] + POSITION_OFFSET };
@@ -326,7 +326,7 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const BlockFace& face, uint8_t axis_, gl
         out.resize(out.size() + kBufferStepSize);
 
     //Get AO
-    glm::u8vec4 AO = allowAO ? GetAO(axis_, x / 16, y / 16, z / 16) : glm::u8vec4{ 15, 15, 15, 15 };
+    glm::u8vec4 AO = allowAO ? GetAO(axis_, x / kChunkDim, y / kChunkDim, z / kChunkDim) : glm::u8vec4{ 15, 15, 15, 15 };
    
     PP = AO[0], PN = AO[1], NP = AO[2], NN = AO[3];
 

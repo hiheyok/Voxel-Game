@@ -84,9 +84,6 @@
     <ClCompile Include="src\Utils\Math\Probability\Probability.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Block\Material\BlockMaterial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\RenderEngine\EntityRender\Models\EntityModels.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -366,6 +363,9 @@
     <ClCompile Include="src\Level\Block\Type\SolidBlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Level\Block\Type\AirBlock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Level\Chunk\Chunk.h">
@@ -495,9 +495,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Block\Type\Dirt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\Block\Material\BlockMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Event\BlockEventHandles\BlockHandles.h">
@@ -1008,6 +1005,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Block\Type\SolidBlock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Block\Type\AirBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

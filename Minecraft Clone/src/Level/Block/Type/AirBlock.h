@@ -4,7 +4,7 @@
 
 class Dimension;
 
-struct DirtBlock : Block {
-    DirtBlock();
+struct AirBlock : Block {
+    AirBlock();
     void Tick(const BlockPos& pos, Dimension* currentWorld) override;
 };

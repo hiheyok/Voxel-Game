@@ -117,8 +117,8 @@ void TerrainRenderer::Update() {
     cubic_shader_->SetMat4("view", view);
     cubic_shader_->SetMat4("model", model);
     cubic_shader_->SetMat4("projection", projection);
-    cubic_shader_->SetFloat("RenderDistance", (float)(horizontal_render_distance_ * 16));
-    cubic_shader_->SetFloat("VerticalRenderDistance", (float)(vertical_render_distance_ * 16));
+    cubic_shader_->SetFloat("RenderDistance", (float)(horizontal_render_distance_ * kChunkDim));
+    cubic_shader_->SetFloat("VerticalRenderDistance", (float)(vertical_render_distance_ * kChunkDim));
     cubic_shader_->SetVec3("camPos", camera_->position_);
     cubic_shader_->SetVec3("tintColor",  glm::vec3(0.40828402 * clrMultiplier, 0.5917159 * clrMultiplier, 0.2781065 * clrMultiplier));
     cubic_shader_->SetInt("TextureAimIndex", TextureAminationIndex);

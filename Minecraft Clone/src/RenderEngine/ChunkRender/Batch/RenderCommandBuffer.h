@@ -310,7 +310,7 @@ public:
 
         current_node_visit_id_++;
 
-        if (current_node_visit_id_ == 16) {
+        if (current_node_visit_id_ == kChunkDim) {
             current_node_visit_id_ = 0;
         }
 

@@ -4,15 +4,13 @@ DebugWorldSecond::DebugWorldSecond() = default;
 void DebugWorldSecond::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
     chunk->SetBlock(g_blocks.COBBLESTONE, 8, 8, 8);
 
-    ChunkPos scaledPos = pos;
+    ChunkPos scaledPos = pos * kChunkDim;
 
-    scaledPos.set(pos.x * 16, pos.y * 16, pos.z * 16);
+    for (int gx = 0; gx < kChunkDim; gx++) {
+        for (int gy = 0; gy < kChunkDim; gy++) {
+            for (int gz = 0; gz < kChunkDim; gz++) {
 
-    for (int gx = 0; gx < 16; gx++) {
-        for (int gy = 0; gy < 16; gy++) {
-            for (int gz = 0; gz < 16; gz++) {
-
-                int index = gz * 256 + gy * 16 + gx;
+                int index = gz * kChunkSize2D + gy * kChunkDim + gx;
 
 
                 if (index % 5) {

@@ -5,9 +5,11 @@
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
 #include "FileManager/Files.h"
 
-Fluid::Fluid() {
+Fluid::Fluid(int spread_rate) {
     properties_->is_solid_ = false;
     properties_->is_fluid_ = true;
+
+    fluid_properties_.spread_rate_ = spread_rate;
 }
 
 void Fluid::InitializeBlockModel(ModelLoader & modelLoader) {

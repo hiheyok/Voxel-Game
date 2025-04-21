@@ -3,14 +3,14 @@
 MathWorld::MathWorld() = default;
 
 void MathWorld::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
-    int cx = pos.x * 16;
-    int cy = pos.y * 16;
-    int cz = pos.z * 16;
+    int cx = pos.x * kChunkDim;
+    int cy = pos.y * kChunkDim;
+    int cz = pos.z * kChunkDim;
     float zoom = 20.f;
 
-    for (int x = 0; x < 16; x++) {
-        for (int y = 0; y < 16; y++) {
-            for (int z = 0; z < 16; z++) {
+    for (int x = 0; x < kChunkDim; x++) {
+        for (int y = 0; y < kChunkDim; y++) {
+            for (int z = 0; z < kChunkDim; z++) {
 
                 if ((chunk->GetBlock(x, y, z) == g_blocks.RED_STAINED_GLASS) || (chunk->GetBlock(x, y, z) == g_blocks.BLACK_STAINED_GLASS))
                     continue;

@@ -22,6 +22,8 @@ public:
 
     template <typename T>
     void Set(size_t idx, T val);
+    template <typename T>
+    void SetUnsafe(size_t idx, T val) noexcept;
 private:
     void ComputeMaskCache();
 
@@ -33,7 +35,6 @@ private:
     static constexpr StorageBit kAllOnes = ~(static_cast<StorageBit>(0));
     StorageBit all_ones_bit_width_;
 
-    std::array<StorageBit, kStorageBits> mask_table_;
     std::array<StorageBit, kStorageBits> overflow_table_;
 };
 
@@ -79,17 +80,22 @@ template<typename StorageBit>
 template <typename T>
 void NBitVector<StorageBit>::Set(size_t idx, T val) {
     if (static_cast<size_t>(val) >= (1ULL << bit_width_))
-        g_logger.LogError("NBitVector<StorageBit>::Set","Invalid number. Wrong size" );
+        g_logger.LogError("NBitVector<StorageBit>::Set", "Invalid number. Wrong size");
     if (idx >= num_elements_)
         g_logger.LogError("NBitVector<StorageBit>::Set", "Index out of range");
+    SetUnsafe(idx, val);
+}
 
+template<typename StorageBit>
+template <typename T>
+void NBitVector<StorageBit>::SetUnsafe(size_t idx, T val) noexcept {
     StorageBit data = static_cast<StorageBit>(val);
 
     size_t vectorIndex = bit_width_ * idx / kStorageBits;
     size_t integerIndex = (bit_width_ * idx) % kStorageBits;
 
-    const StorageBit mask = mask_table_[integerIndex];
-    const StorageBit overflowMask = overflow_table_[integerIndex];
+    const StorageBit mask = all_ones_bit_width_ << integerIndex;
+    const StorageBit& overflowMask = overflow_table_[integerIndex];
 
     // Clear data first
     data_[vectorIndex] &= ~mask;
@@ -113,7 +119,7 @@ StorageBit NBitVector<StorageBit>::GetUnsafe(size_t idx) const {
     size_t vectorIndex = bit_width_ * idx / kStorageBits;
     size_t integerIndex = (bit_width_ * idx) % kStorageBits;
 
-    const StorageBit& mask = mask_table_[integerIndex];
+    const StorageBit mask = all_ones_bit_width_ << integerIndex;
     const StorageBit& overflowMask = overflow_table_[integerIndex];
 
     StorageBit data = (data_[vectorIndex] & mask) >> integerIndex;
@@ -128,8 +134,6 @@ StorageBit NBitVector<StorageBit>::GetUnsafe(size_t idx) const {
     return data;
 }
 
-
-
 template<typename StorageBit>
 template <typename T>
 void NBitVector<StorageBit>::Append(T val) {
@@ -137,7 +141,7 @@ void NBitVector<StorageBit>::Append(T val) {
         g_logger.LogError("NBitVector<StorageBit>::Append", "Invalid number. Wrong size");
 
     num_elements_++;
-    if (num_elements_ * bit_width_ / kStorageBits >= data_.size()) {
+    if (num_elements_ * bit_width_ / kStorageBits >= data_.size() - 1) { // -1 to keep an extra space of padding
         data_.push_back(static_cast<StorageBit>(0));
     }
 
@@ -147,7 +151,6 @@ void NBitVector<StorageBit>::Append(T val) {
 template<typename StorageBit>
 void NBitVector<StorageBit>::ComputeMaskCache() {
     for (size_t i = 0; i < kStorageBits; ++i) {
-        mask_table_[i] = all_ones_bit_width_ << i;
         overflow_table_[i] = (kStorageBits - i < bit_width_)
             ? (all_ones_bit_width_ >> (kStorageBits - i))
             : 0;

@@ -1,5 +1,5 @@
 #pragma once
-#include "../Block.h"
+#include "Level/Block/Block.h"
 #include "Core/Typenames.h"
 
 class Dimension;
@@ -9,7 +9,7 @@ struct FluidProperties {
 };
 
 struct Fluid : Block {
-    Fluid();
+    Fluid(int spread_rate);
     FluidProperties fluid_properties_;
     // Use custom block model for fluids
     void InitializeBlockModel(ModelLoader& modelLoader) override;

@@ -118,10 +118,10 @@ void Palette::SetBlock(BlockID block, int x, int y, int z) {
 
     // Look at original block
     PaletteIndex oldPaletteIdx = static_cast<PaletteIndex>(data_.Get(GetIndex(x, y, z)));
+
     if (oldPaletteIdx >= palette_entries_.size() || palette_entries_[oldPaletteIdx].second <= 0) {
         throw std::runtime_error("Palette::SetBlock - Corrupt old palette index found in data.");
     }
-
 
     BlockID oldBlockId = palette_entries_[oldPaletteIdx].first;
 
@@ -173,7 +173,7 @@ void Palette::SetBlockUnsafe(BlockID block, int x, int y, int z) {
         uniqueCountChanged = !uniqueCountChanged;
     }
 
-    data_.Set(GetIndex(x, y, z), idx);
+    data_.SetUnsafe(GetIndex(x, y, z), idx);
     if (uniqueCountChanged) {
         Resize();
     }

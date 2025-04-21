@@ -4,7 +4,7 @@
 #include "Level/TerrainGeneration/Structures/Structure.h"
 
 static const int NeighborOffset[6] = {
-      -16, 16,-16, 16,-16, 16
+      -kChunkDim, kChunkDim,-kChunkDim, kChunkDim,-kChunkDim, kChunkDim
 };
 
 ChunkContainer::ChunkContainer() : 
@@ -105,8 +105,8 @@ LightStorage ChunkContainer::GetLightData() {
 }
 
 void ChunkContainer::UpdateHeightMap() {
-    for (int x = 0; x < 16; ++x) {
-        for (int z = 0; z < 16; ++z) {
+    for (int x = 0; x < kChunkDim; ++x) {
+        for (int z = 0; z < kChunkDim; ++z) {
             UpdateHeightMap(x, z);
         }
     }

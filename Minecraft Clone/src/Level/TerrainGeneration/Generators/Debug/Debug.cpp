@@ -3,9 +3,9 @@
 DebugWorld::DebugWorld() = default;
 
 void DebugWorld::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
-    int gx = pos.x * 16;
-    int gz = pos.z * 16;
-    int gy = pos.y * 16;
+    int gx = pos.x * kChunkDim;
+    int gz = pos.z * kChunkDim;
+    int gy = pos.y * kChunkDim;
 
     if (pos.y < 0) {
         return;
@@ -17,8 +17,8 @@ void DebugWorld::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
     int ColLen = 50;
 
     if (gy == 0) {
-        for (int x = 0; x < 16; x++) {
-            for (int z = 0; z < 16; z++) {
+        for (int x = 0; x < kChunkDim; x++) {
+            for (int z = 0; z < kChunkDim; z++) {
 
                 chunk->SetBlockUnsafe(g_blocks.WHITE_CONCRETE, x, 0, z);
             }
@@ -26,9 +26,9 @@ void DebugWorld::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
     }
     
 
-    for (int x = 0; x < 16; x++) {
-        for (int z = 0; z < 16; z++) {
-            for (int y = 0; y < 16; y++) {
+    for (int x = 0; x < kChunkDim; x++) {
+        for (int z = 0; z < kChunkDim; z++) {
+            for (int y = 0; y < kChunkDim; y++) {
                 int px = x + gx;
                 int pz = z + gz;
                 int py = y + gy - 1;

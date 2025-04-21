@@ -13,12 +13,8 @@
 // TODO : Implement model caching
 using json = nlohmann::json;
 
-BlockID BlockList::RegisterBlock(std::string blockName, Material* material) {
+BlockID BlockList::RegisterBlock(std::string blockName, Block* block) {
     BlockID id = static_cast<BlockID>(block_type_data_.size());
-
-    Block* block = material->BuildNewBlockType();
-
-    // MaterialType Type = material->type;
 
     block->id_ = id;
     block->block_name_ = blockName;
@@ -29,9 +25,9 @@ BlockID BlockList::RegisterBlock(std::string blockName, Material* material) {
     block_id_name_data_[blockName] = id;
 
     g_logger.LogInfo("BlockList::RegisterBlock", "Registered new block (ID): " + std::to_string(id));
-    delete material; // replace w/ unique ptr later
     return id;
 }
+
 
 void BlockList::AddAssets(std::string namespaceIn) {
     try {
@@ -52,7 +48,7 @@ void BlockList::AddAssets(std::string namespaceIn) {
         }
 
         for (std::string& name : allOtherBlocks) {
-            RegisterBlock(name, new MaterialNone());
+            RegisterBlock(name, new DefaultBlock());
         }
 
     }
@@ -63,15 +59,6 @@ void BlockList::AddAssets(std::string namespaceIn) {
 
 
 void BlockList::InitializeBlockModels()  {
-    //add every single block  in the assets bc why not
-    //try {
-    //    for (const auto& entry : std::filesystem::directory_iterator("assets")) {
-    //        if (!entry.is_directory()) continue;
-    //        std::string name = entry.path().filename().string();
-    //        if (!strcmp(name.c_str(), "shaders")) continue;
-    //        AddAssets(name);
-    //    }
-
     for (auto& block : block_type_data_) {
         block->InitializeBlockModel(model_loader_);
         block->InitializeTexture(*block_texture_atlas_);

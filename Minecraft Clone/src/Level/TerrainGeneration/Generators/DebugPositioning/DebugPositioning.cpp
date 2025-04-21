@@ -5,7 +5,7 @@ DebugPositioning::DebugPositioning() = default;
 void DebugPositioning::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
     // Red -> x
     ChunkPos newPos = chunk->position_;
-    for (int i = 0; i < 16; ++i) {
+    for (int i = 0; i < kChunkDim; ++i) {
         if (newPos.x & 1)
             chunk->SetBlockUnsafe(g_blocks.RED_WOOL, i, 0, 0);
         if (newPos.y & 1)
@@ -25,7 +25,7 @@ void DebugPositioning::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chu
     chunk->SetBlockUnsafe(g_blocks.GOLD_BLOCK, 0, 3, 0);
     chunk->SetBlockUnsafe(g_blocks.EMERALD_BLOCK, 15, 3, 0);
 
-    for (int i = 1; i < 15; ++i) {
+    for (int i = 1; i < kChunkDim - 1; ++i) {
         if (i & 1) {
             chunk->SetBlockUnsafe(g_blocks.BLACK_CONCRETE, i, 3, 0);
         }

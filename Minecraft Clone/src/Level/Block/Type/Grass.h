@@ -1,5 +1,5 @@
 #pragma once
-#include "../Block.h"
+#include "Level/Block/Block.h"
 #include "Core/Typenames.h"
 
 class Dimension;
@@ -11,7 +11,7 @@ struct GrassProperties {
 
 struct GrassBlock : Block {
 
-    GrassBlock();
+    GrassBlock(double spread_chance, double break_chance);
 
     GrassProperties grass_properties_;
 
