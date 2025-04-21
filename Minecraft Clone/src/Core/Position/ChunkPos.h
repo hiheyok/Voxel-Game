@@ -154,7 +154,7 @@ public:
         return os << '[' << m.x << ',' << m.y << ',' << m.z << ']';
     }
 
-    friend constexpr std::string operator+(const char* str, const ChunkPos& m) {
+    friend std::string operator+(const char* str, const ChunkPos& m) {
         std::string s = std::string(str) + "[" + std::to_string(m.x) + "," + std::to_string(m.y) + "," + std::to_string(m.z) + "]";
         return s;
     }
@@ -176,7 +176,7 @@ public:
         return h;
     }
 
-    constexpr operator std::string() const {
+    operator std::string() const {
         return "[" + std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z) + "]";
     }
 };

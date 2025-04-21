@@ -6,7 +6,7 @@
 
 Block::~Block() = default;
 Block::Block() {
-    properties_ = std::make_unique<BlockType>();
+    properties_ = std::make_unique<BlockProperties>();
 }
 
 void Block::InitializeBlockModel(ModelLoader& modelLoader) {
@@ -47,4 +47,4 @@ void Block::InitializeTexture(BlockTextureAtlas& textureAtlas) {
     }
 }
 
-BlockType::BlockType() = default;
+BlockProperties::BlockProperties() = default;

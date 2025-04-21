@@ -1,8 +1,5 @@
-#define GLEW_STATIC
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
-
-
 #include "Utils/LogUtils.h"
 #include "Client/Client.h"
 #include "Level/Block/Blocks.h"

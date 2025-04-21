@@ -1,7 +1,7 @@
 #pragma once
 #include "Level/Chunk/TallChunk.h"
 #include "Level/TerrainGeneration/Random/JavaRandom.h"
-#include "Level/TerrainGeneration/Generator.h"
+#include "Level/TerrainGeneration/ChunkGenerator.h"
 
 class MapGenBase {
 protected:

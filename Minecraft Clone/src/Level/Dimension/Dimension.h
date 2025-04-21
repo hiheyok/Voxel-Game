@@ -3,7 +3,7 @@
 #include "Level/Container/EntityContainer.h"
 #include "Level/Event/EventSystem.h"
 #include "Level/Event/EventHandler.h"
-#include "Level/TerrainGeneration/Generator.h"
+#include "Level/TerrainGeneration/ChunkGenerator.h"
 #include "Level/TerrainGeneration/Generators/GeneratorType.h"
 #include "Level/World/World.h"
 #include "Level/World/WorldParameters.h"

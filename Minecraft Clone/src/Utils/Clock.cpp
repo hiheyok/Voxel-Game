@@ -4,7 +4,7 @@
 #include <thread>
 #include <chrono>
 #include <cmath>
-
+#include <immintrin.h> // For _mm_pause()
 #include "Utils/Clock.h"
 
 
@@ -20,37 +20,24 @@ void precisePause(double nanoseconds) {
 }
 
 void timerSleep(double seconds) {
+    using namespace std::chrono;
 
-    static double estimate = 2e-3;
-    static double mean = 2e-3;
-    static double m2 = 0;
-    static int64_t count = 1;
+    if (seconds <= 0.0) return;
 
-    while (seconds > estimate) {
-        auto start = std::chrono::high_resolution_clock::now();
-        timeBeginPeriod(1);
-        std::this_thread::sleep_for(std::chrono::microseconds(1));
-        timeEndPeriod(1);
-        auto end = std::chrono::high_resolution_clock::now();
+    constexpr double sleep_threshold = 2e-3; // 2 milliseconds
+    auto start_time = high_resolution_clock::now();
 
-        double observed = (end - start).count() / 1e9;
-        seconds -= observed;
-
-        ++count;
-        double delta = observed - mean;
-        mean += delta / count;
-        m2 += delta * (observed - mean);
-        double stddev = sqrt(m2 / (count - 1));
-        estimate = mean + stddev;
+    if (seconds > sleep_threshold) {
+        auto sleep_duration = duration<double>(seconds - sleep_threshold);
+        std::this_thread::sleep_for(sleep_duration);
     }
 
-    // spin lock
-    auto start = std::chrono::high_resolution_clock::now();
-    while ((std::chrono::high_resolution_clock::now() - start).count() / 1e9 < seconds);
+    // Spin-wait for the remaining time
+    while (duration<double>(high_resolution_clock::now() - start_time).count() < seconds) {
+        _mm_pause(); // Reduces CPU power consumption during spin-wait
+    }
 }
 
 void timerSleepNotPrecise(int milliseconds) {
-    timeBeginPeriod(1);
     std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
-    timeEndPeriod(1);
 }

@@ -11,12 +11,13 @@ class ModelLoader;
 
 struct BlockModel;
 
-struct BlockType {
-    BlockType();
+struct BlockProperties {
+    BlockProperties();
 
     bool is_fluid_ = false;
     bool transparency_ = false;
     bool is_solid_ = false;
+    bool light_pass_ = false;
 };
 
 class Block {
@@ -33,6 +34,6 @@ public:
 
     BlockID id_ = 0;
     std::unique_ptr<BlockModel> block_model_data_;
-    std::unique_ptr<BlockType> properties_;
+    std::unique_ptr<BlockProperties> properties_;
     std::string block_name_ = "";
 };

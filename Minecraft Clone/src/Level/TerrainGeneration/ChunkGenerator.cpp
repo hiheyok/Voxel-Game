@@ -1,4 +1,4 @@
-#include "Level/TerrainGeneration/Generator.h"
+#include "Level/TerrainGeneration/ChunkGenerator.h"
 #include "Level/TerrainGeneration/Generators/GeneratorType.h"
 #include "Level/Chunk/Chunk.h"
 

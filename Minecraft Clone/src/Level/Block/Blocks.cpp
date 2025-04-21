@@ -93,6 +93,6 @@ const BlockModel& BlockList::GetBlockModel(BlockID id) const {
     return *block_type_data_[id]->block_model_data_;
 }
 
-const BlockType& BlockList::GetBlockProperties(BlockID id) const {
+const BlockProperties& BlockList::GetBlockProperties(BlockID id) const {
     return block_properties_[id];
 }

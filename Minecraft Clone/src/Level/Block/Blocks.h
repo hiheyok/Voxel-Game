@@ -8,14 +8,14 @@
 class BlockTextureAtlas;
 
 struct BlockModel;
-struct BlockType;
+struct BlockProperties;
 
 class BlockList{
 public:
     FastHashMap<std::string, BlockID> block_id_name_data_;
     ModelLoader model_loader_;
     std::vector<Block*> block_type_data_;
-    std::vector<BlockType> block_properties_;
+    std::vector<BlockProperties> block_properties_;
 
     std::unique_ptr<BlockTextureAtlas> block_texture_atlas_;
 
@@ -362,7 +362,7 @@ public:
     Block* GetBlockType(BlockID id);
 
     const BlockModel& GetBlockModel(BlockID) const;
-    const BlockType& GetBlockProperties(BlockID) const;
+    const BlockProperties& GetBlockProperties(BlockID) const;
 
 private:
 

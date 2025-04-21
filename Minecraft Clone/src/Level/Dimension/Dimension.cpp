@@ -1,6 +1,6 @@
 #include "Level/Dimension/Dimension.h"
 #include "Level/Light/LightEngine.h"
-#include "Level/TerrainGeneration/Generator.h"
+#include "Level/TerrainGeneration/ChunkGenerator.h"
 #include "Level/World/WorldUpdater.h"
 
 Dimension::Dimension(DimensionProperties properties, WorldGeneratorID generatorType) :

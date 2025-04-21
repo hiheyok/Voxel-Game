@@ -298,7 +298,7 @@
     <ClCompile Include="src\Level\Chunk\Chunk.cpp" />
     <ClCompile Include="src\Level\Chunk\ChunkData.cpp" />
     <ClCompile Include="src\Utils\Timer\Timer.cpp" />
-    <ClCompile Include="src\Level\TerrainGeneration\Generator.cpp" />
+    <ClCompile Include="src\Level\TerrainGeneration\ChunkGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Client\Client.h" />
@@ -490,7 +490,7 @@
     <ClInclude Include="src\Level\Entity\Entity.h" />
     <ClInclude Include="src\Level\Entity\Collusion\Hitbox.h" />
     <ClInclude Include="src\Utils\Timer\Timer.h" />
-    <ClInclude Include="src\Level\TerrainGeneration\Generator.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\ChunkGenerator.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Generators\DebugSecond\DebugSecond.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Generators\FastTerrain\FastTerrain.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Generators\Generators.h" />

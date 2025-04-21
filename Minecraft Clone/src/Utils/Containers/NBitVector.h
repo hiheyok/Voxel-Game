@@ -2,7 +2,7 @@
 #include <vector>
 #include <array>
 #include <stdexcept>
-// TODO: Add precomputed mask for all instances
+
 template <typename StorageBit = unsigned long long>
 class NBitVector {
 public:
@@ -95,7 +95,7 @@ void NBitVector<StorageBit>::SetUnsafe(size_t idx, T val) noexcept {
     size_t integerIndex = (bit_width_ * idx) % kStorageBits;
 
     const StorageBit mask = all_ones_bit_width_ << integerIndex;
-    const StorageBit& overflowMask = overflow_table_[integerIndex];
+    const StorageBit& overflow_mask = overflow_table_[integerIndex];
 
     // Clear data first
     data_[vectorIndex] &= ~mask;
@@ -103,8 +103,8 @@ void NBitVector<StorageBit>::SetUnsafe(size_t idx, T val) noexcept {
 
     // Insert the left over if it overlaps
     // If there is no overflow, overflow is 0 so it will do nothing to the data
-    data_[vectorIndex + 1] &= ~overflowMask;
-    data_[vectorIndex + 1] |= overflowMask & (data >> (kStorageBits - integerIndex));
+    data_[vectorIndex + 1] &= ~overflow_mask;
+    data_[vectorIndex + 1] |= overflow_mask & (data >> (kStorageBits - integerIndex));
 }
 
 template<typename StorageBit>
@@ -120,14 +120,14 @@ StorageBit NBitVector<StorageBit>::GetUnsafe(size_t idx) const {
     size_t integerIndex = (bit_width_ * idx) % kStorageBits;
 
     const StorageBit mask = all_ones_bit_width_ << integerIndex;
-    const StorageBit& overflowMask = overflow_table_[integerIndex];
+    const StorageBit& overflow_mask = overflow_table_[integerIndex];
 
     StorageBit data = (data_[vectorIndex] & mask) >> integerIndex;
 
     // If it overlap with the next bit extract the next bit too
     // If the overflow mask is 0, it means that there is no overflow
     // Because it is 0, it will set dataNext to 0 too and this will do nothing to the data
-    StorageBit dataNext = data_[vectorIndex + 1] & overflowMask;
+    StorageBit dataNext = data_[vectorIndex + 1] & overflow_mask;
     dataNext <<= (kStorageBits - integerIndex);
     data |= dataNext;
 

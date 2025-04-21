@@ -63,7 +63,7 @@
     <ClCompile Include="src\Client\Player\PlayerPOV.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\TerrainGeneration\Generator.cpp">
+    <ClCompile Include="src\Level\TerrainGeneration\ChunkGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\ChunkRender\Batch\ChunkBatch.cpp">
@@ -458,7 +458,7 @@
     <ClInclude Include="src\Level\Entity\Entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Generator.h">
+    <ClInclude Include="src\Level\TerrainGeneration\ChunkGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\EntityRender\Models\EntityModel.h">
@@ -1001,13 +1001,13 @@
     <ClInclude Include="src\Core\Position\Direction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\EntityRender\MultiEntityRender.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Level\Block\Type\SolidBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Block\Type\AirBlock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\EntityRender\MultiEntityRender.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

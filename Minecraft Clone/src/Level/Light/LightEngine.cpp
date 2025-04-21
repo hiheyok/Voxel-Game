@@ -50,7 +50,8 @@ void LightEngine::WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<LightStorage
     // Look at neighbors too
 
     for (const auto& side : Directions()) {
-        if (side == Directions::kUp || side == Directions::kDown) continue;
+        if (side.GetAxis() == Directions::kYAxis) continue;
+
         ChunkContainer* neighbor = chunk->GetNeighbor(side);
         if (neighbor == nullptr) {
             continue;
@@ -104,7 +105,7 @@ void LightEngine::WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<LightStorage
         //Set node light level
         IncreaseLightLevel(light, nodeLight, nodeX, nodeY, nodeZ);
 
-        if (chunk->GetBlockUnsafe(nodeX, nodeY, nodeZ) != g_blocks.AIR) {
+        if (!g_blocks.GetBlockProperties(chunk->GetBlockUnsafe(nodeX, nodeY, nodeZ)).light_pass_) {
             continue;
         }
 
@@ -130,7 +131,7 @@ void LightEngine::WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<LightStorage
             int8_t newLight = nodeLight - 1;
 
             //Check if it is in the chunk first
-            if (((nx | ny | nz) >> 4))
+            if ((nx | ny | nz) >> 4)
                 continue;
 
             //Check if the light level is more or less

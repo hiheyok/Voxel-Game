@@ -8,6 +8,7 @@
 Fluid::Fluid(int spread_rate) {
     properties_->is_solid_ = false;
     properties_->is_fluid_ = true;
+    properties_->light_pass_ = false;
 
     fluid_properties_.spread_rate_ = spread_rate;
 }
