@@ -35,11 +35,11 @@ void MountainGenerator::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& ch
 
                 if (n > 0.5f) {
                     if (n < 0.54f) {
-                        chunk->SetBlockUnsafe(g_blocks.GRASS, x, y, z);
-                        chunk->SetBlock(g_blocks.DIRT, x, y - 1, z);
+                        chunk->SetBlockUnsafe(g_blocks.GRASS, BlockPos{x, y, z});
+                        chunk->SetBlock(g_blocks.DIRT, BlockPos{x, y - 1, z});
                     }
                     else {
-                        chunk->SetBlockUnsafe(g_blocks.STONE, x, y, z);
+                        chunk->SetBlockUnsafe(g_blocks.STONE, BlockPos{x, y, z});
                     }
                 }
             }
@@ -77,7 +77,7 @@ void MountainGenerator::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& ch
                 int b = px + pz * 20;
 
                 if ((b < numBlocks) && (b >= 0)) {
-                    chunk->SetBlockUnsafe(b, x, 3, z);
+                    chunk->SetBlockUnsafe(b, BlockPos{x, 3, z});
                 }
             }
         }
@@ -85,17 +85,18 @@ void MountainGenerator::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& ch
 }
 
 void MountainGenerator::GenerateEnvironment(const ChunkPos& pos, Chunk* chunk) {
-    for (int x = 0; x < kChunkDim; x++) {
-        for (int z = 0; z < kChunkDim; z++) {
-            for (int y = 0; y < kChunkDim; y++) {
+    BlockPos block_pos{0, 0, 0};
+    for (block_pos.x = 0; block_pos.x < kChunkDim; block_pos.x++) {
+        for (block_pos.z = 0; block_pos.z < kChunkDim; block_pos.z++) {
+            for (block_pos.y = 0; block_pos.y < kChunkDim; block_pos.y++) {
 
-                if (y + pos.y < 34) {
-                    if ((chunk->GetBlockUnsafe(x, y, z) == g_blocks.AIR)) {
-                        chunk->SetBlockUnsafe(g_blocks.BLUE_CONCRETE, x, y, z);
+                if (block_pos.y + pos.y * kChunkDim < 34) {
+                    if ((chunk->GetBlockUnsafe(block_pos) == g_blocks.AIR)) {
+                        chunk->SetBlockUnsafe(g_blocks.BLUE_CONCRETE, block_pos);
                     }
 
-                    if ((chunk->GetBlockUnsafe(x, y, z) == g_blocks.GRASS)) {
-                        chunk->SetBlockUnsafe(g_blocks.SAND, x, y, z);
+                    if ((chunk->GetBlockUnsafe(block_pos) == g_blocks.GRASS)) {
+                        chunk->SetBlockUnsafe(g_blocks.SAND, block_pos);
                     }
                 }
             }
@@ -115,7 +116,7 @@ void MountainGenerator::GenerateDecor(const ChunkPos& pos, Chunk* chunk) {
 
             float TREE_MAP = (float)((double)(noise_->GetNoise((float)gx * 100.f, (float)gz * 100.f, 3453454.f) + 1.f) / 2.f);
             for (int y = 0; y < kChunkDim; y++) {
-                if (chunk->GetBlock(x, y - 1, z) == g_blocks.GRASS) {
+                if (chunk->GetBlock(BlockPos{x, y - 1, z}) == g_blocks.GRASS) {
 
                     if (TREE_MAP <= 0.04) {
                         
@@ -125,7 +126,7 @@ void MountainGenerator::GenerateDecor(const ChunkPos& pos, Chunk* chunk) {
                                     continue;
                                 
                                 for (int ty = tree_height; ty <= tree_height + 1; ty++)
-                                    chunk->SetBlock(g_blocks.OAK_LEAF, x + tx, y + ty, z + tz);
+                                    chunk->SetBlock(g_blocks.OAK_LEAF, BlockPos{x + tx, y + ty, z + tz});
 
                             }
                         }
@@ -137,12 +138,12 @@ void MountainGenerator::GenerateDecor(const ChunkPos& pos, Chunk* chunk) {
                                     if ((abs(tx) == 1) && (abs(tz) == 1) && (ty == tree_height + 3)) {
                                         continue;
                                     }
-                                    chunk->SetBlock(g_blocks.OAK_LEAF, x + tx, y + ty, z + tz);
+                                    chunk->SetBlock(g_blocks.OAK_LEAF, BlockPos{x + tx, y + ty, z + tz});
                                 }
                             }
                         }
                         for (int ty = 0; ty < tree_height + 2; ty++) {
-                            chunk->SetBlock(g_blocks.OAK_LOG, x, y + ty, z);
+                            chunk->SetBlock(g_blocks.OAK_LOG, BlockPos{x, y + ty, z});
                         }
                     }
                 }
@@ -157,7 +158,7 @@ void MountainGenerator::GenerateDecor(const ChunkPos& pos, Chunk* chunk) {
         for (int z = 0 + pos.z; z < kChunkDim + pos.z; z++) {
             for (int y = 0 + pos.y; y < kChunkDim + pos.y; y++) {
                 if ((x * x) + (y - 140) * (y - 140) + z * z <= radius * radius) {
-                    chunk->SetBlock(g_blocks.SAND, x - pos.x, y - pos.y, z - pos.z);
+                    chunk->SetBlock(g_blocks.SAND, BlockPos{x - pos.x, y - pos.y, z - pos.z});
                 }
 
                 //if (y == 90) {
@@ -172,7 +173,7 @@ void MountainGenerator::GenerateDecor(const ChunkPos& pos, Chunk* chunk) {
     for (int x = 0 + pos.x; x < kChunkDim + pos.x; x++) {
         for (int z = 0 + pos.z; z < kChunkDim + pos.z; z++) {
             if ((x - 100) * (x - 100) + (z - 100) * (z - 100) <= 100 * 100) {
-                chunk->SetBlock(g_blocks.WHITE_CONCRETE, x - pos.x, 10, z - pos.z);
+                chunk->SetBlock(g_blocks.WHITE_CONCRETE, BlockPos{x - pos.x, 10, z - pos.z});
             }
 
             //if (y == 90) {

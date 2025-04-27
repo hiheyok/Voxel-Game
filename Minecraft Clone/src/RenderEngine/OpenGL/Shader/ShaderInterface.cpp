@@ -1,5 +1,4 @@
 #include <fstream>
-
 #include "RenderEngine/OpenGL/Shader/ShaderInterface.h"
 
 ShaderInterface::ShaderInterface() = default;
@@ -14,10 +13,10 @@ void ShaderInterface::Use() {
     glUseProgram(shader_id_);
 }
 
-void ShaderInterface::SetBool(const std::string& name, bool value) {
+ShaderInterface& ShaderInterface::SetBool(const std::string& name, bool value) {
     auto it = cache_bool_.find(name);
     if (it != cache_bool_.end()) {
-        if (it->second == value) return;
+        if (it->second == value) return *this;
         it->second = value;
     }
     else {
@@ -25,12 +24,13 @@ void ShaderInterface::SetBool(const std::string& name, bool value) {
     }
     Use();
     glUniform1i(GetUniformLocation(name), (int)value);
+    return *this;
 }
 
-void ShaderInterface::SetInt(const std::string& name, int value) {
+ShaderInterface& ShaderInterface::SetInt(const std::string& name, int value) {
     auto it = cache_int_.find(name);
     if (it != cache_int_.end()) {
-        if (it->second == value) return;
+        if (it->second == value) return *this;
         it->second = value;
     }
     else {
@@ -38,12 +38,13 @@ void ShaderInterface::SetInt(const std::string& name, int value) {
     }
     Use();
     glUniform1i(GetUniformLocation(name), value);
+    return *this;
 }
 
-void ShaderInterface::SetFloat(const std::string& name, float value) {
+ShaderInterface& ShaderInterface::SetFloat(const std::string& name, float value) {
     auto it = cache_float_.find(name);
     if (it != cache_float_.end()) {
-        if (it->second == value) return;
+        if (it->second == value) return *this;
         it->second = value;
     }
     else {
@@ -51,12 +52,13 @@ void ShaderInterface::SetFloat(const std::string& name, float value) {
     }
     Use();
     glUniform1f(GetUniformLocation(name), value);
+    return *this;
 }
 
-void ShaderInterface::SetVec2(const std::string& name, const glm::vec2& value) {
+ShaderInterface& ShaderInterface::SetVec2(const std::string& name, const glm::vec2& value) {
     auto it = cache_vec2_.find(name);
     if (it != cache_vec2_.end()) {
-        if (it->second == value) return;
+        if (it->second == value) return *this;
         it->second = value;
     }
     else {
@@ -64,12 +66,13 @@ void ShaderInterface::SetVec2(const std::string& name, const glm::vec2& value) {
     }
     Use();
     glUniform2fv(GetUniformLocation(name), 1, &value[0]);
+    return *this;
 }
 
-void ShaderInterface::SetVec2(const std::string& name, float x, float y) {
+ShaderInterface& ShaderInterface::SetVec2(const std::string& name, float x, float y) {
     auto it = cache_vec2_.find(name);
     if (it != cache_vec2_.end()) {
-        if (it->second == glm::vec2(x, y)) return;
+        if (it->second == glm::vec2(x, y)) return *this;
         it->second = glm::vec2(x, y);
     }
     else {
@@ -77,12 +80,13 @@ void ShaderInterface::SetVec2(const std::string& name, float x, float y) {
     }
     Use();
     glUniform2f(GetUniformLocation(name), x, y);
+    return *this;
 }
 
-void ShaderInterface::SetVec3(const std::string& name, const glm::vec3& value) {
+ShaderInterface& ShaderInterface::SetVec3(const std::string& name, const glm::vec3& value) {
     auto it = cache_vec3_.find(name);
     if (it != cache_vec3_.end()) {
-        if (it->second == value) return;
+        if (it->second == value) return *this;
         it->second = value;
     }
     else {
@@ -90,12 +94,13 @@ void ShaderInterface::SetVec3(const std::string& name, const glm::vec3& value) {
     }
     Use();
     glUniform3fv(GetUniformLocation(name), 1, &value[0]);
+    return *this;
 }
 
-void ShaderInterface::SetVec3(const std::string& name, float x, float y, float z) {
+ShaderInterface& ShaderInterface::SetVec3(const std::string& name, float x, float y, float z) {
     auto it = cache_vec3_.find(name);
     if (it != cache_vec3_.end()) {
-        if (it->second == glm::vec3(x, y, z)) return;
+        if (it->second == glm::vec3(x, y, z)) return *this;
         it->second = glm::vec3(x, y, z);
     }
     else {
@@ -103,12 +108,13 @@ void ShaderInterface::SetVec3(const std::string& name, float x, float y, float z
     }
     Use();
     glUniform3f(GetUniformLocation(name), x, y, z);
+    return *this;
 }
 
-void ShaderInterface::SetIVec3(const std::string& name, const glm::ivec3& value) {
+ShaderInterface& ShaderInterface::SetIVec3(const std::string& name, const glm::ivec3& value) {
     auto it = cache_ivec3_.find(name);
     if (it != cache_ivec3_.end()) {
-        if (it->second == value) return;
+        if (it->second == value) return *this;
         it->second = value;
     }
     else {
@@ -116,12 +122,13 @@ void ShaderInterface::SetIVec3(const std::string& name, const glm::ivec3& value)
     }
     Use();
     glUniform3iv(GetUniformLocation(name), 1, &value[0]);
+    return *this;
 }
 
-void ShaderInterface::SetIVec3(const std::string& name, int x, int y, int z) {
+ShaderInterface& ShaderInterface::SetIVec3(const std::string& name, int x, int y, int z) {
     auto it = cache_ivec3_.find(name);
     if (it != cache_ivec3_.end()) {
-        if (it->second == glm::ivec3(x, y, z)) return;
+        if (it->second == glm::ivec3(x, y, z)) return *this;
         it->second = glm::ivec3(x, y, z);
     }
     else {
@@ -129,12 +136,13 @@ void ShaderInterface::SetIVec3(const std::string& name, int x, int y, int z) {
     }
     Use();
     glUniform3i(GetUniformLocation(name), x, y, z);
+    return *this;
 }
 
-void ShaderInterface::SetVec4(const std::string& name, const glm::vec4& value) {
+ShaderInterface& ShaderInterface::SetVec4(const std::string& name, const glm::vec4& value) {
     auto it = cache_vec4_.find(name);
     if (it != cache_vec4_.end()) {
-        if (it->second == value) return;
+        if (it->second == value) return *this;
         it->second = value;
     }
     else {
@@ -142,12 +150,13 @@ void ShaderInterface::SetVec4(const std::string& name, const glm::vec4& value) {
     }
     Use();
     glUniform4fv(GetUniformLocation(name), 1, &value[0]);
+    return *this;
 }
 
-void ShaderInterface::SetVec4(const std::string& name, float x, float y, float z, float w) {
+ShaderInterface& ShaderInterface::SetVec4(const std::string& name, float x, float y, float z, float w) {
     auto it = cache_vec4_.find(name);
     if (it != cache_vec4_.end()) {
-        if (it->second == glm::vec4(x, y, z, w)) return;
+        if (it->second == glm::vec4(x, y, z, w)) return *this;
         it->second = glm::vec4(x, y, z, w);
     }
     else {
@@ -155,12 +164,13 @@ void ShaderInterface::SetVec4(const std::string& name, float x, float y, float z
     }
     Use();
     glUniform4f(GetUniformLocation(name), x, y, z, w);
+    return *this;
 }
 
-void ShaderInterface::SetMat2(const std::string& name, const glm::mat2& mat) {
+ShaderInterface& ShaderInterface::SetMat2(const std::string& name, const glm::mat2& mat) {
     auto it = cache_mat2_.find(name);
     if (it != cache_mat2_.end()) {
-        if (it->second == mat) return;
+        if (it->second == mat) return *this;
         it->second = mat;
     }
     else {
@@ -168,12 +178,13 @@ void ShaderInterface::SetMat2(const std::string& name, const glm::mat2& mat) {
     }
     Use();
     glUniformMatrix2fv(GetUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
+    return *this;
 }
 
-void ShaderInterface::SetMat3(const std::string& name, const glm::mat3& mat) {
+ShaderInterface& ShaderInterface::SetMat3(const std::string& name, const glm::mat3& mat) {
     auto it = cache_mat3_.find(name);
     if (it != cache_mat3_.end()) {
-        if (it->second == mat) return;
+        if (it->second == mat) return *this;
         it->second = mat;
     }
     else {
@@ -181,12 +192,13 @@ void ShaderInterface::SetMat3(const std::string& name, const glm::mat3& mat) {
     }
     Use();
     glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
+    return *this;
 }
 
-void ShaderInterface::SetMat4(const std::string& name, const glm::mat4& mat) {
+ShaderInterface& ShaderInterface::SetMat4(const std::string& name, const glm::mat4& mat) {
     auto it = cache_mat4_.find(name);
     if (it != cache_mat4_.end()) {
-        if (it->second == mat) return;
+        if (it->second == mat) return *this;
         it->second = mat;
     }
     else {
@@ -194,21 +206,23 @@ void ShaderInterface::SetMat4(const std::string& name, const glm::mat4& mat) {
     }
     Use();
     glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &mat[0][0]);
+    return *this;
 }
 
-void ShaderInterface::BindTexture2D(GLuint index, GLuint img, const std::string& name) {
+ShaderInterface& ShaderInterface::BindTexture2D(GLuint index, GLuint img, const std::string& name) {
     SetInt(name, index);
     Use();
     glActiveTexture(GL_TEXTURE0 + index);
     glBindTexture(GL_TEXTURE_2D, img);
-
+    return *this;
 }
 
-void ShaderInterface::BindTextureArray2D(GLuint index, GLuint img, const std::string& name) {
+ShaderInterface& ShaderInterface::BindTextureArray2D(GLuint index, GLuint img, const std::string& name) {
     SetInt(name, index);
     Use();
     glActiveTexture(GL_TEXTURE0 + index);
     glBindTexture(GL_TEXTURE_2D_ARRAY, img);
+    return *this;
 }
 
 GLint ShaderInterface::GetUniformLocation(std::string name) {
@@ -268,4 +282,21 @@ std::string ShaderInterface::ReadFile(std::string path) {
     }
 
     return code;
+}
+
+ShaderInterface& ShaderInterface::BindBufferAsSSBO(GLuint buffer, int idx) {
+    Use();
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, idx, buffer);
+    return *this;
+}
+
+ShaderInterface& ShaderInterface::UnbindBufferSSBO(int idx) {
+    Use();
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, idx, 0);
+    return *this;
+}
+
+ShaderInterface& ShaderInterface::SSBOMemoryBarrier() {
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+    return *this;
 }

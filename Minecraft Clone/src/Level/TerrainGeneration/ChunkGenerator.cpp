@@ -40,7 +40,7 @@ std::vector<std::unique_ptr<Chunk>> ChunkGenerator::Worker(const ChunkPos& task 
 
     if (!g_generators.GetGenerator(world_generator_type_)->use_tall_chunks_) {
         std::unique_ptr<Chunk> chunk = std::make_unique<Chunk>();
-        chunk->SetPosition(pos.x, pos.y, pos.z);
+        chunk->SetPosition(pos);
         g_generators.GetGenerator(world_generator_type_)->Generate(pos, chunk);
 
         output.push_back(std::move(chunk));

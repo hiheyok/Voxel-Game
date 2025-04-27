@@ -4,12 +4,12 @@ SuperflatWorld::SuperflatWorld() = default;
 
 void SuperflatWorld::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
     int cy = pos.y * kChunkDim;
-
-    for (int x = 0; x < kChunkDim; x++) {
-        for (int z = 0; z < kChunkDim; z++) {
-            for (int y = 0; y < kChunkDim; y++) {
-                if (y + cy < 10) {
-                    chunk->SetBlockUnsafe(g_blocks.WHITE_CONCRETE, x, y, z);
+    BlockPos block_pos{0, 0, 0};
+    for (block_pos.x = 0; block_pos.x < kChunkDim; block_pos.x++) {
+        for (block_pos.z = 0; block_pos.z < kChunkDim; block_pos.z++) {
+            for (block_pos.y = 0; block_pos.y < kChunkDim; block_pos.y++) {
+                if (block_pos.y + cy < 10) {
+                    chunk->SetBlockUnsafe(g_blocks.WHITE_CONCRETE, block_pos);
                 }
             }
         }

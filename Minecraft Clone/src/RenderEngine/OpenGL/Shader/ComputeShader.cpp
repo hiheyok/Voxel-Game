@@ -14,13 +14,6 @@ ComputeShader::ComputeShader(std::string source) {
     glDeleteShader(shader); // Cleanup
 }
 
-ComputeShader::~ComputeShader() = default;
-
-void ComputeShader::BindBufferAsSSBO(GLuint buffer, int idx) {
-    Use();
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, idx, buffer);
-}
-
 void ComputeShader::DispatchCompute(int x, int y, int z) {
     Use();
     int maxWorkGroupCount[3];
@@ -35,8 +28,3 @@ void ComputeShader::DispatchCompute(int x, int y, int z) {
 
     glDispatchCompute(x, y, z);
 }
-
-void ComputeShader::SSBOMemoryBarrier() {
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-}
-

@@ -18,13 +18,6 @@ struct SetBlockRelative;
 
 class ChunkContainer {
 public:
-    ChunkPos position_;
-    std::vector<ChunkContainer*> neighbors_;
-    std::vector<std::vector<SetBlockRelative>> outside_block_to_place_;
-    std::unique_ptr<LightStorage> lighting_;
-    std::unique_ptr<Heightmap> heightmap_;
-    bool is_empty_ = true;
-
     ChunkContainer();
     virtual ~ChunkContainer();
     ChunkContainer(const ChunkRawData&);
@@ -35,17 +28,17 @@ public:
     ChunkContainer* GetNeighbor(unsigned int side) const;
     void ClearNeighbors();
 
-    BlockID GetBlock(int x, int y, int z) const;
-    BlockID GetBlockUnsafe(int x, int y, int z) const;
+    BlockID GetBlock(const BlockPos& pos) const;
+    BlockID GetBlockUnsafe(const BlockPos& pos) const;
 
-    void SetBlock(BlockID block, int x, int y, int z);
-    void SetBlockUnsafe(BlockID block, int x, int y, int z);
+    void SetBlock(BlockID block, const BlockPos& pos);
+    void SetBlockUnsafe(BlockID block, const BlockPos& pos);
 
     void SetData(const ChunkRawData& data);
     ChunkRawData GetRawData();
     LightStorage GetLightData();
 
-    void SetPosition(int x, int y, int z);
+    void SetPosition(const ChunkPos& pos);
 
     void UpdateHeightMap();
     void UpdateHeightMap(int x, int z);
@@ -54,6 +47,13 @@ public:
 
     bool CheckLightDirty();
     void SetLightDirty();
+
+    ChunkPos position_;
+    std::vector<ChunkContainer*> neighbors_;
+    std::vector<std::vector<SetBlockRelative>> outside_block_to_place_;
+    std::unique_ptr<LightStorage> lighting_;
+    std::unique_ptr<Heightmap> heightmap_;
+    bool is_empty_ = true;
 private:
     bool light_dirty_ = false;
     Palette block_storage_;

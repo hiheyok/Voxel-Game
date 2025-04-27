@@ -25,9 +25,6 @@ namespace Mesh {
         std::vector<uint32_t> fluid_vertices_buffer_;
 
         ChunkPos position_;
-        size_t time_;
-        size_t greedy_time_;
-        size_t cache_time_;
     };
 
 
@@ -65,25 +62,21 @@ namespace Mesh {
         void GenerateFluidMesh();
 
         //Check if the player can see the mesh
-        bool IsFaceVisible(const Cuboid& cube, int x, int y, int z, uint8_t side);
-        bool IsFaceVisibleUnsafe(const Cuboid& cube, int x, int y, int z, uint8_t side);
+        bool IsFaceVisible(const Cuboid& cube, const BlockPos& pos, uint8_t side);
 
-        bool CompareBlockSide(int x, int y, int z, uint8_t side, BlockID b);
-        bool CompareBlockSideUnsafe(int x, int y, int z, uint8_t side, BlockID b);
+        bool CompareBlockSide(const BlockPos& pos, uint8_t side, BlockID b);
 
         //Add faces to the mesh
         void AddModelToMesh(const BlockModel& curr_model, const BlockModel& back_model, 
             glm::ivec3 pos, int u_length, int v_length, bool curr_blank, bool back_blank, int axis);
-        void AddFaceToMesh(const BlockFace& face, uint8_t axis, glm::ivec3 from, glm::ivec3 to, bool allow_ao, int x, int y, int z);
+        void AddFaceToMesh(const BlockFace& face, uint8_t axis, glm::ivec3 from, glm::ivec3 to, bool allow_ao, const BlockPos& pos);
 
-        const BlockID& GetCachedBlockID(int x, int y, int z) const;
-        const BlockID& GetCachedBlockID(int* pos) const;
-        void SetCachedBlockID(BlockID b, int x, int y, int z);
+        const BlockID& GetCachedBlockID(const BlockPos& pos) const;
+        void SetCachedBlockID(BlockID b, const BlockPos& pos);
 
 
-        glm::u8vec4 GetAO(uint8_t direction, int x, int y, int z);
+        glm::u8vec4 GetAO(uint8_t direction, const BlockPos& pos);
 
-        //To check if a block had been used in the Greedy Meshing Algorithm
         static constexpr uint64_t kBufferStepSize = 262144;
 
         Chunk* chunk_;

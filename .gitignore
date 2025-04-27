@@ -363,3 +363,20 @@ MigrationBackup/
 FodyWeavers.xsd
 /Minecraft Clone/src/lineCounter.exe
 /Minecraft Clone/src/Total.txt
+/Minecraft Clone/build/.cmake/api/v1
+/Minecraft Clone/build/CMakeFiles
+/Minecraft Clone/build/CMakeCache.txt
+/Minecraft Clone/build/cmake_install.cmake
+/Minecraft Clone/build/compile_commands.json
+/Minecraft Clone/build/libmmd.dll
+/Minecraft Clone/build/libmmdd.dll
+/Minecraft Clone/build/Makefile
+/Minecraft Clone/build/my_program.exe
+/Minecraft Clone/build/options.txt
+/Minecraft Clone/build/svml_dispmd.dll
+/Minecraft Clone/build/Voxel Game - Copy.exe
+/Minecraft Clone/build/Voxel Game.exe
+/Minecraft Clone/build/Voxel Game_debug.exe
+/Minecraft Clone/.vscode
+/Minecraft Clone/src.zip
+/Minecraft Clone.db3

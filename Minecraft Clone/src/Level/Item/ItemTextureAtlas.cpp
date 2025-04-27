@@ -46,19 +46,19 @@ void ItemTextureAtlas::StitchTexture(size_t index, ItemID ItemID) {
 
     items_uv_map_[ItemID] = uvMap;
 
-    vbo_.InsertData(sizeof(vertices), vertices, GL_STATIC_DRAW);
-    ebo_.InsertData(sizeof(indices), indices, GL_STATIC_DRAW);
+    vbo_->InsertData(sizeof(vertices), vertices, GL_STATIC_DRAW);
+    ebo_->InsertData(sizeof(indices), indices, GL_STATIC_DRAW);
     //Render
     atlas_framebuffer_.BindFBO();
     stitching_shader_.BindTexture2D(0, framebuffer_single_block_render_.texture_, "ItemTexture");
 
     glEnable(GL_BLEND);
 
-    vao_.Bind();
-    ebo_.Bind();
+    vao_->Bind();
+    ebo_->Bind();
     glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(uint32_t), GL_UNSIGNED_INT, 0);
-    vao_.Unbind();
-    ebo_.Unbind();
+    vao_->Unbind();
+    ebo_->Unbind();
 
     glDisable(GL_BLEND);
     atlas_framebuffer_.UnbindFBO();
@@ -76,22 +76,22 @@ void ItemTextureAtlas::Initialize(int atlasItemSize, int individualItemSize) {
     atlas_framebuffer_.GenBuffer(atlas_size_, atlas_size_, 1, GL_RGBA);
     framebuffer_single_block_render_.GenBuffer(individual_size_, individual_size_, 2, GL_RGBA);
 
-    vbo_.SetType(GL_ARRAY_BUFFER);
-    ebo_.SetType(GL_ELEMENT_ARRAY_BUFFER);
+    vbo_ = std::make_unique<Buffer>();
+    ebo_ = std::make_unique<Buffer>();
+    vao_ = std::make_unique<VertexArray>();
 
-    vbo_.SetUsage(GL_STATIC_DRAW);
-    ebo_.SetUsage(GL_STATIC_DRAW);
+    vbo_->SetType(GL_ARRAY_BUFFER);
+    ebo_->SetType(GL_ELEMENT_ARRAY_BUFFER);
 
-    vao_.GenArray();
-    vbo_.GenBuffer();
-    ebo_.GenBuffer();
-
-    vao_.Bind();
-    vbo_.Bind();
-    vao_.EnableAttriPTR(0, 2, GL_FLOAT, GL_FALSE, 4, 0);
-    vao_.EnableAttriPTR(1, 2, GL_FLOAT, GL_FALSE, 4, 2);
-    vao_.Unbind();
-    vbo_.Unbind();
+    vbo_->SetUsage(GL_STATIC_DRAW);
+    ebo_->SetUsage(GL_STATIC_DRAW);
+ 
+    vao_->Bind();
+    vbo_->Bind();
+    vao_->EnableAttriPTR(0, 2, GL_FLOAT, GL_FALSE, 4, 0);
+    vao_->EnableAttriPTR(1, 2, GL_FLOAT, GL_FALSE, 4, 2);
+    vao_->Unbind();
+    vbo_->Unbind();
 
     block_item_renderer_.Initialize();
 }

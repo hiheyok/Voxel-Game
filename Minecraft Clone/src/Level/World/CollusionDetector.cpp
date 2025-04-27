@@ -11,31 +11,30 @@
 CollusionDetector::CollusionDetector(ChunkMap* cache) : cache_{cache} {}
 CollusionDetector::~CollusionDetector() = default;
 
-float CollusionDetector::TraceSingleAxisCollision(glm::vec3 origin, int direction, int distanceTest) {
+float CollusionDetector::TraceSingleAxisCollision(glm::vec3 origin, int direction, int distance_test) {
     float displacement = 0;
 
-    glm::ivec3 flooredPos(floor(origin.x), floor(origin.y), floor(origin.z));
+    glm::ivec3 floored_pos(floor(origin.x), floor(origin.y), floor(origin.z));
     int move = 0;
 
-    int axis_ = direction >> 1;
+    int axis = direction >> 1;
 
     if (direction & 0b1) {
-        displacement = origin[axis_] - (float)flooredPos[axis_];
+        displacement = origin[axis] - (float)floored_pos[axis];
         move = -1;
-    }
-    else {
-        displacement = 1 - (origin[axis_] - (float)flooredPos[axis_]);
+    } else {
+        displacement = 1 - (origin[axis] - (float)floored_pos[axis]);
         move = 1;
     }
 
-    for (int i = 0; i < distanceTest; i++) {
+    for (int i = 0; i < distance_test; i++) {
 
-        flooredPos[axis_] += move * (int)(i != 0);
+        floored_pos[axis] += move * (int)(i != 0);
 
-        BlockID b = cache_->GetBlock(BlockPos{ flooredPos.x, flooredPos.y, flooredPos.z });
+        BlockID b = cache_->GetBlock(BlockPos{ floored_pos.x, floored_pos.y, floored_pos.z });
 
         if (g_blocks.GetBlockType(b)->properties_->is_solid_) {
-            return (float)i + displacement - 1.f;
+            return (float)i + displacement - 1.0f;
         }
     }
 
@@ -45,8 +44,8 @@ float CollusionDetector::TraceSingleAxisCollision(glm::vec3 origin, int directio
 glm::dvec3 CollusionDetector::ComputeCollisionTimes(Entity* entity) {
     AABB hitbox = g_entity_list.GetEntity(entity->properties_.type_)->GetHitbox();
 
-    glm::vec3 hitboxStart = entity->properties_.position_ - (hitbox.size_ / 2.f);
-    glm::vec3 hitboxEnd = entity->properties_.position_ + (hitbox.size_ / 2.f);
+    glm::vec3 hitbox_start = entity->properties_.position_ - (hitbox.size_ / 2.f);
+    glm::vec3 hitbox_end = entity->properties_.position_ + (hitbox.size_ / 2.f);
 
     int ix = (int)floor(hitbox.size_.x) + 1;
     int iy = (int)floor(hitbox.size_.y) + 1;
@@ -54,11 +53,11 @@ glm::dvec3 CollusionDetector::ComputeCollisionTimes(Entity* entity) {
 
     glm::ivec3 i_bound = glm::ivec3(ix, iy, iz);
 
-    glm::vec3 leastTime(-1.f, -1.f, -1.f);
+    glm::vec3 least_time(-1.f, -1.f, -1.f);
 
-    int searchDistance = 5;
+    int search_distance = 5;
 
-    float leastDistance = (float)searchDistance;
+    float least_distance = (float)search_distance;
 
     for (int axis = 0; axis < 3; axis++) {
 
@@ -75,24 +74,24 @@ glm::dvec3 CollusionDetector::ComputeCollisionTimes(Entity* entity) {
                 offset[u_axis] = u;
                 offset[v_axis] = v;
 
-                glm::vec3 origin_ = hitboxStart + (glm::vec3)offset;
+                glm::vec3 origin_ = hitbox_start + (glm::vec3)offset;
 
-                if (origin_.x > hitboxEnd.x)
-                    origin_.x = hitboxEnd.x;
-                if (origin_.y > hitboxEnd.y)
-                    origin_.y = hitboxEnd.y;
-                if (origin_.z > hitboxEnd.z)
-                    origin_.z = hitboxEnd.z;
+                if (origin_.x > hitbox_end.x)
+                    origin_.x = hitbox_end.x;
+                if (origin_.y > hitbox_end.y)
+                    origin_.y = hitbox_end.y;
+                if (origin_.z > hitbox_end.z)
+                    origin_.z = hitbox_end.z;
 
-                bool IsPointOnHitboxSurface =
-                    (origin_.x == hitboxStart.x) ||
-                    (origin_.x == hitboxEnd.x) ||
-                    (origin_.y == hitboxStart.y) ||
-                    (origin_.y == hitboxEnd.y) ||
-                    (origin_.z == hitboxStart.z) ||
-                    (origin_.z == hitboxEnd.z);
+                bool is_point_on_hitbox_surface =
+                    (origin_.x == hitbox_start.x) ||
+                    (origin_.x == hitbox_end.x) ||
+                    (origin_.y == hitbox_start.y) ||
+                    (origin_.y == hitbox_end.y) ||
+                    (origin_.z == hitbox_start.z) ||
+                    (origin_.z == hitbox_end.z);
 
-                if (!IsPointOnHitboxSurface) //Checks if the origin is on the surface to optimize stuff
+                if (!is_point_on_hitbox_surface) //Checks if the origin is on the surface to optimize stuff
                     continue;
 
                 if (entity->properties_.velocity_[axis] == 0.f) //First checks if the velocity isn't 0 because if it is 0, it's not moving in that axis so it's not going to collide in that direction
@@ -100,28 +99,28 @@ glm::dvec3 CollusionDetector::ComputeCollisionTimes(Entity* entity) {
 
                 int direction = axis * 2 + (entity->properties_.velocity_[axis] < 0); // The "+1" indicates that the direction is negative 
 
-                float distance = TraceSingleAxisCollision(origin_, direction, (int)floor(leastDistance) + 2);
+                float distance = TraceSingleAxisCollision(origin_, direction, (int)floor(least_distance) + 2);
 
-                if ((distance < leastDistance) && (distance != -1.f))
-                    leastDistance = distance;
+                if ((distance < least_distance) && (distance != -1.f))
+                    least_distance = distance;
 
                 if (distance == -1.f) // -1.f means that it cannot find any blocks that could collide in that range (5)
                     continue;
 
                 float time = abs(distance / entity->properties_.velocity_[axis]);// This gets the time it takes for the entity to travel that distance
 
-                if (time < leastTime[axis]) {
-                    leastTime[axis] = time;
+                if (time < least_time[axis]) {
+                    least_time[axis] = time;
                     continue;
                 }
 
-                if (leastTime[axis] == -1.f) //leasttime[axis] == -1.f means that a "time" value haven't been inputted yet
-                    leastTime[axis] = time;
+                if (least_time[axis] == -1.f) //leasttime[axis] == -1.f means that a "time" value haven't been inputted yet
+                    least_time[axis] = time;
             }
         }
     }
 
-    return leastTime;
+    return least_time;
 }
 
 bool CollusionDetector::CheckRayIntersection(Ray& ray) {
@@ -136,26 +135,26 @@ bool CollusionDetector::CheckRayIntersection(Ray& ray) {
     glm::ivec3 blockPos = glm::ivec3(floor(ray.origin_.x), floor(ray.origin_.y), floor(ray.origin_.z));
 
     //To keep track of point location
-    glm::vec3 endPoint = ray.origin_;
+    glm::vec3 end_point = ray.origin_;
 
-    glm::vec3 deltaDist(
+    glm::vec3 delta_dist(
         abs(1 / delta[0]), abs(1 / delta[1]), abs(1 / delta[2])
     );
 
     //Stepping Variable
-    glm::vec3 sideDist(
-        ((float)direction[0] * ((float)blockPos[0] - endPoint[0]) + ((float)direction[0] * 0.5f) + 0.5f) * deltaDist[0],
-        ((float)direction[1] * ((float)blockPos[1] - endPoint[1]) + ((float)direction[1] * 0.5f) + 0.5f) * deltaDist[1],
-        ((float)direction[2] * ((float)blockPos[2] - endPoint[2]) + ((float)direction[2] * 0.5f) + 0.5f) * deltaDist[2]
+    glm::vec3 side_dist(
+        ((float)direction[0] * ((float)blockPos[0] - end_point[0]) + ((float)direction[0] * 0.5f) + 0.5f) * delta_dist[0],
+        ((float)direction[1] * ((float)blockPos[1] - end_point[1]) + ((float)direction[1] * 0.5f) + 0.5f) * delta_dist[1],
+        ((float)direction[2] * ((float)blockPos[2] - end_point[2]) + ((float)direction[2] * 0.5f) + 0.5f) * delta_dist[2]
     );
 
     //Max Iterations
-    const uint32_t maxIterations = 50;
+    static constexpr uint32_t kMaxIterations = 50;
     uint32_t iterations = 0;
 
     glm::bvec3 mask(false, false, false);
 
-    while (iterations < maxIterations) {
+    while (iterations < kMaxIterations) {
         iterations++;
 
         BlockID b = cache_->GetBlock(BlockPos{ blockPos.x, blockPos.y, blockPos.z });
@@ -175,16 +174,16 @@ bool CollusionDetector::CheckRayIntersection(Ray& ray) {
             return false;
         }
 
-        glm::bvec3 l1 = LessThan(sideDist[0], sideDist[1], sideDist[2], sideDist[1], sideDist[2], sideDist[0]);
-        glm::bvec3 l2 = LessThanEqual(sideDist[0], sideDist[1], sideDist[2], sideDist[2], sideDist[0], sideDist[1]);
+        glm::bvec3 l1 = LessThan(side_dist[0], side_dist[1], side_dist[2], side_dist[1], side_dist[2], side_dist[0]);
+        glm::bvec3 l2 = LessThanEqual(side_dist[0], side_dist[1], side_dist[2], side_dist[2], side_dist[0], side_dist[1]);
 
         mask[0] = l1[0] && l2[0];
         mask[1] = l1[1] && l2[1];
         mask[2] = l1[2] && l2[2];
 
-        sideDist[0] += (float)mask[0] * deltaDist[0];
-        sideDist[1] += (float)mask[1] * deltaDist[1];
-        sideDist[2] += (float)mask[2] * deltaDist[2];
+        side_dist[0] += (float)mask[0] * delta_dist[0];
+        side_dist[1] += (float)mask[1] * delta_dist[1];
+        side_dist[2] += (float)mask[2] * delta_dist[2];
 
         blockPos[0] += ((int)mask[0]) * direction[0];
         blockPos[1] += ((int)mask[1]) * direction[1];
@@ -197,17 +196,17 @@ bool CollusionDetector::CheckRayIntersection(Ray& ray) {
 bool CollusionDetector::IsEntityOnGround(Entity* entity) {
     AABB hitbox = g_entity_list.GetEntity(entity->properties_.type_)->GetHitbox();
 
-    glm::vec3 hitboxStart = entity->properties_.position_ - (hitbox.size_ / 2.f);
-    glm::vec3 hitboxEnd = entity->properties_.position_ + (hitbox.size_ / 2.f);
+    glm::vec3 hitbox_start = entity->properties_.position_ - (hitbox.size_ / 2.f);
+    glm::vec3 hitbox_end = entity->properties_.position_ + (hitbox.size_ / 2.f);
 
     int ix = (int)floor(hitbox.size_.x) + 1;
     int iz = (int)floor(hitbox.size_.z) + 1;
 
-    int searchDistance = 5;
+    int search_distance = 5;
 
-    float leastLength = (float)searchDistance;
+    float least_length = (float)search_distance;
 
-    float onGroundError = 0.001f;
+    static constexpr float kOnGroundError = 0.001f;
 
     if (entity->properties_.velocity_.y > 0.f) {
         return false;
@@ -215,26 +214,25 @@ bool CollusionDetector::IsEntityOnGround(Entity* entity) {
 
     for (int x = 0; x <= ix; x++) {
         for (int z = 0; z <= iz; z++) {
-            glm::vec3 origin = hitboxStart + glm::vec3(x, 0, z);
+            glm::vec3 origin = hitbox_start + glm::vec3(x, 0, z);
 
-            if (origin.x > hitboxEnd.x)
-                origin.x = hitboxEnd.x;
-            if (origin.z > hitboxEnd.z)
-                origin.z = hitboxEnd.z;
+            if (origin.x > hitbox_end.x)
+                origin.x = hitbox_end.x;
+            if (origin.z > hitbox_end.z)
+                origin.z = hitbox_end.z;
 
-            float distance = 0.f;
+            float distance = 0.0f;
 
             //Set the distance to check to the previose least length from collusion to optimize searching
-            distance = TraceSingleAxisCollision(origin, Directions::kDown , (int)floor(leastLength) + 2);
+            distance = TraceSingleAxisCollision(origin, Directions<BlockPos>::kDown , (int)floor(least_length) + 2);
 
-            if (distance < leastLength) {
-                leastLength = distance;
+            if (distance < least_length) {
+                least_length = distance;
             }
 
-            if ((distance != -1) && (distance < onGroundError)) {
+            if ((distance != -1) && (distance < kOnGroundError)) {
                 return true;
             }
-
         }
     }
     return false;

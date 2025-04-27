@@ -40,18 +40,20 @@ void Mesh::ChunkMeshData::Reset() {
 }
 
 void Mesh::ChunkMeshData::GenerateCache() {
-    int pos[3]{ 0, 0, 0 };
-    int localPos[3]{ 0, 0, 0 };
+    BlockPos pos{ 0, 0, 0 };
+    BlockPos local_pos{ 0, 0, 0 };
 
-    for (int x = 0; x < kChunkDim; x++) {
-        for (int z = 0; z < kChunkDim; z++) {
-            for (int y = 0; y < kChunkDim; ++y) {
-                SetCachedBlockID(chunk_->GetBlockUnsafe(x, y, z), x, y, z);
+    for (local_pos.x = 0; local_pos.x < kChunkDim; ++local_pos.x) {
+        for (local_pos.z = 0; local_pos.z < kChunkDim; ++local_pos.z) {
+            for (local_pos.y = 0; local_pos.y < kChunkDim; ++local_pos.y) {
+                SetCachedBlockID(chunk_->GetBlockUnsafe(local_pos), local_pos);
             }
         }
     }
 
-    for (const auto& side : Directions()) {
+    local_pos = BlockPos{0, 0, 0};
+
+    for (const auto& side : Directions<ChunkPos>()) {
         int axis = side.GetAxis();
         int direction = side.GetDirection() & 0b1;
 
@@ -68,12 +70,12 @@ void Mesh::ChunkMeshData::GenerateCache() {
                 pos[(axis + 1) % 3] = u;
                 pos[(axis + 2) % 3] = v;
 
-                localPos[axis] = 17 - 17 * direction;
-                localPos[(axis + 1) % 3] = u + 1;
-                localPos[(axis + 2) % 3] = v + 1;
+                local_pos[axis] = 17 - 17 * direction;
+                local_pos[(axis + 1) % 3] = u + 1;
+                local_pos[(axis + 2) % 3] = v + 1;
 
-                BlockID block = neighbor->GetBlockUnsafe(pos[0], pos[1], pos[2]);
-                SetCachedBlockID(block, localPos[0] - 1, localPos[1] - 1, localPos[2] - 1);
+                BlockID block = neighbor->GetBlockUnsafe(pos);
+                SetCachedBlockID(block, local_pos - BlockPos{1, 1, 1});
             }
         }
     }
@@ -105,7 +107,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
     for (int axis = 0; axis < 3; axis++) {
         int axisU = (axis + 2) % 3;
         int axisV = (axis + 1) % 3;
-        glm::ivec3 pos{ 0,0,0 };
+        BlockPos pos{ 0,0,0 };
 
         for (pos[axis] = 0; pos[axis] <= kChunkDim; ++pos[axis]) {//Slice
             usedBlock.fill(0);
@@ -119,9 +121,9 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
 
                     usedBlock[(pos[axisU] << 4) + pos[axisV]] = 0xFF;
 
-                    const BlockID& currBlock = GetCachedBlockID(pos[0], pos[1], pos[2]);
+                    const BlockID& currBlock = GetCachedBlockID(pos);
                     --pos[axis];
-                    const BlockID& backBlock = GetCachedBlockID(pos[0], pos[1], pos[2]);
+                    const BlockID& backBlock = GetCachedBlockID(pos);
                     ++pos[axis];
 
                     const BlockModel& currModel = g_blocks.GetBlockModel(currBlock);
@@ -140,7 +142,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
                                 continue;
 
                             if (element.faces_[axis * 2 + 1].cull_face_ != -1) {
-                                if (!IsFaceVisible(element, pos[0], pos[1], pos[2], element.faces_[axis * 2 + 1].cull_face_)) continue;
+                                if (!IsFaceVisible(element, pos, element.faces_[axis * 2 + 1].cull_face_)) continue;
                             }
 
                             faceVisibility[i] |= 0b1;
@@ -158,7 +160,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
                                 continue;
 
                             if (element.faces_[axis * 2].cull_face_ != -1) {
-                                if (!IsFaceVisible(element, pos[0], pos[1], pos[2], element.faces_[axis * 2].cull_face_)) continue;
+                                if (!IsFaceVisible(element, pos, element.faces_[axis * 2].cull_face_)) continue;
                             }
 
                             faceVisibilityBack[i] |= 0b1;
@@ -171,36 +173,34 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
                     int uLength = 1;
                     int vLength = 1;
 
-                    glm::ivec3 qPos{ pos[0], pos[1], pos[2] };
+                    BlockPos q_pos = pos;
 
-                    for (qPos[axisV] = pos[axisV] + 1; qPos[axisV] < kChunkDim; ++qPos[axisV]) {
+                    for (q_pos[axisV] = pos[axisV] + 1; q_pos[axisV] < kChunkDim; ++q_pos[axisV]) {
                         //Check if they are the same
-                        const BlockID& currBlock2 = GetCachedBlockID(qPos[0], qPos[1], qPos[2]);
-                        --qPos[axis];
-                        const BlockID& backBlock2 = GetCachedBlockID(qPos[0], qPos[1], qPos[2]);
-                        ++qPos[axis];
+                        const BlockID& currBlock2 = GetCachedBlockID(q_pos);
+                        --q_pos[axis];
+                        const BlockID& backBlock2 = GetCachedBlockID(q_pos);
+                        ++q_pos[axis];
 
                         if (currBlock2 != currBlock || backBlock2 != backBlock)
                             break;
 
-                        usedBlock[(qPos[axisU] << 4) + qPos[axisV]] = 0xFFU;
+                        usedBlock[(q_pos[axisU] << 4) + q_pos[axisV]] = 0xFFU;
                         vLength++;
                     }
 
                     //memset(usedBlock.data() + (pos[axisU] << 4) + pos[axisV], vLength, vLength);
 
-                    qPos[0] = pos[0];
-                    qPos[1] = pos[1];
-                    qPos[2] = pos[2];
+                    q_pos = pos;
 
-                    for (qPos[axisU] = pos[axisU] + 1; qPos[axisU] < kChunkDim; ++qPos[axisU]) {
+                    for (q_pos[axisU] = pos[axisU] + 1; q_pos[axisU] < kChunkDim; ++q_pos[axisU]) {
                         bool isValid = true;
 
-                        for (qPos[axisV] = pos[axisV]; qPos[axisV] < pos[axisV] + vLength; ++qPos[axisV]) {
-                            const BlockID& currBlock2 = GetCachedBlockID(qPos[0], qPos[1], qPos[2]);
-                            --qPos[axis];
-                            const BlockID& backBlock2 = GetCachedBlockID(qPos[0], qPos[1], qPos[2]);
-                            ++qPos[axis];
+                        for (q_pos[axisV] = pos[axisV]; q_pos[axisV] < pos[axisV] + vLength; ++q_pos[axisV]) {
+                            const BlockID& currBlock2 = GetCachedBlockID(q_pos);
+                            --q_pos[axis];
+                            const BlockID& backBlock2 = GetCachedBlockID(q_pos);
+                            ++q_pos[axis];
 
                             if (currBlock2 != currBlock || backBlock2 != backBlock) {
                                 isValid = false;
@@ -212,14 +212,14 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
                             break;
                         }
 
-                        memset(usedBlock.data() + (static_cast<long long>(qPos[axisU]) << 4) + pos[axisV], vLength, vLength);
+                        memset(usedBlock.data() + (static_cast<long long>(q_pos[axisU]) << 4) + pos[axisV], vLength, vLength);
 
                         ++uLength;
                     }
 
-                    qPos[0] = pos[0];
-                    qPos[1] = pos[1];
-                    qPos[2] = pos[2];
+                    q_pos[0] = pos[0];
+                    q_pos[1] = pos[1];
+                    q_pos[2] = pos[2];
 
                     //Memorize & Add Faces
 
@@ -233,29 +233,27 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
                         for (int i = 0; i < currModel.elements_.size(); i++) {
                             if (faceVisibility[i] != 1) continue;
                             const Cuboid& element = currModel.elements_[i];
-                            for (qPos[axisU] = pos[axisU]; qPos[axisU] < pos[axisU] + uLength; ++qPos[axisU]) {
-                                for (qPos[axisV] = pos[axisV]; qPos[axisV] < pos[axisV] + vLength; ++qPos[axisV]) {
-                                    AddFaceToMesh(element.faces_[axis * 2 + 1], axis * 2 + 1, element.from_, element.to_, currModel.ambient_occlusion_, qPos[0], qPos[1], qPos[2]);
+                            for (q_pos[axisU] = pos[axisU]; q_pos[axisU] < pos[axisU] + uLength; ++q_pos[axisU]) {
+                                for (q_pos[axisV] = pos[axisV]; q_pos[axisV] < pos[axisV] + vLength; ++q_pos[axisV]) {
+                                    AddFaceToMesh(element.faces_[axis * 2 + 1], axis * 2 + 1, element.from_, element.to_, currModel.ambient_occlusion_, q_pos);
                                 }
                             }
                         }
                     }
-                    --qPos[axis];
+                    --q_pos[axis];
                     if (!blankBackModel) {
                         for (int i = 0; i < backModel.elements_.size(); i++) {
                             if (faceVisibilityBack[i] != 1) continue;
                             const Cuboid& element = backModel.elements_[i];
-                            for (qPos[axisU] = pos[axisU]; qPos[axisU] < pos[axisU] + uLength; ++qPos[axisU]) {
-                                for (qPos[axisV] = pos[axisV]; qPos[axisV] < pos[axisV] + vLength; ++qPos[axisV]) {
-                                    AddFaceToMesh(element.faces_[axis * 2], axis * 2, element.from_, element.to_, backModel.ambient_occlusion_, qPos[0], qPos[1], qPos[2]);
+                            for (q_pos[axisU] = pos[axisU]; q_pos[axisU] < pos[axisU] + uLength; ++q_pos[axisU]) {
+                                for (q_pos[axisV] = pos[axisV]; q_pos[axisV] < pos[axisV] + vLength; ++q_pos[axisV]) {
+                                    AddFaceToMesh(element.faces_[axis * 2], axis * 2, element.from_, element.to_, backModel.ambient_occlusion_, q_pos);
                                 }
                             }
                         }
                     }
 
-                    qPos[0] = pos[0];
-                    qPos[1] = pos[1];
-                    qPos[2] = pos[2];
+                    q_pos = pos;
 
                     if (vLength == kChunkDim && uLength == kChunkDim) { //Skip entire layer
                         pos[axisV] = kChunkDim - 1;
@@ -270,14 +268,14 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
     }
 }
 
-void Mesh::ChunkMeshData::AddFaceToMesh(const BlockFace& face, uint8_t axis_, glm::ivec3 from_, glm::ivec3 to_, bool allowAO, int x, int y, int z) {
+void Mesh::ChunkMeshData::AddFaceToMesh(const BlockFace& face, uint8_t axis_, glm::ivec3 from_, glm::ivec3 to_, bool allowAO, const BlockPos& pos) {
     uint8_t NN = 15, PN = 15, PP = 15, NP = 15;
     uint8_t direction = axis_ & 0b1;
     uint8_t facing = axis_ >> 1;
 
-    x *= kChunkDim;
-    y *= kChunkDim;
-    z *= kChunkDim;
+    int x = pos.x * kChunkDim;
+    int y = pos.y * kChunkDim;
+    int z = pos.z * kChunkDim;
 
     glm::ivec3 P0{ x + from_[0] + POSITION_OFFSET, y + from_[1] + POSITION_OFFSET, z + from_[2] + POSITION_OFFSET };
     glm::ivec3 P1{ x + to_[0] + POSITION_OFFSET, y + to_[1] + POSITION_OFFSET, z + to_[2] + POSITION_OFFSET };
@@ -326,7 +324,7 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const BlockFace& face, uint8_t axis_, gl
         out.resize(out.size() + kBufferStepSize);
 
     //Get AO
-    glm::u8vec4 AO = allowAO ? GetAO(axis_, x / kChunkDim, y / kChunkDim, z / kChunkDim) : glm::u8vec4{ 15, 15, 15, 15 };
+    glm::u8vec4 AO = allowAO ? GetAO(axis_, pos) : glm::u8vec4{ 15, 15, 15, 15 };
    
     PP = AO[0], PN = AO[1], NP = AO[2], NN = AO[3];
 
@@ -352,24 +350,20 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const BlockFace& face, uint8_t axis_, gl
     }
 }
 
-inline const BlockID& Mesh::ChunkMeshData::GetCachedBlockID(int x, int y, int z) const {
-    return chunk_cache_[(x + 1) * 18 * 18 + (z + 1) * 18 + (y + 1)];
+const BlockID& Mesh::ChunkMeshData::GetCachedBlockID(const BlockPos& pos) const {
+    return chunk_cache_[(pos.x + 1) * 18 * 18 + (pos.z + 1) * 18 + (pos.y + 1)];
 }
 
-inline const BlockID& Mesh::ChunkMeshData::GetCachedBlockID(int* pos) const {
-    return GetCachedBlockID(pos[0], pos[1], pos[2]);
-}
-
-inline void Mesh::ChunkMeshData::SetCachedBlockID(BlockID b, int x, int y, int z) {
-    chunk_cache_[(x + 1) * (kChunkDim + 2) * (kChunkDim + 2) + (z + 1) * (kChunkDim + 2) + (y + 1)] = b;
+void Mesh::ChunkMeshData::SetCachedBlockID(BlockID b, const BlockPos& pos) {
+    chunk_cache_[(pos.x + 1) * (kChunkDim + 2) * (kChunkDim + 2) + (pos.z + 1) * (kChunkDim + 2) + (pos.y + 1)] = b;
     //is_fluid_.set((x + 1) * (kChunkDim + 2) * (kChunkDim + 2) + (z + 1) * (kChunkDim + 2) + (y + 1), g_blocks.GetBlockProperties(b).is_fluid_);
 }
 
-inline glm::u8vec4 Mesh::ChunkMeshData::GetAO(uint8_t direction, int x, int y, int z) {
+glm::u8vec4 Mesh::ChunkMeshData::GetAO(uint8_t direction, const BlockPos& block_pos) {
     const uint8_t AMBIENT_OCCLUSION_STRENGTH = 2;
-    glm::ivec3 pos{x, y, z};
+    BlockPos pos = block_pos;
 
-    char InitialLighting = chunk_->lighting_->GetLighting(x, y, z);
+    char InitialLighting = chunk_->lighting_->GetLighting(pos);
 
     uint8_t PP{ 15 }, PN{ 15 }, NP{ 15 }, NN{ 15 };
 
@@ -386,14 +380,14 @@ inline glm::u8vec4 Mesh::ChunkMeshData::GetAO(uint8_t direction, int x, int y, i
     //Check up
     pos[axis1] += 1;
 
-    if (GetCachedBlockID(pos.x, pos.y, pos.z) != g_blocks.AIR) {
+    if (GetCachedBlockID(pos) != g_blocks.AIR) {
         PP -= AMBIENT_OCCLUSION_STRENGTH;
         PN -= AMBIENT_OCCLUSION_STRENGTH;
     }
 
     pos[axis1] -= 2;
 
-    if (GetCachedBlockID(pos.x, pos.y, pos.z) != g_blocks.AIR) {
+    if (GetCachedBlockID(pos) != g_blocks.AIR) {
         NP -= AMBIENT_OCCLUSION_STRENGTH;
         NN -= AMBIENT_OCCLUSION_STRENGTH;
     }
@@ -401,14 +395,14 @@ inline glm::u8vec4 Mesh::ChunkMeshData::GetAO(uint8_t direction, int x, int y, i
     pos[axis1] += 1;
     pos[axis2] += 1;
 
-    if (GetCachedBlockID(pos.x, pos.y, pos.z) != g_blocks.AIR) {
+    if (GetCachedBlockID(pos) != g_blocks.AIR) {
         NP -= AMBIENT_OCCLUSION_STRENGTH;
         PP -= AMBIENT_OCCLUSION_STRENGTH;
     }
 
     pos[axis2] -= 2;
 
-    if (GetCachedBlockID(pos.x, pos.y, pos.z) != g_blocks.AIR) {
+    if (GetCachedBlockID(pos) != g_blocks.AIR) {
         PN -= AMBIENT_OCCLUSION_STRENGTH;
         NN -= AMBIENT_OCCLUSION_STRENGTH;
     }
@@ -420,21 +414,21 @@ inline glm::u8vec4 Mesh::ChunkMeshData::GetAO(uint8_t direction, int x, int y, i
     pos[axis1] += 1;
     pos[axis2] += 1;
 
-    if (GetCachedBlockID(pos.x, pos.y, pos.z) != g_blocks.AIR)
+    if (GetCachedBlockID(pos) != g_blocks.AIR)
         PP -= AMBIENT_OCCLUSION_STRENGTH;
 
     pos[axis1] -= 2;
-    if (GetCachedBlockID(pos.x, pos.y, pos.z) != g_blocks.AIR)
+    if (GetCachedBlockID(pos) != g_blocks.AIR)
         NP -= AMBIENT_OCCLUSION_STRENGTH;
 
     pos[axis2] -= 2;
 
-    if (GetCachedBlockID(pos.x, pos.y, pos.z) != g_blocks.AIR)
+    if (GetCachedBlockID(pos) != g_blocks.AIR)
         NN -= AMBIENT_OCCLUSION_STRENGTH;
 
     pos[axis1] += 2;
 
-    if (GetCachedBlockID(pos.x, pos.y, pos.z) != g_blocks.AIR)
+    if (GetCachedBlockID(pos) != g_blocks.AIR)
         PN -= AMBIENT_OCCLUSION_STRENGTH;
 
 
@@ -463,17 +457,15 @@ inline glm::u8vec4 Mesh::ChunkMeshData::GetAO(uint8_t direction, int x, int y, i
 }
 
 //Checks if a block side is visible to the player
-inline bool Mesh::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int x, int y, int z, uint8_t side) {
+bool Mesh::ChunkMeshData::IsFaceVisible(const Cuboid& cube, const BlockPos& block_pos, uint8_t side) {
     const uint8_t axis_ = (side >> 1); //Get side
     const uint8_t axis1 = (axis_ + 1) % 3;
     const uint8_t axis2 = (axis_ + 2) % 3;
-    const uint8_t oppositeSide = axis_ * 2 + static_cast<uint8_t>(!(side & 0b1));
+    const uint8_t oppositeSide = side ^ 1; // Flip the leading bit
+    BlockPos pos = block_pos;
+    pos.IncrementSide(side, 1);
 
-    int p[3]{ x, y, z };
-
-    p[axis_] += 1 - 2 * (side & 0b1);
-
-    const BlockModel& model = g_blocks.GetBlockModel(GetCachedBlockID(p[0], p[1], p[2]));
+    const BlockModel& model = g_blocks.GetBlockModel(GetCachedBlockID(pos));
 
     if (!model.is_initialized_) return true;
 
@@ -500,34 +492,10 @@ inline bool Mesh::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int x, int y,
     return true;
 }
 
-inline bool Mesh::ChunkMeshData::IsFaceVisibleUnsafe(const Cuboid& cube, int x, int y, int z, uint8_t side) {
-    uint8_t axis_ = (side >> 1); //Get side
 
-    int p[3]{ x,y,z };
+bool Mesh::ChunkMeshData::CompareBlockSide(const BlockPos& pos, uint8_t side, BlockID b) {
+    BlockPos new_pos = pos;
+    new_pos.IncrementSide(side, 1);
 
-    p[axis_] += 1 - 2 * (side & 0b1);
-
-    return g_blocks.GetBlockType(GetCachedBlockID(p[0], p[1], p[2]))->properties_->transparency_;
-}
-
-inline bool Mesh::ChunkMeshData::CompareBlockSide(int x, int y, int z, uint8_t side, BlockID b) {
-    //IsFaceVisibleCalls++;
-
-    uint8_t axis_ = (side >> 1); //Get side
-
-    int p[3]{ x,y,z };
-
-    p[axis_] += 1 - 2 * (side & 0b1);
-
-    return GetCachedBlockID(p[0], p[1], p[2]) == b;
-}
-
-inline bool Mesh::ChunkMeshData::CompareBlockSideUnsafe(int x, int y, int z, uint8_t side, BlockID b) {
-    uint8_t axis_ = (side >> 1); //Get side
-
-    int p[3]{ x,y,z };
-
-    p[axis_] += 1 - 2 * (side & 0b1);
-
-    return GetCachedBlockID(p[0], p[1], p[2]) == b;
+    return GetCachedBlockID(new_pos) == b;
 }

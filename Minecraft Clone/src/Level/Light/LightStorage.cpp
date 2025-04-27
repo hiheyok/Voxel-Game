@@ -25,20 +25,23 @@ void LightStorage::ReplaceData(const uint64_t* src) {
     memcpy(data_, src, sizeof(uint64_t) * 256);
 }
 
-void LightStorage::EditLight(int x, int y, int z, unsigned char lightingInfo) {
-    data_[(x << 4) | (z)] &= (~(0b1111ULL << (y << 2)));
+void LightStorage::EditLight(const BlockPos& pos, unsigned char lightingInfo) {
+    static constexpr uint64_t mask = kChunkDim - 1;
 
-    data_[(x << 4) | (z)] |= ((uint64_t)lightingInfo << (y << 2));
+    data_[(pos.x << 4) | (pos.z)] &= (~(mask << (pos.y << 2)));
+
+    data_[(pos.x << 4) | (pos.z)] |= ((uint64_t)lightingInfo << (pos.y << 2));
 }
 
-uint8_t LightStorage::GetLighting(int x, int y, int z) const {
-    return (data_[(x << 4) | (z)] >> (y << 2)) & 0b1111;
+uint8_t LightStorage::GetLighting(const BlockPos& pos) const {
+    static constexpr uint64_t mask = kChunkDim - 1;
+    return (data_[(pos.x << 4) | (pos.z)] >> (pos.y << 2)) & mask;
 }
 
 void LightStorage::ResetLighting() {
-    memset((uint8_t*)data_, 0, 256 * 8); //8 = sizeof uint64_t
+    memset((uint8_t*)data_, 0, kChunkSize2D * sizeof(uint64_t)); //8 = sizeof uint64_t
 }
 
 void LightStorage::ResetLightingCustom(uint8_t lvl) {
-    memset((uint8_t*)data_, lvl | (lvl << 4), 256 * 8); //8 = sizeof uint64_t
+    memset((uint8_t*)data_, lvl | (lvl << 4), kChunkSize2D * sizeof(uint64_t)); //8 = sizeof uint64_t
 }

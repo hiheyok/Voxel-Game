@@ -15,9 +15,6 @@
 class ComputeShader : public ShaderInterface {
 public:
     ComputeShader(std::string source);
-    ~ComputeShader();
 
     void DispatchCompute(int x, int y, int z);
-    void BindBufferAsSSBO(GLuint buffer, int idx);
-    void SSBOMemoryBarrier();
 };

@@ -23,7 +23,7 @@ void Block::InitializeBlockModel(ModelLoader& modelLoader) {
 
 void Block::InitializeTexture(BlockTextureAtlas& textureAtlas) {
     for (auto& element : block_model_data_->elements_) {
-        for (const auto& side : Directions()) {
+        for (const auto& side : Directions<BlockPos>()) {
             const std::string& path = element.faces_[side].reference_texture_;
             if (path.length() == 0) continue;
 

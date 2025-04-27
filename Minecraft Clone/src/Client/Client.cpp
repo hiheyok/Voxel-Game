@@ -12,7 +12,6 @@
 #include "Level/Item/ItemTextureAtlas.h"
 #include "Level/Entity/Entities.h"
 #include "Level/Entity/Mobs/Player.h"
-#include "Utils/Timer/Timer.h"
 #include "Core/Interfaces/InternalInterface.h"
 #include "Core/Networking/Packet.h"
 #include "Level/Level.h"
@@ -20,6 +19,8 @@
 #include "RenderEngine/EntityRender/MultiEntityRender.h"
 #include "RenderEngine/GUI/TextRenderer.h"
 #include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
+#include "Utils/Clock.h"
+#include "Utils/Timer/Timer.h"
 #include "Utils/LogUtils.h"
 #include "Server/Server.h"
 
@@ -33,41 +34,32 @@ Client::~Client() = default;
 
 void Client::InitializeServerCom() {
     // Start Server First
-    ServerSettings settings_;
-    settings_.gen_thread_count_ = g_app_options.world_gen_threads_;
-    settings_.light_engine_thread_count_ = g_app_options.light_engine_threads_;
-    settings_.horizontal_ticking_distance_ = g_app_options.horizontal_render_distance_;
-    settings_.vertical_ticking_distance_ = g_app_options.vertical_render_distance_;
+    ServerSettings settings;
+    settings.gen_thread_count_ = g_app_options.world_gen_threads_;
+    settings.light_engine_thread_count_ = g_app_options.light_engine_threads_;
+    settings.horizontal_ticking_distance_ = g_app_options.horizontal_render_distance_;
+    settings.vertical_ticking_distance_ = g_app_options.vertical_render_distance_;
 
     // Joins the server it should start receiving stuff now
-    server_->StartServer(settings_);
+    server_->StartServer(settings);
     player_uuid_ = server_->SetInternalConnection(internal_interface_.get());
     client_play_ = std::make_unique<ClientPlay>(internal_interface_.get(), this, profiler_);
 }
 void Client::InitializeGameContent() {
     g_blocks.Initialize();
     g_entity_list.Initialize();
-    //entity_render_->Initialize(profiler_);
-    //entity_render_->SetWindow(GetWindow());
     text_render_->InitializeTextRenderer(GetWindow());
     g_items.RegisterAll();
     g_item_atlas.Initialize(512 * 16 * 2, 16 * 2 * 8);
     for (auto& item : g_items.item_container_) {
         g_item_atlas.AddItem(item.second);
     }
-
 }
 
 void Client::Initialize() {
     DisableCursor();
     InitializeGameContent();
-
-
     InitializeServerCom();
-
-    //entity_updater_->SetEntityRenderer(entity_render_.get(), server_->GetTickClock());
-    //entity_updater_->Start(server_->server->level_->main_world_.get());
-
 }
 
 void Client::run() {
@@ -77,10 +69,8 @@ void Client::run() {
 }
 
 void Client::Cleanup() {
-    //entity_render_->Clean();
     server_->Stop();
     g_logger.Stop();
-    //entity_updater_->Stop();
 }
 
 void Client::Render() {
@@ -89,8 +79,10 @@ void Client::Render() {
 }
 
 void Client::GameLoop() {
+    int fps = 120;
+
     while (!WindowCloseCheck()) {
-        Timer FrametimeTracker;
+        Timer frametime_tracker;
 
         Update();
 
@@ -98,7 +90,14 @@ void Client::GameLoop() {
         profiler_->ProfileStart("root/refresh");
         Refresh();
         profiler_->ProfileStop("root/refresh");
-        frametime_ = FrametimeTracker.GetTimePassed_s();
+
+        double curr = frametime_tracker.GetTimePassed_s();
+
+        if (curr < (1.0 / (double)fps)) {
+            timerSleep((1.0 / (double)fps) - curr);
+        }
+
+        frametime_ = frametime_tracker.GetTimePassed_s();
         client_play_->frametime_ = frametime_;
         inputs_.delta_ = frametime_;
     }

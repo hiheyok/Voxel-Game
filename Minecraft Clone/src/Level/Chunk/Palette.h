@@ -19,12 +19,11 @@ public:
     Palette& operator=(const Palette&);
     Palette& operator=(Palette&&) noexcept;
 
-    BlockID GetBlock(int x, int y, int z) const;
-    BlockID GetBlockUnsafe(int x, int y, int z) const;
+    BlockID GetBlock(const BlockPos& pos) const;
+    BlockID GetBlockUnsafe(const BlockPos& pos) const;
 
-    void SetBlock(BlockID block, int x, int y, int z);
-
-    void SetBlockUnsafe(BlockID block, int x, int y, int z);
+    void SetBlock(BlockID block, const BlockPos& pos);
+    void SetBlockUnsafe(BlockID block, const BlockPos& pos);
 private:
 
     using PaletteIndex = uint16_t;
@@ -33,10 +32,6 @@ private:
     static constexpr int GetBitWidth(unsigned int n) {
         int bitWidth = std::bit_width(n);
         return std::max(bitWidth, kMinBitWidth);
-    }
-
-    static constexpr size_t GetIndex(int x, int y, int z) {
-        return x * kChunkDim * kChunkDim + y * kChunkDim + z;
     }
 
     void Shrink();

@@ -9,23 +9,11 @@
 ChunkDrawBatch::ChunkDrawBatch(size_t maxSize) : 
     max_buffer_size_{ maxSize },
     memory_pool_{ maxSize } {}
+    
 ChunkDrawBatch::ChunkDrawBatch(ChunkDrawBatch&&) = default;
-ChunkDrawBatch::~ChunkDrawBatch() {
-    memory_pool_.buffer_->Delete();
-    ibo_.Delete();
-    ssbo_.Delete();
-    array_.~VertexArray();
-
-    draw_commands_.clear();
-    render_list_.clear();
-    chunk_shader_pos_.clear();
-}
+ChunkDrawBatch::~ChunkDrawBatch() = default;
 
 void ChunkDrawBatch::SetupBuffers() {
-    ibo_.GenBuffer();
-    ssbo_.GenBuffer();
-    array_.GenArray();
-
     ibo_.SetType(GL_DRAW_INDIRECT_BUFFER);
     ssbo_.SetType(GL_SHADER_STORAGE_BUFFER);
 
@@ -73,7 +61,6 @@ void ChunkDrawBatch::GenDrawCommands(int renderDistance, int verticalRenderDista
     int index = 1;
 
     for (const auto& data : render_list_arr_) {
-
         int x = data.position_.x;
         int y = data.position_.y;
         int z = data.position_.z;
@@ -82,13 +69,12 @@ void ChunkDrawBatch::GenDrawCommands(int renderDistance, int verticalRenderDista
         float deltaY = static_cast<float>((y - position.y) * (y - position.y));
         float deltaZ = static_cast<float>((z - position.z) * (z - position.z));
 
-
         float dx2 = deltaX / (renderDistance * renderDistance);
         float dy2 = deltaY / (verticalRenderDistance * verticalRenderDistance);
         float dz2 = deltaZ / (renderDistance * renderDistance);
 
         if (dx2 + dy2 + dz2 < 1.f) {
-            if (frustum_.SphereInFrustum((float)(x << 4), (float)(y << 4), (float)(z << 4), 24.3f)) { // << 4 means multiply by 4
+            if (frustum_.SphereInFrustum((float)(x << kChunkDimLog2), (float)(y << kChunkDimLog2), (float)(z << kChunkDimLog2), 24.3f)) {
                 draw_commands_[index - 1].set(static_cast<uint32_t>(data.mem_size_ >> 3), 1, static_cast<uint32_t>(data.mem_offset_ >> 3), index);
                 chunk_shader_pos_[(index - 1) * 3 + 0] = x;
                 chunk_shader_pos_[(index - 1) * 3 + 1] = y;

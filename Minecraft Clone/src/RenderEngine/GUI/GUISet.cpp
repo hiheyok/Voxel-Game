@@ -109,9 +109,6 @@ size_t GUISet::AddRenderingObj() {
     vaos_.emplace_back();
     ebos_.emplace_back();
     vbos_.emplace_back();
-    vaos_.back().GenArray();
-    vbos_.back().GenBuffer();
-    ebos_.back().GenBuffer();
 
     vbos_.back().SetType(GL_ARRAY_BUFFER);
     ebos_.back().SetType(GL_ELEMENT_ARRAY_BUFFER);

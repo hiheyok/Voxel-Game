@@ -3,7 +3,7 @@
 #include "Level/Chunk/Heightmap/Heightmap.h"
 #include "Level/TerrainGeneration/Structures/Structure.h"
 
-static const int NeighborOffset[6] = {
+static constexpr int NeighborOffset[6] = {
       -kChunkDim, kChunkDim,-kChunkDim, kChunkDim,-kChunkDim, kChunkDim
 };
 
@@ -22,70 +22,71 @@ ChunkContainer::ChunkContainer(const ChunkRawData& data) : ChunkContainer() {
     SetData(data);
 }
 
-BlockID ChunkContainer::GetBlock(int x, int y, int z) const {
-    if (!((x | y | z) >> 4)) {
-        return block_storage_.GetBlock(x, y, z);
-    }
+BlockID ChunkContainer::GetBlock(const BlockPos& pos) const {
+    if ((pos.x | pos.y | pos.z) >> kChunkDimLog2) {
+        int dx = ((pos.x >> 31) & 1) + 0;
+        int dy = ((pos.y >> 31) & 1) + 2;
+        int dz = ((pos.z >> 31) & 1) + 4;
 
-    int dx = ((x >> 31) & 0b1) + 0;
-    int dy = ((y >> 31) & 0b1) + 2;
-    int dz = ((z >> 31) & 0b1) + 4;
-
-    if (neighbors_[dx] && (x >> 4)) return neighbors_[dx]->GetBlock(x + NeighborOffset[dx], y, z );
-    if (neighbors_[dy] && (y >> 4)) return neighbors_[dy]->GetBlock(x, y + NeighborOffset[dy], z );
-    if (neighbors_[dz] && (z >> 4)) return neighbors_[dz]->GetBlock(x, y, z + NeighborOffset[dz]);
-
-    return g_blocks.AIR;
-}
-
-BlockID ChunkContainer::GetBlockUnsafe(int x, int y, int z) const {
-    return block_storage_.GetBlockUnsafe(x, y, z);
-}
-
-void ChunkContainer::SetBlock(BlockID block, int x, int y, int z) {
-    if (!((x | y | z) >> 4)) { //check if it is in the chunk
-        SetBlockUnsafe(block, x, y, z);
-        return;
-    }
-
-    int dx = ((x >> 31) & 0b1) + 0;
-    int dy = ((y >> 31) & 0b1) + 2;
-    int dz = ((z >> 31) & 0b1) + 4;
-
-    if (x >> 4) {
-        outside_block_to_place_[dx].emplace_back(block, x + NeighborOffset[dx], y, z);
-        return;
-    }
-    if (y >> 4) {
-        outside_block_to_place_[dy].emplace_back(block, x, y + NeighborOffset[dy], z);
-        return;
-    }
-    if (z >> 4) {
-        outside_block_to_place_[dz].emplace_back(block, x, y, z + NeighborOffset[dz]);
-        return;
+        if (neighbors_[dx] && (pos.x >> kChunkDimLog2)) return neighbors_[dx]->GetBlock(BlockPos{ pos.x + NeighborOffset[dx], pos.y, pos.z });
+        if (neighbors_[dy] && (pos.y >> kChunkDimLog2)) return neighbors_[dy]->GetBlock(BlockPos{ pos.x, pos.y + NeighborOffset[dy], pos.z });
+        if (neighbors_[dz] && (pos.z >> kChunkDimLog2)) return neighbors_[dz]->GetBlock(BlockPos{ pos.x, pos.y, pos.z + NeighborOffset[dz] });
+    
+        return g_blocks.AIR;
+    } else {
+        return block_storage_.GetBlock(pos);
     }
 }
 
-void ChunkContainer::SetBlockUnsafe(BlockID block, int x, int y, int z) {
-    block_storage_.SetBlockUnsafe(block, (uint32_t)x, (uint32_t)y, (uint32_t)z);
+BlockID ChunkContainer::GetBlockUnsafe(const BlockPos& pos) const {
+    return block_storage_.GetBlockUnsafe(pos);
+}
+
+void ChunkContainer::SetBlock(BlockID block, const BlockPos& pos) {
+    if ((pos.x | pos.y | pos.z) >> kChunkDimLog2) { //check if it is in the chunk
+        int dx = ((pos.x >> 31) & 1) + 0;
+        int dy = ((pos.y >> 31) & 1) + 2;
+        int dz = ((pos.z >> 31) & 1) + 4;
+    
+        if (pos.x >> kChunkDimLog2) {
+            outside_block_to_place_[dx].emplace_back(block, BlockPos{pos.x + NeighborOffset[dx], pos.y, pos.z});
+            return;
+        }
+        if (pos.y >> kChunkDimLog2) {
+            outside_block_to_place_[dy].emplace_back(block, BlockPos{pos.x, pos.y + NeighborOffset[dy], pos.z});
+            return;
+        }
+        if (pos.z >> kChunkDimLog2) {
+            outside_block_to_place_[dz].emplace_back(block, BlockPos{pos.x, pos.y, pos.z + NeighborOffset[dz]});
+            return;
+        }
+    } else {
+        SetBlockUnsafe(block, pos);
+    }
+
+    
+}
+
+void ChunkContainer::SetBlockUnsafe(BlockID block, const BlockPos& pos) {
+    block_storage_.SetBlockUnsafe(block, pos);
     is_empty_ = false;
 }
 
-void ChunkContainer::SetPosition(int x, int y, int z) {
-    position_.set(x, y, z);
-    lighting_->position_.set(x, y, z);
+void ChunkContainer::SetPosition(const ChunkPos& pos) {
+    position_ = pos;
+    lighting_->position_ = pos;
 }
 
 ChunkContainer* ChunkContainer::GetNeighbor(unsigned int side) const {
     return neighbors_[side];
 }
 
-void ChunkContainer::SetNeighbor(ChunkContainer* Neighbor, unsigned int Side) {
-    neighbors_[Side] = Neighbor;
+void ChunkContainer::SetNeighbor(ChunkContainer* neighbor, unsigned int side) {
+    neighbors_[side] = neighbor;
 }
 
 void ChunkContainer::ClearNeighbors() {
-    for (const auto& side : Directions()) {
+    for (const auto& side : Directions<ChunkPos>()) {
         neighbors_[side] = nullptr;
     }
 }
@@ -115,29 +116,29 @@ void ChunkContainer::UpdateHeightMap() {
 void ChunkContainer::UpdateHeightMap(int x, int z) {
     // Check chunk above first, if the heightmap above is > -1, it means that there are block above
     // -1 indicate theirs nothing in the column
-    ChunkContainer* chunkAbove = neighbors_[Directions::kUp];
+    ChunkContainer* chunk_above = neighbors_[Directions<ChunkPos>::kUp];
 
-    int newHeight = -1; // -1 is the default height if there is no blocks in the column
-    int oldHeight = heightmap_->Get(x, z);
+    int new_height = -1; // -1 is the default height if there is no blocks in the column
+    int old_height = heightmap_->Get(x, z);
     
-    if (chunkAbove != nullptr && chunkAbove->heightmap_->Get(x, z) != -1) {
-        newHeight = kChunkDim;
+    if (chunk_above != nullptr && chunk_above->heightmap_->Get(x, z) != -1) {
+        new_height = kChunkDim;
     } else {
         for (int i = 15; i >= 0; --i) {
-            if (GetBlockUnsafe(x, i, z) != g_blocks.AIR) {
-                newHeight = i;
+            if (GetBlockUnsafe(BlockPos{ x, i, z }) != g_blocks.AIR) {
+                new_height = i;
                 break;
             }
         }
     }
 
-    if (newHeight != oldHeight) {
+    if (new_height != old_height) {
         light_dirty_ = true;
-        heightmap_->Edit(x, z, newHeight);
+        heightmap_->Edit(x, z, new_height);
     
-        ChunkContainer* chunkBottom = neighbors_[Directions::kDown];
-        if (chunkBottom != nullptr && (oldHeight == -1 || newHeight == -1)) {
-            chunkBottom->UpdateHeightMap(x, z);
+        ChunkContainer* chunk_bottom = neighbors_[Directions<ChunkPos>::kDown];
+        if (chunk_bottom != nullptr && (old_height == -1 || new_height == -1)) {
+            chunk_bottom->UpdateHeightMap(x, z);
         }
     }
 
@@ -145,9 +146,9 @@ void ChunkContainer::UpdateHeightMap(int x, int z) {
 }
 
 bool ChunkContainer::CheckLightDirty() {
-    bool isDirty = light_dirty_;
+    bool is_dirty = light_dirty_;
     light_dirty_ = false;
-    return isDirty;
+    return is_dirty;
 }
 
 void ChunkContainer::SetLightDirty() {

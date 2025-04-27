@@ -4,7 +4,14 @@
 
 class Buffer {
 public:
-    void GenBuffer();
+    Buffer();
+    ~Buffer();
+
+    Buffer(const Buffer&) = delete;
+    Buffer& operator=(const Buffer&) = delete;
+
+    Buffer(Buffer&&) noexcept;
+    Buffer& operator=(Buffer&&) noexcept;
 
     void SetType(GLenum type);
     void SetMaxSize(size_t maxSize);
@@ -14,8 +21,6 @@ public:
 
     void InitializeData();
 
-    void Delete();
-
     void BindBase(int index);
 
     void UnbindBase(int index);
@@ -24,11 +29,9 @@ public:
 
     void Unbind();
 
-    void getData(uint32_t* ptr, size_t offset, size_t size);
+    void GetData(uint32_t* ptr, size_t offset, size_t size);
 
     void CopyFrom(Buffer buffer, size_t readOffset, size_t writeOffset, size_t size);
-
-    unsigned int GetID();
 
     void InsertData(GLsizeiptr size, const void* data, GLenum usage);
     void InsertSubData(GLintptr Offset, GLsizeiptr Size, const void* Data);
@@ -37,6 +40,9 @@ public:
 
     void CopyTo(Buffer& destination, size_t offset, size_t desOffset, size_t size);
 
+    operator unsigned int() const noexcept;
+    unsigned int GetId() const noexcept;
+private:
     size_t max_size_ = 0;
     unsigned int buffer_id_ = 0;
     unsigned int type_ = 0, usage_ = 0;

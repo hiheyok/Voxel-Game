@@ -96,31 +96,30 @@ namespace MemoryManagement {
 class ChunkGPUMemoryPool {
 public:
     ChunkGPUMemoryPool(size_t memoryPoolSize);
-    ChunkGPUMemoryPool(const ChunkGPUMemoryPool&) = delete;
-    ChunkGPUMemoryPool(ChunkGPUMemoryPool&&);
     ~ChunkGPUMemoryPool();
 
+    ChunkGPUMemoryPool(ChunkGPUMemoryPool&&) noexcept;
+    ChunkGPUMemoryPool& operator=(ChunkGPUMemoryPool&&) noexcept;
+
+    ChunkGPUMemoryPool(const ChunkGPUMemoryPool&) = delete;
+    ChunkGPUMemoryPool& operator=(const ChunkGPUMemoryPool&) = delete;
+
     void DeleteChunk(ChunkPos pos);
-
     ChunkMemoryPoolOffset AddChunk(const std::vector<uint32_t>& vertices, ChunkPos pos);
-
     ChunkMemoryPoolOffset GetChunkMemoryPoolOffset(ChunkPos pos) const;
-
     bool CheckChunk(ChunkPos pos) const;
-
     ChunkMemoryPoolOffset AddChunkStaggingBuffer(ChunkPos pos, uint64_t blockOffset, uint64_t blockSize);
     ChunkMemoryPoolOffset AddChunkMove(ChunkPos pos, uint64_t blockOffset, uint64_t blockSize);
-
     void Update();
+    size_t GetSize() const noexcept;
 
     MemoryManagement::MemoryPoolStatistics statistics_;
     std::unique_ptr<BufferStorage> stagging_buffer_;
     std::unique_ptr<BufferStorage> buffer_;
-
     MemoryManagement::MemoryPoolManager memory_pool_;
     FastHashMap<ChunkPos, ChunkMemoryPoolOffset> chunk_memory_offsets_;
     FastHashMap<size_t, ChunkPos> memory_chunk_offsets_;
-
+private:
     size_t memory_pool_size_ = 0;
-
+    static constexpr size_t kStaggingBufferSize = 1048576;
 };

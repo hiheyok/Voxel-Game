@@ -191,33 +191,25 @@ size_t MemoryPoolManager::GetReserveSpaceFragmentCount() const {
 }
 
 // Other class
-ChunkGPUMemoryPool::ChunkGPUMemoryPool(ChunkGPUMemoryPool&&) = default;
+ChunkGPUMemoryPool::ChunkGPUMemoryPool(ChunkGPUMemoryPool&&) noexcept = default;
+ChunkGPUMemoryPool& ChunkGPUMemoryPool::operator=(ChunkGPUMemoryPool&& other) noexcept = default;
 
-ChunkGPUMemoryPool::ChunkGPUMemoryPool(size_t memoryPoolSize) :
-    stagging_buffer_{ std::make_unique<BufferStorage>() },
-    buffer_{ std::make_unique<BufferStorage>() } {
-    memory_pool_size_ = memoryPoolSize;
+ChunkGPUMemoryPool::ChunkGPUMemoryPool(size_t memory_pool_size) :
+    stagging_buffer_{ std::make_unique<BufferStorage>(GL_COPY_WRITE_BUFFER, kStaggingBufferSize, true, nullptr) },
+    buffer_{ std::make_unique<BufferStorage>(GL_ARRAY_BUFFER, memory_pool_size, true, nullptr) } {
+    memory_pool_size_ = memory_pool_size;
     if (memory_pool_size_ == 0) {
         g_logger.LogError("ChunkGPUMemoryPool::Allocate", "Attempted to allocate with zero size.");
         return;
     }
 
     // Use the modified Create method with dynamic=true
-    buffer_->Create(GL_ARRAY_BUFFER, memory_pool_size_, true, nullptr);
     if (!buffer_->IsInitialized()) {
         g_logger.LogError("ChunkGPUMemoryPool::Allocate", "Failed to create main buffer storage.");
         memory_pool_size_ = 0; // Reset size on failure
         return;
     }
 
-    size_t stagingSize = 10000000;
-    stagging_buffer_->Create(GL_COPY_WRITE_BUFFER, stagingSize, true, nullptr); // Dynamic for potential reuse
-    if (!stagging_buffer_->IsInitialized()) {
-        g_logger.LogError("ChunkGPUMemoryPool::Allocate", "Failed to create staging buffer storage.");
-        buffer_->Delete(); // Clean up main buffer if staging fails
-        memory_pool_size_ = 0;
-        return;
-    }
     memory_pool_.Initialize(memory_pool_size_);
     g_logger.LogInfo("ChunkGPUMemoryPool::Allocate", "Allocated GPU memory pool. Size: " + std::to_string(memory_pool_size_) + " bytes.");
 
@@ -250,10 +242,10 @@ ChunkMemoryPoolOffset ChunkGPUMemoryPool::AddChunk(const std::vector<uint32_t>& 
         return ChunkMemoryPoolOffset{ std::numeric_limits<size_t>::max(), std::numeric_limits<size_t>::max() };
     }
 
-    ChunkMemoryPoolOffset chunkMemoryBlock;
-    chunkMemoryBlock.mem_offset_ = blockOffset;
-    chunkMemoryBlock.mem_size_ = blockSize;
-    chunkMemoryBlock.position_ = pos;
+    ChunkMemoryPoolOffset chunk_memory_block;
+    chunk_memory_block.mem_offset_ = blockOffset;
+    chunk_memory_block.mem_size_ = blockSize;
+    chunk_memory_block.position_ = pos;
 
     memory_pool_.AllocateSpace(blockOffset, blockSize);
 
@@ -261,12 +253,12 @@ ChunkMemoryPoolOffset ChunkGPUMemoryPool::AddChunk(const std::vector<uint32_t>& 
     buffer_->InsertData(blockOffset, blockSize, vertices.data());
 
     //Store Memory Offset
-    chunk_memory_offsets_[pos] = chunkMemoryBlock;
+    chunk_memory_offsets_[pos] = chunk_memory_block;
     memory_chunk_offsets_[blockOffset] = pos;
 
     statistics_.memory_usage_ += blockSize;
     Update();
-    return chunkMemoryBlock;
+    return chunk_memory_block;
 }
 
 ChunkMemoryPoolOffset ChunkGPUMemoryPool::GetChunkMemoryPoolOffset(ChunkPos pos) const {
@@ -282,49 +274,53 @@ bool ChunkGPUMemoryPool::CheckChunk(ChunkPos pos) const {
 }
 
 ChunkMemoryPoolOffset ChunkGPUMemoryPool::AddChunkStaggingBuffer(ChunkPos pos, uint64_t blockOffset, uint64_t blockSize) { //assumes vertices.size() != 0
-    ChunkMemoryPoolOffset chunkMemoryBlock;
-    chunkMemoryBlock.mem_offset_ = blockOffset;
-    chunkMemoryBlock.mem_size_ = blockSize;
-    chunkMemoryBlock.position_ = pos;
+    ChunkMemoryPoolOffset chunk_memory_block;
+    chunk_memory_block.mem_offset_ = blockOffset;
+    chunk_memory_block.mem_size_ = blockSize;
+    chunk_memory_block.position_ = pos;
 
     memory_pool_.AllocateSpace(blockOffset, blockSize);
 
     buffer_->CopyFrom(stagging_buffer_.get(), 0, blockOffset, blockSize);
 
-    chunk_memory_offsets_[pos] = chunkMemoryBlock;
+    chunk_memory_offsets_[pos] = chunk_memory_block;
     memory_chunk_offsets_[blockOffset] = pos;
 
     statistics_.memory_usage_ += blockSize;
     Update();
-    return chunkMemoryBlock;
+    return chunk_memory_block;
 }
 
 
 ChunkMemoryPoolOffset ChunkGPUMemoryPool::AddChunkMove(ChunkPos pos, uint64_t blockOffset, uint64_t blockSize) { //assumes vertices.size() != 0
-    ChunkMemoryPoolOffset chunkMemoryBlock;
-    chunkMemoryBlock.mem_offset_ = blockOffset;
-    chunkMemoryBlock.mem_size_ = blockSize;
-    chunkMemoryBlock.position_ = pos;
+    ChunkMemoryPoolOffset chunk_memory_block;
+    chunk_memory_block.mem_offset_ = blockOffset;
+    chunk_memory_block.mem_size_ = blockSize;
+    chunk_memory_block.position_ = pos;
 
     memory_pool_.AllocateSpace(blockOffset, blockSize);
 
-    chunk_memory_offsets_[pos] = chunkMemoryBlock;
+    chunk_memory_offsets_[pos] = chunk_memory_block;
     memory_chunk_offsets_[blockOffset] = pos;
 
     statistics_.memory_usage_ += blockSize;
     Update();
-    return chunkMemoryBlock;
+    return chunk_memory_block;
 }
 
 void ChunkGPUMemoryPool::Update() {
     if (memory_pool_.reserved_memory_blocks_.size() == 0) {
         return;
     }
-
+    
     statistics_.full_memory_usage_ = memory_pool_.reserved_memory_blocks_.rbegin()->first +
         memory_pool_.reserved_memory_blocks_.rbegin()->second.size_;
 
     if (statistics_.full_memory_usage_ != 0) {
         statistics_.fragmentation_rate_ = (double)statistics_.memory_usage_ / (double)statistics_.full_memory_usage_;
     }
+}
+
+size_t ChunkGPUMemoryPool::GetSize() const noexcept {
+    return memory_pool_size_;
 }

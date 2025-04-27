@@ -93,17 +93,17 @@ void EntitiesList::InitializeModels() {
 
                     // TODO: refactor FRONT BACK LEFT RIGHT TOP BOTTOM to new directions
                     if (texSide == "FRONT")
-                        s = Directions::kEast;
+                        s = Directions<BlockPos>::kEast;
                     if (texSide == "BACK")
-                        s = Directions::kWest;
+                        s = Directions<BlockPos>::kWest;
                     if (texSide == "LEFT")
-                        s = Directions::kNorth;
+                        s = Directions<BlockPos>::kNorth;
                     if (texSide == "RIGHT")
-                        s = Directions::kSouth;
+                        s = Directions<BlockPos>::kSouth;
                     if (texSide == "TOP")
-                        s = Directions::kUp;
+                        s = Directions<BlockPos>::kUp;
                     if (texSide == "BOTTOM")
-                        s = Directions::kDown;
+                        s = Directions<BlockPos>::kDown;
 
                     uvFaces.push_back(s);
                 }

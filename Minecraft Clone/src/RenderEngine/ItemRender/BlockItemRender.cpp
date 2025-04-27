@@ -11,9 +11,6 @@
 #include "Level/Item/Item.h"
 
 BlockItemRender::BlockItemRender() : 
-    vao_{ std::make_unique<VertexArray>()},
-    ebo_{ std::make_unique<Buffer>() },
-    vbo_{ std::make_unique<Buffer>() },
     camera_{ std::make_unique<Camera>() } {
 }
 BlockItemRender::~BlockItemRender() = default;
@@ -21,14 +18,14 @@ BlockItemRender::~BlockItemRender() = default;
 void BlockItemRender::Initialize() {
     shader_ = std::make_unique<Shader>("assets/shaders/ItemRender/BlockModelVert.glsl", "assets/shaders/ItemRender/BlockModelFrag.glsl");
 
+    vao_ = std::make_unique<VertexArray>();
+    ebo_ = std::make_unique<Buffer>();
+    vbo_ = std::make_unique<Buffer>();
+
     ebo_->SetType(GL_ELEMENT_ARRAY_BUFFER);
     ebo_->SetUsage(GL_STATIC_DRAW);
     vbo_->SetType(GL_ARRAY_BUFFER);
     vbo_->SetUsage(GL_STATIC_DRAW);
-
-    vao_->GenArray();
-    ebo_->GenBuffer();
-    vbo_->GenBuffer();
 
     vao_->Bind();
     vbo_->Bind();

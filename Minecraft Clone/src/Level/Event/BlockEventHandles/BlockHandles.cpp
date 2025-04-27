@@ -7,7 +7,7 @@
 #include "Level/World/WorldInterface.h"
 
 void UpdateSurrounding(const BlockEvent& blockEvent, Dimension* dimension) {
-    for (const auto& offset : Directions()) {
+    for (const auto& offset : Directions<BlockPos>()) {
         BlockPos newPos = blockEvent.pos_ + offset;
         BlockID block = dimension->world_->GetBlock(newPos);
 

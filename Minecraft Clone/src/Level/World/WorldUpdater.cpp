@@ -137,14 +137,14 @@ void WorldUpdater::loadSurroundedMovedEntityChunk() {
 
             for (int u = -uDistance; u <= uDistance; u++) {
                 for (int v = -vDistance; v <= uDistance; v++) {
-                    ivec3 testPosition = pos;
+                    ivec3 test_position = pos;
 
-                    testPosition[(j + 1) % 3] += u;
-                    testPosition[(j + 2) % 3] += v;
-                    testPosition[j] += sideDistanceOffset * side;
+                    test_position[(j + 1) % 3] += u;
+                    test_position[(j + 2) % 3] += v;
+                    test_position[j] += sideDistanceOffset * side;
 
                     //Test if it exist of generating
-                    bool isSuccess = RequestLoad(ChunkPos{ testPosition.x, testPosition.y, testPosition.z });
+                    bool isSuccess = RequestLoad(ChunkPos{ test_position.x, test_position.y, test_position.z });
                     if (!isSuccess) continue;
                 }
             }
@@ -237,12 +237,12 @@ std::vector<EntityUUID> WorldUpdater::GetRemovedEntities() {
 
 void WorldUpdater::SetBlock(const BlockID& block, const BlockPos& pos) {
     world_->SetBlock(block, pos);
-    ChunkPos chunkPos = pos / kChunkDim;
+    ChunkPos chunk_pos = pos;
 
     std::unique_lock<std::mutex> lock{ updated_chunk_lock_ };
-    if (!updated_chunk_.contains(chunkPos)) {
-        updated_chunk_.insert(chunkPos);
-        updated_chunk_arr_.emplace_back(chunkPos);
+    if (!updated_chunk_.contains(chunk_pos)) {
+        updated_chunk_.insert(chunk_pos);
+        updated_chunk_arr_.emplace_back(chunk_pos);
     }
 }
 
@@ -261,8 +261,8 @@ void WorldUpdater::SetChunk(std::unique_ptr<Chunk> chunk) {
 }
 
 void WorldUpdater::SetLight(std::vector<std::unique_ptr<LightStorage>> lights) {
-    std::vector<ChunkPos> updatedPos;
-    updatedPos.reserve(lights.size());
+    std::vector<ChunkPos> updated_pos;
+    updated_pos.reserve(lights.size());
 
     // TODO: add some optimizations to only update if it will affect the neighbors
     for (auto& light : lights) {
@@ -272,66 +272,66 @@ void WorldUpdater::SetLight(std::vector<std::unique_ptr<LightStorage>> lights) {
         if (*light == *chunk->lighting_) continue;
 
         // Update neighbor side too
-        for (const auto& side : Directions()) {
-            if (side.GetAxis() == Directions::kYAxis) {
+        for (const auto& side : Directions<ChunkPos>()) {
+            if (side.GetAxis() == Directions<ChunkPos>::kYAxis) {
                 continue;
             }
             ChunkContainer* neighbor = chunk->GetNeighbor(side);
             if (neighbor == nullptr) continue;
 
             // Check if it should update the neighbor too
-            bool updateNeighbor = false;
+            bool update_neighbor = false;
 
-            int orthoPos = (kChunkDim - 1) * (~side.GetDirection() & 0b1);
-            int relativePos = (kChunkDim - 1) * (side.GetDirection() & 0b1);
+            int ortho_pos = (kChunkDim - 1) * (~side.GetDirection() & 0b1);
+            int relative_pos = (kChunkDim - 1) * (side.GetDirection() & 0b1);
 
             // Verify that it actually changed the side close to the neighboring chunk
-            for (int i = 0; i < kChunkDim && !updateNeighbor; ++i) {
-                for (int y = 0; y < kChunkDim && !updateNeighbor; ++y) {
-                    if (side.GetAxis() == Directions::kXAxis) {
-                        int currLight = chunk->lighting_->GetLighting(orthoPos, y, i);
-                        if (currLight != light->GetLighting(orthoPos, y, i)) {
-                            updateNeighbor = true;
+            for (int i = 0; i < kChunkDim && !update_neighbor; ++i) {
+                for (int y = 0; y < kChunkDim && !update_neighbor; ++y) {
+                    if (side.GetAxis() == Directions<ChunkPos>::kXAxis) {
+                        int curr_light = chunk->lighting_->GetLighting(BlockPos{ortho_pos, y, i});
+                        if (curr_light != light->GetLighting(BlockPos{ortho_pos, y, i})) {
+                            update_neighbor = true;
                         }
                     } else {
-                        int currLight = chunk->lighting_->GetLighting(i, y, orthoPos);
-                        if (currLight != light->GetLighting(i, y, orthoPos)) {
-                            updateNeighbor = true;
+                        int curr_light = chunk->lighting_->GetLighting(BlockPos{i, y, ortho_pos});
+                        if (curr_light != light->GetLighting(BlockPos{i, y, ortho_pos})) {
+                            update_neighbor = true;
                         }
                     }
                 }
             }
 
             // TODO: Then verify that it will produce changes in the neighbor side
-            for (int i = 0; i < kChunkDim && !updateNeighbor; ++i) {
-                for (int y = 0; y < kChunkDim && !updateNeighbor; ++y) {
-                    if (side.GetAxis() == Directions::kXAxis) {
-                        int currLight = chunk->lighting_->GetLighting(orthoPos, y, i);
-                        int neighborLight = neighbor->lighting_->GetLighting(relativePos, y, i);
+            for (int i = 0; i < kChunkDim && !update_neighbor; ++i) {
+                for (int y = 0; y < kChunkDim && !update_neighbor; ++y) {
+                    if (side.GetAxis() == Directions<ChunkPos>::kXAxis) {
+                        int currLight = chunk->lighting_->GetLighting(BlockPos{ortho_pos, y, i});
+                        int neighborLight = neighbor->lighting_->GetLighting(BlockPos{relative_pos, y, i});
                         if (currLight != neighborLight - 1) {
-                            updateNeighbor = true;
+                            update_neighbor = true;
                         }
                     }
                     else {
-                        int currLight = chunk->lighting_->GetLighting(i, y, orthoPos);
-                        int neighborLight = neighbor->lighting_->GetLighting( i, y, relativePos);
+                        int currLight = chunk->lighting_->GetLighting(BlockPos{i, y, ortho_pos});
+                        int neighborLight = neighbor->lighting_->GetLighting(BlockPos{i, y, relative_pos});
                         if (currLight != neighborLight - 1) {
-                            updateNeighbor = true;
+                            update_neighbor = true;
                         }
                     }
                 }
             }
 
-            if (updateNeighbor) {
+            if (update_neighbor) {
                 chunk->GetNeighbor(side)->SetLightDirty();
             }
         }
-        updatedPos.push_back(light->position_);
+        updated_pos.push_back(light->position_);
         chunk->lighting_->ReplaceData(light->GetData());
     }
     
     std::unique_lock<std::mutex> lock{ updated_light_lock_ };
-    for (const auto& pos : updatedPos) {
+    for (const auto& pos : updated_pos) {
         if (!updated_light_.contains(pos)) {
             updated_light_.insert(pos);
             updated_light_arr_.emplace_back(pos);
@@ -342,25 +342,25 @@ void WorldUpdater::SetLight(std::vector<std::unique_ptr<LightStorage>> lights) {
 }
 
 void WorldUpdater::SetChunk(std::vector<std::unique_ptr<Chunk>> chunks) {
-    std::vector<ChunkPos> updatedPos;
-    updatedPos.reserve(chunks.size());
+    std::vector<ChunkPos> updated_pos;
+    updated_pos.reserve(chunks.size());
 
     for (auto& chunk : chunks) {
-        updatedPos.push_back(chunk->position_);
+        updated_pos.push_back(chunk->position_);
         world_->SetChunk(std::move(chunk));
     }
 
     std::unique_lock<std::mutex> lock{ updated_chunk_lock_ };
-    for (const auto& pos : updatedPos) {
+    for (const auto& pos : updated_pos) {
         if (!updated_chunk_.contains(pos)) {
             updated_chunk_.insert(pos);
             updated_chunk_arr_.emplace_back(pos);
 
-            for (const auto& offset : Directions()) {
-                ChunkPos neighborPos = pos + offset;
+            for (const auto& offset : Directions<ChunkPos>()) {
+                ChunkPos neighbor_pos = pos + offset;
 
-                if (world_->CheckChunk(neighborPos) && !updated_chunk_.contains(neighborPos)) {
-                    updated_chunk_arr_.push_back(neighborPos);
+                if (world_->CheckChunk(neighbor_pos) && !updated_chunk_.contains(neighbor_pos)) {
+                    updated_chunk_arr_.push_back(neighbor_pos);
                 }
             }
         }
@@ -368,9 +368,9 @@ void WorldUpdater::SetChunk(std::vector<std::unique_ptr<Chunk>> chunks) {
 }
 
 EntityUUID WorldUpdater::SetEntity(std::unique_ptr<Entity> entity) {
-    bool isChunkLoader = entity->properties_.is_chunk_loader_;
+    bool is_chunk_loader = entity->properties_.is_chunk_loader_;
     EntityUUID uuid = world_->SetEntity(std::move(entity));
-    if (isChunkLoader) {
+    if (is_chunk_loader) {
         SetEntityChunkLoader(uuid);
     }
     return uuid;

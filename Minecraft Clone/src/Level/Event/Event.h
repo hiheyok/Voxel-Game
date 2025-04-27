@@ -3,7 +3,6 @@
 
 #include "Level/Entity/Entity.h"
 #include "Core/Typenames.h"
-#include "Core/Position/ChunkPos.h"
 
 
 constexpr size_t MAX_EVENT_SIZE = 32;

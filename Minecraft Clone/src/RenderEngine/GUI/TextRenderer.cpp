@@ -26,9 +26,6 @@ TextRenderer::~TextRenderer() = default;
 
 void TextRenderer::InitializeTextRenderer(GLFWwindow* w) {
     //Setup buffer for text rendering
-    vbo_->GenBuffer();
-    vao_->GenArray();
-
     vbo_->SetType(GL_ARRAY_BUFFER);
     vbo_->SetUsage(GL_STATIC_DRAW);
 
@@ -43,9 +40,6 @@ void TextRenderer::InitializeTextRenderer(GLFWwindow* w) {
     vbo_->Unbind();
 
     //Setup buffer for background rendering
-    background_vbo_->GenBuffer();
-    background_vao_->GenArray();
-
     background_vbo_->SetType(GL_ARRAY_BUFFER);
     background_vbo_->SetUsage(GL_STATIC_DRAW);
 

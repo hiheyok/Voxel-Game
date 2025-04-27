@@ -94,30 +94,30 @@ Palette::PaletteIndex Palette::GetOrAddPaletteIndex(BlockID block) {
     return newIndex;
 }
 
-BlockID Palette::GetBlock(int x, int y, int z) const {
-    if (x < 0 || x >= kChunkDim || y < 0 || y >= kChunkDim || z < 0 || z >= kChunkDim) {
+BlockID Palette::GetBlock(const BlockPos& pos) const {
+    if ((pos.x | pos.y | pos.z) >> kChunkDimLog2) {
         throw std::out_of_range("Palette::GetBlock - Invalid palette index");
     }
 
-    PaletteIndex idx = static_cast<PaletteIndex>(data_.Get(GetIndex(x, y, z)));
+    PaletteIndex idx = static_cast<PaletteIndex>(data_.Get(pos.GetIndex()));
 
     if (idx >= palette_entries_.size()) throw std::runtime_error("Palette::GetBlock - Error in getting BlockID");
 
     return palette_entries_[idx].first;
 }
 
-BlockID Palette::GetBlockUnsafe(int x, int y, int z) const {
-    PaletteIndex idx = static_cast<PaletteIndex>(data_.GetUnsafe(GetIndex(x, y, z)));
+BlockID Palette::GetBlockUnsafe(const BlockPos& pos) const {
+    PaletteIndex idx = static_cast<PaletteIndex>(data_.GetUnsafe(pos.GetIndex()));
     return palette_entries_[idx].first;
 }
 
-void Palette::SetBlock(BlockID block, int x, int y, int z) {
-    if (x < 0 || x >= kChunkDim || y < 0 || y >= kChunkDim || z < 0 || z >= kChunkDim) {
+void Palette::SetBlock(BlockID block, const BlockPos& pos) {
+    if ((pos.x | pos.y | pos.z) >> kChunkDimLog2) {
         throw std::out_of_range("Palette::SetBlock - Invalid palette index");
     }
 
     // Look at original block
-    PaletteIndex oldPaletteIdx = static_cast<PaletteIndex>(data_.Get(GetIndex(x, y, z)));
+    PaletteIndex oldPaletteIdx = static_cast<PaletteIndex>(data_.Get(pos.GetIndex()));
 
     if (oldPaletteIdx >= palette_entries_.size() || palette_entries_[oldPaletteIdx].second <= 0) {
         throw std::runtime_error("Palette::SetBlock - Corrupt old palette index found in data.");
@@ -143,15 +143,15 @@ void Palette::SetBlock(BlockID block, int x, int y, int z) {
     }
     palette_entries_[idx].second++;
 
-    data_.Set(GetIndex(x, y, z), idx);
+    data_.Set(pos.GetIndex(), idx);
     if (uniqueCountChanged) {
         Resize();
     }
 }
 
-void Palette::SetBlockUnsafe(BlockID block, int x, int y, int z) {
+void Palette::SetBlockUnsafe(BlockID block, const BlockPos& pos) {
     // Look at original block
-    PaletteIndex oldPaletteIdx = static_cast<PaletteIndex>(data_.GetUnsafe(GetIndex(x, y, z)));
+    PaletteIndex oldPaletteIdx = static_cast<PaletteIndex>(data_.GetUnsafe(pos.GetIndex()));
     if (oldPaletteIdx >= palette_entries_.size() || palette_entries_[oldPaletteIdx].second <= 0) {
         throw std::runtime_error("Palette::SetBlockUnsafe - Corrupt old palette index found in data.");
     }
@@ -173,7 +173,7 @@ void Palette::SetBlockUnsafe(BlockID block, int x, int y, int z) {
         uniqueCountChanged = !uniqueCountChanged;
     }
 
-    data_.SetUnsafe(GetIndex(x, y, z), idx);
+    data_.SetUnsafe(pos.GetIndex(), idx);
     if (uniqueCountChanged) {
         Resize();
     }

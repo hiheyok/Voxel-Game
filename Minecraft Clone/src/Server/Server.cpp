@@ -1,7 +1,6 @@
 #include "Server/Server.h"
 #include "Core/Interfaces/ClientInterface.h"
 #include "Core/Interfaces/InternalInterface.h"
-#include "Core/Position/ChunkPos.h"
 #include "Level/Chunk/ChunkData.h"
 #include "Level/Dimension/Dimension.h"
 #include "Level/Entity/Properties/EntityProperties.h"
@@ -42,11 +41,13 @@ void Server::Loop() {
         SendPacket();
 
         mspt_ = time_->GetTimePassed_ms();
-        double timeLeft = (1000.0 / (double)settings_->tick_rate_) - mspt_;
+        double time_left = (1.0 / (double)settings_->tick_rate_) - mspt_ / 1000.0;
 
-        if (timeLeft > 0) {
-            timerSleepNotPrecise(static_cast<int>(timeLeft));
+        if (time_left > 0) {
+            timerSleep(time_left);
         }
+
+        mspt_ = time_->GetTimePassed_ms();
     }
     g_logger.LogDebug("Server::Loop", "Shutting down main server loop");
 }

@@ -7,14 +7,14 @@ Chunk::~Chunk() = default;
 Chunk::Chunk(const ChunkRawData& data) : ChunkContainer{ data } {}
 
 void Chunk::UpdateGen() {
-    for (const auto& offset : Directions()) {
+    for (const auto& offset : Directions<ChunkPos>()) {
         if (neighbors_[offset] == nullptr || 
             neighbors_[offset]->outside_block_to_place_[!offset].size() == 0) {
             continue;
         }
 
         for (const auto& block : neighbors_[offset]->outside_block_to_place_[!offset]) {
-            SetBlock(block.block_, block.x_, block.y_, block.z_);
+            SetBlock(block.block_, block.pos_);
         }
 
         neighbors_[offset]->outside_block_to_place_[!offset].clear();

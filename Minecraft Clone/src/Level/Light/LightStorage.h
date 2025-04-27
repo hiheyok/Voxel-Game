@@ -19,9 +19,9 @@ public:
 
     void ReplaceData(const uint64_t* src);
 
-    void EditLight(int x, int y, int z, unsigned char LightingInfo);
+    void EditLight(const BlockPos& pos, unsigned char LightingInfo);
 
-    uint8_t GetLighting(int x, int y, int z) const;
+    uint8_t GetLighting(const BlockPos& pos) const;
 
     void ResetLighting();
 

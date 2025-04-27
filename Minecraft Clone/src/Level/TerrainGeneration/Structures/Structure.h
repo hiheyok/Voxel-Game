@@ -3,16 +3,12 @@
 #include "Level/Block/Block.h"
 
 struct SetBlockRelative {
-    int8_t x_;
-    int8_t y_;
-    int8_t z_;
+    BlockPos pos_;
 
     BlockID block_;
 
-    SetBlockRelative(BlockID block, int8_t x, int8_t y, int8_t z);
+    SetBlockRelative(BlockID block, const BlockPos& pos);
     ~SetBlockRelative();
-
-    void SetPos(int8_t x, int8_t y, int8_t z);
 };
 
 struct Structure {

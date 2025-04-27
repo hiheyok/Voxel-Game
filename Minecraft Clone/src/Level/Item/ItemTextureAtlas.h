@@ -30,9 +30,9 @@ private:
     void RenderBlockItem(Item item);
     void StitchTexture(size_t index, ItemID ItemID);
 
-    VertexArray vao_;
-    Buffer ebo_;
-    Buffer vbo_;
+    std::unique_ptr<VertexArray> vao_;
+    std::unique_ptr<Buffer> ebo_;
+    std::unique_ptr<Buffer> vbo_;
 
     BlockItemRender block_item_renderer_;
     Shader stitching_shader_;

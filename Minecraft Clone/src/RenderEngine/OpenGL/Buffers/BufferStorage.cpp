@@ -2,17 +2,50 @@
 #include "RenderEngine/OpenGL/Shader/ComputeShader.h"
 #include "Utils/LogUtils.h"
 
-BufferStorage::BufferStorage() : 
+BufferStorage::BufferStorage(GLuint bufferTarget, uint64_t size, bool dynamic, const void* data) : 
     copy_shader_{ std::make_unique<ComputeShader>("assets/shaders/Buffers/CopyData.glsl") },
-    move_shader_{ std::make_unique<ComputeShader>("assets/shaders/Buffers/MoveData.glsl") } {}
+    move_shader_{ std::make_unique<ComputeShader>("assets/shaders/Buffers/MoveData.glsl") } {
 
-BufferStorage::~BufferStorage() {
-    if (buffer_storage_id_ != 0) {
-        Delete();
-    }
+        target_ = bufferTarget;
+        max_size_ = size;
+    
+        glGenBuffers(1, &buffer_storage_id_);
+    
+        if (buffer_storage_id_ == 0) {
+            g_logger.LogError("BufferStorage::Create", "glGenBuffers failed!");
+            max_size_ = 0;
+            target_ = 0;
+            return;
+        }
+    
+        g_logger.LogDebug("BufferStorage::Create", "Generated buffer storage. ID: " + std::to_string(buffer_storage_id_));
+        Bind();
+    
+        // *** Use glBufferStorage ***
+        GLbitfield flags = 0;
+        if (dynamic) {
+            flags |= GL_DYNAMIC_STORAGE_BIT; // Crucial for glBufferSubData/glCopyBufferSubData
+        }
+        // *** NO MAPPING FLAGS (GL_MAP_*) are included ***
+        // This strongly hints the driver to keep the buffer in VRAM if possible.
+    
+        glBufferStorage(target_, static_cast<GLsizeiptr>(size), data, flags);
+    
+        // Check for OpenGL errors after buffer storage creation
+        GLenum err;
+        if ((err = glGetError()) != GL_NO_ERROR) {
+            g_logger.LogError("BufferStorage::Create", "OpenGL error after glBufferStorage: " + std::to_string(err));
+            return;
+        }
+    
+    
+        g_logger.LogInfo("BufferStorage::Create", "Created buffer storage ID: " + std::to_string(buffer_storage_id_)
+            + " Size: " + std::to_string(size) + " bytes, Target: " + std::to_string(target_)
+            + ", Dynamic: " + (dynamic ? "Yes" : "No"));
+
 }
 
-void BufferStorage::Delete() {
+BufferStorage::~BufferStorage() {
     if (buffer_storage_id_ != 0) {
         glDeleteBuffers(1, &buffer_storage_id_);
         buffer_storage_id_ = 0; // Use 0 to indicate deleted/uninitialized
@@ -20,7 +53,23 @@ void BufferStorage::Delete() {
         target_ = 0;
         g_logger.LogDebug("BufferStorage::Delete", "Deleted buffer storage. ID was: " + std::to_string(buffer_storage_id_)); // Log before setting to 0
     }
+}
 
+BufferStorage::BufferStorage(BufferStorage&& buffer) noexcept {
+    (*this) = std::move(buffer);
+}
+
+BufferStorage& BufferStorage::operator=(BufferStorage&& buffer) noexcept {
+    buffer_storage_id_ = buffer.buffer_storage_id_;
+    max_size_ = buffer.max_size_;
+    target_ = buffer.target_;
+    copy_shader_ = std::move(buffer.copy_shader_);
+    move_shader_ = std::move(buffer.move_shader_);
+
+    buffer.buffer_storage_id_ = 0;
+    buffer.max_size_ = 0;
+    buffer.target_ = 0;
+    return *this;
 }
 
 void BufferStorage::Bind() {
@@ -34,57 +83,6 @@ void BufferStorage::Bind() {
 
 void BufferStorage::Unbind() {
     glBindBuffer(target_, 0);
-}
-
-
-void BufferStorage::Create(GLuint bufferTarget, uint64_t size, bool dynamic, const void* data) {
-    if (buffer_storage_id_ != 0) {
-        g_logger.LogWarn("BufferStorage::Create", "Create called on an already initialized buffer storage. Deleting old one. ID: " + std::to_string(buffer_storage_id_));
-        Delete();
-    }
-
-    target_ = bufferTarget;
-    max_size_ = size;
-
-    glGenBuffers(1, &buffer_storage_id_);
-
-    if (buffer_storage_id_ == 0) {
-        g_logger.LogError("BufferStorage::Create", "glGenBuffers failed!");
-        max_size_ = 0;
-        target_ = 0;
-        return;
-    }
-
-    g_logger.LogDebug("BufferStorage::Create", "Generated buffer storage. ID: " + std::to_string(buffer_storage_id_));
-    Bind();
-
-    // *** Use glBufferStorage ***
-    GLbitfield flags = 0;
-    if (dynamic) {
-        flags |= GL_DYNAMIC_STORAGE_BIT; // Crucial for glBufferSubData/glCopyBufferSubData
-    }
-    // *** NO MAPPING FLAGS (GL_MAP_*) are included ***
-    // This strongly hints the driver to keep the buffer in VRAM if possible.
-
-    glBufferStorage(target_, static_cast<GLsizeiptr>(size), data, flags);
-
-    // Check for OpenGL errors after buffer storage creation
-    GLenum err;
-    if ((err = glGetError()) != GL_NO_ERROR) {
-        g_logger.LogError("BufferStorage::Create", "OpenGL error after glBufferStorage: " + std::to_string(err));
-        Delete(); // Clean up failed buffer
-        return;
-    }
-
-
-    g_logger.LogInfo("BufferStorage::Create", "Created buffer storage ID: " + std::to_string(buffer_storage_id_)
-        + " Size: " + std::to_string(size) + " bytes, Target: " + std::to_string(target_)
-        + ", Dynamic: " + (dynamic ? "Yes" : "No"));
-
-    /*glGenBuffers(1, &buffer_storage_id_);
-    Bind();
-    GLbitfield flags = GL_MAP_PERSISTENT_BIT | GL_MAP_READ_BIT | GL_DYNAMIC_STORAGE_BIT;
-    glBufferStorage(target_, size, nullptr, flags);*/
 }
 
 void BufferStorage::InsertData(uint64_t offset, uint64_t size, const void* data) {
@@ -121,15 +119,13 @@ void BufferStorage::CopyFrom(BufferStorage* sourceBuffer, size_t readOffset, siz
         return;
     }
 
-    copy_shader_->BindBufferAsSSBO(sourceBuffer->buffer_storage_id_, 0);
-    copy_shader_->BindBufferAsSSBO(buffer_storage_id_, 1);
-    copy_shader_->SetInt("srcOffset", readOffset / sizeof(unsigned int));
-    copy_shader_->SetInt("dstOffset", writeOffset / sizeof(unsigned int));
-    copy_shader_->SetInt("copySize", size / sizeof(unsigned int));
-    copy_shader_->DispatchCompute((int)ceil((double)size / kWorkGroupSize / sizeof(unsigned int)), 1, 1);
-    //copy_shader_->BindBufferAsSSBO(0, 0);
-    //copy_shader_->BindBufferAsSSBO(0, 1);
+    copy_shader_->BindBufferAsSSBO(sourceBuffer->buffer_storage_id_, 0).
+        BindBufferAsSSBO(buffer_storage_id_, 1).
+        SetInt("srcOffset", readOffset / sizeof(unsigned int)).
+        SetInt("dstOffset", writeOffset / sizeof(unsigned int)).
+        SetInt("copySize", size / sizeof(unsigned int));
 
+    copy_shader_->DispatchCompute((int)ceil((double)size / kWorkGroupSize / sizeof(unsigned int)), 1, 1);
     copy_shader_->SSBOMemoryBarrier();
 }
 
@@ -142,15 +138,13 @@ void BufferStorage::CopyTo(BufferStorage* destinationBuffer, size_t readOffset, 
         g_logger.LogError("BufferStorage::CopyTo", "CopyTo exceeds buffer bounds.");
         return;
     }
-    copy_shader_->BindBufferAsSSBO(buffer_storage_id_, 0);
-    copy_shader_->BindBufferAsSSBO(destinationBuffer->buffer_storage_id_, 1);
-    copy_shader_->SetInt("srcOffset", readOffset / sizeof(unsigned int));
-    copy_shader_->SetInt("dstOffset", writeOffset / sizeof(unsigned int));
-    copy_shader_->SetInt("copySize", size / sizeof(unsigned int));
-    copy_shader_->DispatchCompute((int)ceil((double)size / kWorkGroupSize / sizeof(unsigned int)), 1, 1);
-    //copy_shader_->BindBufferAsSSBO(0, 0);
-    //copy_shader_->BindBufferAsSSBO(0, 1);
+    copy_shader_->BindBufferAsSSBO(buffer_storage_id_, 0).
+        BindBufferAsSSBO(destinationBuffer->buffer_storage_id_, 1).
+        SetInt("srcOffset", readOffset / sizeof(unsigned int)).
+        SetInt("dstOffset", writeOffset / sizeof(unsigned int)).
+        SetInt("copySize", size / sizeof(unsigned int));
 
+    copy_shader_->DispatchCompute((int)ceil((double)size / kWorkGroupSize / sizeof(unsigned int)), 1, 1);
     copy_shader_->SSBOMemoryBarrier();
 }
 
@@ -164,12 +158,12 @@ void BufferStorage::MoveData(size_t readOffset, size_t writeOffset, size_t size)
         return;
     }
 
-    move_shader_->BindBufferAsSSBO(buffer_storage_id_, 0);
-    move_shader_->SetInt("srcOffset", readOffset / sizeof(unsigned int));
-    move_shader_->SetInt("dstOffset", writeOffset / sizeof(unsigned int));
-    move_shader_->SetInt("copySize", size / sizeof(unsigned int));
-    move_shader_->DispatchCompute((int)ceil((double)size / kWorkGroupSize / sizeof(unsigned int)), 1, 1);
+    move_shader_->BindBufferAsSSBO(buffer_storage_id_, 0).
+        SetInt("srcOffset", readOffset / sizeof(unsigned int)).
+        SetInt("dstOffset", writeOffset / sizeof(unsigned int)).
+        SetInt("copySize", size / sizeof(unsigned int));
 
+    move_shader_->DispatchCompute((int)ceil((double)size / kWorkGroupSize / sizeof(unsigned int)), 1, 1);
     move_shader_->SSBOMemoryBarrier();
 }
 

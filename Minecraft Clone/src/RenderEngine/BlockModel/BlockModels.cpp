@@ -64,7 +64,7 @@ void BlockModel::GetVertices(std::vector<float>& vertices, std::vector<unsigned 
         glm::vec3 to = element.to_;
         from = from / 16.f;
         to = to / 16.f;
-        for (const auto& side : Directions()) {
+        for (const auto& side : Directions<BlockPos>()) {
             BlockFace face = element.faces_[side];
             if (face.reference_texture_.length() == 0) continue;
 

@@ -9,10 +9,10 @@ ChunkMap::ChunkMap(bool neighborUpdate, bool heightmapUpdate) : neighbor_update_
 ChunkMap::~ChunkMap() = default;
 
 void ChunkMap::EraseChunk(const ChunkPos& pos) {
-    RegionPos regPos = pos / kRegionDim;
-    Region* reg = GetRegion(regPos);
+    RegionPos reg_pos = pos;
+    Region* reg = GetRegion(reg_pos);
 
-    for (const auto& offset : Directions()) {
+    for (const auto& offset : Directions<ChunkPos>()) {
         ChunkPos neighborPos = pos + offset;
 
         if (CheckChunk(neighborPos)) {
@@ -29,7 +29,7 @@ void ChunkMap::EraseChunk(const ChunkPos& pos) {
     std::swap(chunks_[idx], chunks_.back());
     chunks_.pop_back();
 
-    ChunkContainer* bottomChunk = reg->GetChunk(pos)->GetNeighbor(Directions::kDown);
+    ChunkContainer* bottomChunk = reg->GetChunk(pos)->GetNeighbor(Directions<ChunkPos>::kDown);
 
     reg->EraseChunk(pos);
 
@@ -39,27 +39,27 @@ void ChunkMap::EraseChunk(const ChunkPos& pos) {
 
     // Delete region if it is empty
     if (reg->GetChunkCount() == 0) {
-        DeleteRegion(regPos);
+        DeleteRegion(reg_pos);
     }
 }
 
 
 bool ChunkMap::SetBlock(BlockID block, const BlockPos& pos) {
-    ChunkPos chunkPos = pos / kChunkDim;
-    BlockPos localPos = pos & (kChunkDim - 1);
-    RegionPos regPos = chunkPos / kRegionDim;
+    ChunkPos chunk_pos = pos;
+    RegionPos reg_pos = pos;
+    BlockPos local_pos = pos.GetLocalPos();
 
-    Region* reg = GetRegionUncheck(regPos);
+    Region* reg = GetRegionUncheck(reg_pos);
     if (reg == nullptr) return false;
 
-    Chunk* chunk = reg->GetChunk(chunkPos);
+    Chunk* chunk = reg->GetChunk(chunk_pos);
 
     if (chunk != nullptr) {
-        chunk->SetBlockUnsafe(block, localPos.x, localPos.y, localPos.z);
+        chunk->SetBlockUnsafe(block, local_pos);
         chunk->is_empty_ = false;
 
         if (heightmap_update_) {
-            chunk->UpdateHeightMap(localPos.x, localPos.z);
+            chunk->UpdateHeightMap(local_pos.x, local_pos.z);
         }
 
         return true;
@@ -69,32 +69,32 @@ bool ChunkMap::SetBlock(BlockID block, const BlockPos& pos) {
 }
 
 BlockID ChunkMap::GetBlock(const BlockPos& pos) const {
-    ChunkPos chunkPos = pos / kChunkDim;
-    BlockPos localBlockPos = pos & (kChunkDim - 1);
-    RegionPos regPos = chunkPos / kRegionDim;
+    ChunkPos chunk_pos = pos;
+    RegionPos reg_pos = pos;
+    BlockPos local_block_pos = pos.GetLocalPos();
 
-    Region* reg = GetRegionUncheck(regPos);
+    Region* reg = GetRegionUncheck(reg_pos);
     if (reg == nullptr) return g_blocks.AIR;
 
-    if (!reg->CheckChunk(chunkPos)) {
+    if (!reg->CheckChunk(chunk_pos)) {
         return g_blocks.AIR;
     }
 
-    Chunk* chunk = reg->GetChunk(chunkPos);
+    Chunk* chunk = reg->GetChunk(chunk_pos);
 
-    return chunk->GetBlock(localBlockPos.x, localBlockPos.y, localBlockPos.z);
+    return chunk->GetBlock(local_block_pos);
 }
 
 bool ChunkMap::CheckChunk(const ChunkPos& pos) const {
-    RegionPos regPos = pos / kRegionDim;
-    Region* reg = GetRegionUncheck(regPos);
+    RegionPos reg_pos = pos;
+    Region* reg = GetRegionUncheck(reg_pos);
     if (reg == nullptr) return false;
     return reg->CheckChunk(pos);
 }
 
 Chunk* ChunkMap::GetChunk(const ChunkPos& pos) const {
-    RegionPos regPos = pos / kRegionDim;
-    Region* reg = GetRegionUncheck(regPos);
+    RegionPos reg_pos = pos;
+    Region* reg = GetRegionUncheck(reg_pos);
     if (reg == nullptr) return nullptr;
 
     return reg->GetChunk(pos);
@@ -107,15 +107,15 @@ std::vector<Chunk*> ChunkMap::GetAllChunks() const {
 void ChunkMap::InsertChunk(std::unique_ptr<Chunk> chunk) {
     const ChunkPos pos = chunk->position_;
 
-    RegionPos regPos = pos / kRegionDim;
-    Region* reg = GetRegionUncheck(regPos);
+    RegionPos reg_pos = pos;
+    Region* reg = GetRegionUncheck(reg_pos);
 
     if (reg == nullptr) {
-        reg = CreateRegion(regPos);
+        reg = CreateRegion(reg_pos);
     }
 
 
-    for (const auto& offset : Directions()) {
+    for (const auto& offset : Directions<ChunkPos>()) {
         ChunkPos posNeighbor = chunk->position_ + offset;
 
         if (CheckChunk(posNeighbor)) {

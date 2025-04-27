@@ -24,19 +24,19 @@ void Fluid::InitializeBlockModel(ModelLoader & modelLoader) {
     side.uv_ = { 0, 0, 16, 16 };
 
     Cuboid cuboid;
-    face.cull_face_ = Directions::kUp;
-    cuboid.EditFace(Directions::kUp, face);
+    face.cull_face_ = Directions<BlockPos>::kUp;
+    cuboid.EditFace(Directions<BlockPos>::kUp, face);
 
-    side.cull_face_ = Directions::kEast;
-    cuboid.EditFace(Directions::kEast, side);
-    side.cull_face_ = Directions::kWest;
-    cuboid.EditFace(Directions::kWest, side);
-    side.cull_face_ = Directions::kNorth;
-    cuboid.EditFace(Directions::kNorth, side);
-    side.cull_face_ = Directions::kSouth;
-    cuboid.EditFace(Directions::kSouth, side);
-    side.cull_face_ = Directions::kDown;
-    cuboid.EditFace(Directions::kDown, side);
+    side.cull_face_ = Directions<BlockPos>::kEast;
+    cuboid.EditFace(Directions<BlockPos>::kEast, side);
+    side.cull_face_ = Directions<BlockPos>::kWest;
+    cuboid.EditFace(Directions<BlockPos>::kWest, side);
+    side.cull_face_ = Directions<BlockPos>::kNorth;
+    cuboid.EditFace(Directions<BlockPos>::kNorth, side);
+    side.cull_face_ = Directions<BlockPos>::kSouth;
+    cuboid.EditFace(Directions<BlockPos>::kSouth, side);
+    side.cull_face_ = Directions<BlockPos>::kDown;
+    cuboid.EditFace(Directions<BlockPos>::kDown, side);
 
     cuboid.to_.y = 15;
 
@@ -48,10 +48,10 @@ void Fluid::InitializeBlockModel(ModelLoader & modelLoader) {
 void Fluid::Tick(const BlockPos& pos, Dimension* currentWorld) {
     BlockID blockType = currentWorld->world_->GetBlock(pos);
 
-    for (const auto& offset : Directions()) {
+    for (const auto& offset : Directions<BlockPos>()) {
         BlockPos newPos = pos + offset;
 
-        if (offset == Directions::kUp) { 
+        if (offset == Directions<BlockPos>::kUp) { 
             continue;
         }
 

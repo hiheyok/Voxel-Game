@@ -20,7 +20,7 @@ void DebugWorld::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
         for (int x = 0; x < kChunkDim; x++) {
             for (int z = 0; z < kChunkDim; z++) {
 
-                chunk->SetBlockUnsafe(g_blocks.WHITE_CONCRETE, x, 0, z);
+                chunk->SetBlockUnsafe(g_blocks.WHITE_CONCRETE, BlockPos{x, 0, z});
             }
         }
     }
@@ -48,7 +48,7 @@ void DebugWorld::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
                 int b = px + pz * RowLen + py * RowLen * ColLen;
 
                 if ((b < numBlocks) && (b >= 0)) {
-                    chunk->SetBlockUnsafe(b, x, y, z);
+                    chunk->SetBlockUnsafe(b, BlockPos{x, y, z});
                 }
             }
         }

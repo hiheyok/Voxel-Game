@@ -17,37 +17,42 @@ public:
 
     void Use();
 
-    void SetBool(const std::string& name, bool value);
+    ShaderInterface& SetBool(const std::string& name, bool value);
 
-    void SetInt(const std::string& name, int value);
+    ShaderInterface& SetInt(const std::string& name, int value);
 
-    void SetFloat(const std::string& name, float value);
+    ShaderInterface& SetFloat(const std::string& name, float value);
 
-    void SetVec2(const std::string& name, const glm::vec2& value);
+    ShaderInterface& SetVec2(const std::string& name, const glm::vec2& value);
 
-    void SetVec2(const std::string& name, float x, float y);
+    ShaderInterface& SetVec2(const std::string& name, float x, float y);
 
-    void SetVec3(const std::string& name, const glm::vec3& value);
+    ShaderInterface& SetVec3(const std::string& name, const glm::vec3& value);
 
-    void SetVec3(const std::string& name, float x, float y, float z);
+    ShaderInterface& SetVec3(const std::string& name, float x, float y, float z);
 
-    void SetIVec3(const std::string& name, const glm::ivec3& value);
+    ShaderInterface& SetIVec3(const std::string& name, const glm::ivec3& value);
 
-    void SetIVec3(const std::string& name, int x, int y, int z);
+    ShaderInterface& SetIVec3(const std::string& name, int x, int y, int z);
 
-    void SetVec4(const std::string& name, const glm::vec4& value);
+    ShaderInterface& SetVec4(const std::string& name, const glm::vec4& value);
 
-    void SetVec4(const std::string& name, float x, float y, float z, float w);
+    ShaderInterface& SetVec4(const std::string& name, float x, float y, float z, float w);
 
-    void SetMat2(const std::string& name, const glm::mat2& mat);
+    ShaderInterface& SetMat2(const std::string& name, const glm::mat2& mat);
 
-    void SetMat3(const std::string& name, const glm::mat3& mat);
+    ShaderInterface& SetMat3(const std::string& name, const glm::mat3& mat);
 
-    void SetMat4(const std::string& name, const glm::mat4& mat);
+    ShaderInterface& SetMat4(const std::string& name, const glm::mat4& mat);
 
-    void BindTexture2D(GLuint index, GLuint img, const std::string& name);
+    ShaderInterface& BindTexture2D(GLuint index, GLuint img, const std::string& name);
 
-    void BindTextureArray2D(GLuint index, GLuint img, const std::string& name);
+    ShaderInterface& BindTextureArray2D(GLuint index, GLuint img, const std::string& name);
+
+    ShaderInterface& BindBufferAsSSBO(GLuint buffer, int idx);
+    ShaderInterface& UnbindBufferSSBO(int idx);
+
+    ShaderInterface& SSBOMemoryBarrier();
 
     unsigned int shader_id_ = 0;
 protected:

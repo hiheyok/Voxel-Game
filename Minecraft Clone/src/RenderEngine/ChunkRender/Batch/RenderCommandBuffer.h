@@ -3,7 +3,7 @@
 #include <glm/vec3.hpp>
 
 #include "Core/Typenames.h"
-#include "Core/Position/ChunkPos.h"
+
 struct DrawCommandIndirect {
     unsigned int  count_;
     unsigned int  instance_count_;
@@ -50,19 +50,19 @@ namespace CMDGraph {
         int visit_id_ = 0;
 
         CommandPtr() {
-            for (const auto& side : Directions()) {
+            for (const auto& side : Directions<ChunkPos>()) {
                 neighbor_[side] = nullptr;
             }
         }
 
         CommandPtr(DrawCommandIndirect cmd_) : cmd_(cmd_) {
-            for (const auto& side : Directions()) {
+            for (const auto& side : Directions<ChunkPos>()) {
                 neighbor_[side] = nullptr;
             }
         }
 
         CommandPtr(DrawCommandIndirect cmd_, ChunkPos pos) : cmd_(cmd_), position_(pos) {
-            for (const auto& side : Directions()) {
+            for (const auto& side : Directions<ChunkPos>()) {
                 neighbor_[side] = nullptr;
             }
         }
@@ -343,13 +343,13 @@ public:
 
         CMDGraph::CommandPtr* rootNeighbors[6]{nullptr};
 
-        for (const auto& side : Directions()) {
+        for (const auto& side : Directions<ChunkPos>()) {
             rootNeighbors[side] = node->neighbor_[side];
         }
         node->PrepareDelete();
         delete node;
 
-        for (const auto& side : Directions()) {
+        for (const auto& side : Directions<ChunkPos>()) {
             if (rootNeighbors[side] == nullptr) {
                 continue;
             }
@@ -359,7 +359,7 @@ public:
 
         float min = FLT_MAX;
 
-        for (const auto& side : Directions()) {
+        for (const auto& side : Directions<ChunkPos>()) {
             if (distances[side] == 0.f) {
                 continue;
             }
@@ -372,7 +372,7 @@ public:
             return;
         }
 
-        for (const auto& side : Directions()) {
+        for (const auto& side : Directions<ChunkPos>()) {
             if (distances[side] == min) {
                 root_ = rootNeighbors[side];
                 break;
@@ -406,7 +406,7 @@ public:
         commands_position_[depth].push_back(node->position_.z);
     //    CommandsLayer[depth].push_back(depth);
         count++;
-        for (const auto& side : Directions()) {
+        for (const auto& side : Directions<ChunkPos>()) {
              TraverseTree(node->neighbor_[side], depth + 1);
         }
     }
@@ -420,7 +420,7 @@ private:
             return isCorrect;
         }
 
-        for (const auto& side : Directions()) {
+        for (const auto& side : Directions<ChunkPos>()) {
             if (node->neighbor_[side] == nullptr) {
                 continue;
             }

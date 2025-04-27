@@ -2,33 +2,32 @@
 DebugWorldSecond::DebugWorldSecond() = default;
 
 void DebugWorldSecond::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
-    chunk->SetBlock(g_blocks.COBBLESTONE, 8, 8, 8);
+    chunk->SetBlock(g_blocks.COBBLESTONE,BlockPos{ 8, 8, 8});
 
-    ChunkPos scaledPos = pos * kChunkDim;
+    BlockPos scaled_pos = BlockPos{pos.x, pos.y, pos.z} * kChunkDim;
 
-    for (int gx = 0; gx < kChunkDim; gx++) {
-        for (int gy = 0; gy < kChunkDim; gy++) {
-            for (int gz = 0; gz < kChunkDim; gz++) {
+    BlockPos local_pos{0, 0, 0};
 
-                int index = gz * kChunkSize2D + gy * kChunkDim + gx;
+    for (local_pos.x = 0; local_pos.x < kChunkDim; ++local_pos.x) {
+        for (local_pos.y = 0; local_pos.y < kChunkDim; ++local_pos.y) {
+            for (local_pos.z = 0; local_pos.z < kChunkDim; ++local_pos.z) {
 
+                int index = local_pos.GetIndex();
 
                 if (index % 5) {
                     continue;
                 }
 
-                int x = gx + scaledPos.x;
-                int y = gy + scaledPos.y;
-                int z = gz + scaledPos.z;
+                BlockPos global_pos = local_pos + scaled_pos;
 
-                if ((abs(x) >= abs(z)) && (abs(x) >= abs(y))) {
-                    chunk->SetBlock(g_blocks.BLUE_STAINED_GLASS, gx, gy, gz);
+                if ((abs(global_pos.x) >= abs(global_pos.z)) && (abs(global_pos.x) >= abs(global_pos.y))) {
+                    chunk->SetBlock(g_blocks.BLUE_STAINED_GLASS, local_pos);
                 }
-                if ((abs(z) >= abs(x)) && (abs(z) >= abs(y))) {
-                    chunk->SetBlock(g_blocks.DARK_OAK_PLANKS, gx, gy, gz);
+                if ((abs(global_pos.z) >= abs(global_pos.x)) && (abs(global_pos.z) >= abs(global_pos.y))) {
+                    chunk->SetBlock(g_blocks.DARK_OAK_PLANKS, local_pos);
                 }
-                if ((abs(y) >= abs(x)) && (abs(y) >= abs(z))) {
-                    chunk->SetBlock(g_blocks.ORANGE_CONCRETE, gx, gy, gz);
+                if ((abs(global_pos.y) >= abs(global_pos.x)) && (abs(global_pos.y) >= abs(global_pos.z))) {
+                    chunk->SetBlock(g_blocks.ORANGE_CONCRETE, local_pos);
                 }
             }
         }

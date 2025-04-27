@@ -37,12 +37,12 @@ void MultiEntityRender::RemoveEntity(EntityUUID entityUUID) {
 }
 
 void MultiEntityRender::Clean() {
-    vbo_->Delete();
-    ebo_->Delete();
-    ssbo_pos_->Delete();
-    ssbo_vel_->Delete();
-    ssbo_acc_->Delete();
-    vao_->Delete();
+    vbo_ = std::make_unique<Buffer>();
+    ebo_ = std::make_unique<Buffer>();
+    ssbo_pos_ = std::make_unique<Buffer>();
+    ssbo_vel_ = std::make_unique<Buffer>();
+    ssbo_acc_ = std::make_unique<Buffer>();
+    vao_ = std::make_unique<VertexArray>();
 }
 
 void MultiEntityRender::Initialize(PerformanceProfiler* pProfilerIn) {
@@ -71,14 +71,6 @@ void MultiEntityRender::Initialize(PerformanceProfiler* pProfilerIn) {
 
         entity_vertices_.insert(entity_vertices_.end(), model.vertices_.begin(), model.vertices_.end());
     }
-
-
-    vbo_->GenBuffer();
-    ebo_->GenBuffer();
-    ssbo_pos_->GenBuffer();
-    ssbo_vel_->GenBuffer();
-    ssbo_acc_->GenBuffer();
-    vao_->GenArray();
 
     vao_->Bind();
 
@@ -157,32 +149,27 @@ void MultiEntityRender::Render() {
 
         n += entityarr.second.size();
 
-        ssbo_pos_->InsertSubData(0, (i * 3) * sizeof(float), position_arr_.data());
-        ssbo_vel_->InsertSubData(0, (i * 3) * sizeof(float), velocity_arr_.data());
-        ssbo_acc_->InsertSubData(0, (i * 3) * sizeof(float), acceleration_arr_.data());
+        ssbo_pos_->InsertSubData(0, (i * 3) * sizeof(position_arr_[0]), position_arr_.data());
+        ssbo_vel_->InsertSubData(0, (i * 3) * sizeof(velocity_arr_[0]), velocity_arr_.data());
+        ssbo_acc_->InsertSubData(0, (i * 3) * sizeof(acceleration_arr_[0]), acceleration_arr_.data());
 
-        shader_->BindTexture2D(0, g_entity_list.entity_type_list_[entityarr.first]->texture_->Get(), "EntityTexture");
         shader_->Use();
+        shader_->BindTexture2D(0, g_entity_list.entity_type_list_[entityarr.first]->texture_->Get(), "EntityTexture");
 
         vao_->Bind();
         ebo_->Bind();
         vbo_->Bind();
-        ssbo_pos_->Bind();
-        ssbo_pos_->BindBase(1);
-        ssbo_vel_->Bind();
-        ssbo_vel_->BindBase(2);
-        ssbo_acc_->Bind();
-        ssbo_acc_->BindBase(3);
+        shader_->BindBufferAsSSBO(ssbo_pos_->GetId(), 1).
+            BindBufferAsSSBO(ssbo_vel_->GetId(), 2).
+            BindBufferAsSSBO(ssbo_acc_->GetId(), 3);
 
         glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(entity_element_size_[entityarr.first]),
             GL_UNSIGNED_INT, (void*)(entity_element_index_[entityarr.first] * sizeof(unsigned int)), static_cast<GLsizei>(i));
 
-        ssbo_acc_->UnbindBase(3);
-        ssbo_acc_->Unbind();
-        ssbo_vel_->UnbindBase(2);
-        ssbo_vel_->Unbind();
-        ssbo_pos_->UnbindBase(1);
-        ssbo_pos_->Unbind();
+        shader_->UnbindBufferSSBO(3).
+            UnbindBufferSSBO(2).
+            UnbindBufferSSBO(1);
+            
         vbo_->Unbind();
         ebo_->Unbind();
         vao_->Unbind();
@@ -211,22 +198,22 @@ void MultiEntityRender::Update() {
     glm::mat4 projection = glm::perspective(glm::radians(player_->GetCamera()->fov_), (float)x / (float)y, 0.1f, 1000000.0f);
 
     shader_->Use();
-    shader_->SetMat4("view", view);
-    shader_->SetMat4("model", model);
-    shader_->SetMat4("projection", projection);
-    shader_->SetFloat("RenderDistance", (float)(horizontal_render_distance_ * kChunkDim));
-    shader_->SetFloat("VerticalRenderDistance", (float)(vertical_render_distance_ * kChunkDim));
-    shader_->SetVec3("camPos", player_->GetPosition());
-    shader_->SetFloat("TimeDelta", static_cast<float>(time_past_tick_));
+    shader_->SetMat4("view", view).
+        SetMat4("model", model).
+        SetMat4("projection", projection).
+        SetFloat("RenderDistance", (float)(horizontal_render_distance_ * kChunkDim)).
+        SetFloat("VerticalRenderDistance", (float)(vertical_render_distance_ * kChunkDim)).
+        SetVec3("camPos", player_->GetPosition()).
+        SetFloat("TimeDelta", static_cast<float>(time_past_tick_));
+        
     profiler_->ProfileStop("root/update/entity");
 }
 
 void MultiEntityRender::Reload() {
-
     //reset gpu data
-    vbo_->Delete();
-    ebo_->Delete();
-    vao_->ResetArray();
+    vbo_ = std::make_unique<Buffer>();
+    ebo_ = std::make_unique<Buffer>();
+    vao_ = std::make_unique<VertexArray>();
 
     //reset entity models
     for (auto e : g_entity_list.entity_type_list_) {

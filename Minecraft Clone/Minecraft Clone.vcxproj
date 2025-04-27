@@ -180,6 +180,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Client\Client.cpp" />
+    <ClCompile Include="src\Core\Position\PositionTypes.cpp" />
     <ClCompile Include="src\Level\Block\Type\AirBlock.cpp" />
     <ClCompile Include="src\Level\Block\Type\SolidBlock.cpp" />
     <ClCompile Include="src\Level\Chunk\ChunkRawData.cpp" />
@@ -207,7 +208,6 @@
     <ClCompile Include="src\Level\Block\Type\Fluid.cpp" />
     <ClCompile Include="src\Level\Block\Type\Grass.cpp" />
     <ClCompile Include="src\Level\Block\Type\GravityBlock.cpp" />
-    <ClCompile Include="src\Core\Position\ChunkPos.cpp" />
     <ClCompile Include="src\Level\Chunk\Heightmap\Heightmap.cpp" />
     <ClCompile Include="src\Level\Light\LightStorage.cpp" />
     <ClCompile Include="src\Level\Chunk\Palette.cpp" />
@@ -226,6 +226,8 @@
     <ClCompile Include="src\Level\Light\LightEngine.cpp" />
     <ClCompile Include="src\Level\World\WorldInterface.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRender\BlockTextureAtlas.cpp" />
+    <ClCompile Include="src\RenderEngine\OpenGL\Render\RenderDrawArrays.cpp" />
+    <ClCompile Include="src\RenderEngine\OpenGL\Render\RenderObject.cpp" />
     <ClCompile Include="src\Server\Server.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Biome\BiomeProperties.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugPositioning\DebugPositioning.cpp" />
@@ -259,6 +261,9 @@
     <ClCompile Include="src\RenderEngine\EntityRender\EntityRenderCache.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRender\Models\EntityModels.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRender\MultiEntityRender.cpp" />
+    <ClInclude Include="src\Core\GameContext\GameContext.h" />
+    <ClInclude Include="src\Core\Position\Position.h" />
+    <ClInclude Include="src\Core\Position\PositionTypes.h" />
     <ClInclude Include="src\Level\Block\Type\AirBlock.h" />
     <ClInclude Include="src\Level\Block\Type\SolidBlock.h" />
     <ClInclude Include="src\RenderEngine\EntityRender\MultiEntityRender.h" />
@@ -325,7 +330,6 @@
     <ClInclude Include="src\Core\Registry\ResourceLocation.h" />
     <ClInclude Include="src\FileManager\Files.h" />
     <ClInclude Include="src\Level\Block\Type\DefaultBlock.h" />
-    <ClInclude Include="src\Core\Position\ChunkPos.h" />
     <ClInclude Include="src\Level\Chunk\ChunkRawData.h" />
     <ClInclude Include="src\Level\Chunk\Heightmap\Heightmap.h" />
     <ClInclude Include="src\Level\Chunk\Palette.h" />
@@ -346,6 +350,11 @@
     <ClInclude Include="src\Level\World\WorldInterface.h" />
     <ClInclude Include="src\RenderEngine\ChunkRender\BlockTextureAtlas.h" />
     <ClInclude Include="src\RenderEngine\GUI\Item\ItemRender.h" />
+    <ClInclude Include="src\RenderEngine\OpenGL\Render\RenderDrawArrays.h" />
+    <ClInclude Include="src\RenderEngine\OpenGL\Render\RenderObject.h" />
+    <ClInclude Include="src\RenderEngine\UI\Display.h" />
+    <ClInclude Include="src\RenderEngine\UI\DisplayVertices.h" />
+    <ClInclude Include="src\RenderEngine\UI\Screen.h" />
     <ClInclude Include="src\Server\Server.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\Biome.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeProperties.h" />
