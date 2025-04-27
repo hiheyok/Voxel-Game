@@ -43,5 +43,5 @@ private:
     DimensionProperties properties_;
     WorldParameters world_settings_;
 
-    FastHashMap<int, FastHashSet<ChunkPos>> tick_usage_;
+    FastHashMap<int, FastHashSet<BlockPos>> tick_usage_;
 };
