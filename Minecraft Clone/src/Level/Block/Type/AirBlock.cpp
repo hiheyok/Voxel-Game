@@ -7,6 +7,4 @@ AirBlock::AirBlock() {
     properties_->light_pass_ = true;
 }
 
-void AirBlock::Tick(const BlockPos& pos, Dimension* currentWorld) {
-
-}
+void AirBlock::Tick(const BlockPos& pos, Dimension* currentWorld) {}

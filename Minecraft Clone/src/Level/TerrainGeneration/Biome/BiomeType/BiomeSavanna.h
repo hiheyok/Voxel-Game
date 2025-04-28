@@ -2,7 +2,7 @@
 #include "Level/TerrainGeneration/Biome/Biome.h"
 
 class BiomeSavanna : public Biome {
-public:
+   public:
     BiomeSavanna(BiomeProperties properties) : Biome(properties) {}
 
     const std::type_info& getBiomeClass() const override {

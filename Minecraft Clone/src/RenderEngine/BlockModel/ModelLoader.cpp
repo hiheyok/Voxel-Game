@@ -1,16 +1,19 @@
+#include "RenderEngine/BlockModel/ModelLoader.h"
+
 #include <fstream>
 #include <iostream>
-#include "RenderEngine/BlockModel/ModelLoader.h"
+
 #include "FileManager/Files.h"
 #include "Utils/LogUtils.h"
 
 ModelLoader::ModelLoader() = default;
 ModelLoader::~ModelLoader() = default;
 
-std::unique_ptr<BlockModel> ModelLoader::GetModel(const ResourceLocation& location) {
+std::unique_ptr<BlockModel> ModelLoader::GetModel(
+    const ResourceLocation& location) {
     // Check if the model is already in the cache
     const auto& it = cache_.find(location);
-    
+
     if (it != cache_.end()) {
         return std::make_unique<BlockModel>(*it->second);
     }
@@ -22,7 +25,8 @@ std::unique_ptr<BlockModel> ModelLoader::GetModel(const ResourceLocation& locati
     return model;
 }
 
-std::unique_ptr<BlockModel> ModelLoader::GetModelRecursive(const ResourceLocation& location) {
+std::unique_ptr<BlockModel> ModelLoader::GetModelRecursive(
+    const ResourceLocation& location) {
     std::unique_ptr<BlockModel> model = nullptr;
 
     std::string jsonPath = location.GetPath();
@@ -30,24 +34,25 @@ std::unique_ptr<BlockModel> ModelLoader::GetModelRecursive(const ResourceLocatio
 
     try {
         std::ifstream file(jsonPath);
-        if (!file.good()) { //checks if  it exist
+        if (!file.good()) {  // checks if  it exist
             return nullptr;
         }
         JSONData = json::parse(file);
-    }
-    catch (const std::exception& e) {
+    } catch (const std::exception& e) {
         g_logger.LogWarn("ModelLoader::GetModelRecursive", e.what());
         return nullptr;
     }
 
-    //Search for the parent
+    // Search for the parent
     for (auto& item : JSONData.items()) {
         if (item.key() == "parent") {
             std::string parentData = item.value();
 
-            //Parse for the parent json
+            // Parse for the parent json
 
-            std::vector<std::string> tokens = Tokenize(parentData, ':'); //This assumes that the parent is always in the same folder
+            std::vector<std::string> tokens =
+                Tokenize(parentData, ':');  // This assumes that the parent is
+                                            // always in the same folder
             std::string parentJSON = tokens.back();
             std::string parentNamespace = tokens.front();
 
@@ -56,17 +61,19 @@ std::unique_ptr<BlockModel> ModelLoader::GetModelRecursive(const ResourceLocatio
             }
 
             // First check if the model is in the cache
-            ResourceLocation parentLocation = ResourceLocation("models/" + parentJSON + ".json", parentNamespace);
+            ResourceLocation parentLocation = ResourceLocation(
+                "models/" + parentJSON + ".json", parentNamespace);
             const auto& it = cache_.find(parentLocation);
             if (it != cache_.end()) {
                 model = std::make_unique<BlockModel>(*it->second);
             } else {
                 model = GetModelRecursive(parentLocation);
-                if (model != nullptr) { // TODO: Debug how this return null in the first place
+                if (model != nullptr) {  // TODO: Debug how this return null in
+                                         // the first place
                     CacheModel(parentLocation, model);
                 }
             }
-            
+
             break;
         }
     }
@@ -75,11 +82,12 @@ std::unique_ptr<BlockModel> ModelLoader::GetModelRecursive(const ResourceLocatio
         model = std::make_unique<BlockModel>();
     }
 
-    //Searches for the other stuff like textures and elements 
+    // Searches for the other stuff like textures and elements
 
     for (auto& item : JSONData.items()) {
         if (item.key() == "elements") {
-            model->elements_.clear(); //Child elements override parent elements
+            model->elements_.clear();  // Child elements override parent
+                                       // elements
             UpdateModelElements(model, item.value());
         } else if (item.key() == "textures") {
             ProcessCuboidTexture(model, item.value());
@@ -93,24 +101,28 @@ std::unique_ptr<BlockModel> ModelLoader::GetModelRecursive(const ResourceLocatio
     return model;
 }
 
-void ModelLoader::CacheModel(const ResourceLocation& location, const std::unique_ptr<BlockModel>& model) {
+void ModelLoader::CacheModel(const ResourceLocation& location,
+                             const std::unique_ptr<BlockModel>& model) {
     // Check if the model is already cached
     const auto& it = cache_.find(location);
     if (it != cache_.find(location)) {
-        g_logger.LogError("ModelLoader::CacheModel", "Attempted to cache model that is already cached");
+        g_logger.LogError("ModelLoader::CacheModel",
+                          "Attempted to cache model that is already cached");
     }
-    std::unique_ptr<BlockModel> copiedModel = std::make_unique<BlockModel>(*model);
+    std::unique_ptr<BlockModel> copiedModel =
+        std::make_unique<BlockModel>(*model);
     cache_[location] = std::move(copiedModel);
 }
 
-
-void ModelLoader::ProcessModelDisplay(std::unique_ptr<BlockModel>& model, json JsonData) {
+void ModelLoader::ProcessModelDisplay(std::unique_ptr<BlockModel>& model,
+                                      json JsonData) {
     for (auto& displayPlaces : JsonData.items()) {
         std::string position = displayPlaces.key();
         BlockDisplay display;
 
         for (auto& transitions : displayPlaces.value().items()) {
-            std::vector<float> arr = GetJSONArrayValuesFloat(transitions.value());
+            std::vector<float> arr =
+                GetJSONArrayValuesFloat(transitions.value());
 
             if (transitions.key() == "rotation") {
                 for (int i = 0; i < 3; i++) {
@@ -124,9 +136,10 @@ void ModelLoader::ProcessModelDisplay(std::unique_ptr<BlockModel>& model, json J
                 for (int i = 0; i < 3; i++) {
                     display.scale_[i] = arr[i];
                 }
-            }
-            else {
-                g_logger.LogError("ProcessModelDisplay", "Unknown display attribute: " + transitions.key());
+            } else {
+                g_logger.LogError(
+                    "ProcessModelDisplay",
+                    "Unknown display attribute: " + transitions.key());
             }
         }
 
@@ -147,7 +160,8 @@ void ModelLoader::ProcessModelDisplay(std::unique_ptr<BlockModel>& model, json J
         } else if (position == "fixed") {
             display.position_ = DisplayPosition::fixed;
         } else {
-            g_logger.LogError("ProcessModelDisplay", "Unknown display position: " + position);
+            g_logger.LogError("ProcessModelDisplay",
+                              "Unknown display position: " + position);
             return;
         }
 
@@ -157,9 +171,9 @@ void ModelLoader::ProcessModelDisplay(std::unique_ptr<BlockModel>& model, json J
     }
 }
 
-void ModelLoader::UpdateModelElements(std::unique_ptr<BlockModel>& model, json JsonData) {
+void ModelLoader::UpdateModelElements(std::unique_ptr<BlockModel>& model,
+                                      json JsonData) {
     for (auto& item : JsonData.items()) {
-
         Cuboid cuboid;
 
         for (auto& subElements : item.value().items()) {
@@ -178,22 +192,25 @@ void ModelLoader::UpdateModelElements(std::unique_ptr<BlockModel>& model, json J
             } else if (subElements.key() == "faces") {
                 ProcessSingleCubeFaces(cuboid, subElements.value());
             } else if (subElements.key() == "rotation") {
-                CuboidRotationInfo rotation = GetRotationalData(subElements.value());
+                CuboidRotationInfo rotation =
+                    GetRotationalData(subElements.value());
                 cuboid.rotation_ = rotation;
             } else if (subElements.key() == "__comment") {
                 cuboid.comments_ = subElements.value();
             } else if (subElements.key() == "shade") {
                 cuboid.shade_ = static_cast<bool>(subElements.value());
             } else {
-                g_logger.LogWarn("UpdateModelElements", "Unknown element attribute: " + subElements.key());
+                g_logger.LogWarn(
+                    "UpdateModelElements",
+                    "Unknown element attribute: " + subElements.key());
             }
         }
         model->AddElement(cuboid);
     }
 }
 
-
-void ModelLoader::ProcessCuboidTexture(std::unique_ptr<BlockModel>& model, json JsonData) {
+void ModelLoader::ProcessCuboidTexture(std::unique_ptr<BlockModel>& model,
+                                       json JsonData) {
     for (auto& TextureElement : JsonData.items()) {
         auto tokens = Tokenize(TextureElement.value(), ':');
 
@@ -210,13 +227,12 @@ void ModelLoader::ProcessCuboidTexture(std::unique_ptr<BlockModel>& model, json 
 
         if (isVariable) {
             model->texture_variable_[textureVariableName] = textureName;
-        }
-        else {
-            model->texture_variable_[textureVariableName] = textureName + ":" + textureNamespace;
+        } else {
+            model->texture_variable_[textureVariableName] =
+                textureName + ":" + textureNamespace;
         }
     }
 }
-
 
 CuboidRotationInfo ModelLoader::GetRotationalData(json JsonData) {
     CuboidRotationInfo rotationInfo;
@@ -237,7 +253,10 @@ CuboidRotationInfo ModelLoader::GetRotationalData(json JsonData) {
             } else if (axis_ == 'z') {
                 rotationInfo.axis_ = 2;
             } else {
-                g_logger.LogError("getRotationalData", "Unknown rotational axis: " + static_cast<std::string>(attribute.value()));
+                g_logger.LogError(
+                    "getRotationalData",
+                    "Unknown rotational axis: " +
+                        static_cast<std::string>(attribute.value()));
             }
         } else if (attribute.key() == "axis") {
             int angle_ = attribute.value();
@@ -256,11 +275,10 @@ void ModelLoader::ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
         int faceIndex = ConvertStringFaceToIndex(face.key());
         BlockFace bFace;
         for (auto& faceElements : face.value().items()) {
-
             if (faceElements.key() == "uv") {
                 std::vector<int> arr = GetJSONArrayValues(faceElements.value());
 
-                //flip
+                // flip
                 arr[1] = 16 - arr[1];
                 arr[3] = 16 - arr[3];
 
@@ -283,21 +301,21 @@ void ModelLoader::ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
 
                 if (isVariable) {
                     bFace.reference_texture_ = texName;
-                }
-                else {
+                } else {
                     bFace.reference_texture_ = texName + ":" + texNamespace;
                 }
             } else if (faceElements.key() == "cullface") {
-                bFace.cull_face_ = ConvertStringFaceToIndex(faceElements.value());
+                bFace.cull_face_ =
+                    ConvertStringFaceToIndex(faceElements.value());
             } else if (faceElements.key() == "tintindex") {
                 bFace.tint_index_ = faceElements.value();
             } else if (faceElements.key() == "rotation") {
                 bFace.rotation_ = faceElements.value();
             } else {
-                g_logger.LogError("ProcessSingleCubeFaces", "Unknown face attribute: " + faceElements.key());
+                g_logger.LogError(
+                    "ProcessSingleCubeFaces",
+                    "Unknown face attribute: " + faceElements.key());
             }
-
-
         }
         cube.EditFace(faceIndex, bFace);
     }
@@ -317,10 +335,10 @@ int ModelLoader::ConvertStringFaceToIndex(const std::string& str) {
     } else if (str == "east") {
         return EAST;
     } else {
-        g_logger.LogWarn("ModelLoader::ConvertStringFaceToIndex", "Unknown direction: " + str);
+        g_logger.LogWarn("ModelLoader::ConvertStringFaceToIndex",
+                         "Unknown direction: " + str);
         return 0;
     }
-
 }
 
 std::vector<float> ModelLoader::GetJSONArrayValuesFloat(json JsonData) {

@@ -2,22 +2,22 @@
 #include <string>
 #include <vector>
 
-#include "Utils/Containers/ConcurrentQueue.h"
 #include "Core/Networking/Packet.h"
 #include "Core/Stats/ServerStats.h"
+#include "Utils/Containers/ConcurrentQueue.h"
 #include "Utils/Timer/Timer.h"
 /*
-* Abstraction for client to server interfacing
-*/
+ * Abstraction for client to server interfacing
+ */
 class ServerInterface {
-
-public:
+   public:
     virtual ~ServerInterface() = default;
 
     virtual void SendPlayerAction(const Packet::PlayerAction& input) = 0;
 
     virtual bool IsConnected() const = 0;
-    virtual void Connect(const std::string& address, int port) = 0; // For external server
+    virtual void Connect(const std::string& address,
+                         int port) = 0;  // For external server
     virtual void Disconnect() = 0;
     virtual void Update() = 0;
 
@@ -39,16 +39,13 @@ public:
         return outUpdates.size() - prevSize;
     }
 
-    ServerStats GetServerStats() {
-        return server_stats_;
-    }
+    ServerStats GetServerStats() { return server_stats_; }
 
-    EntityUUID GetPlayerUUID() const {
-        return client_player_uuid_;
-    }
+    EntityUUID GetPlayerUUID() const { return client_player_uuid_; }
 
     Timer time;
-protected:
+
+   protected:
     // Server -> Client queues
     ConcurrentQueue<Packet::BlockUpdate> block_update_queue_;
     ConcurrentQueue<Packet::EntityUpdate> entity_update_queue_;

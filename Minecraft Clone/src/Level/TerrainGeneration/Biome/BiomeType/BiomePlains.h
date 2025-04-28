@@ -2,10 +2,11 @@
 #include "Level/TerrainGeneration/Biome/Biome.h"
 
 class BiomePlains : public Biome {
-public:
+   public:
     bool sunglowers = false;
 
-    BiomePlains(bool sunflowersIn, BiomeProperties p) : Biome(p), sunglowers(sunflowersIn) {}
+    BiomePlains(bool sunflowersIn, BiomeProperties p)
+        : Biome(p), sunglowers(sunflowersIn) {}
 
     const std::type_info& getBiomeClass() const override {
         return typeid(*this);

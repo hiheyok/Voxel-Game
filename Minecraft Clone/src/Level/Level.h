@@ -4,7 +4,7 @@
 class Dimension;
 
 class Level {
-public:
+   public:
     std::unique_ptr<Dimension> main_world_;
 
     Level();

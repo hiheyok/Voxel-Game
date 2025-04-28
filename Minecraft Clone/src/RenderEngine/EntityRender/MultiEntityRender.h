@@ -1,7 +1,8 @@
 #pragma once
-#include <vector>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <vector>
+
 #include "Core/Typenames.h"
 
 class Buffer;
@@ -17,8 +18,7 @@ struct EntityProperty;
 struct GLFWwindow;
 
 class MultiEntityRender {
-private:
-
+   private:
     std::vector<float> entity_vertices_;
     std::vector<unsigned int> entity_indices_;
 
@@ -46,8 +46,8 @@ private:
     size_t num_entity_rendered_ = 0;
 
     double time_past_tick_ = 0.0;
-public:
 
+   public:
     int vertical_render_distance_ = 16;
     int horizontal_render_distance_ = 16;
 

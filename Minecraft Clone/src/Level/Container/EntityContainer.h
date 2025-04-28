@@ -1,6 +1,6 @@
 #pragma once
-#include <mutex>
 #include <memory>
+#include <mutex>
 #include <vector>
 
 #include "Core/Typenames.h"
@@ -9,8 +9,8 @@ class Dimension;
 struct Entity;
 struct EntityProperty;
 
-class EntityContainer { //Manages all entities in world
-public:
+class EntityContainer {  // Manages all entities in world
+   public:
     EntityContainer();
     ~EntityContainer();
     EntityUUID AddEntity(std::unique_ptr<Entity> e);
@@ -24,7 +24,8 @@ public:
 
     Entity* GetEntity(EntityUUID entityId) const;
     void Tick(Dimension* dimension);
-private:
+
+   private:
     FastHashMap<EntityUUID, size_t> entities_idx_;
     std::vector<std::unique_ptr<Entity>> entities_;
     FastHashSet<EntityUUID> removed_entity_;

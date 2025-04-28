@@ -1,8 +1,6 @@
 #include "Level/Light/LightStorage.h"
 
-LightStorage::LightStorage() {
-    ResetLighting();
-}
+LightStorage::LightStorage() { ResetLighting(); }
 
 LightStorage::LightStorage(LightStorage&&) = default;
 LightStorage::LightStorage(const LightStorage&) = default;
@@ -17,9 +15,7 @@ bool LightStorage::operator==(const LightStorage& other) const {
     return true;
 }
 
-const uint64_t* LightStorage::GetData() const {
-    return data_;
-}
+const uint64_t* LightStorage::GetData() const { return data_; }
 
 void LightStorage::ReplaceData(const uint64_t* src) {
     memcpy(data_, src, sizeof(uint64_t) * 256);
@@ -39,9 +35,11 @@ uint8_t LightStorage::GetLighting(const BlockPos& pos) const {
 }
 
 void LightStorage::ResetLighting() {
-    memset((uint8_t*)data_, 0, kChunkSize2D * sizeof(uint64_t)); //8 = sizeof uint64_t
+    memset((uint8_t*)data_, 0,
+           kChunkSize2D * sizeof(uint64_t));  // 8 = sizeof uint64_t
 }
 
 void LightStorage::ResetLightingCustom(uint8_t lvl) {
-    memset((uint8_t*)data_, lvl | (lvl << 4), kChunkSize2D * sizeof(uint64_t)); //8 = sizeof uint64_t
+    memset((uint8_t*)data_, lvl | (lvl << 4),
+           kChunkSize2D * sizeof(uint64_t));  // 8 = sizeof uint64_t
 }

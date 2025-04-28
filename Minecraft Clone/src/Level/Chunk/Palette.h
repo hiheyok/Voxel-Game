@@ -2,16 +2,17 @@
 #include <vector>
 
 #include "Core/Typenames.h"
-#include "Utils/Containers/NBitVector.h"
 #include "Level/Block/Blocks.h"
+#include "Utils/Containers/NBitVector.h"
 /*
-* The palette class is used to store the block data in a compressed state in a chunk
-* Each chunk has up to 4096 unique blocks so it attempts to store it in up to 12 bits per blocks
+ * The palette class is used to store the block data in a compressed state in a
+ * chunk Each chunk has up to 4096 unique blocks so it attempts to store it in
+ * up to 12 bits per blocks
  */
 
-//TODO: for a large amount of unique block, use stack / hashmap
-class Palette { 
-public:
+// TODO: for a large amount of unique block, use stack / hashmap
+class Palette {
+   public:
     Palette();
     ~Palette();
     Palette(Palette&&) noexcept;
@@ -24,8 +25,8 @@ public:
 
     void SetBlock(BlockID block, const BlockPos& pos);
     void SetBlockUnsafe(BlockID block, const BlockPos& pos);
-private:
 
+   private:
     using PaletteIndex = uint16_t;
     using StorageBit = uint64_t;
 
@@ -42,11 +43,11 @@ private:
 
     PaletteIndex GetOrAddPaletteIndex(BlockID block);
 
-    static constexpr int kMinBitWidth = 1; // Minimum bits
+    static constexpr int kMinBitWidth = 1;  // Minimum bits
     static constexpr int kMaxBitWidth = 12;
 
     int current_bit_width_;
-    int unique_blocks_count_ = 1; // Initialize with only air blocks
+    int unique_blocks_count_ = 1;  // Initialize with only air blocks
 
     int d1 = 0, d2 = 0;
 

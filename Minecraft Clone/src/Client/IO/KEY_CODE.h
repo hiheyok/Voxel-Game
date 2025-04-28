@@ -1,10 +1,10 @@
 #pragma once
 inline constexpr unsigned short int KEY_SPACE = 32;
 inline constexpr unsigned short int KEY_APOSTROPHE = 39; /* ' */
-inline constexpr unsigned short int KEY_COMMA = 44; /* , */
-inline constexpr unsigned short int KEY_MINUS = 45; /* - */
-inline constexpr unsigned short int KEY_PERIOD = 46; /* . */
-inline constexpr unsigned short int KEY_SLASH = 47; /* / */
+inline constexpr unsigned short int KEY_COMMA = 44;      /* , */
+inline constexpr unsigned short int KEY_MINUS = 45;      /* - */
+inline constexpr unsigned short int KEY_PERIOD = 46;     /* . */
+inline constexpr unsigned short int KEY_SLASH = 47;      /* / */
 inline constexpr unsigned short int KEY_0 = 48;
 inline constexpr unsigned short int KEY_1 = 49;
 inline constexpr unsigned short int KEY_2 = 50;
@@ -16,7 +16,7 @@ inline constexpr unsigned short int KEY_7 = 55;
 inline constexpr unsigned short int KEY_8 = 56;
 inline constexpr unsigned short int KEY_9 = 57;
 inline constexpr unsigned short int KEY_SEMICOLON = 59; /* ; */
-inline constexpr unsigned short int KEY_EQUAL = 61; /* = */
+inline constexpr unsigned short int KEY_EQUAL = 61;     /* = */
 inline constexpr unsigned short int KEY_A = 65;
 inline constexpr unsigned short int KEY_B = 66;
 inline constexpr unsigned short int KEY_C = 67;
@@ -43,12 +43,12 @@ inline constexpr unsigned short int KEY_W = 87;
 inline constexpr unsigned short int KEY_X = 88;
 inline constexpr unsigned short int KEY_Y = 89;
 inline constexpr unsigned short int KEY_Z = 90;
-inline constexpr unsigned short int KEY_LEFT_BRACKET = 91; /* [ */
-inline constexpr unsigned short int KEY_BACKSLASH = 92; /* \ */
+inline constexpr unsigned short int KEY_LEFT_BRACKET = 91;  /* [ */
+inline constexpr unsigned short int KEY_BACKSLASH = 92;     /* \ */
 inline constexpr unsigned short int KEY_RIGHT_BRACKET = 93; /* ] */
-inline constexpr unsigned short int KEY_GRAVE_ACCENT = 96; /* ` */
-inline constexpr unsigned short int KEY_WORLD_1 = 161; /* non-US #1 */
-inline constexpr unsigned short int KEY_WORLD_2 = 162; /* non-US #2 */
+inline constexpr unsigned short int KEY_GRAVE_ACCENT = 96;  /* ` */
+inline constexpr unsigned short int KEY_WORLD_1 = 161;      /* non-US #1 */
+inline constexpr unsigned short int KEY_WORLD_2 = 162;      /* non-US #2 */
 inline constexpr unsigned short int KEY_ESCAPE = 256;
 inline constexpr unsigned short int KEY_ENTER = 257;
 inline constexpr unsigned short int KEY_TAB = 258;

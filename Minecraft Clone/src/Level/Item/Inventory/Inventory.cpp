@@ -1,16 +1,10 @@
 #include "Level/Item/Inventory/Inventory.h"
 
-ItemStack Inventory::GetItem(int slot) {
-    return storage_[slot];
-}
+ItemStack Inventory::GetItem(int slot) { return storage_[slot]; }
 
-void Inventory::SetSlot(int slot, ItemStack item) {
-    storage_[slot] = item;
-}
+void Inventory::SetSlot(int slot, ItemStack item) { storage_[slot] = item; }
 
-int Inventory::GetSlotCount() {
-    return num_slots_;
-}
+int Inventory::GetSlotCount() { return num_slots_; }
 
 void Inventory::ChangeSlotSize(int slotCount) {
     storage_.resize(slotCount);

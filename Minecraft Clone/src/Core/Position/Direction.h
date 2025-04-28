@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+
 #include "Core/Position/PositionTypes.h"
 
 // TODO: Refactor the code to use these
@@ -13,10 +14,9 @@ inline constexpr int kNorthDirection = 0x05;
 // Use for offsets
 template <class PositionType>
 class Direction {
-public:
-    constexpr Direction(int x, int y, int z, int direction) noexcept :
-        offset_{ x, y, z },
-        direction_{ direction } {};
+   public:
+    constexpr Direction(int x, int y, int z, int direction) noexcept
+        : offset_{x, y, z}, direction_{direction} {};
 
     constexpr Direction(const Direction&) noexcept = default;
     constexpr Direction(Direction&&) noexcept = default;
@@ -25,7 +25,8 @@ public:
     constexpr Direction& operator=(Direction&&) noexcept = default;
     constexpr Direction& operator=(const Direction&) noexcept = default;
 
-    friend constexpr PositionType operator+(const PositionType& m, const Direction& n) {
+    friend constexpr PositionType operator+(const PositionType& m,
+                                            const Direction& n) {
         return m + n.offset_;
     }
 
@@ -40,69 +41,49 @@ public:
         return opposite;
     }
 
-    constexpr int GetDirection() const {
-        return direction_;
-    }
+    constexpr int GetDirection() const { return direction_; }
 
-    constexpr int GetOppositeDirection() const {
-        return direction_ ^ 1;
-    }
+    constexpr int GetOppositeDirection() const { return direction_ ^ 1; }
 
-    constexpr int GetAxis() const {
-        return direction_ >> 1;
-    }
+    constexpr int GetAxis() const { return direction_ >> 1; }
 
-    constexpr bool IsPositive() const {
-        return (direction_ & 0b1) == 0;
-    }
+    constexpr bool IsPositive() const { return (direction_ & 0b1) == 0; }
 
-    constexpr bool IsNegative() const {
-        return (direction_ & 0b1) == 1;
-    }
+    constexpr bool IsNegative() const { return (direction_ & 0b1) == 1; }
 
-    constexpr operator int() const {
-        return direction_;
-    }
+    constexpr operator int() const { return direction_; }
 
-private:
+   private:
     PositionType offset_;
     int direction_;
 };
 
 /*
-* Class containing directional offsets
-*/
+ * Class containing directional offsets
+ */
 template <class PositionType>
 class Directions {
-public:
+   public:
     using const_iterator = const Direction<PositionType>*;
 
-    static constexpr const_iterator begin() {
-        return std::begin(kDirections);
-    }
+    static constexpr const_iterator begin() { return std::begin(kDirections); }
 
-    static constexpr const_iterator end() {
-        return std::end(kDirections);
-    }
+    static constexpr const_iterator end() { return std::end(kDirections); }
 
-    static constexpr Direction<PositionType> kEast{ 1, 0, 0, kEastDirection };
-    static constexpr Direction<PositionType> kWest{ -1, 0, 0, kWestDirection };
-    static constexpr Direction<PositionType> kUp{ 0, 1, 0, kUpDirection };
-    static constexpr Direction<PositionType> kDown{ 0, -1, 0, kDownDirection };
-    static constexpr Direction<PositionType> kSouth{ 0, 0, 1, kSouthDirection };
-    static constexpr Direction<PositionType> kNorth{ 0, 0, -1, kNorthDirection };
+    static constexpr Direction<PositionType> kEast{1, 0, 0, kEastDirection};
+    static constexpr Direction<PositionType> kWest{-1, 0, 0, kWestDirection};
+    static constexpr Direction<PositionType> kUp{0, 1, 0, kUpDirection};
+    static constexpr Direction<PositionType> kDown{0, -1, 0, kDownDirection};
+    static constexpr Direction<PositionType> kSouth{0, 0, 1, kSouthDirection};
+    static constexpr Direction<PositionType> kNorth{0, 0, -1, kNorthDirection};
 
     static constexpr int kXAxis = 0;
     static constexpr int kYAxis = 1;
     static constexpr int kZAxis = 2;
-private:
-    static constexpr Direction<PositionType> kDirections[6]{ 
-        { 1 , 0 , 0 , kEastDirection } , 
-        { -1, 0 , 0 , kWestDirection }, 
-        { 0 , 1 , 0 , kUpDirection },
-        { 0 , -1, 0 , kDownDirection },
-        { 0 , 0 , 1 , kSouthDirection },
-        { 0 , 0 , -1, kNorthDirection }
-    };
-};
 
+   private:
+    static constexpr Direction<PositionType> kDirections[6]{
+        {1, 0, 0, kEastDirection},  {-1, 0, 0, kWestDirection},
+        {0, 1, 0, kUpDirection},    {0, -1, 0, kDownDirection},
+        {0, 0, 1, kSouthDirection}, {0, 0, -1, kNorthDirection}};
+};

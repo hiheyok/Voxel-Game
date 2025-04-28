@@ -1,11 +1,11 @@
 #include "Level/World/WorldInterface.h"
+
 #include "Level/Container/ChunkMap.h"
 #include "Level/Container/EntityContainer.h"
 
-WorldInterface::WorldInterface() :
-    chunks_{ std::make_unique<ChunkMap>(true, true) },
-    entities_{ std::make_unique<EntityContainer>() } {
-    }
+WorldInterface::WorldInterface()
+    : chunks_{std::make_unique<ChunkMap>(true, true)},
+      entities_{std::make_unique<EntityContainer>()} {}
 
 WorldInterface::~WorldInterface() = default;
 
@@ -29,9 +29,7 @@ Entity* WorldInterface::GetEntity(EntityUUID uuid) const {
     return entities_->GetEntity(uuid);
 }
 
-ChunkMap* WorldInterface::GetChunkMap() const {
-    return chunks_.get();
-}
+ChunkMap* WorldInterface::GetChunkMap() const { return chunks_.get(); }
 
 EntityContainer* WorldInterface::GetEntityContainer() const {
     return entities_.get();

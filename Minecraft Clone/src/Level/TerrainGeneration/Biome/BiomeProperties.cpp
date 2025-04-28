@@ -1,12 +1,14 @@
 #include "BiomeProperties.h"
+
 #include "Utils/LogUtils.h"
 
 BiomeProperties& BiomeProperties::setTemperature(float temperatureIn) {
     if (temperatureIn > 0.1F && temperatureIn < 0.2F) {
-        g_logger.LogError("BiomeProperties::setTemperature", "Please avoid temperatures in the range 0.1 - 0.2 because of snow");
-        
-    }
-    else {
+        g_logger.LogError(
+            "BiomeProperties::setTemperature",
+            "Please avoid temperatures in the range 0.1 - 0.2 because of snow");
+
+    } else {
         temperature = temperatureIn;
         return *this;
     }

@@ -5,15 +5,17 @@ class UserInputs;
 class ClientCache;
 
 class PlayerMovement {
-public:
+   public:
     void Update(Player* player, const UserInputs& inputs, ClientCache* world);
-private:
+
+   private:
     float VelocityMovementCurve(float current, float max, float delta);
 
     void RotatePlayer(Player* player, const UserInputs& inputs);
-    void MovePlayer(Player* player, const UserInputs& inputs, ClientCache* server);
-    void MoveRelative(Player* player, float strafe, float up, float forward, float friction);
+    void MovePlayer(Player* player, const UserInputs& inputs,
+                    ClientCache* server);
+    void MoveRelative(Player* player, float strafe, float up, float forward,
+                      float friction);
 
     bool enable_collusion_ = false;
-
 };

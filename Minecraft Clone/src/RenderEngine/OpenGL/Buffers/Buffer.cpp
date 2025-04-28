@@ -1,9 +1,11 @@
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
+
 #include "Utils/LogUtils.h"
 
 Buffer::Buffer() {
     glGenBuffers(1, &buffer_id_);
-    g_logger.LogDebug("Buffer::GenBuffer", "Created buffer. ID: " + std::to_string(buffer_id_));
+    g_logger.LogDebug("Buffer::GenBuffer",
+                      "Created buffer. ID: " + std::to_string(buffer_id_));
 }
 
 Buffer::~Buffer() {
@@ -12,9 +14,7 @@ Buffer::~Buffer() {
     }
 }
 
-Buffer::Buffer(Buffer&& buffer) noexcept {
-    (*this) = std::move(buffer);
-}
+Buffer::Buffer(Buffer&& buffer) noexcept { (*this) = std::move(buffer); }
 
 Buffer& Buffer::operator=(Buffer&& buffer) noexcept {
     max_size_ = buffer.max_size_;
@@ -46,26 +46,15 @@ void Buffer::ResetBuffer() {
     glGenBuffers(1, &buffer_id_);
 }
 
-void Buffer::Bind() {
-    glBindBuffer(type_, buffer_id_);
-}
+void Buffer::Bind() { glBindBuffer(type_, buffer_id_); }
 
-void Buffer::Unbind() {
-    glBindBuffer(type_, 0);
-}
+void Buffer::Unbind() { glBindBuffer(type_, 0); }
 
+void Buffer::SetMaxSize(size_t maxSize) { max_size_ = maxSize; }
 
-void Buffer::SetMaxSize(size_t maxSize) {
-    max_size_ = maxSize;
-}
+void Buffer::SetType(GLenum type) { type_ = type; }
 
-void Buffer::SetType(GLenum type) {
-    type_ = type;
-}
-
-void Buffer::SetUsage(GLenum usage) {
-    usage_ = usage;
-}
+void Buffer::SetUsage(GLenum usage) { usage_ = usage; }
 
 void Buffer::InitializeData() {
     Bind();
@@ -73,13 +62,9 @@ void Buffer::InitializeData() {
     Unbind();
 }
 
-void Buffer::BindBase(int index) {
-    glBindBufferBase(type_, index, buffer_id_);
-}
+void Buffer::BindBase(int index) { glBindBufferBase(type_, index, buffer_id_); }
 
-void Buffer::UnbindBase(int index) {
-    glBindBufferBase(type_, index, 0);
-}
+void Buffer::UnbindBase(int index) { glBindBufferBase(type_, index, 0); }
 
 void Buffer::GetData(uint32_t* ptr, size_t offset, size_t size) {
     Bind();
@@ -87,27 +72,27 @@ void Buffer::GetData(uint32_t* ptr, size_t offset, size_t size) {
     Unbind();
 }
 
-void Buffer::CopyFrom(Buffer buffer, size_t readOffset, size_t writeOffset, size_t size) {
+void Buffer::CopyFrom(Buffer buffer, size_t readOffset, size_t writeOffset,
+                      size_t size) {
     glBindBuffer(GL_COPY_READ_BUFFER, buffer.buffer_id_);
     glBindBuffer(GL_COPY_WRITE_BUFFER, buffer_id_);
-    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, readOffset, writeOffset, size);
+    glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, readOffset,
+                        writeOffset, size);
     glBindBuffer(GL_COPY_READ_BUFFER, 0);
     glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
 }
 
-void Buffer::CopyTo(Buffer& destination, size_t offset, size_t desOffset, size_t size) {
+void Buffer::CopyTo(Buffer& destination, size_t offset, size_t desOffset,
+                    size_t size) {
     Bind();
     destination.Bind();
-//    glCopyNamedBufferSubData(BufferID, destination.BufferID, offset, desOffset, size);
+    //    glCopyNamedBufferSubData(BufferID, destination.BufferID, offset,
+    //    desOffset, size);
     glCopyBufferSubData(type_, destination.type_, offset, desOffset, size);
     Unbind();
     destination.Unbind();
 }
 
-Buffer::operator unsigned int() const noexcept {
-    return buffer_id_;
-}
+Buffer::operator unsigned int() const noexcept { return buffer_id_; }
 
-unsigned int Buffer::GetId() const noexcept {
-    return buffer_id_;
-}
+unsigned int Buffer::GetId() const noexcept { return buffer_id_; }

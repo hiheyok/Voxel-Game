@@ -1,21 +1,20 @@
 #pragma once
-#include "Level/TerrainGeneration/Random/JavaRandom.h"
-#include "Level/TerrainGeneration/Noisemaps/NoiseOctave.h"
-#include "Level/TerrainGeneration/Noisemaps/MinecraftNoiseGeneratorPerlin.h"
-#include "Level/TerrainGeneration/Noisemaps/TerrainParameters.h"
 #include "Level/Chunk/Chunk.h"
-#include "Level/Chunk/TallChunk.h"
 #include "Level/Chunk/Heightmap/Heightmap.h"
+#include "Level/Chunk/TallChunk.h"
 #include "Level/TerrainGeneration/Biome/Biome.h"
+#include "Level/TerrainGeneration/Noisemaps/MinecraftNoiseGeneratorPerlin.h"
+#include "Level/TerrainGeneration/Noisemaps/NoiseOctave.h"
+#include "Level/TerrainGeneration/Noisemaps/TerrainParameters.h"
+#include "Level/TerrainGeneration/Random/JavaRandom.h"
 
 // TODO: Fix me
 
 class OverworldGenerator {
-private:
-
+   private:
     static double clampedLerp(double lowerBnd, double upperBnd, double slide);
 
-public:
+   public:
     JavaRandom rand;
     NoiseOctave minLimitPerlinNoise;
     NoiseOctave maxLimitPerlinNoise;
@@ -34,19 +33,18 @@ public:
     std::vector<float> biomeWeights;
     std::vector<Biome*> biomesForGeneration;
 
-    OverworldGenerator(int64_t seed, ChunkGeneratorSettings setting) : 
-        rand{ JavaRandom(seed) }, 
-        minLimitPerlinNoise{ NoiseOctave(rand, 16) },
-        maxLimitPerlinNoise{ NoiseOctave(rand, 16) }, 
-        mainPerlinNoise{ NoiseOctave(rand, 8) },
-        surfaceNoise{ NoiseGeneratorPerlin(rand, 4) }, 
-        scaleNoise{ NoiseOctave(rand, 10) },
-        depthNoise{ NoiseOctave(rand, 16) }, 
-        depthBuffer{ std::vector<double>(256) },
-        heightMap{ std::vector<double>(825) },
-        settings_{ setting },
-        biomeWeights{ std::vector<float>(25) } {
-
+    OverworldGenerator(int64_t seed, ChunkGeneratorSettings setting)
+        : rand{JavaRandom(seed)},
+          minLimitPerlinNoise{NoiseOctave(rand, 16)},
+          maxLimitPerlinNoise{NoiseOctave(rand, 16)},
+          mainPerlinNoise{NoiseOctave(rand, 8)},
+          surfaceNoise{NoiseGeneratorPerlin(rand, 4)},
+          scaleNoise{NoiseOctave(rand, 10)},
+          depthNoise{NoiseOctave(rand, 16)},
+          depthBuffer{std::vector<double>(256)},
+          heightMap{std::vector<double>(825)},
+          settings_{setting},
+          biomeWeights{std::vector<float>(25)} {
         for (int i = -2; i <= 2; ++i) {
             for (int j = -2; j <= 2; ++j) {
                 float f = 10.0f / sqrtf((float)(i * i + j * j) + 0.2f);
@@ -55,7 +53,8 @@ public:
         }
     }
 
-    void replaceBiomeBlocks(int x, int z, TallChunk* chunk, std::vector<Biome*> biomesIn);
+    void replaceBiomeBlocks(int x, int z, TallChunk* chunk,
+                            std::vector<Biome*> biomesIn);
 
     void GenerateChunk(int x, int z, TallChunk* chunk);
 

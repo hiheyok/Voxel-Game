@@ -1,4 +1,5 @@
 #include "Core/Registry/ResourceLocation.h"
+
 #include "FileManager/Files.h"
 #include "Utils/LogUtils.h"
 ResourceLocation::ResourceLocation() = default;
@@ -18,13 +19,13 @@ void ResourceLocation::SetPath(std::string path, std::string namespaceIn) {
     path_ = std::string(kAssetPath) + '/' + namespaceIn + '/' + path;
 }
 
-std::string ResourceLocation::GetPath() const {
-    return path_;
-}
+std::string ResourceLocation::GetPath() const { return path_; }
 
 bool ResourceLocation::operator==(const ResourceLocation& other) const {
     return GetPath() == other.GetPath();
 }
 
-ResourceLocation& ResourceLocation::operator=(const ResourceLocation&) = default;
-ResourceLocation& ResourceLocation::operator=(ResourceLocation&&) noexcept = default;
+ResourceLocation& ResourceLocation::operator=(const ResourceLocation&) =
+    default;
+ResourceLocation& ResourceLocation::operator=(ResourceLocation&&) noexcept =
+    default;

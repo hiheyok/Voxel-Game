@@ -1,11 +1,11 @@
 #pragma once
-#include "Level/Block/Block.h"
 #include "Core/Typenames.h"
+#include "Level/Block/Block.h"
 
 class Dimension;
 
 struct FluidProperties {
-    int spread_rate_ = 1; // Ticks for fluid to spread
+    int spread_rate_ = 1;  // Ticks for fluid to spread
 };
 
 struct Fluid : Block {

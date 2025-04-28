@@ -17,13 +17,13 @@ struct ChunkRawData;
 struct SetBlockRelative;
 
 class ChunkContainer {
-public:
+   public:
     ChunkContainer();
     virtual ~ChunkContainer();
     ChunkContainer(const ChunkRawData&);
     ChunkContainer(ChunkContainer&&);
     ChunkContainer(const ChunkContainer&) = delete;
-    
+
     void SetNeighbor(ChunkContainer* neighbor, unsigned int side);
     ChunkContainer* GetNeighbor(unsigned int side) const;
     void ClearNeighbors();
@@ -54,7 +54,8 @@ public:
     std::unique_ptr<LightStorage> lighting_;
     std::unique_ptr<Heightmap> heightmap_;
     bool is_empty_ = true;
-private:
+
+   private:
     bool light_dirty_ = false;
     Palette block_storage_;
 };

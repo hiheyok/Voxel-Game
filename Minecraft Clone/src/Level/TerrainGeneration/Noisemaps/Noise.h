@@ -1,13 +1,13 @@
 #pragma once
-#include "Utils/FastNoiseLite.h"
 #include "Level/TerrainGeneration/Random/JavaRandom.h"
+#include "Utils/FastNoiseLite.h"
 
 class NoiseGenerator {
-private:
+   private:
     FastNoiseLite noise;
 
-public:
+   public:
     NoiseGenerator(JavaRandom seed) {
-        (void)seed; //TODO Check this again later
+        (void)seed;  // TODO Check this again later
     }
 };

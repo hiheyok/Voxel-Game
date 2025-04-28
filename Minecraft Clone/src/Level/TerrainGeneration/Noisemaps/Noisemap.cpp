@@ -9,7 +9,8 @@ void NoiseMapTypes::Initialize(int SEED) {
     IslandLayer2048.SetFrequency(1.f / 128.f);
     IslandLayer2048.SetSeed(SEED + SEED_OFFSET);
 
-    TemperatureLayer512.SetNoiseType(TemperatureLayer512.NoiseType_OpenSimplex2);
+    TemperatureLayer512.SetNoiseType(
+        TemperatureLayer512.NoiseType_OpenSimplex2);
     TemperatureLayer512.SetFrequency(1.f / 32.f);
     TemperatureLayer512.SetSeed(SEED + SEED_OFFSET * 3);
 
@@ -32,7 +33,8 @@ void NoiseMapTypes::Initialize(int SEED) {
     }
 }
 
-template <typename T> float NoiseMapTypes::GetNoise(T x, T y, T z, int Octaves, float zoom_) {
+template <typename T>
+float NoiseMapTypes::GetNoise(T x, T y, T z, int Octaves, float zoom_) {
     float gx = static_cast<float>(x);
     float gy = static_cast<float>(y);
     float gz = static_cast<float>(z);
@@ -40,7 +42,10 @@ template <typename T> float NoiseMapTypes::GetNoise(T x, T y, T z, int Octaves, 
     float out = 0.0f;
 
     for (int i = 0; i < Octaves; i++) {
-        float n = (OctaveNoise.GetNoise(gx * PowTable[i], gy * PowTable[i], gz * PowTable[i]) + 1) * 0.5f;
+        float n = (OctaveNoise.GetNoise(gx * PowTable[i], gy * PowTable[i],
+                                        gz * PowTable[i]) +
+                   1) *
+                  0.5f;
         out += n * PowTableHalf[i];
     }
 

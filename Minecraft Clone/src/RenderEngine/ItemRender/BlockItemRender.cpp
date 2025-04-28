@@ -1,22 +1,23 @@
 #include "BlockitemRender.h"
+
+#include "Level/Block/Block.h"
+#include "Level/Block/Blocks.h"
+#include "Level/Item/Item.h"
+#include "RenderEngine/BlockModel/BlockModels.h"
 #include "RenderEngine/Camera/camera.h"
+#include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
-#include "RenderEngine/BlockModel/BlockModels.h"
-#include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
-#include "Level/Block/Block.h"
-#include "Level/Block/Blocks.h"
-#include "Level/Item/Item.h"
 
-BlockItemRender::BlockItemRender() : 
-    camera_{ std::make_unique<Camera>() } {
-}
+BlockItemRender::BlockItemRender() : camera_{std::make_unique<Camera>()} {}
 BlockItemRender::~BlockItemRender() = default;
 
 void BlockItemRender::Initialize() {
-    shader_ = std::make_unique<Shader>("assets/shaders/ItemRender/BlockModelVert.glsl", "assets/shaders/ItemRender/BlockModelFrag.glsl");
+    shader_ = std::make_unique<Shader>(
+        "assets/shaders/ItemRender/BlockModelVert.glsl",
+        "assets/shaders/ItemRender/BlockModelFrag.glsl");
 
     vao_ = std::make_unique<VertexArray>();
     ebo_ = std::make_unique<Buffer>();
@@ -41,15 +42,16 @@ void BlockItemRender::Initialize() {
 
     glm::mat4 view = camera_->GetViewMatrix();
     glm::mat4 modelMat = glm::mat4(1.f);
-    glm::mat4 orthoProj = glm::ortho(-dimensions, dimensions, -dimensions, dimensions, 0.001f, 3.0f);
+    glm::mat4 orthoProj = glm::ortho(-dimensions, dimensions, -dimensions,
+                                     dimensions, 0.001f, 3.0f);
     shader_->Use();
 
     shader_->SetMat4("view", view);
     shader_->SetMat4("model", modelMat);
     shader_->SetMat4("projection", orthoProj);
 
-
-    shader_->BindTexture2D(0, g_blocks.block_texture_atlas_->Get(), "BlockTexture");
+    shader_->BindTexture2D(0, g_blocks.block_texture_atlas_->Get(),
+                           "BlockTexture");
 }
 
 void BlockItemRender::RenderBlock(Item item) {
@@ -60,20 +62,25 @@ void BlockItemRender::RenderBlock(Item item) {
     std::vector<float> vertices{};
     std::vector<uint32_t> indices{};
 
-    g_blocks.GetBlockType(item.GetBlock())->block_model_data_->GetVertices(vertices, indices);
+    g_blocks.GetBlockType(item.GetBlock())
+        ->block_model_data_->GetVertices(vertices, indices);
 
-    vbo_->InsertData(vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
-    ebo_->InsertData(indices.size() * sizeof(uint32_t), indices.data(), GL_STATIC_DRAW);
-    //std::cout << model.Vertices.size() << '\n';
+    vbo_->InsertData(vertices.size() * sizeof(float), vertices.data(),
+                     GL_STATIC_DRAW);
+    ebo_->InsertData(indices.size() * sizeof(uint32_t), indices.data(),
+                     GL_STATIC_DRAW);
+    // std::cout << model.Vertices.size() << '\n';
     camera_->screen_res_ = glm::vec2(16.f, 16.f);
 
     shader_->Use();
-    shader_->BindTexture2D(0, g_blocks.block_texture_atlas_->Get(), "BlockTexture");
+    shader_->BindTexture2D(0, g_blocks.block_texture_atlas_->Get(),
+                           "BlockTexture");
     setDrawCalls();
     vao_->Bind();
     ebo_->Bind();
     vbo_->Bind();
-    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()),
+                   GL_UNSIGNED_INT, 0);
     vao_->Unbind();
     ebo_->Unbind();
     vbo_->Unbind();

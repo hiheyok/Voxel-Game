@@ -1,8 +1,9 @@
 #include "Level/TerrainGeneration/Generators/DebugSecond/DebugSecond.h"
 DebugWorldSecond::DebugWorldSecond() = default;
 
-void DebugWorldSecond::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
-    chunk->SetBlock(g_blocks.COBBLESTONE,BlockPos{ 8, 8, 8});
+void DebugWorldSecond::Generate(const ChunkPos& pos,
+                                std::unique_ptr<Chunk>& chunk) {
+    chunk->SetBlock(g_blocks.COBBLESTONE, BlockPos{8, 8, 8});
 
     BlockPos scaled_pos = BlockPos{pos.x, pos.y, pos.z} * kChunkDim;
 
@@ -11,7 +12,6 @@ void DebugWorldSecond::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chu
     for (local_pos.x = 0; local_pos.x < kChunkDim; ++local_pos.x) {
         for (local_pos.y = 0; local_pos.y < kChunkDim; ++local_pos.y) {
             for (local_pos.z = 0; local_pos.z < kChunkDim; ++local_pos.z) {
-
                 int index = local_pos.GetIndex();
 
                 if (index % 5) {
@@ -20,13 +20,16 @@ void DebugWorldSecond::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chu
 
                 BlockPos global_pos = local_pos + scaled_pos;
 
-                if ((abs(global_pos.x) >= abs(global_pos.z)) && (abs(global_pos.x) >= abs(global_pos.y))) {
+                if ((abs(global_pos.x) >= abs(global_pos.z)) &&
+                    (abs(global_pos.x) >= abs(global_pos.y))) {
                     chunk->SetBlock(g_blocks.BLUE_STAINED_GLASS, local_pos);
                 }
-                if ((abs(global_pos.z) >= abs(global_pos.x)) && (abs(global_pos.z) >= abs(global_pos.y))) {
+                if ((abs(global_pos.z) >= abs(global_pos.x)) &&
+                    (abs(global_pos.z) >= abs(global_pos.y))) {
                     chunk->SetBlock(g_blocks.DARK_OAK_PLANKS, local_pos);
                 }
-                if ((abs(global_pos.y) >= abs(global_pos.x)) && (abs(global_pos.y) >= abs(global_pos.z))) {
+                if ((abs(global_pos.y) >= abs(global_pos.x)) &&
+                    (abs(global_pos.y) >= abs(global_pos.z))) {
                     chunk->SetBlock(g_blocks.ORANGE_CONCRETE, local_pos);
                 }
             }

@@ -2,15 +2,14 @@
 
 #include "Level/Entity/Type/EntityType.h"
 
-enum EntityTypeEnums {
-    ENTITY_PASSIVE, ENTITY_HOSTILE, ENTITY_FALLING_BLOCK
-};
+enum EntityTypeEnums { ENTITY_PASSIVE, ENTITY_HOSTILE, ENTITY_FALLING_BLOCK };
 
 class EntitiesList {
-private:
+   private:
     int entity_type_count_ = 0;
     FastHashMap<std::string, EntityTypeID> entity_name_id_;
-public:
+
+   public:
     EntitiesList();
 
     void InitializeModels();
@@ -23,10 +22,8 @@ public:
     EntityTypeID HUMAN = RegisterEntity("human", ENTITY_PASSIVE);
     EntityTypeID PLAYER = RegisterEntity("player", ENTITY_PASSIVE);
     EntityTypeID ZOMBIE = RegisterEntity("zombie", ENTITY_HOSTILE);
-    EntityTypeID SAND_GRAVITY_BLOCK = RegisterEntity("sand", ENTITY_FALLING_BLOCK);
-
+    EntityTypeID SAND_GRAVITY_BLOCK =
+        RegisterEntity("sand", ENTITY_FALLING_BLOCK);
 };
 
 extern EntitiesList g_entity_list;
-
-

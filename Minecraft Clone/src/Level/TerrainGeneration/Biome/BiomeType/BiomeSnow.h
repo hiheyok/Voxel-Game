@@ -2,10 +2,11 @@
 #include "Level/TerrainGeneration/Biome/Biome.h"
 
 class BiomeSnow : public Biome {
-public:
+   public:
     bool superIcy = false;
 
-    BiomeSnow(bool superIcyIn, BiomeProperties properties) : Biome(properties), superIcy(superIcyIn) {
+    BiomeSnow(bool superIcyIn, BiomeProperties properties)
+        : Biome(properties), superIcy(superIcyIn) {
         if (superIcyIn) {
             topBlock = g_blocks.SNOW_BLOCK;
         }

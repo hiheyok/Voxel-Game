@@ -19,12 +19,11 @@ void DebugWorld::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
     if (gy == 0) {
         for (int x = 0; x < kChunkDim; x++) {
             for (int z = 0; z < kChunkDim; z++) {
-
-                chunk->SetBlockUnsafe(g_blocks.WHITE_CONCRETE, BlockPos{x, 0, z});
+                chunk->SetBlockUnsafe(g_blocks.WHITE_CONCRETE,
+                                      BlockPos{x, 0, z});
             }
         }
     }
-    
 
     for (int x = 0; x < kChunkDim; x++) {
         for (int z = 0; z < kChunkDim; z++) {
@@ -33,7 +32,8 @@ void DebugWorld::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
                 int pz = z + gz;
                 int py = y + gy - 1;
 
-                if (((px & 0b1) == 1) || ((pz & 0b1) == 1) || ((py & 0b1) == 1)) {
+                if (((px & 0b1) == 1) || ((pz & 0b1) == 1) ||
+                    ((py & 0b1) == 1)) {
                     continue;
                 }
 

@@ -2,7 +2,7 @@
 #include "Level/TerrainGeneration/Biome/Biome.h"
 
 class BiomeBeach : public Biome {
-public:
+   public:
     BiomeBeach(BiomeProperties properties) : Biome(properties) {
         topBlock = g_blocks.SAND;
         fillerBlock = g_blocks.SAND;

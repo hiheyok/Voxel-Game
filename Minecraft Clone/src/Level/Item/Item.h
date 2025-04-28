@@ -14,18 +14,14 @@ struct ItemProperties {
 };
 
 class Item {
-public:
-    Item() {
-
-    }
+   public:
+    Item() {}
 
     BlockID GetBlock() const;
 
     bool CheckIsBlockItem() const;
 
     ItemProperties properties_;
-    
-private:
 
+   private:
 };
-

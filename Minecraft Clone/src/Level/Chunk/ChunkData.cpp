@@ -1,17 +1,17 @@
 #include "Level/Chunk/ChunkData.h"
+
 #include "Level/Chunk/ChunkRawData.h"
 #include "Level/Chunk/Heightmap/Heightmap.h"
 #include "Level/TerrainGeneration/Structures/Structure.h"
 
-static constexpr int NeighborOffset[6] = {
-      -kChunkDim, kChunkDim,-kChunkDim, kChunkDim,-kChunkDim, kChunkDim
-};
+static constexpr int NeighborOffset[6] = {-kChunkDim, kChunkDim,  -kChunkDim,
+                                          kChunkDim,  -kChunkDim, kChunkDim};
 
-ChunkContainer::ChunkContainer() : 
-    lighting_{ std::make_unique<LightStorage>() },
-    neighbors_{ 6 },
-    outside_block_to_place_{ 6 },
-    heightmap_{ std::make_unique<Heightmap>() } {
+ChunkContainer::ChunkContainer()
+    : lighting_{std::make_unique<LightStorage>()},
+      neighbors_{6},
+      outside_block_to_place_{6},
+      heightmap_{std::make_unique<Heightmap>()} {
     lighting_->position_ = position_;
 }
 
@@ -28,10 +28,16 @@ BlockID ChunkContainer::GetBlock(const BlockPos& pos) const {
         int dy = ((pos.y >> 31) & 1) + 2;
         int dz = ((pos.z >> 31) & 1) + 4;
 
-        if (neighbors_[dx] && (pos.x >> kChunkDimLog2)) return neighbors_[dx]->GetBlock(BlockPos{ pos.x + NeighborOffset[dx], pos.y, pos.z });
-        if (neighbors_[dy] && (pos.y >> kChunkDimLog2)) return neighbors_[dy]->GetBlock(BlockPos{ pos.x, pos.y + NeighborOffset[dy], pos.z });
-        if (neighbors_[dz] && (pos.z >> kChunkDimLog2)) return neighbors_[dz]->GetBlock(BlockPos{ pos.x, pos.y, pos.z + NeighborOffset[dz] });
-    
+        if (neighbors_[dx] && (pos.x >> kChunkDimLog2))
+            return neighbors_[dx]->GetBlock(
+                BlockPos{pos.x + NeighborOffset[dx], pos.y, pos.z});
+        if (neighbors_[dy] && (pos.y >> kChunkDimLog2))
+            return neighbors_[dy]->GetBlock(
+                BlockPos{pos.x, pos.y + NeighborOffset[dy], pos.z});
+        if (neighbors_[dz] && (pos.z >> kChunkDimLog2))
+            return neighbors_[dz]->GetBlock(
+                BlockPos{pos.x, pos.y, pos.z + NeighborOffset[dz]});
+
         return g_blocks.AIR;
     } else {
         return block_storage_.GetBlock(pos);
@@ -43,28 +49,30 @@ BlockID ChunkContainer::GetBlockUnsafe(const BlockPos& pos) const {
 }
 
 void ChunkContainer::SetBlock(BlockID block, const BlockPos& pos) {
-    if ((pos.x | pos.y | pos.z) >> kChunkDimLog2) { //check if it is in the chunk
+    if ((pos.x | pos.y | pos.z) >>
+        kChunkDimLog2) {  // check if it is in the chunk
         int dx = ((pos.x >> 31) & 1) + 0;
         int dy = ((pos.y >> 31) & 1) + 2;
         int dz = ((pos.z >> 31) & 1) + 4;
-    
+
         if (pos.x >> kChunkDimLog2) {
-            outside_block_to_place_[dx].emplace_back(block, BlockPos{pos.x + NeighborOffset[dx], pos.y, pos.z});
+            outside_block_to_place_[dx].emplace_back(
+                block, BlockPos{pos.x + NeighborOffset[dx], pos.y, pos.z});
             return;
         }
         if (pos.y >> kChunkDimLog2) {
-            outside_block_to_place_[dy].emplace_back(block, BlockPos{pos.x, pos.y + NeighborOffset[dy], pos.z});
+            outside_block_to_place_[dy].emplace_back(
+                block, BlockPos{pos.x, pos.y + NeighborOffset[dy], pos.z});
             return;
         }
         if (pos.z >> kChunkDimLog2) {
-            outside_block_to_place_[dz].emplace_back(block, BlockPos{pos.x, pos.y, pos.z + NeighborOffset[dz]});
+            outside_block_to_place_[dz].emplace_back(
+                block, BlockPos{pos.x, pos.y, pos.z + NeighborOffset[dz]});
             return;
         }
     } else {
         SetBlockUnsafe(block, pos);
     }
-
-    
 }
 
 void ChunkContainer::SetBlockUnsafe(BlockID block, const BlockPos& pos) {
@@ -98,11 +106,11 @@ void ChunkContainer::SetData(const ChunkRawData& data) {
 }
 
 ChunkRawData ChunkContainer::GetRawData() {
-    return ChunkRawData{ block_storage_, *lighting_.get(), position_ };
+    return ChunkRawData{block_storage_, *lighting_.get(), position_};
 }
 
 LightStorage ChunkContainer::GetLightData() {
-    return LightStorage{ *lighting_.get() };
+    return LightStorage{*lighting_.get()};
 }
 
 void ChunkContainer::UpdateHeightMap() {
@@ -114,18 +122,19 @@ void ChunkContainer::UpdateHeightMap() {
 }
 
 void ChunkContainer::UpdateHeightMap(int x, int z) {
-    // Check chunk above first, if the heightmap above is > -1, it means that there are block above
-    // -1 indicate theirs nothing in the column
+    // Check chunk above first, if the heightmap above is > -1, it means that
+    // there are block above -1 indicate theirs nothing in the column
     ChunkContainer* chunk_above = neighbors_[Directions<ChunkPos>::kUp];
 
-    int new_height = -1; // -1 is the default height if there is no blocks in the column
+    int new_height =
+        -1;  // -1 is the default height if there is no blocks in the column
     int old_height = heightmap_->Get(x, z);
-    
+
     if (chunk_above != nullptr && chunk_above->heightmap_->Get(x, z) != -1) {
         new_height = kChunkDim;
     } else {
         for (int i = 15; i >= 0; --i) {
-            if (GetBlockUnsafe(BlockPos{ x, i, z }) != g_blocks.AIR) {
+            if (GetBlockUnsafe(BlockPos{x, i, z}) != g_blocks.AIR) {
                 new_height = i;
                 break;
             }
@@ -135,14 +144,12 @@ void ChunkContainer::UpdateHeightMap(int x, int z) {
     if (new_height != old_height) {
         light_dirty_ = true;
         heightmap_->Edit(x, z, new_height);
-    
+
         ChunkContainer* chunk_bottom = neighbors_[Directions<ChunkPos>::kDown];
         if (chunk_bottom != nullptr && (old_height == -1 || new_height == -1)) {
             chunk_bottom->UpdateHeightMap(x, z);
         }
     }
-
-
 }
 
 bool ChunkContainer::CheckLightDirty() {
@@ -151,6 +158,4 @@ bool ChunkContainer::CheckLightDirty() {
     return is_dirty;
 }
 
-void ChunkContainer::SetLightDirty() {
-    light_dirty_ = true;
-}
+void ChunkContainer::SetLightDirty() { light_dirty_ = true; }

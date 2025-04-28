@@ -1,17 +1,18 @@
 #pragma once
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
-#include <glm/vec2.hpp>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <string>
+#include <glm/vec2.hpp>
 #include <optional>
+#include <string>
 #include <variant>
 
 #include "Core/Typenames.h"
 
 class ShaderInterface {
-public:
+   public:
     ShaderInterface();
     ~ShaderInterface();
 
@@ -29,7 +30,8 @@ public:
 
     ShaderInterface& SetVec3(const std::string& name, const glm::vec3& value);
 
-    ShaderInterface& SetVec3(const std::string& name, float x, float y, float z);
+    ShaderInterface& SetVec3(const std::string& name, float x, float y,
+                             float z);
 
     ShaderInterface& SetIVec3(const std::string& name, const glm::ivec3& value);
 
@@ -37,7 +39,8 @@ public:
 
     ShaderInterface& SetVec4(const std::string& name, const glm::vec4& value);
 
-    ShaderInterface& SetVec4(const std::string& name, float x, float y, float z, float w);
+    ShaderInterface& SetVec4(const std::string& name, float x, float y, float z,
+                             float w);
 
     ShaderInterface& SetMat2(const std::string& name, const glm::mat2& mat);
 
@@ -45,9 +48,11 @@ public:
 
     ShaderInterface& SetMat4(const std::string& name, const glm::mat4& mat);
 
-    ShaderInterface& BindTexture2D(GLuint index, GLuint img, const std::string& name);
+    ShaderInterface& BindTexture2D(GLuint index, GLuint img,
+                                   const std::string& name);
 
-    ShaderInterface& BindTextureArray2D(GLuint index, GLuint img, const std::string& name);
+    ShaderInterface& BindTextureArray2D(GLuint index, GLuint img,
+                                        const std::string& name);
 
     ShaderInterface& BindBufferAsSSBO(GLuint buffer, int idx);
     ShaderInterface& UnbindBufferSSBO(int idx);
@@ -55,7 +60,8 @@ public:
     ShaderInterface& SSBOMemoryBarrier();
 
     unsigned int shader_id_ = 0;
-protected:
+
+   protected:
     FastHashMap<std::string, int> cache_;
 
     // Value cache | Used to make sure to not update if the values are the same
@@ -75,5 +81,6 @@ protected:
 
     GLint GetUniformLocation(std::string name);
     void CheckCompileErrors(GLuint shader, std::string type);
-    GLuint CompileShader(std::string source, std::string type, GLuint shaderType);
+    GLuint CompileShader(std::string source, std::string type,
+                         GLuint shaderType);
 };

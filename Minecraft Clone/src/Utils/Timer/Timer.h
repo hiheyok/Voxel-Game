@@ -3,11 +3,8 @@
 #include <string>
 
 class Timer {
-public:
-    
-    Timer() {
-        first_ = std::chrono::high_resolution_clock::now();
-    }
+   public:
+    Timer() { first_ = std::chrono::high_resolution_clock::now(); }
 
     double GetTimePassed_ns() const;
     double GetTimePassed_μs() const;
@@ -21,7 +18,6 @@ public:
 
     void Set();
 
-private:
+   private:
     std::chrono::high_resolution_clock::time_point first_;
-
 };

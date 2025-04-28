@@ -7,14 +7,16 @@ struct Entity;
 struct Ray;
 
 class CollusionDetector {
-public:
+   public:
     CollusionDetector(ChunkMap* cache);
     ~CollusionDetector();
 
     bool CheckRayIntersection(Ray& ray);
-    float TraceSingleAxisCollision(glm::vec3 Origin, int direction, int distanceTest);
+    float TraceSingleAxisCollision(glm::vec3 Origin, int direction,
+                                   int distanceTest);
     glm::dvec3 ComputeCollisionTimes(Entity* entity);
     bool IsEntityOnGround(Entity* entity);
-private:
+
+   private:
     ChunkMap* cache_;
 };

@@ -1,37 +1,31 @@
 #pragma once
-#include "ServerInterface.h"
-#include "Utils/LogUtils.h"
-#include "Utils/Containers/ConcurrentQueue.h"
 #include "ClientInterface.h"
+#include "ServerInterface.h"
+#include "Utils/Containers/ConcurrentQueue.h"
+#include "Utils/LogUtils.h"
 
 //
 class InternalInterface : public ServerInterface, public ClientInterface {
     bool is_connected_ = false;
-public:
-    InternalInterface() {
 
-    }
+   public:
+    InternalInterface() {}
 
     // Client -> Server
     void SendPlayerAction(const Packet::PlayerAction& action) override {
         player_action_queue_.Push(action);
     }
 
-    bool IsConnected() const override {
-        return is_connected_;
-    }
+    bool IsConnected() const override { return is_connected_; }
 
     void Connect(const std::string& address, int port) override {
-        g_logger.LogError("InternalServerInterface::Connect", "This function isn't active!");
+        g_logger.LogError("InternalServerInterface::Connect",
+                          "This function isn't active!");
     }
 
-    void Disconnect() {
+    void Disconnect() {}
 
-    }
-
-    void Update() {
-
-    }
+    void Update() {}
 
     // Server -> Client
 
@@ -51,7 +45,5 @@ public:
         server_stats_ = stats;
     }
 
-    void SendTimeLastTick() override {
-        time.Set();
-    }
+    void SendTimeLastTick() override { time.Set(); }
 };

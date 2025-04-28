@@ -1,6 +1,7 @@
+#include "FileManager/Files.h"
+
 #include <filesystem>
 #include <sstream>
-#include "FileManager/Files.h"
 
 std::vector<std::string> Tokenize(std::string str, char divider) {
     std::vector<std::string> tokens = {};
@@ -19,21 +20,16 @@ std::vector<std::string> Tokenize(std::string str, char divider) {
 
 File::File() = default;
 
-File::File(std::string dir) {
-    Open(dir);
-}
+File::File(std::string dir) { Open(dir); }
 
 void File::Open(std::string dir) {
     dir_ = dir;
     file_.open(dir_);
 }
 
-void File::Close() {
-    file_.close();
-}
+void File::Close() { file_.close(); }
 
 std::vector<std::string> File::GetToken(char divider) {
-
     std::ifstream f(dir_);
 
     std::vector<std::string> tokens = {};
@@ -41,7 +37,6 @@ std::vector<std::string> File::GetToken(char divider) {
     std::string line;
 
     while (std::getline(f, line)) {
-
         std::vector<std::string> lineTokens = Tokenize(line, divider);
         tokens.insert(tokens.end(), lineTokens.begin(), lineTokens.end());
     }
@@ -56,21 +51,18 @@ bool FileManager::CheckFolder(const char* dir) {
 
 bool FileManager::CreateFolder(const char* name) {
     if (CheckFolder(name)) {
-        return false; //Already exist
+        return false;  // Already exist
     }
 
     return (mkdir(name) == 0);
 }
 
-//Return true of file exist and false if it doesn't
+// Return true of file exist and false if it doesn't
 bool FileManager::CheckFile(const char* dir) {
     return std::filesystem::exists(dir);
-
 }
 
-bool FileManager::CheckFile(std::string dir) {
-    return CheckFile(dir.c_str());
-}
+bool FileManager::CheckFile(std::string dir) { return CheckFile(dir.c_str()); }
 
 void FileManager::CreateFile(std::string name, std::string dir) {
     std::string d = "";
@@ -90,7 +82,6 @@ File FileManager::GetFile(std::string name, std::string dir) {
         d = name;
     else
         d = (dir + "//" + name);
-
 
     return File(d);
 }

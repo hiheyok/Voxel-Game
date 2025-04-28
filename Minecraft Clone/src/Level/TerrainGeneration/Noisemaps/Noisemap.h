@@ -2,17 +2,18 @@
 #include "Utils/FastNoiseLite.h"
 
 class NoiseMapTypes {
-public:
+   public:
     void Initialize(int SEED);
 
-    template <typename T> float GetNoise(T x, T y, T z, int Octaves, float zoom_);
+    template <typename T>
+    float GetNoise(T x, T y, T z, int Octaves, float zoom_);
 
     FastNoiseLite IslandLayer4096;
     FastNoiseLite IslandLayer2048;
     FastNoiseLite TemperatureLayer512;
     FastNoiseLite RainfallLayer512;
-private:
 
+   private:
     float PowTableHalf[32]{};
     float PowTable[32]{};
 
@@ -22,7 +23,7 @@ private:
 };
 
 class NoiseMaps1122 {
-public:
+   public:
     FastNoiseLite minLimitPerlinNoise;
     FastNoiseLite maxLimitPerlinNoise;
     FastNoiseLite mainPerlinNoise;

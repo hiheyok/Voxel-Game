@@ -1,9 +1,7 @@
 #pragma once
+#include <glm/vec2.hpp>
 #include <string>
 #include <vector>
-#include <glm/vec2.hpp>
-
-
 
 struct GUIElement {
     struct GUIVertices {
@@ -17,8 +15,8 @@ struct GUIElement {
     GUIVertices GetVertices();
 
     std::string text_ = "";
-    glm::vec2 size_ = glm::vec2(0.f, 0.f);;
-    glm::vec2 location_ = glm::vec2(0.f,0.f);
+    glm::vec2 size_ = glm::vec2(0.f, 0.f);
+    glm::vec2 location_ = glm::vec2(0.f, 0.f);
     glm::vec2 uv_p0_ = glm::vec2(0.f, 0.f);
     glm::vec2 uv_p1_ = glm::vec2(0.f, 0.f);
 

@@ -3,12 +3,10 @@
 #include "Level/Item/Inventory/EntityInventory.h"
 
 class Player : public Entity {
-public:
+   public:
     EntityInventory entity_inventory_;
 
-    Player() {
-        properties_.is_chunk_loader_ = true;
-    }
+    Player() { properties_.is_chunk_loader_ = true; }
 
-private:
+   private:
 };

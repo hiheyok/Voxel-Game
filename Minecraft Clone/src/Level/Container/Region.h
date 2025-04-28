@@ -7,11 +7,11 @@
 class Chunk;
 
 /*
-* Simple chunk storage for the client
-*/
+ * Simple chunk storage for the client
+ */
 
 class Region {
-public:
+   public:
     Region();
     ~Region();
 
@@ -23,8 +23,10 @@ public:
     void IncrementUsage();
     size_t GetUsageCount() const;
     void ResetUsageCount();
-private:
+
+   private:
     int chunk_count_;
-    int usage_; // use for finding region with the most usage and caching them for faster access
+    int usage_;  // use for finding region with the most usage and caching them
+                 // for faster access
     std::vector<std::unique_ptr<Chunk>> region_data_;
 };

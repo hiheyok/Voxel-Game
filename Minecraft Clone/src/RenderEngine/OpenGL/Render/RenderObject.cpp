@@ -9,6 +9,4 @@ void RenderObject::SetShader(std::unique_ptr<ShaderInterface> shader) {
     shader_ = std::move(shader);
 }
 
-ShaderInterface& RenderObject::GetShader() {
-    return *shader_;
-}
+ShaderInterface& RenderObject::GetShader() { return *shader_; }

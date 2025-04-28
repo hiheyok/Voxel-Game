@@ -1,4 +1,5 @@
 #include "Level/Entity/Type/Passive.h"
+
 #include "Level/Dimension/Dimension.h"
 #include "Level/Entity/Entity.h"
 

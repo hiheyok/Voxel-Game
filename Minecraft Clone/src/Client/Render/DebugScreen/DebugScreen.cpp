@@ -1,20 +1,19 @@
+#include "Client/Render/DebugScreen/DebugScreen.h"
+
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "Client/Render/DebugScreen/DebugScreen.h"
-#include "Utils/Timer/Timer.h"
-#include "RenderEngine/GUI/TextRenderer.h"
 #include "RenderEngine/GUI/Font.h"
+#include "RenderEngine/GUI/TextRenderer.h"
+#include "Utils/Timer/Timer.h"
 
-DebugScreen::DebugScreen() : 
-    renderer_{ std::make_unique<TextRenderer>() },
-    timer_{ std::make_unique<Timer>() } {}
+DebugScreen::DebugScreen()
+    : renderer_{std::make_unique<TextRenderer>()},
+      timer_{std::make_unique<Timer>()} {}
 
 DebugScreen::~DebugScreen() = default;
 
-void DebugScreen::Render() {
-    renderer_->RenderFont();
-}
+void DebugScreen::Render() { renderer_->RenderFont(); }
 
 void DebugScreen::Update() {
     if (timer_->GetTimePassed_ms() > update_rate_) {
@@ -23,9 +22,7 @@ void DebugScreen::Update() {
     }
 }
 
-void DebugScreen::SetUpdateRate(int rate) {
-    update_rate_ = rate;
-}
+void DebugScreen::SetUpdateRate(int rate) { update_rate_ = rate; }
 
 void DebugScreen::EditText(const std::string& name, const char* c) {
     EditText(name, std::string(c));

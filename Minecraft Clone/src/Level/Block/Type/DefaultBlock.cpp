@@ -1,4 +1,5 @@
 #include "Level/Block/Type/DefaultBlock.h"
+
 #include "Level/Dimension/Dimension.h"
 
 DefaultBlock::DefaultBlock() {

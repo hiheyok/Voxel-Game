@@ -1,7 +1,5 @@
 #pragma once
 #include <thread>
-#include <vector>
-#include <glm/vec3.hpp>
 
 #include "Core/Typenames.h"
 
@@ -29,10 +27,10 @@ struct ServerSettings {
     ~ServerSettings() = default;
 };
 
-//This manages the input/output system of the world
-//This also manages the ticking system
+// This manages the input/output system of the world
+// This also manages the ticking system
 class Server {
-public:
+   public:
     std::unique_ptr<Level> level_ = nullptr;
     std::unique_ptr<ServerSettings> settings_ = nullptr;
     ClientInterface* client_interface_ = nullptr;
@@ -52,7 +50,8 @@ public:
 
     // This will cause the player to join and return a uuid for the player
     EntityUUID SetInternalConnection(InternalInterface* conn);
-private:
+
+   private:
     bool stop_ = true;
     std::thread main_server_loop_;
     std::unique_ptr<Timer> time_;

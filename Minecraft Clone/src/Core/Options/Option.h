@@ -2,7 +2,7 @@
 #include "Core/Typenames.h"
 
 class Options {
-public:
+   public:
     size_t vertical_render_distance_ = 8;
     size_t horizontal_render_distance_ = 16;
     size_t world_gen_threads_ = 6;
@@ -13,16 +13,16 @@ public:
     size_t light_engine_threads_ = 2;
 
     Options();
-private:
 
+   private:
     bool SetValue(std::string name, std::string value);
 
     void ProcessTokens(std::vector<std::string> tokens);
 
     void SetOptionNameTable();
 
-    void GenerateOptionFile(); //Generate file if deleted
+    void GenerateOptionFile();  // Generate file if deleted
 
-    FastHashMap<std::string, size_t*> option_name_; //name -> ptr
+    FastHashMap<std::string, size_t*> option_name_;  // name -> ptr
 
 } extern g_app_options;

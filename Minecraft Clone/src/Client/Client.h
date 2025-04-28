@@ -11,12 +11,13 @@ class ClientLevel;
 class Server;
 
 class Client : public Window {
-public:
+   public:
     Client();
     ~Client();
 
     void run();
-private:
+
+   private:
     void Initialize();
     void GameLoop();
     void Update();

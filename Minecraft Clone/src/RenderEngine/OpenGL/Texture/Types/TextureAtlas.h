@@ -1,13 +1,14 @@
 #pragma once
-#include <vector>
-#include <optional>
 #include <cctype>
+#include <optional>
+#include <vector>
 
 #include "RenderEngine/OpenGL/Texture/Texture.h"
 
 class TextureAtlas : public Texture {
-public:
-    TextureAtlas(int width, int height, int individualWidth, int individualHeight);
+   public:
+    TextureAtlas(int width, int height, int individualWidth,
+                 int individualHeight);
     virtual ~TextureAtlas();
     void LoadToGPU();
 
@@ -15,8 +16,8 @@ public:
 
     size_t GetTextureCount() const;
 
-private:
-    void SetPixel(int r, int  g, int b, int a, size_t w, size_t h);
+   private:
+    void SetPixel(int r, int g, int b, int a, size_t w, size_t h);
     bool AddTextureToAtlasHelper(const RawTextureData& data);
     void AddData(std::vector<uint8_t> data, int format);
 

@@ -1,6 +1,6 @@
 #pragma once
-#include <mutex>
 #include <memory>
+#include <mutex>
 
 #include "Core/Typenames.h"
 
@@ -14,7 +14,7 @@ struct WorldParameters;
 
 // Add chunk unloading later when entity goes out of range
 class WorldUpdater {
-public:
+   public:
     bool tall_generation_ = false;
 
     WorldUpdater(World* w, WorldParameters p);
@@ -23,7 +23,7 @@ public:
     bool CheckEntityExistChunkLoader(EntityUUID uuid) const;
     void Load();
 
-    // Getters 
+    // Getters
     std::vector<ChunkPos> GetUpdatedChunkPos();
     std::vector<ChunkPos> GetUpdatedLightPos();
     std::vector<ChunkPos> GetRequestedLightUpdates();
@@ -43,7 +43,7 @@ public:
     void SetBlock(const BlockID& block, const BlockPos& pos);
     void KillEntity(const EntityUUID& uuid);
 
-private:
+   private:
     bool RequestLoad(const ChunkPos& pos);
     void loadSpawnChunks();
     void loadSummonEntitySurrounding(EntityUUID uuid);
@@ -52,11 +52,12 @@ private:
     std::unique_ptr<WorldParameters> settings_;
     World* world_ = nullptr;
     std::mutex lock_;
-    std::mutex other_lock_; // TODO: tmp fix this later
+    std::mutex other_lock_;  // TODO: tmp fix this later
     bool is_spawn_chunks_loaded_ = false;
     std::vector<ChunkPos> chunk_request_;
 
-    FastHashSet<EntityUUID> entity_chunk_loaders_; //List of entities that force loads chunks 
+    FastHashSet<EntityUUID>
+        entity_chunk_loaders_;  // List of entities that force loads chunks
     FastHashSet<ChunkPos> generating_chunk_;
 
     std::mutex updated_chunk_lock_;

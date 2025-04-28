@@ -1,7 +1,9 @@
 #include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
+
 #include "Utils/LogUtils.h"
 
-TextureAtlas::TextureAtlas(int width, int height, int individualWidth, int individualHeight) {
+TextureAtlas::TextureAtlas(int width, int height, int individualWidth,
+                           int individualHeight) {
     width_ = width;
     height_ = height;
     individual_tex_height_ = individualHeight;
@@ -14,87 +16,94 @@ TextureAtlas::~TextureAtlas() = default;
 
 void TextureAtlas::LoadToGPU() {
     glBindTexture(GL_TEXTURE_2D, texture_id_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, static_cast<GLsizei>(width_), static_cast<GLsizei>(height_), 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_atlas_data_.data());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, static_cast<GLsizei>(width_),
+                 static_cast<GLsizei>(height_), 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                 texture_atlas_data_.data());
     glGenerateMipmap(GL_TEXTURE_2D);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    GL_NEAREST_MIPMAP_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 4);
 
-    g_logger.LogDebug("TextureAtlas::LoadToGPU", "Loaded Texture Atlas: " + std::to_string(texture_id_));
+    g_logger.LogDebug("TextureAtlas::LoadToGPU",
+                      "Loaded Texture Atlas: " + std::to_string(texture_id_));
 }
 
-void TextureAtlas::SetPixel(int r, int  g, int b, int a, size_t w, size_t h) {
+void TextureAtlas::SetPixel(int r, int g, int b, int a, size_t w, size_t h) {
     texture_atlas_data_[w * color_space_ + h * color_space_ + 0] = r;
     texture_atlas_data_[w * color_space_ + h * color_space_ + 1] = g;
     texture_atlas_data_[w * color_space_ + h * color_space_ + 2] = b;
     texture_atlas_data_[w * color_space_ + h * color_space_ + 3] = a;
 }
 
-void TextureAtlas::AddData(std::vector<uint8_t> data, int format) { //assumes that all textures  are 16 x 16
-    //Get offset to where to put the texture
+void TextureAtlas::AddData(
+    std::vector<uint8_t> data,
+    int format) {  // assumes that all textures  are 16 x 16
+    // Get offset to where to put the texture
     size_t widthTex = width_ / individual_tex_width_;
     int heightTex = height_ / individual_tex_height_;
 
     size_t widthIndex = count_ % widthTex;
     size_t heightIndex = count_ / widthTex;
 
-    size_t widthOffset = widthIndex * individual_tex_width_; //Offset for the width
-    size_t heightOffset = width_ * heightIndex * individual_tex_height_; //Offset for the height
+    size_t widthOffset =
+        widthIndex * individual_tex_width_;  // Offset for the width
+    size_t heightOffset =
+        width_ * heightIndex * individual_tex_height_;  // Offset for the height
 
     switch (format) {
-    case GL_RGB:
-        for (int index = 0; index < individual_tex_height_ * individual_tex_width_; index++) {
-            SetPixel(
-                data[(index * 3)],
-                data[(index * 3) + 1],
-                data[(index * 3) + 2],
-                255,
-                widthOffset + (index % individual_tex_width_),
-                heightOffset + width_ * (index / individual_tex_width_));
-        }
-        count_++;
-        break;
-    case GL_RG:
-        for (int index = 0; index < individual_tex_height_ * individual_tex_width_; index++) {
-            SetPixel(
-                data[(index * 2)],
-                data[(index * 2)],
-                data[(index * 2)],
-                data[(index * 2) + 1],
-                widthOffset + (index % individual_tex_width_),
-                heightOffset + width_ * (index / individual_tex_width_));
-        }
-        count_++;
-        break;
-    case GL_RGBA:
-        for (int index = 0; index < individual_tex_height_ * individual_tex_width_; index++) {
-            SetPixel(
-                data[(index * 4)],
-                data[(index * 4) + 1],
-                data[(index * 4) + 2],
-                data[(index * 4) + 3],
-                widthOffset + (index % individual_tex_width_),
-                heightOffset + width_ * (index / individual_tex_width_));
-        }
-        count_++;
-        break;
-    case GL_RED:
-        for (int index = 0; index < individual_tex_height_ * individual_tex_width_; index++) {
-            SetPixel(
-                data[index],
-                data[index],
-                data[index],
-                255,
-                widthOffset + (index % individual_tex_width_),
-                heightOffset + width_ * (index / individual_tex_width_));
-        }
-        count_++;
-        break;
-    default:
-        g_logger.LogError("TextureAtlas::AddData", "Invalid image format!");
-        break;
+        case GL_RGB:
+            for (int index = 0;
+                 index < individual_tex_height_ * individual_tex_width_;
+                 index++) {
+                SetPixel(
+                    data[(index * 3)], data[(index * 3) + 1],
+                    data[(index * 3) + 2], 255,
+                    widthOffset + (index % individual_tex_width_),
+                    heightOffset + width_ * (index / individual_tex_width_));
+            }
+            count_++;
+            break;
+        case GL_RG:
+            for (int index = 0;
+                 index < individual_tex_height_ * individual_tex_width_;
+                 index++) {
+                SetPixel(
+                    data[(index * 2)], data[(index * 2)], data[(index * 2)],
+                    data[(index * 2) + 1],
+                    widthOffset + (index % individual_tex_width_),
+                    heightOffset + width_ * (index / individual_tex_width_));
+            }
+            count_++;
+            break;
+        case GL_RGBA:
+            for (int index = 0;
+                 index < individual_tex_height_ * individual_tex_width_;
+                 index++) {
+                SetPixel(
+                    data[(index * 4)], data[(index * 4) + 1],
+                    data[(index * 4) + 2], data[(index * 4) + 3],
+                    widthOffset + (index % individual_tex_width_),
+                    heightOffset + width_ * (index / individual_tex_width_));
+            }
+            count_++;
+            break;
+        case GL_RED:
+            for (int index = 0;
+                 index < individual_tex_height_ * individual_tex_width_;
+                 index++) {
+                SetPixel(
+                    data[index], data[index], data[index], 255,
+                    widthOffset + (index % individual_tex_width_),
+                    heightOffset + width_ * (index / individual_tex_width_));
+            }
+            count_++;
+            break;
+        default:
+            g_logger.LogError("TextureAtlas::AddData", "Invalid image format!");
+            break;
     }
 }
 
@@ -105,8 +114,10 @@ bool TextureAtlas::AddTextureToAtlasHelper(const RawTextureData& data) {
         return false;
     }
 
-    if (((data.width_ % individual_tex_width_) != 0) || ((data.height_ % individual_tex_height_) != 0)) {
-        g_logger.LogError("TextureAtlas::AddTextureToAtlasHelper", "Width or height doesn't match");
+    if (((data.width_ % individual_tex_width_) != 0) ||
+        ((data.height_ % individual_tex_height_) != 0)) {
+        g_logger.LogError("TextureAtlas::AddTextureToAtlasHelper",
+                          "Width or height doesn't match");
         return false;
     }
 
@@ -130,13 +141,13 @@ bool TextureAtlas::AddTextureToAtlasHelper(const RawTextureData& data) {
             int gx = x * individual_tex_width_ * colorSize;
             int gy = y * individual_tex_width_ * data.width_ * colorSize;
 
-            std::vector<uint8_t> buffer(individual_tex_height_ * individual_tex_width_ * colorSize);
+            std::vector<uint8_t> buffer(individual_tex_height_ *
+                                        individual_tex_width_ * colorSize);
 
             for (int h = 0; h < individual_tex_height_; h++) {
-                memcpy(
-                    buffer.data() + (h * cWidth),
-                    data.data_ + (h * data.width_ * colorSize + gx + gy),
-                    cWidth);
+                memcpy(buffer.data() + (h * cWidth),
+                       data.data_ + (h * data.width_ * colorSize + gx + gy),
+                       cWidth);
             }
 
             AddData(buffer, data.format_);
@@ -146,19 +157,22 @@ bool TextureAtlas::AddTextureToAtlasHelper(const RawTextureData& data) {
     return true;
 }
 
-std::optional<RawTextureData> TextureAtlas::AddTextureToAtlas(std::string file) {
+std::optional<RawTextureData> TextureAtlas::AddTextureToAtlas(
+    std::string file) {
     std::optional<RawTextureData> data;
-    RawTextureData tex{ file };
+    RawTextureData tex{file};
     if (AddTextureToAtlasHelper(tex)) {
-        g_logger.LogInfo("TextureAtlas::AddTextureToAtlas", "Loaded: " + file + " | Size: " + std::to_string(tex.height_) + ", " + std::to_string(tex.width_));
+        g_logger.LogInfo("TextureAtlas::AddTextureToAtlas",
+                         "Loaded: " + file +
+                             " | Size: " + std::to_string(tex.height_) + ", " +
+                             std::to_string(tex.width_));
         data = std::move(tex);
         return data;
     } else {
-        g_logger.LogWarn("TextureAtlas::AddTextureToAtlas", "Unable to load: " + file);
+        g_logger.LogWarn("TextureAtlas::AddTextureToAtlas",
+                         "Unable to load: " + file);
         return data;
     }
 }
 
-size_t TextureAtlas::GetTextureCount() const {
-    return count_;
-}
+size_t TextureAtlas::GetTextureCount() const { return count_; }

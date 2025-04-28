@@ -1,15 +1,15 @@
-#include <iterator>
-#include <cmath>
-
 #include "RenderEngine/ChunkRender/Batch/ChunkBatch.h"
+
+#include <cmath>
+#include <iterator>
+
 #include "RenderEngine/OpenGL/Buffers/BufferStorage.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "Utils/Timer/Timer.h"
 
-ChunkDrawBatch::ChunkDrawBatch(size_t maxSize) : 
-    max_buffer_size_{ maxSize },
-    memory_pool_{ maxSize } {}
-    
+ChunkDrawBatch::ChunkDrawBatch(size_t maxSize)
+    : max_buffer_size_{maxSize}, memory_pool_{maxSize} {}
+
 ChunkDrawBatch::ChunkDrawBatch(ChunkDrawBatch&&) = default;
 ChunkDrawBatch::~ChunkDrawBatch() = default;
 
@@ -36,28 +36,29 @@ void ChunkDrawBatch::SetupBuffers() {
 }
 
 void ChunkDrawBatch::Reset() {
-//    MemoryPool.buffer.ResetBuffer();
+    //    MemoryPool.buffer.ResetBuffer();
     ibo_.ResetBuffer();
     ssbo_.ResetBuffer();
     array_.ResetArray();
     SetupBuffers();
 }
 
-void ChunkDrawBatch::GenDrawCommands(int renderDistance, int verticalRenderDistance) {
-
+void ChunkDrawBatch::GenDrawCommands(int renderDistance,
+                                     int verticalRenderDistance) {
     Timer time;
 
     if (render_list_.size() > draw_commands_.size()) {
         UpdateCommandBufferSize();
     }
 
-    if (!update_commands_)
-        return;
+    if (!update_commands_) return;
 
     frustum_.CalculateFrustum(camera_);
 
-    glm::ivec3 position(floor(camera_->position_.x / 16.f), floor(camera_->position_.y / 16.f), floor(camera_->position_.z / 16.f));
-    
+    glm::ivec3 position(floor(camera_->position_.x / 16.f),
+                        floor(camera_->position_.y / 16.f),
+                        floor(camera_->position_.z / 16.f));
+
     int index = 1;
 
     for (const auto& data : render_list_arr_) {
@@ -74,8 +75,12 @@ void ChunkDrawBatch::GenDrawCommands(int renderDistance, int verticalRenderDista
         float dz2 = deltaZ / (renderDistance * renderDistance);
 
         if (dx2 + dy2 + dz2 < 1.f) {
-            if (frustum_.SphereInFrustum((float)(x << kChunkDimLog2), (float)(y << kChunkDimLog2), (float)(z << kChunkDimLog2), 24.3f)) {
-                draw_commands_[index - 1].set(static_cast<uint32_t>(data.mem_size_ >> 3), 1, static_cast<uint32_t>(data.mem_offset_ >> 3), index);
+            if (frustum_.SphereInFrustum((float)(x << kChunkDimLog2),
+                                         (float)(y << kChunkDimLog2),
+                                         (float)(z << kChunkDimLog2), 24.3f)) {
+                draw_commands_[index - 1].set(
+                    static_cast<uint32_t>(data.mem_size_ >> 3), 1,
+                    static_cast<uint32_t>(data.mem_offset_ >> 3), index);
                 chunk_shader_pos_[(index - 1) * 3 + 0] = x;
                 chunk_shader_pos_[(index - 1) * 3 + 1] = y;
                 chunk_shader_pos_[(index - 1) * 3 + 2] = z;
@@ -85,14 +90,15 @@ void ChunkDrawBatch::GenDrawCommands(int renderDistance, int verticalRenderDista
         }
     }
 
-
     index--;
 
     amount_of_chunks_being_rendered_ = index;
 
-    ssbo_.InsertSubData(0, (amount_of_chunks_being_rendered_ * 3) * sizeof(int), chunk_shader_pos_.data());
-    ibo_.InsertSubData(0, amount_of_chunks_being_rendered_ * sizeof(DrawCommandIndirect), draw_commands_.data());
-
+    ssbo_.InsertSubData(0, (amount_of_chunks_being_rendered_ * 3) * sizeof(int),
+                        chunk_shader_pos_.data());
+    ibo_.InsertSubData(
+        0, amount_of_chunks_being_rendered_ * sizeof(DrawCommandIndirect),
+        draw_commands_.data());
 }
 
 void ChunkDrawBatch::UpdateCommandBufferSize() {
@@ -100,33 +106,39 @@ void ChunkDrawBatch::UpdateCommandBufferSize() {
     chunk_shader_pos_.resize(render_list_.size() * 3);
 }
 
-bool ChunkDrawBatch::AddChunkVertices(const std::vector<uint32_t>& Data, const ChunkPos& pos) {
-    //size_t DataSize = Data.size() * sizeof(uint32_t);
+bool ChunkDrawBatch::AddChunkVertices(const std::vector<uint32_t>& Data,
+                                      const ChunkPos& pos) {
+    // size_t DataSize = Data.size() * sizeof(uint32_t);
 
-    ChunkMemoryPoolOffset memoryPoolBlockData = memory_pool_.AddChunk(Data, pos);
+    ChunkMemoryPoolOffset memoryPoolBlockData =
+        memory_pool_.AddChunk(Data, pos);
 
     if (memoryPoolBlockData.mem_offset_ == ULLONG_MAX) {
         return false;
     }
-    
+
     if (render_list_.contains(memoryPoolBlockData.mem_offset_)) {
         size_t idx = render_list_[memoryPoolBlockData.mem_offset_];
-        render_list_arr_[idx] = memoryPoolBlockData;;
+        render_list_arr_[idx] = memoryPoolBlockData;
+        ;
     } else {
         render_list_[memoryPoolBlockData.mem_offset_] = render_list_arr_.size();
         render_list_arr_.emplace_back(memoryPoolBlockData);
     }
 
     update_commands_ = true;
-//    CommandBuffer.AddDrawCommand(DrawCommandIndirect(memoryPoolBlockData.mem_size_ >> 3, 1, memoryPoolBlockData.mem_offset_ >> 3, 0),x,y,z);
+    //    CommandBuffer.AddDrawCommand(DrawCommandIndirect(memoryPoolBlockData.mem_size_
+    //    >> 3, 1, memoryPoolBlockData.mem_offset_ >> 3, 0),x,y,z);
     return true;
 }
 
 void ChunkDrawBatch::DeleteChunkVertices(const ChunkPos& id) {
     if (memory_pool_.CheckChunk(id)) {
-        ChunkMemoryPoolOffset ChunkMemOffset = memory_pool_.GetChunkMemoryPoolOffset(id);
+        ChunkMemoryPoolOffset ChunkMemOffset =
+            memory_pool_.GetChunkMemoryPoolOffset(id);
         if (ChunkMemOffset.mem_offset_ == std::numeric_limits<size_t>::max()) {
-            g_logger.LogError("ChunkDrawBatch::DeleteChunkVertices", "Failed to delete chunk: " + std::to_string(id));
+            g_logger.LogError("ChunkDrawBatch::DeleteChunkVertices",
+                              "Failed to delete chunk: " + std::to_string(id));
             return;
         }
 
@@ -138,7 +150,6 @@ void ChunkDrawBatch::DeleteChunkVertices(const ChunkPos& id) {
 
         memory_pool_.DeleteChunk(id);
         update_commands_ = true;
-        
     }
 }
 
@@ -161,35 +172,51 @@ void ChunkDrawBatch::Unbind() {
 void ChunkDrawBatch::Draw(Shader* shader) {
     Bind();
     shader->Use();
-    glMultiDrawArraysIndirect(GL_TRIANGLES, (GLvoid*)0, (GLsizei)amount_of_chunks_being_rendered_, 0);
+    glMultiDrawArraysIndirect(GL_TRIANGLES, (GLvoid*)0,
+                              (GLsizei)amount_of_chunks_being_rendered_, 0);
     Unbind();
 }
 
 void ChunkDrawBatch::Defrag(size_t iterations) {
-    size_t fragmentCount = memory_pool_.memory_pool_.GetFreeSpaceFragmentCount();
+    size_t fragmentCount =
+        memory_pool_.memory_pool_.GetFreeSpaceFragmentCount();
     if (fragmentCount == 1) {
         return;
     }
 
     iterations = std::min(iterations, fragmentCount - 1);
 
-    for (int i = 0; i < iterations && memory_pool_.memory_pool_.free_memory_blocks_.size() != 1; ++i) {
-        MemoryManagement::MemoryBlock freeMemoryBlock = memory_pool_.memory_pool_.free_memory_blocks_.begin()->second;
+    for (int i = 0; i < iterations &&
+                    memory_pool_.memory_pool_.free_memory_blocks_.size() != 1;
+         ++i) {
+        MemoryManagement::MemoryBlock freeMemoryBlock =
+            memory_pool_.memory_pool_.free_memory_blocks_.begin()->second;
         size_t freeSpaceOffset = freeMemoryBlock.offset_;
 
-        auto reserve = memory_pool_.memory_pool_.reserved_memory_blocks_.GetIterator(freeMemoryBlock.size_ + freeMemoryBlock.offset_);
+        auto reserve =
+            memory_pool_.memory_pool_.reserved_memory_blocks_.GetIterator(
+                freeMemoryBlock.size_ + freeMemoryBlock.offset_);
         MemoryManagement::MemoryBlock reservedBlock = reserve->second;
 
-        ChunkPos pos = memory_pool_.memory_chunk_offsets_[reservedBlock.offset_];
+        ChunkPos pos =
+            memory_pool_.memory_chunk_offsets_[reservedBlock.offset_];
         DeleteChunkVertices(pos);
 
         ChunkMemoryPoolOffset memoryPoolBlockData;
-        if (abs((int)freeMemoryBlock.offset_ - (int)reservedBlock.offset_) <= (int)reservedBlock.size_) { // If it overlap, use the stagging buffer
-            memory_pool_.buffer_->CopyTo(memory_pool_.stagging_buffer_.get(), reservedBlock.offset_, 0, reservedBlock.size_);
-            memoryPoolBlockData = memory_pool_.AddChunkStaggingBuffer(pos, freeSpaceOffset, reservedBlock.size_);
+        if (abs((int)freeMemoryBlock.offset_ - (int)reservedBlock.offset_) <=
+            (int)reservedBlock
+                .size_) {  // If it overlap, use the stagging buffer
+            memory_pool_.buffer_->CopyTo(memory_pool_.stagging_buffer_.get(),
+                                         reservedBlock.offset_, 0,
+                                         reservedBlock.size_);
+            memoryPoolBlockData = memory_pool_.AddChunkStaggingBuffer(
+                pos, freeSpaceOffset, reservedBlock.size_);
         } else {
-            memory_pool_.buffer_->MoveData(reservedBlock.offset_, freeMemoryBlock.offset_, reservedBlock.size_);
-            memoryPoolBlockData = memory_pool_.AddChunkMove(pos, freeSpaceOffset, reservedBlock.size_);
+            memory_pool_.buffer_->MoveData(reservedBlock.offset_,
+                                           freeMemoryBlock.offset_,
+                                           reservedBlock.size_);
+            memoryPoolBlockData = memory_pool_.AddChunkMove(
+                pos, freeSpaceOffset, reservedBlock.size_);
         }
 
         render_list_[memoryPoolBlockData.mem_offset_] = render_list_arr_.size();

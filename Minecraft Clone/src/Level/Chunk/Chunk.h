@@ -4,11 +4,16 @@
 struct ChunkRawData;
 
 enum TerrainType {
-    SUPERFLAT, FASTTERRAIN, MOUNTAINS, DEBUG_WORLD, MATH_WORLD, DEBUG_WORLD_2
+    SUPERFLAT,
+    FASTTERRAIN,
+    MOUNTAINS,
+    DEBUG_WORLD,
+    MATH_WORLD,
+    DEBUG_WORLD_2
 };
 
 class Chunk : public ChunkContainer {
-public:
+   public:
     Chunk();
     Chunk(const ChunkRawData&);
     ~Chunk();

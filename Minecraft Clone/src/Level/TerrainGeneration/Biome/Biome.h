@@ -7,7 +7,7 @@
 #include "Level/TerrainGeneration/Noisemaps/TerrainParameters.h"
 
 class Biome {
-private:
+   private:
     std::string biomeName = "";
     std::string baseBiome = "";
     float baseHeight = 0.1F;
@@ -17,7 +17,8 @@ private:
     int waterColor = 16777215;
     bool enableSnow;
     bool enableRain = true;
-public:
+
+   public:
     BiomeProperties biomeProperties;
 
     static Registry<ResourceLocation, Biome*> REGISTRY;
@@ -29,12 +30,7 @@ public:
     BlockID topBlock = g_blocks.GRASS;
     BlockID fillerBlock = g_blocks.DIRT;
 
-    enum TempCategory {
-        OCEAN,
-        COLD,
-        MEDIUM,
-        WARM
-    };
+    enum TempCategory { OCEAN, COLD, MEDIUM, WARM };
 
     static void Register(int ID, std::string BiomeName, Biome* biome) {
         REGISTRY.Register(ID, ResourceLocation(BiomeName), biome);
@@ -45,9 +41,7 @@ public:
         }
     }
 
-    bool isMutation() {
-        return baseBiome.length() != 0;
-    }
+    bool isMutation() { return baseBiome.length() != 0; }
 
     static int getIdForBiome(Biome* biome) {
         if (!BiomeIDs.count(biome)) {
@@ -60,19 +54,16 @@ public:
         return REGISTRY.GetValue(REGISTRY.GetKey(ID));
     }
 
-    static Biome* getBiome(int id) {
-        return getBiome(id, (Biome*)nullptr);
-    }
+    static Biome* getBiome(int id) { return getBiome(id, (Biome*)nullptr); }
 
     static Biome* getBiome(int biomeId, Biome* fallback) {
         Biome* biome = nullptr;
         try {
             biome = REGISTRY.GetValue(REGISTRY.GetKey(biomeId));
-        }
-        catch (const std::exception& e) {
+        } catch (const std::exception& e) {
             g_logger.LogError("Biome::getBiome", e.what());
         }
-        
+
         return biome == nullptr ? fallback : biome;
     }
 
@@ -85,48 +76,37 @@ public:
     }
 
     virtual Biome::TempCategory getTempCategory() {
-        if ((double)getDefaultTemperature() < 0.2)
-        {
+        if ((double)getDefaultTemperature() < 0.2) {
             return Biome::TempCategory::COLD;
+        } else {
+            return (double)getDefaultTemperature() < 1.0
+                       ? Biome::TempCategory::MEDIUM
+                       : Biome::TempCategory::WARM;
         }
-        else
-        {
-            return (double)getDefaultTemperature() < 1.0 ? Biome::TempCategory::MEDIUM : Biome::TempCategory::WARM;
-        }
     }
 
-    float getDefaultTemperature() {
-        return temperature;
-    }
+    float getDefaultTemperature() { return temperature; }
 
-    bool isSnowyBiome() {
-        return enableSnow;
-    }
+    bool isSnowyBiome() { return enableSnow; }
 
-    float getHeightVariation() {
-        return heightVariation;
-    }
+    float getHeightVariation() { return heightVariation; }
 
-    float getBaseHeight() {
-        return baseHeight;
-    }
+    float getBaseHeight() { return baseHeight; }
 
-    float getTemperature(glm::ivec3 pos)
-    {
-        if (pos.y > 64)
-        {
-            float f = (float)(TEMPERATURE_NOISE.getValue((double)((float)pos.x / 8.0F), (double)((float)pos.z / 8.0F)) * 4.0);
-            return getDefaultTemperature() - (f + (float)pos.y - 64.0F) * 0.05F / 30.0F;
-        }
-        else
-        {
+    float getTemperature(glm::ivec3 pos) {
+        if (pos.y > 64) {
+            float f = (float)(TEMPERATURE_NOISE.getValue(
+                                  (double)((float)pos.x / 8.0F),
+                                  (double)((float)pos.z / 8.0F)) *
+                              4.0);
+            return getDefaultTemperature() -
+                   (f + (float)pos.y - 64.0F) * 0.05F / 30.0F;
+        } else {
             return getDefaultTemperature();
         }
     }
 
-    Biome() {
-
-    }
+    Biome() {}
 
     Biome(BiomeProperties p) {
         biomeProperties = p;
@@ -141,30 +121,32 @@ public:
         enableRain = p.enableRain;
     }
 
-    virtual ~Biome() {
-
-    }
+    virtual ~Biome() {}
 
     virtual const std::type_info& getBiomeClass() const {
         return typeid(*this);
     }
 
-    virtual void GenTerrainBlocks(JavaRandom& rand, TallChunk* chunk, int x, int z, double noiseVal, ChunkGeneratorSettings* settings_) {
+    virtual void GenTerrainBlocks(JavaRandom& rand, TallChunk* chunk, int x,
+                                  int z, double noiseVal,
+                                  ChunkGeneratorSettings* settings_) {
         generateBiomeTerrain(rand, chunk, x, z, noiseVal, settings_);
     }
 
-    void SetBlockChunkSafe(TallChunk* chunk, BlockID block, int x, int y, int z) {
+    void SetBlockChunkSafe(TallChunk* chunk, BlockID block, int x, int y,
+                           int z) {
         if ((x | (y >> 4) | z) >> 4) return;
         chunk->SetBlockUnsafe(x, y, z, block);
     }
 
     BlockID GetBlockChunkSafe(TallChunk* chunk, int x, int y, int z) {
         if ((x | (y >> 4) | z) >> 4) return g_blocks.AIR;
-        return chunk->GetBlockUnsafe( x, y, z);
+        return chunk->GetBlockUnsafe(x, y, z);
     }
 
-    void generateBiomeTerrain(JavaRandom& rand, TallChunk* chunk, int x, int z, double noiseVal, ChunkGeneratorSettings* settings_) {
-
+    void generateBiomeTerrain(JavaRandom& rand, TallChunk* chunk, int x, int z,
+                              double noiseVal,
+                              ChunkGeneratorSettings* settings_) {
         int i = settings_->seaLevel;
         BlockID iblockstate = topBlock;
         BlockID iblockstate1 = fillerBlock;
@@ -173,71 +155,48 @@ public:
         int l = x & 15;
         int i1 = z & 15;
 
-        for (int j1 = 255; j1 >= 0; --j1)
-        {
-            if (j1 <= rand.NextInt(5))
-            {
+        for (int j1 = 255; j1 >= 0; --j1) {
+            if (j1 <= rand.NextInt(5)) {
                 chunk->SetBlockUnsafe(i1, j1, l, g_blocks.BEDROCK);
-            }
-            else
-            {
+            } else {
                 BlockID iblockstate2 = chunk->GetBlockUnsafe(i1, j1, l);
 
-                if (iblockstate2 == g_blocks.AIR)
-                {
+                if (iblockstate2 == g_blocks.AIR) {
                     j = -1;
-                }
-                else if (iblockstate2 == g_blocks.STONE)
-                {
-                    if (j == -1)
-                    {
-                        if (k <= 0)
-                        {
+                } else if (iblockstate2 == g_blocks.STONE) {
+                    if (j == -1) {
+                        if (k <= 0) {
                             iblockstate = g_blocks.AIR;
                             iblockstate1 = g_blocks.STONE;
-                        }
-                        else if (j1 >= i - 4 && j1 <= i + 1)
-                        {
+                        } else if (j1 >= i - 4 && j1 <= i + 1) {
                             iblockstate = topBlock;
                             iblockstate1 = fillerBlock;
                         }
 
-                        if (j1 < i && (iblockstate == g_blocks.AIR))
-                        {
-                            if (getTemperature(glm::ivec3(x, j1, z)) < 0.15F)
-                            {
+                        if (j1 < i && (iblockstate == g_blocks.AIR)) {
+                            if (getTemperature(glm::ivec3(x, j1, z)) < 0.15F) {
                                 iblockstate = g_blocks.ICE;
-                            }
-                            else
-                            {
+                            } else {
                                 iblockstate = g_blocks.WATER;
                             }
                         }
 
                         j = k;
 
-                        if (j1 >= i - 1)
-                        {
+                        if (j1 >= i - 1) {
                             chunk->SetBlockUnsafe(i1, j1, l, iblockstate);
-                        }
-                        else if (j1 < i - 7 - k)
-                        {
+                        } else if (j1 < i - 7 - k) {
                             iblockstate = g_blocks.AIR;
                             iblockstate1 = g_blocks.STONE;
                             chunk->SetBlockUnsafe(i1, j1, l, g_blocks.GRAVEL);
-                        }
-                        else
-                        {
+                        } else {
                             chunk->SetBlockUnsafe(i1, j1, l, iblockstate1);
                         }
-                    }
-                    else if (j > 0)
-                    {
+                    } else if (j > 0) {
                         --j;
                         chunk->SetBlockUnsafe(i1, j1, l, iblockstate1);
 
-                        if (j == 0 && iblockstate1 == g_blocks.SAND && k > 1)
-                        {
+                        if (j == 0 && iblockstate1 == g_blocks.SAND && k > 1) {
                             j = rand.NextInt(4) + std::max(0, j1 - 63);
                             iblockstate1 = g_blocks.RED_SAND;
                         }
@@ -246,6 +205,4 @@ public:
             }
         }
     }
-
 };
-

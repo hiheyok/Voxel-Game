@@ -1,6 +1,6 @@
 #pragma once
-#include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 
 #include "Core/Typenames.h"
 
@@ -21,7 +21,7 @@ struct EntityProperty {
     bool is_chunk_loader_ = false;
 
     EntityUUID entity_uuid_ = 0;
-    EntityTypeID type_ = 0; //State what type of entity is it. Zombie? Human??
+    EntityTypeID type_ = 0;  // State what type of entity is it. Zombie? Human??
 
     bool operator==(const EntityProperty& other) {
         return entity_uuid_ == other.entity_uuid_;
@@ -29,11 +29,11 @@ struct EntityProperty {
 };
 
 namespace std {
-    template <>
-    struct hash<EntityProperty> {
-        size_t operator ()(const EntityProperty& e) const {
-            return hash<EntityUUID>{}(e.entity_uuid_);
-        }
-    };
-    
-}
+template <>
+struct hash<EntityProperty> {
+    size_t operator()(const EntityProperty& e) const {
+        return hash<EntityUUID>{}(e.entity_uuid_);
+    }
+};
+
+}  // namespace std

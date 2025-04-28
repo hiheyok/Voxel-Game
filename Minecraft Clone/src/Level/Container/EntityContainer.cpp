@@ -1,4 +1,5 @@
 #include "Level/Container/EntityContainer.h"
+
 #include "Level/Entity/Entity.h"
 #include "Level/Entity/Properties/EntityProperties.h"
 
@@ -15,12 +16,10 @@ EntityUUID EntityContainer::AddEntity(std::unique_ptr<Entity> e) {
     return unique_id_ - 1;
 }
 
-int EntityContainer::GetEntityCount() const {
-    return entity_count_;
-}
+int EntityContainer::GetEntityCount() const { return entity_count_; }
 
 std::vector<EntityProperty> EntityContainer::GetSpawnedEntities() {
-    std::lock_guard<std::mutex> lock{ entity_lock_ };
+    std::lock_guard<std::mutex> lock{entity_lock_};
     std::vector<EntityProperty> out;
 
     for (const auto& entity : spawned_entity_) {
@@ -30,8 +29,10 @@ std::vector<EntityProperty> EntityContainer::GetSpawnedEntities() {
     return out;
 }
 
-std::vector<EntityProperty> EntityContainer::GetUpdatedEntities() { //change this to past on a vector later
-    std::lock_guard<std::mutex> lock{ entity_lock_ };
+std::vector<EntityProperty>
+EntityContainer::GetUpdatedEntities() {  // change this to past on a vector
+                                         // later
+    std::lock_guard<std::mutex> lock{entity_lock_};
     std::vector<EntityProperty> out;
     out.reserve(entities_idx_.size());
 
@@ -46,28 +47,27 @@ std::vector<EntityProperty> EntityContainer::GetUpdatedEntities() { //change thi
 }
 
 std::vector<EntityUUID> EntityContainer::GetRemovedEntities() {
-    std::lock_guard<std::mutex> lock{ entity_lock_ };
+    std::lock_guard<std::mutex> lock{entity_lock_};
     std::vector<EntityUUID> out(removed_entity_.begin(), removed_entity_.end());
     removed_entity_.clear();
     return out;
 }
 
-
 void EntityContainer::RemoveEntity(EntityUUID entityId) {
     auto it = entities_idx_.find(entityId);
     if (it == entities_idx_.end()) {
-        g_logger.LogError("EntityContainer::RemoveEntity", "Tried to remove entity that doesn't exist!");
+        g_logger.LogError("EntityContainer::RemoveEntity",
+                          "Tried to remove entity that doesn't exist!");
     }
     size_t removeIdx = it->second;
     entities_idx_[entities_.back()->properties_.entity_uuid_] = removeIdx;
     std::swap(entities_.back(), entities_[removeIdx]);
     entities_idx_.erase(it);
     entities_.pop_back();
-    std::lock_guard<std::mutex> lock{ entity_lock_ };
+    std::lock_guard<std::mutex> lock{entity_lock_};
     removed_entity_.emplace(entityId);
     entity_count_--;
 }
-
 
 Entity* EntityContainer::GetEntity(EntityUUID entityId) const {
     const auto& it = entities_idx_.find(entityId);

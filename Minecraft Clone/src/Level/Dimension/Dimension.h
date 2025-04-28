@@ -1,13 +1,13 @@
 #pragma once
-#include "Level/Dimension/DimensionProperties.h"
+#include "Core/Options/Option.h"
 #include "Level/Container/EntityContainer.h"
-#include "Level/Event/EventSystem.h"
+#include "Level/Dimension/DimensionProperties.h"
 #include "Level/Event/EventHandler.h"
+#include "Level/Event/EventSystem.h"
 #include "Level/TerrainGeneration/ChunkGenerator.h"
 #include "Level/TerrainGeneration/Generators/GeneratorType.h"
 #include "Level/World/World.h"
 #include "Level/World/WorldParameters.h"
-#include "Core/Options/Option.h"
 
 class WorldInterface;
 class CollusionDetector;
@@ -16,11 +16,12 @@ class ChunkGenerator;
 class LightEngine;
 
 class Dimension {
-public:
+   public:
     EventSystem event_manager_;
-    const int tick_rate_ = 20; //TODO: tmp fix
+    const int tick_rate_ = 20;  // TODO: tmp fix
 
-    Dimension(DimensionProperties properties, WorldGeneratorID generatorTypeIn = g_generators.DEBUG);
+    Dimension(DimensionProperties properties,
+              WorldGeneratorID generatorTypeIn = g_generators.DEBUG);
     virtual ~Dimension();
 
     virtual void Tick() = 0;
@@ -34,7 +35,8 @@ public:
     WorldInterface* world_;
     std::unique_ptr<WorldUpdater> world_updater_;
     std::unique_ptr<CollusionDetector> collusion_detector_;
-private:
+
+   private:
     std::unique_ptr<World> main_world_;
     std::unique_ptr<ChunkGenerator> chunk_generator_;
     std::unique_ptr<LightEngine> light_engine_;

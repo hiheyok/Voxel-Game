@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
-#include <vector>
 #include <string>
+#include <vector>
 
 class GUISet;
 class Shader;
@@ -10,7 +10,7 @@ class Window;
 struct GLFWwindow;
 
 class GUI {
-public:
+   public:
     GUI(Window* win);
     GUI(const GUI&) = delete;
     GUI(GUI&&);
@@ -21,7 +21,7 @@ public:
     void PrepareRenderer();
     void Render();
 
-private:
+   private:
     void SetupDrawCalls();
     void Update();
 

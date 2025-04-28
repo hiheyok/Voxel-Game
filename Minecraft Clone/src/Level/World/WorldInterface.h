@@ -13,7 +13,7 @@ struct Entity;
 
 // Allows for read only
 class WorldInterface {
-public:
+   public:
     WorldInterface();
     virtual ~WorldInterface();
 
@@ -27,7 +27,8 @@ public:
     EntityContainer* GetEntityContainer() const;
 
     WorldParameters parameters;
-protected:
+
+   protected:
     std::unique_ptr<EntityContainer> entities_;
     std::unique_ptr<ChunkMap> chunks_;
 };

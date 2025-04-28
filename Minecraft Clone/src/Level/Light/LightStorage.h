@@ -3,8 +3,8 @@
 
 #include "Core/Typenames.h"
 
-class LightStorage { //Contains all lighting infomation for solid blocks
-public:
+class LightStorage {  // Contains all lighting infomation for solid blocks
+   public:
     LightStorage();
     LightStorage(const LightStorage&);
     LightStorage(LightStorage&&);
@@ -29,6 +29,7 @@ public:
 
     static const unsigned char kMaxLightLevel = 15;
     ChunkPos position_;
-private:
-    uint64_t data_[256]{}; //x z y
+
+   private:
+    uint64_t data_[256]{};  // x z y
 };

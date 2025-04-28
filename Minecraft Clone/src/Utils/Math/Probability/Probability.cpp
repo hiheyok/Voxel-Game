@@ -1,6 +1,6 @@
 #include "Probability.h"
-#include <cstdlib>
 
+#include <cstdlib>
 
 bool TestProbability(double odds) {
     int rng = rand();
@@ -10,5 +10,4 @@ bool TestProbability(double odds) {
     }
 
     return false;
-    
 }

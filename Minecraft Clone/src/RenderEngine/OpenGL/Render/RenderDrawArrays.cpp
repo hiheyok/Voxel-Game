@@ -6,6 +6,4 @@ RenderDrawArrays::RenderDrawArrays(uint32_t draw_type) {
 
 RenderDrawArrays::~RenderDrawArrays() = default;
 
-void RenderDrawArrays::Render() {
-
-}
+void RenderDrawArrays::Render() {}

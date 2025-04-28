@@ -1,29 +1,46 @@
 #include "Level/TerrainGeneration/Noisemaps/MinecraftNoiseGenerator.h"
 
-static constexpr double GRAD_X[16] = { 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, -1.0, 0.0 };
-static constexpr double GRAD_Y[16] = { 1.0, 1.0, -1.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0 };
-static constexpr double GRAD_Z[16] = { 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 0.0, 1.0, 0.0, -1.0 };
-static constexpr double GRAD_2X[16] = { 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, -1.0, 0.0 };
-static constexpr double GRAD_2Z[16] = { 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 0.0, 1.0, 0.0, -1.0 };
+static constexpr double GRAD_X[16] = {1.0, -1.0, 1.0,  -1.0, 1.0, -1.0,
+                                      1.0, -1.0, 0.0,  0.0,  0.0, 0.0,
+                                      1.0, 0.0,  -1.0, 0.0};
+static constexpr double GRAD_Y[16] = {1.0, 1.0,  -1.0, -1.0, 0.0, 0.0,
+                                      0.0, 0.0,  1.0,  -1.0, 1.0, -1.0,
+                                      1.0, -1.0, 1.0,  -1.0};
+static constexpr double GRAD_Z[16] = {0.0,  0.0,  0.0, 0.0, 1.0,  1.0,
+                                      -1.0, -1.0, 1.0, 1.0, -1.0, -1.0,
+                                      0.0,  1.0,  0.0, -1.0};
+static constexpr double GRAD_2X[16] = {1.0, -1.0, 1.0,  -1.0, 1.0, -1.0,
+                                       1.0, -1.0, 0.0,  0.0,  0.0, 0.0,
+                                       1.0, 0.0,  -1.0, 0.0};
+static constexpr double GRAD_2Z[16] = {0.0,  0.0,  0.0, 0.0, 1.0,  1.0,
+                                       -1.0, -1.0, 1.0, 1.0, -1.0, -1.0,
+                                       0.0,  1.0,  0.0, -1.0};
 
-double NoiseGeneratorImproved::lerp(double p_76311_1_, double p_76311_3_, double p_76311_5_) {
+double NoiseGeneratorImproved::lerp(double p_76311_1_, double p_76311_3_,
+                                    double p_76311_5_) {
     return p_76311_3_ + p_76311_1_ * (p_76311_5_ - p_76311_3_);
 }
 
-double NoiseGeneratorImproved::grad2(int p_76309_1_, double p_76309_2_, double p_76309_4_) {
+double NoiseGeneratorImproved::grad2(int p_76309_1_, double p_76309_2_,
+                                     double p_76309_4_) {
     int i = p_76309_1_ & 15;
     return GRAD_2X[i] * p_76309_2_ + GRAD_2Z[i] * p_76309_4_;
 }
 
-double NoiseGeneratorImproved::grad(int p_76310_1_, double p_76310_2_, double p_76310_4_, double p_76310_6_) {
+double NoiseGeneratorImproved::grad(int p_76310_1_, double p_76310_2_,
+                                    double p_76310_4_, double p_76310_6_) {
     int i = p_76310_1_ & 15;
-    return GRAD_X[i] * p_76310_2_ + GRAD_Y[i] * p_76310_4_ + GRAD_Z[i] * p_76310_6_;
+    return GRAD_X[i] * p_76310_2_ + GRAD_Y[i] * p_76310_4_ +
+           GRAD_Z[i] * p_76310_6_;
 }
 
 /**
  * noiseArray should be xSize*ySize*zSize in size
  */
-void NoiseGeneratorImproved::populateNoiseArray(std::vector<double>& noiseArray, double xOffset, double yOffset, double zOffset, int xSize, int ySize, int zSize, double xScale, double yScale, double zScale, double noiseScale) {
+void NoiseGeneratorImproved::populateNoiseArray(
+    std::vector<double>& noiseArray, double xOffset, double yOffset,
+    double zOffset, int xSize, int ySize, int zSize, double xScale,
+    double yScale, double zScale, double noiseScale) {
     if (ySize == 1) {
         int i5 = 0;
         int j5 = 0;
@@ -56,13 +73,17 @@ void NoiseGeneratorImproved::populateNoiseArray(std::vector<double>& noiseArray,
 
                 int l6 = k6 & 255;
                 d19 = d19 - (double)k6;
-                double d20 = d19 * d19 * d19 * (d19 * (d19 * 6.0 - 15.0) + 10.0);
+                double d20 =
+                    d19 * d19 * d19 * (d19 * (d19 * 6.0 - 15.0) + 10.0);
                 i5 = permutations[k2] + 0;
                 j5 = permutations[i5] + l6;
                 j = permutations[k2 + 1] + 0;
                 k5 = permutations[j] + l6;
-                d14 = lerp(d18, grad2(permutations[j5], d17, d19), grad(permutations[k5], d17 - 1.0, 0.0, d19));
-                d15 = lerp(d18, grad(permutations[j5 + 1], d17, 0.0, d19 - 1.0), grad(permutations[k5 + 1], d17 - 1.0, 0.0, d19 - 1.0));
+                d14 = lerp(d18, grad2(permutations[j5], d17, d19),
+                           grad(permutations[k5], d17 - 1.0, 0.0, d19));
+                d15 =
+                    lerp(d18, grad(permutations[j5 + 1], d17, 0.0, d19 - 1.0),
+                         grad(permutations[k5 + 1], d17 - 1.0, 0.0, d19 - 1.0));
                 double d21 = lerp(d20, d14, d15);
                 int i7 = l5++;
                 noiseArray[i7] += d21 * d16;
@@ -127,10 +148,19 @@ void NoiseGeneratorImproved::populateNoiseArray(std::vector<double>& noiseArray,
                         k1 = permutations[j3 + 1] + l4;
                         l1 = permutations[k1] + i4;
                         i2 = permutations[k1 + 1] + i4;
-                        d1 = lerp(d6, grad(permutations[i1], d5, d9, d7), grad(permutations[l1], d5 - 1.0, d9, d7));
-                        d2 = lerp(d6, grad(permutations[j1], d5, d9 - 1.0, d7), grad(permutations[i2], d5 - 1.0, d9 - 1.0, d7));
-                        d3 = lerp(d6, grad(permutations[i1 + 1], d5, d9, d7 - 1.0), grad(permutations[l1 + 1], d5 - 1.0, d9, d7 - 1.0));
-                        d4 = lerp(d6, grad(permutations[j1 + 1], d5, d9 - 1.0, d7 - 1.0), grad(permutations[i2 + 1], d5 - 1.0, d9 - 1.0, d7 - 1.0));
+                        d1 = lerp(d6, grad(permutations[i1], d5, d9, d7),
+                                  grad(permutations[l1], d5 - 1.0, d9, d7));
+                        d2 = lerp(
+                            d6, grad(permutations[j1], d5, d9 - 1.0, d7),
+                            grad(permutations[i2], d5 - 1.0, d9 - 1.0, d7));
+                        d3 = lerp(
+                            d6, grad(permutations[i1 + 1], d5, d9, d7 - 1.0),
+                            grad(permutations[l1 + 1], d5 - 1.0, d9, d7 - 1.0));
+                        d4 = lerp(
+                            d6,
+                            grad(permutations[j1 + 1], d5, d9 - 1.0, d7 - 1.0),
+                            grad(permutations[i2 + 1], d5 - 1.0, d9 - 1.0,
+                                 d7 - 1.0));
                     }
 
                     double d11 = lerp(d10, d1, d2);

@@ -7,10 +7,8 @@
 // TODO: Fix me later
 
 class WorldGenerator {
-public:
-    WorldGenerator() {
-
-    }
+   public:
+    WorldGenerator() {}
 
     static void SetSeed(long long worldSeedIn) {
         WorldGenerator::world_seed_ = worldSeedIn;
@@ -22,7 +20,8 @@ public:
         g_logger.LogError("WorldGenerator::Generate", "Don't use");
     }
     // TODO: Use custom tall chunk positioning
-    virtual void GenerateTall(const ChunkPos& pos, std::unique_ptr<TallChunk>& chunk) {
+    virtual void GenerateTall(const ChunkPos& pos,
+                              std::unique_ptr<TallChunk>& chunk) {
         (void)pos;
         (void)chunk;
         g_logger.LogError("WorldGenerator::GenerateTall", "Don't use");

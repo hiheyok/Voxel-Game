@@ -1,6 +1,7 @@
-#include <memory>
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
+
+#include <memory>
 
 #include "RenderEngine/OpenGL/Shader/ShaderInterface.h"
 
@@ -10,7 +11,7 @@ Cannot be copied
 */
 
 class RenderObject {
-public:
+   public:
     RenderObject() noexcept;
     RenderObject(RenderObject&&) noexcept;
     RenderObject& operator=(RenderObject&&) noexcept;
@@ -26,7 +27,8 @@ public:
 
     // Use to configure shader before rendering
     ShaderInterface& GetShader();
-protected:
+
+   protected:
     static constexpr size_t GetDataTypeSize(uint32_t data_type) {
         switch (data_type) {
             case GL_BYTE:
@@ -53,7 +55,7 @@ protected:
                 throw std::runtime_error("Invalid datatype");
         }
     }
-private:
-    std::unique_ptr<ShaderInterface> shader_;
 
+   private:
+    std::unique_ptr<ShaderInterface> shader_;
 };

@@ -1,13 +1,14 @@
 #pragma once
-#include "Level/TerrainGeneration/Generators/Generator.h"
 #include <memory>
+
+#include "Level/TerrainGeneration/Generators/Generator.h"
 
 class FastNoiseLite;
 
 class FastTerrain : public WorldGenerator {
-public:
+   public:
     FastTerrain();
-    
+
     void Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) override;
 
     std::unique_ptr<FastNoiseLite> noise_;

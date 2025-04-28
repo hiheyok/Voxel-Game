@@ -1,13 +1,14 @@
 #pragma once
-#include "Level/Entity/Properties/EntityProperties.h"
 #include "Core/Typenames.h"
+#include "Level/Entity/Properties/EntityProperties.h"
 
 class Dimension;
 
-struct Entity  {
+struct Entity {
     Entity();
 
-    EntityProperty properties_; //Provide properties such as position, acceleration, etc.
+    EntityProperty
+        properties_;  // Provide properties such as position, acceleration, etc.
 
     bool is_dirty_ = true;
 

@@ -1,14 +1,15 @@
 #include "Core/Options/Option.h"
+
 #include "FileManager/Files.h"
 #include "Utils/LogUtils.h"
 
 Options::Options() {
     SetOptionNameTable();
 
-    //Set values from option file
+    // Set values from option file
     if (!FileManager::CheckFile("options.txt")) {
         GenerateOptionFile();
-        return; //check if option file exist
+        return;  // check if option file exist
     }
 
     File file = FileManager::GetFile("options.txt");
@@ -41,7 +42,7 @@ void Options::ProcessTokens(std::vector<std::string> tokens) {
             success = false;
         }
     }
-    //Regenerate file if it has an error in it
+    // Regenerate file if it has an error in it
     if (!success) {
         FileManager::DeleteFile("options.txt");
         GenerateOptionFile();
@@ -59,7 +60,7 @@ void Options::SetOptionNameTable() {
     option_name_["LightEngineThreads"] = &light_engine_threads_;
 }
 
-void Options::GenerateOptionFile() { //Generate file if deleted
+void Options::GenerateOptionFile() {  // Generate file if deleted
     FileManager::CreateFile("options.txt");
 
     std::ofstream file("options.txt");

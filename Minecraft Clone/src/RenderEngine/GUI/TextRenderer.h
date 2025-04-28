@@ -15,7 +15,7 @@ struct GLFWwindow;
 
 // TODO: Rename
 class TextRenderer {
-public:
+   public:
     TextRenderer();
     ~TextRenderer();
 
@@ -32,7 +32,8 @@ public:
     void Prepare();
 
     void RenderFont();
-private:
+
+   private:
     FastHashMap<std::string, RenderableFont> font_map_;
     std::unique_ptr<Shader> font_shader_, background_shader_;
     std::unique_ptr<Buffer> vbo_, background_vbo_;
@@ -42,7 +43,7 @@ private:
 
     std::vector<float> vertices_ = {};
     std::vector<float> vertices_background_ = {};
-    
+
     size_t vertices_count_ = 0;
     size_t background_vert_count_ = 0;
 };

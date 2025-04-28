@@ -8,7 +8,7 @@ class Region;
 #include "Core/Typenames.h"
 
 class ChunkMap {
-public:
+   public:
     ChunkMap(bool neighborUpdate = false, bool heightmapUpdate = false);
     ~ChunkMap();
 
@@ -20,7 +20,8 @@ public:
     void EraseChunk(const ChunkPos& pos);
     Chunk* GetChunk(const ChunkPos& pos) const;
     std::vector<Chunk*> GetAllChunks() const;
-private:
+
+   private:
     Region* GetRegion(const RegionPos& pos) const;
     Region* GetRegionUncheck(const RegionPos& pos) const;
     bool CheckRegion(const RegionPos& pos, bool checkCache = true) const;

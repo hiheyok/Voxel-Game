@@ -1,7 +1,7 @@
 #pragma once
-#include <vector>
-#include <string>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "Core/Typenames.h"
 
@@ -21,7 +21,7 @@ struct BlockProperties {
 };
 
 class Block {
-public:
+   public:
     Block();
     ~Block();
 
@@ -30,7 +30,6 @@ public:
     // For client side
     virtual void InitializeBlockModel(ModelLoader& modelLoader);
     void InitializeTexture(BlockTextureAtlas& textureAtlas);
-
 
     BlockID id_ = 0;
     std::unique_ptr<BlockModel> block_model_data_;

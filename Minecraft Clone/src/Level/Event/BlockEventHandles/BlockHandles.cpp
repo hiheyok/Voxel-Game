@@ -1,23 +1,26 @@
 #include "Level/Event/BlockEventHandles/BlockHandles.h"
-#include "Level/Event/EventHandler.h"
+
+#include <iostream>
+
 #include "Level/Block/Block.h"
 #include "Level/Block/Type/Dirt.h"
 #include "Level/Dimension/Dimension.h"
-#include "Level/World/WorldUpdater.h"
+#include "Level/Event/EventHandler.h"
 #include "Level/World/WorldInterface.h"
-
-#include <iostream>
+#include "Level/World/WorldUpdater.h"
 
 void UpdateSurrounding(const BlockEvent& blockEvent, Dimension* dimension) {
     for (const auto& offset : Directions<BlockPos>()) {
         BlockPos new_pos = blockEvent.pos_ + offset;
         BlockID block = dimension->world_->GetBlock(new_pos);
 
-        BlockEvent tickNeighbor{ new_pos, block, g_event_handler.BlockTick };
+        BlockEvent tickNeighbor{new_pos, block, g_event_handler.BlockTick};
         dimension->event_manager_.AddEvent(tickNeighbor);
     }
 
-    BlockEvent tickMain{ blockEvent.pos_, dimension->world_->GetBlock(blockEvent.pos_), g_event_handler.BlockTick};
+    BlockEvent tickMain{blockEvent.pos_,
+                        dimension->world_->GetBlock(blockEvent.pos_),
+                        g_event_handler.BlockTick};
     dimension->event_manager_.AddEvent(tickMain);
 }
 

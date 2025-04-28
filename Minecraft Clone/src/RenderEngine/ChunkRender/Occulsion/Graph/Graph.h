@@ -8,28 +8,17 @@ struct Node {
     Node* edge_;
 };
 
-template <class T> 
+template <class T>
 class Graph {
-
-private:
+   private:
     std::list<Node> nodes_;
-public:
 
-    void InsertVertex(T* vertex) {
+   public:
+    void InsertVertex(T* vertex) {}
 
-    }
+    void InsertEdge(T* vertex0, T* vertex1) {}
 
-    void InsertEdge(T* vertex0, T* vertex1) {
+    void DeleteEdge() {}
 
-    }
-
-    void DeleteEdge() {
-
-    }
-
-    void DeleteVertex(T* vertex) {
-
-    }
-
-
+    void DeleteVertex(T* vertex) {}
 };

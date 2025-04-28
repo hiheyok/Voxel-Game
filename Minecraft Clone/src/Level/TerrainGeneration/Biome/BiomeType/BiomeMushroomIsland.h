@@ -2,7 +2,7 @@
 #include "Level/TerrainGeneration/Biome/Biome.h"
 
 class BiomeMushroomIsland : public Biome {
-public:
+   public:
     BiomeMushroomIsland(BiomeProperties properties) : Biome(properties) {
         topBlock = g_blocks.MYCELIUM;
     }
@@ -10,6 +10,4 @@ public:
     const std::type_info& getBiomeClass() const override {
         return typeid(*this);
     }
-
-    
 };

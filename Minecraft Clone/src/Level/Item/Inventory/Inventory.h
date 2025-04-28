@@ -6,32 +6,26 @@
 #include "Level/Item/ItemStack.h"
 
 class Inventory {
-public:
-
+   public:
     Inventory(int inventorySize = 0x7FFFFFFF) {
-        if (inventorySize == 0x7FFFFFFF)
-            return;
+        if (inventorySize == 0x7FFFFFFF) return;
         Initialize(inventorySize);
     }
 
-    ~Inventory() {
-        storage_.clear();
-    }
+    ~Inventory() { storage_.clear(); }
 
     ItemStack GetItem(int slot);
 
     void SetSlot(int slot, ItemStack item);
-    
+
     int GetSlotCount();
 
     void ChangeSlotSize(int slotCount);
 
-protected:
+   protected:
     void Initialize(int slotCount);
 
-private:
-    
+   private:
     int num_slots_ = 64;
     std::vector<ItemStack> storage_;
-
 };

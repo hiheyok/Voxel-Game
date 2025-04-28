@@ -1,11 +1,11 @@
 #pragma once
-#include <memory>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <memory>
 
-#include "WorldRenderInfo.h"
-#include "Utils/ThreadPool.h"
 #include "Core/Typenames.h"
+#include "Utils/ThreadPool.h"
+#include "WorldRenderInfo.h"
 
 class TerrainRenderer;
 class ClientCache;
@@ -15,11 +15,11 @@ class PlayerPOV;
 struct GLFWwindow;
 
 namespace Mesh {
-    struct ChunkVertexData;
+struct ChunkVertexData;
 }
 
 class WorldRender : public WorldRenderInfo {
-public:
+   public:
     WorldRender(PlayerPOV* player);
     ~WorldRender();
 
@@ -27,7 +27,8 @@ public:
 
     void LoadChunkToRenderer(ChunkPos chunk);
 
-    void Start(GLFWwindow* window, ClientCache* cache, PerformanceProfiler* profiler);
+    void Start(GLFWwindow* window, ClientCache* cache,
+               PerformanceProfiler* profiler);
 
     void Stop();
 
@@ -37,11 +38,14 @@ public:
 
     std::unique_ptr<TerrainRenderer> renderer_;
     PerformanceProfiler* profiler_;
-private:
+
+   private:
     void LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks);
     std::unique_ptr<Mesh::ChunkVertexData> Worker(const ChunkPos& pos);
-    
-    std::unique_ptr<ThreadPool<ChunkPos, std::unique_ptr<Mesh::ChunkVertexData>>> mesh_thread_pool_;
+
+    std::unique_ptr<
+        ThreadPool<ChunkPos, std::unique_ptr<Mesh::ChunkVertexData>>>
+        mesh_thread_pool_;
     std::vector<std::unique_ptr<Mesh::ChunkVertexData>> mesh_add_queue_;
 
     PlayerPOV* player_;

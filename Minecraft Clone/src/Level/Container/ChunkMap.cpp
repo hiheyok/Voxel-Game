@@ -1,11 +1,13 @@
+#include "Level/Container/ChunkMap.h"
+
 #include <limits>
 
-#include "Level/Container/ChunkMap.h"
-#include "Level/Container/Region.h"
 #include "Level/Chunk/Chunk.h"
 #include "Level/Chunk/ChunkRawData.h"
+#include "Level/Container/Region.h"
 
-ChunkMap::ChunkMap(bool neighborUpdate, bool heightmapUpdate) : neighbor_update_{neighborUpdate}, heightmap_update_ { heightmapUpdate } {};
+ChunkMap::ChunkMap(bool neighborUpdate, bool heightmapUpdate)
+    : neighbor_update_{neighborUpdate}, heightmap_update_{heightmapUpdate} {};
 ChunkMap::~ChunkMap() = default;
 
 void ChunkMap::EraseChunk(const ChunkPos& pos) {
@@ -22,14 +24,15 @@ void ChunkMap::EraseChunk(const ChunkPos& pos) {
 
     // erase chunk from chunks_
     Chunk* swappedChunk = chunks_.back();
-    
+
     int idx = chunks_idx_[pos];
     chunks_idx_[swappedChunk->position_] = idx;
     chunks_idx_.erase(pos);
     std::swap(chunks_[idx], chunks_.back());
     chunks_.pop_back();
 
-    ChunkContainer* bottomChunk = reg->GetChunk(pos)->GetNeighbor(Directions<ChunkPos>::kDown);
+    ChunkContainer* bottomChunk =
+        reg->GetChunk(pos)->GetNeighbor(Directions<ChunkPos>::kDown);
 
     reg->EraseChunk(pos);
 
@@ -42,7 +45,6 @@ void ChunkMap::EraseChunk(const ChunkPos& pos) {
         DeleteRegion(reg_pos);
     }
 }
-
 
 bool ChunkMap::SetBlock(BlockID block, const BlockPos& pos) {
     ChunkPos chunk_pos = pos;
@@ -100,9 +102,7 @@ Chunk* ChunkMap::GetChunk(const ChunkPos& pos) const {
     return reg->GetChunk(pos);
 }
 
-std::vector<Chunk*> ChunkMap::GetAllChunks() const {
-    return chunks_;
-}
+std::vector<Chunk*> ChunkMap::GetAllChunks() const { return chunks_; }
 
 void ChunkMap::InsertChunk(std::unique_ptr<Chunk> chunk) {
     const ChunkPos pos = chunk->position_;
@@ -114,13 +114,15 @@ void ChunkMap::InsertChunk(std::unique_ptr<Chunk> chunk) {
         reg = CreateRegion(reg_pos);
     }
 
-
     for (const auto& offset : Directions<ChunkPos>()) {
         ChunkPos posNeighbor = chunk->position_ + offset;
 
         if (CheckChunk(posNeighbor)) {
-            chunk->SetNeighbor(static_cast<ChunkContainer*>(GetChunk(posNeighbor)), offset);
-            GetChunk(posNeighbor)->SetNeighbor(static_cast<ChunkContainer*>(chunk.get()), !offset);
+            chunk->SetNeighbor(
+                static_cast<ChunkContainer*>(GetChunk(posNeighbor)), offset);
+            GetChunk(posNeighbor)
+                ->SetNeighbor(static_cast<ChunkContainer*>(chunk.get()),
+                              !offset);
             if (neighbor_update_) {
                 GetChunk(posNeighbor)->UpdateGen();
             }
@@ -147,7 +149,7 @@ void ChunkMap::InsertChunk(std::unique_ptr<Chunk> chunk) {
 }
 
 Region* ChunkMap::GetRegion(const RegionPos& pos) const {
-    // First try to find region in the cache 
+    // First try to find region in the cache
     size_t minUsageCount = SIZE_MAX;
     int minIdx = -1;
 
@@ -164,30 +166,31 @@ Region* ChunkMap::GetRegion(const RegionPos& pos) const {
             minIdx = i;
         }
     }
-    
+
     const auto& it = regions_.find(pos);
 
-    if (it == regions_.end()) { // don't the cache because it is not in there
-        g_logger.LogError("ChunkMap::GetRegion", "Tried to get region that doesn't exist!");
+    if (it == regions_.end()) {  // don't the cache because it is not in there
+        g_logger.LogError("ChunkMap::GetRegion",
+                          "Tried to get region that doesn't exist!");
     }
     Region* region = it->second.get();
-    
+
     if (region_cache_.size() <= kRegionCacheSize) {
         region_cache_.emplace_back(pos, region);
         return region;
     }
 
     // Check if the region is less than the min
-    if (minUsageCount < region->GetUsageCount()) { // replace the min with the more used region
-        region_cache_[minIdx] = { pos, region };
+    if (minUsageCount <
+        region->GetUsageCount()) {  // replace the min with the more used region
+        region_cache_[minIdx] = {pos, region};
     }
-    
+
     return region;
 }
 
-
 Region* ChunkMap::GetRegionUncheck(const RegionPos& pos) const {
-    // First try to find region in the cache 
+    // First try to find region in the cache
     size_t minUsageCount = std::numeric_limits<size_t>::max();
     int minIdx = -1;
 
@@ -207,7 +210,7 @@ Region* ChunkMap::GetRegionUncheck(const RegionPos& pos) const {
 
     const auto& it = regions_.find(pos);
 
-    if (it == regions_.end()) { 
+    if (it == regions_.end()) {
         return nullptr;
     }
     Region* region = it->second.get();
@@ -218,8 +221,9 @@ Region* ChunkMap::GetRegionUncheck(const RegionPos& pos) const {
     }
 
     // Check if the region is less than the min
-    if (minUsageCount < region->GetUsageCount()) { // replace the min with the more used region
-        region_cache_[minIdx] = { pos, region };
+    if (minUsageCount <
+        region->GetUsageCount()) {  // replace the min with the more used region
+        region_cache_[minIdx] = {pos, region};
     }
 
     return region;
@@ -257,9 +261,8 @@ bool ChunkMap::CheckRegion(const RegionPos& pos, bool checkCache) const {
         }
 
         if (region->GetUsageCount() > minUsageCount) {
-            region_cache_[minIdx] = { pos, region };
+            region_cache_[minIdx] = {pos, region};
         }
-
 
         return true;
 
@@ -270,7 +273,8 @@ bool ChunkMap::CheckRegion(const RegionPos& pos, bool checkCache) const {
 
 Region* ChunkMap::CreateRegion(const RegionPos& pos) {
     if (CheckRegion(pos)) {
-        g_logger.LogError("ChunkMap::CreateRegion", "Tried to create region when one already exist!");
+        g_logger.LogError("ChunkMap::CreateRegion",
+                          "Tried to create region when one already exist!");
     }
     std::unique_ptr<Region> newRegion = std::make_unique<Region>();
     Region* region = newRegion.get();
@@ -280,7 +284,8 @@ Region* ChunkMap::CreateRegion(const RegionPos& pos) {
 
 void ChunkMap::DeleteRegion(const RegionPos& pos) {
     if (!CheckRegion(pos)) {
-        g_logger.LogError("ChunkMap::DeleteRegion", "Tried to delete region that is already deleted!");
+        g_logger.LogError("ChunkMap::DeleteRegion",
+                          "Tried to delete region that is already deleted!");
     }
     // Tries to delete from cache
     for (int i = 0; i < region_cache_.size(); ++i) {
@@ -293,4 +298,3 @@ void ChunkMap::DeleteRegion(const RegionPos& pos) {
 
     regions_.erase(pos);
 }
-

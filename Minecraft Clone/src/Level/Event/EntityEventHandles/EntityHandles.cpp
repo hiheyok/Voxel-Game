@@ -1,14 +1,16 @@
+#include "Level/Event/EntityEventHandles/EntityHandles.h"
+
 #include <memory>
 
-#include "Level/Event/EntityEventHandles/EntityHandles.h"
-#include "Level/Event/Event.h"
-#include "Level/Entity/Entity.h"
-#include "Level/Entity/Entities.h"
 #include "Level/Block/Block.h"
 #include "Level/Dimension/Dimension.h"
+#include "Level/Entity/Entities.h"
+#include "Level/Entity/Entity.h"
+#include "Level/Event/Event.h"
 #include "Level/World/WorldUpdater.h"
 
-void HandleEntityTick(const EntityEvent& e, Dimension* dimension) { //prob useless
+void HandleEntityTick(const EntityEvent& e,
+                      Dimension* dimension) {  // prob useless
     Entity* entity = dimension->world_->GetEntity(e.entity_type_);
     entity->Tick(dimension);
 }

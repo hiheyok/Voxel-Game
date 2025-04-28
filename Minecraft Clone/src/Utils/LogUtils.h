@@ -1,13 +1,13 @@
 #pragma once
 
-#include <thread>
-#include <deque>
-#include <string>
 #include <chrono>
-#include <mutex>
-#include <fstream>
-#include <cstdarg>
 #include <condition_variable>
+#include <cstdarg>
+#include <deque>
+#include <fstream>
+#include <mutex>
+#include <string>
+#include <thread>
 
 inline constexpr int LOG_TYPE_DEBUG = 0x00;
 inline constexpr int LOG_TYPE_INFO = 0x01;
@@ -24,8 +24,7 @@ struct LogData {
 };
 
 class LogUtils {
-public:
-
+   public:
     LogUtils();
     ~LogUtils();
 
@@ -36,15 +35,18 @@ public:
     void LogWarn(std::string subtype, std::string message);
     void LogInfo(std::string subtype, std::string message);
     void LogDebug(std::string subtype, std::string message);
-    void LogDebugf(std::string subtype, std::string message,...);
+    void LogDebugf(std::string subtype, std::string message, ...);
 
-private:
+   private:
     void MainLogger();
 
     std::string FormatString(std::string in, ...);
-    std::string FormatMessage(std::string severity, long long time, std::string timestamp, std::string subtype, std::string message);
+    std::string FormatMessage(std::string severity, long long time,
+                              std::string timestamp, std::string subtype,
+                              std::string message);
 
-    std::chrono::high_resolution_clock::time_point init_time_ = std::chrono::high_resolution_clock::now();
+    std::chrono::high_resolution_clock::time_point init_time_ =
+        std::chrono::high_resolution_clock::now();
 
     std::thread logging_thread_;
     std::mutex mutex_;

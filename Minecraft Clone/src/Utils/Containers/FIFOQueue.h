@@ -2,7 +2,7 @@
 #include <vector>
 template <class T>
 class FixedFIFOQueue {
-public:
+   public:
     FixedFIFOQueue();
     FixedFIFOQueue(unsigned long long size);
     ~FixedFIFOQueue();
@@ -19,7 +19,8 @@ public:
     bool IsEmpty() const;
     bool IsFull() const;
     bool IsInitialized() const;
-private:
+
+   private:
     T* buffer_ = nullptr;
     bool is_initialized_ = false;
 

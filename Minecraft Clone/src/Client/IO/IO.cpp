@@ -1,6 +1,8 @@
+#include "Client/IO/IO.h"
+
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
-#include "Client/IO/IO.h"
+
 #include "Client/IO/KEY_CODE.h"
 
 void UserInputs::UpdateAllKey() {

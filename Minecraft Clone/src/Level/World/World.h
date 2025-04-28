@@ -2,14 +2,14 @@
 #include <memory>
 
 #include "Level/World/CollusionDetector.h"
-#include "Level/World/WorldParameters.h"
 #include "Level/World/WorldInterface.h"
+#include "Level/World/WorldParameters.h"
 
 class ChunkMap;
 class EntityContainer;
 
 class World : public WorldInterface {
-public:
+   public:
     World();
     ~World();
 

@@ -1,7 +1,8 @@
 #pragma once
+#include <gl/glew.h>
 
 class VertexArray {
-public:
+   public:
     VertexArray();
     ~VertexArray();
 
@@ -14,7 +15,10 @@ public:
     void Bind();
     void Unbind();
     void ResetArray();
-    VertexArray& EnableAttriPTR(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, int subIndex);
-private:
+    VertexArray& EnableAttriPTR(GLuint index, GLint size, GLenum type,
+                                GLboolean normalized, GLsizei stride,
+                                int subIndex);
+
+   private:
     unsigned int array_id_ = 0;
 };

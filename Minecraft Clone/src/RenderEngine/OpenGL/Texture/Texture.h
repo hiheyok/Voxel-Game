@@ -1,12 +1,12 @@
 #pragma once
 
-#include <string>
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <string>
 
 class RawTextureData {
-public:
+   public:
     ~RawTextureData();
     RawTextureData(const std::string& path);
     RawTextureData(RawTextureData&&) noexcept;
@@ -28,7 +28,8 @@ public:
     int height_ = 0;
     int format_ = 0;
     unsigned char* data_ = nullptr;
-private:
+
+   private:
     void AnalyzeTransparency();
 
     std::string image_path_;
@@ -39,7 +40,7 @@ private:
 
 // Abstract class to handle textures
 class Texture {
-public:
+   public:
     Texture();
     Texture(const Texture&) = delete;
     Texture(Texture&&) noexcept;
@@ -47,13 +48,14 @@ public:
 
     Texture& operator=(Texture&&) noexcept;
 
-    void Set(int textureId, size_t height, size_t width); // TODO: tmp function for now
+    void Set(int textureId, size_t height,
+             size_t width);  // TODO: tmp function for now
     GLuint Get() const;
     size_t GetHeight() const;
     size_t GetWidth() const;
     int GetFormat() const;
 
-protected:
+   protected:
     GLuint texture_id_ = 0;
     size_t width_ = 0;
     size_t height_ = 0;

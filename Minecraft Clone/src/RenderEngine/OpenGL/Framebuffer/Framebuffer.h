@@ -1,14 +1,15 @@
 #pragma once
-#include <vector>
-#include <memory>
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <memory>
+#include <vector>
+
 class Shader;
 
-//TODO: Make this a child of texture class ??
+// TODO: Make this a child of texture class ??
 class TexturedFrameBuffer {
-public:
+   public:
     TexturedFrameBuffer();
     ~TexturedFrameBuffer();
 
@@ -33,7 +34,8 @@ public:
     void Render();
 
     GLuint texture_ = 0;
-private:
+
+   private:
     std::unique_ptr<Shader> screen_;
     GLuint fbo_ = 0, rbo_ = 0, shader_id_ = 0;
     GLint sx = 0;

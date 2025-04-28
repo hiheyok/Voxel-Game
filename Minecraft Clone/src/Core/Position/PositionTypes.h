@@ -8,21 +8,21 @@ class ChunkPos;
 class RegionPos;
 class BlockPos;
 
-class RegionPos : public Position<RegionPos>{
-public:
+class RegionPos : public Position<RegionPos> {
+   public:
     using Position<RegionPos>::Position;
 };
 
-class ChunkPos : public Position<ChunkPos>{
-public:
+class ChunkPos : public Position<ChunkPos> {
+   public:
     using Position<ChunkPos>::Position;
 
     operator RegionPos() const noexcept;
     size_t GetIndex() const noexcept;
 };
 
-class BlockPos : public Position<BlockPos>{
-public:
+class BlockPos : public Position<BlockPos> {
+   public:
     using Position<BlockPos>::Position;
 
     operator RegionPos() const noexcept;
@@ -31,6 +31,5 @@ public:
     size_t GetIndex() const noexcept;
     BlockPos GetLocalPos() const noexcept;
 };
-
 
 #endif

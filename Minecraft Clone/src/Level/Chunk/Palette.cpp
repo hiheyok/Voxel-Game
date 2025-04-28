@@ -1,7 +1,10 @@
 #include "Level/Chunk/Palette.h"
 
-Palette::Palette() : current_bit_width_{ kMinBitWidth }, data_{ kChunkSize3D, current_bit_width_ } {
-    palette_entries_.emplace_back(g_blocks.AIR, static_cast<uint16_t>(kChunkSize3D));
+Palette::Palette()
+    : current_bit_width_{kMinBitWidth},
+      data_{kChunkSize3D, current_bit_width_} {
+    palette_entries_.emplace_back(g_blocks.AIR,
+                                  static_cast<uint16_t>(kChunkSize3D));
 }
 
 Palette::~Palette() = default;
@@ -16,7 +19,8 @@ void Palette::Shrink() {
 
     // Repack
 
-    std::vector<std::pair<BlockID, int16_t>> newBlockToPaletteIndex(unique_blocks_count_);
+    std::vector<std::pair<BlockID, int16_t>> newBlockToPaletteIndex(
+        unique_blocks_count_);
     std::vector<PaletteIndex> newPaletteIndex(palette_entries_.size(), 0);
 
     // 2 pointers
@@ -56,12 +60,13 @@ void Palette::Grow() {
 void Palette::Resize() {
     int newBitWidth = GetBitWidth(unique_blocks_count_);
     // Plus 1 to avoid frequent resizing
-    if (newBitWidth == current_bit_width_ || newBitWidth + 1 == current_bit_width_) return;
+    if (newBitWidth == current_bit_width_ ||
+        newBitWidth + 1 == current_bit_width_)
+        return;
 
     if (newBitWidth + 1 < current_bit_width_) {
         Shrink();
-    }
-    else {
+    } else {
         Grow();
     }
 }
@@ -79,17 +84,18 @@ Palette::PaletteIndex Palette::GetOrAddPaletteIndex(BlockID block) {
         }
     }
 
-    //d1++;
+    // d1++;
 
     if (foundZero) {
         palette_entries_[firstZero].first = block;
         return firstZero;
     }
-    //d2++;
+    // d2++;
 
     palette_entries_.emplace_back(block, static_cast<int16_t>(0));
     Resize();
-    PaletteIndex newIndex = static_cast<PaletteIndex>(palette_entries_.size() - 1);
+    PaletteIndex newIndex =
+        static_cast<PaletteIndex>(palette_entries_.size() - 1);
 
     return newIndex;
 }
@@ -101,13 +107,16 @@ BlockID Palette::GetBlock(const BlockPos& pos) const {
 
     PaletteIndex idx = static_cast<PaletteIndex>(data_.Get(pos.GetIndex()));
 
-    if (idx >= palette_entries_.size()) throw std::runtime_error("Palette::GetBlock - Error in getting BlockID");
+    if (idx >= palette_entries_.size())
+        throw std::runtime_error(
+            "Palette::GetBlock - Error in getting BlockID");
 
     return palette_entries_[idx].first;
 }
 
 BlockID Palette::GetBlockUnsafe(const BlockPos& pos) const {
-    PaletteIndex idx = static_cast<PaletteIndex>(data_.GetUnsafe(pos.GetIndex()));
+    PaletteIndex idx =
+        static_cast<PaletteIndex>(data_.GetUnsafe(pos.GetIndex()));
     return palette_entries_[idx].first;
 }
 
@@ -117,10 +126,13 @@ void Palette::SetBlock(BlockID block, const BlockPos& pos) {
     }
 
     // Look at original block
-    PaletteIndex oldPaletteIdx = static_cast<PaletteIndex>(data_.Get(pos.GetIndex()));
+    PaletteIndex oldPaletteIdx =
+        static_cast<PaletteIndex>(data_.Get(pos.GetIndex()));
 
-    if (oldPaletteIdx >= palette_entries_.size() || palette_entries_[oldPaletteIdx].second <= 0) {
-        throw std::runtime_error("Palette::SetBlock - Corrupt old palette index found in data.");
+    if (oldPaletteIdx >= palette_entries_.size() ||
+        palette_entries_[oldPaletteIdx].second <= 0) {
+        throw std::runtime_error(
+            "Palette::SetBlock - Corrupt old palette index found in data.");
     }
 
     BlockID oldBlockId = palette_entries_[oldPaletteIdx].first;
@@ -151,9 +163,13 @@ void Palette::SetBlock(BlockID block, const BlockPos& pos) {
 
 void Palette::SetBlockUnsafe(BlockID block, const BlockPos& pos) {
     // Look at original block
-    PaletteIndex oldPaletteIdx = static_cast<PaletteIndex>(data_.GetUnsafe(pos.GetIndex()));
-    if (oldPaletteIdx >= palette_entries_.size() || palette_entries_[oldPaletteIdx].second <= 0) {
-        throw std::runtime_error("Palette::SetBlockUnsafe - Corrupt old palette index found in data.");
+    PaletteIndex oldPaletteIdx =
+        static_cast<PaletteIndex>(data_.GetUnsafe(pos.GetIndex()));
+    if (oldPaletteIdx >= palette_entries_.size() ||
+        palette_entries_[oldPaletteIdx].second <= 0) {
+        throw std::runtime_error(
+            "Palette::SetBlockUnsafe - Corrupt old palette index found in "
+            "data.");
     }
     BlockID oldBlockId = palette_entries_[oldPaletteIdx].first;
     bool uniqueCountChanged = false;

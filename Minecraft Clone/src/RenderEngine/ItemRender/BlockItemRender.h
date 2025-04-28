@@ -8,13 +8,14 @@ class Camera;
 class Item;
 
 class BlockItemRender {
-public:
+   public:
     BlockItemRender();
     ~BlockItemRender();
 
     void Initialize();
     void RenderBlock(Item item);
-private:
+
+   private:
     std::unique_ptr<VertexArray> vao_;
     std::unique_ptr<Buffer> ebo_, vbo_;
     std::unique_ptr<Shader> shader_;

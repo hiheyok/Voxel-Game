@@ -1,6 +1,6 @@
 #pragma once
-#include "Level/Block/Block.h"
 #include "Core/Typenames.h"
+#include "Level/Block/Block.h"
 
 class Dimension;
 
@@ -10,7 +10,6 @@ struct GrassProperties {
 };
 
 struct GrassBlock : Block {
-
     GrassBlock(double spread_chance, double break_chance);
 
     GrassProperties grass_properties_;

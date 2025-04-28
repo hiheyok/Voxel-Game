@@ -1,11 +1,13 @@
+#include "RenderEngine/OpenGL/Shader/Shader.h"
+
 #include <sstream>
 
-#include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "Utils/LogUtils.h"
 
 Shader::Shader() = default;
 
-Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath) {
+Shader::Shader(const char* vertexPath, const char* fragmentPath,
+               const char* geometryPath) {
     // 1. retrieve the vertex/fragment source code from filePath
     std::string vertexCode = ReadFile(vertexPath);
     std::string fragmentCode = ReadFile(fragmentPath);
@@ -14,11 +16,14 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
     if (geometryPath != nullptr) {
         geometryCode = ReadFile(geometryPath);
     }
-  
-    g_logger.LogDebug("Shader::Init", "Compiling shader: " + std::string(vertexPath) + ", " + std::string(fragmentPath));
+
+    g_logger.LogDebug("Shader::Init",
+                      "Compiling shader: " + std::string(vertexPath) + ", " +
+                          std::string(fragmentPath));
 
     unsigned int vertex = CompileShader(vertexCode, "Vertex", GL_VERTEX_SHADER);
-    unsigned int fragment = CompileShader(fragmentCode, "Fragment", GL_FRAGMENT_SHADER);
+    unsigned int fragment =
+        CompileShader(fragmentCode, "Fragment", GL_FRAGMENT_SHADER);
 
     // if geometry shader is given, compile geometry shader
     unsigned int geometry;

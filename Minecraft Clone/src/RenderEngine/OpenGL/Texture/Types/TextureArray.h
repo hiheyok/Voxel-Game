@@ -1,15 +1,17 @@
 #pragma once
-#include "RenderEngine/OpenGL/Texture/Texture.h"
-#include <vector>
 #include <optional>
+#include <vector>
+
+#include "RenderEngine/OpenGL/Texture/Texture.h"
 
 class TextureArray : public Texture {
-public:
+   public:
     void LoadToGPU();
 
     void SetSize(int width, int height);
 
-    void AddData(std::vector<uint8_t> data, size_t width, size_t height, int format);
+    void AddData(std::vector<uint8_t> data, size_t width, size_t height,
+                 int format);
 
     bool AddTextureToArray(RawTextureData* data);
 
@@ -20,5 +22,4 @@ public:
     std::vector<unsigned char> array_data_;
 
     int layers_ = 0;
-
 };

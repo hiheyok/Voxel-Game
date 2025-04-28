@@ -4,7 +4,8 @@
 
 struct ChunkRawData {
     ChunkRawData();
-    ChunkRawData(const Palette& chunkData, const LightStorage& lightData, const ChunkPos& pos);
+    ChunkRawData(const Palette& chunkData, const LightStorage& lightData,
+                 const ChunkPos& pos);
     ChunkRawData(const ChunkRawData&);
     ChunkRawData(ChunkRawData&&);
     ~ChunkRawData();

@@ -1,7 +1,6 @@
 #include "Utils/Containers/BitStorage.h"
 
-
-void BitStorage3D::Initialize(int x, int y, int z) { //Set Sizes
+void BitStorage3D::Initialize(int x, int y, int z) {  // Set Sizes
     int nBits = x * y * z;
 
     int mapsize = nBits >> 6;
@@ -37,18 +36,14 @@ void BitStorage3D::SetBit(int x, int y, int z) {
     map_[NumIndex] |= (0b1LL << Index);
 }
 
-void BitStorage3D::SetBit(int* pos) {
-    SetBit(pos[0], pos[1], pos[2]);
-}
+void BitStorage3D::SetBit(int* pos) { SetBit(pos[0], pos[1], pos[2]); }
 
 bool BitStorage3D::GetBit(int x, int y, int z) {
-    int index = x * (sy_ * sz_) + y  * (sz_) + z;
+    int index = x * (sy_ * sz_) + y * (sz_) + z;
 
     size_t numIndex = index >> 6;
     size_t bitIndex = index & 0b111111;
     return (map_[numIndex] >> bitIndex) & 0b1;
 }
 
-bool BitStorage3D::GetBit(int* pos) {
-    return GetBit(pos[0], pos[1], pos[2]);
-}
+bool BitStorage3D::GetBit(int* pos) { return GetBit(pos[0], pos[1], pos[2]); }

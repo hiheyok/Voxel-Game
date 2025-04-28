@@ -1,16 +1,16 @@
 #pragma once
 
+#include <direct.h>  // TODO: Look into direct.h later make sure its cpp standard
 #include <sys/stat.h>
-#include <direct.h> // TODO: Look into direct.h later make sure its cpp standard
+
 #include <fstream>
 #include <string>
 #include <vector>
 
 std::vector<std::string> Tokenize(std::string str, char divider);
 
-class File{
-public:
-
+class File {
+   public:
     std::ifstream file_;
     std::string dir_ = "";
 
@@ -25,12 +25,12 @@ public:
 };
 
 class FileManager {
-public:
+   public:
     static bool CheckFolder(const char* dir);
 
     static bool CreateFolder(const char* name);
 
-    //Return true of file exist and false if it doesn't
+    // Return true of file exist and false if it doesn't
     static bool CheckFile(const char* dir);
 
     static bool CheckFile(std::string dir);

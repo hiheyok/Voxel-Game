@@ -3,7 +3,7 @@
 #include "Level/TerrainGeneration/Biome/Biome.h"
 
 class BiomeOcean : public Biome {
-public:
+   public:
     BiomeOcean(BiomeProperties p) : Biome(p) {}
 
     const std::type_info& getBiomeClass() const override {

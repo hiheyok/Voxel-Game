@@ -1,12 +1,12 @@
 #pragma once
-#include <string>
 #include <iostream>
 #include <stack>
+#include <string>
 
 #include "Core/Typenames.h"
 
 class PerformanceProfiler {
-public:
+   public:
     PerformanceProfiler();
 
     void ProfileStart(uint64_t hash);
@@ -33,26 +33,25 @@ public:
     std::vector<std::pair<uint64_t, uint64_t>> time_pass_cache_{};
 
     FastHashMap<uint64_t, std::string> string_hash_container_;
-    FastHashMap<uint64_t, std::vector<std::string>> string_tokenized_hash_container_;
-private:
+    FastHashMap<uint64_t, std::vector<std::string>>
+        string_tokenized_hash_container_;
+
+   private:
     std::stack<std::pair<uint64_t, uint64_t>> timer_stack_;
-    
 
     struct PerformanceTree {
         PerformanceTree();
         PerformanceTree(std::string name);
 
         void ChangeTime(std::vector<std::string>& path, int depth, double time);
-        
+
         void print(int depth = 0) const;
 
         double time_passed_ = 0.0;
         std::string name_ = "";
         std::vector<std::unique_ptr<PerformanceTree>> nodes_{};
-        
     };
 
     PerformanceTree root_{"root"};
     std::chrono::high_resolution_clock::time_point initial_time_;
-
 };

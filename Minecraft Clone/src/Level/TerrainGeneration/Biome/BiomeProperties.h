@@ -1,9 +1,8 @@
 #pragma once
 #include <string>
 class BiomeProperties {
-private:
-    
-public:
+   private:
+   public:
     std::string biomeName = "";
     std::string baseBiome = "";
     float baseHeight = 0.1F;

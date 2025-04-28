@@ -11,7 +11,7 @@ ComputeShader::ComputeShader(std::string source) {
 
     CheckCompileErrors(shader_id_, "PROGRAM");
 
-    glDeleteShader(shader); // Cleanup
+    glDeleteShader(shader);  // Cleanup
 }
 
 void ComputeShader::DispatchCompute(int x, int y, int z) {
@@ -21,8 +21,10 @@ void ComputeShader::DispatchCompute(int x, int y, int z) {
     glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1, &maxWorkGroupCount[1]);
     glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 2, &maxWorkGroupCount[2]);
 
-    if (x > maxWorkGroupCount[0] || y > maxWorkGroupCount[1] || z > maxWorkGroupCount[2]) {
-        g_logger.LogError("ComputeShader::DispatchCompute", "Work group size exceeds hardware limits.");
+    if (x > maxWorkGroupCount[0] || y > maxWorkGroupCount[1] ||
+        z > maxWorkGroupCount[2]) {
+        g_logger.LogError("ComputeShader::DispatchCompute",
+                          "Work group size exceeds hardware limits.");
         return;
     }
 

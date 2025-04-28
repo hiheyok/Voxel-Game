@@ -3,6 +3,7 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <string>
+
 #include "Core/Typenames.h"
 
 #define EAST 0x00
@@ -31,30 +32,32 @@ struct BlockFace {
     BlockFace& operator=(const BlockFace&);
 
     glm::ivec3 normal_ = glm::ivec3(0, 0, 0);
-    std::string reference_texture_ = ""; // variables starts with #
+    std::string reference_texture_ = "";  // variables starts with #
     int cull_face_ = -1;
     int tint_index_ = -1;
     size_t texture_id_ = 0;
-    size_t texture_count_ = 0; //For amination purposes.
+    size_t texture_count_ = 0;  // For amination purposes.
     unsigned int rotation_ = 0;
     bool partially_transparent_pixel_ = false;
     bool fully_transparent_pixel_ = false;
     glm::ivec4 uv_ = glm::ivec4(0, 0, 16, 16);
 
-    glm::ivec2 uv_coord_nn{ 0, 0 };
-    glm::ivec2 uv_coord_np{ 0, 0 };
-    glm::ivec2 uv_coord_pp{ 0, 0 };
-    glm::ivec2 uv_coord_pn{ 0, 0 };
+    glm::ivec2 uv_coord_nn{0, 0};
+    glm::ivec2 uv_coord_np{0, 0};
+    glm::ivec2 uv_coord_pp{0, 0};
+    glm::ivec2 uv_coord_pn{0, 0};
 };
 
-struct BlockDisplay { //Positions {thirdperson_righthand, thirdperson_lefthand, firstperson_righthand, firstperson_lefthand, gui, head, ground, or fixed}
+struct BlockDisplay {  // Positions {thirdperson_righthand,
+                       // thirdperson_lefthand, firstperson_righthand,
+                       // firstperson_lefthand, gui, head, ground, or fixed}
     BlockDisplay();
     ~BlockDisplay();
     BlockDisplay(const BlockDisplay&);
     BlockDisplay(BlockDisplay&&);
     BlockDisplay& operator=(const BlockDisplay&);
 
-    //fixed = item frame
+    // fixed = item frame
     DisplayPosition position_;
     glm::vec3 rotation_ = glm::vec3(0.f, 0.f, 0.f);
     glm::vec3 translation_ = glm::vec3(0.f, 0.f, 0.f);
@@ -68,7 +71,6 @@ struct CuboidRotationInfo {
     CuboidRotationInfo(const CuboidRotationInfo&);
     CuboidRotationInfo(CuboidRotationInfo&&);
     CuboidRotationInfo& operator=(const CuboidRotationInfo&);
-
 
     glm::vec3 origin_ = glm::vec3(0.f, 0.f, 0.f);
     int axis_ = 0;
@@ -87,7 +89,8 @@ struct Cuboid {
     void EditFace(int location, BlockFace f);
 
     glm::ivec3 from_ = glm::ivec3(0, 0, 0);
-    glm::ivec3 to_ = glm::ivec3(16, 16, 16); //Relative inner block position from -16 to 32
+    glm::ivec3 to_ =
+        glm::ivec3(16, 16, 16);  // Relative inner block position from -16 to 32
     BlockFace faces_[6]{};
     CuboidRotationInfo rotation_;
     std::string comments_ = "";
@@ -104,14 +107,14 @@ struct BlockModel {
     void AddDisplay(BlockDisplay display, DisplayPosition position);
     bool CheckDisplay(DisplayPosition position);
     void AddElement(Cuboid element);
-    void GetVertices(std::vector<float>& vertices, std::vector<unsigned int>& indices);
+    void GetVertices(std::vector<float>& vertices,
+                     std::vector<unsigned int>& indices);
     void FlattenVariables();
     void BakeTextureRotation();
 
     std::vector<Cuboid> elements_{};
-    bool ambient_occlusion_ = true; //default value
+    bool ambient_occlusion_ = true;  // default value
     bool is_initialized_ = false;
-    FastHashMap<std::string, std::string > texture_variable_;
+    FastHashMap<std::string, std::string> texture_variable_;
     BlockDisplay display_[8]{};
 };
-

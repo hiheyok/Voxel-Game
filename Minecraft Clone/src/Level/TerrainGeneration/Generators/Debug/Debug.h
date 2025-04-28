@@ -2,7 +2,7 @@
 #include "Level/TerrainGeneration/Generators/Generator.h"
 
 class DebugWorld : public WorldGenerator {
-public:
+   public:
     DebugWorld();
 
     void Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) override;

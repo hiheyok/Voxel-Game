@@ -1,14 +1,15 @@
 #pragma once
-#include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
-#include "Core/Typenames.h"
-
 #include <optional>
+
+#include "Core/Typenames.h"
+#include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
 /*
-* This manages all of the block textures
-*/
+ * This manages all of the block textures
+ */
 class BlockTextureAtlas : public TextureAtlas {
-public:
-    BlockTextureAtlas(int imagesX, int imagesY, int individual_image_x_, int individual_image_y_);
+   public:
+    BlockTextureAtlas(int imagesX, int imagesY, int individual_image_x_,
+                      int individual_image_y_);
     ~BlockTextureAtlas();
 
     // This takes in the RawTextureData and returns the textureID
@@ -17,8 +18,8 @@ public:
     int GetBlockTextureCount(const ResourceLocation&) const;
     bool IsTexturePartiallyTransparent(const ResourceLocation&) const;
     bool IsTextureFullyTransparent(const ResourceLocation&) const;
-private:
 
+   private:
     struct TextureMetadata {
         int texture_id_ = 0;
         int texture_count_ = 0;

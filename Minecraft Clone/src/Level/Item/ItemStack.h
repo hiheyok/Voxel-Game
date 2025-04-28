@@ -2,11 +2,10 @@
 
 #include "Level/Item/Item.h"
 
-class ItemStack { //Contains additional properties of item such as item count enchantments, etc
-public:
-    ItemStack() {
-
-    }
+class ItemStack {  // Contains additional properties of item such as item count
+                   // enchantments, etc
+   public:
+    ItemStack() {}
 
     ItemStack(Item item) {
         item_ = item;
@@ -17,7 +16,7 @@ public:
 
     Item item_;
     int item_count_ = 1;
-private:
-    bool initialized_ = false;
 
+   private:
+    bool initialized_ = false;
 };

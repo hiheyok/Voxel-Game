@@ -1,12 +1,12 @@
 #pragma once
-#include <memory>
-#include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <memory>
 
 class Camera;
 
 class PlayerPOV {
-public:
+   public:
     PlayerPOV();
     ~PlayerPOV();
 
@@ -18,6 +18,7 @@ public:
     void SetFOV(float fov);
 
     Camera* GetCamera();
-private:
+
+   private:
     std::unique_ptr<Camera> camera_;
 };

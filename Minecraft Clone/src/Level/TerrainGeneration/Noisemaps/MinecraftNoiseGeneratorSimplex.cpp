@@ -1,13 +1,17 @@
 #include "MinecraftNoiseGeneratorSimplex.h"
 
-static constexpr int grad3[12][3]{ {1, 1, 0}, { -1, 1, 0}, {1, -1, 0}, { -1, -1, 0}, {1, 0, 1}, { -1, 0, 1}, {1, 0, -1}, { -1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1} };
+static constexpr int grad3[12][3]{
+    {1, 1, 0},  {-1, 1, 0},  {1, -1, 0}, {-1, -1, 0}, {1, 0, 1},  {-1, 0, 1},
+    {1, 0, -1}, {-1, 0, -1}, {0, 1, 1},  {0, -1, 1},  {0, 1, -1}, {0, -1, -1}};
 
 int NoiseGeneratorSimplex::fastFloor(double value) {
     return value > 0.0 ? (int)value : (int)value - 1;
 }
 
-double NoiseGeneratorSimplex::dot(const int p_151604_0_[], double p_151604_1_, double p_151604_3_) {
-    return (double)p_151604_0_[0] * p_151604_1_ + (double)p_151604_0_[1] * p_151604_3_;
+double NoiseGeneratorSimplex::dot(const int p_151604_0_[], double p_151604_1_,
+                                  double p_151604_3_) {
+    return (double)p_151604_0_[0] * p_151604_1_ +
+           (double)p_151604_0_[1] * p_151604_3_;
 }
 
 double NoiseGeneratorSimplex::getValue(double p_151605_1_, double p_151605_3_) {
@@ -27,8 +31,7 @@ double NoiseGeneratorSimplex::getValue(double p_151605_1_, double p_151605_3_) {
     if (d9 > d10) {
         k = 1;
         l = 0;
-    }
-    else {
+    } else {
         k = 0;
         l = 1;
     }
@@ -47,8 +50,7 @@ double NoiseGeneratorSimplex::getValue(double p_151605_1_, double p_151605_3_) {
 
     if (d15 < 0.0) {
         d0 = 0.0;
-    }
-    else {
+    } else {
         d15 = d15 * d15;
         d0 = d15 * d15 * dot(grad3[k1], d9, d10);
     }
@@ -58,8 +60,7 @@ double NoiseGeneratorSimplex::getValue(double p_151605_1_, double p_151605_3_) {
 
     if (d16 < 0.0) {
         d1 = 0.0;
-    }
-    else {
+    } else {
         d16 = d16 * d16;
         d1 = d16 * d16 * dot(grad3[l1], d11, d12);
     }
@@ -69,8 +70,7 @@ double NoiseGeneratorSimplex::getValue(double p_151605_1_, double p_151605_3_) {
 
     if (d17 < 0.0) {
         d2 = 0.0;
-    }
-    else {
+    } else {
         d17 = d17 * d17;
         d2 = d17 * d17 * dot(grad3[i2], d13, d14);
     }
@@ -78,7 +78,11 @@ double NoiseGeneratorSimplex::getValue(double p_151605_1_, double p_151605_3_) {
     return 70.0 * (d0 + d1 + d2);
 }
 
-void NoiseGeneratorSimplex::add(std::vector<double>& p_151606_1_, double p_151606_2_, double p_151606_4_, int p_151606_6_, int p_151606_7_, double p_151606_8_, double p_151606_10_, double p_151606_12_) {
+void NoiseGeneratorSimplex::add(std::vector<double>& p_151606_1_,
+                                double p_151606_2_, double p_151606_4_,
+                                int p_151606_6_, int p_151606_7_,
+                                double p_151606_8_, double p_151606_10_,
+                                double p_151606_12_) {
     int i = 0;
 
     for (int j = 0; j < p_151606_7_; ++j) {
@@ -99,8 +103,7 @@ void NoiseGeneratorSimplex::add(std::vector<double>& p_151606_1_, double p_15160
             if (d9 > d10) {
                 j1 = 1;
                 k1 = 0;
-            }
-            else {
+            } else {
                 j1 = 0;
                 k1 = 1;
             }
@@ -119,8 +122,7 @@ void NoiseGeneratorSimplex::add(std::vector<double>& p_151606_1_, double p_15160
 
             if (d15 < 0.0) {
                 d2 = 0.0;
-            }
-            else {
+            } else {
                 d15 = d15 * d15;
                 d2 = d15 * d15 * dot(grad3[j2], d9, d10);
             }
@@ -130,8 +132,7 @@ void NoiseGeneratorSimplex::add(std::vector<double>& p_151606_1_, double p_15160
 
             if (d16 < 0.0) {
                 d3 = 0.0;
-            }
-            else {
+            } else {
                 d16 = d16 * d16;
                 d3 = d16 * d16 * dot(grad3[k2], d11, d12);
             }
@@ -141,8 +142,7 @@ void NoiseGeneratorSimplex::add(std::vector<double>& p_151606_1_, double p_15160
 
             if (d17 < 0.0) {
                 d4 = 0.0;
-            }
-            else {
+            } else {
                 d17 = d17 * d17;
                 d4 = d17 * d17 * dot(grad3[l2], d13, d14);
             }

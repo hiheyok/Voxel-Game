@@ -13,10 +13,8 @@ class Window;
 
 struct EntityProperty;
 
-
 class MainPlayer {
-public:
-
+   public:
     MainPlayer(Window* window, ServerInterface* server, ClientCache* cache);
     MainPlayer(const MainPlayer&) = delete;
     ~MainPlayer();
@@ -33,8 +31,8 @@ public:
     void RenderGUIs();
 
     std::unique_ptr<Player> player_;
-private:
 
+   private:
     void PrepareGUIs();
     void InventoryUpdate(const UserInputs& inputs);
 

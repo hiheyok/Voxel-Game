@@ -1,13 +1,13 @@
 #pragma once
+#include <glm/vec2.hpp>
+
 #include "Level/Item/Item.h"
-#include "RenderEngine/OpenGL//Texture/Types/Texture2D.h"
-#include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
 #include "RenderEngine/ItemRender/BlockItemRender.h"
+#include "RenderEngine/OpenGL//Texture/Types/Texture2D.h"
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
+#include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
-
-#include <glm/vec2.hpp>
 
 struct ItemUVMapping {
     glm::vec2 uv_1_;
@@ -15,7 +15,7 @@ struct ItemUVMapping {
 };
 
 class ItemTextureAtlas {
-public:
+   public:
     FastHashMap<int, ItemUVMapping> items_uv_map_;
     FastHashMap<ItemID, size_t> offsets_;
 
@@ -26,7 +26,8 @@ public:
     size_t GetWidth() const;
 
     void AddItem(Item item);
-private:
+
+   private:
     void RenderBlockItem(Item item);
     void StitchTexture(size_t index, ItemID ItemID);
 

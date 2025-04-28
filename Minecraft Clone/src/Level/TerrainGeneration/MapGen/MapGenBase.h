@@ -1,24 +1,21 @@
 #pragma once
 #include "Level/Chunk/TallChunk.h"
-#include "Level/TerrainGeneration/Random/JavaRandom.h"
 #include "Level/TerrainGeneration/ChunkGenerator.h"
+#include "Level/TerrainGeneration/Random/JavaRandom.h"
 
 class MapGenBase {
-protected:
+   protected:
     JavaRandom rand = JavaRandom();
     int range = 0;
 
-    void generate(int x, int z, TallChunk* chunk)
-    {
+    void generate(int x, int z, TallChunk* chunk) {
         int i = range;
         rand.SetSeed(WorldGenerator::world_seed_);
         long long j = rand.NextLong();
         long long k = rand.NextLong();
 
-        for (int l = x - i; l <= x + i; ++l)
-        {
-            for (int i1 = z - i; i1 <= z + i; ++i1)
-            {
+        for (int l = x - i; l <= x + i; ++l) {
+            for (int i1 = z - i; i1 <= z + i; ++i1) {
                 long long j1 = (long long)l * j;
                 long long k1 = (long long)i1 * k;
                 rand.SetSeed(j1 ^ k1 ^ WorldGenerator::world_seed_);
@@ -27,8 +24,8 @@ protected:
         }
     }
 
-    static void setupChunkSeed(long long seed, JavaRandom randIn, int p_191068_3_, int p_191068_4_)
-    {
+    static void setupChunkSeed(long long seed, JavaRandom randIn,
+                               int p_191068_3_, int p_191068_4_) {
         randIn.SetSeed(seed);
         long i = randIn.NextLong();
         long j = randIn.NextLong();
@@ -37,7 +34,6 @@ protected:
         randIn.SetSeed(k ^ l ^ seed);
     }
 
-    virtual void recursiveGenerate(int chunkX, int chunkZ, int originalX, int originalZ, TallChunk* chunk)
-    {
-    }
+    virtual void recursiveGenerate(int chunkX, int chunkZ, int originalX,
+                                   int originalZ, TallChunk* chunk) {}
 };

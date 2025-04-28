@@ -1,6 +1,7 @@
 #pragma once
-#include <vector>
 #include <array>
+#include <vector>
+
 #include "Core/Typenames.h"
 /*
 
@@ -10,7 +11,7 @@ heightmap for chunk column 32 * 16 = 512 blocks columns 9 bits per column
 */
 
 class Heightmap {
-public:
+   public:
     Heightmap();
     ~Heightmap();
 
@@ -19,6 +20,7 @@ public:
     int Get(int x, int z) const;
 
     void Clear();
-private:
+
+   private:
     std::array<char, kChunkSize2D> data_;
 };

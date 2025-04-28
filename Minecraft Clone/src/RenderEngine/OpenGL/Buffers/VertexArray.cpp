@@ -1,11 +1,14 @@
+#include "RenderEngine/OpenGL/Buffers/VertexArray.h"
+
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
-#include "RenderEngine/OpenGL/Buffers/VertexArray.h"
+
 #include "Utils/LogUtils.h"
 
 VertexArray::VertexArray() {
     glGenVertexArrays(1, &array_id_);
-    g_logger.LogDebug("VertexArray::GenArray", "Created array. ID: " + std::to_string(array_id_));
+    g_logger.LogDebug("VertexArray::GenArray",
+                      "Created array. ID: " + std::to_string(array_id_));
 }
 
 VertexArray::~VertexArray() {
@@ -24,16 +27,16 @@ VertexArray& VertexArray::operator=(VertexArray&& buffer) noexcept {
     return *this;
 }
 
-void VertexArray::Bind() {
-    glBindVertexArray(array_id_);
-}
+void VertexArray::Bind() { glBindVertexArray(array_id_); }
 
-void VertexArray::Unbind() {
-    glBindVertexArray(0);
-}
+void VertexArray::Unbind() { glBindVertexArray(0); }
 
-VertexArray& VertexArray::EnableAttriPTR(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, int subIndex) {
-    glVertexAttribPointer(index, size, type, normalized, sizeof(GL_FLOAT) * stride, (void*)(subIndex * sizeof(unsigned int)));
+VertexArray& VertexArray::EnableAttriPTR(GLuint index, GLint size, GLenum type,
+                                         GLboolean normalized, GLsizei stride,
+                                         int subIndex) {
+    glVertexAttribPointer(index, size, type, normalized,
+                          sizeof(GL_FLOAT) * stride,
+                          (void*)(subIndex * sizeof(unsigned int)));
     glEnableVertexAttribArray(index);
     return *this;
 }

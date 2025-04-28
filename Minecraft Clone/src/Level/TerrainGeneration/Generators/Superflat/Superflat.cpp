@@ -2,7 +2,8 @@
 
 SuperflatWorld::SuperflatWorld() = default;
 
-void SuperflatWorld::Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) {
+void SuperflatWorld::Generate(const ChunkPos& pos,
+                              std::unique_ptr<Chunk>& chunk) {
     int cy = pos.y * kChunkDim;
     BlockPos block_pos{0, 0, 0};
     for (block_pos.x = 0; block_pos.x < kChunkDim; block_pos.x++) {

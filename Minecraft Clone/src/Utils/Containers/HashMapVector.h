@@ -1,15 +1,15 @@
 #pragma once
-#include "Core/Typenames.h"
-
-#include <vector>
+#include <iterator>
+#include <stdexcept>
 #include <unordered_map>
 #include <utility>
-#include <stdexcept>
-#include <iterator>
+#include <vector>
+
+#include "Core/Typenames.h"
 
 template <class Key, class Val>
 class HashMapVector {
-public:
+   public:
     using value_type = Val;
     using reference = value_type&;
     using const_reference = const value_type&;
@@ -18,39 +18,63 @@ public:
 
     template <bool IsConst>
     class base_iterator {
-    public:
+       public:
         using iterator_category = std::random_access_iterator_tag;
         using value_type = HashMapVector::value_type;
         using difference_type = HashMapVector::difference_type;
 
-        using pointer = typename std::conditional<IsConst, const value_type*, value_type*>::type;
-        using reference = typename std::conditional<IsConst, const value_type&, value_type&>::type;
+        using pointer = typename std::conditional<IsConst, const value_type*,
+                                                  value_type*>::type;
+        using reference = typename std::conditional<IsConst, const value_type&,
+                                                    value_type&>::type;
 
         using internal_iterator_type = typename std::conditional<
-            IsConst,
-            typename std::vector<value_type>::const_iterator,
-            typename std::vector<value_type>::iterator
-        >::type;
+            IsConst, typename std::vector<value_type>::const_iterator,
+            typename std::vector<value_type>::iterator>::type;
 
         base_iterator() = default;
 
         explicit base_iterator(internal_iterator_type it) : current_(it) {}
 
-        template <bool WasConst = IsConst, typename = std::enable_if_t<WasConst>>
-        base_iterator(const base_iterator<false>& other) : current_(other.base()) {}
+        template <bool WasConst = IsConst,
+                  typename = std::enable_if_t<WasConst>>
+        base_iterator(const base_iterator<false>& other)
+            : current_(other.base()) {}
 
         reference operator*() const { return *current_; }
-        pointer operator->() const { return current_.operator->(); } // Or &(*current_)
+        pointer operator->() const {
+            return current_.operator->();
+        }  // Or &(*current_)
 
         reference operator[](difference_type n) const { return current_[n]; }
 
-        base_iterator& operator++() { ++current_; return *this; } // prefix ++
-        base_iterator operator++(int) { base_iterator tmp = *this; ++current_; return tmp; } // postfix ++
-        base_iterator& operator--() { --current_; return *this; } // prefix --
-        base_iterator operator--(int) { base_iterator tmp = *this; --current_; return tmp; } // postfix --
+        base_iterator& operator++() {
+            ++current_;
+            return *this;
+        }  // prefix ++
+        base_iterator operator++(int) {
+            base_iterator tmp = *this;
+            ++current_;
+            return tmp;
+        }  // postfix ++
+        base_iterator& operator--() {
+            --current_;
+            return *this;
+        }  // prefix --
+        base_iterator operator--(int) {
+            base_iterator tmp = *this;
+            --current_;
+            return tmp;
+        }  // postfix --
 
-        base_iterator& operator+=(difference_type n) { current_ += n; return *this; }
-        base_iterator& operator-=(difference_type n) { current_ -= n; return *this; }
+        base_iterator& operator+=(difference_type n) {
+            current_ += n;
+            return *this;
+        }
+        base_iterator& operator-=(difference_type n) {
+            current_ -= n;
+            return *this;
+        }
 
         friend base_iterator operator+(base_iterator lhs, difference_type n) {
             lhs += n;
@@ -64,34 +88,40 @@ public:
             lhs -= n;
             return lhs;
         }
-        friend difference_type operator-(const base_iterator& lhs, const base_iterator& rhs) {
+        friend difference_type operator-(const base_iterator& lhs,
+                                         const base_iterator& rhs) {
             return lhs.current_ - rhs.current_;
         }
 
-        friend bool operator==(const base_iterator& lhs, const base_iterator& rhs) {
+        friend bool operator==(const base_iterator& lhs,
+                               const base_iterator& rhs) {
             return lhs.current_ == rhs.current_;
         }
         // C++20: Define <=> spaceship operator if desired for simplicity
-        friend bool operator!=(const base_iterator& lhs, const base_iterator& rhs) {
+        friend bool operator!=(const base_iterator& lhs,
+                               const base_iterator& rhs) {
             return !(lhs == rhs);
         }
-        friend bool operator<(const base_iterator& lhs, const base_iterator& rhs) {
+        friend bool operator<(const base_iterator& lhs,
+                              const base_iterator& rhs) {
             return lhs.current_ < rhs.current_;
         }
-        friend bool operator>(const base_iterator& lhs, const base_iterator& rhs) {
+        friend bool operator>(const base_iterator& lhs,
+                              const base_iterator& rhs) {
             return rhs < lhs;
         }
-        friend bool operator<=(const base_iterator& lhs, const base_iterator& rhs) {
+        friend bool operator<=(const base_iterator& lhs,
+                               const base_iterator& rhs) {
             return !(rhs < lhs);
         }
-        friend bool operator>=(const base_iterator& lhs, const base_iterator& rhs) {
+        friend bool operator>=(const base_iterator& lhs,
+                               const base_iterator& rhs) {
             return !(lhs < rhs);
         }
 
         internal_iterator_type base() const { return current_; }
 
-
-    private:
+       private:
         internal_iterator_type current_;
     };
 
@@ -111,8 +141,7 @@ public:
                 arr_.emplace_back(Val{});
                 keys_.emplace_back(key);
                 return arr_.back();
-            }
-            catch (...) {
+            } catch (...) {
                 idx_.erase(key);
                 throw;
             }
@@ -143,9 +172,7 @@ public:
         idx_.erase(map_it);
     }
 
-    bool Contains(const Key& key) const {
-        return idx_.count(key) > 0;
-    }
+    bool Contains(const Key& key) const { return idx_.count(key) > 0; }
 
     const Val& At(const Key& key) const {
         auto map_it = idx_.find(key);
@@ -163,49 +190,34 @@ public:
         return arr_[map_it->second];
     }
 
+    size_type size() const noexcept { return arr_.size(); }
 
-    size_type size() const noexcept {
-        return arr_.size();
-    }
-
-    bool empty() const noexcept {
-        return arr_.empty();
-    }
+    bool empty() const noexcept { return arr_.empty(); }
 
     void clear() noexcept {
         arr_.clear();
         idx_.clear();
     }
 
-    iterator begin() noexcept {
-        return iterator(arr_.begin());
-    }
+    iterator begin() noexcept { return iterator(arr_.begin()); }
 
-    iterator end() noexcept {
-        return iterator(arr_.end());
-    }
+    iterator end() noexcept { return iterator(arr_.end()); }
 
     const_iterator begin() const noexcept {
         return const_iterator(arr_.cbegin());
     }
 
-    const_iterator end() const noexcept {
-        return const_iterator(arr_.cend());
-    }
+    const_iterator end() const noexcept { return const_iterator(arr_.cend()); }
 
     const_iterator cbegin() const noexcept {
         return const_iterator(arr_.cbegin());
     }
 
-    const_iterator cend() const noexcept {
-        return const_iterator(arr_.cend());
-    }
+    const_iterator cend() const noexcept { return const_iterator(arr_.cend()); }
 
-    std::vector<Val> GetVals() const {
-        return arr_;
-    }
+    std::vector<Val> GetVals() const { return arr_; }
 
-private: 
+   private:
     FastHashMap<Key, size_t> idx_;
     std::vector<Key> keys_;
     std::vector<Val> arr_;

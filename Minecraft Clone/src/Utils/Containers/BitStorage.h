@@ -2,7 +2,7 @@
 #include <vector>
 
 class BitStorage3D {
-public:
+   public:
     void Initialize(int x, int y, int z);
 
     void SetBit(int x, int y, int z);
@@ -16,7 +16,8 @@ public:
     void ClearBit(int x, int y, int z);
 
     void Clear();
-private:
+
+   private:
     std::vector<unsigned long long> map_;
     int sx_ = 0, sy_ = 0, sz_ = 0;
 };

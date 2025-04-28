@@ -1,30 +1,36 @@
 #include "RenderEngine/GUI/GUISet.h"
+
 #include "RenderEngine/GUI/GUIObject.h"
-#include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
+#include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "RenderEngine/OpenGL/Texture/Types/Texture2D.h"
 
-GUISet::GUISet() : gui_texture_{ std::make_unique<Texture2D>()} {}
+GUISet::GUISet() : gui_texture_{std::make_unique<Texture2D>()} {}
 GUISet::~GUISet() = default;
 GUISet::GUISet(GUISet&& other) = default;
 
-void GUISet::AddGUIElementNorm(std::string Name, std::string Text, glm::vec2 Size, glm::vec2 Position, glm::vec2 UV_P0, glm::vec2 UV_P1) {
+void GUISet::AddGUIElementNorm(std::string Name, std::string Text,
+                               glm::vec2 Size, glm::vec2 Position,
+                               glm::vec2 UV_P0, glm::vec2 UV_P1) {
     if (gui_element_index_.find(Name) == gui_element_index_.end()) {
         elements_.emplace_back(Text, Size, Position);
         elements_.back().buffer_index_ = AddRenderingObj();
         elements_.back().uv_p0_ = UV_P0;
         elements_.back().uv_p1_ = UV_P1;
-        gui_element_index_.emplace(Name, static_cast<int>(elements_.size() - 1));
+        gui_element_index_.emplace(Name,
+                                   static_cast<int>(elements_.size() - 1));
         num_of_renderable_objects_++;
         is_dirty_ = true;
-    }
-    else {
-        g_logger.LogError("GUISet::AddGUIElementNorm", "Element " + Name + " already exist!");
+    } else {
+        g_logger.LogError("GUISet::AddGUIElementNorm",
+                          "Element " + Name + " already exist!");
     }
 }
 
-void GUISet::AddGUIElement(std::string name, std::string text, glm::vec2 size, glm::vec2 position, glm::vec2 UV_P0, glm::vec2 UV_P1) {
+void GUISet::AddGUIElement(std::string name, std::string text, glm::vec2 size,
+                           glm::vec2 position, glm::vec2 UV_P0,
+                           glm::vec2 UV_P1) {
     UV_P0.x = UV_P0.x / (float)gui_texture_->GetWidth();
     UV_P1.x = UV_P1.x / (float)gui_texture_->GetWidth();
 
@@ -36,12 +42,13 @@ void GUISet::AddGUIElement(std::string name, std::string text, glm::vec2 size, g
         elements_.back().buffer_index_ = AddRenderingObj();
         elements_.back().uv_p0_ = UV_P0;
         elements_.back().uv_p1_ = UV_P1;
-        gui_element_index_.emplace(name, static_cast<int>(elements_.size() - 1));
+        gui_element_index_.emplace(name,
+                                   static_cast<int>(elements_.size() - 1));
         num_of_renderable_objects_++;
         is_dirty_ = true;
-    }
-    else {
-        g_logger.LogError("GUISet::AddGUIElement", "Element " + name + " already exist!");
+    } else {
+        g_logger.LogError("GUISet::AddGUIElement",
+                          "Element " + name + " already exist!");
     }
 }
 
@@ -54,15 +61,15 @@ void GUISet::EditElementPosition(std::string Name, glm::vec2 Position) {
             elements_[idx].location_ = Position;
             is_dirty_ = true;
         }
-    }
-    else {
-        g_logger.LogError("GUISet::EditElementPosition", "Element " + Name + " doesn't exist!");
+    } else {
+        g_logger.LogError("GUISet::EditElementPosition",
+                          "Element " + Name + " doesn't exist!");
     }
 }
 
 void GUISet::EditElementUVNorm(std::string Name, glm::vec2 UV0, glm::vec2 UV1) {
     auto it = gui_element_index_.find(Name);
-    
+
     if (it != gui_element_index_.end()) {
         int idx = it->second;
         if (elements_[idx].uv_p0_ != UV0 || elements_[idx].uv_p1_ != UV1) {
@@ -70,9 +77,9 @@ void GUISet::EditElementUVNorm(std::string Name, glm::vec2 UV0, glm::vec2 UV1) {
             elements_[idx].uv_p1_ = UV1;
             is_dirty_ = true;
         }
-    }
-    else {
-        g_logger.LogError("GUISet::EditElementUVNorm", "Element " + Name + " doesn't exist!");
+    } else {
+        g_logger.LogError("GUISet::EditElementUVNorm",
+                          "Element " + Name + " doesn't exist!");
     }
 }
 
@@ -93,17 +100,18 @@ void GUISet::PrepareRenderer() {
     for (auto& e : elements_) {
         GUIElement::GUIVertices GUIData = e.GetVertices();
         size_t BufferIndex = e.buffer_index_;
-        vbos_[BufferIndex].InsertData(GUIData.vertices_.size() * sizeof(float), GUIData.vertices_.data(), GL_STATIC_DRAW);
-        ebos_[BufferIndex].InsertData(GUIData.indices_.size() * sizeof(unsigned int), GUIData.indices_.data(), GL_STATIC_DRAW);
+        vbos_[BufferIndex].InsertData(GUIData.vertices_.size() * sizeof(float),
+                                      GUIData.vertices_.data(), GL_STATIC_DRAW);
+        ebos_[BufferIndex].InsertData(
+            GUIData.indices_.size() * sizeof(unsigned int),
+            GUIData.indices_.data(), GL_STATIC_DRAW);
         vbo_size_[BufferIndex] = GUIData.indices_.size();
     }
 }
 size_t GUISet::GetNumRenderableObjects() const {
     return num_of_renderable_objects_;
 }
-GLuint GUISet::GetGUITextureID() const {
-    return gui_texture_->Get();
-}
+GLuint GUISet::GetGUITextureID() const { return gui_texture_->Get(); }
 
 size_t GUISet::AddRenderingObj() {
     vaos_.emplace_back();

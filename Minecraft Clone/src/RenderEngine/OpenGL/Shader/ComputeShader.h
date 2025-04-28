@@ -1,19 +1,17 @@
 #pragma once
-#include <gl/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/vec2.hpp>
+#include <fstream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <string>
-#include <fstream>
+#include <glm/vec2.hpp>
 #include <sstream>
+#include <string>
 
-#include "Utils/LogUtils.h"
 #include "Core/Typenames.h"
 #include "RenderEngine/OpenGL/Shader/ShaderInterface.h"
+#include "Utils/LogUtils.h"
 
 class ComputeShader : public ShaderInterface {
-public:
+   public:
     ComputeShader(std::string source);
 
     void DispatchCompute(int x, int y, int z);

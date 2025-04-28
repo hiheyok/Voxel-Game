@@ -1,4 +1,5 @@
 #include "Level/Block/Type/Dirt.h"
+
 #include "Level/Dimension/Dimension.h"
 
 DirtBlock::DirtBlock() {

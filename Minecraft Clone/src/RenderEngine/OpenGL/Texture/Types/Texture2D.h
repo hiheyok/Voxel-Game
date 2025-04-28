@@ -2,7 +2,7 @@
 #include "RenderEngine/OpenGL/Texture/Texture.h"
 
 class Texture2D : public Texture {
-public:
+   public:
     Texture2D(const RawTextureData& data);
     Texture2D();
 

@@ -1,7 +1,7 @@
 #include "UI/DisplayVertices.h"
 
 class Display {
-public:
+   public:
     Display() noexcept = default;
 
     Display(const Display&) noexcept = default;
@@ -11,6 +11,7 @@ public:
     Display& operator=(Display&&) noexcept = default;
 
     DisplayVertices GetDisplayVertices();
-private:
+
+   private:
     DisplayVertices render_info_;
 };

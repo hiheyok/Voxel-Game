@@ -1,9 +1,10 @@
 #include "Level/Block/Type/Fluid.h"
+
+#include "FileManager/Files.h"
 #include "Level/Dimension/Dimension.h"
 #include "Level/Event/EventHandler.h"
 #include "RenderEngine/BlockModel/ModelLoader.h"
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
-#include "FileManager/Files.h"
 
 Fluid::Fluid(int spread_rate) {
     properties_->is_solid_ = false;
@@ -13,15 +14,17 @@ Fluid::Fluid(int spread_rate) {
     fluid_properties_.spread_rate_ = spread_rate;
 }
 
-void Fluid::InitializeBlockModel(ModelLoader & modelLoader) {
+void Fluid::InitializeBlockModel(ModelLoader& modelLoader) {
     auto tokens = Tokenize(block_name_, ':');
     block_model_data_ = std::make_unique<BlockModel>();
     BlockFace face;
-    face.reference_texture_ = "block/" + tokens.back() + "_still:" + tokens.front();
+    face.reference_texture_ =
+        "block/" + tokens.back() + "_still:" + tokens.front();
     face.uv_ = {0, 0, 16, 16};
     BlockFace side;
-    side.reference_texture_ = "block/" + tokens.back() + "_flow:" + tokens.front();
-    side.uv_ = { 0, 0, 16, 16 };
+    side.reference_texture_ =
+        "block/" + tokens.back() + "_flow:" + tokens.front();
+    side.uv_ = {0, 0, 16, 16};
 
     Cuboid cuboid;
     face.cull_face_ = Directions<BlockPos>::kUp;
@@ -51,7 +54,7 @@ void Fluid::Tick(const BlockPos& pos, Dimension* currentWorld) {
     for (const auto& offset : Directions<BlockPos>()) {
         BlockPos newPos = pos + offset;
 
-        if (offset == Directions<BlockPos>::kUp) { 
+        if (offset == Directions<BlockPos>::kUp) {
             continue;
         }
 
@@ -70,8 +73,7 @@ void Fluid::Tick(const BlockPos& pos, Dimension* currentWorld) {
         }
 
         currentWorld->TickUsed(g_event_handler.BlockPlace, pos);
-        BlockEvent blockEvent{ newPos, blockType, g_event_handler.BlockPlace };
+        BlockEvent blockEvent{newPos, blockType, g_event_handler.BlockPlace};
         currentWorld->event_manager_.AddEvent(blockEvent);
-
     }
 }

@@ -1,22 +1,19 @@
 #pragma once
 #include "Level/TerrainGeneration/Random/JavaRandom.h"
-//directly copied from mc source code
-
+// directly copied from mc source code
 
 class NoiseGeneratorImproved {
-private:
+   private:
     std::vector<int> permutations;
 
-public:
+   public:
     double xCoord;
     double yCoord;
     double zCoord;
-    
-    ~NoiseGeneratorImproved() {
-    }
+
+    ~NoiseGeneratorImproved() {}
 
     NoiseGeneratorImproved(JavaRandom& random) {
-
         permutations.resize(512);
         xCoord = random.NextDouble() * 256.0;
         yCoord = random.NextDouble() * 256.0;
@@ -38,9 +35,13 @@ public:
 
     double grad2(int p_76309_1_, double p_76309_2_, double p_76309_4_);
 
-    double grad(int p_76310_1_, double p_76310_2_, double p_76310_4_, double p_76310_6_);
+    double grad(int p_76310_1_, double p_76310_2_, double p_76310_4_,
+                double p_76310_6_);
     /**
      * noiseArray should be xSize*ySize*zSize in size
      */
-    void populateNoiseArray(std::vector<double>& noiseArray, double xOffset, double yOffset, double zOffset, int xSize, int ySize, int zSize, double xScale, double yScale, double zScale, double noiseScale);
+    void populateNoiseArray(std::vector<double>& noiseArray, double xOffset,
+                            double yOffset, double zOffset, int xSize,
+                            int ySize, int zSize, double xScale, double yScale,
+                            double zScale, double noiseScale);
 };

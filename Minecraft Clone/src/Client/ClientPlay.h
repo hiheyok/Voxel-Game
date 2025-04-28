@@ -2,7 +2,8 @@
 #include <memory>
 
 #include "Core/Typenames.h"
-// This will handle all of the world rendering and interaction with the server and play controls stuff
+// This will handle all of the world rendering and interaction with the server
+// and play controls stuff
 
 class ServerInterface;
 class TexturedFrameBuffer;
@@ -19,8 +20,9 @@ struct WindowProperties;
 struct GLFWwindow;
 
 class ClientPlay {
-public:
-    ClientPlay(ServerInterface* interface, Window* window, PerformanceProfiler* profiler);
+   public:
+    ClientPlay(ServerInterface* interface, Window* window,
+               PerformanceProfiler* profiler);
     ~ClientPlay();
 
     void Update(Window* window);
@@ -34,7 +36,8 @@ public:
     std::unique_ptr<MultiEntityRender> entity_render_;
 
     double frametime_ = 1;
-private:
+
+   private:
     void UpdateDebugStats();
     void UpdateChunks();
     void UpdateEntities();
