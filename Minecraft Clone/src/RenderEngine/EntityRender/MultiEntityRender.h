@@ -1,7 +1,10 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 #pragma once
+
+#include <memory>
+#include <vector>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
-#include <vector>
 
 #include "Core/Typenames.h"
 
@@ -18,61 +21,61 @@ struct EntityProperty;
 struct GLFWwindow;
 
 class MultiEntityRender {
-   private:
-    std::vector<float> entity_vertices_;
-    std::vector<unsigned int> entity_indices_;
+ public:
+  int vertical_render_distance_ = 16;
+  int horizontal_render_distance_ = 16;
 
-    FastHashMap<EntityTypeID, EntityModel> entity_cached_models_;
-    FastHashMap<EntityTypeID, size_t> entity_element_index_;
-    FastHashMap<EntityTypeID, size_t> entity_element_size_;
+  explicit MultiEntityRender(PlayerPOV*);
+  ~MultiEntityRender();
 
-    std::unique_ptr<EntityRenderCache> renderable_entities_;
-    std::unique_ptr<Shader> shader_;
+  void Clean();
 
-    PlayerPOV* player_;
-    GLFWwindow* window_;
+  size_t GetNumEntityRendered();
 
-    std::unique_ptr<Buffer> vbo_;
-    std::unique_ptr<Buffer> ebo_;
-    std::unique_ptr<Buffer> ssbo_pos_, ssbo_vel_, ssbo_acc_;
-    std::unique_ptr<VertexArray> vao_;
+  void InsertEntity(const EntityProperty& entity);
 
-    std::vector<float> position_arr_;
-    std::vector<float> velocity_arr_;
-    std::vector<float> acceleration_arr_;
+  void RemoveEntity(EntityUUID EntityUUID);
 
-    PerformanceProfiler* profiler_;
+  void Initialize(PerformanceProfiler* pProfilerIn);
 
-    size_t num_entity_rendered_ = 0;
+  void SetTimePastTick(double t);
 
-    double time_past_tick_ = 0.0;
+  void SetupCall();
 
-   public:
-    int vertical_render_distance_ = 16;
-    int horizontal_render_distance_ = 16;
+  void Render();
 
-    MultiEntityRender(PlayerPOV*);
-    ~MultiEntityRender();
+  void SetWindow(GLFWwindow* win);
 
-    void Clean();
+  void Update();
 
-    size_t GetNumEntityRendered();
+  void Reload();
 
-    void InsertEntity(const EntityProperty& entity);
+ private:
+  std::vector<float> entity_vertices_;
+  std::vector<uint32_t> entity_indices_;
 
-    void RemoveEntity(EntityUUID EntityUUID);
+  FastHashMap<EntityTypeID, EntityModel> entity_cached_models_;
+  FastHashMap<EntityTypeID, size_t> entity_element_index_;
+  FastHashMap<EntityTypeID, size_t> entity_element_size_;
 
-    void Initialize(PerformanceProfiler* pProfilerIn);
+  std::unique_ptr<EntityRenderCache> renderable_entities_;
+  std::unique_ptr<Shader> shader_;
 
-    void SetTimePastTick(double t);
+  PlayerPOV* player_;
+  GLFWwindow* window_;
 
-    void SetupCall();
+  std::unique_ptr<Buffer> vbo_;
+  std::unique_ptr<Buffer> ebo_;
+  std::unique_ptr<Buffer> ssbo_pos_, ssbo_vel_, ssbo_acc_;
+  std::unique_ptr<VertexArray> vao_;
 
-    void Render();
+  std::vector<float> position_arr_;
+  std::vector<float> velocity_arr_;
+  std::vector<float> acceleration_arr_;
 
-    void SetWindow(GLFWwindow* win);
+  PerformanceProfiler* profiler_;
 
-    void Update();
+  size_t num_entity_rendered_ = 0;
 
-    void Reload();
+  double time_past_tick_ = 0.0;
 };

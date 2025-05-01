@@ -1,25 +1,28 @@
 #pragma once
 #include <vector>
-#include "Level/TerrainGeneration/Generators/Generators.h"
+
 #include "Core/Typenames.h"
+#include "Level/TerrainGeneration/Generators/Generators.h"
 
 class WorldGenerator;
 
 class GeneratorType {
-private:
-    std::vector<WorldGenerator*> generator_list_ = {};
-    WorldGeneratorID RegisterWorldGenerator(WorldGenerator* Gen);
-public:
-    WorldGeneratorID DEBUG = RegisterWorldGenerator(new DebugWorld());
-    WorldGeneratorID DEBUG_2 = RegisterWorldGenerator(new DebugWorldSecond());
-    WorldGeneratorID DEBUG_POSITIONING = RegisterWorldGenerator(new DebugPositioning());
-    WorldGeneratorID FAST_TERRAIN = RegisterWorldGenerator(new FastTerrain());
-    WorldGeneratorID MATH_WORLD = RegisterWorldGenerator(new MathWorld());
-    WorldGeneratorID MOUNTAINS = RegisterWorldGenerator(new MountainGenerator());
-    WorldGeneratorID SUPERFLAT = RegisterWorldGenerator(new SuperflatWorld());
-    WorldGeneratorID MINECRAFT = RegisterWorldGenerator(new MinecraftTerrain());
+ private:
+  std::vector<WorldGenerator*> generator_list_ = {};
+  WorldGeneratorID RegisterWorldGenerator(WorldGenerator* Gen);
 
-    WorldGenerator* GetGenerator(WorldGeneratorID ID);
+ public:
+  WorldGeneratorID DEBUG = RegisterWorldGenerator(new DebugWorld());
+  WorldGeneratorID DEBUG_2 = RegisterWorldGenerator(new DebugWorldSecond());
+  WorldGeneratorID DEBUG_POSITIONING =
+      RegisterWorldGenerator(new DebugPositioning());
+  WorldGeneratorID FAST_TERRAIN = RegisterWorldGenerator(new FastTerrain());
+  WorldGeneratorID MATH_WORLD = RegisterWorldGenerator(new MathWorld());
+  WorldGeneratorID MOUNTAINS = RegisterWorldGenerator(new MountainGenerator());
+  WorldGeneratorID SUPERFLAT = RegisterWorldGenerator(new SuperflatWorld());
+  WorldGeneratorID MINECRAFT = RegisterWorldGenerator(new MinecraftTerrain());
+
+  WorldGenerator* GetGenerator(WorldGeneratorID ID);
 };
 
 extern GeneratorType g_generators;

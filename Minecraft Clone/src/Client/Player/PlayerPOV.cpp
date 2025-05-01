@@ -9,10 +9,10 @@ PlayerPOV::~PlayerPOV() = default;
 void PlayerPOV::SetPosition(glm::vec3 pos) { camera_->position_ = pos; }
 
 void PlayerPOV::SetRotation(glm::vec2 rot) {
-    camera_->yaw_ = rot.x;
-    camera_->pitch_ = rot.y;
+  camera_->yaw_ = rot.x;
+  camera_->pitch_ = rot.y;
 
-    camera_->UpdateCameraVectors();
+  camera_->UpdateCameraVectors();
 }
 
 glm::vec3 PlayerPOV::GetPosition() const { return camera_->position_; }

@@ -10,49 +10,49 @@
  * up to 12 bits per blocks
  */
 
-// TODO: for a large amount of unique block, use stack / hashmap
+// TODO(hiheyok): for a large amount of unique block, use stack / hashmap
 class Palette {
-   public:
-    Palette();
-    ~Palette();
-    Palette(Palette&&) noexcept;
-    Palette(const Palette&) noexcept;
-    Palette& operator=(const Palette&);
-    Palette& operator=(Palette&&) noexcept;
+ public:
+  Palette();
+  ~Palette();
+  Palette(Palette&&) noexcept;
+  Palette(const Palette&) noexcept;
+  Palette& operator=(const Palette&);
+  Palette& operator=(Palette&&) noexcept;
 
-    BlockID GetBlock(const BlockPos& pos) const;
-    BlockID GetBlockUnsafe(const BlockPos& pos) const;
+  BlockID GetBlock(BlockPos pos) const;
+  BlockID GetBlockUnsafe(BlockPos pos) const noexcept;
 
-    void SetBlock(BlockID block, const BlockPos& pos);
-    void SetBlockUnsafe(BlockID block, const BlockPos& pos);
+  void SetBlock(BlockID block, BlockPos pos);
+  void SetBlockUnsafe(BlockID block, BlockPos pos);
 
-   private:
-    using PaletteIndex = uint16_t;
-    using StorageBit = uint64_t;
+ private:
+  using PaletteIndex = uint16_t;
+  using StorageBit = uint64_t;
 
-    static constexpr int GetBitWidth(unsigned int n) {
-        int bitWidth = std::bit_width(n);
-        return std::max(bitWidth, kMinBitWidth);
-    }
+  static constexpr int GetBitWidth(uint32_t n) noexcept {
+    int bitWidth = std::bit_width(n);
+    return std::max(bitWidth, kMinBitWidth);
+  }
 
-    void Shrink();
+  void Shrink();
 
-    void Grow();
+  void Grow();
 
-    void Resize();
+  void Resize();
 
-    PaletteIndex GetOrAddPaletteIndex(BlockID block);
+  PaletteIndex GetOrAddPaletteIndex(BlockID block);
 
-    static constexpr int kMinBitWidth = 1;  // Minimum bits
-    static constexpr int kMaxBitWidth = 12;
+  static constexpr int kMinBitWidth = 1;  // Minimum bits
+  static constexpr int kMaxBitWidth = 12;
 
-    int current_bit_width_;
-    int unique_blocks_count_ = 1;  // Initialize with only air blocks
+  int current_bit_width_;
+  int unique_blocks_count_ = 1;  // Initialize with only air blocks
 
-    int d1 = 0, d2 = 0;
+  int d1 = 0, d2 = 0;
 
-    NBitVector<StorageBit> data_;
+  NBitVector<StorageBit> data_;
 
-    // BlockID -> Block, int_16 -> num of that block
-    std::vector<std::pair<BlockID, int16_t>> palette_entries_;
+  // BlockID -> Block, int_16 -> num of that block
+  std::vector<std::pair<BlockID, int16_t>> palette_entries_;
 };

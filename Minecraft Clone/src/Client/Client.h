@@ -11,27 +11,27 @@ class ClientLevel;
 class Server;
 
 class Client : public Window {
-   public:
-    Client();
-    ~Client();
+ public:
+  Client();
+  ~Client();
 
-    void run();
+  void run();
 
-   private:
-    void Initialize();
-    void GameLoop();
-    void Update();
-    void Cleanup();
-    void Render();
-    void InitializeServerCom();
-    void InitializeGameContent();
+ private:
+  void Initialize();
+  void GameLoop();
+  void Update();
+  void Cleanup();
+  void Render();
+  void InitializeServerCom();
+  void InitializeGameContent();
 
-    double frametime_ = 0.5;
+  double frametime_ = 0.5;
 
-    EntityUUID player_uuid_;
-    std::unique_ptr<ClientPlay> client_play_;
-    std::unique_ptr<Server> server_;
-    std::unique_ptr<InternalInterface> internal_interface_;
-    std::unique_ptr<TextRenderer> text_render_;
-    PerformanceProfiler* profiler_;
+  EntityUUID player_uuid_;
+  std::unique_ptr<ClientPlay> client_play_;
+  std::unique_ptr<Server> server_;
+  std::unique_ptr<InternalInterface> internal_interface_;
+  std::unique_ptr<TextRenderer> text_render_;
+  PerformanceProfiler* profiler_;
 };

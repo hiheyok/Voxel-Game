@@ -5,6 +5,6 @@
 class Dimension;
 
 struct DefaultBlock : Block {
-    DefaultBlock();
-    void Tick(const BlockPos& pos, Dimension* currentWorld) override;
+  DefaultBlock();
+  void Tick(BlockPos pos, Dimension* currentWorld) override;
 };

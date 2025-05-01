@@ -8,33 +8,33 @@ class Region;
 #include "Core/Typenames.h"
 
 class ChunkMap {
-   public:
-    ChunkMap(bool neighborUpdate = false, bool heightmapUpdate = false);
-    ~ChunkMap();
+ public:
+  ChunkMap(bool neighborUpdate = false, bool heightmapUpdate = false);
+  ~ChunkMap();
 
-    BlockID GetBlock(const BlockPos& pos) const;
-    bool SetBlock(BlockID block, const BlockPos& pos);
+  BlockID GetBlock(BlockPos pos) const;
+  bool SetBlock(BlockID block, BlockPos pos);
 
-    bool CheckChunk(const ChunkPos& pos) const;
-    void InsertChunk(std::unique_ptr<Chunk> chunk);
-    void EraseChunk(const ChunkPos& pos);
-    Chunk* GetChunk(const ChunkPos& pos) const;
-    std::vector<Chunk*> GetAllChunks() const;
+  bool CheckChunk(ChunkPos pos) const;
+  void InsertChunk(std::unique_ptr<Chunk> chunk);
+  void EraseChunk(ChunkPos pos);
+  Chunk* GetChunk(ChunkPos pos) const;
+  std::vector<Chunk*> GetAllChunks() const;
 
-   private:
-    Region* GetRegion(const RegionPos& pos) const;
-    Region* GetRegionUncheck(const RegionPos& pos) const;
-    bool CheckRegion(const RegionPos& pos, bool checkCache = true) const;
-    Region* CreateRegion(const RegionPos& pos);
-    void DeleteRegion(const RegionPos& pos);
+ private:
+  Region* GetRegion(RegionPos pos) const;
+  Region* GetRegionUncheck(RegionPos pos) const;
+  bool CheckRegion(RegionPos pos, bool checkCache = true) const;
+  Region* CreateRegion(RegionPos pos);
+  void DeleteRegion(RegionPos pos);
 
-    bool heightmap_update_ = false;
-    bool neighbor_update_ = false;
+  bool heightmap_update_ = false;
+  bool neighbor_update_ = false;
 
-    static constexpr int kRegionCacheSize = 16;
+  static constexpr int kRegionCacheSize = 16;
 
-    std::vector<Chunk*> chunks_;
-    FastHashMap<ChunkPos, size_t> chunks_idx_;
-    FastHashMap<RegionPos, std::unique_ptr<Region>> regions_;
-    mutable std::vector<std::pair<RegionPos, Region*>> region_cache_;
+  std::vector<Chunk*> chunks_;
+  FastHashMap<ChunkPos, size_t> chunks_idx_;
+  FastHashMap<RegionPos, std::unique_ptr<Region>> regions_;
+  mutable std::vector<std::pair<RegionPos, Region*>> region_cache_;
 };

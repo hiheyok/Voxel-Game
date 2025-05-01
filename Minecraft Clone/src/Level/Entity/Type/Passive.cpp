@@ -4,6 +4,6 @@
 #include "Level/Entity/Entity.h"
 
 void Passive::Tick(Entity* entity, Dimension* dimension) {
-    (void)entity;
-    (void)dimension;
+  (void)entity;
+  (void)dimension;
 }

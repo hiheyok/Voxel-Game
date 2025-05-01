@@ -1,3 +1,6 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
+#pragma once
 #include <vector>
 
 /*
@@ -8,6 +11,6 @@ Vertices Format
 */
 
 struct DisplayVertices {
-    std::vector<float> vertices_;
-    std::vector<unsigned int> indices_;
+  std::vector<float> vertices_;
+  std::vector<uint32_t> indices_;
 };

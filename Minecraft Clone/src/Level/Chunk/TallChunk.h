@@ -2,20 +2,20 @@
 #include "Level/Chunk/Chunk.h"
 
 struct TallChunk {
-    std::vector<std::unique_ptr<Chunk>> chunk_sub_column_;
+  std::vector<std::unique_ptr<Chunk>> chunk_sub_column_;
 
-    TallChunk();
-    ~TallChunk();
+  TallChunk();
+  ~TallChunk();
 
-    void SetPosition(int x, int y, int z);
+  void SetPosition(int x, int y, int z);
 
-    int GetYPosition();
+  int GetYPosition();
 
-    int GetXPosition();
+  int GetXPosition();
 
-    int GetZPosition();
+  int GetZPosition();
 
-    void SetBlockUnsafe(int x, int y, int z, BlockID block);
+  void SetBlockUnsafe(int x, int y, int z, BlockID block);
 
-    BlockID GetBlockUnsafe(int x, int y, int z);
+  BlockID GetBlockUnsafe(int x, int y, int z);
 };

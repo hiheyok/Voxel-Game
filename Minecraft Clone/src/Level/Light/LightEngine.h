@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <vector>
 
 #include "Core/Typenames.h"
 #include "Utils/ThreadPool.h"
@@ -10,32 +11,30 @@ class Chunk;
 class WorldInterface;
 
 class LightEngine {
-   public:
-    void Generate(const std::vector<ChunkPos>& IDs);
+ public:
+  void Generate(const std::vector<ChunkPos>& IDs);
 
-    std::vector<std::unique_ptr<LightStorage>> GetOutput();
+  std::vector<std::unique_ptr<LightStorage>> GetOutput();
 
-    void Stop();
+  void Stop();
 
-    void Start(int lightEngineThreadsCount, WorldInterface* w);
+  void Start(int lightEngineThreadsCount, WorldInterface* w);
 
-    void QueueChunk(const ChunkPos& pos);
+  void QueueChunk(ChunkPos pos);
 
-    size_t GetQueueSize();
+  size_t GetQueueSize();
 
-   private:
-    std::unique_ptr<LightStorage> Worker(const ChunkPos& pos);
+ private:
+  std::unique_ptr<LightStorage> Worker(ChunkPos pos);
 
-    std::unique_ptr<ThreadPool<ChunkPos, std::unique_ptr<LightStorage>>>
-        lighting_thread_pool_;
-    WorldInterface* world_;
+  std::unique_ptr<ThreadPool<ChunkPos, std::unique_ptr<LightStorage>>>
+      lighting_thread_pool_;
+  WorldInterface* world_;
 
-    void IncreaseLightLevel(std::unique_ptr<LightStorage>& container,
-                            uint8_t lvl, int x, int y, int z);
+  void IncreaseLightLevel(std::unique_ptr<LightStorage>& container, uint8_t lvl,
+                          int x, int y, int z);
 
-    void WorkOnChunkSkylight(Chunk* chunk,
-                             std::unique_ptr<LightStorage>& light);
+  void WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<LightStorage>& light);
 
-    std::unique_ptr<LightStorage> SkyLighting(const ChunkPos& id);
-    const static size_t DEFAULT_FIFO_QUEUE_SIZE = 32768;
+  std::unique_ptr<LightStorage> SkyLighting(ChunkPos id);
 };

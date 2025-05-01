@@ -6,5 +6,5 @@ class Dimension;
 struct Entity;
 
 class Hostile : public EntityType {
-    void Tick(Entity* entity, Dimension* dimension) override;
+  void Tick(Entity* entity, Dimension* dimension) override;
 };

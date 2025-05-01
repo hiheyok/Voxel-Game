@@ -10,22 +10,21 @@ struct TerrainParamters;
 struct ChunkGeneratorSettings;
 
 class MinecraftTerrain : public WorldGenerator {
-   public:
-    MinecraftTerrain();
+ public:
+  MinecraftTerrain();
 
-    void GenerateTall(const ChunkPos& pos,
-                      std::unique_ptr<TallChunk>& chunk) override;
+  void GenerateTall(ChunkPos pos, std::unique_ptr<TallChunk>& chunk) override;
 
-   private:
-    void Init();
+ private:
+  void Init();
 
-    std::unique_ptr<NoiseMaps1122> noisemaps_;
-    std::unique_ptr<TerrainParamters> parameters_;
-    std::unique_ptr<ChunkGeneratorSettings> settings_;
+  std::unique_ptr<NoiseMaps1122> noisemaps_;
+  std::unique_ptr<TerrainParamters> parameters_;
+  std::unique_ptr<ChunkGeneratorSettings> settings_;
 
-    // double* heightMap;
+  // double* heightMap;
 
-    // bool isInitialized = false;
+  // bool isInitialized = false;
 
-    glm::vec3 VecFloor(glm::vec3 v);
+  glm::vec3 VecFloor(glm::vec3 v);
 };

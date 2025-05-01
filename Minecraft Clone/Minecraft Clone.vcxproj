@@ -405,7 +405,6 @@
     <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerZoom.h" />
     <ClInclude Include="src\Level\TerrainGeneration\GenLayer\IntCache.h" />
     <ClInclude Include="src\Level\TerrainGeneration\MapGen\MapGenBase.h" />
-    <ClInclude Include="src\Level\TerrainGeneration\MapGen\MapGenCaves.h" />
     <ClInclude Include="src\Level\World\World.h" />
     <ClInclude Include="src\Level\World\WorldUpdater.h" />
     <ClInclude Include="src\Level\World\WorldParameters.h" />
@@ -444,8 +443,6 @@
     <ClInclude Include="src\RenderEngine\ChunkRender\Batch\ChunkBatch.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\BakedChunkMesh.h" />
     <ClInclude Include="src\RenderEngine\ChunkRenderer\Mesh\Mesher.h" />
-    <ClInclude Include="src\RenderEngine\ChunkRender\Occulsion\Data\OcculsionData.h" />
-    <ClInclude Include="src\RenderEngine\ChunkRender\Occulsion\Data\OcculsionDataManager.h" />
     <ClInclude Include="src\RenderEngine\ChunkRender\Occulsion\Graph\Graph.h" />
     <ClInclude Include="src\RenderEngine\ChunkRender\TerrainRenderer.h" />
     <ClInclude Include="src\RenderEngine\EntityRender\EntityRenderCache.h" />

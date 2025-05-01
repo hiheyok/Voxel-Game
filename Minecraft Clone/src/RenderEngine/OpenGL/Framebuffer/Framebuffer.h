@@ -1,6 +1,5 @@
 #pragma once
 #include <gl/glew.h>
-#include <GLFW/glfw3.h>
 
 #include <memory>
 #include <vector>
@@ -9,39 +8,39 @@ class Shader;
 
 // TODO: Make this a child of texture class ??
 class TexturedFrameBuffer {
-   public:
-    TexturedFrameBuffer();
-    ~TexturedFrameBuffer();
+ public:
+  TexturedFrameBuffer();
+  ~TexturedFrameBuffer();
 
-    void GenBuffer(GLint x, GLint y, float muti, GLuint format = GL_RGBA);
+  void GenBuffer(GLint x, GLint y, float muti, GLuint format = GL_RGBA);
 
-    void UpdateResolution(GLint x, GLint y, float muti = 1.f);
+  void UpdateResolution(GLint x, GLint y, float muti = 1.f);
 
-    void BindRBO() const;
+  void BindRBO() const;
 
-    void UnbindRBO() const;
+  void UnbindRBO() const;
 
-    void BindFBO();
+  void BindFBO();
 
-    void UnbindFBO();
+  void UnbindFBO();
 
-    void Clear() const;
+  void Clear() const;
 
-    void GetShaders();
+  void GetShaders();
 
-    void UpdateTexture();
+  void UpdateTexture();
 
-    void Render();
+  void Render();
 
-    GLuint texture_ = 0;
+  GLuint texture_ = 0;
 
-   private:
-    std::unique_ptr<Shader> screen_;
-    GLuint fbo_ = 0, rbo_ = 0, shader_id_ = 0;
-    GLint sx = 0;
-    GLint sy = 0;
+ private:
+  std::unique_ptr<Shader> screen_;
+  GLuint fbo_ = 0, rbo_ = 0, shader_id_ = 0;
+  GLint sx = 0;
+  GLint sy = 0;
 
-    GLint text_size_x_ = 0, text_size_y_ = 0;
-    unsigned int quad_vao_ = 0, quad_vbo_ = 0;
-    GLfloat res_multiplier_ = 1;
+  GLint text_size_x_ = 0, text_size_y_ = 0;
+  uint32_t quad_vao_ = 0, quad_vbo_ = 0;
+  GLfloat res_multiplier_ = 1;
 };

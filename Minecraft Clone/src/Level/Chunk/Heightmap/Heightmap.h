@@ -11,16 +11,16 @@ heightmap for chunk column 32 * 16 = 512 blocks columns 9 bits per column
 */
 
 class Heightmap {
-   public:
-    Heightmap();
-    ~Heightmap();
+ public:
+  Heightmap();
+  ~Heightmap();
 
-    void Edit(int x, int z, int height);
+  void Edit(int x, int z, int height);
 
-    int Get(int x, int z) const;
+  int Get(int x, int z) const;
 
-    void Clear();
+  void Clear();
 
-   private:
-    std::array<char, kChunkSize2D> data_;
+ private:
+  std::array<char, kChunkSize2D> data_;
 };

@@ -9,8 +9,8 @@
 #include "RenderEngine/OpenGL/Shader/ShaderInterface.h"
 
 class Shader : public ShaderInterface {
-   public:
-    Shader();
-    Shader(const char* vertexPath, const char* fragmentPath,
-           const char* geometryPath = nullptr);
+ public:
+  Shader();
+  Shader(const char* vertexPath, const char* fragmentPath,
+         const char* geometryPath = nullptr);
 };

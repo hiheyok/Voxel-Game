@@ -1,17 +1,18 @@
 #pragma once
 #include <cctype>
+#include <vector>
 
 #include "Level/Block/Block.h"
 
 struct SetBlockRelative {
-    BlockPos pos_;
+  BlockPos pos_;
 
-    BlockID block_;
+  BlockID block_;
 
-    SetBlockRelative(BlockID block, const BlockPos& pos);
-    ~SetBlockRelative();
+  SetBlockRelative(BlockID block, BlockPos pos);
+  ~SetBlockRelative();
 };
 
 struct Structure {
-    std::vector<SetBlockRelative> build_;
+  std::vector<SetBlockRelative> build_;
 };

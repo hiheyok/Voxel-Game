@@ -19,36 +19,35 @@ struct ChunkVertexData;
 }
 
 class WorldRender : public WorldRenderInfo {
-   public:
-    WorldRender(PlayerPOV* player);
-    ~WorldRender();
+ public:
+  WorldRender(PlayerPOV* player);
+  ~WorldRender();
 
-    void Render();
+  void Render();
 
-    void LoadChunkToRenderer(ChunkPos chunk);
+  void LoadChunkToRenderer(ChunkPos chunk);
 
-    void Start(GLFWwindow* window, ClientCache* cache,
-               PerformanceProfiler* profiler);
+  void Start(GLFWwindow* window, ClientCache* cache,
+             PerformanceProfiler* profiler);
 
-    void Stop();
+  void Stop();
 
-    void Update(std::vector<ChunkPos> updatedChunks);
+  void Update(std::vector<ChunkPos> updatedChunks);
 
-    size_t GetQueuedSize();
+  size_t GetQueuedSize();
 
-    std::unique_ptr<TerrainRenderer> renderer_;
-    PerformanceProfiler* profiler_;
+  std::unique_ptr<TerrainRenderer> renderer_;
+  PerformanceProfiler* profiler_;
 
-   private:
-    void LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks);
-    std::unique_ptr<Mesh::ChunkVertexData> Worker(const ChunkPos& pos);
+ private:
+  void LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks);
+  std::unique_ptr<Mesh::ChunkVertexData> Worker(ChunkPos pos);
 
-    std::unique_ptr<
-        ThreadPool<ChunkPos, std::unique_ptr<Mesh::ChunkVertexData>>>
-        mesh_thread_pool_;
-    std::vector<std::unique_ptr<Mesh::ChunkVertexData>> mesh_add_queue_;
+  std::unique_ptr<ThreadPool<ChunkPos, std::unique_ptr<Mesh::ChunkVertexData>>>
+      mesh_thread_pool_;
+  std::vector<std::unique_ptr<Mesh::ChunkVertexData>> mesh_add_queue_;
 
-    PlayerPOV* player_;
-    GLFWwindow* window_;
-    ClientCache* cache_;
+  PlayerPOV* player_;
+  GLFWwindow* window_;
+  ClientCache* cache_;
 };

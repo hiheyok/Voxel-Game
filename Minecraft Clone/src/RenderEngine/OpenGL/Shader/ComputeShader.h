@@ -11,8 +11,8 @@
 #include "Utils/LogUtils.h"
 
 class ComputeShader : public ShaderInterface {
-   public:
-    ComputeShader(std::string source);
+ public:
+  ComputeShader(std::string source);
 
-    void DispatchCompute(int x, int y, int z);
+  void DispatchCompute(int x, int y, int z);
 };

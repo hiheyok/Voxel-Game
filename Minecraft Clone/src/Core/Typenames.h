@@ -29,16 +29,19 @@ using FastHashSet = robin_hood::unordered_flat_set<V, _Hash>;
 constexpr int kChunkDim = 16;
 constexpr int kChunkSize2D = kChunkDim * kChunkDim;
 constexpr int kChunkSize3D = kChunkSize2D * kChunkDim;
-constexpr int kChunkDimLog2 = std::bit_width((unsigned int)(kChunkDim)) - 1;
+constexpr int kChunkDimLog2 =
+    std::bit_width(static_cast<uint32_t>(kChunkDim)) - 1;
 
 constexpr int kRegionDim = 32;
 constexpr int kRegionSize2D = kRegionDim * kRegionDim;
 constexpr int kRegionSize3D = kRegionSize2D * kRegionDim;
+constexpr int kRegionDimLog2 =
+    std::bit_width(static_cast<uint32_t>(kRegionDim)) - 1;
 
-constexpr long long kWorldSeed =
-    0;  //;-501575345763903LL;//-501575345763903LL;//-1587754402LL
+constexpr int64_t kWorldSeed = -501575345763903LL;
+// -501575345763903LL;//-501575345763903LL;//-1587754402LL
 
 template <typename Target, typename Base>
 bool instanceof(Base* obj) {
-    return dynamic_cast<Target*>(obj) != nullptr;
+  return dynamic_cast<Target*>(obj) != nullptr;
 }

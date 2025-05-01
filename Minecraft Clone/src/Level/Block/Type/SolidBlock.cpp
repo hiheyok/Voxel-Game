@@ -2,4 +2,4 @@
 
 SolidBlock::SolidBlock() { properties_->light_pass_ = false; }
 
-void SolidBlock::Tick(const BlockPos& pos, Dimension* currentWorld) {}
+void SolidBlock::Tick(BlockPos pos, Dimension* currentWorld) {}

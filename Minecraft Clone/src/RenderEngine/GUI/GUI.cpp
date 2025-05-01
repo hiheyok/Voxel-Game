@@ -21,47 +21,47 @@ GUI::GUI(GUI&&) = default;
 GUI::~GUI() = default;
 
 size_t GUI::AddGUI(std::string Name, GUISet set) {
-    guis_.push_back(std::move(set));
-    return guis_.size() - 1;
+  guis_.push_back(std::move(set));
+  return guis_.size() - 1;
 }
 
 GUISet& GUI::EditGUISet(size_t GUIIndex) { return guis_[GUIIndex]; }
 
 void GUI::PrepareRenderer() {
-    for (auto& gui : guis_) {
-        gui.PrepareRenderer();
-    }
+  for (auto& gui : guis_) {
+    gui.PrepareRenderer();
+  }
 }
 
 void GUI::Render() {
-    Update();
-    SetupDrawCalls();
+  Update();
+  SetupDrawCalls();
 
-    shader_->Use();
-    for (auto& gui : guis_) {
-        shader_->BindTexture2D(0, gui.GetGUITextureID(), "GUITexture");
-        for (int i = 0; i < gui.GetNumRenderableObjects(); i++) {
-            gui.vaos_[i].Bind();
-            gui.ebos_[i].Bind();
-            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(gui.vbo_size_[i]),
-                           GL_UNSIGNED_INT, 0);
-            gui.ebos_[i].Unbind();
-            gui.vaos_[i].Unbind();
-        }
+  shader_->Use();
+  for (auto& gui : guis_) {
+    shader_->BindTexture2D(0, gui.GetGUITextureID(), "GUITexture");
+    for (int i = 0; i < gui.GetNumRenderableObjects(); i++) {
+      gui.vaos_[i].Bind();
+      gui.ebos_[i].Bind();
+      glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(gui.vbo_size_[i]),
+                     GL_UNSIGNED_INT, 0);
+      gui.ebos_[i].Unbind();
+      gui.vaos_[i].Unbind();
     }
+  }
 }
 
 void GUI::SetupDrawCalls() {
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
-    glDisable(GL_CULL_FACE);
+  glEnable(GL_BLEND);
+  glDisable(GL_DEPTH_TEST);
+  glDepthMask(GL_TRUE);
+  glDisable(GL_CULL_FACE);
 }
 
 void GUI::Update() {
-    int Height, Width;
-    glfwGetWindowSize(window_->GetWindow(), &Width, &Height);
+  int height, width;
+  glfwGetWindowSize(window_->GetWindow(), &width, &height);
 
-    shader_->Use();
-    shader_->SetFloat("AspectRatio", ((float)Height) / ((float)Width));
+  shader_->Use();
+  shader_->SetFloat("AspectRatio", static_cast<float>(height) / width);
 }

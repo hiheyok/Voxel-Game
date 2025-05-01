@@ -5,21 +5,21 @@
 #include "RenderEngine/OpenGL/Texture/Texture.h"
 
 class TextureArray : public Texture {
-   public:
-    void LoadToGPU();
+ public:
+  void LoadToGPU();
 
-    void SetSize(int width, int height);
+  void SetSize(int width, int height);
 
-    void AddData(std::vector<uint8_t> data, size_t width, size_t height,
-                 int format);
+  void AddData(std::vector<uint8_t> data, size_t width, size_t height,
+               int format);
 
-    bool AddTextureToArray(RawTextureData* data);
+  bool AddTextureToArray(RawTextureData* data);
 
-    std::optional<RawTextureData> AddTextureToArray(std::string file);
+  std::optional<RawTextureData> AddTextureToArray(std::string file);
 
-    int GetLayers() const;
+  int GetLayers() const;
 
-    std::vector<unsigned char> array_data_;
+  std::vector<uint8_t> array_data_;
 
-    int layers_ = 0;
+  int layers_ = 0;
 };

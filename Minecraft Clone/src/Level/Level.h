@@ -4,15 +4,15 @@
 class Dimension;
 
 class Level {
-   public:
-    std::unique_ptr<Dimension> main_world_;
+ public:
+  std::unique_ptr<Dimension> main_world_;
 
-    Level();
-    ~Level();
+  Level();
+  ~Level();
 
-    void Start(int worldGenThreadCount, int light_engine_thread_count_);
+  void Start(int worldGenThreadCount, int light_engine_thread_count_);
 
-    void Stop();
+  void Stop();
 
-    void updateDimensions();
+  void updateDimensions();
 };

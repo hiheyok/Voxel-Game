@@ -1,6 +1,6 @@
 
-#ifndef CORE_POSITION_POSITION_TYPE_H
-#define CORE_POSITION_POSITION_TYPE_H
+#ifndef CORE_POSITION_POSITION_TYPES_H
+#define CORE_POSITION_POSITION_TYPES_H
 
 #include "Core/Position/Position.h"
 
@@ -8,28 +8,28 @@ class ChunkPos;
 class RegionPos;
 class BlockPos;
 
-class RegionPos : public Position<RegionPos> {
-   public:
-    using Position<RegionPos>::Position;
+class RegionPos final : public Position<RegionPos> {
+ public:
+  using Position<RegionPos>::Position;
 };
 
-class ChunkPos : public Position<ChunkPos> {
-   public:
-    using Position<ChunkPos>::Position;
+class ChunkPos final : public Position<ChunkPos> {
+ public:
+  using Position<ChunkPos>::Position;
 
-    operator RegionPos() const noexcept;
-    size_t GetIndex() const noexcept;
+  [[nodiscard]] RegionPos ToRegionPos() const noexcept;
+  [[nodiscard]] size_t GetIndex() const noexcept;
 };
 
-class BlockPos : public Position<BlockPos> {
-   public:
-    using Position<BlockPos>::Position;
+class BlockPos final : public Position<BlockPos> {
+ public:
+  using Position<BlockPos>::Position;
 
-    operator RegionPos() const noexcept;
-    operator ChunkPos() const noexcept;
+  [[nodiscard]] RegionPos ToRegionPos() const noexcept;
+  [[nodiscard]] ChunkPos ToChunkPos() const noexcept;
 
-    size_t GetIndex() const noexcept;
-    BlockPos GetLocalPos() const noexcept;
+  [[nodiscard]] size_t GetIndex() const noexcept;
+  [[nodiscard]] BlockPos GetLocalPos() const noexcept;
 };
 
 #endif

@@ -1,45 +1,49 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
+
 #include <iostream>
 #include <vector>
 
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+
 namespace Model {
 struct ModelData {
-    std::vector<float> vertices_;
-    std::vector<unsigned int> indices_;
+  std::vector<float> vertices_;
+  std::vector<uint32_t> indices_;
 
-    int vertices_count_ = 0;
+  int vertices_count_ = 0;
 };
 
 struct UV {
-    glm::vec2 p0_ = glm::vec2(0.f, 0.f);
-    glm::vec2 p1_ = glm::vec2(0.f, 0.f);
+  glm::vec2 p0_ = glm::vec2(0.f, 0.f);
+  glm::vec2 p1_ = glm::vec2(0.f, 0.f);
 };
 
 struct RectangularPrism {
-    RectangularPrism(float x, float y, float z);
+  RectangularPrism(float x, float y, float z);
 
-    RectangularPrism(glm::vec3 size, glm::vec3 offset);
+  RectangularPrism(glm::vec3 size, glm::vec3 offset);
 
-    ModelData GetVertices();
+  ModelData GetVertices();
 
-    glm::vec3 offset_ = glm::vec3(0.f, 0.f, 0.f);
+  glm::vec3 offset_ = glm::vec3(0.f, 0.f, 0.f);
 
-    glm::vec3 size_ = glm::vec3(0.f, 0.f, 0.f);
+  glm::vec3 size_ = glm::vec3(0.f, 0.f, 0.f);
 
-    UV uv_map_[6]{};
+  UV uv_map_[6]{};
 };
 }  // namespace Model
 
 class EntityModel {
-   public:
-    Model::RectangularPrism* AddRectangle(glm::vec3 size, glm::vec3 offset);
+ public:
+  Model::RectangularPrism* AddRectangle(glm::vec3 size, glm::vec3 offset);
 
-    Model::ModelData GetVertices();
+  Model::ModelData GetVertices();
 
-    void Clear();
+  void Clear();
 
-   private:
-    std::vector<Model::RectangularPrism> shapes_;
+ private:
+  std::vector<Model::RectangularPrism> shapes_;
 };

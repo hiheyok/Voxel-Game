@@ -14,39 +14,39 @@ class Window;
 struct EntityProperty;
 
 class MainPlayer {
-   public:
-    MainPlayer(Window* window, ServerInterface* server, ClientCache* cache);
-    MainPlayer(const MainPlayer&) = delete;
-    ~MainPlayer();
+ public:
+  MainPlayer(Window* window, ServerInterface* server, ClientCache* cache);
+  MainPlayer(const MainPlayer&) = delete;
+  ~MainPlayer();
 
-    void Update(const UserInputs& inputs);
+  void Update(const UserInputs& inputs);
 
-    EntityProperty GetEntityProperties();
+  EntityProperty GetEntityProperties();
 
-    void SetPlayerRotation(float x, float y);
-    void SetPlayerPosition(float x, float y, float z);
+  void SetPlayerRotation(float x, float y);
+  void SetPlayerPosition(float x, float y, float z);
 
-    PlayerPOV* GetPlayerPOV();
+  PlayerPOV* GetPlayerPOV();
 
-    void RenderGUIs();
+  void RenderGUIs();
 
-    std::unique_ptr<Player> player_;
+  std::unique_ptr<Player> player_;
 
-   private:
-    void PrepareGUIs();
-    void InventoryUpdate(const UserInputs& inputs);
+ private:
+  void PrepareGUIs();
+  void InventoryUpdate(const UserInputs& inputs);
 
-    std::unique_ptr<PlayerMovement> movement_;
-    std::unique_ptr<WorldInteraction> interactions_;
-    std::unique_ptr<PlayerPOV> player_pov_;
-    std::unique_ptr<GUI> player_gui_;
+  std::unique_ptr<PlayerMovement> movement_;
+  std::unique_ptr<WorldInteraction> interactions_;
+  std::unique_ptr<PlayerPOV> player_pov_;
+  std::unique_ptr<GUI> player_gui_;
 
-    ClientCache* client_cache_ = nullptr;
-    ServerInterface* internal_interface_ = nullptr;
+  ClientCache* client_cache_ = nullptr;
+  ServerInterface* internal_interface_ = nullptr;
 
-    size_t gui_index_ = 0;
-    size_t item_gui_index_ = 0;
-    size_t slot_index_ = 0;
+  size_t gui_index_ = 0;
+  size_t item_gui_index_ = 0;
+  size_t slot_index_ = 0;
 
-    static constexpr float kHotbarSize = 0.135f;
+  static constexpr float kHotbarSize = 0.135f;
 };

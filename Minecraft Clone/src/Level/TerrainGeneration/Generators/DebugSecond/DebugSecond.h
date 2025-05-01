@@ -2,8 +2,8 @@
 #include "Level/TerrainGeneration/Generators/Generator.h"
 
 class DebugWorldSecond : public WorldGenerator {
-   public:
-    DebugWorldSecond();
+ public:
+  DebugWorldSecond();
 
-    void Generate(const ChunkPos& pos, std::unique_ptr<Chunk>& chunk) override;
+  void Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) override;
 };

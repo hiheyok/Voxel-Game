@@ -3,21 +3,21 @@
 #include <string>
 
 class Timer {
-   public:
-    Timer() { first_ = std::chrono::high_resolution_clock::now(); }
+ public:
+  Timer() noexcept;
 
-    double GetTimePassed_ns() const;
-    double GetTimePassed_μs() const;
-    double GetTimePassed_ms() const;
-    double GetTimePassed_s() const;
+  double GetTimePassed_ns() const noexcept;
+  double GetTimePassed_μs() const noexcept;
+  double GetTimePassed_ms() const noexcept;
+  double GetTimePassed_s() const noexcept;
 
-    std::string StrGetTimePassed_ns() const;
-    std::string StrGetTimePassed_μs() const;
-    std::string StrGetTimePassed_ms() const;
-    std::string StrGetTimePassed_s() const;
+  std::string StrGetTimePassed_ns() const;
+  std::string StrGetTimePassed_μs() const;
+  std::string StrGetTimePassed_ms() const;
+  std::string StrGetTimePassed_s() const;
 
-    void Set();
+  void Set();
 
-   private:
-    std::chrono::high_resolution_clock::time_point first_;
+ private:
+  std::chrono::high_resolution_clock::time_point first_;
 };

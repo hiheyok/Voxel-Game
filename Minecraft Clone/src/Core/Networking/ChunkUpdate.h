@@ -8,14 +8,14 @@ namespace ChunkUpdatePacket {
 enum PacketType { ADD_CHUNK, LIGHT_UPDATE, DELETE_CHUNK };
 
 struct AddChunk {
-    ChunkRawData chunk_;
+  ChunkRawData chunk_;
 };
 
 struct LightUpdate {
-    LightStorage light_;
+  LightStorage light_;
 };
 
 struct DeleteChunk {
-    ChunkPos pos_;
+  ChunkPos pos_;
 };
 }  // namespace ChunkUpdatePacket

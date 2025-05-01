@@ -5,12 +5,12 @@
 class Dimension;
 
 struct Entity {
-    Entity();
+  Entity();
 
-    EntityProperty
-        properties_;  // Provide properties such as position, acceleration, etc.
+  EntityProperty
+      properties_;  // Provide properties such as position, acceleration, etc.
 
-    bool is_dirty_ = true;
+  bool is_dirty_ = true;
 
-    void Tick(Dimension* dimension);
+  void Tick(Dimension* dimension);
 };

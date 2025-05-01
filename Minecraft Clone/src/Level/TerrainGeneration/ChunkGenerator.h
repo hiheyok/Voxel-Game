@@ -8,29 +8,29 @@
 class Chunk;
 
 class ChunkGenerator {
-   public:
-    void Start(int ThreadCount, long long int WorldSeedIn,
-               WorldGeneratorID worldGeneratorType);
+ public:
+  void Start(int ThreadCount, int64_t WorldSeedIn,
+             WorldGeneratorID worldGeneratorType);
 
-    void Stop();  // Stop the threads and does some clean up
+  void Stop();  // Stop the threads and does some clean up
 
-    void Generate(const std::vector<ChunkPos>& ids);
-    void Generate(const ChunkPos& ids);
+  void Generate(const std::vector<ChunkPos>& ids);
+  void Generate(ChunkPos ids);
 
-    std::vector<std::unique_ptr<Chunk>> GetOutput();
+  std::vector<std::unique_ptr<Chunk>> GetOutput();
 
-   private:
-    /*
-     * Worker submitting output as std::vector<Chunk*> to handle tall chunks
-     * with multiple sub chunks for now
-     */
-    std::vector<std::unique_ptr<Chunk>> Worker(const ChunkPos& task);
+ private:
+  /*
+   * Worker submitting output as std::vector<Chunk*> to handle tall chunks
+   * with multiple sub chunks for now
+   */
+  std::vector<std::unique_ptr<Chunk>> Worker(ChunkPos task);
 
-    std::unique_ptr<ThreadPool<ChunkPos, std::vector<std::unique_ptr<Chunk>>>>
-        gen_pool_;
+  std::unique_ptr<ThreadPool<ChunkPos, std::vector<std::unique_ptr<Chunk>>>>
+      gen_pool_;
 
-    WorldGeneratorID world_generator_type_;
+  WorldGeneratorID world_generator_type_;
 
-    bool stop_ = false;
-    bool collect_ready_ = false;
+  bool stop_ = false;
+  bool collect_ready_ = false;
 };

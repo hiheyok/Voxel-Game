@@ -8,38 +8,39 @@ LightStorage::LightStorage(const LightStorage&) = default;
 LightStorage::~LightStorage() = default;
 
 bool LightStorage::operator==(const LightStorage& other) const {
-    int len = kChunkSize3D * 4 / 64;
-    for (int i = 0; i < len; ++i) {
-        if (other.data_[i] != data_[i]) return false;
-    }
-    return true;
+  int len = kChunkSize3D * 4 / 64;
+  for (int i = 0; i < len; ++i) {
+    if (other.data_[i] != data_[i]) return false;
+  }
+  return true;
 }
 
 const uint64_t* LightStorage::GetData() const { return data_; }
 
 void LightStorage::ReplaceData(const uint64_t* src) {
-    memcpy(data_, src, sizeof(uint64_t) * 256);
+  memcpy(data_, src, sizeof(uint64_t) * 256);
 }
 
-void LightStorage::EditLight(const BlockPos& pos, unsigned char lightingInfo) {
-    static constexpr uint64_t mask = kChunkDim - 1;
+void LightStorage::EditLight(BlockPos pos, uint8_t lightingInfo) {
+  static constexpr uint64_t mask = kChunkDim - 1;
 
-    data_[(pos.x << 4) | (pos.z)] &= (~(mask << (pos.y << 2)));
+  data_[(pos.x << 4) | (pos.z)] &= (~(mask << (pos.y << 2)));
 
-    data_[(pos.x << 4) | (pos.z)] |= ((uint64_t)lightingInfo << (pos.y << 2));
+  data_[(pos.x << 4) | (pos.z)] |=
+      (static_cast<uint64_t>(lightingInfo) << (pos.y << 2));
 }
 
-uint8_t LightStorage::GetLighting(const BlockPos& pos) const {
-    static constexpr uint64_t mask = kChunkDim - 1;
-    return (data_[(pos.x << 4) | (pos.z)] >> (pos.y << 2)) & mask;
+uint8_t LightStorage::GetLighting(BlockPos pos) const {
+  static constexpr uint64_t mask = kChunkDim - 1;
+  return (data_[(pos.x << 4) | (pos.z)] >> (pos.y << 2)) & mask;
 }
 
 void LightStorage::ResetLighting() {
-    memset((uint8_t*)data_, 0,
-           kChunkSize2D * sizeof(uint64_t));  // 8 = sizeof uint64_t
+  memset(reinterpret_cast<uint8_t*>(data_), 0,
+         kChunkSize2D * sizeof(uint64_t));  // 8 = sizeof uint64_t
 }
 
 void LightStorage::ResetLightingCustom(uint8_t lvl) {
-    memset((uint8_t*)data_, lvl | (lvl << 4),
-           kChunkSize2D * sizeof(uint64_t));  // 8 = sizeof uint64_t
+  memset(reinterpret_cast<uint8_t*>(data_), lvl | (lvl << 4),
+         kChunkSize2D * sizeof(uint64_t));  // 8 = sizeof uint64_t
 }

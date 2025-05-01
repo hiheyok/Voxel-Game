@@ -7,31 +7,31 @@
 
 namespace EntityUpdatePacket {
 enum PacketType {
-    ENTITY_SPAWN,
-    ENTITY_MOVE,
-    ENTITY_INVENTORY_UPDATE,
-    ENTITY_DESPAWN
+  ENTITY_SPAWN,
+  ENTITY_MOVE,
+  ENTITY_INVENTORY_UPDATE,
+  ENTITY_DESPAWN
 };
 
 struct EntitySpawn {
-    EntitySpawn() = default;
-    EntityProperty properties_;
+  EntitySpawn() = default;
+  EntityProperty properties_;
 };
 
 struct EntityMove {
-    EntityMove() = default;
-    EntityProperty properties_;
+  EntityMove() = default;
+  EntityProperty properties_;
 };
 
 struct EntityInventoryUpdate {
-    EntityInventoryUpdate() = default;
-    EntityUUID uuid;
-    ItemStack item_;
-    int slot_;
+  EntityInventoryUpdate() = default;
+  EntityUUID uuid;
+  ItemStack item_;
+  int slot_;
 };
 
 struct EntityDespawn {
-    EntityDespawn() = default;
-    EntityUUID uuid_;
+  EntityDespawn() = default;
+  EntityUUID uuid_;
 };
 }  // namespace EntityUpdatePacket

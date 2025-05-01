@@ -1,27 +1,24 @@
-#include <gl/glew.h>
-#include <GLFW/glfw3.h>
-#include "Utils/LogUtils.h"
 #include "Client/Client.h"
 #include "Level/Block/Blocks.h"
+#include "Utils/LogUtils.h"
 #define STB_IMAGE_IMPLEMENTATION
-#include "Utils/stb_image.h"
-#include "Core/Initializer.h"
-#include <cstdlib> 
 #include <time.h>
+
+#include <cstdlib>
+
+#include "Core/Initializer.h"
 #include "Core/Options/Option.h"
+#include "Utils/stb_image.h"
 
 int main() {
-    
-    stbi_set_flip_vertically_on_load(true);
-    srand(static_cast<unsigned int>(time(0)));//Set rng seed
+  stbi_set_flip_vertically_on_load(true);
+  srand(static_cast<uint32_t>(time(0)));  // Set rng seed
 
-    Initialize();
+  Initialize();
 
-    Client GameClient;
-    GameClient.run();
+  Client GameClient;
+  GameClient.run();
 
-    Options options;
-
-    g_logger.Stop();
-    return 0;
+  Options options;
+  return 0;
 }

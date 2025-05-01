@@ -518,12 +518,6 @@
     <ClInclude Include="src\Level\Entity\Properties\EntityProperties.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\ChunkRender\Occulsion\Data\OcculsionData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RenderEngine\ChunkRender\Occulsion\Data\OcculsionDataManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Level\Container\EntityContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -879,9 +873,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\TerrainGeneration\MapGen\MapGenBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\MapGen\MapGenCaves.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\BlockModel\ModelLoader.h">

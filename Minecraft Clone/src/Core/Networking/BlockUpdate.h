@@ -3,8 +3,8 @@
 
 namespace BlockUpdatePacket {
 struct BlockUpdate {
-    BlockID block_;
-    BlockPos pos_;
-    BlockUpdate() = default;
+  BlockID block_;
+  BlockPos pos_;
+  BlockUpdate() = default;
 };
 }  // namespace BlockUpdatePacket

@@ -5,6 +5,6 @@
 class Dimension;
 
 struct AirBlock : Block {
-    AirBlock();
-    void Tick(const BlockPos& pos, Dimension* currentWorld) override;
+  AirBlock();
+  void Tick(BlockPos pos, Dimension* currentWorld) override;
 };

@@ -5,6 +5,6 @@
 class Dimension;
 
 struct SolidBlock : Block {
-    SolidBlock();
-    virtual void Tick(const BlockPos& pos, Dimension* currentWorld) override;
+  SolidBlock();
+  virtual void Tick(BlockPos pos, Dimension* currentWorld) override;
 };

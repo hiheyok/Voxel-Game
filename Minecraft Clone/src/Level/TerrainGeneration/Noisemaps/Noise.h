@@ -3,11 +3,11 @@
 #include "Utils/FastNoiseLite.h"
 
 class NoiseGenerator {
-   private:
-    FastNoiseLite noise;
+ private:
+  FastNoiseLite noise;
 
-   public:
-    NoiseGenerator(JavaRandom seed) {
-        (void)seed;  // TODO Check this again later
-    }
+ public:
+  NoiseGenerator(JavaRandom seed) {
+    (void)seed;
+  }
 };

@@ -3,5 +3,5 @@
 #include <glm/vec3.hpp>
 
 struct DimensionProperties {
-    DimensionProperties() {}
+  DimensionProperties() {}
 };

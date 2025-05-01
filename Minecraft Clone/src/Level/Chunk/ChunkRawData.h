@@ -3,17 +3,17 @@
 #include "Level/Light/LightStorage.h"
 
 struct ChunkRawData {
-    ChunkRawData();
-    ChunkRawData(const Palette& chunkData, const LightStorage& lightData,
-                 const ChunkPos& pos);
-    ChunkRawData(const ChunkRawData&);
-    ChunkRawData(ChunkRawData&&);
-    ~ChunkRawData();
+  ChunkRawData();
+  ChunkRawData(const Palette& chunkData, const LightStorage& lightData,
+               ChunkPos pos);
+  ChunkRawData(const ChunkRawData&);
+  ChunkRawData(ChunkRawData&&);
+  ~ChunkRawData();
 
-    ChunkRawData& operator=(const ChunkRawData&);
-    ChunkRawData& operator=(ChunkRawData&&);
+  ChunkRawData& operator=(const ChunkRawData&);
+  ChunkRawData& operator=(ChunkRawData&&);
 
-    Palette chunk_data_;
-    LightStorage lighting_data_;
-    ChunkPos pos_;
+  Palette chunk_data_;
+  LightStorage lighting_data_;
+  ChunkPos pos_;
 };

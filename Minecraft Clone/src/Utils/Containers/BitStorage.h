@@ -1,23 +1,24 @@
 #pragma once
+#include <cstdint>
 #include <vector>
 
 class BitStorage3D {
-   public:
-    void Initialize(int x, int y, int z);
+ public:
+  void Initialize(int x, int y, int z);
 
-    void SetBit(int x, int y, int z);
+  void SetBit(int x, int y, int z);
 
-    void SetBit(int* pos);
+  void SetBit(int* pos);
 
-    bool GetBit(int x, int y, int z);
+  bool GetBit(int x, int y, int z);
 
-    bool GetBit(int* pos);
+  bool GetBit(int* pos);
 
-    void ClearBit(int x, int y, int z);
+  void ClearBit(int x, int y, int z);
 
-    void Clear();
+  void Clear();
 
-   private:
-    std::vector<unsigned long long> map_;
-    int sx_ = 0, sy_ = 0, sz_ = 0;
+ private:
+  std::vector<uint64_t> map_;
+  int sx_ = 0, sy_ = 0, sz_ = 0;
 };

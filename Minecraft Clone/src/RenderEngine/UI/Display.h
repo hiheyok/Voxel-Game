@@ -1,17 +1,17 @@
 #include "UI/DisplayVertices.h"
 
 class Display {
-   public:
-    Display() noexcept = default;
+ public:
+  Display() noexcept = default;
 
-    Display(const Display&) noexcept = default;
-    Display(Display&&) noexcept = default;
+  Display(const Display&) noexcept = default;
+  Display(Display&&) noexcept = default;
 
-    Display& operator=(const Display&) noexcept = default;
-    Display& operator=(Display&&) noexcept = default;
+  Display& operator=(const Display&) noexcept = default;
+  Display& operator=(Display&&) noexcept = default;
 
-    DisplayVertices GetDisplayVertices();
+  DisplayVertices GetDisplayVertices();
 
-   private:
-    DisplayVertices render_info_;
+ private:
+  DisplayVertices render_info_;
 };
