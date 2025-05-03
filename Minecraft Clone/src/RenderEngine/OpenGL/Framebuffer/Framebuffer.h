@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
 #include <gl/glew.h>
 
@@ -6,7 +8,7 @@
 
 class Shader;
 
-// TODO: Make this a child of texture class ??
+// TODO(hiheyok): Make this a child of texture class ??
 class TexturedFrameBuffer {
  public:
   TexturedFrameBuffer();

@@ -1,9 +1,24 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Level/TerrainGeneration/ChunkGenerator.h"
 
 #include <functional>
 
 #include "Level/Chunk/Chunk.h"
 #include "Level/TerrainGeneration/Generators/GeneratorType.h"
+
+ChunkGenerator::ChunkGenerator(int thread_count, int64_t world_seed,
+                               WorldGeneratorID gen_type) {
+  world_generator_type_ = gen_type;
+
+  gen_pool_ = std::make_unique<ThreadPool<ChunkPos, WorkerReturnType>>(
+      thread_count, "World Generator",
+      std::bind_front(&ChunkGenerator::Worker, this), 100);
+
+  WorldGenerator::SetSeed(world_seed);
+}
+
+ChunkGenerator::~ChunkGenerator() = default;
 
 std::vector<std::unique_ptr<Chunk>> ChunkGenerator::GetOutput() {
   std::vector<std::unique_ptr<Chunk>> output;
@@ -14,20 +29,6 @@ std::vector<std::unique_ptr<Chunk>> ChunkGenerator::GetOutput() {
 
   return output;
 }
-
-void ChunkGenerator::Start(int threadCount, int64_t worldSeedIn,
-                           WorldGeneratorID worldGeneratorType) {
-  world_generator_type_ = worldGeneratorType;
-
-  gen_pool_ = std::make_unique<
-      ThreadPool<ChunkPos, std::vector<std::unique_ptr<Chunk>>>>(
-      threadCount, "World Generator",
-      std::bind_front(&ChunkGenerator::Worker, this), 100);
-
-  WorldGenerator::SetSeed(worldSeedIn);
-}
-
-void ChunkGenerator::Stop() { gen_pool_->Stop(); }
 
 /*
  * Static function for the thread pool to use

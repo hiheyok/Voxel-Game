@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Level/Item/Inventory/Inventory.h"
 
 ItemStack Inventory::GetItem(int slot) { return storage_[slot]; }

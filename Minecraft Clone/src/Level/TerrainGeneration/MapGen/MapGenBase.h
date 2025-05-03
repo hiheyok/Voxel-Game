@@ -27,10 +27,10 @@ class MapGenBase {
   static void setupChunkSeed(int64_t seed, JavaRandom randIn, int p_191068_3_,
                              int p_191068_4_) {
     randIn.SetSeed(seed);
-    long i = randIn.NextLong();
-    long j = randIn.NextLong();
-    long k = (long)p_191068_3_ * i;
-    long l = (long)p_191068_4_ * j;
+    int64_t i = randIn.NextLong();
+    int64_t j = randIn.NextLong();
+    int64_t k = static_cast<int64_t>(p_191068_3_) * i;
+    int64_t l = static_cast<int64_t>(p_191068_4_) * j;
     randIn.SetSeed(k ^ l ^ seed);
   }
 

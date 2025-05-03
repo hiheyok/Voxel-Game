@@ -1,6 +1,9 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Client/Render/DebugScreen/DebugScreen.h"
 
 #include <gl/glew.h>
+#include <string>
 
 #include "RenderEngine/GUI/Font.h"
 #include "RenderEngine/GUI/TextRenderer.h"

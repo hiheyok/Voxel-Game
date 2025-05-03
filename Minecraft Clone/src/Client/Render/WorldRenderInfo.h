@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
 
 // TODO(hiheyok): use std::atomic for some of the stats

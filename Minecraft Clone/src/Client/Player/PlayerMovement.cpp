@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Client/Player/PlayerMovement.h"
 
 #include <cmath>
@@ -22,8 +24,8 @@ void PlayerMovement::Update(Player* player, const UserInputs& inputs,
 
 float PlayerMovement::VelocityMovementCurve(float current, float max,
                                             float delta) {
-  int currentTime =
-      static_cast<int>(-log(max - current) + log(max));  // TODO: Fix this
+  int currentTime = static_cast<int>(-log(max - current) +
+                                     log(max));  // TODO(hiheyok): Fix this
 
   int x = static_cast<int>(delta - log(max) - currentTime);
 

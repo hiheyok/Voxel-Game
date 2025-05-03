@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "RenderEngine/OpenGL/Buffers/BufferStorage.h"
 
 #include <GLFW/glfw3.h>

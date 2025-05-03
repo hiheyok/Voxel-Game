@@ -6,7 +6,7 @@
 class BiomeMesa : public Biome {
  private:
   std::vector<BlockID> clay_bands_;
-  long world_seed_ = 0;
+  int64_t world_seed_ = 0;
   std::unique_ptr<NoiseGeneratorPerlin> pillar_noise_;
   std::unique_ptr<NoiseGeneratorPerlin> pillar_roof_noise_;
   std::unique_ptr<NoiseGeneratorPerlin> clay_bands_offset_noise_;
@@ -25,7 +25,7 @@ class BiomeMesa : public Biome {
 
   const std::type_info& getBiomeClass() const override { return typeid(*this); }
 
-  void GenerateBands(long p_150619_1_) {
+  void GenerateBands(int64_t p_150619_1_) {
     clay_bands_.resize(64);
     for (int i = 0; i < 64; i++) clay_bands_[i] = g_blocks.TERRACOTTA;
     JavaRandom random = JavaRandom(p_150619_1_);

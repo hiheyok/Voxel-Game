@@ -21,8 +21,6 @@
 
 #include "RenderEngine/Camera/camera.h"
 
-using namespace glm;
-
 // We create an enum of the sides so we don't have to call each side 0 or 1.
 // This way it makes it more understandable and readable when dealing with
 // frustum sides.
@@ -57,9 +55,10 @@ void NormalizePlane(float frustum[6][4], int side) {
   // Remember that (A, B, C) is that same thing as the normal's (X, Y, Z).
   // To calculate magnitude you use the equation:  magnitude = sqrt( x^2 + y^2
   // + z^2)
-  float magnitude = (float)sqrt(frustum[side][A] * frustum[side][A] +
-                                frustum[side][B] * frustum[side][B] +
-                                frustum[side][C] * frustum[side][C]);
+  float magnitude =
+      static_cast<float>(sqrt(frustum[side][A] * frustum[side][A] +
+                              frustum[side][B] * frustum[side][B] +
+                              frustum[side][C] * frustum[side][C]));
 
   // Then we divide the plane's values by it's magnitude.
   // This makes it easier to work with.
@@ -81,10 +80,10 @@ void CFrustum::CalculateFrustum(Camera* cam) {
   float clip[16];
 
   glm::mat4 modl = cam->GetViewMatrix();
-  glm::mat4 proj =
-      perspective(glm::radians(cam->fov_),
-                  static_cast<float>(cam->screen_res_.x) / cam->screen_res_.y,
-                  0.001f, 32768.0f);
+  glm::mat4 proj = glm::perspective(
+      glm::radians(cam->fov_),
+      static_cast<float>(cam->screen_res_.x) / cam->screen_res_.y, 0.001f,
+      32768.0f);
 
   // Now that we have our modelview and projection matrix, if we combine these
   // 2 matrices, it will give us our clipping planes.  To combine 2 matrices,
@@ -417,6 +416,5 @@ bool CFrustum::CubeInFrustum(float x, float y, float z, float size) const {
 // Ben Humphrey (DigiBen)
 // Game Programmer
 // DigiBen@GameTutorials.com
-// �2000-2005 GameTutorials
 //
 //

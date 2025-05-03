@@ -1,4 +1,10 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
+
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "Utils/LogUtils.h"
 

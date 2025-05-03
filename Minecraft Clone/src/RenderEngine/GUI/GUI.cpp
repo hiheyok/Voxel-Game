@@ -1,5 +1,9 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "RenderEngine/GUI/GUI.h"
 
+#include <string>
+#include <utility>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 

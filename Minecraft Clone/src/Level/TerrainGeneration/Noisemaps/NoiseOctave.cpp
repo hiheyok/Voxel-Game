@@ -1,8 +1,10 @@
 #include "Level/TerrainGeneration/Noisemaps/NoiseOctave.h"
 
+#include <vector>
+
 int64_t NoiseOctave::lfloor(double value) {
-  int64_t i = (int64_t)value;
-  return value < static_cast<double>(i) ? i - 1L : i;
+  int64_t i = static_cast<int64_t>(value);
+  return i - 1L * (value < static_cast<double>(i));
 }
 
 std::vector<double> NoiseOctave::generateNoiseOctaves(

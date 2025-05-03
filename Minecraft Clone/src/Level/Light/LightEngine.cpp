@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Level/Light/LightEngine.h"
 
 #include <memory>
@@ -32,6 +34,16 @@ inline void UnpackLightNode(uint16_t node, uint8_t& x, uint8_t& y, uint8_t& z,
   light = (node >> 12) & 0xF;
 }
 
+LightEngine::LightEngine(size_t thread_count, WorldInterface* interface) {
+  lighting_thread_pool_ =
+      std::make_unique<ThreadPool<ChunkPos, WorkerReturnType>>(
+          thread_count, "Light Engine",
+          std::bind_front(&LightEngine::Worker, this), 100);
+
+  world_ = interface;
+}
+LightEngine::~LightEngine() = default;
+
 void LightEngine::IncreaseLightLevel(std::unique_ptr<LightStorage>& container,
                                      uint8_t lvl, int x, int y, int z) {
   uint8_t curr = container->GetLighting(BlockPos{x, y, z});
@@ -40,7 +52,7 @@ void LightEngine::IncreaseLightLevel(std::unique_ptr<LightStorage>& container,
 
 void LightEngine::WorkOnChunkSkylight(Chunk* chunk,
                                       std::unique_ptr<LightStorage>& light) {
-  const Heightmap& heightmap = *chunk->heightmap_.get();
+  const HeightMap& heightmap = *chunk->heightmap_.get();
   FIFOQueues.ResetData();
 
   for (int x = 0; x < kChunkDim; x++) {
@@ -58,12 +70,12 @@ void LightEngine::WorkOnChunkSkylight(Chunk* chunk,
   for (const auto& side : Directions<ChunkPos>()) {
     if (side.GetAxis() == Directions<ChunkPos>::kYAxis) continue;
 
-    ChunkContainer* neighbor = chunk->GetNeighbor(side);
-    if (neighbor == nullptr) {
+    std::optional<ChunkContainer*> neighbor = chunk->GetNeighbor(side);
+    if (!neighbor.has_value()) {
       continue;
     }
 
-    LightStorage neighborLight = neighbor->GetLightData();
+    LightStorage neighborLight = neighbor.value()->GetLightData();
 
     int axis = side.GetAxis();
     int direction = side.GetDirection() & 0b1;
@@ -155,7 +167,7 @@ void LightEngine::WorkOnChunkSkylight(Chunk* chunk,
 std::unique_ptr<LightStorage> LightEngine::Worker(ChunkPos pos) {
   Chunk* chunk = world_->GetChunk(pos);
 
-  Heightmap heightmap = *chunk->heightmap_;
+  HeightMap heightmap = *chunk->heightmap_;
 
   std::unique_ptr<LightStorage> lighting = std::make_unique<LightStorage>();
   lighting->ResetLightingCustom(4);
@@ -174,17 +186,6 @@ std::vector<std::unique_ptr<LightStorage>> LightEngine::GetOutput() {
   std::vector<std::unique_ptr<LightStorage>> out =
       lighting_thread_pool_->GetOutput();
   return out;
-}
-
-void LightEngine::Stop() { lighting_thread_pool_->Stop(); }
-
-void LightEngine::Start(int lightEngineThreadsCount, WorldInterface* w) {
-  lighting_thread_pool_ =
-      std::make_unique<ThreadPool<ChunkPos, std::unique_ptr<LightStorage>>>(
-          lightEngineThreadsCount, "Light Engine",
-          std::bind_front(&LightEngine::Worker, this), 100);
-
-  world_ = w;
 }
 
 void LightEngine::QueueChunk(ChunkPos pos) {

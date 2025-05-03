@@ -287,7 +287,6 @@
     <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\TextureArray.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\TextureAtlas.cpp" />
     <ClCompile Include="src\RenderEngine\Window.cpp" />
-    <ClCompile Include="src\Utils\Containers\BitStorage.cpp" />
     <ClCompile Include="src\Utils\Math\Probability\Probability.cpp" />
     <ClCompile Include="src\Level\Block\Blocks.cpp" />
     <ClCompile Include="src\Level\Entity\Entity.cpp" />
@@ -416,6 +415,7 @@
     <ClInclude Include="src\Utils\Containers\HashMapVector.h" />
     <ClInclude Include="src\Utils\Containers\N2BitVector.h" />
     <ClInclude Include="src\Utils\Containers\NBitVector.h" />
+    <ClInclude Include="src\Utils\Containers\PackedBitArray.h" />
     <ClInclude Include="src\Utils\Containers\robin_hood.h" />
     <ClInclude Include="src\RenderEngine\BlockModel\ModelLoader.h" />
     <ClInclude Include="src\RenderEngine\BlockModel\RectangularModel.h" />
@@ -430,7 +430,6 @@
     <ClInclude Include="src\RenderEngine\GUI\TextRenderer.h" />
     <ClInclude Include="src\RenderEngine\ItemRender\BlockItemRender.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureAtlas.h" />
-    <ClInclude Include="src\Utils\Containers\BitStorage.h" />
     <ClInclude Include="src\Level\Light\LightStorage.h" />
     <ClInclude Include="src\Level\Entity\Mobs\Player.h" />
     <ClInclude Include="src\Level\Event\ChunkEventHandles\ChunkHandles.h" />

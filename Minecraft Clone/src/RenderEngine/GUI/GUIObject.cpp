@@ -1,4 +1,8 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "RenderEngine/GUI/GUIObject.h"
+
+#include <string>
 
 GUIElement::GUIElement() = default;
 GUIElement::~GUIElement() = default;

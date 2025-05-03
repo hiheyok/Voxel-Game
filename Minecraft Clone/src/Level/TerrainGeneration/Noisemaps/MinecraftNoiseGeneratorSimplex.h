@@ -21,7 +21,7 @@ class NoiseGeneratorSimplex {
   double G2 = (3.0 - SQRT_3) / 6.0;
 
  public:
-  NoiseGeneratorSimplex(JavaRandom& seed);
+  explicit NoiseGeneratorSimplex(JavaRandom& seed);
   ~NoiseGeneratorSimplex();
 
   NoiseGeneratorSimplex();

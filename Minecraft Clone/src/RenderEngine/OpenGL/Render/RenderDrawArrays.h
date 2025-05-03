@@ -1,3 +1,7 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
+#pragma once
+
 #include "RenderEngine/OpenGL/Render/RenderObject.h"
 
 class RenderDrawArrays : public RenderObject {

@@ -1,14 +1,18 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Level/Chunk/Heightmap/Heightmap.h"
 
 #include "Core//Typenames.h"
 
-Heightmap::Heightmap() { data_.fill(-1); }
-Heightmap::~Heightmap() = default;
+HeightMap::HeightMap() { data_.fill(-1); }
+HeightMap::~HeightMap() = default;
 
-void Heightmap::Edit(int x, int z, int height) {
-  data_[x * kChunkDim + z] = height;
+void HeightMap::Edit(int x, int z, int height) noexcept {
+  data_[x * kChunkDim + z] = static_cast<int8_t>(height);
 }
 
-int Heightmap::Get(int x, int z) const { return data_[x * kChunkDim + z]; }
+int8_t HeightMap::Get(int x, int z) const noexcept {
+  return data_[x * kChunkDim + z];
+}
 
-void Heightmap::Clear() { data_.fill(-1); }
+void HeightMap::Clear() { data_.fill(-1); }

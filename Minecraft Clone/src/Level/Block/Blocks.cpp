@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Level/Block/Blocks.h"
 
 #include <filesystem>
@@ -11,7 +13,7 @@
 #include "RenderEngine/BlockModel/ModelLoader.h"
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
 
-// TODO : Implement model caching
+// TODO(hiheyok): Implement model caching
 using json = nlohmann::json;
 
 BlockID BlockList::RegisterBlock(std::string blockName, Block* block) {

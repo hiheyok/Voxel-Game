@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Level/Item/ItemTextureAtlas.h"
 
 void ItemTextureAtlas::RenderBlockItem(Item item) {

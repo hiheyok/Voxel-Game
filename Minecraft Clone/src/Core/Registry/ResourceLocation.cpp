@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Core/Registry/ResourceLocation.h"
 
 #include <string>
@@ -13,9 +15,7 @@ ResourceLocation::ResourceLocation(std::string path, std::string namespaceIn) {
 
 ResourceLocation::~ResourceLocation() = default;
 
-ResourceLocation::ResourceLocation(ResourceLocation&& other) noexcept {
-  *this = std::move(other);
-}
+ResourceLocation::ResourceLocation(ResourceLocation&& other) noexcept = default;
 ResourceLocation::ResourceLocation(const ResourceLocation&) = default;
 
 void ResourceLocation::SetPath(std::string path, std::string namespaceIn) {

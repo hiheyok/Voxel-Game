@@ -21,7 +21,7 @@
 #include "BiomeType/BiomeTaiga.h"
 #include "BiomeType/BiomeVoid.h"
 
-// TODO: Rework this to not use static variables
+// TODO(hiheyok): Rework this to not use static variables
 
 class Biomes {
  public:

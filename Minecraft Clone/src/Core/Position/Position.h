@@ -1,5 +1,6 @@
-#ifndef CORE_POSITION_POSITION_H
-#define CORE_POSITION_POSITION_H
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
+#pragma once
 
 #include <cmath>
 #include <cstddef>
@@ -32,11 +33,12 @@ class Position {
     z = pz;
   }
 
-  void IncrementSide(int side, int val) noexcept {
+  Derived& IncrementSide(int side, int val) noexcept {
     const int direction = 1 - 2 * (side & 1);
     const int axis = side >> 1;
 
     (*this)[axis] += direction * val;
+    return *static_cast<Derived*>(this);
   }
 
   int& operator[](int axis) noexcept {
@@ -207,5 +209,3 @@ string to_string(const T& obj) {
          to_string(obj.z) + "]";
 }
 }  // namespace std
-
-#endif

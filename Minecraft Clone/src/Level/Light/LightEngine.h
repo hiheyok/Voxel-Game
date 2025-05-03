@@ -1,24 +1,32 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
+
 #include <memory>
+#include <type_traits>
 #include <vector>
 
 #include "Core/Typenames.h"
 #include "Utils/ThreadPool.h"
 
 class LightStorage;
-class Heightmap;
+class HeightMap;
 class Chunk;
 class WorldInterface;
 
 class LightEngine {
  public:
+  LightEngine(size_t thread_count, WorldInterface* interface);
+  ~LightEngine();
+
+  LightEngine(const LightEngine&) = delete;
+  LightEngine(LightEngine&&) = delete;
+  LightEngine& operator=(const LightEngine&) = delete;
+  LightEngine& operator=(LightEngine&&) = delete;
+
   void Generate(const std::vector<ChunkPos>& IDs);
 
   std::vector<std::unique_ptr<LightStorage>> GetOutput();
-
-  void Stop();
-
-  void Start(int lightEngineThreadsCount, WorldInterface* w);
 
   void QueueChunk(ChunkPos pos);
 
@@ -27,8 +35,10 @@ class LightEngine {
  private:
   std::unique_ptr<LightStorage> Worker(ChunkPos pos);
 
-  std::unique_ptr<ThreadPool<ChunkPos, std::unique_ptr<LightStorage>>>
-      lighting_thread_pool_;
+  using WorkerReturnType = std::invoke_result_t<decltype(&LightEngine::Worker),
+                                                LightEngine*, ChunkPos>;
+
+  std::unique_ptr<ThreadPool<ChunkPos, WorkerReturnType>> lighting_thread_pool_;
   WorldInterface* world_;
 
   void IncreaseLightLevel(std::unique_ptr<LightStorage>& container, uint8_t lvl,

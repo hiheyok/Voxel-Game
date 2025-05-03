@@ -16,7 +16,7 @@ class JavaRandom {
 
   int NextInt() noexcept;
 
-  uint64_t NextLong() noexcept;
+  int64_t NextLong() noexcept;
 
   bool NextBoolean() noexcept;
 

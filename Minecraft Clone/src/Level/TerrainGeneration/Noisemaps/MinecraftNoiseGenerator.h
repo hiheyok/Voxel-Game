@@ -4,7 +4,7 @@
 
 class NoiseGeneratorImproved {
  public:
-  NoiseGeneratorImproved(JavaRandom& random);
+  explicit NoiseGeneratorImproved(JavaRandom& random);
 
   ~NoiseGeneratorImproved() noexcept;
 

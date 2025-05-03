@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Level/Dimension/Dimension.h"
 
 #include "Level/Light/LightEngine.h"
@@ -9,14 +11,17 @@ Dimension::Dimension(DimensionProperties properties,
     : properties_{properties},
       generator_type_{generatorType},
       main_world_{std::make_unique<World>()},
-      chunk_generator_{std::make_unique<ChunkGenerator>()},
-      light_engine_{std::make_unique<LightEngine>()} {
+      chunk_generator_{std::make_unique<ChunkGenerator>(
+          g_app_options.world_gen_threads_, kWorldSeed, generatorType)} {
   world_settings_.horizontal_ticking_distance_ =
       g_app_options.horizontal_render_distance_;
   world_settings_.vertical_ticking_distance_ =
       g_app_options.vertical_render_distance_;
 
   world_ = static_cast<WorldInterface*>(main_world_.get());
+  light_engine_ = std::make_unique<LightEngine>(
+      g_app_options.light_engine_threads_, world_);
+
   world_updater_ =
       std::make_unique<WorldUpdater>(main_world_.get(), world_settings_);
   collusion_detector_ =
@@ -25,10 +30,6 @@ Dimension::Dimension(DimensionProperties properties,
   if (g_generators.GetGenerator(generator_type_)->use_tall_chunks_) {
     world_updater_->tall_generation_ = true;
   }
-
-  light_engine_->Start(g_app_options.light_engine_threads_, world_);
-  chunk_generator_->Start(g_app_options.world_gen_threads_, kWorldSeed,
-                          generatorType);
 }
 Dimension::~Dimension() = default;
 
@@ -67,7 +68,7 @@ void Dimension::EventTick() {
             CheckTickUsed(entityEvent.unique_id_, entityEvent.pos_)) {
           continue;
         }
-        // TODO: tmp fix rework this later
+        // TODO(hiheyok): tmp fix rework this later
         if ((entityEvent.unique_id_ != 0)) {
           TickUsed(static_cast<EventID>(entityEvent.entity_uuid_),
                    entityEvent.pos_);

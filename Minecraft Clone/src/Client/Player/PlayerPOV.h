@@ -1,7 +1,10 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
+
+#include <memory>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
-#include <memory>
 
 class Camera;
 

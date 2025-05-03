@@ -1,4 +1,10 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Client/Profiler/PerformanceProfiler.h"
+
+#include <iostream>
+#include <string>
+#include <vector>
 
 #include "FileManager/Files.h"
 #include "Utils/Timer/Timer.h"
@@ -105,7 +111,7 @@ void PerformanceProfiler::CombineCache(PerformanceProfiler profiler) {
 
 PerformanceProfiler::PerformanceTree::PerformanceTree() = default;
 PerformanceProfiler::PerformanceTree::PerformanceTree(std::string name)
-    : name_(name) {};
+    : name_(name) {}
 
 void PerformanceProfiler::PerformanceTree::ChangeTime(
     std::vector<std::string>& path, int depth, double time) {

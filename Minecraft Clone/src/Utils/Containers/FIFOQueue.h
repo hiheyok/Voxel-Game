@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #ifndef UTILS_CONTAINERS_FIFO_QUEUE_H
 #define UTILS_CONTAINERS_FIFO_QUEUE_H
 

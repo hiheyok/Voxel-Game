@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "RenderEngine/OpenGL/Render/RenderDrawArrays.h"
 
 RenderDrawArrays::RenderDrawArrays(uint32_t draw_type) {

@@ -1,7 +1,9 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
-#include <glm/vec3.hpp>
 #include <memory>
 #include <string>
+#include <glm/vec3.hpp>
 
 class TextRenderer;
 class Timer;

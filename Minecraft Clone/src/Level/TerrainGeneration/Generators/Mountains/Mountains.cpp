@@ -53,8 +53,8 @@ void MountainGenerator::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
     }
   }
 
-  GenerateEnvironment(scaledPos, chunk.get());
-  GenerateDecor(scaledPos, chunk.get());
+  GenerateEnvironment(pos, chunk.get());
+  GenerateDecor(pos, chunk.get());
 
   int gx = scaledPos.x;
   int gz = scaledPos.z;
@@ -114,8 +114,8 @@ void MountainGenerator::GenerateDecor(ChunkPos pos, Chunk* chunk) {
   for (int x = 0; x < kChunkDim; x++) {
     for (int z = 0; z < kChunkDim; z++) {
       // Global Pos
-      int gx = pos.x + x;
-      int gz = pos.z + z;
+      int gx = pos.x * kChunkDim + x;
+      int gz = pos.z * kChunkDim + z;
 
       float TREE_MAP =
           (noise_->GetNoise(static_cast<float>(gx) * 100.f,
@@ -158,12 +158,15 @@ void MountainGenerator::GenerateDecor(ChunkPos pos, Chunk* chunk) {
 
   int radius = 40;
 
-  for (int x = 0 + pos.x; x < kChunkDim + pos.x; x++) {
-    for (int z = 0 + pos.z; z < kChunkDim + pos.z; z++) {
-      for (int y = 0 + pos.y; y < kChunkDim + pos.y; y++) {
+  for (int x = 0 + pos.x * kChunkDim; x < kChunkDim + pos.x * kChunkDim; x++) {
+    for (int z = 0 + pos.z * kChunkDim; z < kChunkDim + pos.z * kChunkDim;
+         z++) {
+      for (int y = 0 + pos.y * kChunkDim; y < kChunkDim + pos.y * kChunkDim;
+           y++) {
         if ((x * x) + (y - 140) * (y - 140) + z * z <= radius * radius) {
           chunk->SetBlock(g_blocks.SAND,
-                          BlockPos{x - pos.x, y - pos.y, z - pos.z});
+                          BlockPos{x - pos.x * kChunkDim, y - pos.y * kChunkDim,
+                                   z - pos.z * kChunkDim});
         }
 
         // if (y == 90) {
@@ -174,12 +177,14 @@ void MountainGenerator::GenerateDecor(ChunkPos pos, Chunk* chunk) {
   }
 
   // Create a roof to test lighting
-  if (pos.y != kChunkDim * 5) return;
-  for (int x = 0 + pos.x; x < kChunkDim + pos.x; x++) {
-    for (int z = 0 + pos.z; z < kChunkDim + pos.z; z++) {
+  if (pos.y != 5) return;
+  for (int x = 0 + pos.x * kChunkDim; x < kChunkDim + pos.x * kChunkDim; x++) {
+    for (int z = 0 + pos.z * kChunkDim; z < kChunkDim + pos.z * kChunkDim;
+         z++) {
       if ((x - 100) * (x - 100) + (z - 100) * (z - 100) <= 100 * 100) {
-        chunk->SetBlock(g_blocks.WHITE_CONCRETE,
-                        BlockPos{x - pos.x, 10, z - pos.z});
+        chunk->SetBlock(
+            g_blocks.WHITE_CONCRETE,
+            BlockPos{x - pos.x * kChunkDim, 10, z - pos.z * kChunkDim});
       }
 
       // if (y == 90) {

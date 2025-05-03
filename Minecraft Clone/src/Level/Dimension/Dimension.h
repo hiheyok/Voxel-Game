@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
 #include "Core/Options/Option.h"
 #include "Level/Container/EntityContainer.h"
@@ -18,7 +20,7 @@ class LightEngine;
 class Dimension {
  public:
   EventSystem event_manager_;
-  const int tick_rate_ = 20;  // TODO: tmp fix
+  const int tick_rate_ = 20;  // TODO(hiheyok): tmp fix
 
   Dimension(DimensionProperties properties,
             WorldGeneratorID generatorTypeIn = g_generators.DEBUG);

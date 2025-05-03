@@ -77,8 +77,8 @@ class ChunkMeshData {
   void AddFaceToMesh(const BlockFace& face, uint8_t axis, glm::ivec3 from,
                      glm::ivec3 to, bool allow_ao, BlockPos pos);
 
-  const BlockID& GetCachedBlockID(BlockPos pos) const;
-  void SetCachedBlockID(BlockID b, BlockPos pos);
+  const BlockID& GetCachedBlockID(BlockPos pos) const noexcept;
+  void SetCachedBlockID(BlockID b, BlockPos pos) noexcept;
 
   glm::u8vec4 GetAO(uint8_t direction, BlockPos pos);
 

@@ -1,7 +1,10 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
 #include <iostream>
 #include <stack>
 #include <string>
+#include <vector>
 
 #include "Core/Typenames.h"
 
@@ -41,7 +44,7 @@ class PerformanceProfiler {
 
   struct PerformanceTree {
     PerformanceTree();
-    PerformanceTree(std::string name);
+    explicit PerformanceTree(std::string name);
 
     void ChangeTime(std::vector<std::string>& path, int depth, double time);
 

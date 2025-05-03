@@ -1,4 +1,7 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
+
 #include <glm/vec2.hpp>
 
 #include "Core/Typenames.h"
@@ -12,7 +15,7 @@ struct MouseInputs {
   ButtonState middle_ = RELEASE;
   ButtonState right_ = RELEASE;
 
-  ScrollState scroll_direction_ = SCROLL_NONE;  //-1 or 1
+  ScrollState scroll_direction_ = SCROLL_NONE;  // -1 or 1
 
   glm::dvec2 displacement_ = glm::dvec2(0.f, 0.f);
   glm::dvec2 position_ = glm::dvec2(0.f, 0.f);

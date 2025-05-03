@@ -1,16 +1,16 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
 
-#ifndef CHUNKDATA_H
-#define CHUNKDATA_H
-
 #include <glm/vec3.hpp>
+#include <optional>
 #include <vector>
 
 #include "Core/Typenames.h"
 #include "Level/Chunk/Palette.h"
 #include "Level/Light/LightStorage.h"
 
-class Heightmap;
+class HeightMap;
 class LightStorage;
 
 struct ChunkRawData;
@@ -24,12 +24,12 @@ class ChunkContainer {
   ChunkContainer(ChunkContainer&&);
   ChunkContainer(const ChunkContainer&) = delete;
 
-  void SetNeighbor(ChunkContainer* neighbor, uint32_t side);
-  ChunkContainer* GetNeighbor(uint32_t side) const;
+  void SetNeighbor(ChunkContainer* neighbor, int side);
+  std::optional<ChunkContainer*> GetNeighbor(int side) const noexcept;
   void ClearNeighbors();
 
   BlockID GetBlock(BlockPos pos) const;
-  BlockID GetBlockUnsafe(BlockPos pos) const;
+  BlockID GetBlockUnsafe(BlockPos pos) const noexcept;
 
   void SetBlock(BlockID block, BlockPos pos);
   void SetBlockUnsafe(BlockID block, BlockPos pos);
@@ -49,15 +49,15 @@ class ChunkContainer {
   void SetLightDirty();
 
   ChunkPos position_;
-  std::vector<ChunkContainer*> neighbors_;
-  std::vector<std::vector<SetBlockRelative>> outside_block_to_place_;
   std::unique_ptr<LightStorage> lighting_;
-  std::unique_ptr<Heightmap> heightmap_;
+  std::unique_ptr<HeightMap> heightmap_;
   bool is_empty_ = true;
+  std::vector<std::vector<SetBlockRelative>> outside_block_to_place_;
+
+ protected:
+  std::vector<std::optional<ChunkContainer*>> neighbors_;
 
  private:
   bool light_dirty_ = false;
   Palette block_storage_;
 };
-
-#endif

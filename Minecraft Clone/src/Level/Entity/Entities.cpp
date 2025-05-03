@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Level/Entity/Entities.h"
 
 #include <fstream>
@@ -96,7 +98,7 @@ void EntitiesList::InitializeModels() {
 
           std::string texSide = uvFace.value();
 
-          // TODO: refactor FRONT BACK LEFT RIGHT TOP BOTTOM to new
+          // TODO(hiheyok): refactor FRONT BACK LEFT RIGHT TOP BOTTOM to new
           // directions
           if (texSide == "FRONT") s = Directions<BlockPos>::kEast;
           if (texSide == "BACK") s = Directions<BlockPos>::kWest;

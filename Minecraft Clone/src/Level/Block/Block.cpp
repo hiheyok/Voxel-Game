@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Level/Block/Block.h"
 
 #include "FileManager/Files.h"

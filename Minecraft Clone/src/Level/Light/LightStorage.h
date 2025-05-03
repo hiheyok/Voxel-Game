@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
 #include <cctype>
 
@@ -6,22 +8,22 @@
 class LightStorage {  // Contains all lighting infomation for solid blocks
  public:
   LightStorage();
-  LightStorage(const LightStorage&);
-  LightStorage(LightStorage&&);
+  LightStorage(const LightStorage&) noexcept;
+  LightStorage(LightStorage&&) noexcept;
   ~LightStorage();
 
-  LightStorage& operator=(const LightStorage&) = default;
-  LightStorage& operator=(LightStorage&&) = default;
+  LightStorage& operator=(const LightStorage&) noexcept;
+  LightStorage& operator=(LightStorage&&) noexcept;
 
-  bool operator==(const LightStorage&) const;
+  bool operator==(const LightStorage&) const noexcept;
 
   const uint64_t* GetData() const;
 
   void ReplaceData(const uint64_t* src);
 
-  void EditLight(BlockPos pos, uint8_t LightingInfo);
+  void EditLight(BlockPos pos, uint8_t LightingInfo) noexcept;
 
-  uint8_t GetLighting(BlockPos pos) const;
+  uint8_t GetLighting(BlockPos pos) const noexcept;
 
   void ResetLighting();
 

@@ -1,7 +1,11 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
+
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <memory>
+#include <vector>
 
 #include "Core/Typenames.h"
 #include "Utils/ThreadPool.h"
@@ -20,8 +24,13 @@ struct ChunkVertexData;
 
 class WorldRender : public WorldRenderInfo {
  public:
-  WorldRender(PlayerPOV* player);
+  explicit WorldRender(PlayerPOV* player);
   ~WorldRender();
+
+  WorldRender(const WorldRender&) = delete;
+  WorldRender(WorldRender&&) = delete;
+  WorldRender& operator=(const WorldRender&) = delete;
+  WorldRender& operator=(WorldRender&&) = delete;
 
   void Render();
 
@@ -29,8 +38,6 @@ class WorldRender : public WorldRenderInfo {
 
   void Start(GLFWwindow* window, ClientCache* cache,
              PerformanceProfiler* profiler);
-
-  void Stop();
 
   void Update(std::vector<ChunkPos> updatedChunks);
 
@@ -43,8 +50,10 @@ class WorldRender : public WorldRenderInfo {
   void LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks);
   std::unique_ptr<Mesh::ChunkVertexData> Worker(ChunkPos pos);
 
-  std::unique_ptr<ThreadPool<ChunkPos, std::unique_ptr<Mesh::ChunkVertexData>>>
-      mesh_thread_pool_;
+  using WorkerReturnType = std::invoke_result_t<decltype(&WorldRender::Worker),
+                                                WorldRender*, ChunkPos>;
+
+  std::unique_ptr<ThreadPool<ChunkPos, WorkerReturnType>> mesh_thread_pool_;
   std::vector<std::unique_ptr<Mesh::ChunkVertexData>> mesh_add_queue_;
 
   PlayerPOV* player_;

@@ -1,4 +1,8 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "RenderEngine/OpenGL/Shader/ComputeShader.h"
+
+#include <string>
 
 ComputeShader::ComputeShader(std::string source) {
   std::string shaderSource = ReadFile(source);

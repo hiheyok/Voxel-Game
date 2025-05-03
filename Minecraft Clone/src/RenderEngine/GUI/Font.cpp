@@ -1,4 +1,9 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "RenderEngine/GUI/Font.h"
+
+#include <string>
+#include <vector>
 
 glm::vec4 RenderableFont::GetCharUV(char c) {
   int index = static_cast<int>(c);

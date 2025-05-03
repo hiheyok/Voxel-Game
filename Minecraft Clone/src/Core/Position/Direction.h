@@ -1,4 +1,7 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
+
 #include <vector>
 
 #include "Core/Position/PositionTypes.h"
@@ -47,9 +50,9 @@ class Direction {
 
   constexpr int GetAxis() const { return direction_ >> 1; }
 
-  constexpr bool IsPositive() const { return (direction_ & 0b1) == 0; }
+  constexpr bool IsPositive() const { return (direction_ & 1) == 0; }
 
-  constexpr bool IsNegative() const { return (direction_ & 0b1) == 1; }
+  constexpr bool IsNegative() const { return (direction_ & 1) == 1; }
 
   constexpr operator int() const { return direction_; }
 

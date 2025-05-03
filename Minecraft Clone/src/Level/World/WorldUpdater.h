@@ -53,7 +53,7 @@ class WorldUpdater {
   std::unique_ptr<WorldParameters> settings_;
   World* world_ = nullptr;
   std::mutex lock_;
-  std::mutex other_lock_;  // TODO: tmp fix this later
+  std::mutex other_lock_;  // TODO(hiheyok): tmp fix this later
   bool is_spawn_chunks_loaded_ = false;
   std::vector<ChunkPos> chunk_request_;
 

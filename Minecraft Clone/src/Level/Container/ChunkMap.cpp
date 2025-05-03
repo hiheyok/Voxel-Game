@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Level/Container/ChunkMap.h"
 
 #include <limits>
@@ -31,13 +33,13 @@ void ChunkMap::EraseChunk(ChunkPos pos) {
   std::swap(chunks_[idx], chunks_.back());
   chunks_.pop_back();
 
-  ChunkContainer* bottomChunk =
+  auto bottom_chunk =
       reg->GetChunk(pos)->GetNeighbor(Directions<ChunkPos>::kDown);
 
   reg->EraseChunk(pos);
 
-  if (heightmap_update_) {
-    bottomChunk->UpdateHeightMap();
+  if (heightmap_update_ && bottom_chunk.has_value()) {
+    bottom_chunk.value()->UpdateHeightMap();
   }
 
   // Delete region if it is empty

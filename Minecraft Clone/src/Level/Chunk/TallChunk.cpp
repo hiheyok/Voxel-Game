@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Level/Chunk/TallChunk.h"
 
 TallChunk::TallChunk() {
@@ -21,7 +23,7 @@ int TallChunk::GetXPosition() { return chunk_sub_column_[0]->position_.x; }
 
 int TallChunk::GetZPosition() { return chunk_sub_column_[0]->position_.z; }
 
-// TODO: Refactor to use TallBlockPos later
+// TODO(hiheyok): Refactor to use TallBlockPos later
 void TallChunk::SetBlockUnsafe(int x, int y, int z, BlockID block) {
   int ChunkIndex = y / 16;
   chunk_sub_column_[ChunkIndex]->SetBlockUnsafe(block,

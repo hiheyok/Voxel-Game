@@ -1,4 +1,9 @@
-#include "BlockitemRender.h"
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
+#include "RenderEngine/ItemRender/BlockItemRender.h"
+
+#include <memory>
+#include <vector>
 
 #include "Level/Block/Block.h"
 #include "Level/Block/Blocks.h"

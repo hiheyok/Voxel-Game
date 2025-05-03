@@ -1,9 +1,14 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "RenderEngine/GUI/TextRenderer.h"
 
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 
 #include <exception>
+#include <memory>
+#include <string>
+#include <vector>
 
 #include "RenderEngine/GUI/Font.h"
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"

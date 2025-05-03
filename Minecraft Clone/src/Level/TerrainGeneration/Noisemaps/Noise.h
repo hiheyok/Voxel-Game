@@ -7,7 +7,7 @@ class NoiseGenerator {
   FastNoiseLite noise;
 
  public:
-  NoiseGenerator(JavaRandom seed) {
+  explicit NoiseGenerator(JavaRandom seed) {
     (void)seed;
   }
 };

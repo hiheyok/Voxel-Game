@@ -1,4 +1,10 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Server/Server.h"
+
+#include <memory>
+#include <utility>
+#include <vector>
 
 #include "Core/Interfaces/ClientInterface.h"
 #include "Core/Interfaces/InternalInterface.h"
@@ -180,7 +186,7 @@ void Server::SendChunkUpdatePacket(ClientInterface* receiver) {
 
   for (const auto& pos : updated_chunks) {
     ChunkContainer* chunk = level_->main_world_->world_->GetChunk(pos);
-    if (chunk == nullptr) continue;  // TODO: Fix this later
+    if (chunk == nullptr) continue;  // TODO(hiheyok): Fix this later
     ChunkRawData data = chunk->GetRawData();
 
     ChunkUpdatePacket::AddChunk packet;
@@ -200,8 +206,8 @@ void Server::SendChunkUpdatePacket(ClientInterface* receiver) {
 
 void Server::SendServerStats(ClientInterface* receiver) {
   ServerStats stats;
-  stats.chunk_count_ =
-      0;  // level_->level_loader_->GetChunkCount(); TODO: Add chunk counter
+  stats.chunk_count_ = 0;  // level_->level_loader_->GetChunkCount();
+                           // TODO(hiheyok): Add chunk counter
   stats.mspt_ = mspt_;
   stats.event_queued_ = 0;
   receiver->SendServerStats(stats);

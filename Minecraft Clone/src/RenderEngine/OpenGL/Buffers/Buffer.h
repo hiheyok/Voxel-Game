@@ -1,6 +1,8 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
-#include <cstdint>
 #include <gl/glew.h>
+#include <cstdint>
 
 class Buffer {
  public:

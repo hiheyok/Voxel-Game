@@ -1,6 +1,7 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
 #include <array>
-#include <vector>
 
 #include "Core/Typenames.h"
 /*
@@ -10,17 +11,17 @@ heightmap for chunk column 32 * 16 = 512 blocks columns 9 bits per column
 16 x 16 * 9 = 2304 bits = 36 uint64_t
 */
 
-class Heightmap {
+class HeightMap {
  public:
-  Heightmap();
-  ~Heightmap();
+ HeightMap();
+  ~HeightMap();
 
-  void Edit(int x, int z, int height);
+  void Edit(int x, int z, int height) noexcept;
 
-  int Get(int x, int z) const;
+  int8_t Get(int x, int z) const noexcept;
 
   void Clear();
 
  private:
-  std::array<char, kChunkSize2D> data_;
+  std::array<int8_t, kChunkSize2D> data_;
 };

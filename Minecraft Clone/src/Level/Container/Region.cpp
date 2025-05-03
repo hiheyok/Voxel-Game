@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Level/Container/Region.h"
 
 #include <exception>
@@ -13,9 +15,7 @@ Region::Region() {
 Region::~Region() = default;
 
 Chunk* Region::GetChunk(ChunkPos pos) const {
-  ChunkPos localChunkPos = pos & (kRegionDim - 1);
-  int idx = localChunkPos.x * kRegionSize2D + localChunkPos.y * kRegionDim +
-            localChunkPos.z;
+  int idx = pos.GetIndex();
   if (!CheckChunk(pos)) {
     g_logger.LogError("ClientRegion::GetChunk",
                       "Tried to get non-existent chunk!");
@@ -24,22 +24,18 @@ Chunk* Region::GetChunk(ChunkPos pos) const {
 }
 
 bool Region::CheckChunk(ChunkPos pos) const {
-  ChunkPos localChunkPos = pos & (kRegionDim - 1);
-  int idx = localChunkPos.x * kRegionSize2D + localChunkPos.y * kRegionDim +
-            localChunkPos.z;
+  int idx = pos.GetIndex();
   return region_data_[idx] != nullptr;
 }
 
 void Region::InsertChunk(std::unique_ptr<Chunk> chunk) {
   ChunkPos pos = chunk->position_;
-  ChunkPos localChunkPos = pos & (kRegionDim - 1);
-  int idx = localChunkPos.x * kRegionSize2D + localChunkPos.y * kRegionDim +
-            localChunkPos.z;
+  int idx = pos.GetIndex();
   if (region_data_[idx] != nullptr) {
     g_logger.LogWarn(
         "ClientRegion::InsertChunk",
-        "Chunk already exist! Replacing chunk");  // TODO: Maybe change this
-                                                  // to error later
+        "Chunk already exist! Replacing chunk");  // TODO(hiheyok): Maybe change
+                                                  // this to error later
     chunk_count_--;
   }
   chunk_count_++;
@@ -47,9 +43,7 @@ void Region::InsertChunk(std::unique_ptr<Chunk> chunk) {
 }
 
 void Region::EraseChunk(ChunkPos pos) {
-  ChunkPos localChunkPos = pos & (kRegionDim - 1);
-  int idx = localChunkPos.x * kRegionSize2D + localChunkPos.y * kRegionDim +
-            localChunkPos.z;
+  int idx = pos.GetIndex();
   if (region_data_[idx] == nullptr) {
     g_logger.LogWarn(
         "ClientRegion::EraseChunk",

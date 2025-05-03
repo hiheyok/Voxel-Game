@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Level/Chunk/Palette.h"
 
 Palette::Palette()
@@ -39,11 +41,12 @@ void Palette::Shrink() {
     newData.Set(i, newVal);
   }
 
-  data_ = newData;
+  data_ = std::move(newData);
   current_bit_width_ = newBitWidth;
 
   // refactor palette block index
-  palette_entries_ = newBlockToPaletteIndex;
+  palette_entries_ = std::move(newBlockToPaletteIndex);
+  empty_slot_counter_ = 0;
 }
 
 void Palette::Grow() {
@@ -54,7 +57,7 @@ void Palette::Grow() {
     newData.Set(i, data_.Get(i));
   }
 
-  data_ = newData;
+  data_ = std::move(newData);
 }
 
 void Palette::Resize() {
@@ -84,13 +87,10 @@ Palette::PaletteIndex Palette::GetOrAddPaletteIndex(BlockID block) {
     }
   }
 
-  // d1++;
-
   if (foundZero) {
     palette_entries_[firstZero].first = block;
     return firstZero;
   }
-  // d2++;
 
   palette_entries_.emplace_back(block, static_cast<int16_t>(0));
   Resize();
@@ -105,12 +105,7 @@ BlockID Palette::GetBlock(BlockPos pos) const {
     throw std::out_of_range("Palette::GetBlock - Invalid palette index");
   }
 
-  PaletteIndex idx = static_cast<PaletteIndex>(data_.Get(pos.GetIndex()));
-
-  if (idx >= palette_entries_.size())
-    throw std::runtime_error("Palette::GetBlock - Error in getting BlockID");
-
-  return palette_entries_[idx].first;
+  return GetBlockUnsafe(pos);
 }
 
 BlockID Palette::GetBlockUnsafe(BlockPos pos) const noexcept {
@@ -123,40 +118,7 @@ void Palette::SetBlock(BlockID block, BlockPos pos) {
     throw std::out_of_range("Palette::SetBlock - Invalid palette index");
   }
 
-  // Look at original block
-  PaletteIndex oldPaletteIdx =
-      static_cast<PaletteIndex>(data_.Get(pos.GetIndex()));
-
-  if (oldPaletteIdx >= palette_entries_.size() ||
-      palette_entries_[oldPaletteIdx].second <= 0) {
-    throw std::runtime_error(
-        "Palette::SetBlock - Corrupt old palette index found in data.");
-  }
-
-  BlockID oldBlockId = palette_entries_[oldPaletteIdx].first;
-
-  if (block == oldBlockId) {
-    return;
-  }
-  bool uniqueCountChanged = false;
-
-  palette_entries_[oldPaletteIdx].second--;
-  if (palette_entries_[oldPaletteIdx].second == 0) {
-    unique_blocks_count_--;
-    uniqueCountChanged = true;
-  }
-
-  PaletteIndex idx = GetOrAddPaletteIndex(block);
-  if (palette_entries_[idx].second == 0) {
-    unique_blocks_count_++;
-    uniqueCountChanged = !uniqueCountChanged;
-  }
-  palette_entries_[idx].second++;
-
-  data_.Set(pos.GetIndex(), idx);
-  if (uniqueCountChanged) {
-    Resize();
-  }
+  SetBlockUnsafe(block, pos);
 }
 
 void Palette::SetBlockUnsafe(BlockID block, BlockPos pos) {
@@ -174,16 +136,17 @@ void Palette::SetBlockUnsafe(BlockID block, BlockPos pos) {
   if (block == oldBlockId) {
     return;
   }
-  palette_entries_[oldPaletteIdx].second--;
 
-  if (palette_entries_[oldPaletteIdx].second == 0) {
-    unique_blocks_count_--;
+  if (--palette_entries_[oldPaletteIdx].second == 0) {
+    --unique_blocks_count_;
+    ++empty_slot_counter_;
     uniqueCountChanged = !uniqueCountChanged;
   }
 
   PaletteIndex idx = GetOrAddPaletteIndex(block);
   if (palette_entries_[idx].second++ == 0) {
     unique_blocks_count_++;
+    --empty_slot_counter_;
     uniqueCountChanged = !uniqueCountChanged;
   }
 

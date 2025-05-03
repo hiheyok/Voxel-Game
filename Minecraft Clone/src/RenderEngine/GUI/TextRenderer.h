@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
 #include <memory>
 #include <string>
@@ -13,7 +15,6 @@ class Texture2D;
 
 struct GLFWwindow;
 
-// TODO: Rename
 class TextRenderer {
  public:
   TextRenderer();

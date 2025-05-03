@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
 #include <vector>
 
@@ -46,10 +48,10 @@ class Palette {
   static constexpr int kMinBitWidth = 1;  // Minimum bits
   static constexpr int kMaxBitWidth = 12;
 
-  int current_bit_width_;
+  int current_bit_width_ = kMinBitWidth;
   int unique_blocks_count_ = 1;  // Initialize with only air blocks
-
-  int d1 = 0, d2 = 0;
+  int empty_slot_counter_ = 0;   // This counts the amount of empty entries
+                                 // (count == 0) in palette_entries_
 
   NBitVector<StorageBit> data_;
 

@@ -286,8 +286,8 @@ void WorldUpdater::SetLight(std::vector<std::unique_ptr<LightStorage>> lights) {
       if (side.GetAxis() == Directions<ChunkPos>::kYAxis) {
         continue;
       }
-      ChunkContainer* neighbor = chunk->GetNeighbor(side);
-      if (neighbor == nullptr) continue;
+      std::optional<ChunkContainer*> neighbor = chunk->GetNeighbor(side);
+      if (!neighbor.has_value()) continue;
 
       // Check if it should update the neighbor too
       bool update_neighbor = false;
@@ -322,16 +322,16 @@ void WorldUpdater::SetLight(std::vector<std::unique_ptr<LightStorage>> lights) {
           if (side.GetAxis() == Directions<ChunkPos>::kXAxis) {
             int currLight =
                 chunk->lighting_->GetLighting(BlockPos{ortho_pos, y, i});
-            int neighborLight =
-                neighbor->lighting_->GetLighting(BlockPos{relative_pos, y, i});
+            int neighborLight = neighbor.value()->lighting_->GetLighting(
+                BlockPos{relative_pos, y, i});
             if (currLight != neighborLight - 1) {
               update_neighbor = true;
             }
           } else {
             int currLight =
                 chunk->lighting_->GetLighting(BlockPos{i, y, ortho_pos});
-            int neighborLight =
-                neighbor->lighting_->GetLighting(BlockPos{i, y, relative_pos});
+            int neighborLight = neighbor.value()->lighting_->GetLighting(
+                BlockPos{i, y, relative_pos});
             if (currLight != neighborLight - 1) {
               update_neighbor = true;
             }
@@ -340,7 +340,7 @@ void WorldUpdater::SetLight(std::vector<std::unique_ptr<LightStorage>> lights) {
       }
 
       if (update_neighbor) {
-        chunk->GetNeighbor(side)->SetLightDirty();
+        neighbor.value()->SetLightDirty();
       }
     }
     updated_pos.push_back(light->position_);

@@ -1,3 +1,7 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
+#pragma once
+
 #include "UI/DisplayVertices.h"
 
 class Display {

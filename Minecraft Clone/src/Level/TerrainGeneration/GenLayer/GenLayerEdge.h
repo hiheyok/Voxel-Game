@@ -89,7 +89,7 @@ class GenLayerEdge : public GenLayer {
 
         if (k != 0 && NextInt(13) == 0) {
           k |= (1 + NextInt(15)) << 8 &
-               3840;  // TODO: Original: 1 + NextInt(15) << 8 & 3840
+               3840;  // TODO(idk): Original: 1 + NextInt(15) << 8 & 3840
         }
 
         aint1[j + i * p_151625_3_] = k;

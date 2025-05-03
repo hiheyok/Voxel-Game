@@ -1,5 +1,8 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Client/Player/MainPlayer.h"
 
+#include <utility>
 #include <glm/vec2.hpp>
 
 #include "Client/IO/IO.h"

@@ -1,4 +1,9 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "RenderEngine/OpenGL/Texture/Texture.h"
+
+#include <string>
+#include <utility>
 
 #include "Utils/LogUtils.h"
 #include "Utils/stb_image.h"

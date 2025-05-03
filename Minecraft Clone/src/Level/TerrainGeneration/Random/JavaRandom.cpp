@@ -19,7 +19,7 @@ int JavaRandom::Next(int bits) noexcept {
 int JavaRandom::NextInt(int n) {
   if (n <= 0) g_logger.LogError("JavaRandom", "n must be positive");
   if ((n & (-n)) == n)  // n is power of 2
-    return static_cast<int>((n * (int64_t)Next(31)) >> 31);
+    return static_cast<int>((n * static_cast<int64_t>(Next(31))) >> 31);
   int bits, val;
   do {
     bits = Next(31);
@@ -30,7 +30,7 @@ int JavaRandom::NextInt(int n) {
 
 int JavaRandom::NextInt() noexcept { return Next(32); }
 
-uint64_t JavaRandom::NextLong() noexcept {
+int64_t JavaRandom::NextLong() noexcept {
   return (static_cast<int64_t>(Next(32)) << 32) + Next(32);
 }
 
@@ -41,6 +41,6 @@ float JavaRandom::NextFloat() noexcept {
 }
 
 double JavaRandom::NextDouble() noexcept {
-  return (((int64_t)Next(26) << 27) + Next(27)) /
+  return ((static_cast<int64_t>(Next(26)) << 27) + Next(27)) /
          static_cast<double>(1LL << 53);
 }

@@ -1,6 +1,6 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
-#ifndef CORE_POSITION_POSITION_TYPES_H
-#define CORE_POSITION_POSITION_TYPES_H
+#pragma once
 
 #include "Core/Position/Position.h"
 
@@ -31,5 +31,3 @@ class BlockPos final : public Position<BlockPos> {
   [[nodiscard]] size_t GetIndex() const noexcept;
   [[nodiscard]] BlockPos GetLocalPos() const noexcept;
 };
-
-#endif

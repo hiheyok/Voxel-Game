@@ -1,9 +1,12 @@
-﻿#include "Client/Client.h"
+﻿// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
+#include "Client/Client.h"
 
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 
 #include <chrono>
+#include <memory>
 
 #include "Client/ClientPlay.h"
 #include "Client/IO/KEY_CODE.h"

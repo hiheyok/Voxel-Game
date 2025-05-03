@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
 #include <array>
 #include <stdexcept>
@@ -29,12 +31,13 @@ class NBitVector {
  private:
   void ComputeMaskCache() noexcept;
 
+  static constexpr size_t kStorageBits = sizeof(StorageBit) * 8;
+  static constexpr StorageBit kAllOnes = ~(static_cast<StorageBit>(0));
+
   std::vector<StorageBit> data_;
   int bit_width_ = 0;
   int num_elements_ = 0;
 
-  static constexpr size_t kStorageBits = sizeof(StorageBit) * 8;
-  static constexpr StorageBit kAllOnes = ~(static_cast<StorageBit>(0));
   StorageBit all_ones_bit_width_;
 
   std::array<StorageBit, kStorageBits> overflow_table_;
@@ -101,7 +104,7 @@ void NBitVector<StorageBit>::SetUnsafe(size_t idx, T val) noexcept {
   size_t integerIndex = (bit_width_ * idx) % kStorageBits;
 
   const StorageBit mask = all_ones_bit_width_ << integerIndex;
-  const StorageBit& overflow_mask = overflow_table_[integerIndex];
+  const StorageBit overflow_mask = overflow_table_[integerIndex];
 
   // Clear data first
   data_[vectorIndex] &= ~mask;
@@ -127,7 +130,7 @@ StorageBit NBitVector<StorageBit>::GetUnsafe(size_t idx) const noexcept {
   size_t integerIndex = (bit_width_ * idx) % kStorageBits;
 
   const StorageBit mask = all_ones_bit_width_ << integerIndex;
-  const StorageBit& overflow_mask = overflow_table_[integerIndex];
+  const StorageBit overflow_mask = overflow_table_[integerIndex];
 
   StorageBit data = (data_[vectorIndex] & mask) >> integerIndex;
 

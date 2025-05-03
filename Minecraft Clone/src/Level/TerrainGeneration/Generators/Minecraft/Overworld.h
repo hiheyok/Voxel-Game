@@ -8,7 +8,6 @@
 #include "Level/TerrainGeneration/Noisemaps/TerrainParameters.h"
 #include "Level/TerrainGeneration/Random/JavaRandom.h"
 
-// TODO: Fix me
 
 class OverworldGenerator {
  private:

@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Level/Chunk/Chunk.h"
 
 #include "Level/Light/LightStorage.h"
@@ -9,16 +11,17 @@ Chunk::Chunk(const ChunkRawData& data) : ChunkContainer{data} {}
 
 void Chunk::UpdateGen() {
   for (const auto& offset : Directions<ChunkPos>()) {
-    if (neighbors_[offset] == nullptr ||
-        neighbors_[offset]->outside_block_to_place_[!offset].size() == 0) {
+    if (!neighbors_[offset].has_value() ||
+        neighbors_[offset].value()->outside_block_to_place_[!offset].size() ==
+            0) {
       continue;
     }
 
     for (const auto& block :
-         neighbors_[offset]->outside_block_to_place_[!offset]) {
+         neighbors_[offset].value()->outside_block_to_place_[!offset]) {
       SetBlock(block.block_, block.pos_);
     }
 
-    neighbors_[offset]->outside_block_to_place_[!offset].clear();
+    neighbors_[offset].value()->outside_block_to_place_[!offset].clear();
   }
 }

@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
 
 #include <gl/glew.h>
@@ -7,7 +9,7 @@
 class RawTextureData {
  public:
   ~RawTextureData();
-  RawTextureData(const std::string& path);
+  explicit RawTextureData(const std::string& path);
   RawTextureData(RawTextureData&&) noexcept;
   RawTextureData(const RawTextureData&) = delete;
 
@@ -48,7 +50,7 @@ class Texture {
   Texture& operator=(Texture&&) noexcept;
 
   void Set(int textureId, size_t height,
-           size_t width);  // TODO: tmp function for now
+           size_t width);  // TODO(hiheyok): tmp function for now
   GLuint Get() const;
   size_t GetHeight() const;
   size_t GetWidth() const;

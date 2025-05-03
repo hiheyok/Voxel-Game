@@ -59,9 +59,9 @@ void Mesh::ChunkMeshData::GenerateCache() {
     int axis = side.GetAxis();
     int direction = side.GetDirection() & 0b1;
 
-    ChunkContainer* neighbor = chunk_->neighbors_[side];
+    std::optional<ChunkContainer*> neighbor = chunk_->GetNeighbor(side);
 
-    if (neighbor == nullptr) {
+    if (!neighbor.has_value()) {
       continue;
     }
 
@@ -75,7 +75,7 @@ void Mesh::ChunkMeshData::GenerateCache() {
         local_pos[(axis + 1) % 3] = u + 1;
         local_pos[(axis + 2) % 3] = v + 1;
 
-        BlockID block = neighbor->GetBlockUnsafe(pos);
+        BlockID block = neighbor.value()->GetBlockUnsafe(pos);
         SetCachedBlockID(block, local_pos - BlockPos{1, 1, 1});
       }
     }
@@ -378,11 +378,12 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const BlockFace& face, uint8_t axis_,
   }
 }
 
-const BlockID& Mesh::ChunkMeshData::GetCachedBlockID(BlockPos pos) const {
+const BlockID& Mesh::ChunkMeshData::GetCachedBlockID(
+    BlockPos pos) const noexcept {
   return chunk_cache_[(pos.x + 1) * 18 * 18 + (pos.z + 1) * 18 + (pos.y + 1)];
 }
 
-void Mesh::ChunkMeshData::SetCachedBlockID(BlockID b, BlockPos pos) {
+void Mesh::ChunkMeshData::SetCachedBlockID(BlockID b, BlockPos pos) noexcept {
   chunk_cache_[(pos.x + 1) * (kChunkDim + 2) * (kChunkDim + 2) +
                (pos.z + 1) * (kChunkDim + 2) + (pos.y + 1)] = b;
   // is_fluid_.set((x + 1) * (kChunkDim + 2) * (kChunkDim + 2) + (z + 1) *
@@ -390,51 +391,51 @@ void Mesh::ChunkMeshData::SetCachedBlockID(BlockID b, BlockPos pos) {
 }
 
 glm::u8vec4 Mesh::ChunkMeshData::GetAO(uint8_t direction, BlockPos block_pos) {
-  const uint8_t AMBIENT_OCCLUSION_STRENGTH = 2;
+  static constexpr uint8_t kAmbientOcclusionStrength = 2;
   BlockPos pos = block_pos;
 
-  char InitialLighting = chunk_->lighting_->GetLighting(pos);
+  char initial_lighting = chunk_->lighting_->GetLighting(pos);
 
   uint8_t PP{15}, PN{15}, NP{15}, NN{15};
 
-  uint8_t axis_ = direction >> 1;
-  uint8_t facing = direction & 0b1;
+  uint8_t axis = direction >> 1;
+  uint8_t facing = direction & 1;
 
-  pos[axis_] += 1 - 2 * facing;
+  pos[axis] += 1 - 2 * facing;
 
   // Check up down left right
 
-  int axis1 = (axis_ + 1) % 3;
-  int axis2 = (axis_ + 2) % 3;
+  int axis1 = (axis + 1) % 3;
+  int axis2 = (axis + 2) % 3;
 
   // Check up
   pos[axis1] += 1;
 
   if (GetCachedBlockID(pos) != g_blocks.AIR) {
-    PP -= AMBIENT_OCCLUSION_STRENGTH;
-    PN -= AMBIENT_OCCLUSION_STRENGTH;
+    PP -= kAmbientOcclusionStrength;
+    PN -= kAmbientOcclusionStrength;
   }
 
   pos[axis1] -= 2;
 
   if (GetCachedBlockID(pos) != g_blocks.AIR) {
-    NP -= AMBIENT_OCCLUSION_STRENGTH;
-    NN -= AMBIENT_OCCLUSION_STRENGTH;
+    NP -= kAmbientOcclusionStrength;
+    NN -= kAmbientOcclusionStrength;
   }
 
   pos[axis1] += 1;
   pos[axis2] += 1;
 
   if (GetCachedBlockID(pos) != g_blocks.AIR) {
-    NP -= AMBIENT_OCCLUSION_STRENGTH;
-    PP -= AMBIENT_OCCLUSION_STRENGTH;
+    NP -= kAmbientOcclusionStrength;
+    PP -= kAmbientOcclusionStrength;
   }
 
   pos[axis2] -= 2;
 
   if (GetCachedBlockID(pos) != g_blocks.AIR) {
-    PN -= AMBIENT_OCCLUSION_STRENGTH;
-    NN -= AMBIENT_OCCLUSION_STRENGTH;
+    PN -= kAmbientOcclusionStrength;
+    NN -= kAmbientOcclusionStrength;
   }
 
   pos[axis2] += 1;
@@ -443,36 +444,36 @@ glm::u8vec4 Mesh::ChunkMeshData::GetAO(uint8_t direction, BlockPos block_pos) {
   pos[axis1] += 1;
   pos[axis2] += 1;
 
-  if (GetCachedBlockID(pos) != g_blocks.AIR) PP -= AMBIENT_OCCLUSION_STRENGTH;
+  if (GetCachedBlockID(pos) != g_blocks.AIR) PP -= kAmbientOcclusionStrength;
 
   pos[axis1] -= 2;
-  if (GetCachedBlockID(pos) != g_blocks.AIR) NP -= AMBIENT_OCCLUSION_STRENGTH;
+  if (GetCachedBlockID(pos) != g_blocks.AIR) NP -= kAmbientOcclusionStrength;
 
   pos[axis2] -= 2;
 
-  if (GetCachedBlockID(pos) != g_blocks.AIR) NN -= AMBIENT_OCCLUSION_STRENGTH;
+  if (GetCachedBlockID(pos) != g_blocks.AIR) NN -= kAmbientOcclusionStrength;
 
   pos[axis1] += 2;
 
-  if (GetCachedBlockID(pos) != g_blocks.AIR) PN -= AMBIENT_OCCLUSION_STRENGTH;
+  if (GetCachedBlockID(pos) != g_blocks.AIR) PN -= kAmbientOcclusionStrength;
 
-  if (PP >= (15 - InitialLighting))
-    PP = PP - (15 - InitialLighting);
+  if (PP >= (15 - initial_lighting))
+    PP = PP - (15 - initial_lighting);
   else
     PP = 0;
 
-  if (PN >= (15 - InitialLighting))
-    PN = PN - (15 - InitialLighting);
+  if (PN >= (15 - initial_lighting))
+    PN = PN - (15 - initial_lighting);
   else
     PN = 0;
 
-  if (NN >= (15 - InitialLighting))
-    NN = NN - (15 - InitialLighting);
+  if (NN >= (15 - initial_lighting))
+    NN = NN - (15 - initial_lighting);
   else
     NN = 0;
 
-  if (NP >= (15 - InitialLighting))
-    NP = NP - (15 - InitialLighting);
+  if (NP >= (15 - initial_lighting))
+    NP = NP - (15 - initial_lighting);
   else
     NP = 0;
 
@@ -482,9 +483,9 @@ glm::u8vec4 Mesh::ChunkMeshData::GetAO(uint8_t direction, BlockPos block_pos) {
 // Checks if a block side is visible to the player
 bool Mesh::ChunkMeshData::IsFaceVisible(const Cuboid& cube, BlockPos block_pos,
                                         uint8_t side) {
-  const uint8_t axis_ = (side >> 1);  // Get side
-  const uint8_t axis1 = (axis_ + 1) % 3;
-  const uint8_t axis2 = (axis_ + 2) % 3;
+  const uint8_t axis = (side >> 1);  // Get side
+  const uint8_t axis1 = (axis + 1) % 3;
+  const uint8_t axis2 = (axis + 2) % 3;
   const uint8_t oppositeSide = side ^ 1;  // Flip the leading bit
   BlockPos pos = block_pos;
   pos.IncrementSide(side, 1);
@@ -505,9 +506,9 @@ bool Mesh::ChunkMeshData::IsFaceVisible(const Cuboid& cube, BlockPos block_pos,
     }
 
     if (side & 1) {  // if the  block arent touching
-      if (element.to_[axis_] < 16) {
+      if (element.to_[axis] < 16) {
         continue;
-      } else if (element.from_[axis_] > 0) {
+      } else if (element.from_[axis] > 0) {
         continue;
       }
     }

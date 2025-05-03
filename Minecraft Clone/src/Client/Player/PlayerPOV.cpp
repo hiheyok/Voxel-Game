@@ -1,3 +1,5 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Client/Player/PlayerPOV.h"
 
 #include "RenderEngine/Camera/camera.h"

@@ -1,6 +1,9 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
 #include <cctype>
 #include <optional>
+#include <string>
 #include <vector>
 
 #include "RenderEngine/OpenGL/Texture/Texture.h"

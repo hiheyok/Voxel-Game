@@ -1,4 +1,9 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
+
+#include <utility>
+
 #include "Client/ClientLevel/Entity/ClientEntities.h"
 #include "Level/Chunk/Chunk.h"
 #include "Level/Container/ChunkMap.h"

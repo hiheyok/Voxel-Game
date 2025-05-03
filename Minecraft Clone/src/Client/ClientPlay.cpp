@@ -1,4 +1,10 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include "Client/ClientPlay.h"
+
+#include <memory>
+#include <utility>
+#include <vector>
 
 #include "Client/IO/IO.h"
 #include "Client/Player/MainPlayer.h"
@@ -54,7 +60,7 @@ ClientPlay::ClientPlay(ServerInterface* interface, Window* window,
                           static_cast<float>(g_app_options.graphics_scale_),
                           GL_RGB);
 }
-ClientPlay::~ClientPlay() { terrain_render_->Stop(); }
+ClientPlay::~ClientPlay() = default;
 
 void ClientPlay::Render(Window* window) {
   framebuffer_->BindFBO();
@@ -85,7 +91,7 @@ void ClientPlay::Update(Window* window) {
     framebuffer_->Clear();
     framebuffer_->GenBuffer(window->GetProperties().window_size_x_,
                             window->GetProperties().window_size_y_,
-                            (float)g_app_options.graphics_scale_);
+                            static_cast<float>(g_app_options.graphics_scale_));
   }
 
   if (window->GetUserInputs().CheckKeyPress(GLFW_KEY_R)) {
@@ -186,7 +192,7 @@ void ClientPlay::UpdateChunks() {
         addChunkPackets.push_back(p);
       } break;
       case ChunkUpdatePacket::DELETE_CHUNK:
-        // TODO: Implement later
+        // TODO(hiheyok): Implement later
         g_logger.LogError("ClientPlay::UpdateChunks", "Don't call me");
         break;
       case ChunkUpdatePacket::LIGHT_UPDATE: {

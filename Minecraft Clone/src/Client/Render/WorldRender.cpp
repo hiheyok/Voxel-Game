@@ -1,6 +1,11 @@
-﻿#include "Client/Render/WorldRender.h"
+﻿// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
+#include "Client/Render/WorldRender.h"
 
 #include <functional>
+#include <memory>
+#include <utility>
+#include <vector>
 
 #include "Client/ClientLevel/ClientCache.h"
 #include "Client/Player/PlayerPOV.h"
@@ -79,7 +84,6 @@ void WorldRender::Update(std::vector<ChunkPos> updatedChunks) {
     if (kChunkUpdateLimit == updateAmount) {
       break;
     }
-    // profiler_->CombineCache(worker_output_[(uint64_t)workerId].front()->profiler);
     renderer_->AddChunk(std::move(mesh_add_queue_.back()));
     mesh_add_queue_.pop_back();
     renderer_->Defrag(2);
@@ -93,8 +97,6 @@ void WorldRender::Update(std::vector<ChunkPos> updatedChunks) {
   renderer_->PrepareRenderer();
 }
 
-void WorldRender::Stop() { mesh_thread_pool_->Stop(); }
-
 void WorldRender::Start(GLFWwindow* window, ClientCache* cache,
                         PerformanceProfiler* profiler) {
   horizontal_render_distance_ = g_app_options.horizontal_render_distance_;
@@ -102,8 +104,7 @@ void WorldRender::Start(GLFWwindow* window, ClientCache* cache,
 
   size_t threadCount = g_app_options.mesh_threads_;
 
-  mesh_thread_pool_ = std::make_unique<
-      ThreadPool<ChunkPos, std::unique_ptr<Mesh::ChunkVertexData>>>(
+  mesh_thread_pool_ = std::make_unique<ThreadPool<ChunkPos, WorkerReturnType>>(
       threadCount, "Mesher", std::bind_front(&WorldRender::Worker, this), 250);
 
   window_ = window;

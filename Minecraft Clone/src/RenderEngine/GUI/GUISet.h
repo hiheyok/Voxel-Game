@@ -1,8 +1,12 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
 #include <gl/glew.h>
 
-#include <glm/vec2.hpp>
+#include <memory>
+#include <string>
 #include <vector>
+#include <glm/vec2.hpp>
 
 #include "Core/Typenames.h"
 
