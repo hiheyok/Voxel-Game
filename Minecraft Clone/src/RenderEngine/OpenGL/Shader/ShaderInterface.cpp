@@ -5,12 +5,54 @@
 #include <fstream>
 #include <string>
 
-ShaderInterface::ShaderInterface() = default;
+#include "Core/GameContext/GameContext.h"
+#include "Utils/LogUtils.h"
+
+ShaderInterface::ShaderInterface(GameContext& game_context)
+    : game_context_{game_context} {}
 
 ShaderInterface::~ShaderInterface() {
   if (shader_id_) {
     glDeleteProgram(shader_id_);
   }
+}
+
+ShaderInterface::ShaderInterface(ShaderInterface&& other) noexcept
+    : game_context_{other.game_context_} {
+  shader_id_ = other.shader_id_;
+  other.shader_id_ = 0;
+  cache_ = std::move(other.cache_);
+  cache_bool_ = std::move(other.cache_bool_);
+  cache_int_ = std::move(other.cache_int_);
+  cache_float_ = std::move(other.cache_float_);
+  cache_vec2_ = std::move(other.cache_vec2_);
+  cache_vec3_ = std::move(other.cache_vec3_);
+  cache_vec4_ = std::move(other.cache_vec4_);
+  cache_ivec2_ = std::move(other.cache_ivec2_);
+  cache_ivec3_ = std::move(other.cache_ivec3_);
+  cache_mat2_ = std::move(other.cache_mat2_);
+  cache_mat3_ = std::move(other.cache_mat3_);
+  cache_mat4_ = std::move(other.cache_mat4_);
+}
+
+ShaderInterface& ShaderInterface::operator=(ShaderInterface&& other) noexcept {
+  if (this != &other) {
+    shader_id_ = other.shader_id_;
+    other.shader_id_ = 0;
+    cache_ = std::move(other.cache_);
+    cache_bool_ = std::move(other.cache_bool_);
+    cache_int_ = std::move(other.cache_int_);
+    cache_float_ = std::move(other.cache_float_);
+    cache_vec2_ = std::move(other.cache_vec2_);
+    cache_vec3_ = std::move(other.cache_vec3_);
+    cache_vec4_ = std::move(other.cache_vec4_);
+    cache_ivec2_ = std::move(other.cache_ivec2_);
+    cache_ivec3_ = std::move(other.cache_ivec3_);
+    cache_mat2_ = std::move(other.cache_mat2_);
+    cache_mat3_ = std::move(other.cache_mat3_);
+    cache_mat4_ = std::move(other.cache_mat4_);
+  }
+  return *this;
 }
 
 void ShaderInterface::Use() { glUseProgram(shader_id_); }
@@ -256,15 +298,16 @@ void ShaderInterface::CheckCompileErrors(GLuint shader, std::string type) {
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success) {
       glGetShaderInfoLog(shader, 1024, 0, infoLog);
-      g_logger.LogError("Shader::CheckCompileErrors",
-                        "Failed to compile" + type + " Shader: \n" +
-                            std::string(infoLog) + "\n");
+      game_context_.logger_->LogError("Shader::CheckCompileErrors",
+                                      "Failed to compile" + type +
+                                          " Shader: \n" + std::string(infoLog) +
+                                          "\n");
     }
   } else {
     glGetProgramiv(shader, GL_LINK_STATUS, &success);
     if (!success) {
       glGetProgramInfoLog(shader, 1024, 0, infoLog);
-      g_logger.LogError(
+      game_context_.logger_->LogError(
           "Shader::CheckCompileErrors",
           "Failed to link Shader Program: \n" + std::string(infoLog) + "\n");
     }
@@ -282,9 +325,9 @@ std::string ShaderInterface::ReadFile(std::string path) {
     file.close();
     code = shaderStream.str();
   } catch (std::ifstream::failure& e) {
-    g_logger.LogError("Shader::ReadFile",
-                      "Failed to read file: " + std::string(path));
-    g_logger.LogError("Shader::ReadFile", e.what());
+    game_context_.logger_->LogError(
+        "Shader::ReadFile", "Failed to read file: " + std::string(path));
+    game_context_.logger_->LogError("Shader::ReadFile", e.what());
   }
 
   return code;

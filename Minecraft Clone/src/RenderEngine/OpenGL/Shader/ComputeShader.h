@@ -15,7 +15,7 @@
 
 class ComputeShader : public ShaderInterface {
  public:
-  explicit ComputeShader(std::string source);
+  explicit ComputeShader(GameContext&, std::string source);
 
   void DispatchCompute(int x, int y, int z);
 };

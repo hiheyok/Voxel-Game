@@ -2,32 +2,38 @@
 
 #include "Level/Dimension/Dimension.h"
 
+#include <stdexcept>
+
+#include "Core/GameContext/GameContext.h"
+#include "Core/Options/Option.h"
 #include "Level/Light/LightEngine.h"
 #include "Level/TerrainGeneration/ChunkGenerator.h"
 #include "Level/World/WorldUpdater.h"
 
-Dimension::Dimension(DimensionProperties properties,
+Dimension::Dimension(GameContext& game_context, DimensionProperties properties,
                      WorldGeneratorID generatorType)
-    : properties_{properties},
+    : game_context_{game_context},
+      properties_{properties},
       generator_type_{generatorType},
-      main_world_{std::make_unique<World>()},
+      main_world_{std::make_unique<World>(game_context)},
       chunk_generator_{std::make_unique<ChunkGenerator>(
-          g_app_options.world_gen_threads_, kWorldSeed, generatorType)} {
+          game_context, kWorldSeed, generatorType)} {
   world_settings_.horizontal_ticking_distance_ =
-      g_app_options.horizontal_render_distance_;
+      game_context.options_->horizontal_render_distance_;
   world_settings_.vertical_ticking_distance_ =
-      g_app_options.vertical_render_distance_;
+      game_context.options_->vertical_render_distance_;
 
   world_ = static_cast<WorldInterface*>(main_world_.get());
   light_engine_ = std::make_unique<LightEngine>(
-      g_app_options.light_engine_threads_, world_);
+      game_context, game_context.options_->light_engine_threads_, world_);
 
   world_updater_ =
-      std::make_unique<WorldUpdater>(main_world_.get(), world_settings_);
+      std::make_unique<WorldUpdater>(game_context_, main_world_.get(), world_settings_);
   collusion_detector_ =
-      std::make_unique<CollusionDetector>(main_world_->GetChunkMap());
+      std::make_unique<CollusionDetector>(game_context_, main_world_->GetChunkMap());
 
-  if (g_generators.GetGenerator(generator_type_)->use_tall_chunks_) {
+  if (game_context_.generators_->GetGenerator(generator_type_)
+          ->use_tall_chunks_) {
     world_updater_->tall_generation_ = true;
   }
 }
@@ -76,10 +82,11 @@ void Dimension::EventTick() {
         break;
       }
       default:
-        g_logger.LogError("Dimension::EventTick", "Not handled yet!");
+        throw std::runtime_error(
+            "Dimension::EventTick - Event not handled yet!");
     }
 
-    g_event_handler.ExecuteEvent(e, this);
+    game_context_.event_handler_->ExecuteEvent(e, this);
   }
 
   EventQueue->clear();

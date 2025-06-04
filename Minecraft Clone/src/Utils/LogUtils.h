@@ -57,5 +57,3 @@ class LogUtils {
   std::ofstream file_;
   std::array<char, kBufferSize> buffer_;
 };
-
-extern LogUtils g_logger;

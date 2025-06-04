@@ -5,24 +5,25 @@
 #include <sstream>
 #include <string>
 
+#include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 
-Shader::Shader() = default;
-
-Shader::Shader(const char* vertexPath, const char* fragmentPath,
-               const char* geometryPath) {
+Shader::Shader(GameContext& game_context) : ShaderInterface{game_context} {}
+Shader::Shader(GameContext& game_context, std::string vertexPath,
+               std::string fragmentPath, std::string geometryPath)
+    : ShaderInterface{game_context} {
   // 1. retrieve the vertex/fragment source code from filePath
   std::string vertexCode = ReadFile(vertexPath);
   std::string fragmentCode = ReadFile(fragmentPath);
   std::string geometryCode;
 
-  if (geometryPath != nullptr) {
+  if (geometryPath.size() != 0) {
     geometryCode = ReadFile(geometryPath);
   }
 
-  g_logger.LogDebug("Shader::Init",
-                    "Compiling shader: " + std::string(vertexPath) + ", " +
-                        std::string(fragmentPath));
+  game_context_.logger_->LogDebug(
+      "Shader::Init", "Compiling shader: " + std::string(vertexPath) + ", " +
+                          std::string(fragmentPath));
 
   uint32_t vertex = CompileShader(vertexCode, "Vertex", GL_VERTEX_SHADER);
   uint32_t fragment =
@@ -30,7 +31,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath,
 
   // if geometry shader is given, compile geometry shader
   uint32_t geometry;
-  if (geometryPath != nullptr) {
+  if (geometryPath.size() != 0) {
     geometry = CompileShader(geometryCode, "Geometry", GL_GEOMETRY_SHADER);
   }
 
@@ -38,7 +39,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath,
   glAttachShader(shader_id_, vertex);
   glAttachShader(shader_id_, fragment);
 
-  if (geometryPath != nullptr) {
+  if (geometryPath.size() != 0) {
     glAttachShader(shader_id_, geometry);
   }
 
@@ -47,7 +48,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath,
 
   glDeleteShader(vertex);
   glDeleteShader(fragment);
-  if (geometryPath != nullptr) {
+  if (geometryPath.size() != 0) {
     glDeleteShader(geometry);
   }
 }

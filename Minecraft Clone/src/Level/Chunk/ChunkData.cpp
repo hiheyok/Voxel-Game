@@ -2,22 +2,28 @@
 
 #include "Level/Chunk/ChunkData.h"
 
+#include "Core/GameContext/GameContext.h"
+#include "Level/Block/Blocks.h"
 #include "Level/Chunk/ChunkRawData.h"
 #include "Level/Chunk/Heightmap/Heightmap.h"
 #include "Level/TerrainGeneration/Structures/Structure.h"
 
-ChunkContainer::ChunkContainer()
-    : lighting_{std::make_unique<LightStorage>()},
-      neighbors_{6},
+ChunkContainer::ChunkContainer(GameContext& game_context)
+    : game_context_{game_context},
+      lighting_{std::make_unique<LightStorage>()},
+      heightmap_{std::make_unique<HeightMap>()},
       outside_block_to_place_{6},
-      heightmap_{std::make_unique<HeightMap>()} {
+      neighbors_{6},
+      block_storage_{} {
   lighting_->position_ = position_;
 }
 
 ChunkContainer::~ChunkContainer() = default;
 ChunkContainer::ChunkContainer(ChunkContainer&&) = default;
 
-ChunkContainer::ChunkContainer(const ChunkRawData& data) : ChunkContainer() {
+ChunkContainer::ChunkContainer(GameContext& game_context,
+                               const ChunkRawData& data)
+    : ChunkContainer(game_context) {
   SetData(data);
 }
 
@@ -37,7 +43,7 @@ BlockID ChunkContainer::GetBlock(BlockPos pos) const {
       return neighbors_[dz].value()->GetBlock(
           pos.IncrementSide(dz, -kChunkDim));
 
-    return g_blocks.AIR;
+    return game_context_.blocks_->AIR;
   } else {
     return GetBlockUnsafe(pos);
   }
@@ -135,7 +141,7 @@ void ChunkContainer::UpdateHeightMap(int x, int z) {
     new_height = kChunkDim;
   } else {
     for (int i = 15; i >= 0; --i) {
-      if (GetBlockUnsafe(BlockPos{x, i, z}) != g_blocks.AIR) {
+      if (GetBlockUnsafe(BlockPos{x, i, z}) != game_context_.blocks_->AIR) {
         new_height = i;
         break;
       }

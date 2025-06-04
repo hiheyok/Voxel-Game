@@ -12,6 +12,7 @@
 #include "Core/Typenames.h"
 
 class Chunk;
+class GameContext;
 
 struct Cuboid;
 struct BlockFace;
@@ -31,7 +32,7 @@ struct ChunkVertexData {
 
 class ChunkMeshData {
  public:
-  ChunkMeshData();
+  explicit ChunkMeshData(GameContext&);
   ~ChunkMeshData();
 
   void SetChunk(Chunk* chunk);
@@ -40,6 +41,7 @@ class ChunkMeshData {
   // Generate the Mesh
   void GenerateMesh();
 
+  GameContext& game_context_;
   // Mesh Vertices
   std::vector<uint32_t> vertices_buffer_;
   std::vector<uint32_t> transparent_vertices_buffer_;

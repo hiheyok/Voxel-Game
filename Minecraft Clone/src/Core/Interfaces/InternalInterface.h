@@ -10,8 +10,6 @@
 #include "Utils/LogUtils.h"
 
 class InternalInterface : public ServerInterface, public ClientInterface {
-  bool is_connected_ = false;
-
  public:
   InternalInterface() {}
 
@@ -23,8 +21,10 @@ class InternalInterface : public ServerInterface, public ClientInterface {
   bool IsConnected() const override { return is_connected_; }
 
   void Connect(const std::string& address, int port) override {
-    g_logger.LogError("InternalServerInterface::Connect",
-                      "This function isn't active!");
+    throw std::runtime_error(
+        "InternalServerInterface::Connect - This function isn't active!");
+    (void)address;
+    (void)port;
   }
 
   void Disconnect() {}
@@ -50,4 +50,7 @@ class InternalInterface : public ServerInterface, public ClientInterface {
   }
 
   void SendTimeLastTick() override { time.Set(); }
+
+ private:
+  bool is_connected_ = false;
 };

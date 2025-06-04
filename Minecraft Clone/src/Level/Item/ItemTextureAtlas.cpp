@@ -65,11 +65,18 @@ void ItemTextureAtlas::StitchTexture(size_t index, ItemID ItemID) {
   glDisable(GL_BLEND);
   atlas_framebuffer_.UnbindFBO();
 }
-ItemTextureAtlas::ItemTextureAtlas() : stitching_shader_{} {};
+ItemTextureAtlas::ItemTextureAtlas(GameContext& game_context)
+    : game_context_{game_context},
+      stitching_shader_{game_context},
+      atlas_framebuffer_{game_context},
+      framebuffer_single_block_render_{game_context},
+      block_item_renderer_{game_context} {}
+ItemTextureAtlas::~ItemTextureAtlas() = default;
 
 void ItemTextureAtlas::Initialize(int atlasItemSize, int individualItemSize) {
-  stitching_shader_ = Shader("assets/shaders/ItemRender/AtlasStitchVert.glsl",
-                             "assets/shaders/ItemRender/AtlasStitchFrag.glsl");
+  stitching_shader_ =
+      Shader(game_context_, "assets/shaders/ItemRender/AtlasStitchVert.glsl",
+             "assets/shaders/ItemRender/AtlasStitchFrag.glsl");
 
   individual_size_ = individualItemSize;
   atlas_size_ = atlasItemSize;
@@ -78,9 +85,9 @@ void ItemTextureAtlas::Initialize(int atlasItemSize, int individualItemSize) {
   framebuffer_single_block_render_.GenBuffer(individual_size_, individual_size_,
                                              2, GL_RGBA);
 
-  vbo_ = std::make_unique<Buffer>();
-  ebo_ = std::make_unique<Buffer>();
-  vao_ = std::make_unique<VertexArray>();
+  vbo_ = std::make_unique<Buffer>(game_context_);
+  ebo_ = std::make_unique<Buffer>(game_context_);
+  vao_ = std::make_unique<VertexArray>(game_context_);
 
   vbo_->SetType(GL_ARRAY_BUFFER);
   ebo_->SetType(GL_ELEMENT_ARRAY_BUFFER);
@@ -88,12 +95,8 @@ void ItemTextureAtlas::Initialize(int atlasItemSize, int individualItemSize) {
   vbo_->SetUsage(GL_STATIC_DRAW);
   ebo_->SetUsage(GL_STATIC_DRAW);
 
-  vao_->Bind();
-  vbo_->Bind();
-  vao_->EnableAttriPTR(0, 2, GL_FLOAT, GL_FALSE, 4, 0);
-  vao_->EnableAttriPTR(1, 2, GL_FLOAT, GL_FALSE, 4, 2);
-  vao_->Unbind();
-  vbo_->Unbind();
+  vao_->EnableAttriPtr(vbo_.get(), 0, 2, GL_FLOAT, GL_FALSE, 4, 0)
+      .EnableAttriPtr(vbo_.get(), 1, 2, GL_FLOAT, GL_FALSE, 4, 2);
 
   block_item_renderer_.Initialize();
 }

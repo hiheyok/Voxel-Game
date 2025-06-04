@@ -4,9 +4,7 @@
 #include "Core/Typenames.h"
 #include "Level/Block/Block.h"
 
-class Dimension;
-
 struct GravityBlock : Block {
-  GravityBlock();
+  explicit GravityBlock(GameContext&);
   void Tick(BlockPos pos, Dimension* currentWorld) override;
 };

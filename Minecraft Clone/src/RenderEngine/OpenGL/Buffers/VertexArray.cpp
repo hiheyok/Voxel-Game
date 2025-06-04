@@ -4,14 +4,20 @@
 
 #include <GLFW/glfw3.h>
 
+#include <stdexcept>
 #include <utility>
 
+#include "Core/GameContext/GameContext.h"
+#include "RenderEngine/OpenGL/Buffers/Buffer.h"
+#include "RenderEngine/OpenGL/Buffers/BufferStorage.h"
 #include "Utils/LogUtils.h"
 
-VertexArray::VertexArray() {
+VertexArray::VertexArray(GameContext& game_context)
+    : game_context_{game_context} {
   glGenVertexArrays(1, &array_id_);
-  g_logger.LogDebug("VertexArray::GenArray",
-                    "Created array. ID: " + std::to_string(array_id_));
+  game_context_.logger_->LogDebug(
+      "VertexArray::GenArray",
+      "Created array. ID: " + std::to_string(array_id_));
 }
 
 VertexArray::~VertexArray() {
@@ -20,7 +26,8 @@ VertexArray::~VertexArray() {
   }
 }
 
-VertexArray::VertexArray(VertexArray&& buffer) noexcept {
+VertexArray::VertexArray(VertexArray&& buffer) noexcept
+    : game_context_{buffer.game_context_} {
   (*this) = std::move(buffer);
 }
 
@@ -34,13 +41,33 @@ void VertexArray::Bind() { glBindVertexArray(array_id_); }
 
 void VertexArray::Unbind() { glBindVertexArray(0); }
 
-VertexArray& VertexArray::EnableAttriPTR(GLuint index, GLint size, GLenum type,
+VertexArray& VertexArray::EnableAttriPtr(Buffer* buffer, GLuint index,
+                                         GLint size, GLenum type,
                                          GLboolean normalized, GLsizei stride,
-                                         int subIndex) {
-  glVertexAttribPointer(index, size, type, normalized,
-                        sizeof(GL_FLOAT) * stride,
-                        reinterpret_cast<void*>(subIndex * sizeof(uint32_t)));
+                                         int sub_index) {
+  Bind();
+  buffer->Bind();
+  glVertexAttribPointer(
+      index, size, type, normalized, GetDataTypeSize(type) * stride,
+      reinterpret_cast<void*>(GetDataTypeSize(type) * sub_index));
   glEnableVertexAttribArray(index);
+  buffer->Unbind();
+  Unbind();
+  return *this;
+}
+
+VertexArray& VertexArray::EnableAttriPtr(BufferStorage* buffer, GLuint index,
+                                         GLint size, GLenum type,
+                                         GLboolean normalized, GLsizei stride,
+                                         int sub_index) {
+  Bind();
+  buffer->Bind();
+  glVertexAttribPointer(
+      index, size, type, normalized, GetDataTypeSize(type) * stride,
+      reinterpret_cast<void*>(GetDataTypeSize(type) * sub_index));
+  glEnableVertexAttribArray(index);
+  buffer->Unbind();
+  Unbind();
   return *this;
 }
 

@@ -8,13 +8,14 @@
 class EntityContainer;
 class ChunkMap;
 class Chunk;
+class GameContext;
 
 struct Entity;
 
 // Allows for read only
 class WorldInterface {
  public:
-  WorldInterface();
+  explicit WorldInterface(GameContext&);
   virtual ~WorldInterface();
 
   BlockID GetBlock(BlockPos pos) const;
@@ -26,9 +27,10 @@ class WorldInterface {
   ChunkMap* GetChunkMap() const;
   EntityContainer* GetEntityContainer() const;
 
+  GameContext& game_context_;
   WorldParameters parameters;
 
  protected:
-  std::unique_ptr<EntityContainer> entities_;
   std::unique_ptr<ChunkMap> chunks_;
+  std::unique_ptr<EntityContainer> entities_;
 };

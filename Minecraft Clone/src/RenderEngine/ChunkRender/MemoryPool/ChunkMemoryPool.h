@@ -8,6 +8,7 @@
 #include "Core/Typenames.h"
 
 class BufferStorage;
+class GameContext;
 
 struct ChunkMemoryPoolOffset {
   size_t mem_offset_ = 0;
@@ -33,28 +34,19 @@ struct MemoryBlock {
 class BlockManagement {
  public:
   void Add(MemoryBlock block);
-
   void Delete(size_t offset);
-
   void Delete(std::map<size_t, MemoryBlock>::const_iterator it);
 
   std::map<size_t, MemoryBlock>::const_iterator GetIterator(
       size_t offset) const;
-
   std::map<size_t, MemoryBlock>::const_iterator begin() const;
-
   std::map<size_t, MemoryBlock>::const_iterator end() const;
-
   std::map<size_t, MemoryBlock>::const_reverse_iterator rbegin() const;
-
   std::map<size_t, MemoryBlock>::const_reverse_iterator rend() const;
-
   std::map<size_t, MemoryBlock>::const_iterator lower_bound(size_t k) const;
-
   std::map<size_t, MemoryBlock>::const_iterator upper_bound(size_t k) const;
 
   size_t size() const;
-
   size_t GetFragmentCount() const;
 
  private:
@@ -69,15 +61,11 @@ class MemoryPoolManager {
   ~MemoryPoolManager();
 
   void Initialize(size_t spaceAvailable);
-
   void AllocateSpace(size_t memOffset, size_t memSize);
-
   void DeallocateSpace(size_t MemOffset, size_t MemSize);
 
   size_t FindFreeSpace(size_t MemSize) const;
-
   size_t GetFreeSpaceFragmentCount() const;
-
   size_t GetReserveSpaceFragmentCount() const;
 
   BlockManagement free_memory_blocks_;
@@ -100,7 +88,7 @@ struct MemoryPoolStatistics {
 
 class ChunkGPUMemoryPool {
  public:
-  explicit ChunkGPUMemoryPool(size_t memoryPoolSize);
+  explicit ChunkGPUMemoryPool(GameContext&, size_t memoryPoolSize);
   ~ChunkGPUMemoryPool();
 
   ChunkGPUMemoryPool(ChunkGPUMemoryPool&&) noexcept;
@@ -122,6 +110,7 @@ class ChunkGPUMemoryPool {
   void Update();
   size_t GetSize() const noexcept;
 
+  GameContext& game_context_;
   MemoryManagement::MemoryPoolStatistics statistics_;
   std::unique_ptr<BufferStorage> stagging_buffer_;
   std::unique_ptr<BufferStorage> buffer_;

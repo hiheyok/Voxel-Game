@@ -2,13 +2,17 @@
 
 #include "Level/Block/Block.h"
 
+#include "Core/GameContext/GameContext.h"
 #include "FileManager/Files.h"
 #include "RenderEngine/BlockModel/BlockModels.h"
 #include "RenderEngine/BlockModel/ModelLoader.h"
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
+#include "Utils/LogUtils.h"
 
+Block::Block(GameContext& game_context) : game_context_{game_context} {
+  properties_ = std::make_unique<BlockProperties>();
+}
 Block::~Block() = default;
-Block::Block() { properties_ = std::make_unique<BlockProperties>(); }
 
 void Block::InitializeBlockModel(ModelLoader& modelLoader) {
   auto tokens = Tokenize(block_name_, ':');
@@ -38,8 +42,8 @@ void Block::InitializeTexture(BlockTextureAtlas& textureAtlas) {
       int textureId = textureAtlas.AddBlockTexture(location);
 
       if (textureId == -1) {
-        g_logger.LogWarn("BlockList::InitializeBlockModels",
-                         "Unable to load texture.");
+        game_context_.logger_->LogWarn("BlockList::InitializeBlockModels",
+                                       "Unable to load texture.");
         continue;
       }
 

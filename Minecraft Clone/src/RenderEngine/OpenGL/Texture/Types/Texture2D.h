@@ -5,8 +5,9 @@
 
 class Texture2D : public Texture {
  public:
-  explicit Texture2D(const RawTextureData& data);
-  Texture2D();
+  Texture2D(GameContext&,const RawTextureData& data);
+  explicit Texture2D(GameContext&);
+  ~Texture2D();
 
   bool Load(const RawTextureData& data);
 };

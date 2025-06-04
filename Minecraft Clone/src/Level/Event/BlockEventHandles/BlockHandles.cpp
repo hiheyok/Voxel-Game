@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+#include "Core/GameContext/GameContext.h"
 #include "Level/Block/Block.h"
 #include "Level/Block/Type/Dirt.h"
 #include "Level/Dimension/Dimension.h"
@@ -16,13 +17,14 @@ void UpdateSurrounding(const BlockEvent& blockEvent, Dimension* dimension) {
     BlockPos new_pos = blockEvent.pos_ + offset;
     BlockID block = dimension->world_->GetBlock(new_pos);
 
-    BlockEvent tickNeighbor{new_pos, block, g_event_handler.BlockTick};
+    BlockEvent tickNeighbor{new_pos, block,
+                            dimension->game_context_.event_handler_->BlockTick};
     dimension->event_manager_.AddEvent(tickNeighbor);
   }
 
   BlockEvent tickMain{blockEvent.pos_,
                       dimension->world_->GetBlock(blockEvent.pos_),
-                      g_event_handler.BlockTick};
+                      dimension->game_context_.event_handler_->BlockTick};
   dimension->event_manager_.AddEvent(tickMain);
 }
 
@@ -32,6 +34,6 @@ void HandlePlaceBlock(const BlockEvent& blockEvent, Dimension* dimension) {
 }
 
 void HandleBlockTick(const BlockEvent& blockEvent, Dimension* dimension) {
-  Block* b = g_blocks.GetBlockType(blockEvent.block_);
+  Block* b = dimension->game_context_.blocks_->GetBlockType(blockEvent.block_);
   b->Tick(blockEvent.pos_, dimension);
 }

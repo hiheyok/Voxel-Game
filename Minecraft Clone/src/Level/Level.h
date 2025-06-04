@@ -2,17 +2,18 @@
 #include <memory>
 
 class Dimension;
+class GameContext;
 
 class Level {
  public:
   std::unique_ptr<Dimension> main_world_;
 
-  Level();
+  explicit Level(GameContext&);
   ~Level();
 
-  void Start(int worldGenThreadCount, int light_engine_thread_count_);
-
+  void Start();
   void Stop();
-
   void updateDimensions();
+
+  GameContext& game_context_;
 };

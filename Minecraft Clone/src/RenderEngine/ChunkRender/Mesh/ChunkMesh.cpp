@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 
+#include "Core/GameContext/GameContext.h"
 #include "Level/Block/Block.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Block/Type/Fluid.h"
@@ -22,7 +23,10 @@ static constexpr int kTintBitOffset = 29;          // 1 bit
 static constexpr int kTextureBitOffset = 10;       // 18 bits
 static constexpr int kBlockShadingBitOffset = 28;  // 4 bits
 
-Mesh::ChunkMeshData::ChunkMeshData() { chunk_cache_.fill(g_blocks.AIR); }
+Mesh::ChunkMeshData::ChunkMeshData(GameContext& game_context)
+    : game_context_{game_context} {
+  chunk_cache_.fill(game_context_.blocks_->AIR);
+}
 
 Mesh::ChunkMeshData::~ChunkMeshData() = default;
 
@@ -38,7 +42,7 @@ void Mesh::ChunkMeshData::Reset() {
   transparent_face_count_ = 0;
   solid_face_count_ = 0;
 
-  chunk_cache_.fill(g_blocks.AIR);
+  chunk_cache_.fill(game_context_.blocks_->AIR);
 }
 
 void Mesh::ChunkMeshData::GenerateCache() {
@@ -125,8 +129,10 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
           const BlockID& backBlock = GetCachedBlockID(pos);
           ++pos[axis];
 
-          const BlockModel& currModel = g_blocks.GetBlockModel(currBlock);
-          const BlockModel& backModel = g_blocks.GetBlockModel(backBlock);
+          const BlockModel& currModel =
+              game_context_.blocks_->GetBlockModel(currBlock);
+          const BlockModel& backModel =
+              game_context_.blocks_->GetBlockModel(backBlock);
 
           bool blankCurrModel =
               !currModel.is_initialized_ || pos[axis] == kChunkDim;
@@ -134,7 +140,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
 
           // Check if it is visible from the back and front
           if (!blankCurrModel) {
-            for (int i = 0; i < currModel.elements_.size(); ++i) {
+            for (size_t i = 0; i < currModel.elements_.size(); ++i) {
               faceVisibility[i] = 0;
               const Cuboid& element = currModel.elements_[i];
 
@@ -153,7 +159,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
           // Check if it is visible from the back and front
           --pos[axis];
           if (!blankBackModel) {
-            for (int i = 0; i < backModel.elements_.size(); ++i) {
+            for (size_t i = 0; i < backModel.elements_.size(); ++i) {
               faceVisibilityBack[i] = 0;
               const Cuboid& element = backModel.elements_[i];
 
@@ -238,7 +244,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
            * Do lighting checks when combining faces
            */
           if (!blankCurrModel) {
-            for (int i = 0; i < currModel.elements_.size(); i++) {
+            for (size_t i = 0; i < currModel.elements_.size(); i++) {
               if (faceVisibility[i] != 1) continue;
               const Cuboid& element = currModel.elements_[i];
               for (q_pos[axisU] = pos[axisU];
@@ -254,7 +260,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
           }
           --q_pos[axis];
           if (!blankBackModel) {
-            for (int i = 0; i < backModel.elements_.size(); i++) {
+            for (size_t i = 0; i < backModel.elements_.size(); i++) {
               if (faceVisibilityBack[i] != 1) continue;
               const Cuboid& element = backModel.elements_[i];
               for (q_pos[axisU] = pos[axisU];
@@ -387,7 +393,8 @@ void Mesh::ChunkMeshData::SetCachedBlockID(BlockID b, BlockPos pos) noexcept {
   chunk_cache_[(pos.x + 1) * (kChunkDim + 2) * (kChunkDim + 2) +
                (pos.z + 1) * (kChunkDim + 2) + (pos.y + 1)] = b;
   // is_fluid_.set((x + 1) * (kChunkDim + 2) * (kChunkDim + 2) + (z + 1) *
-  // (kChunkDim + 2) + (y + 1), g_blocks.GetBlockProperties(b).is_fluid_);
+  // (kChunkDim + 2) + (y + 1),
+  // game_context_.blocks_->GetBlockProperties(b).is_fluid_);
 }
 
 glm::u8vec4 Mesh::ChunkMeshData::GetAO(uint8_t direction, BlockPos block_pos) {
@@ -411,14 +418,14 @@ glm::u8vec4 Mesh::ChunkMeshData::GetAO(uint8_t direction, BlockPos block_pos) {
   // Check up
   pos[axis1] += 1;
 
-  if (GetCachedBlockID(pos) != g_blocks.AIR) {
+  if (GetCachedBlockID(pos) != game_context_.blocks_->AIR) {
     PP -= kAmbientOcclusionStrength;
     PN -= kAmbientOcclusionStrength;
   }
 
   pos[axis1] -= 2;
 
-  if (GetCachedBlockID(pos) != g_blocks.AIR) {
+  if (GetCachedBlockID(pos) != game_context_.blocks_->AIR) {
     NP -= kAmbientOcclusionStrength;
     NN -= kAmbientOcclusionStrength;
   }
@@ -426,14 +433,14 @@ glm::u8vec4 Mesh::ChunkMeshData::GetAO(uint8_t direction, BlockPos block_pos) {
   pos[axis1] += 1;
   pos[axis2] += 1;
 
-  if (GetCachedBlockID(pos) != g_blocks.AIR) {
+  if (GetCachedBlockID(pos) != game_context_.blocks_->AIR) {
     NP -= kAmbientOcclusionStrength;
     PP -= kAmbientOcclusionStrength;
   }
 
   pos[axis2] -= 2;
 
-  if (GetCachedBlockID(pos) != g_blocks.AIR) {
+  if (GetCachedBlockID(pos) != game_context_.blocks_->AIR) {
     PN -= kAmbientOcclusionStrength;
     NN -= kAmbientOcclusionStrength;
   }
@@ -444,18 +451,22 @@ glm::u8vec4 Mesh::ChunkMeshData::GetAO(uint8_t direction, BlockPos block_pos) {
   pos[axis1] += 1;
   pos[axis2] += 1;
 
-  if (GetCachedBlockID(pos) != g_blocks.AIR) PP -= kAmbientOcclusionStrength;
+  if (GetCachedBlockID(pos) != game_context_.blocks_->AIR)
+    PP -= kAmbientOcclusionStrength;
 
   pos[axis1] -= 2;
-  if (GetCachedBlockID(pos) != g_blocks.AIR) NP -= kAmbientOcclusionStrength;
+  if (GetCachedBlockID(pos) != game_context_.blocks_->AIR)
+    NP -= kAmbientOcclusionStrength;
 
   pos[axis2] -= 2;
 
-  if (GetCachedBlockID(pos) != g_blocks.AIR) NN -= kAmbientOcclusionStrength;
+  if (GetCachedBlockID(pos) != game_context_.blocks_->AIR)
+    NN -= kAmbientOcclusionStrength;
 
   pos[axis1] += 2;
 
-  if (GetCachedBlockID(pos) != g_blocks.AIR) PN -= kAmbientOcclusionStrength;
+  if (GetCachedBlockID(pos) != game_context_.blocks_->AIR)
+    PN -= kAmbientOcclusionStrength;
 
   if (PP >= (15 - initial_lighting))
     PP = PP - (15 - initial_lighting);
@@ -490,11 +501,12 @@ bool Mesh::ChunkMeshData::IsFaceVisible(const Cuboid& cube, BlockPos block_pos,
   BlockPos pos = block_pos;
   pos.IncrementSide(side, 1);
 
-  const BlockModel& model = g_blocks.GetBlockModel(GetCachedBlockID(pos));
+  const BlockModel& model =
+      game_context_.blocks_->GetBlockModel(GetCachedBlockID(pos));
 
   if (!model.is_initialized_) return true;
 
-  for (int i = 0; i < model.elements_.size(); ++i) {
+  for (size_t i = 0; i < model.elements_.size(); ++i) {
     const Cuboid& element = model.elements_[i];
     if (element.faces_[oppositeSide].cull_face_ !=
             oppositeSide ||  // TODO(hiheyok): Replace and with OR  later after

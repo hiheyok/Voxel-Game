@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 
+#include "Core/GameContext/GameContext.h"
 #include "Core/Options/Option.h"
 #include "RenderEngine/Camera/camera.h"
 #include "RenderEngine/ChunkRender/Batch/ChunkBatch.h"
@@ -21,14 +22,16 @@
 #include "Utils/MathHelper.h"
 #include "Utils/Timer/Timer.h"
 
-TerrainRenderer::TerrainRenderer()
-    : chunk_solid_batches_{},
+TerrainRenderer::TerrainRenderer(GameContext& game_context)
+    : game_context_{game_context},
+      chunk_solid_batches_{},
       chunk_batch_solid_lookup_{},
       chunk_transparent_batches_{},
       chunk_batch_transparent_lookup_{},
       camera_{nullptr},
       time_{std::make_unique<Timer>()},
-      cubic_shader_{std::make_unique<Shader>("assets/shaders/vert.glsl",
+      cubic_shader_{std::make_unique<Shader>(game_context,
+                                             "assets/shaders/vert.glsl",
                                              "assets/shaders/frag.glsl")} {}
 
 TerrainRenderer::~TerrainRenderer() = default;
@@ -155,8 +158,8 @@ void TerrainRenderer::SetSettings(uint32_t renderDistance,
 }
 
 void TerrainRenderer::LoadAssets() {
-  cubic_shader_->BindTexture2D(0, g_blocks.block_texture_atlas_->Get(),
-                               "BlockTexture");
+  cubic_shader_->BindTexture2D(
+      0, game_context_.blocks_->block_texture_atlas_->Get(), "BlockTexture");
 }
 
 void TerrainRenderer::AddChunk(ChunkPos pos, const std::vector<uint32_t>& data,
@@ -172,7 +175,8 @@ void TerrainRenderer::AddChunk(ChunkPos pos, const std::vector<uint32_t>& data,
 
   bool success = false;
 
-  for (int batchIndex = 0; batchIndex < batchType.size(); batchIndex++) {
+  for (int batchIndex = 0; batchIndex < static_cast<int>(batchType.size());
+       batchIndex++) {
     size_t meshDataSize = data.size() * sizeof(uint32_t);
 
     if (batchType[batchIndex].memory_pool_.memory_pool_.FindFreeSpace(
@@ -189,8 +193,9 @@ void TerrainRenderer::AddChunk(ChunkPos pos, const std::vector<uint32_t>& data,
   }
 
   if (!success) {
-    g_logger.LogInfo("TerrainRenderer::AddChunk",
-                     "Unable to add chunk. Solid buffers are full!");
+    game_context_.logger_->LogInfo(
+        "TerrainRenderer::AddChunk",
+        "Unable to add chunk. Solid buffers are full!");
   }
 }
 
@@ -205,7 +210,7 @@ void TerrainRenderer::AddChunk(
 double TerrainRenderer::GetDebugTime() {
   double t = 0.0;
 
-  for (int batchIndex = 0; batchIndex < chunk_solid_batches_.size();
+  for (size_t batchIndex = 0; batchIndex < chunk_solid_batches_.size();
        batchIndex++) {
     t += chunk_solid_batches_[batchIndex].debug_time_;
   }
@@ -232,7 +237,7 @@ double TerrainRenderer::GetFragmentationRate() {
 size_t TerrainRenderer::GetVRAMUsageFull() {
   size_t memUsage = 0;
 
-  for (int batchIndex = 0; batchIndex < chunk_solid_batches_.size();
+  for (size_t batchIndex = 0; batchIndex < chunk_solid_batches_.size();
        batchIndex++) {
     if (chunk_solid_batches_[batchIndex].render_list_.size() == 0) {
       continue;
@@ -246,7 +251,8 @@ size_t TerrainRenderer::GetVRAMUsageFull() {
 }
 
 void TerrainRenderer::CreateNewSolidBatch() {
-  chunk_solid_batches_.emplace_back(g_app_options.solid_buffer_size_);
+  chunk_solid_batches_.emplace_back(game_context_,
+                                    game_context_.options_->solid_buffer_size_);
   size_t i = chunk_solid_batches_.size() - 1;
   chunk_solid_batches_[i].SetupBuffers();
   chunk_solid_batches_[i].camera_ = camera_;
@@ -254,7 +260,7 @@ void TerrainRenderer::CreateNewSolidBatch() {
 
 void TerrainRenderer::CreateNewTransparentBatch() {
   chunk_transparent_batches_.emplace_back(
-      g_app_options.transparent_buffer_size_);
+      game_context_, game_context_.options_->transparent_buffer_size_);
   size_t i = chunk_transparent_batches_.size() - 1;
   chunk_transparent_batches_[i].SetupBuffers();
   chunk_transparent_batches_[i].camera_ = camera_;

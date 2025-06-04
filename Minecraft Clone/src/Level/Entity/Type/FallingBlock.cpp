@@ -2,16 +2,18 @@
 
 #include "FallingBlock.h"
 
+#include "Core/GameContext/GameContext.h"
 #include "Level/Dimension/Dimension.h"
 #include "Level/Entity/Entity.h"
 
+FallingBlock::FallingBlock(GameContext& game_context)
+    : EntityType{game_context} {}
+FallingBlock::~FallingBlock() = default;
+
 void FallingBlock::Tick(Entity* entity, Dimension* dimension) {
-  //    std::cout << entity->Properties.Velocity.y << "\n";
   float mspt = 1.0f / static_cast<float>(dimension->tick_rate_);
 
   // Physics
-
-  // Logger.LogInfo("Sand", std::to_string(entity->Properties.Position.y));
 
   entity->properties_.acceleration_.y = -dimension->world_->parameters.gravity_;
 
@@ -46,11 +48,12 @@ void FallingBlock::Tick(Entity* entity, Dimension* dimension) {
     BlockEvent addBlock{BlockPos{entity->properties_.position_.x,
                                  entity->properties_.position_.y,
                                  entity->properties_.position_.z},
-                        g_blocks.SAND, g_event_handler.BlockPlace};
+                        game_context_.blocks_->SAND,
+                        game_context_.event_handler_->BlockPlace};
     dimension->event_manager_.AddEvent(addBlock);
 
     EntityEvent removeEntity;
-    removeEntity.id_ = g_event_handler.RemoveEntity;
+    removeEntity.id_ = game_context_.event_handler_->RemoveEntity;
     removeEntity.entity_uuid_ = entity->properties_.entity_uuid_;
     removeEntity.unique_id_ = 50;
 

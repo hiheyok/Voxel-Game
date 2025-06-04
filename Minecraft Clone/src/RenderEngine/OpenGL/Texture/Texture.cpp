@@ -2,9 +2,11 @@
 
 #include "RenderEngine/OpenGL/Texture/Texture.h"
 
+#include <stdexcept>
 #include <string>
 #include <utility>
 
+#include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 #include "Utils/stb_image.h"
 
@@ -68,14 +70,11 @@ void RawTextureData::Load(const std::string& path) {
       break;
     default:
       Erase();
-      g_logger.LogWarn("RawTextureData::Load", "Image invalid format");
   }
   if (success) {
     fully_transparent_pixels_ = false;
     partially_transparent_pixels_ = false;
     AnalyzeTransparency();
-    g_logger.LogDebug("RawTextureData::Load",
-                      "Loaded image: " + std::string(path));
   }
 }
 
@@ -121,14 +120,17 @@ void RawTextureData::Reload() {
   Load(image_path_);
 }
 
-Texture::Texture() {
+Texture::Texture(GameContext& game_context) : game_context_{game_context} {
   glGenTextures(1, &texture_id_);
   if (texture_id_ == 0) {
-    g_logger.LogError("Texture::Texture", "Failed to generate texture.");
+    throw std::runtime_error("Texture::Texture - Failed to generate texture.");
   }
 }
 
-Texture::Texture(Texture&& other) noexcept { *this = std::move(other); }
+Texture::Texture(Texture&& other) noexcept
+    : game_context_{other.game_context_} {
+  *this = std::move(other);
+}
 
 Texture& Texture::operator=(Texture&& other) noexcept {
   texture_id_ = other.texture_id_;
@@ -146,12 +148,12 @@ Texture& Texture::operator=(Texture&& other) noexcept {
 
 Texture::~Texture() {
   if (texture_id_ != 0) {
-    // glDeleteTextures(1, &texture_id_);
+    glDeleteTextures(1, &texture_id_);
   }
 }
 
 void Texture::Set(int textureId, size_t height, size_t width) {
-  // glDeleteTextures(1, &texture_id_);
+  glDeleteTextures(1, &texture_id_);
   texture_id_ = textureId;
   height_ = height;
   width_ = width;

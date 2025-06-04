@@ -8,12 +8,13 @@
 class GUISet;
 class Shader;
 class Window;
+class GameContext;
 
 struct GLFWwindow;
 
 class GUI {
  public:
-  explicit GUI(Window* win);
+  explicit GUI(GameContext&, Window* win);
   GUI(const GUI&) = delete;
   GUI(GUI&&);
   ~GUI();
@@ -27,7 +28,8 @@ class GUI {
   void SetupDrawCalls();
   void Update();
 
+  GameContext& game_context_;
+  Window* window_;
   std::vector<GUISet> guis_;
   std::unique_ptr<Shader> shader_;
-  Window* window_;
 };

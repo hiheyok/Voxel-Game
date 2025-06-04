@@ -1,6 +1,11 @@
 #include "Level/TerrainGeneration/Generators/Debug/Debug.h"
 
-DebugWorld::DebugWorld() = default;
+#include "Core/GameContext/GameContext.h"
+#include "Level/Block/Blocks.h"
+
+DebugWorld::DebugWorld(GameContext& game_context)
+    : WorldGenerator{game_context} {}
+DebugWorld::~DebugWorld() = default;
 
 void DebugWorld::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
   int gx = pos.x * kChunkDim;
@@ -11,7 +16,8 @@ void DebugWorld::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
     return;
   }
 
-  int numBlocks = static_cast<int>(g_blocks.block_type_data_.size());
+  int numBlocks =
+      static_cast<int>(game_context_.blocks_->block_type_data_.size());
 
   int RowLen = 50;
   int ColLen = 50;
@@ -19,7 +25,8 @@ void DebugWorld::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
   if (gy == 0) {
     for (int x = 0; x < kChunkDim; x++) {
       for (int z = 0; z < kChunkDim; z++) {
-        chunk->SetBlockUnsafe(g_blocks.WHITE_CONCRETE, BlockPos{x, 0, z});
+        chunk->SetBlockUnsafe(game_context_.blocks_->WHITE_CONCRETE,
+                              BlockPos{x, 0, z});
       }
     }
   }

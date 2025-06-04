@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 
+#include "Core/GameContext/GameContext.h"
 #include "Level/Block/Block.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Item/Item.h"
@@ -16,31 +17,28 @@
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
 
-BlockItemRender::BlockItemRender() : camera_{std::make_unique<Camera>()} {}
+BlockItemRender::BlockItemRender(GameContext& game_context)
+    : game_context_{game_context}, camera_{std::make_unique<Camera>()} {}
 BlockItemRender::~BlockItemRender() = default;
 
 void BlockItemRender::Initialize() {
-  shader_ =
-      std::make_unique<Shader>("assets/shaders/ItemRender/BlockModelVert.glsl",
-                               "assets/shaders/ItemRender/BlockModelFrag.glsl");
+  shader_ = std::make_unique<Shader>(
+      game_context_, "assets/shaders/ItemRender/BlockModelVert.glsl",
+      "assets/shaders/ItemRender/BlockModelFrag.glsl");
 
-  vao_ = std::make_unique<VertexArray>();
-  ebo_ = std::make_unique<Buffer>();
-  vbo_ = std::make_unique<Buffer>();
+  vao_ = std::make_unique<VertexArray>(game_context_);
+  ebo_ = std::make_unique<Buffer>(game_context_);
+  vbo_ = std::make_unique<Buffer>(game_context_);
 
   ebo_->SetType(GL_ELEMENT_ARRAY_BUFFER);
   ebo_->SetUsage(GL_STATIC_DRAW);
   vbo_->SetType(GL_ARRAY_BUFFER);
   vbo_->SetUsage(GL_STATIC_DRAW);
 
-  vao_->Bind();
-  vbo_->Bind();
-  vao_->EnableAttriPTR(0, 3, GL_FLOAT, GL_FALSE, 7, 0);
-  vao_->EnableAttriPTR(1, 2, GL_FLOAT, GL_FALSE, 7, 3);
-  vao_->EnableAttriPTR(2, 1, GL_FLOAT, GL_FALSE, 7, 5);
-  vao_->EnableAttriPTR(3, 1, GL_FLOAT, GL_FALSE, 7, 6);
-  vao_->Unbind();
-  vbo_->Unbind();
+  vao_->EnableAttriPtr(vbo_.get(), 0, 3, GL_FLOAT, GL_FALSE, 7, 0)
+      .EnableAttriPtr(vbo_.get(), 1, 2, GL_FLOAT, GL_FALSE, 7, 3)
+      .EnableAttriPtr(vbo_.get(), 2, 1, GL_FLOAT, GL_FALSE, 7, 5)
+      .EnableAttriPtr(vbo_.get(), 3, 1, GL_FLOAT, GL_FALSE, 7, 6);
   SetCamera();
 
   float dimensions = 0.85f;
@@ -55,30 +53,29 @@ void BlockItemRender::Initialize() {
   shader_->SetMat4("model", modelMat);
   shader_->SetMat4("projection", orthoProj);
 
-  shader_->BindTexture2D(0, g_blocks.block_texture_atlas_->Get(),
+  shader_->BindTexture2D(0, game_context_.blocks_->block_texture_atlas_->Get(),
                          "BlockTexture");
 }
 
 void BlockItemRender::RenderBlock(Item item) {
-  if (g_blocks.GetBlockType(item.GetBlock())->block_model_data_ == 0) {
+  if (game_context_.blocks_->GetBlockType(item.GetBlock())->block_model_data_ ==
+      0) {
     return;
   }
 
   std::vector<float> vertices{};
   std::vector<uint32_t> indices{};
 
-  g_blocks.GetBlockType(item.GetBlock())
+  game_context_.blocks_->GetBlockType(item.GetBlock())
       ->block_model_data_->GetVertices(vertices, indices);
 
-  vbo_->InsertData(vertices.size() * sizeof(float), vertices.data(),
-                   GL_STATIC_DRAW);
-  ebo_->InsertData(indices.size() * sizeof(uint32_t), indices.data(),
-                   GL_STATIC_DRAW);
+  vbo_->InsertData(vertices, GL_STATIC_DRAW);
+  ebo_->InsertData(indices, GL_STATIC_DRAW);
   // std::cout << model.Vertices.size() << '\n';
   camera_->screen_res_ = glm::vec2(16.f, 16.f);
 
   shader_->Use();
-  shader_->BindTexture2D(0, g_blocks.block_texture_atlas_->Get(),
+  shader_->BindTexture2D(0, game_context_.blocks_->block_texture_atlas_->Get(),
                          "BlockTexture");
   setDrawCalls();
   vao_->Bind();

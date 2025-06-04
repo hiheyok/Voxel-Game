@@ -96,9 +96,6 @@
     <ClCompile Include="src\Level\Event\EntityEventHandles\EntityHandles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Initializer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Level\Item\Items.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -165,12 +162,6 @@
     <ClCompile Include="src\Level\TerrainGeneration\Generators\Mountains\Mountains.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\TerrainGeneration\Generators\Minecraft\Overworld.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Level\TerrainGeneration\Generators\Minecraft\MinecraftTerrain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Level\TerrainGeneration\Generators\Math\MainWorld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -180,22 +171,7 @@
     <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugSecond\DebugSecond.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\TerrainGeneration\Noisemaps\NoiseOctave.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Level\TerrainGeneration\Noisemaps\Noisemap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Level\TerrainGeneration\Noisemaps\MinecraftNoiseGeneratorSimplex.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Level\TerrainGeneration\Noisemaps\MinecraftNoiseGeneratorPerlin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Level\TerrainGeneration\Noisemaps\MinecraftNoiseGenerator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Level\TerrainGeneration\Biome\BiomeProperties.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Server\Server.cpp">
@@ -333,9 +309,6 @@
     <ClCompile Include="src\Client\ClientPlay.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\TerrainGeneration\GenLayer\IntCache.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\ShaderInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -343,9 +316,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Level\World\WorldInterface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Level\TerrainGeneration\Biome\Biome.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\ChunkRender\BlockTextureAtlas.cpp">
@@ -367,6 +337,33 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Position\PositionTypes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\GameContext\GameContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Client\ClientLevel\Entity\ClientEntities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Client\ClientLevel\ClientCache.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Client\ClientLevel\ClientLevel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Entity\EntityType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexPacked.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\OpenGL\Render\RenderDrawElements.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\UI\Widgets\Widget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Dimension\Dimensions\Overworld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -476,9 +473,6 @@
     <ClInclude Include="src\Level\TerrainGeneration\Structures\Structure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\ChunkRender\Occulsion\Graph\Graph.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Level\Block\Type\Grass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -563,9 +557,6 @@
     <ClInclude Include="src\Level\Item\Items.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Initializer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Client\IO\IO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -632,9 +623,6 @@
     <ClInclude Include="src\FileManager\Files.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Generators\Minecraft\MinecraftTerrain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Level\TerrainGeneration\Noisemaps\Noisemap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -665,19 +653,7 @@
     <ClInclude Include="src\Level\TerrainGeneration\Noisemaps\Noise.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Noisemaps\MinecraftNoiseGenerator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Level\TerrainGeneration\Random\JavaRandom.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Noisemaps\MinecraftNoiseGeneratorPerlin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Noisemaps\MinecraftNoiseGeneratorSimplex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Generators\Minecraft\Overworld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Light\LightStorage.h">
@@ -722,145 +698,10 @@
     <ClInclude Include="src\Level\Light\LightEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\Biome.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeProperties.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Level\Chunk\Heightmap\Heightmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeProvider.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\Biomes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeBeach.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeDesert.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeEnd.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeForest.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeForestMutated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeHell.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeHills.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeJungle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeMesa.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeMushroomIsland.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeOcean.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomePlains.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeRiver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeSavanna.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeSavannaMutated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeSnow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeStoneBeach.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeSwamp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeTaiga.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Biome\BiomeType\BiomeVoid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Level\TerrainGeneration\GenLayer\CombineLayers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerAddIsland.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerAddMushroomIsland.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerAddSnow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerBiome.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerBiomeEdge.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerDeepOcean.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerEdge.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerFuzzyZoom.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerHills.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerIsland.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerRareBiome.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerRemoveTooMuchOcean.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerRiver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerRiverInit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerRiverMix.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerShore.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerSmooth.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerVoronoiZoom.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\GenLayerZoom.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\GenLayer\IntCache.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Chunk\TallChunk.h">
@@ -1023,6 +864,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Utils\Containers\PackedBitArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Entity\EntityType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexPacked.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\OpenGL\Render\RenderDrawElements.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\UI\Data\UIVertexFormat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\UI\Widgets\ColoredWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\UI\Widgets\TexturedWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\UI\Widgets\Widget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

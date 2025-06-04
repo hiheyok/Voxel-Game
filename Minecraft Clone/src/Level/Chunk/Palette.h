@@ -15,7 +15,7 @@
 // TODO(hiheyok): for a large amount of unique block, use stack / hashmap
 class Palette {
  public:
-  Palette();
+  explicit Palette();
   ~Palette();
   Palette(Palette&&) noexcept;
   Palette(const Palette&) noexcept;

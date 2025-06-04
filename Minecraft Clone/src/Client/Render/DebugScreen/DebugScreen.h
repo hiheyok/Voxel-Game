@@ -1,18 +1,19 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
 #pragma once
+#include <glm/vec3.hpp>
 #include <memory>
 #include <string>
-#include <glm/vec3.hpp>
 
 class TextRenderer;
 class Timer;
+class GameContext;
 
 struct GLFWwindow;
 
 class DebugScreen {
  public:
-  DebugScreen();
+  explicit DebugScreen(GameContext&);
   ~DebugScreen();
   void Render();
   void Update();
@@ -22,6 +23,7 @@ class DebugScreen {
   void Initialize(GLFWwindow* w);
 
  private:
+  GameContext& game_context_;
   GLFWwindow* window_{nullptr};
   std::unique_ptr<TextRenderer> renderer_;
   std::unique_ptr<Timer> timer_;

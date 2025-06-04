@@ -10,6 +10,7 @@ class Timer;
 class Camera;
 class Shader;
 class ChunkDrawBatch;
+class GameContext;
 
 struct GLFWwindow;
 
@@ -19,7 +20,7 @@ struct ChunkVertexData;
 
 class TerrainRenderer {
  public:
-  TerrainRenderer();
+  explicit TerrainRenderer(GameContext&);
   ~TerrainRenderer();
 
   void Initialize(GLFWwindow* window_, Camera* camera_);
@@ -46,7 +47,8 @@ class TerrainRenderer {
                 FastHashMap<ChunkPos, int>& LookUpMap);
   void CreateNewSolidBatch();
   void CreateNewTransparentBatch();
-
+   
+  GameContext& game_context_;
   int horizontal_render_distance_ = 16;
   int vertical_render_distance_ = 16;
   float fov_ = 80.f;
@@ -63,6 +65,6 @@ class TerrainRenderer {
 
   Camera* camera_;
   GLFWwindow* window_ = nullptr;
-  std::unique_ptr<Shader> cubic_shader_;
   std::unique_ptr<Timer> time_;
+  std::unique_ptr<Shader> cubic_shader_;
 };

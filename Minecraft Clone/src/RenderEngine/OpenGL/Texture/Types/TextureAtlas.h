@@ -10,7 +10,7 @@
 
 class TextureAtlas : public Texture {
  public:
-  TextureAtlas(int width, int height, int individualWidth,
+  TextureAtlas(GameContext&, int width, int height, int individualWidth,
                int individualHeight);
   virtual ~TextureAtlas();
   void LoadToGPU();

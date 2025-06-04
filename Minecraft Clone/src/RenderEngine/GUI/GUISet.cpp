@@ -3,6 +3,7 @@
 #include "RenderEngine/GUI/GUISet.h"
 
 #include <memory>
+#include <stdexcept>
 #include <string>
 
 #include "RenderEngine/GUI/GUIObject.h"
@@ -11,7 +12,9 @@
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "RenderEngine/OpenGL/Texture/Types/Texture2D.h"
 
-GUISet::GUISet() : gui_texture_{std::make_unique<Texture2D>()} {}
+GUISet::GUISet(GameContext& game_context)
+    : game_context_{game_context},
+      gui_texture_{std::make_unique<Texture2D>(game_context)} {}
 GUISet::~GUISet() = default;
 GUISet::GUISet(GUISet&& other) = default;
 
@@ -27,8 +30,8 @@ void GUISet::AddGUIElementNorm(std::string Name, std::string Text,
     num_of_renderable_objects_++;
     is_dirty_ = true;
   } else {
-    g_logger.LogError("GUISet::AddGUIElementNorm",
-                      "Element " + Name + " already exist!");
+    throw std::logic_error("GUISet::AddGUIElementNorm - Element " + Name +
+                           " already exist!");
   }
 }
 
@@ -50,8 +53,8 @@ void GUISet::AddGUIElement(std::string name, std::string text, glm::vec2 size,
     num_of_renderable_objects_++;
     is_dirty_ = true;
   } else {
-    g_logger.LogError("GUISet::AddGUIElement",
-                      "Element " + name + " already exist!");
+    throw std::logic_error("GUISet::AddGUIElement - Element " + name +
+                           " already exist!");
   }
 }
 
@@ -65,8 +68,8 @@ void GUISet::EditElementPosition(std::string Name, glm::vec2 Position) {
       is_dirty_ = true;
     }
   } else {
-    g_logger.LogError("GUISet::EditElementPosition",
-                      "Element " + Name + " doesn't exist!");
+    throw std::logic_error("GUISet::EditElementPosition - Element " + Name +
+                           " doesn't exist!");
   }
 }
 
@@ -81,13 +84,14 @@ void GUISet::EditElementUVNorm(std::string Name, glm::vec2 UV0, glm::vec2 UV1) {
       is_dirty_ = true;
     }
   } else {
-    g_logger.LogError("GUISet::EditElementUVNorm",
-                      "Element " + Name + " doesn't exist!");
+    throw std::logic_error("GUISet::EditElementUVNorm - Element " + Name +
+                           " doesn't exist!");
   }
 }
 
 void GUISet::SetGUITexture(std::string file) {
-  gui_texture_ = std::make_unique<Texture2D>(RawTextureData(file));
+  gui_texture_ =
+      std::make_unique<Texture2D>(game_context_, RawTextureData(file));
 }
 
 void GUISet::SetGUITexture(GLuint textureId, size_t x, size_t y) {
@@ -103,10 +107,8 @@ void GUISet::PrepareRenderer() {
   for (auto& e : elements_) {
     GUIElement::GUIVertices GUIData = e.GetVertices();
     size_t BufferIndex = e.buffer_index_;
-    vbos_[BufferIndex].InsertData(GUIData.vertices_.size() * sizeof(float),
-                                  GUIData.vertices_.data(), GL_STATIC_DRAW);
-    ebos_[BufferIndex].InsertData(GUIData.indices_.size() * sizeof(uint32_t),
-                                  GUIData.indices_.data(), GL_STATIC_DRAW);
+    vbos_[BufferIndex].InsertData(GUIData.vertices_, GL_STATIC_DRAW);
+    ebos_[BufferIndex].InsertData(GUIData.indices_, GL_STATIC_DRAW);
     vbo_size_[BufferIndex] = GUIData.indices_.size();
   }
 }
@@ -116,9 +118,9 @@ size_t GUISet::GetNumRenderableObjects() const {
 GLuint GUISet::GetGUITextureID() const { return gui_texture_->Get(); }
 
 size_t GUISet::AddRenderingObj() {
-  vaos_.emplace_back();
-  ebos_.emplace_back();
-  vbos_.emplace_back();
+  vaos_.emplace_back(game_context_);
+  ebos_.emplace_back(game_context_);
+  vbos_.emplace_back(game_context_);
 
   vbos_.back().SetType(GL_ARRAY_BUFFER);
   ebos_.back().SetType(GL_ELEMENT_ARRAY_BUFFER);
@@ -126,12 +128,9 @@ size_t GUISet::AddRenderingObj() {
   vbos_.back().SetUsage(GL_STATIC_DRAW);
   ebos_.back().SetUsage(GL_STATIC_DRAW);
 
-  vaos_.back().Bind();
-  vbos_.back().Bind();
-  vaos_.back().EnableAttriPTR(0, 2, GL_FLOAT, GL_FALSE, 4, 0);
-  vaos_.back().EnableAttriPTR(1, 2, GL_FLOAT, GL_FALSE, 4, 2);
-  vbos_.back().Unbind();
-  vaos_.back().Unbind();
+  vaos_.back()
+      .EnableAttriPtr(&vbos_.back(), 0, 2, GL_FLOAT, GL_FALSE, 4, 0)
+      .EnableAttriPtr(&vbos_.back(), 1, 2, GL_FLOAT, GL_FALSE, 4, 2);
 
   vbo_size_.emplace_back(0);
   return vaos_.size() - 1;

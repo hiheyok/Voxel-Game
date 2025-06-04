@@ -10,7 +10,7 @@ class EntityContainer;
 
 class World : public WorldInterface {
  public:
-  World();
+  explicit World(GameContext&);
   ~World();
 
   void SetChunk(std::unique_ptr<Chunk> chunk);

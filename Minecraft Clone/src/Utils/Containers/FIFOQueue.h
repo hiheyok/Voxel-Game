@@ -6,9 +6,9 @@
 #include <vector>
 template <class T, size_t kQueueSize>
 class FixedFIFOQueue {
- public:
   static_assert(kQueueSize > 0, "kQueueSize must be greater than 0");
 
+ public:
   FixedFIFOQueue();
   ~FixedFIFOQueue();
 

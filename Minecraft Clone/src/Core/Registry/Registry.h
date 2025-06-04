@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <stdexcept>
 #include <string>
 
 #include "Core/Typenames.h"
@@ -23,8 +24,9 @@ class Registry {
 template <class K, class V>
 inline V Registry<K, V>::GetValue(K key) {
   if (!hashmap_.count(key)) {
-    g_logger.LogError("Registry<K, V>::GetValue",
-                      "Cannot return value because key doesn't exist");
+    throw std::invalid_argument(
+        "Registry<K, V>::GetValue - Cannot return value because key "
+        "doesn't exist");
   }
   return hashmap_[key];
 }
@@ -32,8 +34,8 @@ inline V Registry<K, V>::GetValue(K key) {
 template <class K, class V>
 inline K Registry<K, V>::GetKey(int id) {
   if (!get_key_by_id_.count(id)) {
-    g_logger.LogError("Registry<K, V>::GetKey",
-                      "Cannot return key because ID doesn't exist");
+    throw std::invalid_argument(
+        "Registry<K, V>::GetKey - Cannot return key because ID doesn't exist");
   }
   return get_key_by_id_[id];
 }
@@ -41,8 +43,8 @@ inline K Registry<K, V>::GetKey(int id) {
 template <class K, class V>
 inline int Registry<K, V>::GetId(K key) {
   if (!get_id_by_key_.count(key)) {
-    g_logger.LogError("Registry<K, V>::GetId",
-                      "Cannot return ID because key doesn't exist");
+    throw std::invalid_argument(
+        "Registry<K, V>::GetId - Cannot return ID because key doesn't exist");
   }
   return get_id_by_key_[key];
 }

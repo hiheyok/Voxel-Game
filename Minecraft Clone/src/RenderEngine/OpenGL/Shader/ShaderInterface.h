@@ -3,21 +3,27 @@
 #pragma once
 #include <gl/glew.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/vec2.hpp>
 #include <optional>
 #include <string>
 #include <variant>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/vec2.hpp>
-
-
 #include "Core/Typenames.h"
+
+class GameContext;
 
 class ShaderInterface {
  public:
-  ShaderInterface();
-  ~ShaderInterface();
+  explicit ShaderInterface(GameContext&);
+  virtual ~ShaderInterface();
+
+  ShaderInterface(const ShaderInterface&) = delete;
+  ShaderInterface& operator=(const ShaderInterface&) = delete;
+
+  ShaderInterface(ShaderInterface&&) noexcept;
+  ShaderInterface& operator=(ShaderInterface&&) noexcept;
 
   void Use();
 
@@ -64,6 +70,7 @@ class ShaderInterface {
   uint32_t shader_id_ = 0;
 
  protected:
+  GameContext& game_context_;
   FastHashMap<std::string, int> cache_;
 
   // Value cache | Used to make sure to not update if the values are the same

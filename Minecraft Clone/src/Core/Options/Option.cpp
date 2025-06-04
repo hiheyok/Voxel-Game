@@ -5,10 +5,11 @@
 #include <string>
 #include <vector>
 
+#include "Core/GameContext/GameContext.h"
 #include "FileManager/Files.h"
 #include "Utils/LogUtils.h"
 
-Options::Options() {
+Options::Options(GameContext& game_context) : game_context_{game_context} {
   SetOptionNameTable();
 
   // Set values from option file
@@ -28,7 +29,8 @@ bool Options::SetValue(std::string name, std::string value) {
   size_t val = stoll(value);
 
   if (!option_name_.count(name)) {
-    g_logger.LogError("Options::SetValue", "Unknown option: " + name);
+    game_context_.logger_->LogError("Options::SetValue",
+                                    "Unknown option: " + name);
     return false;
   }
 
@@ -39,10 +41,10 @@ bool Options::SetValue(std::string name, std::string value) {
 void Options::ProcessTokens(std::vector<std::string> tokens) {
   bool success = true;
 
-  for (int i = 0; i < (tokens.size() / 2); i++) {
+  for (int i = 0; i < static_cast<int>(tokens.size() / 2); i++) {
     std::string name = tokens[2 * i];
     std::string val = tokens[2 * i + 1];
-    g_logger.LogDebug("Options::ProcessTokens", name + ":" + val);
+    game_context_.logger_->LogDebug("Options::ProcessTokens", name + ":" + val);
     if (!SetValue(name, val)) {
       success = false;
     }
@@ -76,5 +78,6 @@ void Options::GenerateOptionFile() {  // Generate file if deleted
   }
 
   file.close();
-  g_logger.LogDebug("Options::GenerateOptionFile", "Generated option file");
+  game_context_.logger_->LogDebug("Options::GenerateOptionFile",
+                                  "Generated option file");
 }

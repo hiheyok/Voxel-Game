@@ -171,7 +171,7 @@ class HashMapVector {
   const Val& At(const Key& key) const {
     auto map_it = idx_.find(key);
     if (map_it == idx_.end()) {
-      throw std::out_of_range("HashMapVector::At key not found");
+      throw std::out_of_range("HashMapVector::At - key not found");
     }
     return arr_[map_it->second];
   }
@@ -179,7 +179,7 @@ class HashMapVector {
   Val& At(const Key& key) {
     auto map_it = idx_.find(key);
     if (map_it == idx_.end()) {
-      throw std::out_of_range("HashMapVector::At key not found");
+      throw std::out_of_range("HashMapVector::At - key not found");
     }
     return arr_[map_it->second];
   }

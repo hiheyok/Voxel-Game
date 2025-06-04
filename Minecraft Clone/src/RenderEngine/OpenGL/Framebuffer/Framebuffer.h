@@ -7,36 +7,30 @@
 #include <vector>
 
 class Shader;
+class RenderDrawArrays;
+class GameContext;
 
 // TODO(hiheyok): Make this a child of texture class ??
 class TexturedFrameBuffer {
  public:
-  TexturedFrameBuffer();
+  explicit TexturedFrameBuffer(GameContext&);
   ~TexturedFrameBuffer();
 
   void GenBuffer(GLint x, GLint y, float muti, GLuint format = GL_RGBA);
-
   void UpdateResolution(GLint x, GLint y, float muti = 1.f);
-
   void BindRBO() const;
-
   void UnbindRBO() const;
-
   void BindFBO();
-
   void UnbindFBO();
-
   void Clear() const;
-
   void GetShaders();
-
   void UpdateTexture();
-
   void Render();
 
   GLuint texture_ = 0;
 
  private:
+  GameContext& game_context_;
   std::unique_ptr<Shader> screen_;
   GLuint fbo_ = 0, rbo_ = 0, shader_id_ = 0;
   GLint sx = 0;

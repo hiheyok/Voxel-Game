@@ -3,6 +3,8 @@
 #pragma once
 #include "Level/Chunk/ChunkData.h"
 
+class GameContext;
+
 struct ChunkRawData;
 
 enum TerrainType {
@@ -16,8 +18,8 @@ enum TerrainType {
 
 class Chunk : public ChunkContainer {
  public:
-  Chunk();
-  Chunk(const ChunkRawData&);
+  explicit Chunk(GameContext&);
+  Chunk(GameContext&, const ChunkRawData&);
   ~Chunk();
   void UpdateGen();
 };

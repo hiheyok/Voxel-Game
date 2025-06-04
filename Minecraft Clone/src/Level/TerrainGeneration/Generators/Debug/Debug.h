@@ -3,7 +3,8 @@
 
 class DebugWorld : public WorldGenerator {
  public:
-  DebugWorld();
-
+  explicit DebugWorld(GameContext&);
+  ~DebugWorld();
+  
   void Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) override;
 };

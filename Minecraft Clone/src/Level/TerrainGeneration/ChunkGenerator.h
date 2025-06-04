@@ -9,11 +9,11 @@
 #include "Utils/ThreadPool.h"
 
 class Chunk;
+class GameContext;
 
 class ChunkGenerator {
  public:
-  ChunkGenerator(int thread_count, int64_t world_seed,
-                 WorldGeneratorID gen_type);
+  ChunkGenerator(GameContext&, int64_t world_seed, WorldGeneratorID gen_type);
   ~ChunkGenerator();
 
   ChunkGenerator(const ChunkGenerator&) = delete;
@@ -21,8 +21,8 @@ class ChunkGenerator {
   ChunkGenerator& operator=(const ChunkGenerator&) = delete;
   ChunkGenerator& operator=(ChunkGenerator&&) = delete;
 
-  void Generate(const std::vector<ChunkPos>& ids);
-  void Generate(ChunkPos ids);
+  void Generate(const std::vector<ChunkPos>& pos);
+  void Generate(ChunkPos pos);
 
   std::vector<std::unique_ptr<Chunk>> GetOutput();
 
@@ -37,6 +37,7 @@ class ChunkGenerator {
       std::invoke_result_t<decltype(&ChunkGenerator::Worker), ChunkGenerator*,
                            ChunkPos>;
 
+  GameContext& game_context_;
   std::unique_ptr<ThreadPool<ChunkPos, WorkerReturnType>> gen_pool_;
 
   WorldGeneratorID world_generator_type_;

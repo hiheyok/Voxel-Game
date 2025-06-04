@@ -7,72 +7,60 @@
 
 #include <exception>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
+#include "Core/GameContext/GameContext.h"
 #include "RenderEngine/GUI/Font.h"
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
+#include "RenderEngine/OpenGL/Render/RenderDrawArrays.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "RenderEngine/OpenGL/Texture/Types/Texture2D.h"
 #include "Utils/LogUtils.h"
 
-TextRenderer::TextRenderer()
-    : font_shader_{std::make_unique<Shader>(
-          "assets/shaders/Font/FontVert.glsl",
-          "assets/shaders/Font/FontFrag.glsl")},
-      background_shader_{std::make_unique<Shader>(
-          "assets/shaders/Font/FontBackgroundVert.glsl",
-          "assets/shaders/Font/FontBackgroundFrag.glsl")},
-      vbo_{std::make_unique<Buffer>()},
-      background_vbo_{std::make_unique<Buffer>()},
-      vao_{std::make_unique<VertexArray>()},
-      background_vao_{std::make_unique<VertexArray>()},
-      font_texture_{std::make_unique<Texture2D>()} {}
+TextRenderer::TextRenderer(GameContext& game_context)
+    : game_context_{game_context},
+      font_texture_{std::make_unique<Texture2D>(game_context_)},
+      background_render_{std::make_unique<RenderDrawArrays>(game_context_)},
+      font_render_{std::make_unique<RenderDrawArrays>(game_context_)} {}
 
 TextRenderer::~TextRenderer() = default;
 
 void TextRenderer::InitializeTextRenderer(GLFWwindow* w) {
   // Setup buffer for text rendering
-  vbo_->SetType(GL_ARRAY_BUFFER);
-  vbo_->SetUsage(GL_STATIC_DRAW);
-
-  vao_->Bind();
-  vbo_->Bind();
-  vao_->EnableAttriPTR(0, 2, GL_FLOAT, GL_FALSE, 11, 0);
-  vao_->EnableAttriPTR(1, 2, GL_FLOAT, GL_FALSE, 11, 2);
-  vao_->EnableAttriPTR(2, 2, GL_FLOAT, GL_FALSE, 11, 4);
-  vao_->EnableAttriPTR(3, 2, GL_FLOAT, GL_FALSE, 11, 6);
-  vao_->EnableAttriPTR(4, 3, GL_FLOAT, GL_FALSE, 11, 8);
-  vao_->Unbind();
-  vbo_->Unbind();
+  font_render_->SetDataAttribute(0, 2, GL_FLOAT, 11, 0);
+  font_render_->SetDataAttribute(1, 2, GL_FLOAT, 11, 2);
+  font_render_->SetDataAttribute(2, 2, GL_FLOAT, 11, 4);
+  font_render_->SetDataAttribute(3, 2, GL_FLOAT, 11, 6);
+  font_render_->SetDataAttribute(4, 3, GL_FLOAT, 11, 8);
 
   // Setup buffer for background rendering
-  background_vbo_->SetType(GL_ARRAY_BUFFER);
-  background_vbo_->SetUsage(GL_STATIC_DRAW);
+  background_render_->SetDataAttribute(0, 2, GL_FLOAT, 8, 0);
+  background_render_->SetDataAttribute(1, 2, GL_FLOAT, 8, 2);
+  background_render_->SetDataAttribute(2, 4, GL_FLOAT, 8, 4);
 
-  background_vao_->Bind();
-  background_vbo_->Bind();
-  background_vao_->EnableAttriPTR(0, 2, GL_FLOAT, GL_FALSE, 8, 0);
-  background_vao_->EnableAttriPTR(1, 2, GL_FLOAT, GL_FALSE, 8, 2);
-  background_vao_->EnableAttriPTR(2, 4, GL_FLOAT, GL_FALSE, 8, 4);
-  background_vao_->Unbind();
-  background_vbo_->Unbind();
+  // Initialize shaders
+  font_render_->SetShader("assets/shaders/Font/FontVert.glsl",
+                          "assets/shaders/Font/FontFrag.glsl");
+  background_render_->SetShader("assets/shaders/Font/FontBackgroundVert.glsl",
+                                "assets/shaders/Font/FontBackgroundFrag.glsl");
 
   // Load textures
   RawTextureData RawTexture{"assets/minecraft/textures/font/ascii.png"};
   font_texture_->Load(RawTexture);
-  font_shader_->BindTexture2D(0, font_texture_->Get(), "FontTexture");
+  font_render_->SetTexture2D(0, font_texture_->Get(), "FontTexture");
   window_ = w;
-  g_logger.LogDebug("TextRenderer::InitializeTextRenderer",
-                    "Initialized font renderer");
+  game_context_.logger_->LogDebug("TextRenderer::InitializeTextRenderer",
+                                  "Initialized font renderer");
 }
 
 void TextRenderer::InsertFontObject(const std::string& name,
                                     RenderableFont font) {
   if (font_map_.count(name)) {
-    g_logger.LogError(
-        "TextRenderer::InsertFontObject",
+    throw std::logic_error(
+        "TextRenderer::InsertFontObject - " +
         std::string("Font with the name " + name + " already exist!"));
   }
 
@@ -81,9 +69,9 @@ void TextRenderer::InsertFontObject(const std::string& name,
 
 void TextRenderer::RemoveFontObject(const std::string& name) {
   if (!font_map_.count(name)) {
-    g_logger.LogError("TextRenderer::RemoveFontObject",
-                      std::string("Font with the name " + name +
-                                  " doesn't exist! Cannot remove."));
+    throw std::logic_error("TextRenderer::RemoveFontObject - " +
+                           std::string("Font with the name " + name +
+                                       " doesn't exist! Cannot remove."));
   }
 
   font_map_.erase(name);
@@ -98,56 +86,45 @@ void TextRenderer::ConstructBuffer() {
   // Fill text buffer
   vertices_.clear();
 
-  for (auto& Font : font_map_) {
-    std::vector<float> fontVertices = Font.second.GetVertices();
+  for (const auto& font : font_map_) {
+    std::vector<float> fontVertices = font.second.GetVertices();
 
     vertices_.insert(vertices_.end(), fontVertices.begin(), fontVertices.end());
   }
 
-  vbo_->InsertData(vertices_.size() * sizeof(vertices_[0]), vertices_.data(),
-                   GL_STATIC_DRAW);
-  vertices_count_ = vertices_.size() / 11;
+  font_render_->SetData(vertices_);
+  font_render_->SetIndicesCount(vertices_.size() / 11);
 
   // Fill background buffer
   vertices_background_.clear();
 
-  for (auto& Font : font_map_) {
-    if (!Font.second.background_) continue;
+  for (const auto& font : font_map_) {
+    if (!font.second.background_) continue;
 
-    std::vector<float> backgroundVertices = Font.second.GetBackgroundVertices();
+    std::vector<float> backgroundVertices = font.second.GetBackgroundVertices();
 
     vertices_background_.insert(vertices_background_.end(),
                                 backgroundVertices.begin(),
                                 backgroundVertices.end());
   }
 
-  background_vbo_->InsertData(
-      vertices_background_.size() * sizeof(vertices_background_[0]),
-      vertices_background_.data(), GL_STATIC_DRAW);
-  background_vert_count_ = vertices_background_.size() / 8;
+  background_render_->SetData(vertices_background_);
+  background_render_->SetIndicesCount(vertices_background_.size() / 8);
 }
 
 void TextRenderer::Prepare() {
-  font_shader_->Use();
-  font_shader_->BindTexture2D(0, font_texture_->Get(), "FontTexture");
+  int height, width;
+  glfwGetWindowSize(window_, &width, &height);
 
-  int Height, Width;
-  glfwGetWindowSize(window_, &Width, &Height);
+  font_render_->GetShader().SetFloat("AspectRatio",
+                                     static_cast<float>(height) / width);
 
-  font_shader_->SetFloat("AspectRatio", static_cast<float>(Height) / Width);
-
-  background_shader_->Use();
-  background_shader_->SetFloat("AspectRatio",
-                               static_cast<float>(Height) / Width);
+  background_render_->GetShader().SetFloat("AspectRatio",
+                                           static_cast<float>(height) / width);
 }
 
 void TextRenderer::RenderFont() {
   Prepare();
-  background_shader_->Use();
-  background_vao_->Bind();
-  glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(background_vert_count_));
-
-  font_shader_->Use();
-  vao_->Bind();
-  glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(vertices_count_));
+  background_render_->Render();
+  font_render_->Render();
 }

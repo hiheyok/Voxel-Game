@@ -1,11 +1,15 @@
 #include "Level/TerrainGeneration/Generators/FastTerrain/FastTerrain.h"
 
+#include "Core/GameContext/GameContext.h"
+#include "Level/Block/Blocks.h"
 #include "Utils/FastNoiseLite.h"
 
-FastTerrain::FastTerrain() : noise_{std::make_unique<FastNoiseLite>()} {
+FastTerrain::FastTerrain(GameContext& game_context)
+    : WorldGenerator{game_context}, noise_{std::make_unique<FastNoiseLite>()} {
   noise_->SetNoiseType(noise_->NoiseType_OpenSimplex2);
   noise_->SetFrequency(0.009f);
 }
+FastTerrain::~FastTerrain() = default;
 
 void FastTerrain::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
   int cx = pos.x * kChunkDim;
@@ -59,7 +63,8 @@ void FastTerrain::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
             a > 10) {
           if (TREE_MAP >= (TREE_RAND_VAL - TREE_RAND_VAL_RANGE) &&
               TREE_MAP <= (TREE_RAND_VAL + TREE_RAND_VAL_RANGE)) {
-            chunk->SetBlock(g_blocks.OAK_LOG, BlockPos{x - cx, y - cy, z - cz});
+            chunk->SetBlock(game_context_.blocks_->OAK_LOG,
+                            BlockPos{x - cx, y - cy, z - cz});
           }
         }
         if (a + 5 == y && a > 10) {
@@ -69,7 +74,7 @@ void FastTerrain::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
               for (int ty = -2; ty <= 2; ty++) {
                 for (int tz = -2; tz <= 2; tz++) {
                   chunk->SetBlock(
-                      g_blocks.OAK_LEAF,
+                      game_context_.blocks_->OAK_LEAF,
                       BlockPos{x + tx - cx, y + ty - cy, z + tz - cz});
                 }
               }
@@ -78,22 +83,22 @@ void FastTerrain::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
         }
 
         if (y < 10) {
-          chunk->SetBlockUnsafe(g_blocks.WATER,
+          chunk->SetBlockUnsafe(game_context_.blocks_->WATER,
                                 BlockPos{x - cx, y - cy, z - cz});
         }
 
         if (a > y) {
           if (y < 12) {
-            chunk->SetBlockUnsafe(g_blocks.SAND,
+            chunk->SetBlockUnsafe(game_context_.blocks_->SAND,
                                   BlockPos{x - cx, y - cy, z - cz});
           } else {
             if (a >= y) {
-              chunk->SetBlockUnsafe(g_blocks.GRASS,
+              chunk->SetBlockUnsafe(game_context_.blocks_->GRASS,
                                     BlockPos{x - cx, y - cy, z - cz});
               chunk->is_empty_ = false;
             }
             if (a - 1 > y) {
-              chunk->SetBlockUnsafe(g_blocks.DIRT,
+              chunk->SetBlockUnsafe(game_context_.blocks_->DIRT,
                                     BlockPos{x - cx, y - cy, z - cz});
             }
           }

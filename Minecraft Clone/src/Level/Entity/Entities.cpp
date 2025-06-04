@@ -5,11 +5,14 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
+#include "Core/GameContext/GameContext.h"
 #include "Level/Entity/Type/Types.h"
+#include "Utils/LogUtils.h"
 
 using json = nlohmann::json;
 
-EntitiesList::EntitiesList() {}
+EntitiesList::EntitiesList(GameContext& game_context)
+    : game_context_{game_context} {}
 
 EntityTypeID EntitiesList::RegisterEntity(std::string EntityName,
                                           EntityTypeEnums type_) {
@@ -18,25 +21,26 @@ EntityTypeID EntitiesList::RegisterEntity(std::string EntityName,
 
   switch (type_) {
     case ENTITY_PASSIVE:
-      newEntity = static_cast<EntityType*>(new Passive());
+      newEntity = static_cast<EntityType*>(new Passive(game_context_));
       break;
     case ENTITY_FALLING_BLOCK:
-      newEntity = static_cast<EntityType*>(new FallingBlock());
+      newEntity = static_cast<EntityType*>(new FallingBlock(game_context_));
       break;
     case ENTITY_HOSTILE:
-      newEntity = static_cast<EntityType*>(new Hostile());
+      newEntity = static_cast<EntityType*>(new Hostile(game_context_));
       break;
   }
 
   if (newEntity == nullptr) {
-    g_logger.LogError("RegisterEntity", "Error!");
+    throw std::runtime_error(
+        "EntitiesList::RegisterEntity - Failed to register entity");
   }
 
   newEntity->entity_name_ = EntityName;
 
-  g_logger.LogInfo("EntitiesList::RegisterEntity",
-                   "Registered new entity: " + EntityName +
-                       " | EntityID: " + std::to_string(ID));
+  game_context_.logger_->LogInfo("EntitiesList::RegisterEntity",
+                                 "Registered new entity: " + EntityName +
+                                     " | EntityID: " + std::to_string(ID));
 
   newEntity->id_ = ID;
 
@@ -57,12 +61,13 @@ void EntitiesList::InitializeModels() {
     json::iterator d = b.value().begin();
 
     if (d.value().is_string()) {
-      g_logger.LogInfo("EntitiesList::InitializeModels",
-                       "Entity: " + b.key() +
-                           " | Texture Loading: " + (std::string)d.value());
+      game_context_.logger_->LogInfo(
+          "EntitiesList::InitializeModels",
+          "Entity: " + b.key() +
+              " | Texture Loading: " + (std::string)d.value());
       RawTextureData TexData{d.value()};
       entity_type_list_[entityType]->texture_ =
-          std::make_unique<Texture2D>(TexData);
+          std::make_unique<Texture2D>(game_context_, TexData);
     }
 
     d++;

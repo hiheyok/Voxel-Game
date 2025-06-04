@@ -117,7 +117,7 @@ void PerformanceProfiler::PerformanceTree::ChangeTime(
     std::vector<std::string>& path, int depth, double time) {
   time_passed_ += time;
 
-  if (path.size() == depth) {
+  if (static_cast<int>(path.size()) == depth) {
     return;
   }
 

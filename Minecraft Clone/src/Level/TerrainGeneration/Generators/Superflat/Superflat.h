@@ -3,7 +3,8 @@
 
 class SuperflatWorld : public WorldGenerator {
  public:
-  SuperflatWorld();
+  explicit SuperflatWorld(GameContext&);
+  ~SuperflatWorld();
 
   void Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) override;
 };

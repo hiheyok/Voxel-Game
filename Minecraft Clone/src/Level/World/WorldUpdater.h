@@ -8,6 +8,7 @@
 class World;
 class Chunk;
 class LightStorage;
+class GameContext;
 
 struct Entity;
 struct EntityProperty;
@@ -18,7 +19,7 @@ class WorldUpdater {
  public:
   bool tall_generation_ = false;
 
-  WorldUpdater(World* w, WorldParameters p);
+  WorldUpdater(GameContext&, World* w, WorldParameters p);
 
   void DeleteEntityChunkLoader(EntityUUID uuid);
   bool CheckEntityExistChunkLoader(EntityUUID uuid) const;
@@ -49,7 +50,8 @@ class WorldUpdater {
   void loadSpawnChunks();
   void loadSummonEntitySurrounding(EntityUUID uuid);
   void loadSurroundedMovedEntityChunk();
-
+  
+  GameContext& game_context_;
   std::unique_ptr<WorldParameters> settings_;
   World* world_ = nullptr;
   std::mutex lock_;

@@ -4,16 +4,18 @@
 
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 #include "Client/IO/KEY_CODE.h"
+#include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 
 void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, uint32_t id,
                                     GLenum severity, GLsizei length,
                                     const char* message,
                                     const void* userParam) {
-  (void)userParam;
+  LogUtils* logger = static_cast<LogUtils*>(const_cast<void*>(userParam));
   std::stringstream str;
 
   if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
@@ -91,7 +93,7 @@ void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, uint32_t id,
   str.seekg(0, std::ios::end);
 
   if (str.str().size() != 0) {
-    g_logger.LogError("Window::glDebugOutput", str.str());
+    logger->LogDebug("Window::glDebugOutput", str.str());
   }
 }
 
@@ -99,15 +101,15 @@ GLFWwindow* Window::GetWindow() { return window_; }
 
 bool Window::WindowCloseCheck() { return glfwWindowShouldClose(window_); }
 
-Window::Window() {
+Window::Window(GameContext& game_context) : game_context_{game_context} {
   if (properties_.initialized_) {
-    g_logger.LogError("Window::Start", "Already initialized");
+    game_context_.logger_->LogDebug("Window::Start", "Already initialized");
     return;
   }
 
   glfwInit();
   if (!glfwInit()) {
-    g_logger.LogError("Window::Start", "Initialization Failed: GLFW");
+    throw std::runtime_error("Window::Start - Initialization Failed: GLFW");
     return;
   }
 
@@ -121,12 +123,10 @@ Window::Window() {
   glfwMakeContextCurrent(window_);
 
   if (window_ == nullptr) {
-    g_logger.LogError("Window::Start", "Failed to create GLFW Window");
-
     glfwTerminate();
-    return;
+    throw std::runtime_error("Window::Start - Failed to create GLFW Window");
   } else {
-    g_logger.LogInfo("Window::Start", "Created GLFW Window");
+    game_context_.logger_->LogInfo("Window::Start", "Created GLFW Window");
   }
 
   glfwSetWindowUserPointer(window_, this);
@@ -159,17 +159,18 @@ Window::Window() {
   glewInit();
 
   if (glewInit() != GLEW_OK) {
-    g_logger.LogError("Window::Start", "Initialization Failed: GLEW");
+    throw std::runtime_error("Window::Start - Initialization Failed: GLEW");
     return;
   }
 
   std::stringstream str;
   str << "OpenGL Version: " << glGetString(GL_VERSION);
-  g_logger.LogInfo("Window::Start", str.str());
+  game_context_.logger_->LogInfo("Window::Start", str.str());
 
   glEnable(GL_DEBUG_OUTPUT);
   glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-  glDebugMessageCallback(glDebugOutput, nullptr);
+  glDebugMessageCallback(glDebugOutput,
+                         static_cast<const void*>(&game_context_.logger_));
   glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr,
                         GL_TRUE);
 
@@ -200,7 +201,7 @@ void Window::ResizeWindowCallback(int x, int y) {
   properties_.window_size_y_ = y;
   properties_.window_size_dirty_ = true;
 
-  g_logger.LogInfo(
+  game_context_.logger_->LogInfo(
       "Window::ResizeWindowCallback",
       " Resized Window: " + std::to_string(x) + ", " + std::to_string(y));
 }

@@ -3,10 +3,10 @@
 #pragma once
 #include <gl/glew.h>
 
-#include <vector>
 #include <array>
 #include <list>
 #include <map>
+#include <vector>
 
 #include "Level/Chunk/Chunk.h"
 #include "RenderEngine/Camera/camera.h"
@@ -19,10 +19,11 @@
 #include "Utils/MathHelper.h"
 
 class Shader;
+class GameContext;
 
 class ChunkDrawBatch {
  public:
-  explicit ChunkDrawBatch(size_t maxSize);
+  ChunkDrawBatch(GameContext&, size_t maxSize);
   ChunkDrawBatch(const ChunkDrawBatch&) = delete;
   ChunkDrawBatch(ChunkDrawBatch&&);
   ~ChunkDrawBatch();
@@ -35,7 +36,8 @@ class ChunkDrawBatch {
   void Draw(Shader* shader);
   void Defrag(size_t iterations);
   void UpdateCommandBufferSize();
-
+  
+  GameContext& game_context_;
   Camera* camera_ = nullptr;
   FastHashMap<size_t, size_t> render_list_;
   double debug_time_ = 0.0;

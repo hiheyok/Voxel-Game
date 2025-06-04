@@ -11,6 +11,8 @@
 #include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 
+class GameContext;
+
 struct ItemUVMapping {
   glm::vec2 uv_1_;
   glm::vec2 uv_2_;
@@ -21,7 +23,9 @@ class ItemTextureAtlas {
   FastHashMap<int, ItemUVMapping> items_uv_map_;
   FastHashMap<ItemID, size_t> offsets_;
 
-  ItemTextureAtlas();
+  explicit ItemTextureAtlas(GameContext&);
+  ~ItemTextureAtlas();
+  
   void Initialize(int atlasItemSize, int individualItemSize);
   GLuint Get() const;
   size_t GetHeight() const;
@@ -32,6 +36,8 @@ class ItemTextureAtlas {
  private:
   void RenderBlockItem(Item item);
   void StitchTexture(size_t index, ItemID ItemID);
+
+  GameContext& game_context_;
 
   std::unique_ptr<VertexArray> vao_;
   std::unique_ptr<Buffer> ebo_;
@@ -44,5 +50,3 @@ class ItemTextureAtlas {
   TexturedFrameBuffer atlas_framebuffer_;
   TexturedFrameBuffer framebuffer_single_block_render_;
 };
-
-extern ItemTextureAtlas g_item_atlas;

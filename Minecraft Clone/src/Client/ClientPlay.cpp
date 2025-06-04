@@ -3,6 +3,7 @@
 #include "Client/ClientPlay.h"
 
 #include <memory>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
@@ -13,6 +14,7 @@
 #include "Client/Render/WorldRender.h"
 #include "ClientLevel/ClientCache.h"
 #include "ClientLevel/ClientLevel.h"
+#include "Core/GameContext/GameContext.h"
 #include "Core/Interfaces/ServerInterface.h"
 #include "Core/Networking/ChunkUpdate.h"
 #include "Core/Networking/Packet.h"
@@ -28,18 +30,19 @@
 #include "RenderEngine/Window.h"
 #include "Utils/LogUtils.h"
 
-ClientPlay::ClientPlay(ServerInterface* interface, Window* window,
-                       PerformanceProfiler* profiler)
-    : interface_{interface},
-      framebuffer_{std::make_unique<TexturedFrameBuffer>()},
-      client_level_{std::make_unique<ClientLevel>()},
-      main_player_{std::make_unique<MainPlayer>(window, interface,
-                                                &client_level_->cache)},
-      debug_screen_{std::make_unique<DebugScreen>()},
-      entity_render_{
-          std::make_unique<MultiEntityRender>(main_player_->GetPlayerPOV())},
-      terrain_render_{
-          std::make_unique<WorldRender>(main_player_->GetPlayerPOV())} {
+ClientPlay::ClientPlay(GameContext& game_context, ServerInterface* interface,
+                       Window* window, PerformanceProfiler* profiler)
+    : game_context_{game_context},
+      interface_{interface},
+      framebuffer_{std::make_unique<TexturedFrameBuffer>(game_context)},
+      client_level_{std::make_unique<ClientLevel>(game_context)},
+      main_player_{std::make_unique<MainPlayer>(game_context, window, interface,
+                                                &client_level_->cache_)},
+      debug_screen_{std::make_unique<DebugScreen>(game_context)},
+      entity_render_{std::make_unique<MultiEntityRender>(
+          game_context, main_player_->GetPlayerPOV())},
+      terrain_render_{std::make_unique<WorldRender>(
+          game_context, main_player_->GetPlayerPOV())} {
   main_player_->SetPlayerPosition(0., 50, 0.);
   main_player_->SetPlayerRotation(-135.f, -30.);
 
@@ -54,11 +57,11 @@ ClientPlay::ClientPlay(ServerInterface* interface, Window* window,
   packet.vel_ = main_player_->player_->properties_.velocity_;
   packet.pos_ = main_player_->player_->properties_.position_;
   interface->SendPlayerAction(packet);
-  terrain_render_->Start(window->GetWindow(), &client_level_->cache, profiler);
-  framebuffer_->GenBuffer(window->GetProperties().window_size_x_,
-                          window->GetProperties().window_size_y_,
-                          static_cast<float>(g_app_options.graphics_scale_),
-                          GL_RGB);
+  terrain_render_->Start(window->GetWindow(), &client_level_->cache_, profiler);
+  framebuffer_->GenBuffer(
+      window->GetProperties().window_size_x_,
+      window->GetProperties().window_size_y_,
+      static_cast<float>(game_context_.options_->graphics_scale_), GL_RGB);
 }
 ClientPlay::~ClientPlay() = default;
 
@@ -89,9 +92,10 @@ void ClientPlay::Update(Window* window) {
     window->GetProperties().window_size_dirty_ = false;
 
     framebuffer_->Clear();
-    framebuffer_->GenBuffer(window->GetProperties().window_size_x_,
-                            window->GetProperties().window_size_y_,
-                            static_cast<float>(g_app_options.graphics_scale_));
+    framebuffer_->GenBuffer(
+        window->GetProperties().window_size_x_,
+        window->GetProperties().window_size_y_,
+        static_cast<float>(game_context_.options_->graphics_scale_));
   }
 
   if (window->GetUserInputs().CheckKeyPress(GLFW_KEY_R)) {
@@ -124,8 +128,8 @@ void ClientPlay::UpdateDebugStats() {
   BlockPos block_pos{player_pos.x, player_pos.y, player_pos.z};
   BlockPos rel_block_pos = block_pos.GetLocalPos();
   int light_lvl = -1;
-  if (client_level_->cache.CheckChunk(block_pos.ToChunkPos())) {
-    light_lvl = client_level_->cache.GetChunk(block_pos.ToChunkPos())
+  if (client_level_->cache_.CheckChunk(block_pos.ToChunkPos())) {
+    light_lvl = client_level_->cache_.GetChunk(block_pos.ToChunkPos())
                     ->lighting_->GetLighting(rel_block_pos);
   }
 
@@ -192,8 +196,7 @@ void ClientPlay::UpdateChunks() {
         addChunkPackets.push_back(p);
       } break;
       case ChunkUpdatePacket::DELETE_CHUNK:
-        // TODO(hiheyok): Implement later
-        g_logger.LogError("ClientPlay::UpdateChunks", "Don't call me");
+        throw std::runtime_error("ClientPlay::UpdateChunks - Unimplented type");
         break;
       case ChunkUpdatePacket::LIGHT_UPDATE: {
         const ChunkUpdatePacket::LightUpdate& p =
@@ -208,12 +211,13 @@ void ClientPlay::UpdateChunks() {
   for (const auto& chunk : addChunkPackets) {
     const ChunkRawData& data = chunk.chunk_;
     chunkToUpdateRender.insert(data.pos_);
-    if (client_level_->cache.CheckChunk(data.pos_)) {
-      ChunkContainer* c = client_level_->cache.GetChunk(data.pos_);
+    if (client_level_->cache_.CheckChunk(data.pos_)) {
+      ChunkContainer* c = client_level_->cache_.GetChunk(data.pos_);
       c->SetData(data);
     } else {
-      std::unique_ptr<Chunk> newChunk = std::make_unique<Chunk>(data);
-      client_level_->cache.AddChunk(std::move(newChunk));
+      std::unique_ptr<Chunk> newChunk =
+          std::make_unique<Chunk>(game_context_, data);
+      client_level_->cache_.AddChunk(std::move(newChunk));
     }
   }
 
@@ -221,7 +225,7 @@ void ClientPlay::UpdateChunks() {
     const LightStorage& l = light.light_;
 
     chunkToUpdateRender.insert(l.position_);
-    client_level_->cache.GetChunk(l.position_)
+    client_level_->cache_.GetChunk(l.position_)
         ->lighting_->ReplaceData(l.GetData());
   }
 
@@ -238,8 +242,6 @@ void ClientPlay::UpdateEntities() {
   std::vector<Packet::EntityUpdate> packets;
 
   interface_->PollEntityUpdates(packets);
-  // g_logger.LogDebug("ClientPlay::UpdateEntities",
-  // std::to_string(packets.size()));
 
   for (const auto& packet : packets) {
     switch (packet.type_) {
@@ -247,13 +249,11 @@ void ClientPlay::UpdateEntities() {
         const EntityUpdatePacket::EntityDespawn& data =
             std::get<EntityUpdatePacket::EntityDespawn>(packet.packet_);
         despawnedEntities.push_back(data.uuid_);
-        // g_logger.LogDebug("ClientPlay::UpdateEntities", "Updated
-        // entity");
         break;
       }
       case EntityUpdatePacket::ENTITY_INVENTORY_UPDATE: {
-        const EntityUpdatePacket::EntityInventoryUpdate& data =
-            std::get<EntityUpdatePacket::EntityInventoryUpdate>(packet.packet_);
+        // const EntityUpdatePacket::EntityInventoryUpdate& data =
+        //     std::get<EntityUpdatePacket::EntityInventoryUpdate>(packet.packet_);
         // N/A
         break;
       }
@@ -261,43 +261,40 @@ void ClientPlay::UpdateEntities() {
         const EntityUpdatePacket::EntityMove& data =
             std::get<EntityUpdatePacket::EntityMove>(packet.packet_);
         updatedEntities.push_back(data.properties_);
-        // g_logger.LogDebug("ClientPlay::UpdateEntities", "Updated
-        // entity");
         break;
       }
       case EntityUpdatePacket::ENTITY_SPAWN: {
         const EntityUpdatePacket::EntitySpawn& data =
             std::get<EntityUpdatePacket::EntitySpawn>(packet.packet_);
         spawnedEntities.push_back(data.properties_);
-        // g_logger.LogDebug("ClientPlay::UpdateEntities", "Updated
-        // entity");
         break;
       }
       default:
-        g_logger.LogDebug("ClientPlay::UpdateEntities", "Default");
+        game_context_.logger_->LogDebug("ClientPlay::UpdateEntities",
+                                        "Default");
     }
   }
 
   for (const auto& entity : spawnedEntities) {
-    client_level_->cache.InsertEntity(entity);
+    client_level_->cache_.InsertEntity(entity);
   }
 
   for (const auto& entity : updatedEntities) {
-    client_level_->cache.UpdateEntity(entity);
+    client_level_->cache_.UpdateEntity(entity);
   }
 
   for (const auto& entity : despawnedEntities) {
-    client_level_->cache.RemoveEntity(entity);
+    client_level_->cache_.RemoveEntity(entity);
   }
 
   // Insert it to the renderer now
   for (const auto& entity :
-       client_level_->cache.entities_.GetChangedEntities()) {
+       client_level_->cache_.entities_.GetChangedEntities()) {
     entity_render_->InsertEntity(entity);
   }
 
   for (const auto& entity :
-       client_level_->cache.entities_.GetRemovedEntitiesUUID()) {
+       client_level_->cache_.entities_.GetRemovedEntitiesUUID()) {
     entity_render_->RemoveEntity(entity);
   }
 }

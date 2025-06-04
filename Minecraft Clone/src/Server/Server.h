@@ -11,6 +11,7 @@ class InternalInterface;
 class Timer;
 class Level;
 class Chunk;
+class GameContext;
 
 struct Entity;
 struct Ray;
@@ -34,7 +35,7 @@ struct ServerSettings {
 // This also manages the ticking system
 class Server {
  public:
-  Server();
+  explicit Server(GameContext&);
   ~Server();
 
   void StartServer(ServerSettings serverSettings);
@@ -50,6 +51,7 @@ class Server {
   // This will cause the player to join and return a uuid for the player
   EntityUUID SetInternalConnection(InternalInterface* conn);
 
+  GameContext& game_context_;
   std::unique_ptr<Level> level_ = nullptr;
   std::unique_ptr<ServerSettings> settings_ = nullptr;
   ClientInterface* client_interface_ = nullptr;

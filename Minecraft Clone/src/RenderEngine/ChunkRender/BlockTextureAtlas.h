@@ -5,12 +5,15 @@
 
 #include "Core/Typenames.h"
 #include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
+
+class GameContext;
+
 /*
  * This manages all of the block textures
  */
 class BlockTextureAtlas : public TextureAtlas {
  public:
-  BlockTextureAtlas(int imagesX, int imagesY, int individual_image_x_,
+  BlockTextureAtlas(GameContext&, int imagesX, int imagesY, int individual_image_x_,
                     int individual_image_y_);
   ~BlockTextureAtlas();
 

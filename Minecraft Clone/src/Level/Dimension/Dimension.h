@@ -16,14 +16,15 @@ class CollusionDetector;
 class WorldUpdater;
 class ChunkGenerator;
 class LightEngine;
+class GameContext;
 
 class Dimension {
  public:
   EventSystem event_manager_;
   const int tick_rate_ = 20;  // TODO(hiheyok): tmp fix
 
-  Dimension(DimensionProperties properties,
-            WorldGeneratorID generatorTypeIn = g_generators.DEBUG);
+  Dimension(GameContext&, DimensionProperties properties,
+            WorldGeneratorID generatorTypeIn);
   virtual ~Dimension();
 
   virtual void Tick() = 0;
@@ -33,7 +34,7 @@ class Dimension {
   void TickUsed(EventID id, BlockPos pos);
   void EventTick();
   void Update();
-
+  GameContext& game_context_;
   WorldInterface* world_;
   std::unique_ptr<WorldUpdater> world_updater_;
   std::unique_ptr<CollusionDetector> collusion_detector_;

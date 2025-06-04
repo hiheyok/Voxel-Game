@@ -2,11 +2,17 @@
 
 #pragma once
 #include <gl/glew.h>
+
 #include <cstdint>
+#include <stdexcept>
+
+class Buffer;
+class BufferStorage;
+class GameContext;
 
 class VertexArray {
  public:
-  VertexArray();
+  explicit VertexArray(GameContext&);
   ~VertexArray();
 
   VertexArray(const VertexArray&) = delete;
@@ -18,10 +24,42 @@ class VertexArray {
   void Bind();
   void Unbind();
   void ResetArray();
-  VertexArray& EnableAttriPTR(GLuint index, GLint size, GLenum type,
-                              GLboolean normalized, GLsizei stride,
-                              int subIndex);
+  VertexArray& EnableAttriPtr(Buffer* buffer, GLuint index, GLint size,
+                              GLenum type, GLboolean normalized, GLsizei stride,
+                              int sub_index);
+
+  VertexArray& EnableAttriPtr(BufferStorage* buffer, GLuint index, GLint size,
+                              GLenum type, GLboolean normalized, GLsizei stride,
+                              int sub_index);
 
  private:
+  static constexpr size_t GetDataTypeSize(uint32_t data_type) {
+    switch (data_type) {
+      case GL_BYTE:
+        return 1;
+      case GL_UNSIGNED_BYTE:
+        return 1;
+      case GL_SHORT:
+        return 2;
+      case GL_UNSIGNED_SHORT:
+        return 2;
+      case GL_INT:
+        return 4;
+      case GL_UNSIGNED_INT:
+        return 4;
+      case GL_FIXED:
+        return 4;
+      case GL_HALF_FLOAT:
+        return 2;
+      case GL_FLOAT:
+        return 4;
+      case GL_DOUBLE:
+        return 8;
+      default:
+        throw std::runtime_error("Invalid datatype");
+    }
+  }
+
+  GameContext& game_context_;
   uint32_t array_id_ = 0;
 };

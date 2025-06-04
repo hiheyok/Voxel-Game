@@ -8,7 +8,6 @@
 
 struct MouseInputs {
   enum ButtonState { RELEASE, PRESS, HOLD };
-
   enum ScrollState { SCROLL_NONE, SCROLL_DOWN, SCROLL_UP };
 
   ButtonState left_ = RELEASE;
@@ -22,11 +21,6 @@ struct MouseInputs {
 };
 
 class UserInputs {
- private:
-  enum KeyStatus { PRESS, HOLD };
-
-  FastHashMap<int, KeyStatus> keys_;
-
  public:
   void UpdateAllKey();
 
@@ -43,4 +37,9 @@ class UserInputs {
   MouseInputs mouse_;
 
   float delta_ = 0.f;
+
+ private:
+  enum KeyStatus { PRESS, HOLD };
+
+  FastHashMap<int, KeyStatus> keys_;
 };

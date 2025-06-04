@@ -4,6 +4,9 @@
 
 #include "RenderEngine/OpenGL/Texture/Texture.h"
 
+Item::Item() = default;
+Item::~Item() = default;
+
 BlockID Item::GetBlock() const { return properties_.block_; }
 
 bool Item::CheckIsBlockItem() const { return properties_.is_block_item_; }

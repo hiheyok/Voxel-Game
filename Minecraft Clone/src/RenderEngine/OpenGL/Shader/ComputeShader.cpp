@@ -2,9 +2,11 @@
 
 #include "RenderEngine/OpenGL/Shader/ComputeShader.h"
 
+#include <stdexcept>
 #include <string>
 
-ComputeShader::ComputeShader(std::string source) {
+ComputeShader::ComputeShader(GameContext& game_context, std::string source)
+    : ShaderInterface{game_context} {
   std::string shaderSource = ReadFile(source);
 
   shader_id_ = glCreateProgram();
@@ -27,9 +29,9 @@ void ComputeShader::DispatchCompute(int x, int y, int z) {
 
   if (x > maxWorkGroupCount[0] || y > maxWorkGroupCount[1] ||
       z > maxWorkGroupCount[2]) {
-    g_logger.LogError("ComputeShader::DispatchCompute",
-                      "Work group size exceeds hardware limits.");
-    return;
+    throw std::runtime_error(
+        "ComputeShader::DispatchCompute - Work group size exceeds hardware "
+        "limits.");
   }
 
   glDispatchCompute(x, y, z);

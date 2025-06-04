@@ -8,7 +8,7 @@
 
 #include <cstdlib>
 
-#include "Core/Initializer.h"
+#include "Core/GameContext/GameContext.h"
 #include "Core/Options/Option.h"
 #include "Utils/stb_image.h"
 
@@ -18,11 +18,9 @@ int main() {
   stbi_set_flip_vertically_on_load(true);
   srand(static_cast<uint32_t>(time(0)));  // Set rng seed
 
-  Initialize();
+  GameContext game_context;
 
-  Client GameClient;
+  Client GameClient{game_context};
   GameClient.run();
-
-  Options options;
   return 0;
 }

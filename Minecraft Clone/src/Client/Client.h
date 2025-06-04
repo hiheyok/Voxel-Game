@@ -14,10 +14,11 @@ class PerformanceProfiler;
 class InternalInterface;
 class ClientLevel;
 class Server;
+class GameContext;
 
 class Client : public Window {
  public:
-  Client();
+  Client(GameContext&);
   ~Client();
 
   void run();
@@ -33,10 +34,11 @@ class Client : public Window {
 
   double frametime_ = 0.5;
 
+  GameContext& game_context_;
   EntityUUID player_uuid_;
   std::unique_ptr<ClientPlay> client_play_;
   std::unique_ptr<Server> server_;
-  std::unique_ptr<InternalInterface> internal_interface_;
   std::unique_ptr<TextRenderer> text_render_;
+  std::unique_ptr<InternalInterface> internal_interface_;
   PerformanceProfiler* profiler_;
 };

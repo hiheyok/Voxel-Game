@@ -39,24 +39,24 @@ class RenderableFont {
   void SetPosition(glm::vec2 pos);
 
   bool background_ = false;
-  std::vector<float> GetVertices();  // -1 - 1 coords
-  std::vector<float> GetBackgroundVertices();
+  std::vector<float> GetVertices() const;  // -1 - 1 coords
+  std::vector<float> GetBackgroundVertices() const;
 
  private:
   std::string render_text_ = "";
   float font_size_ = 0.0625f;
   float spacing_ = 0.125f;
 
-  glm::vec4 GetCharUV(char c);
+  glm::vec4 GetCharUV(char c) const noexcept;
   glm::vec3 color_ = glm::vec3(1.f, 1.f, 1.f);
   glm::vec2 position_ = glm::vec2(-1.f, -1.f);
   glm::vec3 background_color_ = glm::vec3(1.f, 1.f, 1.f);
   float background_alpha_ = 1.f;
-  float text_length_ = 0.f;
+  mutable float text_length_ = 0.f; //TODO(hiheyok): fix this later
   float background_height_padding_ = 0.f;
   float background_width_padding_ = 0.f;
 
   std::vector<float> GetCharactorVertex(char c, float xOffset, float yOffset,
-                                        float xOrigin, float yOrigin);
-  float GetCharWidth(char c);
+                                        float xOrigin, float yOrigin) const noexcept;
+  float GetCharWidth(char c) const noexcept;
 };

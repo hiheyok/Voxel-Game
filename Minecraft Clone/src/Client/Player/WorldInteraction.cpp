@@ -8,11 +8,18 @@
 #include "Client/ClientLevel/ClientCache.h"
 #include "Client/IO/IO.h"
 #include "Client/IO/KEY_CODE.h"
+#include "Core/GameContext/GameContext.h"
 #include "Core/Interfaces/ServerInterface.h"
 #include "Core/Networking/PlayerAction.h"
+#include "Level/Block/Blocks.h"
 #include "Level/Entity/Mobs/Player.h"
+#include "Level/Item/Items.h"
 #include "Utils/Math/Ray/Ray.h"
 #include "Utils/Math/vectorOperations.h"
+
+WorldInteraction::WorldInteraction(GameContext& game_context)
+    : game_context_{game_context} {}
+WorldInteraction::~WorldInteraction() = default;
 
 void WorldInteraction::Interact(Player* player, const UserInputs& inputs,
                                 ServerInterface* interface,
@@ -38,25 +45,25 @@ void WorldInteraction::Interact(Player* player, const UserInputs& inputs,
     BreakBlock(ray, interface, cache);
   }
   if (inputs.mouse_.middle_ == inputs.mouse_.PRESS) {
-    BlockID newBlock = GetBlock(ray, interface, cache);
-    if (newBlock != g_blocks.AIR) {
+    BlockID newBlock = GetBlock(ray, cache);
+    if (newBlock != game_context_.blocks_->AIR) {
       player->entity_inventory_.SetSlot(
           player->entity_inventory_.right_hand_slot_,
-          ItemStack{g_items.GetItem(g_items.GetBlockItem(newBlock))});
+          ItemStack{game_context_.items_->GetItem(
+              game_context_.items_->GetBlockItem(newBlock))});
     }
   }
 }
 
 // This will just get the block from the cache
 
-BlockID WorldInteraction::GetBlock(Ray ray, ServerInterface* interface,
-                                   ClientCache* cache) {
+BlockID WorldInteraction::GetBlock(Ray ray, ClientCache* cache) {
   if (cache->collusion_manager_.CheckRayIntersection(ray)) {
     BlockPos pos{floor(ray.end_point_.x), floor(ray.end_point_.y),
                  floor(ray.end_point_.z)};
     return cache->GetBlock(pos);
   }
-  return g_blocks.AIR;
+  return game_context_.blocks_->AIR;
 }
 
 void WorldInteraction::BreakBlock(Ray ray, ServerInterface* interface,

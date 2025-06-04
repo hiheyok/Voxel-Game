@@ -4,17 +4,19 @@
 
 #include <memory>
 
+#include "Core/GameContext/GameContext.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "Utils/LogUtils.h"
 
-TexturedFrameBuffer::TexturedFrameBuffer() = default;
+TexturedFrameBuffer::TexturedFrameBuffer(GameContext& game_context)
+    : game_context_{game_context} {}
 TexturedFrameBuffer::~TexturedFrameBuffer() = default;
 
 void TexturedFrameBuffer::GenBuffer(GLint x, GLint y, float muti,
                                     GLuint format) {
-  screen_ = std::make_unique<Shader>("assets/shaders/screen/vert.glsl",
-                                     "assets/shaders/screen/frag.glsl");
-
+  screen_ =
+      std::make_unique<Shader>(game_context_, "assets/shaders/screen/vert.glsl",
+                               "assets/shaders/screen/frag.glsl");
   screen_->SetVec2("Resolution", glm::vec2((x), (y)));
 
   sy = y;
@@ -48,9 +50,10 @@ void TexturedFrameBuffer::GenBuffer(GLint x, GLint y, float muti,
                             GL_RENDERBUFFER, rbo_);  // now actually attach it
   // now that we actually created the framebuffer and added all attachments we
   // want to check if it is actually complete now
-  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    g_logger.LogError("TexturedFrameBuffer::GenBuffer",
-                      "Failed to create framebuffer!");
+  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+    throw std::runtime_error(
+        "TexturedFrameBuffer::GenBuffer - Failed to create framebuffer!");
+  }
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
   screen_->BindTexture2D(0, texture_, "screenTexture");
@@ -77,8 +80,9 @@ void TexturedFrameBuffer::GenBuffer(GLint x, GLint y, float muti,
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
                         reinterpret_cast<void*>(2 * sizeof(float)));
 
-  g_logger.LogDebug("TexturedFrameBuffer::GenBuffer",
-                    "Created new frame buffer: " + std::to_string(fbo_));
+  game_context_.logger_->LogDebug(
+      "TexturedFrameBuffer::GenBuffer",
+      "Created new framebuffer: " + std::to_string(fbo_));
 }
 
 void TexturedFrameBuffer::UpdateResolution(GLint x, GLint y, float muti) {

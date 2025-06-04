@@ -4,8 +4,8 @@
 #include "Client/ClientLevel/ClientCache.h"
 
 struct ClientLevel {
-  ClientLevel() = default;
-  ~ClientLevel() = default;
+  explicit ClientLevel(GameContext&);
+  ~ClientLevel();
 
-  ClientCache cache;
+  ClientCache cache_;
 };

@@ -6,6 +6,7 @@
 #include <utility>
 #include <vector>
 
+#include "Core/GameContext/GameContext.h"
 #include "Core/Interfaces/ClientInterface.h"
 #include "Core/Interfaces/InternalInterface.h"
 #include "Level/Chunk/ChunkData.h"
@@ -18,13 +19,12 @@
 #include "Utils/Math/Ray/Ray.h"
 #include "Utils/Timer/Timer.h"
 
-Server::Server() = default;
+Server::Server(GameContext& game_context) : game_context_{game_context} {}
 Server::~Server() = default;
 
 void Server::StartServer(ServerSettings serverSettings) {
-  level_ = std::make_unique<Level>();
-  level_->Start(static_cast<int>(serverSettings.gen_thread_count_),
-                static_cast<int>(serverSettings.light_engine_thread_count_));
+  level_ = std::make_unique<Level>(game_context_);
+  level_->Start();
   time_ = std::make_unique<Timer>();
   stop_ = false;
   settings_ = std::make_unique<ServerSettings>(serverSettings);
@@ -38,7 +38,7 @@ void Server::Stop() {
 }
 
 void Server::Loop() {
-  g_logger.LogDebug("Server::Loop", "Started main server loop");
+  game_context_.logger_->LogDebug("Server::Loop", "Started main server loop");
   while (!stop_) {
     time_->Set();
     // Process Client -> Server events
@@ -57,7 +57,8 @@ void Server::Loop() {
 
     mspt_ = time_->GetTimePassed_ms();
   }
-  g_logger.LogDebug("Server::Loop", "Shutting down main server loop");
+  game_context_.logger_->LogDebug("Server::Loop",
+                                  "Shutting down main server loop");
 }
 
 void Server::Tick() {
@@ -113,8 +114,8 @@ void Server::ProcessPlayerPackets(ClientInterface* receiver) {
         const PlayerPacket::PlayerDestroyBlock& destroyBlock =
             std::get<PlayerPacket::PlayerDestroyBlock>(packet.packet_);
         BlockEvent block_event;
-        block_event.block_ = g_blocks.AIR;
-        block_event.id_ = g_event_handler.BlockPlace;
+        block_event.block_ = game_context_.blocks_->AIR;
+        block_event.id_ = game_context_.event_handler_->BlockPlace;
         block_event.pos_ = destroyBlock.pos_;
         level_->main_world_->event_manager_.AddEvent(block_event);
       } break;
@@ -123,7 +124,7 @@ void Server::ProcessPlayerPackets(ClientInterface* receiver) {
             std::get<PlayerPacket::PlayerPlaceBlock>(packet.packet_);
         BlockEvent block_event;
         block_event.block_ = placeBlock.block_;
-        block_event.id_ = g_event_handler.BlockPlace;
+        block_event.id_ = game_context_.event_handler_->BlockPlace;
         block_event.pos_ = placeBlock.pos_;
         level_->main_world_->event_manager_.AddEvent(block_event);
       } break;
@@ -189,8 +190,7 @@ void Server::SendChunkUpdatePacket(ClientInterface* receiver) {
     if (chunk == nullptr) continue;  // TODO(hiheyok): Fix this later
     ChunkRawData data = chunk->GetRawData();
 
-    ChunkUpdatePacket::AddChunk packet;
-    packet.chunk_ = data;
+    ChunkUpdatePacket::AddChunk packet = {.chunk_ = data};
     receiver->SendChunkUpdates(packet);
   }
 

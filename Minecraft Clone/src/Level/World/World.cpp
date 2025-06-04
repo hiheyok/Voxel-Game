@@ -2,19 +2,21 @@
 
 #include <utility>
 
+#include "Core/GameContext/GameContext.h"
 #include "Level/Chunk/Chunk.h"
 #include "Level/Container/ChunkMap.h"
 #include "Level/Container/EntityContainer.h"
 #include "Level/Entity/Entity.h"
+#include "Utils/LogUtils.h"
 
-World::World() : WorldInterface{} {}
+World::World(GameContext& game_context) : WorldInterface{game_context} {}
 
 World::~World() = default;
 
 void World::SetBlock(BlockID block, BlockPos pos) {
   if (!chunks_->SetBlock(block, pos)) {
-    g_logger.LogError("World::SetBlock",
-                      "Tried to place block outside of the world");
+    game_context_.logger_->LogWarn("World::SetBlock",
+                                   "Tried to place block outside of the world");
   }
 }
 

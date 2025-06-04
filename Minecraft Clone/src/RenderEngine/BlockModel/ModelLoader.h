@@ -2,19 +2,19 @@
 
 #pragma once
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
-#include <nlohmann/json.hpp>
-
 
 #include "Core/Typenames.h"
 #include "RenderEngine/BlockModel/BlockModels.h"
 
+class GameContext;
 class ResourceLocation;
 
 class ModelLoader {
  public:
-  ModelLoader();
+  explicit ModelLoader(GameContext&);
   ~ModelLoader();
   ModelLoader(const ModelLoader&) = delete;
   ModelLoader(ModelLoader&&) = delete;
@@ -37,6 +37,8 @@ class ModelLoader {
   int ConvertStringFaceToIndex(const std::string& str);
   std::vector<float> GetJSONArrayValuesFloat(json JsonData);
   std::vector<int> GetJSONArrayValues(json JsonData);
+
+  GameContext& game_context_;
   // Model cache to cache repeated parents
   FastHashMap<ResourceLocation, std::unique_ptr<BlockModel>> cache_;
   const std::string kDefaultNamespace = "minecraft";

@@ -2,16 +2,19 @@
 
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 
-#include <GLFW/glfw3.h>
-
+#include <stdexcept>
 #include <utility>
 
+#include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 
-Buffer::Buffer() {
+Buffer::Buffer(GameContext& game_context) : game_context_{game_context} {
   glGenBuffers(1, &buffer_id_);
-  g_logger.LogDebug("Buffer::GenBuffer",
-                    "Created buffer. ID: " + std::to_string(buffer_id_));
+  if (buffer_id_ == 0) {
+    throw std::runtime_error("Buffer::GenBuffer - glGenBuffers failed!");
+  }
+  game_context_.logger_->LogDebug(
+      "Buffer::GenBuffer", "Created buffer. ID: " + std::to_string(buffer_id_));
 }
 
 Buffer::~Buffer() {
@@ -20,7 +23,9 @@ Buffer::~Buffer() {
   }
 }
 
-Buffer::Buffer(Buffer&& buffer) noexcept { (*this) = std::move(buffer); }
+Buffer::Buffer(Buffer&& buffer) noexcept : game_context_(buffer.game_context_) {
+  (*this) = std::move(buffer);
+}
 
 Buffer& Buffer::operator=(Buffer&& buffer) noexcept {
   max_size_ = buffer.max_size_;
@@ -47,14 +52,11 @@ void Buffer::InsertSubData(GLintptr offset, GLsizeiptr size, const void* data) {
   Unbind();
 }
 
-void Buffer::ResetBuffer() {
-  glDeleteBuffers(1, &buffer_id_);
-  glGenBuffers(1, &buffer_id_);
-}
+void Buffer::ResetBuffer() { glBufferData(type_, 0, nullptr, usage_); }
 
-void Buffer::Bind() { glBindBuffer(type_, buffer_id_); }
+void Buffer::Bind() const { glBindBuffer(type_, buffer_id_); }
 
-void Buffer::Unbind() { glBindBuffer(type_, 0); }
+void Buffer::Unbind() const { glBindBuffer(type_, 0); }
 
 void Buffer::SetMaxSize(size_t maxSize) { max_size_ = maxSize; }
 
@@ -78,8 +80,8 @@ void Buffer::GetData(uint32_t* ptr, size_t offset, size_t size) {
   Unbind();
 }
 
-void Buffer::CopyFrom(Buffer buffer, size_t readOffset, size_t writeOffset,
-                      size_t size) {
+void Buffer::CopyFrom(const Buffer& buffer, size_t readOffset,
+                      size_t writeOffset, size_t size) {
   glBindBuffer(GL_COPY_READ_BUFFER, buffer.buffer_id_);
   glBindBuffer(GL_COPY_WRITE_BUFFER, buffer_id_);
   glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, readOffset,
@@ -88,15 +90,14 @@ void Buffer::CopyFrom(Buffer buffer, size_t readOffset, size_t writeOffset,
   glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
 }
 
-void Buffer::CopyTo(Buffer& destination, size_t offset, size_t desOffset,
-                    size_t size) {
-  Bind();
-  destination.Bind();
-  //    glCopyNamedBufferSubData(BufferID, destination.BufferID, offset,
-  //    desOffset, size);
-  glCopyBufferSubData(type_, destination.type_, offset, desOffset, size);
-  Unbind();
-  destination.Unbind();
+void Buffer::CopyTo(const Buffer& destination, size_t read_offset,
+                    size_t write_offset, size_t size) {
+  glBindBuffer(GL_COPY_READ_BUFFER, buffer_id_);
+  glBindBuffer(GL_COPY_WRITE_BUFFER, destination.buffer_id_);
+  glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, read_offset,
+                      write_offset, size);
+  glBindBuffer(GL_COPY_READ_BUFFER, 0);
+  glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
 }
 
 Buffer::operator uint32_t() const noexcept { return buffer_id_; }

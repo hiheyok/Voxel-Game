@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-glm::vec4 RenderableFont::GetCharUV(char c) {
+glm::vec4 RenderableFont::GetCharUV(char c) const noexcept {
   int index = static_cast<int>(c);
 
   float width = GetCharWidth(c);
@@ -24,12 +24,13 @@ glm::vec4 RenderableFont::GetCharUV(char c) {
   return glm::vec4{x0, 1.f - y0, x1, 1.f - y1};
 }
 
-float RenderableFont::GetCharWidth(char c) { return CharWidth[c]; }
+float RenderableFont::GetCharWidth(char c) const noexcept {
+  return CharWidth[static_cast<int>(c)];
+}
 
-std::vector<float> RenderableFont::GetCharactorVertex(char c, float xOffset,
-                                                      float yOffset,
-                                                      float xOrigin,
-                                                      float yOrigin) {
+std::vector<float> RenderableFont::GetCharactorVertex(
+    char c, float xOffset, float yOffset, float xOrigin,
+    float yOrigin) const noexcept {
   glm::vec4 uv_ = GetCharUV(c);
 
   float x0 = uv_.x;
@@ -109,7 +110,7 @@ std::vector<float> RenderableFont::GetCharactorVertex(char c, float xOffset,
   return out;
 }
 
-std::vector<float> RenderableFont::GetVertices() {
+std::vector<float> RenderableFont::GetVertices() const {
   std::vector<float> out;
 
   float shift = font_size_;
@@ -118,7 +119,7 @@ std::vector<float> RenderableFont::GetVertices() {
 
   float offsetValue = 0.f;
 
-  for (int i = 0; i < render_text_.size(); i++) {
+  for (size_t i = 0; i < render_text_.size(); i++) {
     char c = render_text_[i];
     float Width = GetCharWidth(c);
     float ShiftMag = shift * Width + spacing_ * shift;
@@ -137,7 +138,7 @@ std::vector<float> RenderableFont::GetVertices() {
   return out;
 }
 
-std::vector<float> RenderableFont::GetBackgroundVertices() {
+std::vector<float> RenderableFont::GetBackgroundVertices() const {
   float r = background_color_.x;
   float g = background_color_.y;
   float b = background_color_.z;

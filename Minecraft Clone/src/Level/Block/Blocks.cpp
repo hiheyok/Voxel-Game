@@ -7,14 +7,27 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
+#include "Core/GameContext/GameContext.h"
 #include "FileManager/Files.h"
 #include "Level/Block/Type/BlockTypes.h"
 #include "RenderEngine/BlockModel/BlockModels.h"
 #include "RenderEngine/BlockModel/ModelLoader.h"
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
+#include "Utils/LogUtils.h"
 
 // TODO(hiheyok): Implement model caching
 using json = nlohmann::json;
+
+BlockList::BlockList(GameContext& game_context)
+    : game_context_{game_context}, model_loader_{game_context} {}
+
+BlockList::~BlockList() {
+  for (const auto& obj : block_type_data_) {
+    delete obj;
+  }
+
+  block_type_data_.clear();
+}
 
 BlockID BlockList::RegisterBlock(std::string blockName, Block* block) {
   BlockID id = static_cast<BlockID>(block_type_data_.size());
@@ -27,8 +40,9 @@ BlockID BlockList::RegisterBlock(std::string blockName, Block* block) {
 
   block_id_name_data_[blockName] = id;
 
-  g_logger.LogInfo("BlockList::RegisterBlock",
-                   "Registered new block (ID): " + std::to_string(id));
+  game_context_.logger_->LogInfo(
+      "BlockList::RegisterBlock",
+      "Registered new block (ID): " + std::to_string(id));
   return id;
 }
 
@@ -54,11 +68,11 @@ void BlockList::AddAssets(std::string namespaceIn) {
     }
 
     for (std::string& name : allOtherBlocks) {
-      RegisterBlock(name, new DefaultBlock());
+      RegisterBlock(name, new DefaultBlock(game_context_));
     }
 
   } catch (std::filesystem::filesystem_error& e) {
-    g_logger.LogWarn("BlockList::AddAssets", e.what());
+    game_context_.logger_->LogWarn("BlockList::AddAssets", e.what());
   }
 }
 
@@ -73,21 +87,11 @@ void BlockList::Initialize() {
   int individualTexSize = 16;
 
   block_texture_atlas_ = std::make_unique<BlockTextureAtlas>(
-      512, 512, individualTexSize, individualTexSize);
+      game_context_, 512, 512, individualTexSize, individualTexSize);
 
   InitializeBlockModels();
 
   block_texture_atlas_->LoadToGPU();
-}
-
-BlockList::BlockList() = default;
-
-BlockList::~BlockList() {
-  for (const auto& obj : block_type_data_) {
-    delete obj;
-  }
-
-  block_type_data_.clear();
 }
 
 Block* BlockList::GetBlockType(BlockID id) { return block_type_data_[id]; }

@@ -181,7 +181,7 @@ class Position {
     return h;
   }
 
-  operator std::string() const {
+  explicit operator std::string() const {
     return "[" + std::to_string(x) + "," + std::to_string(y) + "," +
            std::to_string(z) + "]";
   }

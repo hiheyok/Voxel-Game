@@ -2,6 +2,13 @@
 
 #include "Level/Event/EventHandler.h"
 
+#include "Core/GameContext/GameContext.h"
+#include "Utils/LogUtils.h"
+
+EventHandler::EventHandler(GameContext& game_context)
+    : game_context_{game_context} {}
+EventHandler::~EventHandler() = default;
+
 void EventHandler::ExecuteEvent(Event event, Dimension* dimension) {
   switch (event.type_) {
     case BLOCK_EVENT: {
@@ -12,6 +19,11 @@ void EventHandler::ExecuteEvent(Event event, Dimension* dimension) {
     case ENTITY_EVENT: {
       const EntityEvent& entityEvent = std::get<EntityEvent>(event.event_data_);
       (*entity_event_handles_[entityEvent.id_])(entityEvent, dimension);
+      break;
+    }
+    default: {
+      game_context_.logger_->LogWarn("EventHandler::ExecuteEvent",
+                                     "Tried to handle unimplemented case");
       break;
     }
   }

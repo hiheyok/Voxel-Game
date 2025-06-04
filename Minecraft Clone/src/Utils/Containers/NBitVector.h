@@ -7,9 +7,12 @@
 
 template <typename StorageBit = uint64_t>
 class NBitVector {
+  static_assert(std::is_unsigned_v<StorageBit>,
+                "StorageBit is an unsigned type.");
+
  public:
-  NBitVector(int numElements, int bitWidth);
-  NBitVector(int bitWidth) noexcept;
+  NBitVector(size_t numElements, size_t bit_width);
+  NBitVector(size_t bit_width) noexcept;
   NBitVector() noexcept;
   NBitVector(const NBitVector&);
   NBitVector(NBitVector&&) noexcept;
@@ -35,8 +38,8 @@ class NBitVector {
   static constexpr StorageBit kAllOnes = ~(static_cast<StorageBit>(0));
 
   std::vector<StorageBit> data_;
-  int bit_width_ = 0;
-  int num_elements_ = 0;
+  size_t bit_width_ = 0;
+  size_t num_elements_ = 0;
 
   StorageBit all_ones_bit_width_;
 
@@ -49,20 +52,20 @@ NBitVector<StorageBit>::NBitVector() noexcept {
 }
 
 template <typename StorageBit>
-NBitVector<StorageBit>::NBitVector(int numElements, int bitWidth)
-    : bit_width_{bitWidth}, num_elements_{numElements} {
-  if (bitWidth > kStorageBits)
-    g_logger.LogError("NBitVector<StorageBit>::NBitVector",
-                      "Bit width is too wide.");
+NBitVector<StorageBit>::NBitVector(size_t numElements, size_t bit_width)
+    : bit_width_{bit_width}, num_elements_{numElements} {
+  if (bit_width > kStorageBits)
+    throw std::domain_error(
+        "NBitVector<StorageBit>::NBitVector - Bit width is too wide.");
 
-  data_.resize(numElements * bitWidth / kStorageBits + 1);
+  data_.resize(numElements * bit_width / kStorageBits + 1);
   all_ones_bit_width_ = ~(kAllOnes << bit_width_);
   ComputeMaskCache();
 }
 
 template <typename StorageBit>
-NBitVector<StorageBit>::NBitVector(int bitWidth) noexcept
-    : bit_width_{bitWidth} {
+NBitVector<StorageBit>::NBitVector(size_t bit_width) noexcept
+    : bit_width_{bit_width} {
   all_ones_bit_width_ = ~(kAllOnes << bit_width_);
   ComputeMaskCache();
 }
@@ -88,10 +91,10 @@ template <typename StorageBit>
 template <typename T>
 void NBitVector<StorageBit>::Set(size_t idx, T val) {
   if (static_cast<size_t>(val) >= (1ULL << bit_width_))
-    g_logger.LogError("NBitVector<StorageBit>::Set",
-                      "Invalid number. Wrong size");
+    throw std::domain_error(
+        "NBitVector<StorageBit>::Set - Invalid number. Wrong size");
   if (idx >= num_elements_)
-    g_logger.LogError("NBitVector<StorageBit>::Set", "Index out of range");
+    throw std::out_of_range("NBitVector<StorageBit>::Set - Index out of range");
   SetUnsafe(idx, val);
 }
 
@@ -120,7 +123,7 @@ void NBitVector<StorageBit>::SetUnsafe(size_t idx, T val) noexcept {
 template <typename StorageBit>
 StorageBit NBitVector<StorageBit>::Get(size_t idx) const {
   if (idx >= num_elements_)
-    g_logger.LogError("NBitVector<StorageBit>::Get", "Index out of range");
+    throw std::out_of_range("NBitVector<StorageBit>::Get - Index out of range");
   return GetUnsafe(idx);
 }
 
@@ -149,8 +152,8 @@ template <typename StorageBit>
 template <typename T>
 void NBitVector<StorageBit>::Append(T val) {
   if (val >= (1 << bit_width_))
-    g_logger.LogError("NBitVector<StorageBit>::Append",
-                      "Invalid number. Wrong size");
+    throw std::domain_error(
+        "NBitVector<StorageBit>::Append - Invalid number. Wrong size");
 
   num_elements_++;
   if (num_elements_ * bit_width_ / kStorageBits >=

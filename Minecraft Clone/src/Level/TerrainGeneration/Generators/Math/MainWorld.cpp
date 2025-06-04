@@ -2,9 +2,13 @@
 
 #include <memory>
 
+#include "Core/GameContext/GameContext.h"
+#include "Level/Block/Blocks.h"
 #include "Level/TerrainGeneration/Generators/Math/MathWorld.h"
 
-MathWorld::MathWorld() = default;
+MathWorld::MathWorld(GameContext& game_context)
+    : WorldGenerator{game_context} {}
+MathWorld::~MathWorld() = default;
 
 void MathWorld::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
   int cx = pos.x * kChunkDim;
@@ -17,8 +21,10 @@ void MathWorld::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
   for (block_pos.x = 0; block_pos.x < kChunkDim; block_pos.x++) {
     for (block_pos.y = 0; block_pos.y < kChunkDim; block_pos.y++) {
       for (block_pos.z = 0; block_pos.z < kChunkDim; block_pos.z++) {
-        if ((chunk->GetBlock(block_pos) == g_blocks.RED_STAINED_GLASS) ||
-            (chunk->GetBlock(block_pos) == g_blocks.BLACK_STAINED_GLASS))
+        if ((chunk->GetBlock(block_pos) ==
+             game_context_.blocks_->RED_STAINED_GLASS) ||
+            (chunk->GetBlock(block_pos) ==
+             game_context_.blocks_->BLACK_STAINED_GLASS))
           continue;
 
         glm::vec3 globalPos(cx + block_pos.x, cy + block_pos.y,
@@ -38,7 +44,7 @@ void MathWorld::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
         // }
 
         if (gz * gz + gy * gy > 4) {
-          chunk->SetBlock(g_blocks.BRICKS, block_pos);
+          chunk->SetBlock(game_context_.blocks_->BRICKS, block_pos);
         }
 
         int Unit = 1;
@@ -49,12 +55,13 @@ void MathWorld::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
                (Unit * static_cast<int>(zoom))) == 0) {
             for (int i = -UnitSize; i <= UnitSize; i++) {
               for (int j = -UnitSize; j <= UnitSize; j++) {
-                chunk->SetBlock(g_blocks.RED_STAINED_GLASS,
+                chunk->SetBlock(game_context_.blocks_->RED_STAINED_GLASS,
                                 block_pos + BlockPos{j, i, 0});
               }
             }
           } else {
-            chunk->SetBlock(g_blocks.BLACK_STAINED_GLASS, block_pos);
+            chunk->SetBlock(game_context_.blocks_->BLACK_STAINED_GLASS,
+                            block_pos);
           }
         }
         if (gz == 0 && gy == 0) {
@@ -62,12 +69,13 @@ void MathWorld::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
                (Unit * static_cast<int>(zoom))) == 0) {
             for (int i = -UnitSize; i <= UnitSize; i++) {
               for (int j = -UnitSize; j <= UnitSize; j++) {
-                chunk->SetBlock(g_blocks.RED_STAINED_GLASS,
+                chunk->SetBlock(game_context_.blocks_->RED_STAINED_GLASS,
                                 block_pos + BlockPos{0, j, i});
               }
             }
           } else {
-            chunk->SetBlock(g_blocks.BLACK_STAINED_GLASS, block_pos);
+            chunk->SetBlock(game_context_.blocks_->BLACK_STAINED_GLASS,
+                            block_pos);
           }
         }
         if (gz == 0 && gx == 0) {
@@ -75,12 +83,13 @@ void MathWorld::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
                (Unit * static_cast<int>(zoom))) == 0) {
             for (int i = -UnitSize; i <= UnitSize; i++) {
               for (int j = -UnitSize; j <= UnitSize; j++) {
-                chunk->SetBlock(g_blocks.RED_STAINED_GLASS,
+                chunk->SetBlock(game_context_.blocks_->RED_STAINED_GLASS,
                                 block_pos + BlockPos{i, 0, j});
               }
             }
           } else {
-            chunk->SetBlock(g_blocks.BLACK_STAINED_GLASS, block_pos);
+            chunk->SetBlock(game_context_.blocks_->BLACK_STAINED_GLASS,
+                            block_pos);
           }
         }
       }

@@ -2,16 +2,17 @@
 
 #pragma once
 #include <gl/glew.h>
-#include <cstdint>
 
+#include <cstdint>
 #include <memory>
 
 class ComputeShader;
+class GameContext;
 
 class BufferStorage {
  public:
-  BufferStorage(GLuint bufferTarget, uint64_t size, bool dynamic = true,
-                const void* data = nullptr);
+  BufferStorage(GameContext&, GLuint bufferTarget, uint64_t size,
+                bool dynamic = true, const void* data = nullptr);
   ~BufferStorage();
 
   BufferStorage(const BufferStorage&) = delete;
@@ -43,6 +44,7 @@ class BufferStorage {
  private:
   static constexpr int kWorkGroupSize = 512;
 
+  GameContext& game_context_;
   uint32_t buffer_storage_id_ = 0;
   uint64_t max_size_ = 0;
   GLenum target_ = 0;

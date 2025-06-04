@@ -6,6 +6,8 @@
 
 #include <string>
 
+class GameContext;
+
 class RawTextureData {
  public:
   ~RawTextureData();
@@ -42,7 +44,7 @@ class RawTextureData {
 // Abstract class to handle textures
 class Texture {
  public:
-  Texture();
+  explicit Texture(GameContext&);
   Texture(const Texture&) = delete;
   Texture(Texture&&) noexcept;
   virtual ~Texture();
@@ -57,6 +59,7 @@ class Texture {
   int GetFormat() const;
 
  protected:
+  GameContext& game_context_;
   GLuint texture_id_ = 0;
   size_t width_ = 0;
   size_t height_ = 0;

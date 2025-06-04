@@ -14,12 +14,13 @@ class Buffer;
 class VertexArray;
 class Shader;
 class Texture2D;
+class GameContext;
 
 struct GUIElement;
 
 class GUISet {
  public:
-  GUISet();
+  explicit GUISet(GameContext&);
   ~GUISet();
 
   GUISet(GUISet&&);
@@ -37,7 +38,8 @@ class GUISet {
   void PrepareRenderer();
   size_t GetNumRenderableObjects() const;
   GLuint GetGUITextureID() const;
-
+  
+  GameContext& game_context_;
   std::vector<Buffer> ebos_;
   std::vector<VertexArray> vaos_;
   std::vector<size_t> vbo_size_;

@@ -25,8 +25,9 @@ void EntityRenderCache::RemoveEntity(EntityUUID entityUUID) {
   const auto& it = entity_idx_.find(entityUUID);
 
   if (it == entity_idx_.end()) {
-    g_logger.LogError("EntityRenderCache::RemoveEntity",
-                      "Attempted to removed entity that doesn't exist!");
+    throw std::logic_error(
+        "EntityRenderCache::RemoveEntity - Attempted to removed entity that "
+        "doesn't exist!");
   }
 
   const auto& [idx, type] = it->second;

@@ -12,10 +12,16 @@
 
 class EventHandler {
  public:
+  explicit EventHandler(GameContext&);
+  ~EventHandler();
   FastHashMap<EventID, void (*)(const BlockEvent&, Dimension*)>
       block_event_handles_;
   FastHashMap<EventID, void (*)(const EntityEvent&, Dimension*)>
       entity_event_handles_;
+
+  void ExecuteEvent(Event event, Dimension* dimension);
+
+  GameContext& game_context_;
 
   EventID BlockPlace = RegisterBlockEvent(HandlePlaceBlock);
   EventID BlockTick = RegisterBlockEvent(HandleBlockTick);
@@ -24,15 +30,14 @@ class EventHandler {
   EventID EntityTick = RegisterEntityEvent(HandleEntityTick);
   EventID RemoveEntity = RegisterEntityEvent(HandleRemoveEntity);
 
-  void ExecuteEvent(Event event, Dimension* dimension);
-
  private:
   using EventFunctionTypes =
       std::variant<void (*)(BlockID, BlockPos, Dimension*),
-                   void (*)(EntityEvent, Dimension*)>;
+                   void (*)(EntityEvent,
+                            Dimension*)>;  // TODO(hiheyok): Use std::function
 
   int event_count_ = 0;
   EventID RegisterBlockEvent(void (*func)(const BlockEvent&, Dimension*));
   EventID RegisterEntityEvent(void (*func)(const EntityEvent&, Dimension*));
 
-} inline g_event_handler;
+};

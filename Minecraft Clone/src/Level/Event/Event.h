@@ -50,7 +50,7 @@ struct Event {
         tick_time_{other.tick_time_},
         event_data_{other.event_data_} {}
 
-  Event() {};
+  Event() = default;
 
   template <typename EventType>
   Event(const EventType& newEvent) {

@@ -2,7 +2,9 @@
 
 #pragma once
 
-#include "Level/Entity/Type/EntityType.h"
+#include "Level/Entity/EntityType.h"
+
+class GameContext;
 
 enum EntityTypeEnums { ENTITY_PASSIVE, ENTITY_HOSTILE, ENTITY_FALLING_BLOCK };
 
@@ -12,13 +14,14 @@ class EntitiesList {
   FastHashMap<std::string, EntityTypeID> entity_name_id_;
 
  public:
-  EntitiesList();
+  explicit EntitiesList(GameContext&);
 
   void InitializeModels();
   void Initialize();
   EntityTypeID RegisterEntity(std::string entityName, EntityTypeEnums type_);
   EntityType* GetEntity(EntityTypeID id);
 
+  GameContext& game_context_;
   std::vector<EntityType*> entity_type_list_;
 
   EntityTypeID HUMAN = RegisterEntity("human", ENTITY_PASSIVE);
@@ -28,4 +31,3 @@ class EntitiesList {
       RegisterEntity("sand", ENTITY_FALLING_BLOCK);
 };
 
-extern EntitiesList g_entity_list;

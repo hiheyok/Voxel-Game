@@ -4,7 +4,7 @@
 
 #include "Level/Dimension/Dimension.h"
 
-DirtBlock::DirtBlock() {
+DirtBlock::DirtBlock(GameContext& game_context) : Block{game_context} {
   properties_->is_solid_ = true;
   properties_->transparency_ = false;
   properties_->is_fluid_ = false;

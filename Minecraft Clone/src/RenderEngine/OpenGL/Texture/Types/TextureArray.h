@@ -9,6 +9,9 @@
 
 class TextureArray : public Texture {
  public:
+  explicit TextureArray(GameContext&);
+  ~TextureArray();
+
   void LoadToGPU();
 
   void SetSize(int width, int height);

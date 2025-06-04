@@ -6,10 +6,12 @@
 #include <utility>
 #include <vector>
 
+#include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 
-TextureAtlas::TextureAtlas(int width, int height, int individualWidth,
-                           int individualHeight) {
+TextureAtlas::TextureAtlas(GameContext& game_context, int width, int height,
+                           int individualWidth, int individualHeight)
+    : Texture{game_context} {
   width_ = width;
   height_ = height;
   individual_tex_height_ = individualHeight;
@@ -33,7 +35,7 @@ void TextureAtlas::LoadToGPU() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 4);
 
-  g_logger.LogDebug("TextureAtlas::LoadToGPU",
+  game_context_.logger_->LogDebug("TextureAtlas::LoadToGPU",
                     "Loaded Texture Atlas: " + std::to_string(texture_id_));
 }
 
@@ -100,7 +102,7 @@ void TextureAtlas::AddData(
       count_++;
       break;
     default:
-      g_logger.LogError("TextureAtlas::AddData", "Invalid image format!");
+      game_context_.logger_->LogError("TextureAtlas::AddData", "Invalid image format!");
       break;
   }
 }
@@ -108,13 +110,13 @@ void TextureAtlas::AddData(
 bool TextureAtlas::AddTextureToAtlasHelper(const RawTextureData& data) {
   format_ = GL_RGBA;
   if (!data.data_) {
-    g_logger.LogWarn("TextureAtlas::AddTextureToAtlasHelper", "No texture");
+    game_context_.logger_->LogWarn("TextureAtlas::AddTextureToAtlasHelper", "No texture");
     return false;
   }
 
   if (((data.width_ % individual_tex_width_) != 0) ||
       ((data.height_ % individual_tex_height_) != 0)) {
-    g_logger.LogError("TextureAtlas::AddTextureToAtlasHelper",
+    game_context_.logger_->LogError("TextureAtlas::AddTextureToAtlasHelper",
                       "Width or height doesn't match");
     return false;
   }
@@ -159,14 +161,14 @@ std::optional<RawTextureData> TextureAtlas::AddTextureToAtlas(
   std::optional<RawTextureData> data;
   RawTextureData tex{file};
   if (AddTextureToAtlasHelper(tex)) {
-    g_logger.LogInfo("TextureAtlas::AddTextureToAtlas",
+    game_context_.logger_->LogInfo("TextureAtlas::AddTextureToAtlas",
                      "Loaded: " + file +
                          " | Size: " + std::to_string(tex.height_) + ", " +
                          std::to_string(tex.width_));
     data = std::move(tex);
     return data;
   } else {
-    g_logger.LogWarn("TextureAtlas::AddTextureToAtlas",
+    game_context_.logger_->LogWarn("TextureAtlas::AddTextureToAtlas",
                      "Unable to load: " + file);
     return data;
   }

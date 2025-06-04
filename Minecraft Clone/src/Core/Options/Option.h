@@ -6,8 +6,12 @@
 
 #include "Core/Typenames.h"
 
+class GameContext;
+
 class Options {
  public:
+  explicit Options(GameContext&);
+
   size_t vertical_render_distance_ = 8;
   size_t horizontal_render_distance_ = 16;
   size_t world_gen_threads_ = 6;
@@ -16,8 +20,6 @@ class Options {
   size_t transparent_buffer_size_ = 1000000000;
   size_t solid_buffer_size_ = 2000000000;
   size_t light_engine_threads_ = 2;
-
-  Options();
 
  private:
   bool SetValue(std::string name, std::string value);
@@ -28,5 +30,6 @@ class Options {
 
   void GenerateOptionFile();  // Generate file if deleted
 
+  GameContext& game_context_;
   FastHashMap<std::string, size_t*> option_name_;  // name -> ptr
-} extern g_app_options;
+};

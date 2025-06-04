@@ -13,10 +13,11 @@ class LightStorage;
 class HeightMap;
 class Chunk;
 class WorldInterface;
+class GameContext;
 
 class LightEngine {
  public:
-  LightEngine(size_t thread_count, WorldInterface* interface);
+  LightEngine(GameContext&, size_t thread_count, WorldInterface* interface);
   ~LightEngine();
 
   LightEngine(const LightEngine&) = delete;
@@ -46,5 +47,6 @@ class LightEngine {
 
   void WorkOnChunkSkylight(Chunk* chunk, std::unique_ptr<LightStorage>& light);
 
-  std::unique_ptr<LightStorage> SkyLighting(ChunkPos id);
+  GameContext& game_context_;
+  std::unique_ptr<LightStorage> SkyLighting(ChunkPos pos);
 };

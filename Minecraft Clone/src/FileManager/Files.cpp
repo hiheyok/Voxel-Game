@@ -5,7 +5,7 @@
 
 std::vector<std::string> Tokenize(std::string str, char divider) {
   std::vector<std::string> tokens = {};
-  int l = 0, r = 0;
+  size_t l = 0, r = 0;
   while (r < str.size()) {
     // Shift right ptr to the first non-divider character
 

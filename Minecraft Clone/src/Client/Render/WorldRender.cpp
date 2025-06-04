@@ -9,16 +9,17 @@
 
 #include "Client/ClientLevel/ClientCache.h"
 #include "Client/Player/PlayerPOV.h"
+#include "Core/GameContext/GameContext.h"
 #include "Core/Options/Option.h"
 #include "RenderEngine/ChunkRender/Mesh/ChunkMesh.h"
 #include "RenderEngine/ChunkRender/TerrainRenderer.h"
 #include "Utils/Clock.h"
 #include "Utils/Timer/Timer.h"
 
-static thread_local Mesh::ChunkMeshData chunkMesher;
-
-WorldRender::WorldRender(PlayerPOV* player)
-    : player_{player}, renderer_{std::make_unique<TerrainRenderer>()} {}
+WorldRender::WorldRender(GameContext& game_context, PlayerPOV* player)
+    : game_context_{game_context},
+      renderer_{std::make_unique<TerrainRenderer>(game_context)},
+      player_{player} {}
 
 WorldRender::~WorldRender() = default;
 
@@ -39,32 +40,32 @@ void WorldRender::LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks) {
 
 std::unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(ChunkPos pos) {
   Chunk* chunk = WorldRender::cache_->GetChunk(pos);
-
+  Mesh::ChunkMeshData& chunk_mesher = GetMesher();
   Timer timer;
-  chunkMesher.Reset();
-  chunkMesher.SetChunk(chunk);
-  chunkMesher.GenerateMesh();
+  chunk_mesher.Reset();
+  chunk_mesher.SetChunk(chunk);
+  chunk_mesher.GenerateMesh();
   size_t time = static_cast<size_t>(timer.GetTimePassed_μs());
 
   // Transfer Infomation
   std::unique_ptr<Mesh::ChunkVertexData> data =
       std::make_unique<Mesh::ChunkVertexData>();
-  data->solid_vertices_.resize(chunkMesher.solid_face_count_ * 12);
-  data->transparent_vertices_.resize(chunkMesher.transparent_face_count_ * 12);
+  data->solid_vertices_.resize(chunk_mesher.solid_face_count_ * 12);
+  data->transparent_vertices_.resize(chunk_mesher.transparent_face_count_ * 12);
   data->position_ = pos;
 
-  build_stage_0_ += chunkMesher.greedy_time_;
-  build_stage_1_ += chunkMesher.cache_time_;
+  build_stage_0_ += chunk_mesher.greedy_time_;
+  build_stage_1_ += chunk_mesher.cache_time_;
   build_time_ += time;
 
   ++amount_of_mesh_generated_;
 
-  memcpy(data->solid_vertices_.data(), chunkMesher.vertices_buffer_.data(),
-         chunkMesher.solid_face_count_ * 12 * sizeof(uint32_t));
+  memcpy(data->solid_vertices_.data(), chunk_mesher.vertices_buffer_.data(),
+         chunk_mesher.solid_face_count_ * 12 * sizeof(uint32_t));
 
   memcpy(data->transparent_vertices_.data(),
-         chunkMesher.transparent_vertices_buffer_.data(),
-         chunkMesher.transparent_face_count_ * 12 * sizeof(uint32_t));
+         chunk_mesher.transparent_vertices_buffer_.data(),
+         chunk_mesher.transparent_face_count_ * 12 * sizeof(uint32_t));
 
   return data;
 }
@@ -99,10 +100,11 @@ void WorldRender::Update(std::vector<ChunkPos> updatedChunks) {
 
 void WorldRender::Start(GLFWwindow* window, ClientCache* cache,
                         PerformanceProfiler* profiler) {
-  horizontal_render_distance_ = g_app_options.horizontal_render_distance_;
-  vertical_render_distance_ = g_app_options.vertical_render_distance_;
+  horizontal_render_distance_ =
+      game_context_.options_->horizontal_render_distance_;
+  vertical_render_distance_ = game_context_.options_->vertical_render_distance_;
 
-  size_t threadCount = g_app_options.mesh_threads_;
+  size_t threadCount = game_context_.options_->mesh_threads_;
 
   mesh_thread_pool_ = std::make_unique<ThreadPool<ChunkPos, WorkerReturnType>>(
       threadCount, "Mesher", std::bind_front(&WorldRender::Worker, this), 250);
@@ -118,6 +120,11 @@ void WorldRender::Start(GLFWwindow* window, ClientCache* cache,
   profiler_ = profiler;
 }
 
-size_t WorldRender::GetQueuedSize() {
+size_t WorldRender::GetQueuedSize() const noexcept {
   return mesh_thread_pool_->GetQueueSize();
+}
+
+Mesh::ChunkMeshData& WorldRender::GetMesher() {
+  thread_local Mesh::ChunkMeshData mesher{game_context_};
+  return mesher;
 }

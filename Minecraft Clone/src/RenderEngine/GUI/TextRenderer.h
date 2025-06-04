@@ -12,12 +12,14 @@ class Buffer;
 class Shader;
 class RenderableFont;
 class Texture2D;
+class RenderDrawArrays;
+class GameContext;
 
 struct GLFWwindow;
 
 class TextRenderer {
  public:
-  TextRenderer();
+  explicit TextRenderer(GameContext&);
   ~TextRenderer();
 
   void InitializeTextRenderer(GLFWwindow* w);
@@ -35,11 +37,11 @@ class TextRenderer {
   void RenderFont();
 
  private:
+  GameContext& game_context_;
   FastHashMap<std::string, RenderableFont> font_map_;
-  std::unique_ptr<Shader> font_shader_, background_shader_;
-  std::unique_ptr<Buffer> vbo_, background_vbo_;
-  std::unique_ptr<VertexArray> vao_, background_vao_;
   std::unique_ptr<Texture2D> font_texture_;
+  std::unique_ptr<RenderDrawArrays> background_render_;
+  std::unique_ptr<RenderDrawArrays> font_render_;
   GLFWwindow* window_ = nullptr;
 
   std::vector<float> vertices_ = {};

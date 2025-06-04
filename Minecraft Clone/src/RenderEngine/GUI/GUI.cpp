@@ -2,10 +2,10 @@
 
 #include "RenderEngine/GUI/GUI.h"
 
-#include <string>
-#include <utility>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <string>
+#include <utility>
 
 #include "RenderEngine/GUI/GUIObject.h"
 #include "RenderEngine/GUI/GUISet.h"
@@ -15,11 +15,13 @@
 #include "RenderEngine/Window.h"
 #include "Utils/LogUtils.h"
 
-GUI::GUI(Window* win)
-    : shader_{std::make_unique<Shader>("assets/shaders/GUI/GUIVert.glsl",
+GUI::GUI(GameContext& game_context, Window* win)
+    : game_context_{game_context},
+      shader_{std::make_unique<Shader>(game_context,
+                                       "assets/shaders/GUI/GUIVert.glsl",
                                        "assets/shaders/GUI/GUIFrag.glsl")},
       window_{win},
-      guis_{} {};
+      guis_{} {}
 
 GUI::GUI(GUI&&) = default;
 GUI::~GUI() = default;

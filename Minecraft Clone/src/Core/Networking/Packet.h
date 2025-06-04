@@ -62,21 +62,22 @@ struct BlockUpdate {
 };
 
 struct ChunkUpdateData {
-  ChunkUpdatePacket::PacketType type_;
   std::variant<ChunkUpdatePacket::AddChunk, ChunkUpdatePacket::DeleteChunk,
                ChunkUpdatePacket::LightUpdate, std::monostate>
       packet_;
+  ChunkUpdatePacket::PacketType type_;
 
   template <class T>
-  ChunkUpdateData(const T& packet) {
-    packet_ = packet;
-    if constexpr (std::is_same_v<T, ChunkUpdatePacket::AddChunk>) {
-      type_ = ChunkUpdatePacket::ADD_CHUNK;
-    } else if constexpr (std::is_same_v<T, ChunkUpdatePacket::DeleteChunk>) {
-      type_ = ChunkUpdatePacket::DELETE_CHUNK;
-    } else if constexpr (std::is_same_v<T, ChunkUpdatePacket::LightUpdate>) {
-      type_ = ChunkUpdatePacket::LIGHT_UPDATE;
-    }
-  }
+  ChunkUpdateData(const T& packet)
+      : packet_(packet), type_([&]() {
+          if constexpr (std::is_same_v<T, ChunkUpdatePacket::AddChunk>)
+            return ChunkUpdatePacket::ADD_CHUNK;
+          else if constexpr (std::is_same_v<T, ChunkUpdatePacket::DeleteChunk>)
+            return ChunkUpdatePacket::DELETE_CHUNK;
+          else if constexpr (std::is_same_v<T, ChunkUpdatePacket::LightUpdate>)
+            return ChunkUpdatePacket::LIGHT_UPDATE;
+          else
+            return ChunkUpdatePacket::PacketType{};
+        }()) {}
 };
 }  // namespace Packet

@@ -15,16 +15,18 @@ class TerrainRenderer;
 class ClientCache;
 class PerformanceProfiler;
 class PlayerPOV;
+class GameContext;
 
 struct GLFWwindow;
 
 namespace Mesh {
 struct ChunkVertexData;
+class ChunkMeshData;
 }
 
 class WorldRender : public WorldRenderInfo {
  public:
-  explicit WorldRender(PlayerPOV* player);
+  WorldRender(GameContext&, PlayerPOV* player);
   ~WorldRender();
 
   WorldRender(const WorldRender&) = delete;
@@ -33,22 +35,20 @@ class WorldRender : public WorldRenderInfo {
   WorldRender& operator=(WorldRender&&) = delete;
 
   void Render();
-
   void LoadChunkToRenderer(ChunkPos chunk);
-
   void Start(GLFWwindow* window, ClientCache* cache,
              PerformanceProfiler* profiler);
-
   void Update(std::vector<ChunkPos> updatedChunks);
+  size_t GetQueuedSize() const noexcept;
 
-  size_t GetQueuedSize();
-
+  GameContext& game_context_;
   std::unique_ptr<TerrainRenderer> renderer_;
   PerformanceProfiler* profiler_;
 
  private:
   void LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks);
   std::unique_ptr<Mesh::ChunkVertexData> Worker(ChunkPos pos);
+  Mesh::ChunkMeshData& GetMesher();
 
   using WorkerReturnType = std::invoke_result_t<decltype(&WorldRender::Worker),
                                                 WorldRender*, ChunkPos>;

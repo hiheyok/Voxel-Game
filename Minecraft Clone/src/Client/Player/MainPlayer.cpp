@@ -2,14 +2,15 @@
 
 #include "Client/Player/MainPlayer.h"
 
-#include <utility>
 #include <glm/vec2.hpp>
+#include <utility>
 
 #include "Client/IO/IO.h"
 #include "Client/IO/KEY_CODE.h"
 #include "Client/Player/PlayerMovement.h"
 #include "Client/Player/PlayerPOV.h"
 #include "Client/Player/WorldInteraction.h"
+#include "Core/GameContext/GameContext.h"
 #include "Core/Interfaces/ServerInterface.h"
 #include "Level/Entity/Mobs/Player.h"
 #include "Level/Entity/Properties/EntityProperties.h"
@@ -18,18 +19,19 @@
 #include "RenderEngine/GUI/GUISet.h"
 #include "RenderEngine/Window.h"
 
-MainPlayer::MainPlayer(Window* window, ServerInterface* interface,
-                       ClientCache* cache)
-    : player_{std::make_unique<Player>()},
+MainPlayer::MainPlayer(GameContext& game_context, Window* window,
+                       ServerInterface* interface, ClientCache* cache)
+    : game_context_{game_context},
+      player_{std::make_unique<Player>()},
       movement_{std::make_unique<PlayerMovement>()},
-      interactions_{std::make_unique<WorldInteraction>()},
+      interactions_{std::make_unique<WorldInteraction>(game_context)},
       player_pov_{std::make_unique<PlayerPOV>()},
-      player_gui_{std::make_unique<GUI>(window)},
+      player_gui_{std::make_unique<GUI>(game_context, window)},
       internal_interface_{interface},
       client_cache_{cache} {
   float ItemViewRelativeSize = 0.85f;
 
-  GUISet hotbar;
+  GUISet hotbar{game_context};
   hotbar.SetGUITexture("assets/minecraft/textures/gui/widgets.png");
   hotbar.AddGUIElement(
       "Hotbar", "",
@@ -42,9 +44,10 @@ MainPlayer::MainPlayer(Window* window, ServerInterface* interface,
                        glm::vec2(-kHotbarSize * 4.f, -1.f + kHotbarSize * 0.5f),
                        glm::vec2(0.5f, 22.5f), glm::vec2(22.5f, 44.5f));
 
-  GUISet itemBar;
-  itemBar.SetGUITexture(g_item_atlas.Get(), g_item_atlas.GetWidth(),
-                        g_item_atlas.GetHeight());
+  GUISet itemBar{game_context};
+  itemBar.SetGUITexture(game_context_.item_atlas_->Get(),
+                        game_context_.item_atlas_->GetWidth(),
+                        game_context_.item_atlas_->GetHeight());
 
   for (int i = 0; i < 9; i++) {
     itemBar.AddGUIElementNorm(std::to_string(i), "",
@@ -78,7 +81,8 @@ void MainPlayer::PrepareGUIs() {
 
   for (int i = 0; i < 9; i++) {
     ItemStack item = player_->entity_inventory_.GetItem(i);
-    ItemUVMapping uv = g_item_atlas.items_uv_map_[item.item_.properties_.id_];
+    ItemUVMapping uv =
+        game_context_.item_atlas_->items_uv_map_[item.item_.properties_.id_];
 
     if (item.IsInitialized()) {
       player_gui_->EditGUISet(item_gui_index_)

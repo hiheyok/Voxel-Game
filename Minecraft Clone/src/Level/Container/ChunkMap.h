@@ -2,16 +2,18 @@
 
 #pragma once
 #include <memory>
+#include <optional>
 #include <utility>
 
 class Chunk;
 class Region;
+class GameContext;
 
 #include "Core/Typenames.h"
 
 class ChunkMap {
  public:
-  ChunkMap(bool neighborUpdate = false, bool heightmapUpdate = false);
+  ChunkMap(GameContext&, bool neighborUpdate = false, bool heightmapUpdate = false);
   ~ChunkMap();
 
   BlockID GetBlock(BlockPos pos) const;
@@ -29,7 +31,8 @@ class ChunkMap {
   bool CheckRegion(RegionPos pos, bool checkCache = true) const;
   Region* CreateRegion(RegionPos pos);
   void DeleteRegion(RegionPos pos);
-
+  
+  GameContext& game_context_;
   bool heightmap_update_ = false;
   bool neighbor_update_ = false;
 

@@ -2,13 +2,14 @@
 #include <glm/vec3.hpp>
 
 class ChunkMap;
+class GameContext;
 
 struct Entity;
 struct Ray;
 
 class CollusionDetector {
  public:
-  CollusionDetector(ChunkMap* cache);
+  CollusionDetector(GameContext&, ChunkMap* cache);
   ~CollusionDetector();
 
   bool CheckRayIntersection(Ray& ray);
@@ -19,5 +20,6 @@ class CollusionDetector {
 
  private:
   static constexpr int kSearchDistance = 5;
+  GameContext& game_context_;
   ChunkMap* cache_;
 };

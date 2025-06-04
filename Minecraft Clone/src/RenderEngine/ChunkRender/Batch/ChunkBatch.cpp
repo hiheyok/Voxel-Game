@@ -13,8 +13,13 @@
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "Utils/Timer/Timer.h"
 
-ChunkDrawBatch::ChunkDrawBatch(size_t maxSize)
-    : max_buffer_size_{maxSize}, memory_pool_{maxSize} {}
+ChunkDrawBatch::ChunkDrawBatch(GameContext& game_context, size_t maxSize)
+    : game_context_{game_context},
+      memory_pool_{game_context, maxSize},
+      ibo_{game_context},
+      ssbo_{game_context},
+      array_{game_context},
+      max_buffer_size_{maxSize} {}
 
 ChunkDrawBatch::ChunkDrawBatch(ChunkDrawBatch&&) = default;
 ChunkDrawBatch::~ChunkDrawBatch() = default;
@@ -26,16 +31,14 @@ void ChunkDrawBatch::SetupBuffers() {
   ibo_.SetUsage(GL_STATIC_DRAW);
   ssbo_.SetUsage(GL_DYNAMIC_COPY);
 
-  array_.Bind();
-
   ibo_.SetMaxSize(max_buffer_size_ / 100);
   ibo_.InitializeData();
 
-  memory_pool_.buffer_->Bind();
-  array_.EnableAttriPTR(0, 1, GL_FLOAT, GL_FALSE, 2, 0);
-  array_.EnableAttriPTR(1, 1, GL_FLOAT, GL_FALSE, 2, 1);
-  memory_pool_.buffer_->Unbind();
-  array_.Unbind();
+  array_
+      .EnableAttriPtr(memory_pool_.buffer_.get(), 0, 1, GL_FLOAT, GL_FALSE, 2,
+                      0)
+      .EnableAttriPtr(memory_pool_.buffer_.get(), 1, 1, GL_FLOAT, GL_FALSE, 2,
+                      1);
 
   ssbo_.SetMaxSize(max_buffer_size_ / 100);
   ssbo_.InitializeData();
@@ -132,14 +135,14 @@ bool ChunkDrawBatch::AddChunkVertices(const std::vector<uint32_t>& Data,
   return true;
 }
 
-void ChunkDrawBatch::DeleteChunkVertices(ChunkPos id) {
-  if (memory_pool_.CheckChunk(id)) {
+void ChunkDrawBatch::DeleteChunkVertices(ChunkPos pos) {
+  if (memory_pool_.CheckChunk(pos)) {
     ChunkMemoryPoolOffset ChunkMemOffset =
-        memory_pool_.GetChunkMemoryPoolOffset(id);
+        memory_pool_.GetChunkMemoryPoolOffset(pos);
     if (ChunkMemOffset.mem_offset_ == std::numeric_limits<size_t>::max()) {
-      g_logger.LogError("ChunkDrawBatch::DeleteChunkVertices",
-                        "Failed to delete chunk: " + std::to_string(id));
-      return;
+      throw std::logic_error("ChunkDrawBatch::DeleteChunkVertices - " +
+                             std::string("Failed to delete chunk: ") +
+                             std::to_string(pos));
     }
 
     size_t idx = render_list_[ChunkMemOffset.mem_offset_];
@@ -148,7 +151,7 @@ void ChunkDrawBatch::DeleteChunkVertices(ChunkPos id) {
     render_list_arr_.pop_back();
     render_list_.erase(ChunkMemOffset.mem_offset_);
 
-    memory_pool_.DeleteChunk(id);
+    memory_pool_.DeleteChunk(pos);
     update_commands_ = true;
   }
 }
@@ -186,8 +189,8 @@ void ChunkDrawBatch::Defrag(size_t iterations) {
 
   iterations = std::min(iterations, fragmentCount - 1);
 
-  for (int i = 0; i < iterations &&
-                  memory_pool_.memory_pool_.free_memory_blocks_.size() != 1;
+  for (size_t i = 0; i < iterations &&
+                     memory_pool_.memory_pool_.free_memory_blocks_.size() != 1;
        ++i) {
     MemoryManagement::MemoryBlock freeMemoryBlock =
         memory_pool_.memory_pool_.free_memory_blocks_.begin()->second;

@@ -8,11 +8,10 @@ class Dimension;
 
 struct Entity {
   Entity();
+  virtual ~Entity();
+  void Tick(Dimension* dimension);
 
   EntityProperty
       properties_;  // Provide properties such as position, acceleration, etc.
-
   bool is_dirty_ = true;
-
-  void Tick(Dimension* dimension);
 };

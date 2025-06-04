@@ -1,5 +1,6 @@
 #include "Level/World/CollusionDetector.h"
 
+#include "Core/GameContext/GameContext.h"
 #include "Level/Block/Block.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Container/ChunkMap.h"
@@ -9,7 +10,8 @@
 #include "Utils/Math/Ray/Ray.h"
 #include "Utils/Math/vectorOperations.h"
 
-CollusionDetector::CollusionDetector(ChunkMap* cache) : cache_{cache} {}
+CollusionDetector::CollusionDetector(GameContext& game_context, ChunkMap* cache)
+    : game_context_{game_context}, cache_{cache} {}
 CollusionDetector::~CollusionDetector() = default;
 
 float CollusionDetector::TraceSingleAxisCollision(glm::vec3 origin,
@@ -36,7 +38,7 @@ float CollusionDetector::TraceSingleAxisCollision(glm::vec3 origin,
     BlockID b =
         cache_->GetBlock(BlockPos{floored_pos.x, floored_pos.y, floored_pos.z});
 
-    if (g_blocks.GetBlockType(b)->properties_->is_solid_) {
+    if (game_context_.blocks_->GetBlockType(b)->properties_->is_solid_) {
       return static_cast<float>(i) + displacement - 1.0f;
     }
   }
@@ -45,7 +47,9 @@ float CollusionDetector::TraceSingleAxisCollision(glm::vec3 origin,
 }
 
 glm::dvec3 CollusionDetector::ComputeCollisionTimes(Entity* entity) {
-  AABB hitbox = g_entity_list.GetEntity(entity->properties_.type_)->GetHitbox();
+  AABB hitbox =
+      game_context_.entities_list_->GetEntity(entity->properties_.type_)
+          ->GetHitbox();
 
   glm::vec3 hitbox_start = entity->properties_.position_ - (hitbox.size_ / 2.f);
   glm::vec3 hitbox_end = entity->properties_.position_ + (hitbox.size_ / 2.f);
@@ -174,7 +178,7 @@ bool CollusionDetector::CheckRayIntersection(Ray& ray) {
 
     BlockID b = cache_->GetBlock(BlockPos{blockPos.x, blockPos.y, blockPos.z});
 
-    if (g_blocks.GetBlockType(b)->properties_->is_solid_) {
+    if (game_context_.blocks_->GetBlockType(b)->properties_->is_solid_) {
       ray.end_point_ = (glm::vec3)blockPos;
 
       ray.length_ = sqrtf(powf(ray.end_point_.x - ray.origin_.x, 2) +
@@ -216,7 +220,9 @@ bool CollusionDetector::CheckRayIntersection(Ray& ray) {
 }
 
 bool CollusionDetector::IsEntityOnGround(Entity* entity) {
-  AABB hitbox = g_entity_list.GetEntity(entity->properties_.type_)->GetHitbox();
+  AABB hitbox =
+      game_context_.entities_list_->GetEntity(entity->properties_.type_)
+          ->GetHitbox();
 
   glm::vec3 hitbox_start = entity->properties_.position_ - (hitbox.size_ / 2.f);
   glm::vec3 hitbox_end = entity->properties_.position_ + (hitbox.size_ / 2.f);

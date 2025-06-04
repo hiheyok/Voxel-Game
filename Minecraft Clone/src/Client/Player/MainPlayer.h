@@ -13,12 +13,13 @@ class PlayerPOV;
 class Player;
 class GUI;
 class Window;
+class GameContext;
 
 struct EntityProperty;
 
 class MainPlayer {
  public:
-  MainPlayer(Window* window, ServerInterface* server, ClientCache* cache);
+  MainPlayer(GameContext&, Window* window, ServerInterface* server, ClientCache* cache);
   MainPlayer(const MainPlayer&) = delete;
   ~MainPlayer();
 
@@ -32,7 +33,8 @@ class MainPlayer {
   PlayerPOV* GetPlayerPOV();
 
   void RenderGUIs();
-
+  
+  GameContext& game_context_;
   std::unique_ptr<Player> player_;
 
  private:
@@ -44,8 +46,8 @@ class MainPlayer {
   std::unique_ptr<PlayerPOV> player_pov_;
   std::unique_ptr<GUI> player_gui_;
 
-  ClientCache* client_cache_ = nullptr;
   ServerInterface* internal_interface_ = nullptr;
+  ClientCache* client_cache_ = nullptr;
 
   size_t gui_index_ = 0;
   size_t item_gui_index_ = 0;

@@ -58,8 +58,9 @@ std::vector<EntityUUID> EntityContainer::GetRemovedEntities() {
 void EntityContainer::RemoveEntity(EntityUUID entityId) {
   auto it = entities_idx_.find(entityId);
   if (it == entities_idx_.end()) {
-    g_logger.LogError("EntityContainer::RemoveEntity",
-                      "Tried to remove entity that doesn't exist!");
+    throw std::logic_error(
+        "EntityContainer::RemoveEntity - Tried to remove entity that doesn't "
+        "exist!");
   }
   size_t removeIdx = it->second;
   entities_idx_[entities_.back()->properties_.entity_uuid_] = removeIdx;

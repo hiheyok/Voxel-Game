@@ -3,14 +3,16 @@
 #include "Client/Render/DebugScreen/DebugScreen.h"
 
 #include <gl/glew.h>
+
 #include <string>
 
 #include "RenderEngine/GUI/Font.h"
 #include "RenderEngine/GUI/TextRenderer.h"
 #include "Utils/Timer/Timer.h"
 
-DebugScreen::DebugScreen()
-    : renderer_{std::make_unique<TextRenderer>()},
+DebugScreen::DebugScreen(GameContext& game_context)
+    : game_context_{game_context},
+      renderer_{std::make_unique<TextRenderer>(game_context)},
       timer_{std::make_unique<Timer>()} {}
 
 DebugScreen::~DebugScreen() = default;

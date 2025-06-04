@@ -7,17 +7,22 @@ class Player;
 class UserInputs;
 class ServerInterface;
 class ClientCache;
+class GameContext;
 
 struct Ray;
 
 class WorldInteraction {
  public:
+  explicit WorldInteraction(GameContext&);
+  ~WorldInteraction();
+
   void Interact(Player* player, const UserInputs& Inputs,
                 ServerInterface* interface, ClientCache* cache);
 
  private:
-  BlockID GetBlock(Ray ray, ServerInterface* interface, ClientCache* cache);
+  BlockID GetBlock(Ray ray, ClientCache* cache);
   void BreakBlock(Ray ray, ServerInterface* interface, ClientCache* cache);
   void PlaceBlock(Ray ray, BlockID block, ServerInterface* interface,
                   ClientCache* cache);
+  GameContext& game_context_;
 };

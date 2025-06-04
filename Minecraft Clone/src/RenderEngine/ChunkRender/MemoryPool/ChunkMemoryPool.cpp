@@ -6,7 +6,9 @@
 #include <map>
 #include <vector>
 
+#include "Core/GameContext/GameContext.h"
 #include "RenderEngine/OpenGL/Buffers/BufferStorage.h"
+#include "Utils/LogUtils.h"
 
 using namespace MemoryManagement;
 
@@ -207,43 +209,68 @@ size_t MemoryPoolManager::GetReserveSpaceFragmentCount() const {
 }
 
 // Other class
-ChunkGPUMemoryPool::ChunkGPUMemoryPool(ChunkGPUMemoryPool&&) noexcept = default;
-ChunkGPUMemoryPool& ChunkGPUMemoryPool::operator=(
-    ChunkGPUMemoryPool&& other) noexcept = default;
+ChunkGPUMemoryPool::ChunkGPUMemoryPool(ChunkGPUMemoryPool&& other) noexcept
+    : game_context_{other.game_context_},
+      stagging_buffer_{std::move(other.stagging_buffer_)},
+      buffer_{std::move(other.buffer_)},
+      memory_pool_size_{other.memory_pool_size_},
+      chunk_memory_offsets_{std::move(other.chunk_memory_offsets_)},
+      memory_chunk_offsets_{std::move(other.memory_chunk_offsets_)},
+      statistics_{std::move(other.statistics_)} {
+  memory_pool_ = std::move(other.memory_pool_);
+}
 
-ChunkGPUMemoryPool::ChunkGPUMemoryPool(size_t memory_pool_size)
-    : stagging_buffer_{std::make_unique<BufferStorage>(
-          GL_COPY_WRITE_BUFFER, kStaggingBufferSize, true, nullptr)},
-      buffer_{std::make_unique<BufferStorage>(GL_ARRAY_BUFFER, memory_pool_size,
-                                              true, nullptr)} {
+ChunkGPUMemoryPool& ChunkGPUMemoryPool::operator=(
+    ChunkGPUMemoryPool&& other) noexcept {
+  if (this != &other) {
+    stagging_buffer_ = std::move(other.stagging_buffer_);
+    buffer_ = std::move(other.buffer_);
+    memory_pool_ = std::move(other.memory_pool_);
+    memory_pool_size_ = other.memory_pool_size_;
+    chunk_memory_offsets_ = std::move(other.chunk_memory_offsets_);
+    memory_chunk_offsets_ = std::move(other.memory_chunk_offsets_);
+    statistics_ = std::move(other.statistics_);
+  }
+  return *this;
+}
+
+ChunkGPUMemoryPool::ChunkGPUMemoryPool(GameContext& game_context,
+                                       size_t memory_pool_size)
+    : game_context_{game_context},
+      stagging_buffer_{
+          std::make_unique<BufferStorage>(game_context, GL_COPY_WRITE_BUFFER,
+                                          kStaggingBufferSize, true, nullptr)},
+      buffer_{std::make_unique<BufferStorage>(
+          game_context, GL_ARRAY_BUFFER, memory_pool_size, true, nullptr)} {
   memory_pool_size_ = memory_pool_size;
   if (memory_pool_size_ == 0) {
-    g_logger.LogError("ChunkGPUMemoryPool::Allocate",
-                      "Attempted to allocate with zero size.");
-    return;
+    throw std::logic_error(
+        "ChunkGPUMemoryPool::Allocate - Attempted to allocate with zero size.");
   }
 
   // Use the modified Create method with dynamic=true
   if (!buffer_->IsInitialized()) {
-    g_logger.LogError("ChunkGPUMemoryPool::Allocate",
-                      "Failed to create main buffer storage.");
+    throw std::logic_error(
+        "ChunkGPUMemoryPool::Allocate - Failed to create main buffer storage.");
     memory_pool_size_ = 0;  // Reset size on failure
     return;
   }
 
   memory_pool_.Initialize(memory_pool_size_);
-  g_logger.LogInfo("ChunkGPUMemoryPool::Allocate",
-                   "Allocated GPU memory pool. Size: " +
-                       std::to_string(memory_pool_size_) + " bytes.");
+  game_context_.logger_->LogInfo(
+      "ChunkGPUMemoryPool::Allocate",
+      "Allocated GPU memory pool. Size: " + std::to_string(memory_pool_size_) +
+          " bytes.");
 }
 
 ChunkGPUMemoryPool::~ChunkGPUMemoryPool() = default;
 
 void ChunkGPUMemoryPool::DeleteChunk(ChunkPos pos) {
   if (!chunk_memory_offsets_.count(pos)) {
-    g_logger.LogDebug("ChunkGPUMemoryPool::AddChunk",
-                      "Attempted to delete non-existant chunk with ID " +
-                          std::to_string(pos));
+    game_context_.logger_->LogDebug(
+        "ChunkGPUMemoryPool::AddChunk",
+        "Attempted to delete non-existant chunk with ID " +
+            std::to_string(pos));
     return;
   }
 
@@ -266,7 +293,8 @@ ChunkMemoryPoolOffset ChunkGPUMemoryPool::AddChunk(
 
   if (blockOffset ==
       std::numeric_limits<size_t>::max()) {  // Check if it is out of space
-    g_logger.LogError("ChunkGPUMemoryPool::AddChunk", "Out of space!");
+    game_context_.logger_->LogError("ChunkGPUMemoryPool::AddChunk",
+                                    "Out of space!");
     return ChunkMemoryPoolOffset{std::numeric_limits<size_t>::max(),
                                  std::numeric_limits<size_t>::max()};
   }

@@ -10,7 +10,8 @@ class FastNoiseLite;
 
 class FastTerrain : public WorldGenerator {
  public:
-  FastTerrain();
+  explicit FastTerrain(GameContext&);
+  ~FastTerrain();
 
   void Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) override;
 

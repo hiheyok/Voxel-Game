@@ -4,9 +4,7 @@
 #include "Core/Typenames.h"
 #include "Level/Block/Block.h"
 
-class Dimension;
-
 struct AirBlock : Block {
-  AirBlock();
+  explicit AirBlock(GameContext&);
   void Tick(BlockPos pos, Dimension* currentWorld) override;
 };

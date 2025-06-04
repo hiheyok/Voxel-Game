@@ -10,6 +10,7 @@
 class Dimension;
 class BlockTextureAtlas;
 class ModelLoader;
+class GameContext;
 
 struct BlockModel;
 
@@ -24,8 +25,8 @@ struct BlockProperties {
 
 class Block {
  public:
-  Block();
-  ~Block();
+  explicit Block(GameContext&);
+  virtual ~Block();
 
   virtual void Tick(BlockPos pos, Dimension* currentWorld) = 0;
 
@@ -33,6 +34,7 @@ class Block {
   virtual void InitializeBlockModel(ModelLoader& modelLoader);
   void InitializeTexture(BlockTextureAtlas& textureAtlas);
 
+  GameContext& game_context_;
   BlockID id_ = 0;
   std::unique_ptr<BlockModel> block_model_data_;
   std::unique_ptr<BlockProperties> properties_;

@@ -17,10 +17,9 @@ struct ItemProperties {
 
 class Item {
  public:
-  Item() {}
-
+  Item();
+  ~Item();
   BlockID GetBlock() const;
-
   bool CheckIsBlockItem() const;
 
   ItemProperties properties_;

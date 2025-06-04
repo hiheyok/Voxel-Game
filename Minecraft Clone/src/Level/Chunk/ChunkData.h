@@ -12,15 +12,16 @@
 
 class HeightMap;
 class LightStorage;
+class GameContext;
 
 struct ChunkRawData;
 struct SetBlockRelative;
 
 class ChunkContainer {
  public:
-  ChunkContainer();
+  explicit ChunkContainer(GameContext&);
   virtual ~ChunkContainer();
-  ChunkContainer(const ChunkRawData&);
+  ChunkContainer(GameContext&, const ChunkRawData&);
   ChunkContainer(ChunkContainer&&);
   ChunkContainer(const ChunkContainer&) = delete;
 
@@ -48,11 +49,13 @@ class ChunkContainer {
   bool CheckLightDirty();
   void SetLightDirty();
 
+  GameContext& game_context_;
   ChunkPos position_;
   std::unique_ptr<LightStorage> lighting_;
   std::unique_ptr<HeightMap> heightmap_;
-  bool is_empty_ = true;
   std::vector<std::vector<SetBlockRelative>> outside_block_to_place_;
+  
+  bool is_empty_ = true;
 
  protected:
   std::vector<std::optional<ChunkContainer*>> neighbors_;

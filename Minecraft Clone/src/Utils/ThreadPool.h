@@ -7,14 +7,12 @@
 #include <thread>
 #include <vector>
 
-#include "Utils/LogUtils.h"
-
 /*
  * Takes in a function (the func that the worker runs)
  * Has a task scheduler and an output manager
  * Can be fed in a templated input and it will provide an output
  */
-// TODO: Add dynamic thread allocation (should be easy)
+
 template <class TaskIn, class TaskOut>
 class ThreadPool {
  public:
@@ -115,9 +113,6 @@ inline ThreadPool<TaskIn, TaskOut>::~ThreadPool() {
 
 template <class TaskIn, class TaskOut>
 inline void ThreadPool<TaskIn, TaskOut>::Scheduler(std::stop_token stoken) {
-  g_logger.LogDebug("ThreadPool::Scheduler",
-                    type_ + " Thread Pool | Started task scheduler");
-
   std::vector<TaskIn> internal_task_list;
 
   while (!stoken.stop_requested()) {
@@ -137,11 +132,13 @@ inline void ThreadPool<TaskIn, TaskOut>::Scheduler(std::stop_token stoken) {
 
     // Evenly distribute the tasks
     size_t task_per_worker = internal_task_list.size() / worker_count_.load();
-    size_t task_per_worker_remainder = internal_task_list.size() % worker_count_.load();
+    size_t task_per_worker_remainder =
+        internal_task_list.size() % worker_count_.load();
 
     size_t curr_index = 0;
 
-    for (size_t i = 0; !stoken.stop_requested() && i < worker_count_.load(); ++i) {
+    for (size_t i = 0; !stoken.stop_requested() && i < worker_count_.load();
+         ++i) {
       size_t task_count = task_per_worker;
       if (task_per_worker_remainder != 0) {
         task_count += 1;
@@ -151,9 +148,9 @@ inline void ThreadPool<TaskIn, TaskOut>::Scheduler(std::stop_token stoken) {
       if (task_count == 0) break;
 
       std::lock_guard<std::mutex> lock{worker_locks_[i]};
-      worker_task_[i].insert(worker_task_[i].end(),
-                             internal_task_list.begin() + curr_index,
-                             internal_task_list.begin() + task_count + curr_index);
+      worker_task_[i].insert(
+          worker_task_[i].end(), internal_task_list.begin() + curr_index,
+          internal_task_list.begin() + task_count + curr_index);
 
       curr_index += task_count;
 
@@ -162,17 +159,11 @@ inline void ThreadPool<TaskIn, TaskOut>::Scheduler(std::stop_token stoken) {
 
     internal_task_list.clear();
   }
-
-  g_logger.LogDebug("ThreadPool::Scheduler",
-                    type_ + " Thread Pool | Shutting down task scheduler");
 }
 
 template <class TaskIn, class TaskOut>
 inline void ThreadPool<TaskIn, TaskOut>::Worker(std::stop_token stoken,
                                                 int workerId) {
-  g_logger.LogDebug(
-      "ThreadPool::Worker",
-      type_ + " Thread Pool | Started worker " + std::to_string(workerId));
   bool working_on_batch = false;
   size_t batch_index = 0;
   std::vector<TaskIn> worker_tasks;
@@ -231,15 +222,10 @@ inline void ThreadPool<TaskIn, TaskOut>::Worker(std::stop_token stoken,
     }
     output.clear();
   }
-  g_logger.LogDebug("ThreadPool::Worker",
-                    type_ + " Thread Pool | Shutting down worker " +
-                        std::to_string(workerId));
 }
 
 template <class TaskIn, class TaskOut>
 inline void ThreadPool<TaskIn, TaskOut>::OutputManager(std::stop_token stoken) {
-  g_logger.LogDebug("ThreadPool::Worker",
-                    type_ + " Thread Pool | Started output manager");
   while (!stoken.stop_requested()) {
     // Waits for output
     {
@@ -254,7 +240,8 @@ inline void ThreadPool<TaskIn, TaskOut>::OutputManager(std::stop_token stoken) {
 
     // Find workers output and manage them
 
-    for (size_t i = 0; !stoken.stop_requested() && i < worker_count_.load(); ++i) {
+    for (size_t i = 0; !stoken.stop_requested() && i < worker_count_.load();
+         ++i) {
       std::vector<TaskOut> worker_out;
       {
         std::lock_guard<std::mutex> lock{worker_output_locks_[i]};
@@ -269,8 +256,6 @@ inline void ThreadPool<TaskIn, TaskOut>::OutputManager(std::stop_token stoken) {
       }
     }
   }
-  g_logger.LogDebug("ThreadPool::Worker",
-                    type_ + " Thread Pool | Shutting down output manager");
 }
 
 template <class TaskIn, class TaskOut>
@@ -340,7 +325,8 @@ inline void ThreadPool<TaskIn, TaskOut>::AddThread() {
   worker_task_.emplace_back();
   worker_output_.emplace_back();
 
-  workers_.emplace_back(std::bind(&ThreadPool::Worker, this, std::placeholders::_1, worker_count_ + 1));
+  workers_.emplace_back(std::bind(&ThreadPool::Worker, this,
+                                  std::placeholders::_1, worker_count_ + 1));
   worker_count_.store(worker_count_.load() + 1);
 }
 

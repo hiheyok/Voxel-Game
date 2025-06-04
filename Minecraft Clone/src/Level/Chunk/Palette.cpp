@@ -2,10 +2,13 @@
 
 #include "Level/Chunk/Palette.h"
 
+#include "Core/GameContext/GameContext.h"
+#include "Level/Block/Blocks.h"
+
 Palette::Palette()
     : current_bit_width_{kMinBitWidth},
-      data_{kChunkSize3D, current_bit_width_} {
-  palette_entries_.emplace_back(g_blocks.AIR,
+      data_{kChunkSize3D, static_cast<size_t>(current_bit_width_)} {
+  palette_entries_.emplace_back(0, // TODO(hiheyok): Change this default state from 0 to blocks.AIR later
                                 static_cast<uint16_t>(kChunkSize3D));
 }
 
@@ -28,7 +31,7 @@ void Palette::Shrink() {
   // 2 pointers
 
   PaletteIndex curr = 0;
-  for (int i = 0; i < palette_entries_.size(); ++i) {
+  for (size_t i = 0; i < palette_entries_.size(); ++i) {
     if (palette_entries_[i].second == 0) continue;
     newBlockToPaletteIndex[curr] = palette_entries_[i];
     newPaletteIndex[i] = curr;

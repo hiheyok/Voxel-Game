@@ -5,8 +5,7 @@
 
 class OverworldDimension : public Dimension {
  public:
-  OverworldDimension(DimensionProperties properties)
-      : Dimension(properties, g_generators.MOUNTAINS) {}
+  OverworldDimension(GameContext&, DimensionProperties properties);
 
-  void Tick() override {}
+  void Tick() override;
 };

@@ -5,15 +5,15 @@
 #include <memory>
 #include <vector>
 
+#include "Core/GameContext/GameContext.h"
 #include "Level/Chunk/Chunk.h"
 #include "Level/Chunk/Heightmap/Heightmap.h"
 #include "Level/Light/LightStorage.h"
 #include "Level/World/WorldInterface.h"
 #include "Utils/Containers/FIFOQueue.h"
+
 static constexpr size_t kDefaultFifoQueueSize = 32768;
-
 static thread_local FixedFIFOQueue<uint16_t, kDefaultFifoQueueSize> FIFOQueues;
-
 static constexpr int8_t DIRECTION_OFFSETS[6][3] = {
     {-1, 0, 0}, {1, 0, 0},  // X: Left, Right
     {0, -1, 0}, {0, 1, 0},  // Y: Down, Up
@@ -34,7 +34,9 @@ inline void UnpackLightNode(uint16_t node, uint8_t& x, uint8_t& y, uint8_t& z,
   light = (node >> 12) & 0xF;
 }
 
-LightEngine::LightEngine(size_t thread_count, WorldInterface* interface) {
+LightEngine::LightEngine(GameContext& game_context, size_t thread_count,
+                         WorldInterface* interface)
+    : game_context_{game_context} {
   lighting_thread_pool_ =
       std::make_unique<ThreadPool<ChunkPos, WorkerReturnType>>(
           thread_count, "Light Engine",
@@ -124,8 +126,8 @@ void LightEngine::WorkOnChunkSkylight(Chunk* chunk,
     // Set node light level
     IncreaseLightLevel(light, nodeLight, nodeX, nodeY, nodeZ);
 
-    if (!g_blocks
-             .GetBlockProperties(
+    if (!game_context_.blocks_
+             ->GetBlockProperties(
                  chunk->GetBlockUnsafe(BlockPos{nodeX, nodeY, nodeZ}))
              .light_pass_) {
       continue;

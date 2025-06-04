@@ -10,6 +10,8 @@
 
 #include "../Client/IO/IO.h"
 
+class GameContext;
+
 struct WindowProperties {
   int window_size_x_ = 1280;
   int window_size_y_ = 720;
@@ -21,7 +23,7 @@ struct WindowProperties {
 
 class Window {
  public:
-  Window();
+  Window(GameContext&);
   ~Window();
 
   void Refresh();
@@ -46,7 +48,8 @@ class Window {
                         int mods);
   void ResizeWindowCallback(int x, int y);
   void ScrollCallback(GLFWwindow* win, double xoffset, double yoffset);
-
+  
+  GameContext& game_context_;
   UserInputs inputs_;
   WindowProperties properties_;
 

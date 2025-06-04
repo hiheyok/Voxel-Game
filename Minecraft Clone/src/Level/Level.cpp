@@ -3,17 +3,13 @@
 #include <memory>
 
 #include "Level/Dimension/Dimensions/Overworld.h"
-#include "Level/TerrainGeneration/Biome/BiomeProvider.h"
-#include "Level/TerrainGeneration/Biome/Biomes.h"
 
-Level::Level() = default;
+Level::Level(GameContext& game_context) : game_context_{game_context} {}
 Level::~Level() = default;
 
-void Level::Start(int worldGenThreadCount, int light_engine_thread_count_) {
+void Level::Start() {
   DimensionProperties properties;
-  main_world_ = std::make_unique<OverworldDimension>(properties);
-  Biomes::RegisterBiome();
-  BiomeProvider::init(kWorldSeed, new ChunkGeneratorSettings);
+  main_world_ = std::make_unique<OverworldDimension>(game_context_, properties);
 }
 
 void Level::Stop() {}

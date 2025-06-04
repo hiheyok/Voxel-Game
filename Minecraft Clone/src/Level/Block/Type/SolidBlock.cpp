@@ -2,6 +2,11 @@
 
 #include "Level/Block/Type/SolidBlock.h"
 
-SolidBlock::SolidBlock() { properties_->light_pass_ = false; }
+SolidBlock::SolidBlock(GameContext& game_context) : Block{game_context} {
+  properties_->light_pass_ = false;
+}
 
-void SolidBlock::Tick(BlockPos pos, Dimension* currentWorld) {}
+void SolidBlock::Tick(BlockPos pos, Dimension* current_world) {
+  (void)pos;
+  (void)current_world;
+}

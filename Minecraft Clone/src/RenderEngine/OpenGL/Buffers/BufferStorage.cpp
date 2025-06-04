@@ -4,30 +4,31 @@
 
 #include <GLFW/glfw3.h>
 
+#include <stdexcept>
+#include <string>
 #include <utility>
 
+#include "Core/GameContext/GameContext.h"
 #include "RenderEngine/OpenGL/Shader/ComputeShader.h"
 #include "Utils/LogUtils.h"
 
-BufferStorage::BufferStorage(GLuint bufferTarget, uint64_t size, bool dynamic,
-                             const void* data)
-    : copy_shader_{std::make_unique<ComputeShader>(
-          "assets/shaders/Buffers/CopyData.glsl")},
+BufferStorage::BufferStorage(GameContext& game_context, GLuint bufferTarget,
+                             uint64_t size, bool dynamic, const void* data)
+    : game_context_{game_context},
+      copy_shader_{std::make_unique<ComputeShader>(
+          game_context_, "assets/shaders/Buffers/CopyData.glsl")},
       move_shader_{std::make_unique<ComputeShader>(
-          "assets/shaders/Buffers/MoveData.glsl")} {
+          game_context_, "assets/shaders/Buffers/MoveData.glsl")} {
   target_ = bufferTarget;
   max_size_ = size;
 
   glGenBuffers(1, &buffer_storage_id_);
 
   if (buffer_storage_id_ == 0) {
-    g_logger.LogError("BufferStorage::Create", "glGenBuffers failed!");
-    max_size_ = 0;
-    target_ = 0;
-    return;
+    throw std::runtime_error("BufferStorage::Create - glGenBuffers failed!");
   }
 
-  g_logger.LogDebug(
+  game_context_.logger_->LogDebug(
       "BufferStorage::Create",
       "Generated buffer storage. ID: " + std::to_string(buffer_storage_id_));
   Bind();
@@ -46,13 +47,13 @@ BufferStorage::BufferStorage(GLuint bufferTarget, uint64_t size, bool dynamic,
   // Check for OpenGL errors after buffer storage creation
   GLenum err;
   if ((err = glGetError()) != GL_NO_ERROR) {
-    g_logger.LogError(
-        "BufferStorage::Create",
-        "OpenGL error after glBufferStorage: " + std::to_string(err));
-    return;
+    throw std::runtime_error(
+        "BufferStorage::Create - " +
+        std::string(
+            "OpenGL error after glBufferStorage: "));  // std::string(err)
   }
 
-  g_logger.LogInfo(
+  game_context_.logger_->LogInfo(
       "BufferStorage::Create",
       "Created buffer storage ID: " + std::to_string(buffer_storage_id_) +
           " Size: " + std::to_string(size) + " bytes, Target: " +
@@ -65,14 +66,15 @@ BufferStorage::~BufferStorage() {
     buffer_storage_id_ = 0;  // Use 0 to indicate deleted/uninitialized
     max_size_ = 0;
     target_ = 0;
-    g_logger.LogDebug(
+    game_context_.logger_->LogDebug(
         "BufferStorage::Delete",
         "Deleted buffer storage. ID was: " +
             std::to_string(buffer_storage_id_));  // Log before setting to 0
   }
 }
 
-BufferStorage::BufferStorage(BufferStorage&& buffer) noexcept {
+BufferStorage::BufferStorage(BufferStorage&& buffer) noexcept
+    : game_context_{buffer.game_context_} {
   (*this) = std::move(buffer);
 }
 
@@ -93,7 +95,7 @@ void BufferStorage::Bind() {
   if (buffer_storage_id_ != 0) {
     glBindBuffer(target_, buffer_storage_id_);
   } else {
-    g_logger.LogWarn(
+    game_context_.logger_->LogWarn(
         "BufferStorage::Bind",
         "Attempted to bind an uninitialized/deleted buffer storage.");
   }
@@ -104,18 +106,17 @@ void BufferStorage::Unbind() { glBindBuffer(target_, 0); }
 void BufferStorage::InsertData(uint64_t offset, uint64_t size,
                                const void* data) {
   if (buffer_storage_id_ == 0) {
-    g_logger.LogError("BufferStorage::InsertData",
-                      "Attempted InsertData on uninitialized buffer.");
-    return;
+    throw std::logic_error(
+        "BufferStorage::InsertData - Attempted InsertData on uninitialized "
+        "buffer.");
   }
 
   if (offset + size > max_size_) {
-    g_logger.LogError(
-        "BufferStorage::InsertData",
-        "InsertData exceeds buffer bounds. Offset: " + std::to_string(offset) +
-            ", Size: " + std::to_string(size) +
-            ", MaxSize: " + std::to_string(max_size_));
-    return;
+    throw std::logic_error(
+        "BufferStorage::InsertData - " +
+        std::string("InsertData exceeds buffer bounds. Offset: ") +
+        std::to_string(offset) + ", Size: " + std::to_string(size) +
+        ", MaxSize: " + std::to_string(max_size_));
   }
 
   Bind();
@@ -135,14 +136,14 @@ void BufferStorage::CopyTo(BufferStorage& destinationBuffer, size_t readOffset,
 void BufferStorage::CopyFrom(BufferStorage* sourceBuffer, size_t readOffset,
                              size_t writeOffset, size_t size) {
   if (buffer_storage_id_ == 0 || sourceBuffer->buffer_storage_id_ == 0) {
-    g_logger.LogError("BufferStorage::CopyFrom",
-                      "Attempted CopyFrom with uninitialized buffer(s).");
-    return;
+    throw std::logic_error(
+        "BufferStorage::CopyFrom - Attempted CopyFrom with uninitialized "
+        "buffer(s).");
   }
   if (writeOffset + size > max_size_ ||
       readOffset + size > sourceBuffer->max_size_) {
-    g_logger.LogError("BufferStorage::CopyFrom",
-                      "CopyFrom exceeds buffer bounds.");
+    throw std::range_error(
+        "BufferStorage::CopyFrom - CopyFrom exceeds buffer bounds.");
     return;
   }
 
@@ -162,14 +163,15 @@ void BufferStorage::CopyFrom(BufferStorage* sourceBuffer, size_t readOffset,
 void BufferStorage::CopyTo(BufferStorage* destinationBuffer, size_t readOffset,
                            size_t writeOffset, size_t size) {
   if (buffer_storage_id_ == 0 || destinationBuffer->buffer_storage_id_ == 0) {
-    g_logger.LogError("BufferStorage::CopyTo",
-                      "Attempted CopyTo with uninitialized buffer(s).");
+    game_context_.logger_->LogError(
+        "BufferStorage::CopyTo",
+        "Attempted CopyTo with uninitialized buffer(s).");
     return;
   }
   if (readOffset + size > max_size_ ||
       writeOffset + size > destinationBuffer->max_size_) {
-    g_logger.LogError("BufferStorage::CopyTo", "CopyTo exceeds buffer bounds.");
-    return;
+    throw std::range_error(
+        "BufferStorage::CopyTo - CopyTo exceeds buffer bounds.");
   }
   copy_shader_->BindBufferAsSSBO(buffer_storage_id_, 0)
       .BindBufferAsSSBO(destinationBuffer->buffer_storage_id_, 1)
@@ -187,14 +189,13 @@ void BufferStorage::CopyTo(BufferStorage* destinationBuffer, size_t readOffset,
 void BufferStorage::MoveData(size_t readOffset, size_t writeOffset,
                              size_t size) {
   if (buffer_storage_id_ == 0) {
-    g_logger.LogError("BufferStorage::MoveData",
-                      "Attempted MoveData with uninitialized buffer(s).");
-    return;
+    throw std::logic_error(
+        "BufferStorage::MoveData - Attempted MoveData with uninitialized "
+        "buffer(s).");
   }
   if (readOffset + size > max_size_ || writeOffset + size > max_size_) {
-    g_logger.LogError("BufferStorage::MoveData",
-                      "MoveData exceeds buffer bounds.");
-    return;
+    throw std::range_error(
+        "BufferStorage::MoveData - MoveData exceeds buffer bounds.");
   }
 
   move_shader_->BindBufferAsSSBO(buffer_storage_id_, 0)

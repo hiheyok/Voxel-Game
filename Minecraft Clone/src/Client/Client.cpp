@@ -10,6 +10,7 @@
 
 #include "Client/ClientPlay.h"
 #include "Client/IO/KEY_CODE.h"
+#include "Core/GameContext/GameContext.h"
 #include "Core/Interfaces/InternalInterface.h"
 #include "Core/Networking/Packet.h"
 #include "Core/Options/Option.h"
@@ -33,9 +34,11 @@
 #include "Utils/LogUtils.h"
 #include "Utils/Timer/Timer.h"
 
-Client::Client()
-    : server_{std::make_unique<Server>()},
-      text_render_{std::make_unique<TextRenderer>()},
+Client::Client(GameContext& game_context)
+    : Window{game_context},
+      game_context_{game_context},
+      server_{std::make_unique<Server>(game_context)},
+      text_render_{std::make_unique<TextRenderer>(game_context)},
       internal_interface_{std::make_unique<InternalInterface>()},
       profiler_{new PerformanceProfiler()} {}
 
@@ -44,26 +47,28 @@ Client::~Client() = default;
 void Client::InitializeServerCom() {
   // Start Server First
   ServerSettings settings;
-  settings.gen_thread_count_ = g_app_options.world_gen_threads_;
-  settings.light_engine_thread_count_ = g_app_options.light_engine_threads_;
+  settings.gen_thread_count_ = game_context_.options_->world_gen_threads_;
+  settings.light_engine_thread_count_ =
+      game_context_.options_->light_engine_threads_;
   settings.horizontal_ticking_distance_ =
-      g_app_options.horizontal_render_distance_;
-  settings.vertical_ticking_distance_ = g_app_options.vertical_render_distance_;
+      game_context_.options_->horizontal_render_distance_;
+  settings.vertical_ticking_distance_ =
+      game_context_.options_->vertical_render_distance_;
 
   // Joins the server it should start receiving stuff now
   server_->StartServer(settings);
   player_uuid_ = server_->SetInternalConnection(internal_interface_.get());
   client_play_ =
-      std::make_unique<ClientPlay>(internal_interface_.get(), this, profiler_);
+      std::make_unique<ClientPlay>(game_context_, internal_interface_.get(), this, profiler_);
 }
 void Client::InitializeGameContent() {
-  g_blocks.Initialize();
-  g_entity_list.Initialize();
+  game_context_.blocks_->Initialize();
+  game_context_.entities_list_->Initialize();
   text_render_->InitializeTextRenderer(GetWindow());
-  g_items.RegisterAll();
-  g_item_atlas.Initialize(512 * 16 * 2, 16 * 2 * 8);
-  for (auto& item : g_items.item_container_) {
-    g_item_atlas.AddItem(item.second);
+  game_context_.items_->RegisterAll();
+  game_context_.item_atlas_->Initialize(512 * 16 * 2, 16 * 2 * 8);
+  for (auto& item : game_context_.items_->item_container_) {
+    game_context_.item_atlas_->AddItem(item.second);
   }
 }
 
