@@ -366,6 +366,9 @@
     <ClCompile Include="src\Level\Dimension\Dimensions\Overworld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\RenderEngine\BlockModel\BlockModelManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Level\Chunk\Chunk.h">
@@ -885,6 +888,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\UI\Widgets\Widget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\BlockModel\BlockModelManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

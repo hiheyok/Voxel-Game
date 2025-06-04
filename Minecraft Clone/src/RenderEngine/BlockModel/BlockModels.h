@@ -111,7 +111,7 @@ struct BlockModel {
   bool CheckDisplay(DisplayPosition position);
   void AddElement(Cuboid element);
   void GetVertices(std::vector<float>& vertices,
-                   std::vector<uint32_t>& indices);
+                   std::vector<uint32_t>& indices) const;
   void FlattenVariables();
   void BakeTextureRotation();
 

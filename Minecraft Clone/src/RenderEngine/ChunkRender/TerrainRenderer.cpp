@@ -10,6 +10,7 @@
 
 #include "Core/GameContext/GameContext.h"
 #include "Core/Options/Option.h"
+#include "RenderEngine/BlockModel/BlockModelManager.h"
 #include "RenderEngine/Camera/camera.h"
 #include "RenderEngine/ChunkRender/Batch/ChunkBatch.h"
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
@@ -159,7 +160,7 @@ void TerrainRenderer::SetSettings(uint32_t renderDistance,
 
 void TerrainRenderer::LoadAssets() {
   cubic_shader_->BindTexture2D(
-      0, game_context_.blocks_->block_texture_atlas_->Get(), "BlockTexture");
+      0, game_context_.block_model_manager_->GetTextureAtlasID(), "BlockTexture");
 }
 
 void TerrainRenderer::AddChunk(ChunkPos pos, const std::vector<uint32_t>& data,

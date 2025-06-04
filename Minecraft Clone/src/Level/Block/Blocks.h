@@ -5,10 +5,8 @@
 #include <vector>
 
 #include "Core/Typenames.h"
-#include "RenderEngine/BlockModel/ModelLoader.h"
 #include "Type/BlockTypes.h"
 
-class BlockTextureAtlas;
 class GameContext;
 
 struct BlockModel;
@@ -23,15 +21,11 @@ class BlockList {
   Block* GetBlockType(BlockID id);
 
   GameContext& game_context_;
-  const BlockModel& GetBlockModel(BlockID) const;
   const BlockProperties& GetBlockProperties(BlockID) const;
 
   FastHashMap<std::string, BlockID> block_id_name_data_;
-  ModelLoader model_loader_;
   std::vector<Block*> block_type_data_;
   std::vector<BlockProperties> block_properties_;
-
-  std::unique_ptr<BlockTextureAtlas> block_texture_atlas_;
 
   BlockID AIR = RegisterBlock("minecraft:air", new AirBlock(game_context_));
   BlockID NULL_BLOCK =
@@ -704,9 +698,7 @@ class BlockList {
 
  private:
   BlockID RegisterBlock(std::string blockName, Block* block);
-
-  void InitializeBlockModels();
   void AddAssets(std::string namespaceIn);
-
+  
   int block_type_count_ = 0;
 };

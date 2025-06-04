@@ -30,7 +30,6 @@ class Client : public Window {
   void Cleanup();
   void Render();
   void InitializeServerCom();
-  void InitializeGameContent();
 
   double frametime_ = 0.5;
 

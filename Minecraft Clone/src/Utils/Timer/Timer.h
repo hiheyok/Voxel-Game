@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
+#pragma once
+
 #include <chrono>
 #include <string>
 

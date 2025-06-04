@@ -18,10 +18,11 @@ Fluid::Fluid(GameContext& game_context, int spread_rate) : Block{game_context} {
   fluid_properties_.spread_rate_ = spread_rate;
 }
 
-void Fluid::InitializeBlockModel(ModelLoader& modelLoader) {
+std::unique_ptr<BlockModel> Fluid::InitializeBlockModel(
+    ModelLoader& modelLoader) {
   (void)modelLoader;
   auto tokens = Tokenize(block_name_, ':');
-  block_model_data_ = std::make_unique<BlockModel>();
+  std::unique_ptr<BlockModel> block_model = std::make_unique<BlockModel>();
 
   BlockFace face;
   face.reference_texture_ =
@@ -49,9 +50,10 @@ void Fluid::InitializeBlockModel(ModelLoader& modelLoader) {
 
   cuboid.to_.y = 15;
 
-  block_model_data_->AddElement(cuboid);
-  block_model_data_->is_initialized_ = true;
-  block_model_data_->BakeTextureRotation();
+  block_model->AddElement(cuboid);
+  block_model->is_initialized_ = true;
+  block_model->BakeTextureRotation();
+  return block_model;
 }
 
 void Fluid::Tick(BlockPos pos, Dimension* currentWorld) {

@@ -228,6 +228,7 @@
     <ClCompile Include="src\Level\Level.cpp" />
     <ClCompile Include="src\Level\Light\LightEngine.cpp" />
     <ClCompile Include="src\Level\World\WorldInterface.cpp" />
+    <ClCompile Include="src\RenderEngine\BlockModel\BlockModelManager.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRender\BlockTextureAtlas.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexPacked.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Render\RenderDrawArrays.cpp" />
@@ -266,6 +267,7 @@
     <ClInclude Include="src\Level\Block\Type\AirBlock.h" />
     <ClInclude Include="src\Level\Block\Type\SolidBlock.h" />
     <ClInclude Include="src\Level\Entity\EntityType.h" />
+    <ClInclude Include="src\RenderEngine\BlockModel\BlockModelManager.h" />
     <ClInclude Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexPacked.h" />
     <ClInclude Include="src\RenderEngine\EntityRender\MultiEntityRender.h" />
     <ClCompile Include="src\RenderEngine\Frustum\frustum.cpp" />

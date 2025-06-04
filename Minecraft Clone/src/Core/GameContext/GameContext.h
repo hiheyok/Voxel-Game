@@ -12,9 +12,12 @@ class EntitiesList;
 class LogUtils;
 class Options;
 class ItemList;
-class ItemTextureAtlas;
 class GeneratorType;
 class EventHandler;
+
+// Rendering Context;
+class ItemTextureAtlas;
+class BlockModelManager;
 
 class GameContext {
  public:
@@ -32,8 +35,10 @@ class GameContext {
   std::unique_ptr<BlockList> blocks_;
   std::unique_ptr<EntitiesList> entities_list_;
   std::unique_ptr<ItemList> items_;
-  std::unique_ptr<ItemTextureAtlas> item_atlas_;
   std::unique_ptr<GeneratorType> generators_;
   std::unique_ptr<EventHandler> event_handler_;
-  
+
+  // Rendering Context
+  std::unique_ptr<ItemTextureAtlas> item_atlas_;
+  std::unique_ptr<BlockModelManager> block_model_manager_;
 };

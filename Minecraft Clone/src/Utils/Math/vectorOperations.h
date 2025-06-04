@@ -1,4 +1,7 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
+
 #include <cmath>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>

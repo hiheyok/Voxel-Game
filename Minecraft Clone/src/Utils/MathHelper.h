@@ -1,4 +1,7 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
+
 #define DEGTORAD 0.017453
 
 #include <glm/vec2.hpp>

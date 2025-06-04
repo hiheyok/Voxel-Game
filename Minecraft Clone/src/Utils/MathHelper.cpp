@@ -1,7 +1,9 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #include <cmath>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
-#define _CRTDBG_MAP_ALLOC
+
 double toRadians(double x) { return x * 0.01745329251; }
 
 float FindDistanceNoSqrt(float x, float y, float z, float x1, float y1,

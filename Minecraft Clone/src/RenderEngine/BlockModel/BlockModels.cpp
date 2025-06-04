@@ -63,8 +63,8 @@ bool BlockModel::CheckDisplay(DisplayPosition position) {
 void BlockModel::AddElement(Cuboid element) { elements_.push_back(element); }
 
 void BlockModel::GetVertices(std::vector<float>& vertices,
-                             std::vector<uint32_t>& indices) {
-  for (Cuboid& element : elements_) {
+                             std::vector<uint32_t>& indices) const {
+  for (const Cuboid& element : elements_) {
     glm::vec3 from = element.from_;
     glm::vec3 to = element.to_;
     from = from / 16.f;

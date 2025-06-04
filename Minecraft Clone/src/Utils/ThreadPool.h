@@ -1,4 +1,7 @@
+// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+
 #pragma once
+
 #include <atomic>
 #include <condition_variable>
 #include <deque>
@@ -99,6 +102,7 @@ inline ThreadPool<TaskIn, TaskOut>::~ThreadPool() {
 
   for (size_t i = 0; i < worker_count_.load(); ++i) {
     workers_[i].request_stop();
+    workers_[i].join();
   }
 
   worker_cv_.clear();

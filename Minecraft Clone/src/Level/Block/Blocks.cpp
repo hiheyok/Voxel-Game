@@ -19,14 +19,12 @@
 using json = nlohmann::json;
 
 BlockList::BlockList(GameContext& game_context)
-    : game_context_{game_context}, model_loader_{game_context} {}
+    : game_context_{game_context} {}
 
 BlockList::~BlockList() {
   for (const auto& obj : block_type_data_) {
     delete obj;
   }
-
-  block_type_data_.clear();
 }
 
 BlockID BlockList::RegisterBlock(std::string blockName, Block* block) {
@@ -76,29 +74,7 @@ void BlockList::AddAssets(std::string namespaceIn) {
   }
 }
 
-void BlockList::InitializeBlockModels() {
-  for (auto& block : block_type_data_) {
-    block->InitializeBlockModel(model_loader_);
-    block->InitializeTexture(*block_texture_atlas_);
-  }
-}
-
-void BlockList::Initialize() {
-  int individualTexSize = 16;
-
-  block_texture_atlas_ = std::make_unique<BlockTextureAtlas>(
-      game_context_, 512, 512, individualTexSize, individualTexSize);
-
-  InitializeBlockModels();
-
-  block_texture_atlas_->LoadToGPU();
-}
-
 Block* BlockList::GetBlockType(BlockID id) { return block_type_data_[id]; }
-
-const BlockModel& BlockList::GetBlockModel(BlockID id) const {
-  return *block_type_data_[id]->block_model_data_;
-}
 
 const BlockProperties& BlockList::GetBlockProperties(BlockID id) const {
   return block_properties_[id];

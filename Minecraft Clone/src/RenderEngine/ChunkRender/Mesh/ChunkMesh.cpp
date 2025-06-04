@@ -13,6 +13,7 @@
 #include "Level/Block/Type/Fluid.h"
 #include "Level/Chunk/Chunk.h"
 #include "Level/Light/LightStorage.h"
+#include "RenderEngine/BlockModel/BlockModelManager.h"
 #include "RenderEngine/BlockModel/BlockModels.h"
 #include "Utils/Timer/Timer.h"
 
@@ -130,9 +131,9 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
           ++pos[axis];
 
           const BlockModel& currModel =
-              game_context_.blocks_->GetBlockModel(currBlock);
+              game_context_.block_model_manager_->GetBlockModel(currBlock);
           const BlockModel& backModel =
-              game_context_.blocks_->GetBlockModel(backBlock);
+              game_context_.block_model_manager_->GetBlockModel(backBlock);
 
           bool blankCurrModel =
               !currModel.is_initialized_ || pos[axis] == kChunkDim;
@@ -502,7 +503,7 @@ bool Mesh::ChunkMeshData::IsFaceVisible(const Cuboid& cube, BlockPos block_pos,
   pos.IncrementSide(side, 1);
 
   const BlockModel& model =
-      game_context_.blocks_->GetBlockModel(GetCachedBlockID(pos));
+      game_context_.block_model_manager_->GetBlockModel(GetCachedBlockID(pos));
 
   if (!model.is_initialized_) return true;
 

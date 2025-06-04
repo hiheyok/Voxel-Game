@@ -45,15 +45,10 @@ class Direction {
   }
 
   constexpr int GetDirection() const { return direction_; }
-
   constexpr int GetOppositeDirection() const { return direction_ ^ 1; }
-
   constexpr int GetAxis() const { return direction_ >> 1; }
-
   constexpr bool IsPositive() const { return (direction_ & 1) == 0; }
-
   constexpr bool IsNegative() const { return (direction_ & 1) == 1; }
-
   constexpr operator int() const { return direction_; }
 
  private:

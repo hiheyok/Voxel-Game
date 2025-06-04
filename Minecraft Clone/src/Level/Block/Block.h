@@ -31,12 +31,12 @@ class Block {
   virtual void Tick(BlockPos pos, Dimension* currentWorld) = 0;
 
   // For client side
-  virtual void InitializeBlockModel(ModelLoader& modelLoader);
+  virtual std::unique_ptr<BlockModel> InitializeBlockModel(
+      ModelLoader& modelLoader);
   void InitializeTexture(BlockTextureAtlas& textureAtlas);
 
   GameContext& game_context_;
   BlockID id_ = 0;
-  std::unique_ptr<BlockModel> block_model_data_;
   std::unique_ptr<BlockProperties> properties_;
   std::string block_name_ = "";
 };

@@ -61,21 +61,14 @@ void Client::InitializeServerCom() {
   client_play_ =
       std::make_unique<ClientPlay>(game_context_, internal_interface_.get(), this, profiler_);
 }
-void Client::InitializeGameContent() {
-  game_context_.blocks_->Initialize();
-  game_context_.entities_list_->Initialize();
-  text_render_->InitializeTextRenderer(GetWindow());
-  game_context_.items_->RegisterAll();
-  game_context_.item_atlas_->Initialize(512 * 16 * 2, 16 * 2 * 8);
-  for (auto& item : game_context_.items_->item_container_) {
-    game_context_.item_atlas_->AddItem(item.second);
-  }
-}
 
 void Client::Initialize() {
+  game_context_.InitializeRenderingContext();
   DisableCursor();
-  InitializeGameContent();
   InitializeServerCom();
+
+  /// Initialize game rendering context
+
 }
 
 void Client::run() {

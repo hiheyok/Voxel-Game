@@ -9,6 +9,7 @@
 #include "Level/Block/Block.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Item/Item.h"
+#include "RenderEngine/BlockModel/BlockModelManager.h"
 #include "RenderEngine/BlockModel/BlockModels.h"
 #include "RenderEngine/Camera/camera.h"
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
@@ -52,22 +53,16 @@ void BlockItemRender::Initialize() {
   shader_->SetMat4("view", view);
   shader_->SetMat4("model", modelMat);
   shader_->SetMat4("projection", orthoProj);
-
-  shader_->BindTexture2D(0, game_context_.blocks_->block_texture_atlas_->Get(),
-                         "BlockTexture");
+  uint32_t texture_atlas = game_context_.block_model_manager_->GetTextureAtlasID();
+  shader_->BindTexture2D(0, texture_atlas, "BlockTexture");
 }
 
 void BlockItemRender::RenderBlock(Item item) {
-  if (game_context_.blocks_->GetBlockType(item.GetBlock())->block_model_data_ ==
-      0) {
-    return;
-  }
-
   std::vector<float> vertices{};
   std::vector<uint32_t> indices{};
 
-  game_context_.blocks_->GetBlockType(item.GetBlock())
-      ->block_model_data_->GetVertices(vertices, indices);
+  game_context_.block_model_manager_->GetBlockModel(item.GetBlock())
+      .GetVertices(vertices, indices);
 
   vbo_->InsertData(vertices, GL_STATIC_DRAW);
   ebo_->InsertData(indices, GL_STATIC_DRAW);
@@ -75,8 +70,9 @@ void BlockItemRender::RenderBlock(Item item) {
   camera_->screen_res_ = glm::vec2(16.f, 16.f);
 
   shader_->Use();
-  shader_->BindTexture2D(0, game_context_.blocks_->block_texture_atlas_->Get(),
-                         "BlockTexture");
+  shader_->BindTexture2D(
+      0, game_context_.block_model_manager_->GetTextureAtlasID(),
+      "BlockTexture");
   setDrawCalls();
   vao_->Bind();
   ebo_->Bind();
