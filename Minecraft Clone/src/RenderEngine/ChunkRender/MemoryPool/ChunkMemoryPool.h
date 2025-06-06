@@ -10,6 +10,8 @@
 class BufferStorage;
 class GameContext;
 
+struct BlockVertexFormat;
+
 struct ChunkMemoryPoolOffset {
   size_t mem_offset_ = 0;
   size_t mem_size_ = 0;
@@ -98,7 +100,7 @@ class ChunkGPUMemoryPool {
   ChunkGPUMemoryPool& operator=(const ChunkGPUMemoryPool&) = delete;
 
   void DeleteChunk(ChunkPos pos);
-  ChunkMemoryPoolOffset AddChunk(const std::vector<uint32_t>& vertices,
+  ChunkMemoryPoolOffset AddChunk(const std::vector<BlockVertexFormat>& vertices,
                                  ChunkPos pos);
   ChunkMemoryPoolOffset GetChunkMemoryPoolOffset(ChunkPos pos) const;
   bool CheckChunk(ChunkPos pos) const;

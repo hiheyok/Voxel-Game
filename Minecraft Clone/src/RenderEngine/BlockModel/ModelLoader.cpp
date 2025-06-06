@@ -185,13 +185,13 @@ void ModelLoader::UpdateModelElements(std::unique_ptr<BlockModel>& model,
 
     for (auto& subElements : item.value().items()) {
       if (subElements.key() == "from") {
-        std::vector<int> arr = GetJSONArrayValues(subElements.value());
+        std::vector<float> arr = GetJSONArrayValuesFloat(subElements.value());
         for (int i = 0; i < 3; i++) {
           cuboid.from_[i] = arr[i];
         }
         arr.clear();
       } else if (subElements.key() == "to") {
-        std::vector<int> arr = GetJSONArrayValues(subElements.value());
+        std::vector<float> arr = GetJSONArrayValuesFloat(subElements.value());
         for (int i = 0; i < 3; i++) {
           cuboid.to_[i] = arr[i];
         }

@@ -13,6 +13,7 @@ class ChunkDrawBatch;
 class GameContext;
 
 struct GLFWwindow;
+struct BlockVertexFormat;
 
 namespace Mesh {
 struct ChunkVertexData;
@@ -42,12 +43,12 @@ class TerrainRenderer {
   size_t amountOfMeshGenerated = 1;
 
  private:
-  void AddChunk(ChunkPos pos, const std::vector<uint32_t>& data,
+  void AddChunk(ChunkPos pos, const std::vector<BlockVertexFormat>& data,
                 std::vector<ChunkDrawBatch>& BatchType,
                 FastHashMap<ChunkPos, int>& LookUpMap);
   void CreateNewSolidBatch();
   void CreateNewTransparentBatch();
-   
+
   GameContext& game_context_;
   int horizontal_render_distance_ = 16;
   int vertical_render_distance_ = 16;

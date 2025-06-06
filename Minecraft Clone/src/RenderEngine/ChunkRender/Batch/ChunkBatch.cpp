@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 
+#include "RenderEngine/ChunkRender/Mesh/BlockVertexFormat.h"
 #include "RenderEngine/OpenGL/Buffers/BufferStorage.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "Utils/Timer/Timer.h"
@@ -35,10 +36,12 @@ void ChunkDrawBatch::SetupBuffers() {
   ibo_.InitializeData();
 
   array_
-      .EnableAttriPtr(memory_pool_.buffer_.get(), 0, 1, GL_FLOAT, GL_FALSE, 2,
+      .EnableAttriPtr(memory_pool_.buffer_.get(), 0, 3, GL_FLOAT, GL_FALSE, 5,
                       0)
-      .EnableAttriPtr(memory_pool_.buffer_.get(), 1, 1, GL_FLOAT, GL_FALSE, 2,
-                      1);
+      .EnableAttriPtr(memory_pool_.buffer_.get(), 1, 1, GL_FLOAT,
+                      GL_FALSE, 5, 3)
+      .EnableAttriPtr(memory_pool_.buffer_.get(), 2, 1, GL_FLOAT,
+                      GL_FALSE, 5, 4);
 
   ssbo_.SetMaxSize(max_buffer_size_ / 100);
   ssbo_.InitializeData();
@@ -88,8 +91,8 @@ void ChunkDrawBatch::GenDrawCommands(int renderDistance,
                                    static_cast<float>(z << kChunkDimLog2),
                                    24.3f)) {
         draw_commands_[index - 1].set(
-            static_cast<uint32_t>(data.mem_size_ >> 3), 1,
-            static_cast<uint32_t>(data.mem_offset_ >> 3), index);
+            static_cast<uint32_t>(data.mem_size_ / sizeof(BlockVertexFormat)), 1,
+            static_cast<uint32_t>(data.mem_offset_ / sizeof(BlockVertexFormat)), index);
         chunk_shader_pos_[(index - 1) * 3 + 0] = x;
         chunk_shader_pos_[(index - 1) * 3 + 1] = y;
         chunk_shader_pos_[(index - 1) * 3 + 2] = z;
@@ -115,9 +118,9 @@ void ChunkDrawBatch::UpdateCommandBufferSize() {
   chunk_shader_pos_.resize(render_list_.size() * 3);
 }
 
-bool ChunkDrawBatch::AddChunkVertices(const std::vector<uint32_t>& Data,
-                                      ChunkPos pos) {
-  ChunkMemoryPoolOffset memoryPoolBlockData = memory_pool_.AddChunk(Data, pos);
+bool ChunkDrawBatch::AddChunkVertices(
+    const std::vector<BlockVertexFormat>& data, ChunkPos pos) {
+  ChunkMemoryPoolOffset memoryPoolBlockData = memory_pool_.AddChunk(data, pos);
 
   if (memoryPoolBlockData.mem_offset_ == ULLONG_MAX) {
     return false;

@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "Core/GameContext/GameContext.h"
+#include "RenderEngine/ChunkRender/Mesh/BlockVertexFormat.h"
 #include "RenderEngine/OpenGL/Buffers/BufferStorage.h"
 #include "Utils/LogUtils.h"
 
@@ -286,9 +287,9 @@ void ChunkGPUMemoryPool::DeleteChunk(ChunkPos pos) {
 }
 
 ChunkMemoryPoolOffset ChunkGPUMemoryPool::AddChunk(
-    const std::vector<uint32_t>& vertices,
+    const std::vector<BlockVertexFormat>& vertices,
     ChunkPos pos) {  // assumes vertices.size() != 0
-  size_t blockSize = vertices.size() * sizeof(uint32_t);
+  size_t blockSize = vertices.size() * sizeof(vertices[0]);
   size_t blockOffset = memory_pool_.FindFreeSpace(blockSize);
 
   if (blockOffset ==

@@ -3,6 +3,7 @@
 #include "RenderEngine/OpenGL/Shader/ShaderInterface.h"
 
 #include <fstream>
+#include <iostream>
 #include <string>
 
 #include "Core/GameContext/GameContext.h"
@@ -293,11 +294,12 @@ GLuint ShaderInterface::CompileShader(std::string source, std::string type,
 
 void ShaderInterface::CheckCompileErrors(GLuint shader, std::string type) {
   GLint success;
-  GLchar infoLog[1024];
+  GLchar infoLog[2048];
   if (type != "PROGRAM") {
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success) {
-      glGetShaderInfoLog(shader, 1024, 0, infoLog);
+      glGetShaderInfoLog(shader, 2048, 0, infoLog);
+      std::cout << infoLog << '\n';
       game_context_.logger_->LogError("Shader::CheckCompileErrors",
                                       "Failed to compile" + type +
                                           " Shader: \n" + std::string(infoLog) +

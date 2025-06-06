@@ -3,11 +3,10 @@
 #pragma once
 #include <array>
 #include <bitset>
-#include <vector>
-
 #include <glm/ext.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <vector>
 
 #include "Core/Typenames.h"
 
@@ -17,15 +16,16 @@ class GameContext;
 struct Cuboid;
 struct BlockFace;
 struct BlockModel;
+struct BlockVertexFormat;
 
 namespace Mesh {
 struct ChunkVertexData {
   ChunkVertexData() = default;
   ~ChunkVertexData() = default;
 
-  std::vector<uint32_t> solid_vertices_;
-  std::vector<uint32_t> transparent_vertices_;
-  std::vector<uint32_t> fluid_vertices_buffer_;
+  std::vector<BlockVertexFormat> solid_vertices_;
+  std::vector<BlockVertexFormat> transparent_vertices_;
+  std::vector<BlockVertexFormat> fluid_vertices_buffer_;
 
   ChunkPos position_;
 };
@@ -43,10 +43,10 @@ class ChunkMeshData {
 
   GameContext& game_context_;
   // Mesh Vertices
-  std::vector<uint32_t> vertices_buffer_;
-  std::vector<uint32_t> transparent_vertices_buffer_;
-  std::vector<uint32_t> solid_fluid_vertices_buffer_;
-  std::vector<uint32_t> transparent_fluid_vertices_buffer_;
+  std::vector<BlockVertexFormat> vertices_buffer_;
+  std::vector<BlockVertexFormat> transparent_vertices_buffer_;
+  std::vector<BlockVertexFormat> solid_fluid_vertices_buffer_;
+  std::vector<BlockVertexFormat> transparent_fluid_vertices_buffer_;
 
   size_t transparent_face_count_ = 0;
   size_t solid_face_count_ = 0;
@@ -72,25 +72,22 @@ class ChunkMeshData {
   bool CompareBlockSide(BlockPos pos, uint8_t side, BlockID b);
 
   // Add faces to the mesh
-  void AddModelToMesh(const BlockModel& curr_model,
-                      const BlockModel& back_model, glm::ivec3 pos,
-                      int u_length, int v_length, bool curr_blank,
-                      bool back_blank, int axis);
-  void AddFaceToMesh(const BlockFace& face, uint8_t axis, glm::ivec3 from,
-                     glm::ivec3 to, bool allow_ao, BlockPos pos);
+  void AddFaceToMesh(const BlockFace& face, uint8_t axis, glm::vec3 from,
+                     glm::vec3 to, bool allow_ao, BlockPos pos);
 
   const BlockID& GetCachedBlockID(BlockPos pos) const noexcept;
   void SetCachedBlockID(BlockID b, BlockPos pos) noexcept;
 
-  glm::u8vec4 GetAO(uint8_t direction, BlockPos pos);
+  void GetAO(int direction, BlockPos pos, int& ao_00, int& ao_01,
+             int& ao_10, int& ao_11);
 
-  static constexpr uint64_t kBufferStepSize = 262144;
+  static constexpr uint64_t kBufferStepSize = 4096;
 
   Chunk* chunk_;
 
   // TODO(hiheyok): 3 x is to use cache locality for processing for each axis
   // (haven't implemented yet)
-  std::array<BlockID, (kChunkDim + 2) * (kChunkDim + 2) * (kChunkDim + 2) * 3>
+  std::array<BlockID, (kChunkDim + 2) * (kChunkDim + 2) * (kChunkDim + 2)>
       chunk_cache_;
   std::bitset<(kChunkDim + 2) * (kChunkDim + 2) * (kChunkDim + 2)> is_fluid_;
 };

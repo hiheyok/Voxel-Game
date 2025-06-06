@@ -9,6 +9,7 @@ class Shader;
 class Camera;
 class Item;
 class GameContext;
+class RenderDrawElements;
 
 class BlockItemRender {
  public:
@@ -21,9 +22,7 @@ class BlockItemRender {
  private:
 
   GameContext& game_context_;
-  std::unique_ptr<VertexArray> vao_;
-  std::unique_ptr<Buffer> ebo_, vbo_;
-  std::unique_ptr<Shader> shader_;
+  std::unique_ptr<RenderDrawElements> render_;
   std::unique_ptr<Camera> camera_;
 
   void SetCamera();

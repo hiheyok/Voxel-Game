@@ -15,14 +15,8 @@
 #include "Level/Light/LightStorage.h"
 #include "RenderEngine/BlockModel/BlockModelManager.h"
 #include "RenderEngine/BlockModel/BlockModels.h"
+#include "RenderEngine/ChunkRender/Mesh/BlockVertexFormat.h"
 #include "Utils/Timer/Timer.h"
-
-static constexpr int kPositionOffset = 16;
-static constexpr int kBitShiftAmount = 9;          // 27 bits
-static constexpr int kNormBitOffset = 27;          // 2 bits
-static constexpr int kTintBitOffset = 29;          // 1 bit
-static constexpr int kTextureBitOffset = 10;       // 18 bits
-static constexpr int kBlockShadingBitOffset = 28;  // 4 bits
 
 Mesh::ChunkMeshData::ChunkMeshData(GameContext& game_context)
     : game_context_{game_context} {
@@ -33,11 +27,11 @@ Mesh::ChunkMeshData::~ChunkMeshData() = default;
 
 void Mesh::ChunkMeshData::Reset() {
   if (vertices_buffer_.size() != kBufferStepSize) {
-    vertices_buffer_.resize(kBufferStepSize, 0);
+    vertices_buffer_.resize(kBufferStepSize);
   }
 
   if (transparent_vertices_buffer_.size() != kBufferStepSize) {
-    transparent_vertices_buffer_.resize(kBufferStepSize, 0);
+    transparent_vertices_buffer_.resize(kBufferStepSize);
   }
 
   transparent_face_count_ = 0;
@@ -125,9 +119,9 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
 
           usedBlock[(pos[axisU] << 4) + pos[axisV]] = 0xFF;
 
-          const BlockID& currBlock = GetCachedBlockID(pos);
+          BlockID currBlock = GetCachedBlockID(pos);
           --pos[axis];
-          const BlockID& backBlock = GetCachedBlockID(pos);
+          BlockID backBlock = GetCachedBlockID(pos);
           ++pos[axis];
 
           const BlockModel& currModel =
@@ -291,98 +285,141 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
   }
 }
 
-void Mesh::ChunkMeshData::AddFaceToMesh(const BlockFace& face, uint8_t axis_,
-                                        glm::ivec3 from_, glm::ivec3 to_,
+void Mesh::ChunkMeshData::AddFaceToMesh(const BlockFace& face, uint8_t axis,
+                                        glm::vec3 from, glm::vec3 to,
                                         bool allowAO, BlockPos pos) {
-  uint8_t NN = 15, PN = 15, PP = 15, NP = 15;
-  uint8_t direction = axis_ & 0b1;
-  uint8_t facing = axis_ >> 1;
+  // First get some of the general data
+  int direction = axis & 1;
+  int facing = axis >> 1;
 
-  int x = pos.x * kChunkDim;
-  int y = pos.y * kChunkDim;
-  int z = pos.z * kChunkDim;
+  std::vector<BlockVertexFormat>& vertex_buffer =
+      face.partially_transparent_pixel_ ? transparent_vertices_buffer_
+                                        : vertices_buffer_;
 
-  glm::ivec3 P0{x + from_[0] + kPositionOffset, y + from_[1] + kPositionOffset,
-                z + from_[2] + kPositionOffset};
-  glm::ivec3 P1{x + to_[0] + kPositionOffset, y + to_[1] + kPositionOffset,
-                z + to_[2] + kPositionOffset};
+  size_t& face_count = face.partially_transparent_pixel_
+                           ? transparent_face_count_
+                           : solid_face_count_;
 
-  glm::ivec2 texNN = face.uv_coord_nn;
-  glm::ivec2 texPN = face.uv_coord_np;
-  glm::ivec2 texPP = face.uv_coord_pp;
-  glm::ivec2 texNP = face.uv_coord_pn;
+  size_t vertex_index = face_count * 6;
 
-  texNN.y <<= 5;
-  texNP.y <<= 5;
-  texPP.y <<= 5;
-  texPN.y <<= 5;
+  // Resize buffer if it is soo too small
+  if (vertex_buffer.size() <= (face_count + 1) * 6) {
+    vertex_buffer.resize(vertex_buffer.size() + kBufferStepSize);
+  }
 
-  P0.x <<= 0;
-  P1.x <<= 0;
-  P0.y <<= kBitShiftAmount;
-  P1.y <<= kBitShiftAmount;
-  P0.z <<= kBitShiftAmount * 2;
-  P1.z <<= kBitShiftAmount * 2;
+  // Now calculate the AO, lighting, colors
+  int ao[4] = {0};  // 0: NN, 1: NP, 2: PN, 3: PP
+  if (allowAO) {
+    GetAO(axis, pos, ao[0], ao[1], ao[2], ao[3]);
+  }
 
-  glm::ivec3 tP0 = P0;
-  glm::ivec3 tP1 = P1;
+  float ao_multi[4] = {1.0f - static_cast<float>(ao[0]) / 5.0f,
+                       1.0f - static_cast<float>(ao[1]) / 5.0f,
+                       1.0f - static_cast<float>(ao[2]) / 5.0f,
+                       1.0f - static_cast<float>(ao[3]) / 5.0f};
 
-  P0.x = tP0[facing % 3];
-  P1.x = tP1[facing % 3];
-  P0.y = tP0[(facing + 1) % 3];
-  P1.y = tP1[(facing + 1) % 3];
-  P0.z = tP0[(facing + 2) % 3];
-  P1.z = tP1[(facing + 2) % 3];
+  int sky_light = chunk_->lighting_->GetLighting(pos);
+  int block_light = 0;
 
-  if (direction == 0) std::swap(P0.x, P1.x);
-  if (facing == 2) std::swap(texPN, texNP);
+  glm::vec3 tint_color{1.0f};
+  if (face.tint_index_ != -1) {
+    tint_color = glm::vec3(93.0f / 255.0f, 200.0f / 255.0f, 62.0f / 255.0f);
+  }
 
-  uint32_t tex = face.texture_id_ << kTextureBitOffset;
-  uint32_t norm = facing << kNormBitOffset;
-  uint32_t tint = (static_cast<uint32_t>(!!face.tint_index_)) << kTintBitOffset;
+  // Now compute the vertices
+  auto CreateVertex = [&](const glm::ivec2& uv, float ao_multiplier) {
+    BlockVertexFormat v;
+    glm::vec4 color(tint_color * ao_multiplier, 1.0f);
+    // Assuming BlockVertexFormat::Set now takes a vec4 for color
+    v.SetColor(static_cast<int>(color.r * 255), static_cast<int>(color.g * 255),
+               static_cast<int>(color.b * 255), 255);
+    v.SetUV(face.texture_id_, uv.x, uv.y);
+    v.SetLight(sky_light, block_light);
+    return v;
+  };
 
-  std::vector<uint32_t>& out = face.partially_transparent_pixel_
-                                   ? transparent_vertices_buffer_
-                                   : vertices_buffer_;
-
-  uint64_t currIndex = face.partially_transparent_pixel_
-                           ? transparent_face_count_++
-                           : solid_face_count_++;
-
-  if (out.size() <= (currIndex + 1) * 12)
-    out.resize(out.size() + kBufferStepSize);
-
-  // Get AO
-  glm::u8vec4 AO = allowAO ? GetAO(axis_, pos) : glm::u8vec4{15, 15, 15, 15};
-
-  PP = AO[0], PN = AO[1], NP = AO[2], NN = AO[3];
-
-  out[currIndex * 12 + 0] = 0u | P0[0] | P0[1] | P0[2] | norm | tint;
-  out[currIndex * 12 + 1] =
-      0u | texNN.x | texNN.y | tex | (NN << kBlockShadingBitOffset);
-  out[currIndex * 12 + 2] = 0u | P0[0] | P1[1] | P0[2] | norm | tint;
-  out[currIndex * 12 + 3] =
-      0u | texPN.x | texPN.y | tex | (PN << kBlockShadingBitOffset);
-  out[currIndex * 12 + 4] = 0u | P0[0] | P0[1] | P1[2] | norm | tint;
-  out[currIndex * 12 + 5] =
-      0u | texNP.x | texNP.y | tex | (NP << kBlockShadingBitOffset);
-  out[currIndex * 12 + 6] = 0u | P0[0] | P0[1] | P1[2] | norm | tint;
-  out[currIndex * 12 + 7] =
-      0u | texNP.x | texNP.y | tex | (NP << kBlockShadingBitOffset);
-  out[currIndex * 12 + 8] = 0u | P0[0] | P1[1] | P0[2] | norm | tint;
-  out[currIndex * 12 + 9] =
-      0u | texPN.x | texPN.y | tex | (PN << kBlockShadingBitOffset);
-  out[currIndex * 12 + 10] = 0u | P0[0] | P1[1] | P1[2] | norm | tint;
-  out[currIndex * 12 + 11] =
-      0u | texPP.x | texPP.y | tex | (PP << kBlockShadingBitOffset);
+  glm::vec3 min_offset = from / 16.0f;
+  glm::vec3 max_offset = to / 16.0f;
+  glm::vec3 base_pos{pos.x, pos.y, pos.z};
 
   if (direction == 0) {
-    std::swap(out[currIndex * 12 + 2], out[currIndex * 12 + 4]);
-    std::swap(out[currIndex * 12 + 3], out[currIndex * 12 + 5]);
-
-    std::swap(out[currIndex * 12 + 8], out[currIndex * 12 + 10]);
-    std::swap(out[currIndex * 12 + 9], out[currIndex * 12 + 11]);
+    base_pos[facing] += max_offset[facing];
+  } else {
+    base_pos[facing] += min_offset[facing];
   }
+
+  glm::ivec2 uv_coord_00 = face.uv_coord_00;
+  glm::ivec2 uv_coord_01 = face.uv_coord_10;
+  glm::ivec2 uv_coord_10 = face.uv_coord_01;
+  glm::ivec2 uv_coord_11 = face.uv_coord_11;
+
+  BlockVertexFormat v_00, v_10, v_11, v_01;
+  v_00 = CreateVertex(uv_coord_00, ao_multi[0]);
+  v_01 = CreateVertex(uv_coord_01, ao_multi[1]);
+  v_10 = CreateVertex(uv_coord_10, ao_multi[2]);
+  v_11 = CreateVertex(uv_coord_11, ao_multi[3]);
+
+  // Now work on positions
+  switch (facing) {
+    case 0:  // x axis
+      v_00.SetPos(base_pos.x, base_pos.y + min_offset.y,
+                  base_pos.z + min_offset.z);
+      v_10.SetPos(base_pos.x, base_pos.y + max_offset.y,
+                  base_pos.z + min_offset.z);
+      v_11.SetPos(base_pos.x, base_pos.y + max_offset.y,
+                  base_pos.z + max_offset.z);
+      v_01.SetPos(base_pos.x, base_pos.y + min_offset.y,
+                  base_pos.z + max_offset.z);
+      break;
+    case 1:
+      v_00.SetPos(base_pos.x + min_offset.x, base_pos.y,
+                  base_pos.z + min_offset.z);
+      v_10.SetPos(base_pos.x + min_offset.x, base_pos.y,
+                  base_pos.z + max_offset.z);
+      v_11.SetPos(base_pos.x + max_offset.x, base_pos.y,
+                  base_pos.z + max_offset.z);
+      v_01.SetPos(base_pos.x + max_offset.x, base_pos.y,
+                  base_pos.z + min_offset.z);
+      break;
+    case 2:
+      v_00.SetPos(base_pos.x + min_offset.x, base_pos.y + min_offset.y,
+                  base_pos.z);
+      v_10.SetPos(base_pos.x + max_offset.x, base_pos.y + min_offset.y,
+                  base_pos.z);
+      v_11.SetPos(base_pos.x + max_offset.x, base_pos.y + max_offset.y,
+                  base_pos.z);
+      v_01.SetPos(base_pos.x + min_offset.x, base_pos.y + max_offset.y,
+                  base_pos.z);
+  }
+
+  if (ao[0] + ao[3] <= ao[1] + ao[2]) {
+    // Flipped quad
+    vertex_buffer[vertex_index + 0] = v_00;
+    vertex_buffer[vertex_index + 1] = v_10;
+    vertex_buffer[vertex_index + 2] = v_11;
+
+    vertex_buffer[vertex_index + 3] = v_00;
+    vertex_buffer[vertex_index + 4] = v_11;
+    vertex_buffer[vertex_index + 5] = v_01;
+  } else {
+    // Normal quad
+    vertex_buffer[vertex_index + 0] = v_00;
+    vertex_buffer[vertex_index + 1] = v_10;
+    vertex_buffer[vertex_index + 2] = v_01;
+
+    vertex_buffer[vertex_index + 3] = v_01;
+    vertex_buffer[vertex_index + 4] = v_10;
+    vertex_buffer[vertex_index + 5] = v_11;
+  }
+
+  // Flip vertices for face culling
+
+  if (direction == 0) {
+    std::swap(vertex_buffer[vertex_index + 1], vertex_buffer[vertex_index + 2]);
+    std::swap(vertex_buffer[vertex_index + 4], vertex_buffer[vertex_index + 5]);
+  }
+
+  ++face_count;
 }
 
 const BlockID& Mesh::ChunkMeshData::GetCachedBlockID(
@@ -393,103 +430,73 @@ const BlockID& Mesh::ChunkMeshData::GetCachedBlockID(
 void Mesh::ChunkMeshData::SetCachedBlockID(BlockID b, BlockPos pos) noexcept {
   chunk_cache_[(pos.x + 1) * (kChunkDim + 2) * (kChunkDim + 2) +
                (pos.z + 1) * (kChunkDim + 2) + (pos.y + 1)] = b;
-  // is_fluid_.set((x + 1) * (kChunkDim + 2) * (kChunkDim + 2) + (z + 1) *
-  // (kChunkDim + 2) + (y + 1),
-  // game_context_.blocks_->GetBlockProperties(b).is_fluid_);
 }
 
-glm::u8vec4 Mesh::ChunkMeshData::GetAO(uint8_t direction, BlockPos block_pos) {
-  static constexpr uint8_t kAmbientOcclusionStrength = 2;
-  BlockPos pos = block_pos;
+void Mesh::ChunkMeshData::GetAO(int direction, BlockPos pos, int& ao_00,
+                                int& ao_01, int& ao_10, int& ao_11) {
+  ao_00 = 0;
+  ao_01 = 0;
+  ao_10 = 0;
+  ao_11 = 0;
 
-  char initial_lighting = chunk_->lighting_->GetLighting(pos);
-
-  uint8_t PP{15}, PN{15}, NP{15}, NN{15};
-
-  uint8_t axis = direction >> 1;
-  uint8_t facing = direction & 1;
+  int axis = direction >> 1;
+  int facing = direction & 1;
 
   pos[axis] += 1 - 2 * facing;
 
   // Check up down left right
 
-  int axis1 = (axis + 1) % 3;
-  int axis2 = (axis + 2) % 3;
+  int axis_1 = (axis + 1) % 3;
+  int axis_2 = (axis + 2) % 3;
 
   // Check up
-  pos[axis1] += 1;
+  pos[axis_1] += 1;
 
   if (GetCachedBlockID(pos) != game_context_.blocks_->AIR) {
-    PP -= kAmbientOcclusionStrength;
-    PN -= kAmbientOcclusionStrength;
+    ao_11++;
+    ao_10++;
   }
 
-  pos[axis1] -= 2;
+  pos[axis_1] -= 2;
 
   if (GetCachedBlockID(pos) != game_context_.blocks_->AIR) {
-    NP -= kAmbientOcclusionStrength;
-    NN -= kAmbientOcclusionStrength;
+    ao_01++;
+    ao_00++;
   }
 
-  pos[axis1] += 1;
-  pos[axis2] += 1;
+  pos[axis_1] += 1;
+  pos[axis_2] += 1;
 
   if (GetCachedBlockID(pos) != game_context_.blocks_->AIR) {
-    NP -= kAmbientOcclusionStrength;
-    PP -= kAmbientOcclusionStrength;
+    ao_01++;
+    ao_11++;
   }
 
-  pos[axis2] -= 2;
+  pos[axis_2] -= 2;
 
   if (GetCachedBlockID(pos) != game_context_.blocks_->AIR) {
-    PN -= kAmbientOcclusionStrength;
-    NN -= kAmbientOcclusionStrength;
+    ao_10++;
+    ao_00++;
   }
 
-  pos[axis2] += 1;
+  pos[axis_2] += 1;
 
   // Check corners now
-  pos[axis1] += 1;
-  pos[axis2] += 1;
+  pos[axis_1] += 1;
+  pos[axis_2] += 1;
 
-  if (GetCachedBlockID(pos) != game_context_.blocks_->AIR)
-    PP -= kAmbientOcclusionStrength;
+  if (GetCachedBlockID(pos) != game_context_.blocks_->AIR) ao_11++;
 
-  pos[axis1] -= 2;
-  if (GetCachedBlockID(pos) != game_context_.blocks_->AIR)
-    NP -= kAmbientOcclusionStrength;
+  pos[axis_1] -= 2;
+  if (GetCachedBlockID(pos) != game_context_.blocks_->AIR) ao_01++;
 
-  pos[axis2] -= 2;
+  pos[axis_2] -= 2;
 
-  if (GetCachedBlockID(pos) != game_context_.blocks_->AIR)
-    NN -= kAmbientOcclusionStrength;
+  if (GetCachedBlockID(pos) != game_context_.blocks_->AIR) ao_00++;
 
-  pos[axis1] += 2;
+  pos[axis_1] += 2;
 
-  if (GetCachedBlockID(pos) != game_context_.blocks_->AIR)
-    PN -= kAmbientOcclusionStrength;
-
-  if (PP >= (15 - initial_lighting))
-    PP = PP - (15 - initial_lighting);
-  else
-    PP = 0;
-
-  if (PN >= (15 - initial_lighting))
-    PN = PN - (15 - initial_lighting);
-  else
-    PN = 0;
-
-  if (NN >= (15 - initial_lighting))
-    NN = NN - (15 - initial_lighting);
-  else
-    NN = 0;
-
-  if (NP >= (15 - initial_lighting))
-    NP = NP - (15 - initial_lighting);
-  else
-    NP = 0;
-
-  return glm::u8vec4(PP, PN, NP, NN);
+  if (GetCachedBlockID(pos) != game_context_.blocks_->AIR) ao_10++;
 }
 
 // Checks if a block side is visible to the player

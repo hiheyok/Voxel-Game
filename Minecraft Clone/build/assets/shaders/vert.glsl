@@ -1,62 +1,55 @@
 #version 450 core
 
 #extension GL_ARB_shader_draw_parameters : enable
-#define OFFSET -16.f
+const float kMultiplier = 0.001953125;
+const uint kColorMask = 255;
+const uint kTextureMask = (1 << 14) - 1;
+const uint kUVMask = (1 << 5) - 1;
+const uint kLightMask = (1 << 4) - 1;
 
-layout (location = 0) in uint data;
-layout (location = 1) in uint tdata;
+layout (location = 0) in vec3 vertices_positions;
+layout (location = 1) in uint color_data;
+layout (location = 2) in uint tex_uv_light_data;
 
 layout (std430, binding = 2) buffer ChunkPosBuffer {
-     int ChunkPos[100000];
+     int chunk_pos[100000];
 };
 
-out uint texturePosition;
-out float lights;
-out vec3 poss;
-out vec2 textureSize;
-out uint norm;
-out uint tintIndex;
+out uint texture_id;
+out vec3 global_vert;
+out vec2 texture_uv;
+out float sky_light;
+out float block_light;
+out vec4 color;
 
 uniform mat4 model;
 uniform mat4 projection;
 uniform mat4 view;
 
-#define xDataBitOffset 0
-#define yDataBitOffset 9
-#define zDataBitOffset 18
-#define faceNormInfoOffset 27
-#define tintBitOffset 29
-
-#define textureBitOffset 10
-#define lightDataBitOffset 28
-
-float dataToFloat(int index, int size) {
-    return float((((1u << size) - 1u) & (data >> index)));
-}
-
-float tdataToFloat(int index, int size) {
-    return float((((1u << size) - 1u) & (tdata >> index)));
-}
-
-uint dataToUINT(int index, int size) {
-    return ((((1u << size) - 1u) & (data >> index)));
-}
-
-uint tdataToUINT(int index, int size) {
-    return uint((((1u << size) - 1u) & (tdata >> index)));
-}
-
 void main() {
-    vec3 pos = vec3(dataToFloat(xDataBitOffset, 9) + OFFSET,dataToFloat(yDataBitOffset, 9) + OFFSET,dataToFloat(zDataBitOffset, 9) + OFFSET) * 0.0625f;
+    global_vert = vertices_positions + vec3(chunk_pos[0 + (3 * gl_DrawIDARB)], chunk_pos[1 + (3 * gl_DrawIDARB)], chunk_pos[2 + (3 * gl_DrawIDARB)]) * 16;
+    // Unpack the 8 bit colors
+    float r = float((color_data >> 0) & 255) / 255.f;
+    float g = float((color_data >> 8) & 255) / 255.f;
+    float b = float((color_data >> 16) & 255) / 255.f;
+    float a = float((color_data >> 24) & 255) / 255.f;
+    color = vec4(r, g, b, a);
 
-    texturePosition = tdataToUINT(textureBitOffset, 18);
-    textureSize = vec2(tdataToFloat(0, 5),tdataToFloat(5, 5))* 0.0625f;
-    norm = dataToUINT(faceNormInfoOffset, 2);
-    lights = tdataToFloat(lightDataBitOffset, 4) / 16.f;
-    tintIndex  = dataToUINT(tintBitOffset, 3);
+    // Unpack the texture uv light
+    texture_id = (tex_uv_light_data & kTextureMask) - 1;
 
-    vec3 VerticePos = vec3(pos.x + (ChunkPos[0 + (3 * gl_DrawIDARB)]* 16),pos.y + (ChunkPos[1 + (3 * gl_DrawIDARB)] * 16),pos.z + (ChunkPos[2 + (3 * gl_DrawIDARB)] * 16));
+    // Work on uv coordinates
+    float u = float((tex_uv_light_data >> 14) & kUVMask) / 16.f;
+    float v = float((tex_uv_light_data >> 19) & kUVMask) / 16.f;
+    u *= kMultiplier;
+    v *= kMultiplier;
+    float u_offset = float(texture_id & 511) * kMultiplier;
+    float v_offset = float(texture_id >> 9) * kMultiplier;
+    texture_uv = vec2(u + u_offset, v + v_offset);
 
-    poss = VerticePos;
-    gl_Position = projection * view * model * vec4(VerticePos, 1.f);
+    // Work on lighting
+    sky_light = float((tex_uv_light_data >> 24) & kLightMask) / 15.f;
+    block_light = float((tex_uv_light_data >> 28) & kLightMask) / 15.f;
+
+    gl_Position = projection * view * model * vec4(global_vert, 1.f);
 }

@@ -292,21 +292,26 @@ void BlockModel::GetVertices(std::vector<float>& vertices,
 
 void BlockModel::BakeTextureRotation() {
   for (Cuboid& element : elements_) {
-    for (BlockFace& face : element.faces_) {
+    for (auto direction : Directions<BlockPos>()) {
+      BlockFace& face = element.faces_[direction];
       if (face.reference_texture_.length() == 0)
         continue;  // means not initialized
 
       int rotation_ = face.rotation_;
 
-      face.uv_coord_nn = glm::ivec2(face.uv_.x, face.uv_.y);
-      face.uv_coord_np = glm::ivec2(face.uv_.x, face.uv_.w);
-      face.uv_coord_pp = glm::ivec2(face.uv_.z, face.uv_.w);
-      face.uv_coord_pn = glm::ivec2(face.uv_.z, face.uv_.y);
+      face.uv_coord_00 = glm::ivec2(face.uv_.x, face.uv_.y);
+      face.uv_coord_01 = glm::ivec2(face.uv_.x, face.uv_.w);
+      face.uv_coord_11 = glm::ivec2(face.uv_.z, face.uv_.w);
+      face.uv_coord_10 = glm::ivec2(face.uv_.z, face.uv_.y);
 
       for (int r = 0; r < rotation_; r += 90) {
-        std::swap(face.uv_coord_nn, face.uv_coord_np);
-        std::swap(face.uv_coord_nn, face.uv_coord_pn);
-        std::swap(face.uv_coord_pn, face.uv_coord_pp);
+        std::swap(face.uv_coord_00, face.uv_coord_01);
+        std::swap(face.uv_coord_00, face.uv_coord_10);
+        std::swap(face.uv_coord_10, face.uv_coord_11);
+      }
+
+      if (direction.GetAxis() == Directions<BlockPos>::kZAxis) {
+        std::swap(face.uv_coord_10, face.uv_coord_01);
       }
     }
   }

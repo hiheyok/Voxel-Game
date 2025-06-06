@@ -14,6 +14,7 @@
 #include "RenderEngine/Camera/camera.h"
 #include "RenderEngine/ChunkRender/Batch/ChunkBatch.h"
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
+#include "RenderEngine/ChunkRender/Mesh/BlockVertexFormat.h"
 #include "RenderEngine/ChunkRender/Mesh/ChunkMesh.h"
 #include "RenderEngine/Frustum/frustum.h"
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
@@ -126,7 +127,7 @@ void TerrainRenderer::Update() {
       glm::radians(camera_->fov_), static_cast<float>(x) / y, 0.1f, 1000000.0f);
   cubic_shader_->Use();
 
-  float clrMultiplier = 1.4f;
+  float clrMultiplier = 1.0f;
 
   cubic_shader_->SetMat4("view", view)
       .SetMat4("model", model)
@@ -136,9 +137,7 @@ void TerrainRenderer::Update() {
       .SetFloat("VerticalRenderDistance",
                 static_cast<float>(vertical_render_distance_ * kChunkDim))
       .SetVec3("camPos", camera_->position_)
-      .SetVec3("tintColor",
-               glm::vec3(0.40828402 * clrMultiplier, 0.5917159 * clrMultiplier,
-                         0.2781065 * clrMultiplier))
+      .SetVec3("tintColor", glm::vec3(152.0 / 255, 189.0 / 255, 83.0 / 255))
       .SetInt("TextureAimIndex", TextureAminationIndex);
 
   if (time_->GetTimePassed_ms() > 100) {
@@ -160,10 +159,14 @@ void TerrainRenderer::SetSettings(uint32_t renderDistance,
 
 void TerrainRenderer::LoadAssets() {
   cubic_shader_->BindTexture2D(
-      0, game_context_.block_model_manager_->GetTextureAtlasID(), "BlockTexture");
+      0, game_context_.block_model_manager_->GetTextureAtlasID(),
+      "BlockTexture");
+  cubic_shader_->BindTexture2D(
+      1, game_context_.block_model_manager_->GetLightMapID(), "LightMap");
 }
 
-void TerrainRenderer::AddChunk(ChunkPos pos, const std::vector<uint32_t>& data,
+void TerrainRenderer::AddChunk(ChunkPos pos,
+                               const std::vector<BlockVertexFormat>& data,
                                std::vector<ChunkDrawBatch>& batchType,
                                FastHashMap<ChunkPos, int>& lookUpMap) {
   if (lookUpMap.count(pos)) {
@@ -178,15 +181,15 @@ void TerrainRenderer::AddChunk(ChunkPos pos, const std::vector<uint32_t>& data,
 
   for (int batchIndex = 0; batchIndex < static_cast<int>(batchType.size());
        batchIndex++) {
-    size_t meshDataSize = data.size() * sizeof(uint32_t);
+    size_t mesh_data_size = data.size() * sizeof(data[0]);
 
     if (batchType[batchIndex].memory_pool_.memory_pool_.FindFreeSpace(
-            meshDataSize) == ULLONG_MAX)
+            mesh_data_size) == ULLONG_MAX)
       continue;
 
-    bool InsertSuccess = batchType[batchIndex].AddChunkVertices(data, pos);
+    bool insert_success = batchType[batchIndex].AddChunkVertices(data, pos);
 
-    if (!InsertSuccess) continue;
+    if (!insert_success) continue;
 
     lookUpMap.emplace(pos, batchIndex);
     success = true;

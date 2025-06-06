@@ -11,6 +11,7 @@
 #include "Client/Player/PlayerPOV.h"
 #include "Core/GameContext/GameContext.h"
 #include "Core/Options/Option.h"
+#include "RenderEngine/ChunkRender/Mesh/BlockVertexFormat.h"
 #include "RenderEngine/ChunkRender/Mesh/ChunkMesh.h"
 #include "RenderEngine/ChunkRender/TerrainRenderer.h"
 #include "Utils/Clock.h"
@@ -50,8 +51,17 @@ std::unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(ChunkPos pos) {
   // Transfer Infomation
   std::unique_ptr<Mesh::ChunkVertexData> data =
       std::make_unique<Mesh::ChunkVertexData>();
-  data->solid_vertices_.resize(chunk_mesher.solid_face_count_ * 12);
-  data->transparent_vertices_.resize(chunk_mesher.transparent_face_count_ * 12);
+
+  data->solid_vertices_.insert(data->solid_vertices_.end(),
+                               chunk_mesher.vertices_buffer_.begin(),
+                               chunk_mesher.vertices_buffer_.begin() +
+                                   chunk_mesher.solid_face_count_ * 6);
+  data->transparent_vertices_.insert(
+      data->transparent_vertices_.end(),
+      chunk_mesher.transparent_vertices_buffer_.begin(),
+      chunk_mesher.transparent_vertices_buffer_.begin() +
+          chunk_mesher.transparent_face_count_ * 6);
+  
   data->position_ = pos;
 
   build_stage_0_ += chunk_mesher.greedy_time_;
@@ -59,13 +69,6 @@ std::unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(ChunkPos pos) {
   build_time_ += time;
 
   ++amount_of_mesh_generated_;
-
-  memcpy(data->solid_vertices_.data(), chunk_mesher.vertices_buffer_.data(),
-         chunk_mesher.solid_face_count_ * 12 * sizeof(uint32_t));
-
-  memcpy(data->transparent_vertices_.data(),
-         chunk_mesher.transparent_vertices_buffer_.data(),
-         chunk_mesher.transparent_face_count_ * 12 * sizeof(uint32_t));
 
   return data;
 }

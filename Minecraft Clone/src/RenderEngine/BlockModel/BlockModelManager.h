@@ -10,6 +10,7 @@
 class GameContext;
 class ModelLoader;
 class BlockTextureAtlas;
+class Texture2D;
 
 struct BlockModel;
 
@@ -24,11 +25,13 @@ class BlockModelManager {
 
   const BlockModel& GetBlockModel(BlockID id) const;
   uint32_t GetTextureAtlasID() const;
+  uint32_t GetLightMapID() const;
 
  private:
   GameContext& game_context_;
   bool is_loaded_;
   std::unique_ptr<ModelLoader> model_loader_;
   std::unique_ptr<BlockTextureAtlas> block_texture_atlas_;
+  std::unique_ptr<Texture2D> light_map_;
   std::vector<BlockModel> model_data_;
 };

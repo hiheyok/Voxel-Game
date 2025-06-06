@@ -22,7 +22,6 @@ GameContext::GameContext()
       items_{std::make_unique<ItemList>(*this)},
       generators_{std::make_unique<GeneratorType>(*this)},
       event_handler_{std::make_unique<EventHandler>(*this)},
-      item_atlas_{std::make_unique<ItemTextureAtlas>(*this)},
       block_model_manager_{std::make_unique<BlockModelManager>(*this)} {}
 GameContext::~GameContext() = default;
 
@@ -30,6 +29,10 @@ void GameContext::InitializeGameContext() {
   items_->RegisterAll();
 }
 void GameContext::InitializeRenderingContext() {
+  // Initialize objects
+  item_atlas_ = std::make_unique<ItemTextureAtlas>(*this);
+
+
   block_model_manager_->LoadModels();
   item_atlas_->Initialize(512 * 16 * 2, 16 * 2 * 8);
   for (auto& item : items_->item_container_) {

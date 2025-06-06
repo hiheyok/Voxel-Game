@@ -21,6 +21,8 @@
 class Shader;
 class GameContext;
 
+struct BlockVertexFormat;
+
 class ChunkDrawBatch {
  public:
   ChunkDrawBatch(GameContext&, size_t maxSize);
@@ -31,7 +33,7 @@ class ChunkDrawBatch {
   void SetupBuffers();
   void Reset();
   void GenDrawCommands(int RenderDistance, int verticalRenderDistance);
-  bool AddChunkVertices(const std::vector<uint32_t>& Data, ChunkPos pos);
+  bool AddChunkVertices(const std::vector<BlockVertexFormat>& Data, ChunkPos pos);
   void DeleteChunkVertices(ChunkPos ID);
   void Draw(Shader* shader);
   void Defrag(size_t iterations);

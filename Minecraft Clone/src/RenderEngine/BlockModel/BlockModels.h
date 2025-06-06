@@ -45,10 +45,10 @@ struct BlockFace {
   bool fully_transparent_pixel_ = false;
   glm::ivec4 uv_ = glm::ivec4(0, 0, 16, 16);
 
-  glm::ivec2 uv_coord_nn{0, 0};
-  glm::ivec2 uv_coord_np{0, 0};
-  glm::ivec2 uv_coord_pp{0, 0};
-  glm::ivec2 uv_coord_pn{0, 0};
+  glm::ivec2 uv_coord_00{0, 0};
+  glm::ivec2 uv_coord_01{0, 0};
+  glm::ivec2 uv_coord_11{0, 0};
+  glm::ivec2 uv_coord_10{0, 0};
 };
 
 struct BlockDisplay {  // Positions {thirdperson_righthand,
@@ -90,10 +90,9 @@ struct Cuboid {
   Cuboid& operator=(const Cuboid&);
 
   void EditFace(int location, BlockFace f);
-
-  glm::ivec3 from_ = glm::ivec3(0, 0, 0);
-  glm::ivec3 to_ =
-      glm::ivec3(16, 16, 16);  // Relative inner block position from -16 to 32
+  // Relative inner block position from -16 to 32
+  glm::vec3 from_ = glm::vec3(0, 0, 0);
+  glm::vec3 to_ = glm::vec3(16, 16, 16);
   BlockFace faces_[6]{};
   CuboidRotationInfo rotation_;
   std::string comments_ = "";

@@ -354,9 +354,6 @@
     <ClCompile Include="src\Level\Entity\EntityType.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexPacked.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\RenderEngine\OpenGL\Render\RenderDrawElements.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -367,6 +364,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\BlockModel\BlockModelManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexFormat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -872,9 +872,6 @@
     <ClInclude Include="src\Level\Entity\EntityType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexPacked.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\RenderEngine\OpenGL\Render\RenderDrawElements.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -891,6 +888,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\BlockModel\BlockModelManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexFormat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

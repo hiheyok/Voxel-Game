@@ -1,21 +1,20 @@
 #version 450 core
-#define MULTIPLIER 0.001953125
-
-const vec3 skyColor = vec3(0.46274509803f, 0.65882352941f,1.0f);
+const vec3 kSkyColor = vec3(0.46274509803f, 0.65882352941f,1.0f);
 
 out vec4 final;
 
-in float lights;
-flat in uint texturePosition;
-flat in uint norm;
-flat in uint tintIndex;
-in vec2 textureSize;
-in vec3 poss;
+flat in uint texture_id;
+in vec3 global_vert;
+in vec2 texture_uv;
+in float sky_light;
+in float block_light;
+in vec4 color;
 
 uniform vec3 camPos;
 uniform float RenderDistance;
 uniform float VerticalRenderDistance;
 uniform sampler2D BlockTexture;
+uniform sampler2D LightMap;
 uniform vec3 tintColor;
 
 float near = 0.25; 
@@ -27,62 +26,40 @@ float LinearizeDepth(float depth)
     return (2.0 * near * far) / (far + near - z * (far - near));    
 }
 
+vec4 SampleLighting() {
+    // Sample the middle of the pixel
+    // 16 by 16 image
+    float block_samp = block_light * (15.f / 16.f) + (1.f / 32.f);
+    float sky_samp = sky_light * (15.f / 16.f) + (1.f / 32.f);
+    return texture(LightMap, vec2(block_samp, sky_samp));
+}
 
 void main() {
-    vec3 posvec = poss - camPos;
+    vec3 cam_rel_vert = global_vert - camPos;
 
-    posvec.y *= RenderDistance / VerticalRenderDistance;
+    cam_rel_vert.y *= RenderDistance / VerticalRenderDistance;
 
-    float depth = dot(posvec, posvec) / pow(RenderDistance,2);
+    float depth = dot(cam_rel_vert, cam_rel_vert) / pow(RenderDistance,2);
     depth = depth * depth;
     depth = 1 - depth;
 
-    int Index = int(floor(texturePosition -  1.f));
-    float xIndex = float(Index & 511) * MULTIPLIER;
-    float yIndex = floor(Index >> 9) * MULTIPLIER;
+    vec4 block_texture =  texture(BlockTexture, texture_uv);
+    vec4 light_map =  SampleLighting();
 
-    vec2 NormalizedTexCoord = textureSize * MULTIPLIER;
-    NormalizedTexCoord += vec2(xIndex,  yIndex);
-
-    vec3 n = vec3(0.f,0.f,0.f);
-
-    if (norm  == 0) {
-        n = vec3(1.f, 0.f, 0.f);
-    } else if (norm == 1) {
-        n = vec3(0.f, 1.f, 0.f);
-    } else if (norm == 2) {
-        n = vec3(0.f, 0.f, 1.f);
-    }
-//
-//    vec2 tileUV = vec2(dot(n.zxy, poss), dot(n.yzx, poss));
-//
-//    vec2 texCoord = vec2(xIndex,yIndex) + textureSize  * MULTIPLIER * fract(tileUV);
-
-
-    vec4 texture_ =  texture(BlockTexture, NormalizedTexCoord);
-
-    if (tintIndex == 0) {
-        texture_.x *=  tintColor.x;
-        texture_.y *=  tintColor.y;
-        texture_.z *=  tintColor.z;
-    }
-
-    if (texture_.a == 0.0f)
+    if (block_texture.a == 0.0f)
         discard;
 
-    vec4 color = (texture_ * vec4(lights,lights, lights,1.0f));
+    vec4 block_color = block_texture  * color * light_map;
     
     if (depth < -0.1f) {
         discard;
     } else {
-        if (depth < 0.0f) {
-            depth = 0;
-        }
+        depth = depth * float((depth >= 0.0f)); // Set to 0 if depth is negative
         
-        float depthr = color.r - ((1 - depth) * (color.r - skyColor.r));
-        float depthg = color.g - ((1 - depth) * (color.g - skyColor.g));
-        float depthb = color.b - ((1 - depth) * (color.b - skyColor.b));
-        final = vec4(depthr, depthg, depthb, texture_.w);
+        float depth_r = block_color.r - ((1 - depth) * (block_color.r - kSkyColor.r));
+        float depth_g = block_color.g - ((1 - depth) * (block_color.g - kSkyColor.g));
+        float depth_b = block_color.b - ((1 - depth) * (block_color.b - kSkyColor.b));
+        final = vec4(depth_r, depth_g, depth_b, block_texture.w);
     }
     
 }
