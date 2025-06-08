@@ -30,6 +30,14 @@ class Palette {
 
   std::array<BlockID, kChunkSize3D> UnpackAll() const;
 
+  /*
+   Important: This function unpacks slice in this specific format
+   - x: yz
+   - y: zy
+   - z: xy
+  */
+  std::array<BlockID, kChunkSize2D> UnpackSlice(int axis, int slice_idx) const;
+
  private:
   using PaletteIndex = uint16_t;
   using StorageBit = uint64_t;

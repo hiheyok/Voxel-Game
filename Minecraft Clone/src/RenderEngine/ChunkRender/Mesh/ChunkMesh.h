@@ -63,7 +63,7 @@ class ChunkMeshData {
 
   static constexpr int kCacheStrideX = kCacheDim2D;
   static constexpr int kCacheStrideY = kCacheDim1D;  // 18 * 18 = 324
-  static constexpr int kCacheStrideZ = 1;          // 18
+  static constexpr int kCacheStrideZ = 1;            // 18
   static constexpr int kCacheStride[3]{kCacheStrideX, kCacheStrideY,
                                        kCacheStrideZ};
 
@@ -100,7 +100,5 @@ class ChunkMeshData {
   static constexpr uint64_t kBufferStepSize = 4096;
 
   Chunk* chunk_;
-
-  std::bitset<(kChunkDim + 2) * (kChunkDim + 2) * (kChunkDim + 2)> is_fluid_;
 };
 }  // namespace Mesh

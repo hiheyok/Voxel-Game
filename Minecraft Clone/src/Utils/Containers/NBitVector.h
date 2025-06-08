@@ -38,6 +38,9 @@ class NBitVector {
   template <typename T>
   void UnpackAll(std::vector<T>& out) const;
 
+  template <typename T>
+  void UnpackAll(T* out) const;
+
  private:
   void ComputeMaskCache() noexcept;
 
@@ -171,7 +174,12 @@ template <typename StorageBit>
 template <typename T>
 void NBitVector<StorageBit>::UnpackAll(std::vector<T>& out) const {
   out.resize(num_elements_);
+  UnpackAll(out.data());
+}
 
+template <typename StorageBit>
+template <typename T>
+void NBitVector<StorageBit>::UnpackAll(T* out) const {
   size_t out_idx = 0;
   size_t data_idx = 0;
   size_t bit_pos = 0;

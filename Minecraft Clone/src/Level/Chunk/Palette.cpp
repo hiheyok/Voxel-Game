@@ -165,12 +165,48 @@ void Palette::SetBlockUnsafe(BlockID block, BlockPos pos) {
 
 std::array<BlockID, kChunkSize3D> Palette::UnpackAll() const {
   std::array<BlockID, kChunkSize3D> out;
-  std::vector<PaletteIndex> data;
-
-  data_.UnpackAll(data);
-
-  for (int i = 0; i < kChunkSize3D; ++i) {
-    out[i] = palette_entries_id_[data[i]];
+  data_.UnpackAll(out.data());
+  for (auto& i : out) {
+    i = palette_entries_id_[i];
   }
   return out;
+}
+
+std::array<BlockID, kChunkSize2D> Palette::UnpackSlice(int axis,
+                                                       int slice_idx) const {
+  static constexpr int kStrideX = kChunkSize2D;
+  static constexpr int kStrideY = kChunkDim;
+  static constexpr int kStrideZ = 1;
+  static constexpr int kStrides[3]{kStrideX, kStrideY, kStrideZ};
+
+  std::array<BlockID, kChunkSize2D> out_slice;
+
+  BlockPos pos;
+  pos[axis] = slice_idx;
+
+  int block_idx = slice_idx * kStrides[axis];  // Starting point
+
+  int axis_u = (axis + 1) % 3;
+  int axis_v = (axis + 2) % 3;
+
+  // Cache friendly access pattern for y-axis (faster)
+  if (axis == Directions<ChunkPos>::kYAxis) {
+    std::swap(axis_u, axis_v);
+  }
+
+  int write_idx = 0;
+  for (int u = 0; u < kChunkDim; ++u) {
+    int v_block_idx = block_idx;
+    for (int v = 0; v < kChunkDim; ++v) {
+      const PaletteIndex palette_idx =
+          static_cast<PaletteIndex>(data_.GetUnsafe(v_block_idx));
+
+      out_slice[write_idx++] = palette_entries_id_[palette_idx];
+      v_block_idx += kStrides[axis_v];
+    }
+
+    block_idx += kStrides[axis_u];
+  }
+
+  return out_slice;
 }

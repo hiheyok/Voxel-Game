@@ -52,32 +52,28 @@ void Mesh::ChunkMeshData::GenerateCache() {
   int chunk_data_index = 0;
   BlockID* base_ptr =
       &chunk_cache_[kCacheStrideX + kCacheStrideY + kCacheStrideZ];
-
-  BlockID* x_ptr = base_ptr;
-  for (int x = 0; x < kChunkDim; ++x) {
-    BlockID* y_ptr = x_ptr;
-    for (int y = 0; y < kChunkDim; ++y) {
-      BlockID* z_ptr = y_ptr;
-      for (int z = 0; z < kChunkDim; ++z) {
-        *z_ptr = chunk_data[chunk_data_index++];
-        z_ptr += kCacheStrideZ;
-      }
-      y_ptr += kCacheStrideY;
+  const BlockID* x_ptr_end = base_ptr + kCacheStrideX * kChunkDim;
+  for (BlockID* x_ptr = base_ptr; x_ptr < x_ptr_end; x_ptr += kCacheStrideX) {
+    const BlockID* y_ptr_end = x_ptr + kCacheStrideY * kChunkDim;
+    for (BlockID* y_ptr = x_ptr; y_ptr < y_ptr_end; y_ptr += kCacheStrideY) {
+      memcpy(y_ptr, chunk_data.data() + chunk_data_index,
+             kChunkDim * sizeof(BlockID));
+      chunk_data_index += kChunkDim;
     }
-    x_ptr += kCacheStrideX;
   }
 
   for (const auto& side : Directions<ChunkPos>()) {
     int axis = side.GetAxis();
     int direction = side.GetDirection() & 0b1;
 
-    pos[axis] = direction * 15;
-
     std::optional<ChunkContainer*> neighbor = chunk_->GetNeighbor(side);
 
     if (!neighbor.has_value()) {
       continue;
     }
+
+    std::array<BlockID, kChunkSize2D> slice_data =
+        neighbor.value()->GetPalette().UnpackSlice(axis, direction * 15);
 
     int axis_u = (axis + 1) % 3;
     int axis_v = (axis + 2) % 3;
@@ -93,20 +89,19 @@ void Mesh::ChunkMeshData::GenerateCache() {
 
     base_ptr = &chunk_cache_[stride_slice * (17 - 17 * direction) + stride_u +
                              stride_v];
-    BlockID* u_ptr = base_ptr;
-    for (pos[axis_u] = 0; pos[axis_u] < kChunkDim; pos[axis_u]++) {
-      BlockID* v_ptr = u_ptr;
-      for (pos[axis_v] = 0; pos[axis_v] < kChunkDim; pos[axis_v]++) {
-        BlockID block = neighbor.value()->GetBlockUnsafe(pos);
-        *v_ptr = block;
-        v_ptr += stride_v;
+
+    const BlockID* slice_ptr = slice_data.data();
+    const BlockID* u_ptr_end = base_ptr + kChunkDim * stride_u;
+    for (BlockID* u_ptr = base_ptr; u_ptr < u_ptr_end; u_ptr += stride_u) {
+      const BlockID* v_ptr_end = u_ptr + kChunkDim * stride_v;
+      for (BlockID* v_ptr = u_ptr; v_ptr < v_ptr_end; v_ptr += stride_v) {
+        *v_ptr = *(slice_ptr++);
       }
-      u_ptr += stride_u;
     }
   }
 }
 
-void Mesh::ChunkMeshData::SetChunk(Chunk* pChunk) { chunk_ = pChunk; }
+void Mesh::ChunkMeshData::SetChunk(Chunk* chunk) { chunk_ = chunk; }
 
 void Mesh::ChunkMeshData::GenerateMesh() {
   // Initialize
@@ -142,21 +137,19 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
     const int stride_u = kCacheStride[axis_u];
     const int stride_v = kCacheStride[axis_v];
 
-    BlockPos pos{0, 0, 0};
-
     const BlockID* base_ptr =
         &chunk_cache_[kCacheStrideX + kCacheStrideY + kCacheStrideZ];
 
     const BlockID* slice_ptr = base_ptr;
-    for (pos[axis] = 0; pos[axis] <= kChunkDim; ++pos[axis]) {  // Slice
+    for (int slice = 0; slice <= kChunkDim; ++slice) {  // Slice
       used_block.fill(0);
       uint8_t* used_ptr = &used_block[0];
       const BlockID* u_ptr = slice_ptr;
-      for (pos[axis_u] = 0; pos[axis_u] < kChunkDim; ++pos[axis_u]) {
+      for (int u = 0; u < kChunkDim; ++u) {
         const BlockID* v_ptr = u_ptr;
-        for (pos[axis_v] = 0; pos[axis_v] < kChunkDim; ++pos[axis_v]) {
+        for (int v = 0; v < kChunkDim;) {
           if (*used_ptr != 0x00) {
-            pos[axis_v] += *used_ptr-1;
+            v += *used_ptr;
             v_ptr += (*used_ptr) * stride_v;
             used_ptr += *used_ptr;
             continue;
@@ -175,8 +168,8 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
               game_context_.block_model_manager_->GetBlockModel(back_block);
 
           bool blank_curr_model =
-              !currModel.is_initialized_ || pos[axis] == kChunkDim;
-          bool blank_back_model = !backModel.is_initialized_ || pos[axis] == 0;
+              !currModel.is_initialized_ || slice == kChunkDim;
+          bool blank_back_model = !backModel.is_initialized_ || slice == 0;
 
           // Check if it is visible from the back and front
           if (!blank_curr_model) {
@@ -223,7 +216,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
           const BlockID* q_cache_ptr = cache_ptr;
           uint8_t* q_used_ptr = used_ptr;
 
-          for (int v = pos[axis_v] + 1; v < kChunkDim; ++v) {
+          for (int v_ex = v + 1; v_ex < kChunkDim; ++v_ex) {
             q_cache_ptr += stride_v;
             q_used_ptr += chunk_stride_v;
             // Check if they are the same
@@ -236,39 +229,36 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
             v_length++;
           }
 
-          // memset(used_block.data() + (pos[axis_u] << 4) + pos[axis_v],
-          // vLength, vLength);
-
           q_cache_ptr = cache_ptr;
           q_used_ptr = used_ptr;
-          for (int u = pos[axis_u] + 1; u < kChunkDim; ++u) {
-            bool isValid = true;
+          for (int u_ex = u + 1; u_ex < kChunkDim; ++u_ex) {
+            bool is_valid = true;
 
             q_cache_ptr += stride_u;
-            q_used_ptr += chunk_stride_u;
+            const BlockID* q_ptr_v_end = q_cache_ptr + stride_v * v_length;
+            const BlockID* q_ptr_v = q_cache_ptr;
+            for (; q_ptr_v < q_ptr_v_end; q_ptr_v += stride_v) {
+              BlockID curr_block_2 = *q_ptr_v;
+              BlockID back_block_2 = *(q_ptr_v - stride_slice);
 
-            const BlockID* q_cache_ptr_v = q_cache_ptr;
-
-            for (int v = 0; v < v_length; ++v) {
-              BlockID currBlock2 = *q_cache_ptr_v;
-              BlockID backBlock2 = *(q_cache_ptr_v - stride_slice);
-
-              q_cache_ptr_v += stride_v;
-
-              if (currBlock2 != curr_block || backBlock2 != back_block) {
-                isValid = false;
+              if (curr_block_2 != curr_block || back_block_2 != back_block) {
+                is_valid = false;
                 break;
               }
             }
 
-            if (!isValid) {
+            if (!is_valid) {
               break;
             }
+            q_used_ptr += chunk_stride_u;
             memset(q_used_ptr, v_length, v_length);
             ++u_length;
           }
 
-          BlockPos q_pos = pos;
+          BlockPos q_pos;
+          q_pos[axis] = slice;
+          q_pos[axis_u] = u;
+          q_pos[axis_v] = v;
 
           // Memorize & Add Faces
           /*
@@ -279,10 +269,10 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
             for (size_t i = 0; i < currModel.elements_.size(); i++) {
               if (!face_visibility[i]) continue;
               const Cuboid& element = currModel.elements_[i];
-              for (q_pos[axis_u] = pos[axis_u];
-                   q_pos[axis_u] < pos[axis_u] + u_length; ++q_pos[axis_u]) {
-                for (q_pos[axis_v] = pos[axis_v];
-                     q_pos[axis_v] < pos[axis_v] + v_length; ++q_pos[axis_v]) {
+              for (q_pos[axis_u] = u; q_pos[axis_u] < u + u_length;
+                   ++q_pos[axis_u]) {
+                for (q_pos[axis_v] = v; q_pos[axis_v] < v + v_length;
+                     ++q_pos[axis_v]) {
                   AddFaceToMesh(element.faces_[axis * 2 + 1], axis * 2 + 1,
                                 element.from_, element.to_,
                                 currModel.ambient_occlusion_, q_pos);
@@ -295,10 +285,10 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
             for (size_t i = 0; i < backModel.elements_.size(); i++) {
               if (!face_visibility_back[i]) continue;
               const Cuboid& element = backModel.elements_[i];
-              for (q_pos[axis_u] = pos[axis_u];
-                   q_pos[axis_u] < pos[axis_u] + u_length; ++q_pos[axis_u]) {
-                for (q_pos[axis_v] = pos[axis_v];
-                     q_pos[axis_v] < pos[axis_v] + v_length; ++q_pos[axis_v]) {
+              for (q_pos[axis_u] = u; q_pos[axis_u] < u + u_length;
+                   ++q_pos[axis_u]) {
+                for (q_pos[axis_v] = v; q_pos[axis_v] < v + v_length;
+                     ++q_pos[axis_v]) {
                   AddFaceToMesh(element.faces_[axis * 2], axis * 2,
                                 element.from_, element.to_,
                                 backModel.ambient_occlusion_, q_pos);
@@ -307,9 +297,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
             }
           }
 
-          q_pos = pos;
-
-          pos[axis_v] += v_length - 1;
+          v += v_length;
           v_ptr += v_length * stride_v;
           used_ptr += v_length;
         }
@@ -362,15 +350,14 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const BlockFace& face, uint8_t axis,
   }
 
   // Now compute the vertices
-  auto CreateVertex = [&](const glm::ivec2& uv, float ao_multiplier) {
-    BlockVertexFormat v;
+  auto CreateVertex = [&](BlockVertexFormat& v, const glm::ivec2& uv,
+                          float ao_multiplier) {
     glm::vec4 color(tint_color * ao_multiplier, 1.0f);
     // Assuming BlockVertexFormat::Set now takes a vec4 for color
     v.SetColor(static_cast<int>(color.r * 255), static_cast<int>(color.g * 255),
                static_cast<int>(color.b * 255), 255);
     v.SetUV(face.texture_id_, uv.x, uv.y);
     v.SetLight(sky_light, block_light);
-    return v;
   };
 
   glm::vec3 base_pos{pos.x, pos.y, pos.z};
@@ -387,10 +374,10 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const BlockFace& face, uint8_t axis,
   glm::ivec2 uv_coord_11 = face.uv_coord_11;
 
   BlockVertexFormat v_00, v_10, v_11, v_01;
-  v_00 = CreateVertex(uv_coord_00, ao_multi[0]);
-  v_01 = CreateVertex(uv_coord_01, ao_multi[1]);
-  v_10 = CreateVertex(uv_coord_10, ao_multi[2]);
-  v_11 = CreateVertex(uv_coord_11, ao_multi[3]);
+  CreateVertex(v_00, uv_coord_00, ao_multi[0]);
+  CreateVertex(v_01, uv_coord_01, ao_multi[1]);
+  CreateVertex(v_10, uv_coord_10, ao_multi[2]);
+  CreateVertex(v_11, uv_coord_11, ao_multi[3]);
 
   // Now work on positions
   switch (facing) {
@@ -413,7 +400,7 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const BlockFace& face, uint8_t axis,
       v_01.SetPos(base_pos.x + from.x, base_pos.y + to.y, base_pos.z);
   }
 
-  if (ao[0] + ao[3] <= ao[1] + ao[2]) {
+  if (ao[0] + ao[3] > ao[1] + ao[2]) {
     // Flipped quad
     vertex_buffer[vertex_index + 0] = v_00;
     vertex_buffer[vertex_index + 1] = v_10;
