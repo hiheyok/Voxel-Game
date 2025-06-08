@@ -2,6 +2,7 @@
 
 #include "Core/GameContext/GameContext.h"
 
+#include <filesystem>
 #include <memory>
 
 #include "Core/Options/Option.h"
@@ -27,11 +28,22 @@ GameContext::~GameContext() = default;
 
 void GameContext::InitializeGameContext() {
   items_->RegisterAll();
+
+  // try {
+  //   for (const auto& entry : std::filesystem::directory_iterator("assets")) {
+  //     if (!entry.is_directory()) continue;
+  //     std::string name = entry.path().filename().string();
+  //     if (!strcmp(name.c_str(), "shaders")) continue;
+  //     blocks_->AddAssets(name);
+  //   }
+
+  // } catch (std::filesystem::filesystem_error& e) {
+  //   logger_->LogWarn("File System", e.what());
+  // }
 }
 void GameContext::InitializeRenderingContext() {
   // Initialize objects
   item_atlas_ = std::make_unique<ItemTextureAtlas>(*this);
-
 
   block_model_manager_->LoadModels();
   item_atlas_->Initialize(512 * 16 * 2, 16 * 2 * 8);

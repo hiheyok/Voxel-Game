@@ -56,6 +56,27 @@ class ChunkMeshData {
   size_t greedy_time_;
   size_t cache_time_;
 
+  bool use_option_ = false;  // for performance debugging purposes
+  static constexpr int kCacheDim1D = kChunkDim + 2;
+  static constexpr int kCacheDim2D = kCacheDim1D * kCacheDim1D;
+  static constexpr int kCacheDim3D = kCacheDim2D * kCacheDim1D;
+
+  static constexpr int kCacheStrideX = kCacheDim2D;
+  static constexpr int kCacheStrideY = kCacheDim1D;  // 18 * 18 = 324
+  static constexpr int kCacheStrideZ = 1;          // 18
+  static constexpr int kCacheStride[3]{kCacheStrideX, kCacheStrideY,
+                                       kCacheStrideZ};
+
+  static constexpr int kChunkStrideX = kChunkDim * kChunkDim;
+  static constexpr int kChunkStrideY = kChunkDim;
+  static constexpr int kChunkStrideZ = 1;
+  static constexpr int kChunkStride[3]{kChunkStrideX, kChunkStrideY,
+                                       kChunkStrideZ};
+
+  // TODO(hiheyok): 3 x is to use cache locality for processing for each axis
+  // (haven't implemented yet)
+  std::array<BlockID, kCacheDim3D> chunk_cache_;
+
  private:
   // Used to generate the cache
   void GenerateCache();
@@ -67,28 +88,19 @@ class ChunkMeshData {
   void GenerateFluidMesh();
 
   // Check if the player can see the mesh
-  bool IsFaceVisible(const Cuboid& cube, BlockPos pos, uint8_t side);
-
-  bool CompareBlockSide(BlockPos pos, uint8_t side, BlockID b);
+  bool IsFaceVisible(const Cuboid& cube, int side, const BlockID* cache);
 
   // Add faces to the mesh
   void AddFaceToMesh(const BlockFace& face, uint8_t axis, glm::vec3 from,
                      glm::vec3 to, bool allow_ao, BlockPos pos);
 
-  const BlockID& GetCachedBlockID(BlockPos pos) const noexcept;
-  void SetCachedBlockID(BlockID b, BlockPos pos) noexcept;
-
-  void GetAO(int direction, BlockPos pos, int& ao_00, int& ao_01,
-             int& ao_10, int& ao_11);
+  void GetAO(int direction, BlockPos pos, int& ao_00, int& ao_01, int& ao_10,
+             int& ao_11);
 
   static constexpr uint64_t kBufferStepSize = 4096;
 
   Chunk* chunk_;
 
-  // TODO(hiheyok): 3 x is to use cache locality for processing for each axis
-  // (haven't implemented yet)
-  std::array<BlockID, (kChunkDim + 2) * (kChunkDim + 2) * (kChunkDim + 2)>
-      chunk_cache_;
   std::bitset<(kChunkDim + 2) * (kChunkDim + 2) * (kChunkDim + 2)> is_fluid_;
 };
 }  // namespace Mesh

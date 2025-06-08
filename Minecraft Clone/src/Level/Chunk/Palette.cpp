@@ -8,8 +8,9 @@
 Palette::Palette()
     : current_bit_width_{kMinBitWidth},
       data_{kChunkSize3D, static_cast<size_t>(current_bit_width_)} {
-  palette_entries_.emplace_back(0, // TODO(hiheyok): Change this default state from 0 to blocks.AIR later
-                                static_cast<uint16_t>(kChunkSize3D));
+  palette_entries_id_.emplace_back(0);
+  palette_entries_count_.emplace_back(static_cast<uint16_t>(kChunkSize3D));
+  // TODO(hiheyok): Change this default state from 0 to blocks.AIR later
 }
 
 Palette::~Palette() = default;
@@ -24,23 +25,24 @@ void Palette::Shrink() {
 
   // Repack
 
-  std::vector<std::pair<BlockID, int16_t>> newBlockToPaletteIndex(
-      unique_blocks_count_);
-  std::vector<PaletteIndex> newPaletteIndex(palette_entries_.size(), 0);
+  std::vector<BlockID> new_block_to_palette_id_(unique_blocks_count_);
+  std::vector<int16_t> new_block_to_palette_count_(unique_blocks_count_);
+  std::vector<PaletteIndex> new_palette_index(palette_entries_id_.size(), 0);
 
   // 2 pointers
 
   PaletteIndex curr = 0;
-  for (size_t i = 0; i < palette_entries_.size(); ++i) {
-    if (palette_entries_[i].second == 0) continue;
-    newBlockToPaletteIndex[curr] = palette_entries_[i];
-    newPaletteIndex[i] = curr;
+  for (size_t i = 0; i < palette_entries_id_.size(); ++i) {
+    if (palette_entries_count_[i] == 0) continue;
+    new_block_to_palette_id_[curr] = palette_entries_id_[i];
+    new_block_to_palette_count_[curr] = palette_entries_count_[i];
+    new_palette_index[i] = curr;
     curr++;
   }
 
   for (int i = 0; i < kChunkSize3D; ++i) {
     PaletteIndex currVal = static_cast<PaletteIndex>(data_.Get(i));
-    PaletteIndex newVal = newPaletteIndex[currVal];
+    PaletteIndex newVal = new_palette_index[currVal];
     newData.Set(i, newVal);
   }
 
@@ -48,7 +50,8 @@ void Palette::Shrink() {
   current_bit_width_ = newBitWidth;
 
   // refactor palette block index
-  palette_entries_ = std::move(newBlockToPaletteIndex);
+  palette_entries_id_ = std::move(new_block_to_palette_id_);
+  palette_entries_count_ = std::move(new_block_to_palette_count_);
   empty_slot_counter_ = 0;
 }
 
@@ -80,25 +83,26 @@ void Palette::Resize() {
 Palette::PaletteIndex Palette::GetOrAddPaletteIndex(BlockID block) {
   PaletteIndex firstZero = 0;
   bool foundZero = false;
-  for (PaletteIndex i = 0; i < palette_entries_.size(); i++) {
-    if (palette_entries_[i].first == block) {
+  for (PaletteIndex i = 0; i < palette_entries_id_.size(); i++) {
+    if (palette_entries_id_[i] == block) {
       return i;
     }
-    if (palette_entries_[i].second == 0) {
+    if (palette_entries_count_[i] == 0) {
       foundZero = true;
       firstZero = i;
     }
   }
 
   if (foundZero) {
-    palette_entries_[firstZero].first = block;
+    palette_entries_id_[firstZero] = block;
     return firstZero;
   }
 
-  palette_entries_.emplace_back(block, static_cast<int16_t>(0));
+  palette_entries_id_.emplace_back(block);
+  palette_entries_count_.emplace_back(0);
   Resize();
   PaletteIndex newIndex =
-      static_cast<PaletteIndex>(palette_entries_.size() - 1);
+      static_cast<PaletteIndex>(palette_entries_id_.size() - 1);
 
   return newIndex;
 }
@@ -113,7 +117,7 @@ BlockID Palette::GetBlock(BlockPos pos) const {
 
 BlockID Palette::GetBlockUnsafe(BlockPos pos) const noexcept {
   PaletteIndex idx = static_cast<PaletteIndex>(data_.GetUnsafe(pos.GetIndex()));
-  return palette_entries_[idx].first;
+  return palette_entries_id_[idx];
 }
 
 void Palette::SetBlock(BlockID block, BlockPos pos) {
@@ -128,26 +132,26 @@ void Palette::SetBlockUnsafe(BlockID block, BlockPos pos) {
   // Look at original block
   PaletteIndex oldPaletteIdx =
       static_cast<PaletteIndex>(data_.GetUnsafe(pos.GetIndex()));
-  if (oldPaletteIdx >= palette_entries_.size() ||
-      palette_entries_[oldPaletteIdx].second <= 0) {
+  if (oldPaletteIdx >= palette_entries_count_.size() ||
+      palette_entries_count_[oldPaletteIdx] <= 0) {
     throw std::runtime_error(
         "Palette::SetBlockUnsafe - Corrupt old palette index found in "
         "data.");
   }
-  BlockID oldBlockId = palette_entries_[oldPaletteIdx].first;
+  BlockID oldBlockId = palette_entries_id_[oldPaletteIdx];
   bool uniqueCountChanged = false;
   if (block == oldBlockId) {
     return;
   }
 
-  if (--palette_entries_[oldPaletteIdx].second == 0) {
+  if (--palette_entries_count_[oldPaletteIdx] == 0) {
     --unique_blocks_count_;
     ++empty_slot_counter_;
     uniqueCountChanged = !uniqueCountChanged;
   }
 
   PaletteIndex idx = GetOrAddPaletteIndex(block);
-  if (palette_entries_[idx].second++ == 0) {
+  if (palette_entries_count_[idx]++ == 0) {
     unique_blocks_count_++;
     --empty_slot_counter_;
     uniqueCountChanged = !uniqueCountChanged;
@@ -157,4 +161,16 @@ void Palette::SetBlockUnsafe(BlockID block, BlockPos pos) {
   if (uniqueCountChanged) {
     Resize();
   }
+}
+
+std::array<BlockID, kChunkSize3D> Palette::UnpackAll() const {
+  std::array<BlockID, kChunkSize3D> out;
+  std::vector<PaletteIndex> data;
+
+  data_.UnpackAll(data);
+
+  for (int i = 0; i < kChunkSize3D; ++i) {
+    out[i] = palette_entries_id_[data[i]];
+  }
+  return out;
 }

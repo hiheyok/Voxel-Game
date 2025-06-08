@@ -92,7 +92,7 @@ struct Cuboid {
   void EditFace(int location, BlockFace f);
   // Relative inner block position from -16 to 32
   glm::vec3 from_ = glm::vec3(0, 0, 0);
-  glm::vec3 to_ = glm::vec3(16, 16, 16);
+  glm::vec3 to_ = glm::vec3(1, 1, 1);
   BlockFace faces_[6]{};
   CuboidRotationInfo rotation_;
   std::string comments_ = "";

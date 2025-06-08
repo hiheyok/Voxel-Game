@@ -28,6 +28,8 @@ class Palette {
   void SetBlock(BlockID block, BlockPos pos);
   void SetBlockUnsafe(BlockID block, BlockPos pos);
 
+  std::array<BlockID, kChunkSize3D> UnpackAll() const;
+
  private:
   using PaletteIndex = uint16_t;
   using StorageBit = uint64_t;
@@ -38,9 +40,7 @@ class Palette {
   }
 
   void Shrink();
-
   void Grow();
-
   void Resize();
 
   PaletteIndex GetOrAddPaletteIndex(BlockID block);
@@ -56,5 +56,6 @@ class Palette {
   NBitVector<StorageBit> data_;
 
   // BlockID -> Block, int_16 -> num of that block
-  std::vector<std::pair<BlockID, int16_t>> palette_entries_;
+  std::vector<BlockID> palette_entries_id_;
+  std::vector<int16_t> palette_entries_count_;
 };

@@ -158,6 +158,7 @@ void ClientPlay::UpdateDebugStats() {
                          100) +
           "%");
   debug_screen_->EditText("Stat5", "FPS: " + std::to_string(1.0 / frametime_));
+
   debug_screen_->EditText(
       "Stat6", "Mesh Stats (ms) Total/S0/S1/S2: " +
                    std::to_string(terrain_render_->build_time_ / 1000.f) + "/" +

@@ -33,7 +33,7 @@ class ChunkDrawBatch {
   void SetupBuffers();
   void Reset();
   void GenDrawCommands(int RenderDistance, int verticalRenderDistance);
-  bool AddChunkVertices(const std::vector<BlockVertexFormat>& Data, ChunkPos pos);
+  bool AddChunkVertices(const std::vector<BlockVertexFormat>& data, ChunkPos pos);
   void DeleteChunkVertices(ChunkPos ID);
   void Draw(Shader* shader);
   void Defrag(size_t iterations);

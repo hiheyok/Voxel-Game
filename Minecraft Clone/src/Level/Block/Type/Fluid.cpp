@@ -48,7 +48,7 @@ std::unique_ptr<BlockModel> Fluid::InitializeBlockModel(
   side.cull_face_ = Directions<BlockPos>::kDown;
   cuboid.EditFace(Directions<BlockPos>::kDown, side);
 
-  cuboid.to_.y = 15;
+  cuboid.to_.y = 15.f/16;
 
   block_model->AddElement(cuboid);
   block_model->is_initialized_ = true;

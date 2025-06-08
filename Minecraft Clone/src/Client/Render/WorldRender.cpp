@@ -43,6 +43,9 @@ std::unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(ChunkPos pos) {
   Chunk* chunk = WorldRender::cache_->GetChunk(pos);
   Mesh::ChunkMeshData& chunk_mesher = GetMesher();
   Timer timer;
+  chunk_mesher.use_option_ = false;
+
+
   chunk_mesher.Reset();
   chunk_mesher.SetChunk(chunk);
   chunk_mesher.GenerateMesh();
@@ -61,7 +64,7 @@ std::unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(ChunkPos pos) {
       chunk_mesher.transparent_vertices_buffer_.begin(),
       chunk_mesher.transparent_vertices_buffer_.begin() +
           chunk_mesher.transparent_face_count_ * 6);
-  
+
   data->position_ = pos;
 
   build_stage_0_ += chunk_mesher.greedy_time_;

@@ -187,13 +187,13 @@ void ModelLoader::UpdateModelElements(std::unique_ptr<BlockModel>& model,
       if (subElements.key() == "from") {
         std::vector<float> arr = GetJSONArrayValuesFloat(subElements.value());
         for (int i = 0; i < 3; i++) {
-          cuboid.from_[i] = arr[i];
+          cuboid.from_[i] = arr[i] / 16;
         }
         arr.clear();
       } else if (subElements.key() == "to") {
         std::vector<float> arr = GetJSONArrayValuesFloat(subElements.value());
         for (int i = 0; i < 3; i++) {
-          cuboid.to_[i] = arr[i];
+          cuboid.to_[i] = arr[i] / 16;
         }
         arr.clear();
       } else if (subElements.key() == "faces") {
@@ -247,7 +247,7 @@ CuboidRotationInfo ModelLoader::GetRotationalData(json JsonData) {
       std::vector<float> arr = GetJSONArrayValuesFloat(attribute.value());
 
       for (int i = 0; i < 3; i++) {
-        rotationInfo.origin_[i] = arr[i];
+        rotationInfo.origin_[i] = arr[i] / 16;
       }
     } else if (attribute.key() == "axis") {
       char axis_ = static_cast<std::string>(attribute.value())[0];

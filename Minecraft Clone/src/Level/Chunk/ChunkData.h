@@ -49,6 +49,8 @@ class ChunkContainer {
   bool CheckLightDirty();
   void SetLightDirty();
 
+  const Palette& GetPalette() const;
+
   GameContext& game_context_;
   ChunkPos position_;
   std::unique_ptr<LightStorage> lighting_;

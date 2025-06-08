@@ -696,9 +696,9 @@ class BlockList {
   BlockID ANVIL =
       RegisterBlock("minecraft:anvil", new DefaultBlock(game_context_));
 
+  void AddAssets(std::string namespaceIn);
  private:
   BlockID RegisterBlock(std::string blockName, Block* block);
-  void AddAssets(std::string namespaceIn);
   
   int block_type_count_ = 0;
 };

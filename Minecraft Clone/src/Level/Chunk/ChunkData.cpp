@@ -28,7 +28,9 @@ ChunkContainer::ChunkContainer(GameContext& game_context,
 }
 
 BlockID ChunkContainer::GetBlock(BlockPos pos) const {
-  if ((pos.x | pos.y | pos.z) >> kChunkDimLog2) {
+  if (static_cast<unsigned>(pos.x) >= kChunkDim ||
+      static_cast<unsigned>(pos.y) >= kChunkDim ||
+      static_cast<unsigned>(pos.z) >= kChunkDim) {
     int dx = ((pos.x >> 31) & 1) + 0;
     int dy = ((pos.y >> 31) & 1) + 2;
     int dz = ((pos.z >> 31) & 1) + 4;
@@ -54,8 +56,9 @@ BlockID ChunkContainer::GetBlockUnsafe(BlockPos pos) const noexcept {
 }
 
 void ChunkContainer::SetBlock(BlockID block, BlockPos pos) {
-  if ((pos.x | pos.y | pos.z) >>
-      kChunkDimLog2) {  // check if it is in the chunk
+  if (static_cast<unsigned>(pos.x) >= kChunkDim ||
+      static_cast<unsigned>(pos.y) >= kChunkDim ||
+      static_cast<unsigned>(pos.z) >= kChunkDim) {
     int dx = ((pos.x >> 31) & 1) + 0;
     int dy = ((pos.y >> 31) & 1) + 2;
     int dz = ((pos.z >> 31) & 1) + 4;
@@ -167,3 +170,7 @@ bool ChunkContainer::CheckLightDirty() {
 }
 
 void ChunkContainer::SetLightDirty() { light_dirty_ = true; }
+
+const Palette& ChunkContainer::GetPalette() const {
+  return block_storage_;
+}
