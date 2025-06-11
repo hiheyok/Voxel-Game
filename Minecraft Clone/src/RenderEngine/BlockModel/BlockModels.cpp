@@ -67,8 +67,6 @@ void BlockModel::GetVertices(std::vector<float>& vertices,
   for (const Cuboid& element : elements_) {
     glm::vec3 from = element.from_;
     glm::vec3 to = element.to_;
-    from = from / 16.f;
-    to = to / 16.f;
     for (const auto& side : Directions<BlockPos>()) {
       BlockFace face = element.faces_[side];
       if (face.reference_texture_.length() == 0) continue;
@@ -348,7 +346,7 @@ void BlockModel::FlattenVariables() {
         textureName = variableMatcher[textureName];
         break;
       }
-      if (i > 10000) {  // too lazy to fix infinite loop  issues for now
+      if (i > 10000) {  // TODO(hiheyok): Investigate this infinite loop bug 
         break;
       }
       i++;

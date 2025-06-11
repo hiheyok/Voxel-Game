@@ -12,7 +12,7 @@ struct BlockVertexFormat {
   void SetUV(int index, int u, int v) noexcept;
   void SetLight(int sky_light, int block_light) noexcept;
 
-  float x_ = 0, y_ = 0, z_ = 0; // 32 bit float for each position, might change to 16 bit float later
+  float pos_[3]{0.f}; // 32 bit float for each position, might change to 16 bit float later
   uint32_t color_ = 0; // Each channel is 8 bit r, g, b, a
   uint32_t uv_light_ = 0;
 };

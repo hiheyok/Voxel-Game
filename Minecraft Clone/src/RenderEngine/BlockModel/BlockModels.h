@@ -43,6 +43,7 @@ struct BlockFace {
   uint32_t rotation_ = 0;
   bool partially_transparent_pixel_ = false;
   bool fully_transparent_pixel_ = false;
+  bool can_cull = false;
   glm::ivec4 uv_ = glm::ivec4(0, 0, 16, 16);
 
   glm::ivec2 uv_coord_00{0, 0};

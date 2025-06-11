@@ -88,14 +88,14 @@ class ChunkMeshData {
   void GenerateFluidMesh();
 
   // Check if the player can see the mesh
-  bool IsFaceVisible(const Cuboid& cube, int side, const BlockID* cache);
+  bool IsFaceVisible(const Cuboid& cube, int side, const BlockID* __restrict cache);
 
   // Add faces to the mesh
-  void AddFaceToMesh(const BlockFace& face, uint8_t axis, glm::vec3 from,
-                     glm::vec3 to, bool allow_ao, BlockPos pos);
+  void AddFaceToMesh(const Cuboid& cube, int side, bool allow_ao, BlockPos pos,
+                     int u_size, int v_size, const BlockID* __restrict cache_ptr);
 
-  void GetAO(int direction, BlockPos pos, int& ao_00, int& ao_01, int& ao_10,
-             int& ao_11);
+  void GetAO(int side, const BlockID* __restrict cache_ptr, float& ao_m_00, float& ao_m_01,
+             float& ao_m_10, float& ao_m_11);
 
   static constexpr uint64_t kBufferStepSize = 4096;
 

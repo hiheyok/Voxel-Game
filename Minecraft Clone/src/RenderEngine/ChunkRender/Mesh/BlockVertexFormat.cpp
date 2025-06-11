@@ -14,9 +14,9 @@ void BlockVertexFormat::Set(float x, float y, float z, int r, int g, int b,
 }
 
 void BlockVertexFormat::SetPos(float x, float y, float z) noexcept {
-  x_ = x;
-  y_ = y;
-  z_ = z;
+  pos_[0] = x;
+  pos_[1] = y;
+  pos_[2] = z;
 }
 
 void BlockVertexFormat::SetColor(int r, int g, int b, int a) noexcept {

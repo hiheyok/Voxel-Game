@@ -143,7 +143,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
     const BlockID* slice_ptr = base_ptr;
     for (int slice = 0; slice <= kChunkDim; ++slice) {  // Slice
       used_block.fill(0);
-      uint8_t* used_ptr = &used_block[0];
+      uint8_t* __restrict used_ptr = used_block.data();
       const BlockID* u_ptr = slice_ptr;
       for (int u = 0; u < kChunkDim; ++u) {
         const BlockID* v_ptr = u_ptr;
@@ -162,22 +162,22 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
           BlockID curr_block = *cache_ptr;
           BlockID back_block = *(cache_ptr - stride_slice);
 
-          const BlockModel& currModel =
+          const BlockModel& curr_model =
               game_context_.block_model_manager_->GetBlockModel(curr_block);
-          const BlockModel& backModel =
+          const BlockModel& back_model =
               game_context_.block_model_manager_->GetBlockModel(back_block);
 
           bool blank_curr_model =
-              !currModel.is_initialized_ || slice == kChunkDim;
-          bool blank_back_model = !backModel.is_initialized_ || slice == 0;
+              !curr_model.is_initialized_ || slice == kChunkDim;
+          bool blank_back_model = !back_model.is_initialized_ || slice == 0;
 
           // Check if it is visible from the back and front
           if (!blank_curr_model) {
-            for (size_t i = 0; i < currModel.elements_.size(); ++i) {
+            for (size_t i = 0; i < curr_model.elements_.size(); ++i) {
               face_visibility[i] = 0;
-              const Cuboid& element = currModel.elements_[i];
+              const Cuboid& element = curr_model.elements_[i];
 
-              if (element.faces_[axis * 2 + 1].reference_texture_.length() == 0)
+              if (element.faces_[axis * 2 + 1].reference_texture_.size() == 0)
                 continue;
 
               if (element.faces_[axis * 2 + 1].cull_face_ != -1) {
@@ -191,9 +191,9 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
           }
           // Check if it is visible from the back and front
           if (!blank_back_model) {
-            for (size_t i = 0; i < backModel.elements_.size(); ++i) {
+            for (size_t i = 0; i < back_model.elements_.size(); ++i) {
               face_visibility_back[i] = 0;
-              const Cuboid& element = backModel.elements_[i];
+              const Cuboid& element = back_model.elements_[i];
 
               if (element.faces_[axis * 2].reference_texture_.length() == 0)
                 continue;
@@ -220,40 +220,35 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
             q_cache_ptr += stride_v;
             q_used_ptr += chunk_stride_v;
             // Check if they are the same
-            BlockID currBlock2 = *q_cache_ptr;
-            BlockID backBlock2 = *(q_cache_ptr - stride_slice);
-
-            if (currBlock2 != curr_block || backBlock2 != back_block) break;
+            BlockID curr_block_2 = *q_cache_ptr;
+            if (curr_block_2 != curr_block) break;
+            BlockID back_block_2 = *(q_cache_ptr - stride_slice);
+            if (back_block_2 != back_block) break;
 
             *q_used_ptr = 0xFFU;
             v_length++;
           }
 
-          q_cache_ptr = cache_ptr;
+          q_cache_ptr = cache_ptr + stride_u;
           q_used_ptr = used_ptr;
-          for (int u_ex = u + 1; u_ex < kChunkDim; ++u_ex) {
-            bool is_valid = true;
+          for (int u_ex = u + 1; u_ex < kChunkDim;
+               ++u_ex, q_cache_ptr += stride_u) {
 
-            q_cache_ptr += stride_u;
             const BlockID* q_ptr_v_end = q_cache_ptr + stride_v * v_length;
             const BlockID* q_ptr_v = q_cache_ptr;
             for (; q_ptr_v < q_ptr_v_end; q_ptr_v += stride_v) {
               BlockID curr_block_2 = *q_ptr_v;
               BlockID back_block_2 = *(q_ptr_v - stride_slice);
-
-              if (curr_block_2 != curr_block || back_block_2 != back_block) {
-                is_valid = false;
-                break;
+              if (curr_block_2 != curr_block || back_block_2 != back_block) [[unlikely]] {
+                goto skip;
               }
             }
 
-            if (!is_valid) {
-              break;
-            }
             q_used_ptr += chunk_stride_u;
             memset(q_used_ptr, v_length, v_length);
             ++u_length;
           }
+          skip:
 
           BlockPos q_pos;
           q_pos[axis] = slice;
@@ -265,35 +260,23 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
            * Center wont have AO check as it is no sides
            * Do lighting checks when combining faces
            */
-          if (!blank_curr_model) {
-            for (size_t i = 0; i < currModel.elements_.size(); i++) {
+          if (!blank_curr_model) [[likely]] {
+            for (size_t i = 0; i < curr_model.elements_.size(); i++) {
               if (!face_visibility[i]) continue;
-              const Cuboid& element = currModel.elements_[i];
-              for (q_pos[axis_u] = u; q_pos[axis_u] < u + u_length;
-                   ++q_pos[axis_u]) {
-                for (q_pos[axis_v] = v; q_pos[axis_v] < v + v_length;
-                     ++q_pos[axis_v]) {
-                  AddFaceToMesh(element.faces_[axis * 2 + 1], axis * 2 + 1,
-                                element.from_, element.to_,
-                                currModel.ambient_occlusion_, q_pos);
-                }
-              }
+              const Cuboid& element = curr_model.elements_[i];
+              AddFaceToMesh(element, axis * 2 + 1,
+                            curr_model.ambient_occlusion_, q_pos, u_length,
+                            v_length, cache_ptr);
             }
           }
           --q_pos[axis];
-          if (!blank_back_model) {
-            for (size_t i = 0; i < backModel.elements_.size(); i++) {
+          if (!blank_back_model) [[likely]] {
+            for (size_t i = 0; i < back_model.elements_.size(); i++) {
               if (!face_visibility_back[i]) continue;
-              const Cuboid& element = backModel.elements_[i];
-              for (q_pos[axis_u] = u; q_pos[axis_u] < u + u_length;
-                   ++q_pos[axis_u]) {
-                for (q_pos[axis_v] = v; q_pos[axis_v] < v + v_length;
-                     ++q_pos[axis_v]) {
-                  AddFaceToMesh(element.faces_[axis * 2], axis * 2,
-                                element.from_, element.to_,
-                                backModel.ambient_occlusion_, q_pos);
-                }
-              }
+              const Cuboid& element = back_model.elements_[i];
+              AddFaceToMesh(element, axis * 2, back_model.ambient_occlusion_,
+                            q_pos, u_length, v_length,
+                            cache_ptr - stride_slice);
             }
           }
 
@@ -308,12 +291,37 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
   }
 }
 
-void Mesh::ChunkMeshData::AddFaceToMesh(const BlockFace& face, uint8_t axis,
-                                        glm::vec3 from, glm::vec3 to,
-                                        bool allowAO, BlockPos pos) {
+void Mesh::ChunkMeshData::AddFaceToMesh(const Cuboid& cube, int side,
+                                        bool allow_ao, BlockPos pos, int u_size,
+                                        int v_size, const BlockID* __restrict cache_ptr) {
   // First get some of the general data
-  int direction = axis & 1;
-  int facing = axis >> 1;
+  int direction = side & 1;
+  int axis = side >> 1;
+  int axis_u = (axis + 1) % 3;
+  int axis_v = (axis + 2) % 3;
+  int new_face_count = u_size * v_size;
+
+  int stride_u = kCacheStride[axis_u];
+  int stride_v = kCacheStride[axis_v];
+
+  const BlockFace& face = cube.faces_[side];
+  glm::vec3 from = cube.from_;
+  glm::vec3 to = cube.to_;
+
+  auto CreateVertex = [&](BlockVertexFormat& v, const glm::vec3& tint_color,
+                          const glm::ivec2& uv, float ao_multiplier,
+                          int sky_light, int block_light) {
+    glm::vec4 color(tint_color * ao_multiplier, 1.0f);
+    // Assuming BlockVertexFormat::Set now takes a vec4 for color
+    v.SetColor(static_cast<int>(color.r * 255), static_cast<int>(color.g * 255),
+               static_cast<int>(color.b * 255), 255);
+    v.SetUV(face.texture_id_, uv.x, uv.y);
+    v.SetLight(sky_light, block_light);
+  };
+
+  if (axis == Directions<BlockPos>::kYAxis) {
+    std::swap(u_size, v_size);
+  }
 
   std::vector<BlockVertexFormat>& vertex_buffer =
       face.partially_transparent_pixel_ ? transparent_vertices_buffer_
@@ -326,119 +334,117 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const BlockFace& face, uint8_t axis,
   size_t vertex_index = face_count * 6;
 
   // Resize buffer if it is soo too small
-  if (vertex_buffer.size() <= (face_count + 1) * 6) {
+  while (vertex_buffer.size() <= (face_count + new_face_count) * 6) {
     vertex_buffer.resize(vertex_buffer.size() + kBufferStepSize);
   }
 
   // Now calculate the AO, lighting, colors
-  int ao[4] = {0};  // 0: NN, 1: NP, 2: PN, 3: PP
-  if (allowAO) {
-    GetAO(axis, pos, ao[0], ao[1], ao[2], ao[3]);
-  }
-
-  float ao_multi[4] = {1.0f - static_cast<float>(3 - ao[0]) / 5.0f,
-                       1.0f - static_cast<float>(3 - ao[1]) / 5.0f,
-                       1.0f - static_cast<float>(3 - ao[2]) / 5.0f,
-                       1.0f - static_cast<float>(3 - ao[3]) / 5.0f};
-
-  int sky_light = chunk_->lighting_->GetLighting(pos);
-  int block_light = 0;
-
-  glm::vec3 tint_color{1.0f};
-  if (face.tint_index_ != -1) {
-    tint_color = glm::vec3(93.0f / 255.0f, 200.0f / 255.0f, 62.0f / 255.0f);
-  }
-
-  // Now compute the vertices
-  auto CreateVertex = [&](BlockVertexFormat& v, const glm::ivec2& uv,
-                          float ao_multiplier) {
-    glm::vec4 color(tint_color * ao_multiplier, 1.0f);
-    // Assuming BlockVertexFormat::Set now takes a vec4 for color
-    v.SetColor(static_cast<int>(color.r * 255), static_cast<int>(color.g * 255),
-               static_cast<int>(color.b * 255), 255);
-    v.SetUV(face.texture_id_, uv.x, uv.y);
-    v.SetLight(sky_light, block_light);
-  };
-
-  glm::vec3 base_pos{pos.x, pos.y, pos.z};
-
-  if (direction) {
-    base_pos[facing] += from[facing];
-  } else {
-    base_pos[facing] += to[facing];
-  }
-
-  glm::ivec2 uv_coord_00 = face.uv_coord_00;
-  glm::ivec2 uv_coord_01 = face.uv_coord_10;
-  glm::ivec2 uv_coord_10 = face.uv_coord_01;
-  glm::ivec2 uv_coord_11 = face.uv_coord_11;
-
   BlockVertexFormat v_00, v_10, v_11, v_01;
-  CreateVertex(v_00, uv_coord_00, ao_multi[0]);
-  CreateVertex(v_01, uv_coord_01, ao_multi[1]);
-  CreateVertex(v_10, uv_coord_10, ao_multi[2]);
-  CreateVertex(v_11, uv_coord_11, ao_multi[3]);
-
-  // Now work on positions
-  switch (facing) {
-    case 0:  // x axis
-      v_00.SetPos(base_pos.x, base_pos.y + from.y, base_pos.z + from.z);
-      v_10.SetPos(base_pos.x, base_pos.y + to.y, base_pos.z + from.z);
-      v_11.SetPos(base_pos.x, base_pos.y + to.y, base_pos.z + to.z);
-      v_01.SetPos(base_pos.x, base_pos.y + from.y, base_pos.z + to.z);
-      break;
-    case 1:
-      v_00.SetPos(base_pos.x + from.x, base_pos.y, base_pos.z + from.z);
-      v_10.SetPos(base_pos.x + from.x, base_pos.y, base_pos.z + to.z);
-      v_11.SetPos(base_pos.x + to.x, base_pos.y, base_pos.z + to.z);
-      v_01.SetPos(base_pos.x + to.x, base_pos.y, base_pos.z + from.z);
-      break;
-    case 2:
-      v_00.SetPos(base_pos.x + from.x, base_pos.y + from.y, base_pos.z);
-      v_10.SetPos(base_pos.x + to.x, base_pos.y + from.y, base_pos.z);
-      v_11.SetPos(base_pos.x + to.x, base_pos.y + to.y, base_pos.z);
-      v_01.SetPos(base_pos.x + from.x, base_pos.y + to.y, base_pos.z);
+  float ao_multi[4] = {1.0f};
+  glm::vec3 color{1.0f};
+  if (face.tint_index_ != -1) {
+    color = glm::vec3(93.0f / 255.0f, 200.0f / 255.0f, 62.0f / 255.0f);
   }
 
-  if (ao[0] + ao[3] > ao[1] + ao[2]) {
-    // Flipped quad
-    vertex_buffer[vertex_index + 0] = v_00;
-    vertex_buffer[vertex_index + 1] = v_10;
-    vertex_buffer[vertex_index + 2] = v_11;
+  glm::ivec2 uv_00 = face.uv_coord_00;
+  glm::ivec2 uv_01 = face.uv_coord_10;
+  glm::ivec2 uv_10 = face.uv_coord_01;
+  glm::ivec2 uv_11 = face.uv_coord_11;
 
-    vertex_buffer[vertex_index + 3] = v_00;
-    vertex_buffer[vertex_index + 4] = v_11;
-    vertex_buffer[vertex_index + 5] = v_01;
-  } else {
-    // Normal quad
-    vertex_buffer[vertex_index + 0] = v_00;
-    vertex_buffer[vertex_index + 1] = v_10;
-    vertex_buffer[vertex_index + 2] = v_01;
+  BlockPos offset_pos = pos;
+  const BlockID* u_ptr = cache_ptr;
+  for (int u = pos[axis_u]; u < pos[axis_u] + u_size; ++u, u_ptr += stride_u) {
+    const BlockID* v_ptr = u_ptr;
+    for (int v = pos[axis_v]; v < pos[axis_v] + v_size;
+         ++v, v_ptr += stride_v) {
+      offset_pos[axis_u] = u;
+      offset_pos[axis_v] = v;
 
-    vertex_buffer[vertex_index + 3] = v_01;
-    vertex_buffer[vertex_index + 4] = v_10;
-    vertex_buffer[vertex_index + 5] = v_11;
+      if (allow_ao) {
+        GetAO(side, v_ptr, ao_multi[0], ao_multi[1], ao_multi[2], ao_multi[3]);
+      }
+
+      glm::vec3 base_pos{offset_pos.x, offset_pos.y, offset_pos.z};
+
+      if (direction) {
+        base_pos[axis] += from[axis];
+      } else {
+        base_pos[axis] += to[axis];
+      }
+
+      int sky_light = chunk_->lighting_->GetLighting(offset_pos);
+      int block_light = 0;
+
+      CreateVertex(v_00, color, uv_00, ao_multi[0], sky_light, block_light);
+      CreateVertex(v_01, color, uv_01, ao_multi[1], sky_light, block_light);
+      CreateVertex(v_10, color, uv_10, ao_multi[2], sky_light, block_light);
+      CreateVertex(v_11, color, uv_11, ao_multi[3], sky_light, block_light);
+
+      // Now work on positions
+      // Set vertices
+      v_00.pos_[axis] = base_pos[axis];
+      v_00.pos_[axis_u] = base_pos[axis_u] + from[axis_u];
+      v_00.pos_[axis_v] = base_pos[axis_v] + from[axis_v];
+
+      v_01.pos_[axis] = base_pos[axis];
+      v_01.pos_[axis_u] = base_pos[axis_u] + from[axis_u];
+      v_01.pos_[axis_v] = base_pos[axis_v] + to[axis_v];
+
+      v_10.pos_[axis] = base_pos[axis];
+      v_10.pos_[axis_u] = base_pos[axis_u] + to[axis_u];
+      v_10.pos_[axis_v] = base_pos[axis_v] + from[axis_v];
+
+      v_11.pos_[axis] = base_pos[axis];
+      v_11.pos_[axis_u] = base_pos[axis_u] + to[axis_u];
+      v_11.pos_[axis_v] = base_pos[axis_v] + to[axis_v];
+
+      if (ao_multi[0] + ao_multi[3] > ao_multi[1] + ao_multi[2]) {
+        // Flipped quad
+        vertex_buffer[vertex_index + 0] = v_00;
+        vertex_buffer[vertex_index + 1] = v_10;
+        vertex_buffer[vertex_index + 2] = v_11;
+
+        vertex_buffer[vertex_index + 3] = v_00;
+        vertex_buffer[vertex_index + 4] = v_11;
+        vertex_buffer[vertex_index + 5] = v_01;
+      } else {
+        // Normal quad
+        vertex_buffer[vertex_index + 0] = v_00;
+        vertex_buffer[vertex_index + 1] = v_10;
+        vertex_buffer[vertex_index + 2] = v_01;
+
+        vertex_buffer[vertex_index + 3] = v_01;
+        vertex_buffer[vertex_index + 4] = v_10;
+        vertex_buffer[vertex_index + 5] = v_11;
+      }
+
+      // Flip vertices for face culling
+      if (direction == 0) {
+        std::swap(vertex_buffer[vertex_index + 1],
+                  vertex_buffer[vertex_index + 2]);
+        std::swap(vertex_buffer[vertex_index + 4],
+                  vertex_buffer[vertex_index + 5]);
+      }
+      ++face_count;
+      vertex_index += 6;
+    }
   }
-
-  // Flip vertices for face culling
-  if (direction == 0) {
-    std::swap(vertex_buffer[vertex_index + 1], vertex_buffer[vertex_index + 2]);
-    std::swap(vertex_buffer[vertex_index + 4], vertex_buffer[vertex_index + 5]);
-  }
-  ++face_count;
 }
 
-void Mesh::ChunkMeshData::GetAO(int direction, BlockPos pos, int& ao_00,
-                                int& ao_01, int& ao_10, int& ao_11) {
-  ao_00 = 3, ao_01 = 3, ao_10 = 3, ao_11 = 3;
-  const int axis = direction >> 1;
+void Mesh::ChunkMeshData::GetAO(int side, const BlockID* __restrict cache_ptr,
+                                float& ao_m_00, float& ao_m_01, float& ao_m_10,
+                                float& ao_m_11) {
+  int ao_00 = 3, ao_01 = 3, ao_10 = 3, ao_11 = 3;
+  const int axis = side >> 1;
   const int stride_u = kCacheStride[(axis + 1) % 3];
   const int stride_v = kCacheStride[(axis + 2) % 3];
 
-  pos.IncrementSide(direction, 1);
-  const int current_idx =
-      kCacheDim2D * (pos.x + 1) + kCacheDim1D * (pos.y + 1) + (pos.z + 1);
-  const BlockID* center_ptr = &chunk_cache_[current_idx];
+  const BlockID* center_ptr = cache_ptr;
+  if ((side & 1) == 0) {
+    center_ptr += kCacheStride[axis];
+  } else {
+    center_ptr -= kCacheStride[axis];
+  }
 
   if (*(center_ptr + stride_u) != game_context_.blocks_->AIR) {
     ao_11--;
@@ -479,11 +485,16 @@ void Mesh::ChunkMeshData::GetAO(int direction, BlockPos pos, int& ao_00,
       *(center_ptr + stride_u - stride_v) != game_context_.blocks_->AIR) {
     ao_10--;
   }
+
+  ao_m_00 = static_cast<float>(2 + ao_00) / 5.0f;
+  ao_m_01 = static_cast<float>(2 + ao_01) / 5.0f;
+  ao_m_10 = static_cast<float>(2 + ao_10) / 5.0f;
+  ao_m_11 = static_cast<float>(2 + ao_11) / 5.0f;
 }
 
 // Checks if a block side is visible to the player
 bool Mesh::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int side,
-                                        const BlockID* cache) {
+                                        const BlockID* __restrict cache) {
   const int axis = (side >> 1);  // Get side
   const int axis_u = (axis + 1) % 3;
   const int axis_v = (axis + 2) % 3;
@@ -505,16 +516,12 @@ bool Mesh::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int side,
     if (element.faces_[opposite_side].cull_face_ !=
             opposite_side ||  // TODO(hiheyok): Replace and with OR  later
                               // after figuring out fluid rendering
-        element.faces_[opposite_side].partially_transparent_pixel_ ||
-        element.faces_[opposite_side].fully_transparent_pixel_ ||
-        element.faces_[opposite_side].reference_texture_.empty()) {
+        element.faces_[opposite_side].can_cull) {
       continue;
     }
 
     if (side & 1) {  // if the  block arent touching
-      if (element.to_[axis] < 1.0) {
-        continue;
-      } else if (element.from_[axis] > 0) {
+      if (element.to_[axis] < 1.0 || element.from_[axis] > 0) {
         continue;
       }
     }

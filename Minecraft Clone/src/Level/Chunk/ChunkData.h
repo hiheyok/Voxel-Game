@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <glm/vec3.hpp>
 #include <optional>
 #include <vector>
@@ -56,13 +57,13 @@ class ChunkContainer {
   std::unique_ptr<LightStorage> lighting_;
   std::unique_ptr<HeightMap> heightmap_;
   std::vector<std::vector<SetBlockRelative>> outside_block_to_place_;
-  
+
   bool is_empty_ = true;
 
  protected:
   std::vector<std::optional<ChunkContainer*>> neighbors_;
 
  private:
-  bool light_dirty_ = false;
+  std::atomic<bool> light_dirty_ = false;
   Palette block_storage_;
 };

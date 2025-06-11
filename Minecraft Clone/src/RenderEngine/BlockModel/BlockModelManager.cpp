@@ -69,6 +69,11 @@ void BlockModelManager::LoadModels() {
             block_texture_atlas_->IsTexturePartiallyTransparent(location);
         element.faces_[side].fully_transparent_pixel_ =
             block_texture_atlas_->IsTextureFullyTransparent(location);
+
+        element.faces_[side].can_cull =
+            element.faces_[side].fully_transparent_pixel_ ||
+            element.faces_[side].partially_transparent_pixel_ ||
+            element.faces_[side].reference_texture_.empty();
       }
     }
   }

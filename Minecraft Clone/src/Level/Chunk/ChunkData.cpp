@@ -19,7 +19,16 @@ ChunkContainer::ChunkContainer(GameContext& game_context)
 }
 
 ChunkContainer::~ChunkContainer() = default;
-ChunkContainer::ChunkContainer(ChunkContainer&&) = default;
+ChunkContainer::ChunkContainer(ChunkContainer&& other)
+    : game_context_{other.game_context_},
+      lighting_{std::move(other.lighting_)},
+      heightmap_{std::move(other.heightmap_)},
+      outside_block_to_place_{std::move(other.outside_block_to_place_)},
+      neighbors_{std::move(other.neighbors_)},
+      block_storage_{std::move(other.block_storage_)} {
+  light_dirty_.store(other.light_dirty_.load(std::memory_order_release),
+                     std::memory_order_acquire);
+}
 
 ChunkContainer::ChunkContainer(GameContext& game_context,
                                const ChunkRawData& data)
@@ -164,13 +173,13 @@ void ChunkContainer::UpdateHeightMap(int x, int z) {
 }
 
 bool ChunkContainer::CheckLightDirty() {
-  bool is_dirty = light_dirty_;
-  light_dirty_ = false;
+  bool is_dirty = light_dirty_.load(std::memory_order_acquire);
+  light_dirty_.store(false, std::memory_order_release);
   return is_dirty;
 }
 
-void ChunkContainer::SetLightDirty() { light_dirty_ = true; }
-
-const Palette& ChunkContainer::GetPalette() const {
-  return block_storage_;
+void ChunkContainer::SetLightDirty() {
+  light_dirty_.store(true, std::memory_order_release);
 }
+
+const Palette& ChunkContainer::GetPalette() const { return block_storage_; }
