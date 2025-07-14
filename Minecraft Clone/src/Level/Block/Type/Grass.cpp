@@ -17,6 +17,7 @@ GrassBlock::GrassBlock(GameContext& game_context, double spread_chance,
   properties_->is_fluid_ = false;
   properties_->light_pass_ = false;
 
+
   grass_properties_.spread_chance_ = spread_chance;
   grass_properties_.break_chance_ = break_chance;
 }

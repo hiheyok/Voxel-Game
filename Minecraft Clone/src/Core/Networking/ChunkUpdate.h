@@ -15,7 +15,8 @@ struct AddChunk {
 };
 
 struct LightUpdate {
-  LightStorage light_;
+  LightStorage sky_light_;
+  LightStorage block_light_;
 };
 
 struct DeleteChunk {

@@ -1,6 +1,9 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
 #pragma once
+#include <tuple>
+#include <vector>
+
 #include "Level/Chunk/ChunkData.h"
 
 class GameContext;

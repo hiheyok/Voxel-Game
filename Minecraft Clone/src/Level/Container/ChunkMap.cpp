@@ -2,6 +2,7 @@
 
 #include "Level/Container/ChunkMap.h"
 
+#include <cassert>
 #include <limits>
 #include <optional>
 #include <stdexcept>
@@ -16,10 +17,13 @@ ChunkMap::ChunkMap(GameContext& game_context, bool neighborUpdate,
                    bool heightmapUpdate)
     : game_context_{game_context},
       heightmap_update_{heightmapUpdate},
-      neighbor_update_{neighborUpdate} {}
+      neighbor_update_{neighborUpdate} {
+  region_cache_.reserve(kRegionCacheSize);
+}
 ChunkMap::~ChunkMap() = default;
 
 void ChunkMap::EraseChunk(ChunkPos pos) {
+  assert(CheckChunk(pos));
   RegionPos reg_pos = pos.ToRegionPos();
   Region* reg = GetRegion(reg_pos);
 
@@ -31,7 +35,7 @@ void ChunkMap::EraseChunk(ChunkPos pos) {
     }
   }
 
-  // erase chunk from chunks_
+  // erase chunk from chunks
   Chunk* swapped_chunk = chunks_.back();
 
   int idx = chunks_idx_[pos];
@@ -139,10 +143,10 @@ void ChunkMap::InsertChunk(std::unique_ptr<Chunk> chunk) {
 
   chunk->UpdateGen();
 
-  // If there exist a chunk then replace its content
   if (reg->CheckChunk(pos)) {
-    Chunk* oldChunk = reg->GetChunk(pos);
-    oldChunk->SetData(chunk->GetRawData());
+    int idx = chunks_idx_[pos];
+    chunks_[idx] = chunk.get();
+    reg->InsertChunk(std::move(chunk));
   } else {
     chunks_.push_back(chunk.get());
     chunks_idx_.emplace(chunk->position_, chunks_.size() - 1);
@@ -157,6 +161,42 @@ void ChunkMap::InsertChunk(std::unique_ptr<Chunk> chunk) {
 }
 
 Region* ChunkMap::GetRegion(RegionPos pos) const {
+  Region* region = FindAndCacheRegion(pos);
+  assert(region != nullptr && "ChunkMap::GetRegion - Region doesn't exist!");
+  return region;
+}
+
+Region* ChunkMap::GetRegionUncheck(RegionPos pos) const {
+  // First try to find region in the cache
+  return FindAndCacheRegion(pos);
+}
+
+bool ChunkMap::CheckRegion(RegionPos pos, bool check_cache) const {
+  if (check_cache) {
+    Region* reg = FindAndCacheRegion(pos);
+    return reg != nullptr;
+  } else {
+    return regions_.contains(pos);
+  }
+}
+
+Region* ChunkMap::CreateRegion(RegionPos pos) {
+  assert(!CheckRegion(pos) &&
+         "ChunkMap::CreateRegion - Tried to create region when one already "
+         "exist!");
+  std::unique_ptr<Region> newRegion = std::make_unique<Region>(game_context_);
+  Region* region = newRegion.get();
+  regions_.emplace(pos, std::move(newRegion));
+  return region;
+}
+
+void ChunkMap::DeleteRegion(RegionPos pos) {
+  assert(CheckRegion(pos));
+  TryDeleteFromCache(pos);
+  regions_.erase(pos);
+}
+
+Region* ChunkMap::FindAndCacheRegion(RegionPos pos) const {
   // First try to find region in the cache
   size_t minUsageCount = SIZE_MAX;
   int minIdx = -1;
@@ -175,129 +215,39 @@ Region* ChunkMap::GetRegion(RegionPos pos) const {
     }
   }
 
-  const auto& it = regions_.find(pos);
-
-  if (it == regions_.end()) {  // don't the cache because it is not in there
-    throw std::logic_error(
-        "ChunkMap::GetRegion - Tried to get region that doesn't exist!");
-  }
-  Region* region = it->second.get();
-
-  if (region_cache_.size() <= kRegionCacheSize) {
-    region_cache_.emplace_back(pos, region);
-    return region;
-  }
-
-  // Check if the region is less than the min
-  if (minUsageCount <
-      region->GetUsageCount()) {  // replace the min with the more used region
-    region_cache_[minIdx] = {pos, region};
-  }
-
-  return region;
-}
-
-Region* ChunkMap::GetRegionUncheck(RegionPos pos) const {
-  // First try to find region in the cache
-  size_t minUsageCount = std::numeric_limits<size_t>::max();
-  int minIdx = -1;
-
-  for (int i = 0; i < static_cast<int>(region_cache_.size()); ++i) {
-    Region* currRegion = region_cache_[i].second;
-
-    size_t currUsage = currRegion->GetUsageCount();
-    if (region_cache_[i].first == pos) {
-      currRegion->IncrementUsage();
-      return currRegion;
-    }
-    if (minUsageCount > currUsage) {
-      minUsageCount = currUsage;
-      minIdx = i;
-    }
-  }
-
+  // Find the region in main if its not in cache
   const auto& it = regions_.find(pos);
 
   if (it == regions_.end()) {
     return nullptr;
   }
+
   Region* region = it->second.get();
 
-  if (region_cache_.size() <= kRegionCacheSize) {
+  // Cache region
+  if (region_cache_.size() < kRegionCacheSize) {
     region_cache_.emplace_back(pos, region);
     return region;
   }
 
-  // Check if the region is less than the min
-  if (minUsageCount <
-      region->GetUsageCount()) {  // replace the min with the more used region
-    region_cache_[minIdx] = {pos, region};
+  // Case 2: Cache is full, find the least used region to replace
+  size_t min_usage = std::numeric_limits<size_t>::max();
+  auto evict_iterator = region_cache_.begin();
+
+  for (auto it = region_cache_.begin(); it != region_cache_.end(); ++it) {
+    if (it->second->GetUsageCount() < min_usage) {
+      min_usage = it->second->GetUsageCount();
+      evict_iterator = it;
+    }
   }
+
+  // Replace the least-used entry
+  *evict_iterator = {pos, region};
 
   return region;
 }
 
-bool ChunkMap::CheckRegion(RegionPos pos, bool checkCache) const {
-  if (checkCache) {
-    // Tries to find it in the cache first
-    size_t minUsageCount = SIZE_MAX;
-    int minIdx = -.1;
-
-    for (size_t i = 0; i < region_cache_.size(); ++i) {
-      Region* currRegion = region_cache_[i].second;
-
-      size_t currUsage = currRegion->GetUsageCount();
-      if (region_cache_[i].first == pos) {
-        currRegion->IncrementUsage();
-        return currRegion;
-      }
-      if (minUsageCount > currUsage) {
-        minUsageCount = currUsage;
-        minIdx = static_cast<int>(i);
-      }
-    }
-
-    const auto& it = regions_.find(pos);
-    if (it == regions_.end()) return false;
-
-    Region* region = it->second.get();
-    region->IncrementUsage();
-
-    if (region_cache_.size() <= kRegionCacheSize) {
-      region_cache_.emplace_back(pos, region);
-      return true;
-    }
-
-    if (region->GetUsageCount() > minUsageCount) {
-      region_cache_[minIdx] = {pos, region};
-    }
-
-    return true;
-
-  } else {
-    return regions_.contains(pos);
-  }
-}
-
-Region* ChunkMap::CreateRegion(RegionPos pos) {
-  if (CheckRegion(pos)) {
-    throw std::logic_error(
-        "ChunkMap::CreateRegion - Tried to create region when one already "
-        "exist!");
-  }
-  std::unique_ptr<Region> newRegion = std::make_unique<Region>(game_context_);
-  Region* region = newRegion.get();
-  regions_.emplace(pos, std::move(newRegion));
-  return region;
-}
-
-void ChunkMap::DeleteRegion(RegionPos pos) {
-  if (!CheckRegion(pos)) {
-    throw std::logic_error(
-        "ChunkMap::DeleteRegion - Tried to delete region that is already "
-        "deleted!");
-  }
-  // Tries to delete from cache
+void ChunkMap::TryDeleteFromCache(RegionPos pos) {
   for (size_t i = 0; i < region_cache_.size(); ++i) {
     if (region_cache_[i].first == pos) {
       std::swap(region_cache_[i], region_cache_.back());
@@ -305,6 +255,4 @@ void ChunkMap::DeleteRegion(RegionPos pos) {
       break;
     }
   }
-
-  regions_.erase(pos);
 }

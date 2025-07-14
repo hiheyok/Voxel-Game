@@ -18,10 +18,7 @@ Region::~Region() = default;
 
 Chunk* Region::GetChunk(ChunkPos pos) const {
   int idx = pos.GetIndex();
-  if (!CheckChunk(pos)) {
-    throw std::logic_error(
-        "Region::GetChunk - Tried to get chunk that doesn't exist.");
-  }
+  assert(CheckChunk(pos));
   return region_data_[idx].get();
 }
 
@@ -33,27 +30,16 @@ bool Region::CheckChunk(ChunkPos pos) const noexcept {
 void Region::InsertChunk(std::unique_ptr<Chunk> chunk) {
   ChunkPos pos = chunk->position_;
   int idx = pos.GetIndex();
-  if (region_data_[idx] != nullptr) {
-    game_context_.logger_->LogWarn(
-        "ClientRegion::InsertChunk",
-        "Chunk already exist! Replacing chunk");  // TODO(hiheyok): Maybe change
-                                                  // this to error later
-    chunk_count_--;
-  }
+  assert(region_data_[idx] == nullptr);
   chunk_count_++;
   region_data_[idx] = std::move(chunk);
 }
 
 void Region::EraseChunk(ChunkPos pos) {
   int idx = pos.GetIndex();
-  if (region_data_[idx] == nullptr) {
-    game_context_.logger_->LogWarn(
-        "ClientRegion::EraseChunk",
-        "Chunk doesn't exist!");  // TODO: Maybe change this to error later
-  } else {
-    chunk_count_--;
-    region_data_[idx] = nullptr;
-  }
+  assert(region_data_[idx] != nullptr);
+  chunk_count_--;
+  region_data_[idx] = nullptr;
 }
 
 int Region::GetChunkCount() const noexcept { return chunk_count_; }

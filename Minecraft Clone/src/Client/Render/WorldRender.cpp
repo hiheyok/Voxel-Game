@@ -41,7 +41,7 @@ void WorldRender::LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks) {
 
 std::unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(ChunkPos pos) {
   Chunk* chunk = WorldRender::cache_->GetChunk(pos);
-  Mesh::ChunkMeshData& chunk_mesher = GetMesher();
+  thread_local Mesh::ChunkMeshData chunk_mesher{game_context_};
   Timer timer;
   chunk_mesher.use_option_ = false;
 
@@ -128,9 +128,4 @@ void WorldRender::Start(GLFWwindow* window, ClientCache* cache,
 
 size_t WorldRender::GetQueuedSize() const noexcept {
   return mesh_thread_pool_->GetQueueSize();
-}
-
-Mesh::ChunkMeshData& WorldRender::GetMesher() {
-  thread_local Mesh::ChunkMeshData mesher{game_context_};
-  return mesher;
 }

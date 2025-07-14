@@ -4,6 +4,7 @@
 #include <cctype>
 
 #include "Core/Typenames.h"
+#include "Core/DataStructure/AtomicNibbleArray.h"
 
 class LightStorage {  // Contains all lighting infomation for solid blocks
  public:
@@ -17,10 +18,6 @@ class LightStorage {  // Contains all lighting infomation for solid blocks
 
   bool operator==(const LightStorage&) const noexcept;
 
-  const uint64_t* GetData() const;
-
-  void ReplaceData(const uint64_t* src);
-
   void EditLight(BlockPos pos, uint8_t LightingInfo) noexcept;
 
   uint8_t GetLighting(BlockPos pos) const noexcept;
@@ -33,5 +30,5 @@ class LightStorage {  // Contains all lighting infomation for solid blocks
   ChunkPos position_;
 
  private:
-  uint64_t data_[256]{};  // TODO use std::array<uint64_t, kChunkSize2D>
+  AtomicNibbleArray<kChunkSize3D> data_;
 };

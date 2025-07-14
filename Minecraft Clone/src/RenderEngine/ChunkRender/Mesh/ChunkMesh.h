@@ -57,6 +57,32 @@ class ChunkMeshData {
   size_t cache_time_;
 
   bool use_option_ = false;  // for performance debugging purposes
+
+ private:
+  // Used to generate the cache
+  void GenerateCache();
+
+  // Generates all the faces and puts them in the cache
+  void GenerateFaceCollection();
+
+  // Fluid mesh
+  void GenerateFluidMesh();
+
+  // Check if the player can see the mesh
+  bool IsFaceVisible(const Cuboid& cube, int side,
+                     const BlockID* __restrict cache);
+
+  // Add faces to the mesh
+  void AddFaceToMesh(const Cuboid& cube, int side, bool allow_ao, BlockPos pos,
+                     int u_size, int v_size,
+                     const BlockID* __restrict cache_ptr);
+
+  void GetAO(int side, const BlockID* __restrict cache_ptr, float& ao_m_00,
+             float& ao_m_01, float& ao_m_10, float& ao_m_11);
+
+  std::pair<int, int> GetLightDirectional(BlockPos pos, int direction);
+
+  static constexpr uint64_t kBufferStepSize = 4096;
   static constexpr int kCacheDim1D = kChunkDim + 2;
   static constexpr int kCacheDim2D = kCacheDim1D * kCacheDim1D;
   static constexpr int kCacheDim3D = kCacheDim2D * kCacheDim1D;
@@ -72,33 +98,7 @@ class ChunkMeshData {
   static constexpr int kChunkStrideZ = 1;
   static constexpr int kChunkStride[3]{kChunkStrideX, kChunkStrideY,
                                        kChunkStrideZ};
-
-  // TODO(hiheyok): 3 x is to use cache locality for processing for each axis
-  // (haven't implemented yet)
   std::array<BlockID, kCacheDim3D> chunk_cache_;
-
- private:
-  // Used to generate the cache
-  void GenerateCache();
-
-  // Generates all the faces and puts them in the cache
-  void GenerateFaceCollection();
-
-  // Fluid mesh
-  void GenerateFluidMesh();
-
-  // Check if the player can see the mesh
-  bool IsFaceVisible(const Cuboid& cube, int side, const BlockID* __restrict cache);
-
-  // Add faces to the mesh
-  void AddFaceToMesh(const Cuboid& cube, int side, bool allow_ao, BlockPos pos,
-                     int u_size, int v_size, const BlockID* __restrict cache_ptr);
-
-  void GetAO(int side, const BlockID* __restrict cache_ptr, float& ao_m_00, float& ao_m_01,
-             float& ao_m_10, float& ao_m_11);
-
-  static constexpr uint64_t kBufferStepSize = 4096;
-
   Chunk* chunk_;
 };
 }  // namespace Mesh

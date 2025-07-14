@@ -233,13 +233,13 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
           q_used_ptr = used_ptr;
           for (int u_ex = u + 1; u_ex < kChunkDim;
                ++u_ex, q_cache_ptr += stride_u) {
-
             const BlockID* q_ptr_v_end = q_cache_ptr + stride_v * v_length;
             const BlockID* q_ptr_v = q_cache_ptr;
             for (; q_ptr_v < q_ptr_v_end; q_ptr_v += stride_v) {
               BlockID curr_block_2 = *q_ptr_v;
               BlockID back_block_2 = *(q_ptr_v - stride_slice);
-              if (curr_block_2 != curr_block || back_block_2 != back_block) [[unlikely]] {
+              if (curr_block_2 != curr_block || back_block_2 != back_block)
+                  [[unlikely]] {
                 goto skip;
               }
             }
@@ -248,7 +248,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
             memset(q_used_ptr, v_length, v_length);
             ++u_length;
           }
-          skip:
+        skip:
 
           BlockPos q_pos;
           q_pos[axis] = slice;
@@ -293,7 +293,8 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
 
 void Mesh::ChunkMeshData::AddFaceToMesh(const Cuboid& cube, int side,
                                         bool allow_ao, BlockPos pos, int u_size,
-                                        int v_size, const BlockID* __restrict cache_ptr) {
+                                        int v_size,
+                                        const BlockID* __restrict cache_ptr) {
   // First get some of the general data
   int direction = side & 1;
   int axis = side >> 1;
@@ -372,9 +373,8 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const Cuboid& cube, int side,
         base_pos[axis] += to[axis];
       }
 
-      int sky_light = chunk_->lighting_->GetLighting(offset_pos);
-      int block_light = 0;
-
+      const auto [sky_light, block_light] = GetLightDirectional(offset_pos, side);
+      
       CreateVertex(v_00, color, uv_00, ao_multi[0], sky_light, block_light);
       CreateVertex(v_01, color, uv_01, ao_multi[1], sky_light, block_light);
       CreateVertex(v_10, color, uv_10, ao_multi[2], sky_light, block_light);
@@ -536,4 +536,21 @@ bool Mesh::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int side,
     }
   }
   return true;
+}
+
+std::pair<int, int> Mesh::ChunkMeshData::GetLightDirectional(BlockPos pos,
+                                                             int side) {
+  const int axis = side >> 1;
+
+  pos.IncrementSide(side, 1);
+  ChunkContainer* chunk = chunk_;
+  if (0 > pos[axis] || kChunkDim <= pos[axis]) {
+    auto neigh = chunk->GetNeighbor(side);
+    if (!neigh.has_value()) return {0, 0};
+    chunk = neigh.value();
+    pos = pos.GetLocalPos();
+  }
+
+  return {chunk->sky_light_->GetLighting(pos),
+          chunk->block_light_->GetLighting(pos)};
 }

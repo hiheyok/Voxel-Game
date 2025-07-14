@@ -31,6 +31,9 @@ struct PlayerAction {
       type_ = PlayerPacket::PLACE_BLOCK;
     }
   }
+
+  PlayerAction()
+      : type_(PlayerPacket::PacketType{}), packet_(std::monostate{}) {}
 };
 
 struct EntityUpdate {
@@ -55,10 +58,15 @@ struct EntityUpdate {
       type_ = EntityUpdatePacket::ENTITY_SPAWN;
     }
   }
+
+  EntityUpdate()
+      : type_(EntityUpdatePacket::PacketType{}), packet_(std::monostate{}) {}
 };
 
 struct BlockUpdate {
   std::variant<BlockUpdatePacket::BlockUpdate, std::monostate> packet_;
+
+  BlockUpdate() : packet_(std::monostate{}) {}
 };
 
 struct ChunkUpdateData {
@@ -79,5 +87,8 @@ struct ChunkUpdateData {
           else
             return ChunkUpdatePacket::PacketType{};
         }()) {}
+
+  ChunkUpdateData()
+      : type_(ChunkUpdatePacket::PacketType{}), packet_(std::monostate{}) {}
 };
 }  // namespace Packet

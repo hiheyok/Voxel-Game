@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <mutex>
+#include <tuple>
 #include <vector>
 
 #include "Core/Typenames.h"
@@ -15,6 +16,10 @@ struct EntityProperty;
 struct WorldParameters;
 
 // Add chunk unloading later when entity goes out of range
+/*
+Purpose: Handles updating the world or dimension and communication about world
+updates
+*/
 class WorldUpdater {
  public:
   bool tall_generation_ = false;
@@ -26,47 +31,44 @@ class WorldUpdater {
   void Load();
 
   // Getters
-  std::vector<ChunkPos> GetUpdatedChunkPos();
-  std::vector<ChunkPos> GetUpdatedLightPos();
-  std::vector<ChunkPos> GetRequestedLightUpdates();
-  std::vector<ChunkPos> GetRequestedChunks();
-
-  std::vector<EntityProperty> GetSpawnedEntities();
+  std::vector<ChunkPos> GetLightUpdate();
+  const std::vector<ChunkPos>& GetCreatedChunkPos();
+  const std::vector<ChunkPos>& GetRequestedChunks();
   std::vector<EntityProperty> GetUpdatedEntities();
+  std::vector<EntityProperty> GetSpawnedEntities();
   std::vector<EntityUUID> GetRemovedEntities();
+  const FastHashMap<ChunkPos, std::vector<BlockPos>>& GetChangedBlocks();
 
   // Setters
-  void SetLight(std::unique_ptr<LightStorage> light);
   void SetChunk(std::unique_ptr<Chunk> chunk);
-  void SetLight(std::vector<std::unique_ptr<LightStorage>> lights);
   void SetChunk(std::vector<std::unique_ptr<Chunk>> chunks);
   EntityUUID SetEntity(std::unique_ptr<Entity> entity);
   void SetEntityChunkLoader(EntityUUID uuid);
   void SetBlock(const BlockID& block, BlockPos pos);
   void KillEntity(const EntityUUID& uuid);
 
+  void ResetState();
+
  private:
   bool RequestLoad(ChunkPos pos);
   void loadSpawnChunks();
   void loadSummonEntitySurrounding(EntityUUID uuid);
   void loadSurroundedMovedEntityChunk();
-  
+
   GameContext& game_context_;
   std::unique_ptr<WorldParameters> settings_;
   World* world_ = nullptr;
-  std::mutex lock_;
-  std::mutex other_lock_;  // TODO(hiheyok): tmp fix this later
+  FastHashSet<ChunkPos> generating_chunk_;
   bool is_spawn_chunks_loaded_ = false;
-  std::vector<ChunkPos> chunk_request_;
 
   FastHashSet<EntityUUID>
       entity_chunk_loaders_;  // List of entities that force loads chunks
-  FastHashSet<ChunkPos> generating_chunk_;
 
-  std::mutex updated_chunk_lock_;
-  FastHashSet<ChunkPos> updated_chunk_;
-  std::vector<ChunkPos> updated_chunk_arr_;
-  std::mutex updated_light_lock_;
-  FastHashSet<ChunkPos> updated_light_;
-  std::vector<ChunkPos> updated_light_arr_;
+  std::vector<EntityUUID> chunk_loader_queue_;
+
+  // States
+  std::vector<ChunkPos> chunk_request_;
+  FastHashSet<ChunkPos> created_chunk_;
+  std::vector<ChunkPos> created_chunk_arr_;
+  FastHashMap<ChunkPos, std::vector<BlockPos>> changed_block_;
 };

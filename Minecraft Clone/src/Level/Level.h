@@ -13,7 +13,8 @@ class Level {
 
   void Start();
   void Stop();
-  void updateDimensions();
+  void UpdateDimensions();
+  void ResetState();
 
   GameContext& game_context_;
 };

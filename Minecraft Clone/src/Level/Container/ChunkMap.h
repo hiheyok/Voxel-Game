@@ -31,6 +31,8 @@ class ChunkMap {
   bool CheckRegion(RegionPos pos, bool checkCache = true) const;
   Region* CreateRegion(RegionPos pos);
   void DeleteRegion(RegionPos pos);
+  Region* FindAndCacheRegion(RegionPos pos) const;
+  void TryDeleteFromCache(RegionPos pos);
   
   GameContext& game_context_;
   bool heightmap_update_ = false;

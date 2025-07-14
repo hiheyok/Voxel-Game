@@ -43,10 +43,10 @@ void Server::Loop() {
     time_->Set();
     // Process Client -> Server events
     ProcessPacket();
-
+    Load();
     Tick();
-
     SendPacket();
+    ResetState();
 
     mspt_ = time_->GetTimePassed_ms();
     double time_left = (1.0 / settings_->tick_rate_) - mspt_ / 1000.0;
@@ -64,8 +64,7 @@ void Server::Loop() {
 void Server::Tick() {
   level_->main_world_->Tick();
   level_->main_world_->EventTick();
-  level_->updateDimensions();
-  level_->main_world_->world_updater_->Load();
+  level_->UpdateDimensions();
 }
 
 void Server::SendEvent(const Event& eventIn) {
@@ -80,6 +79,12 @@ EntityUUID Server::SetInternalConnection(InternalInterface* interface) {
   interface->SetPlayerUUID(uuid);
   return uuid;
 }
+
+void Server::Load() {
+  level_->main_world_->world_updater_->Load();
+}
+
+void Server::ResetState() { level_->main_world_->ResetState(); }
 
 void Server::ProcessPacket() {
   if (client_interface_ == nullptr) return;
@@ -180,13 +185,26 @@ void Server::SendEntityUpdatePacket(ClientInterface* receiver) {
 }
 
 void Server::SendChunkUpdatePacket(ClientInterface* receiver) {
-  std::vector<ChunkPos> updated_chunks =
-      level_->main_world_->world_updater_->GetUpdatedChunkPos();
+  const std::vector<ChunkPos>& created_chunks =
+      level_->main_world_->world_updater_->GetCreatedChunkPos();
   std::vector<ChunkPos> updated_lights =
-      level_->main_world_->world_updater_->GetUpdatedLightPos();
+      level_->main_world_->world_updater_->GetLightUpdate();
 
-  for (const auto& pos : updated_chunks) {
+  for (const auto& pos : created_chunks) {
     ChunkContainer* chunk = level_->main_world_->world_->GetChunk(pos);
+    if (chunk == nullptr) continue;  // TODO(hiheyok): Fix this later
+    ChunkRawData data = chunk->GetRawData();
+
+    ChunkUpdatePacket::AddChunk packet = {.chunk_ = data};
+    receiver->SendChunkUpdates(packet);
+  }
+
+  const FastHashMap<ChunkPos, std::vector<BlockPos>>& changed_blocks_list =
+      level_->main_world_->world_updater_->GetChangedBlocks();
+
+  // For now just send entire chunk later send individual blocks
+  for (const auto& [chunk_pos, changed_blocks] : changed_blocks_list) {
+    ChunkContainer* chunk = level_->main_world_->world_->GetChunk(chunk_pos);
     if (chunk == nullptr) continue;  // TODO(hiheyok): Fix this later
     ChunkRawData data = chunk->GetRawData();
 
@@ -196,10 +214,12 @@ void Server::SendChunkUpdatePacket(ClientInterface* receiver) {
 
   for (const auto& pos : updated_lights) {
     ChunkContainer* chunk = level_->main_world_->world_->GetChunk(pos);
-    LightStorage data = chunk->GetLightData();
+    LightStorage sky_light = *chunk->sky_light_.get();
+    LightStorage block_light = *chunk->block_light_.get();
 
     ChunkUpdatePacket::LightUpdate packet;
-    packet.light_ = data;
+    packet.sky_light_ = std::move(sky_light);
+    packet.block_light_ = std::move(block_light);
     receiver->SendChunkUpdates(packet);
   }
 }
@@ -210,5 +230,7 @@ void Server::SendServerStats(ClientInterface* receiver) {
                            // TODO(hiheyok): Add chunk counter
   stats.mspt_ = mspt_;
   stats.event_queued_ = 0;
+  stats.light_engine_queue_size_ =
+      level_->main_world_->GetLightEngineQueueSize();
   receiver->SendServerStats(stats);
 }

@@ -39,16 +39,10 @@ class ThreadPool {
   void RemoveThread();
   void AddThread();
 
-  // Threads
-  std::deque<std::jthread> workers_;
-  std::jthread scheduler_;
-  std::jthread output_manager_;
-  std::atomic<size_t> worker_count_;
-
   // Condition Variables
   std::deque<std::condition_variable> worker_cv_;
-  std::condition_variable scheduler_cv_;
   std::condition_variable output_cv_;
+  std::condition_variable scheduler_cv_;
   std::atomic<bool> output_ready_;
 
   // Mutex
@@ -57,6 +51,7 @@ class ThreadPool {
   std::mutex scheduler_lock_;
   std::mutex output_lock_;
   std::string type_;
+  std::mutex threads_mutex_;
 
   // Task list
   std::vector<TaskIn> task_list_;  // This stores all of the task to do
@@ -70,17 +65,19 @@ class ThreadPool {
 
   // Task Queued
   std::atomic<size_t> task_queued_;
+
+  // Threads
+  std::deque<std::jthread> workers_;
+  std::jthread scheduler_;
+  std::jthread output_manager_;
+  std::atomic<size_t> worker_count_;
 };
 
 template <class TaskIn, class TaskOut>
 inline ThreadPool<TaskIn, TaskOut>::ThreadPool(
     size_t threads, std::string type, std::function<TaskOut(TaskIn)> taskFunc,
     size_t batchSize)
-    : workers_{threads},
-      scheduler_{std::bind_front(&ThreadPool::Scheduler, this)},
-      output_manager_{std::bind_front(&ThreadPool::OutputManager, this)},
-      worker_count_{threads},
-      worker_cv_{threads},
+    : worker_cv_{threads},
       output_ready_{false},
       worker_locks_{threads},
       worker_output_locks_{threads},
@@ -89,7 +86,11 @@ inline ThreadPool<TaskIn, TaskOut>::ThreadPool(
       worker_output_{threads},
       batch_size_{batchSize},
       task_func_{taskFunc},
-      task_queued_{0} {
+      task_queued_{0},
+      workers_{threads},
+      scheduler_{std::bind_front(&ThreadPool::Scheduler, this)},
+      output_manager_{std::bind_front(&ThreadPool::OutputManager, this)},
+      worker_count_{threads} {
   for (size_t i = 0; i < threads; ++i) {
     workers_[i] = std::jthread(
         std::bind(&ThreadPool::Worker, this, std::placeholders::_1, i));
@@ -99,11 +100,12 @@ template <class TaskIn, class TaskOut>
 inline ThreadPool<TaskIn, TaskOut>::~ThreadPool() {
   scheduler_.request_stop();
   output_manager_.request_stop();
-
+  scheduler_.join();
   for (size_t i = 0; i < worker_count_.load(); ++i) {
     workers_[i].request_stop();
     workers_[i].join();
   }
+  output_manager_.join();
 
   worker_cv_.clear();
   worker_locks_.clear();
@@ -192,18 +194,21 @@ inline void ThreadPool<TaskIn, TaskOut>::Worker(std::stop_token stoken,
          ++i) {
       if (stoken.stop_requested()) {  // Dump remaining task to TaskList; to
                                       // prevent task lost when changing nums of
-                                      // threads
+                                      // threads if stop midway
         std::unique_lock<std::mutex> lock{scheduler_lock_};
         task_list_.insert(task_list_.end(),
                           std::make_move_iterator(worker_tasks.begin() + i),
                           std::make_move_iterator(worker_tasks.end()));
         break;
       }
+      // Execute task
       const TaskIn& task = worker_tasks[i];
       TaskOut out = task_func_(task);
       output.push_back(std::move(out));
+      task_queued_.fetch_sub(1, std::memory_order_acq_rel);
     }
 
+    // Handles batching
     if (i == worker_tasks.size()) {
       worker_tasks.clear();
       working_on_batch = false;
@@ -265,8 +270,9 @@ inline void ThreadPool<TaskIn, TaskOut>::OutputManager(std::stop_token stoken) {
 template <class TaskIn, class TaskOut>
 inline void ThreadPool<TaskIn, TaskOut>::SubmitTask(
     const std::vector<TaskIn>& task) {
+  if (task.size() == 0) return;
   std::lock_guard<std::mutex> lock{scheduler_lock_};
-  task_queued_ += task.size();
+  task_queued_.fetch_add(task.size(), std::memory_order_acq_rel);
   task_list_.insert(task_list_.end(), task.begin(), task.end());
   scheduler_cv_.notify_one();
 }
@@ -276,7 +282,7 @@ inline void ThreadPool<TaskIn, TaskOut>::SubmitTask(const TaskIn& task) {
   std::lock_guard<std::mutex> lock{scheduler_lock_};
   task_list_.push_back(task);
   scheduler_cv_.notify_one();
-  task_queued_++;
+  task_queued_.fetch_add(1, std::memory_order_acq_rel);
 }
 
 template <class TaskIn, class TaskOut>
@@ -297,28 +303,56 @@ inline void ThreadPool<TaskIn, TaskOut>::EditThreadCount(size_t num_threads) {
 
 template <class TaskIn, class TaskOut>
 inline void ThreadPool<TaskIn, TaskOut>::RemoveThread() {
-  if (worker_count_.load() == 0) {
-    throw std::runtime_error("Tried to remove thread when thread count is 0");
-  }
-  worker_count_.store(worker_count_.load() - 1);
+  std::vector<TaskIn> pending_tasks;
+  std::vector<TaskOut> pending_outputs;
+  std::jthread dying_thread;
 
-  // Attempts to terminate thread first
-  workers_.back().request_stop();
-  workers_.back().join();
-
-  // Now manage the resources of the terminated thread
   {
-    std::unique_lock<std::mutex> lock{output_lock_};
-    output_list_.insert(output_list_.back(),
-                        std::make_move_iterator(worker_output_.back().begin()),
-                        std::make_move_iterator(worker_output_.back().end()));
+    std::scoped_lock registry_lock{threads_mutex_};
+
+    if (worker_count_.load(std::memory_order_relaxed) <= 1) {
+      throw std::runtime_error("Cannot have less than 1 thread");
+    }
+
+    {
+      std::lock_guard lock{worker_locks_.back()};
+      pending_tasks = std::move(worker_task_.back());
+    }
+    
+    {
+      std::lock_guard lock{worker_output_locks_.back()};
+      pending_outputs = std::move(worker_output_.back());
+    }
+
+    dying_thread = std::move(workers_.back());
+    dying_thread.request_stop();
+    worker_cv_.back().notify_one();
+
+    workers_.pop_back();
+    worker_cv_.pop_back();
+    worker_locks_.pop_back();
+    worker_output_locks_.pop_back();
+    worker_task_.pop_back();
+    worker_output_.pop_back();
   }
 
-  worker_locks_.pop_back();
-  worker_output_.pop_back();
-  worker_task_.pop_back();
-  worker_output_.pop_back();
-  worker_cv_.pop_back();
+  dying_thread.join();
+
+  {
+    std::lock_guard lock{output_lock_};
+    output_list_.insert(output_list_.end(),
+                        std::make_move_iterator(pending_outputs.begin()),
+                        std::make_move_iterator(pending_outputs.end()));
+  }
+  output_cv_.notify_one();
+
+  {
+    std::lock_guard lock{scheduler_lock_};
+    task_list_.insert(task_list_.end(),
+                      std::make_move_iterator(pending_tasks.begin()),
+                      std::make_move_iterator(pending_tasks.end()));
+  }
+  scheduler_cv_.notify_one();
 }
 
 template <class TaskIn, class TaskOut>
@@ -330,15 +364,14 @@ inline void ThreadPool<TaskIn, TaskOut>::AddThread() {
   worker_output_.emplace_back();
 
   workers_.emplace_back(std::bind(&ThreadPool::Worker, this,
-                                  std::placeholders::_1, worker_count_ + 1));
-  worker_count_.store(worker_count_.load() + 1);
+                                  std::placeholders::_1, worker_count_.load()));
+  worker_count_.fetch_add(1, std::memory_order_acq_rel);
 }
 
 template <class TaskIn, class TaskOut>
 inline std::vector<TaskOut> ThreadPool<TaskIn, TaskOut>::GetOutput() {
   std::lock_guard<std::mutex> lock{output_lock_};
   std::vector<TaskOut> out = std::move(output_list_);
-  task_queued_ -= out.size();
   return out;
 }
 

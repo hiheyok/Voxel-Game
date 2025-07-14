@@ -4,10 +4,11 @@
 
 #include <vector>
 
+#include "Core/DataStructure/ConcurrentQueue.h"
+#include "Core/DataStructure/blockingconcurrentqueue.h"
 #include "Core/Networking/Packet.h"
 #include "Core/Stats/ServerStats.h"
 #include "Core/Typenames.h"
-#include "Utils/Containers/ConcurrentQueue.h"
 /*
  * Abstraction for server to client interfacing
  */
@@ -22,12 +23,19 @@ class ClientInterface {
   virtual void SendTimeLastTick() = 0;
 
   ClientInterface() = default;
+  virtual ~ClientInterface() = default;
 
   size_t PollClientPlayerAction(
-      std::vector<Packet::PlayerAction>& playerAction) {
-    size_t prevSize = playerAction.size();
-    player_action_queue_.PopAll(playerAction);
-    return playerAction.size() - prevSize;
+      std::vector<Packet::PlayerAction>& out_updates) {
+    const int queue_size = player_action_queue_.size_approx();
+    if (queue_size == 0) return 0;
+    std::vector<Packet::PlayerAction> temp(queue_size);
+
+    size_t dequeue_count =
+        player_action_queue_.wait_dequeue_bulk(temp.data(), queue_size);
+    out_updates.insert(out_updates.end(), std::make_move_iterator(temp.begin()),
+                       std::make_move_iterator(temp.begin() + dequeue_count));
+    return dequeue_count;
   }
 
   EntityUUID GetPlayerUUID() const { return player_uuid_; }
@@ -36,6 +44,8 @@ class ClientInterface {
 
  protected:
   // Client -> Server queues
-  ConcurrentQueue<Packet::PlayerAction> player_action_queue_;
+  moodycamel::BlockingConcurrentQueue<Packet::PlayerAction>
+      player_action_queue_;
   EntityUUID player_uuid_;
+
 };

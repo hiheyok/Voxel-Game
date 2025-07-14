@@ -7,12 +7,13 @@
 #include "Core/Position/PositionTypes.h"
 
 // TODO(hiheyok): Refactor the code to use these
-static constexpr int kEastDirection = 0x00;
-static constexpr int kWestDirection = 0x01;
-static constexpr int kUpDirection = 0x02;
-static constexpr int kDownDirection = 0x03;
-static constexpr int kSouthDirection = 0x04;
-static constexpr int kNorthDirection = 0x05;
+static constexpr int kEastDirection = 0;
+static constexpr int kWestDirection = 1;
+static constexpr int kUpDirection = 2;
+static constexpr int kDownDirection = 3;
+static constexpr int kSouthDirection = 4;
+static constexpr int kNorthDirection = 5;
+static constexpr int kAllDirections = 6;
 
 // Use for offsets
 template <class PositionType>
@@ -78,10 +79,7 @@ class Directions {
   static constexpr int kXAxis = 0;
   static constexpr int kYAxis = 1;
   static constexpr int kZAxis = 2;
-
  private:
   static constexpr Direction<PositionType> kDirections[6]{
-      {1, 0, 0, kEastDirection},  {-1, 0, 0, kWestDirection},
-      {0, 1, 0, kUpDirection},    {0, -1, 0, kDownDirection},
-      {0, 0, 1, kSouthDirection}, {0, 0, -1, kNorthDirection}};
+      kEast, kWest, kUp, kDown, kSouth, kNorth};
 };

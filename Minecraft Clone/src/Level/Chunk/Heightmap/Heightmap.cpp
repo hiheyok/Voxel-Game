@@ -4,7 +4,7 @@
 
 #include "Core//Typenames.h"
 
-HeightMap::HeightMap() { data_.fill(-1); }
+HeightMap::HeightMap() { data_.fill(kNoBlocks); }
 HeightMap::~HeightMap() = default;
 
 void HeightMap::Edit(int x, int z, int height) noexcept {
@@ -15,4 +15,5 @@ int8_t HeightMap::Get(int x, int z) const noexcept {
   return data_[x * kChunkDim + z];
 }
 
-void HeightMap::Clear() { data_.fill(-1); }
+void HeightMap::Clear() { data_.fill(kNoBlocks); }
+     

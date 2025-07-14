@@ -10,18 +10,21 @@
 
 ChunkContainer::ChunkContainer(GameContext& game_context)
     : game_context_{game_context},
-      lighting_{std::make_unique<LightStorage>()},
+      sky_light_{std::make_unique<LightStorage>()},
+      block_light_{std::make_unique<LightStorage>()},
       heightmap_{std::make_unique<HeightMap>()},
       outside_block_to_place_{6},
       neighbors_{6},
       block_storage_{} {
-  lighting_->position_ = position_;
+  sky_light_->position_ = position_;
+  block_light_->position_ = position_;
 }
 
 ChunkContainer::~ChunkContainer() = default;
 ChunkContainer::ChunkContainer(ChunkContainer&& other)
     : game_context_{other.game_context_},
-      lighting_{std::move(other.lighting_)},
+      sky_light_{std::move(other.sky_light_)},
+      block_light_{std::move(other.block_light_)},
       heightmap_{std::move(other.heightmap_)},
       outside_block_to_place_{std::move(other.outside_block_to_place_)},
       neighbors_{std::move(other.neighbors_)},
@@ -64,6 +67,28 @@ BlockID ChunkContainer::GetBlockUnsafe(BlockPos pos) const noexcept {
   return block_storage_.GetBlockUnsafe(pos);
 }
 
+void ChunkContainer::SetLightLvl(BlockPos pos, bool is_sky, int lvl) {
+  if (is_sky) {
+    if (sky_light_->GetLighting(pos) != lvl) {
+      SetLightDirty();
+    }
+    return sky_light_->EditLight(pos, lvl);
+  } else {
+    if (block_light_->GetLighting(pos) != lvl) {
+      SetLightDirty();
+    }
+    return block_light_->EditLight(pos, lvl);
+  }
+}
+
+int ChunkContainer::GetLightLvl(BlockPos pos, bool is_sky) const {
+  if (is_sky) {
+    return sky_light_->GetLighting(pos);
+  } else {
+    return block_light_->GetLighting(pos);
+  }
+}
+
 void ChunkContainer::SetBlock(BlockID block, BlockPos pos) {
   if (static_cast<unsigned>(pos.x) >= kChunkDim ||
       static_cast<unsigned>(pos.y) >= kChunkDim ||
@@ -99,7 +124,8 @@ void ChunkContainer::SetBlockUnsafe(BlockID block, BlockPos pos) {
 
 void ChunkContainer::SetPosition(ChunkPos pos) noexcept {
   position_ = pos;
-  lighting_->position_ = pos;
+  sky_light_->position_ = pos;
+  block_light_->position_ = pos;
 }
 std::optional<ChunkContainer*> ChunkContainer::GetNeighbor(
     int side) const noexcept {
@@ -117,17 +143,15 @@ void ChunkContainer::ClearNeighbors() {
 }
 
 void ChunkContainer::SetData(const ChunkRawData& data) {
-  lighting_->ReplaceData(data.lighting_data_.GetData());
+  *sky_light_.get() = data.sky_light_;
+  *block_light_.get() = data.block_light_;
   block_storage_ = data.chunk_data_;
   position_ = data.pos_;
 }
 
 ChunkRawData ChunkContainer::GetRawData() {
-  return ChunkRawData{block_storage_, *lighting_.get(), position_};
-}
-
-LightStorage ChunkContainer::GetLightData() {
-  return LightStorage{*lighting_.get()};
+  return ChunkRawData{block_storage_, *sky_light_.get(), *block_light_.get(),
+                      position_};
 }
 
 void ChunkContainer::UpdateHeightMap() {
@@ -152,8 +176,8 @@ void ChunkContainer::UpdateHeightMap(int x, int z) {
       chunk_above.value()->heightmap_->Get(x, z) != -1) {
     new_height = kChunkDim;
   } else {
-    for (int i = 15; i >= 0; --i) {
-      if (GetBlockUnsafe(BlockPos{x, i, z}) != game_context_.blocks_->AIR) {
+    for (int i = kChunkDim - 1; i >= 0; --i) {
+      if (game_context_.blocks_->GetBlockProperties(GetBlockUnsafe(BlockPos{x, i, z})).opacity_ > 0) {
         new_height = i;
         break;
       }
@@ -180,6 +204,13 @@ bool ChunkContainer::CheckLightDirty() {
 
 void ChunkContainer::SetLightDirty() {
   light_dirty_.store(true, std::memory_order_release);
+}
+
+bool ChunkContainer::IsLightUp() const noexcept {
+  return is_light_up_.load(std::memory_order_relaxed);
+}
+void ChunkContainer::SetLightUp(bool is_light_up) {
+  is_light_up_.store(is_light_up, std::memory_order_acquire);
 }
 
 const Palette& ChunkContainer::GetPalette() const { return block_storage_; }

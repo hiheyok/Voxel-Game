@@ -24,7 +24,21 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 )
 add_executable(my_program ${SOURCES})
 # Specify the directory containing the libraries
-target_compile_options(my_program PRIVATE -fmodules-ts -mavx2)
+target_compile_options(my_program PRIVATE
+    $<$<CONFIG:Debug>:
+        -g
+        -O0
+    >
+)
+
+target_compile_options(my_program PRIVATE
+    $<$<CONFIG:Release>:
+        -O3
+        -fmodules-ts
+        -mavx2
+        -mbmi
+    >
+)
 
 target_link_directories(my_program PRIVATE ${CMAKE_SOURCE_DIR}/bin/lib/x64/)
 target_link_libraries(my_program PRIVATE

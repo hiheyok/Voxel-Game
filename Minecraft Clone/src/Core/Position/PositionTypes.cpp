@@ -6,6 +6,10 @@
 
 static constexpr int kBlockToRegionLog2 = kChunkDimLog2 + kRegionDimLog2;
 
+BlockPos ChunkPos::GetBlockPosOffset() const noexcept {
+  return BlockPos{x, y, z} * kChunkDim;
+}
+
 RegionPos ChunkPos::ToRegionPos() const noexcept {
   return RegionPos{x >> kRegionDimLog2, y >> kRegionDimLog2,
                    z >> kRegionDimLog2};

@@ -27,6 +27,8 @@ class EntityContainer {  // Manages all entities in world
   Entity* GetEntity(EntityUUID entityId) const;
   void Tick(Dimension* dimension);
 
+  void ResetState();
+
  private:
   FastHashMap<EntityUUID, size_t> entities_idx_;
   std::vector<std::unique_ptr<Entity>> entities_;

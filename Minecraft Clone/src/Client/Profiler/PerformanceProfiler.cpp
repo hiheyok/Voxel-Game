@@ -8,7 +8,7 @@
 
 #include "FileManager/Files.h"
 #include "Utils/Timer/Timer.h"
-// TODO(hiheyok): instead of time measure it using clock cycles instead
+
 PerformanceProfiler::PerformanceProfiler() {
   initial_time_ = std::chrono::high_resolution_clock::now();
 }

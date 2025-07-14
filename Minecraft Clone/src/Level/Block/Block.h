@@ -21,6 +21,8 @@ struct BlockProperties {
   bool transparency_ = false;
   bool is_solid_ = false;
   bool light_pass_ = false;
+  int light_emission = 0;
+  int opacity_ = 15;
 };
 
 class Block {

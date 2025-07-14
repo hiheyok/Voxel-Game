@@ -14,4 +14,10 @@ void Level::Start() {
 
 void Level::Stop() {}
 
-void Level::updateDimensions() { main_world_->Update(); }
+void Level::UpdateDimensions() { 
+  main_world_->Update();
+}
+
+void Level::ResetState() {
+
+}

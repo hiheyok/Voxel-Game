@@ -5,15 +5,17 @@
 #include <string>
 #include <vector>
 
+#include "Core/DataStructure/ConcurrentQueue.h"
+#include "Core/DataStructure/blockingconcurrentqueue.h"
 #include "Core/Networking/Packet.h"
 #include "Core/Stats/ServerStats.h"
-#include "Utils/Containers/ConcurrentQueue.h"
 #include "Utils/Timer/Timer.h"
 /*
  * Abstraction for client to server interfacing
  */
 class ServerInterface {
  public:
+  ServerInterface() = default;
   virtual ~ServerInterface() = default;
 
   virtual void SendPlayerAction(const Packet::PlayerAction& input) = 0;
@@ -24,22 +26,44 @@ class ServerInterface {
   virtual void Disconnect() = 0;
   virtual void Update() = 0;
 
-  size_t PollBlockUpdates(std::vector<Packet::BlockUpdate>& outUpdates) {
-    size_t prevSize = outUpdates.size();
-    block_update_queue_.PopAll(outUpdates);
-    return outUpdates.size() - prevSize;
+  size_t PollBlockUpdates(std::vector<Packet::BlockUpdate>& out_updates) {
+    const int queue_size = block_update_queue_.size_approx();
+    if (queue_size == 0) return 0;
+    std::vector<Packet::BlockUpdate> temp(queue_size);
+
+    size_t dequeue_count =
+        block_update_queue_.wait_dequeue_bulk(temp.data(), queue_size);
+
+    out_updates.insert(out_updates.end(), std::make_move_iterator(temp.begin()),
+                       std::make_move_iterator(temp.begin() + dequeue_count));
+    return dequeue_count;
   }
 
-  size_t PollEntityUpdates(std::vector<Packet::EntityUpdate>& outUpdates) {
-    size_t prevSize = outUpdates.size();
-    entity_update_queue_.PopAll(outUpdates);
-    return outUpdates.size() - prevSize;
+  size_t PollEntityUpdates(std::vector<Packet::EntityUpdate>& out_updates) {
+    const int queue_size = entity_update_queue_.size_approx();
+    if (queue_size == 0) return 0;
+    std::vector<Packet::EntityUpdate> temp(queue_size);
+
+    size_t dequeue_count =
+        entity_update_queue_.wait_dequeue_bulk(temp.data(), queue_size);
+
+    out_updates.insert(out_updates.end(), std::make_move_iterator(temp.begin()),
+                       std::make_move_iterator(temp.begin() + dequeue_count));
+    return dequeue_count;
   }
 
-  size_t PollChunkUpdates(std::vector<Packet::ChunkUpdateData>& outUpdates) {
-    size_t prevSize = outUpdates.size();
-    chunk_update_queue_.PopAll(outUpdates);
-    return outUpdates.size() - prevSize;
+  size_t PollChunkUpdates(std::vector<Packet::ChunkUpdateData>& out_updates) {
+    const int queue_size = chunk_update_queue_.size_approx();
+    if (queue_size == 0) return 0;
+    
+    std::vector<Packet::ChunkUpdateData> temp(queue_size);
+
+    size_t dequeue_count =
+        chunk_update_queue_.wait_dequeue_bulk(temp.data(), queue_size);
+
+    out_updates.insert(out_updates.end(), std::make_move_iterator(temp.begin()),
+                       std::make_move_iterator(temp.begin() + dequeue_count));
+    return dequeue_count;
   }
 
   ServerStats GetServerStats() { return server_stats_; }
@@ -50,10 +74,13 @@ class ServerInterface {
 
  protected:
   // Server -> Client queues
-  ConcurrentQueue<Packet::BlockUpdate> block_update_queue_;
-  ConcurrentQueue<Packet::EntityUpdate> entity_update_queue_;
-  ConcurrentQueue<Packet::ChunkUpdateData> chunk_update_queue_;
+  moodycamel::BlockingConcurrentQueue<Packet::BlockUpdate> block_update_queue_;
+  moodycamel::BlockingConcurrentQueue<Packet::EntityUpdate>
+      entity_update_queue_;
+  moodycamel::BlockingConcurrentQueue<Packet::ChunkUpdateData>
+      chunk_update_queue_;
 
   ServerStats server_stats_;
   EntityUUID client_player_uuid_;
+
 };

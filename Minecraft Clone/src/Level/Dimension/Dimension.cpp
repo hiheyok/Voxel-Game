@@ -6,7 +6,8 @@
 
 #include "Core/GameContext/GameContext.h"
 #include "Core/Options/Option.h"
-#include "Level/Light/LightEngine.h"
+#include "Level/Light/ChunkLightTask.h"
+#include "Level/Light/ThreadedLightEngine.h"
 #include "Level/TerrainGeneration/ChunkGenerator.h"
 #include "Level/World/WorldUpdater.h"
 
@@ -24,13 +25,12 @@ Dimension::Dimension(GameContext& game_context, DimensionProperties properties,
       game_context.options_->vertical_render_distance_;
 
   world_ = static_cast<WorldInterface*>(main_world_.get());
-  light_engine_ = std::make_unique<LightEngine>(
-      game_context, game_context.options_->light_engine_threads_, world_);
+  light_engine_ = std::make_unique<ThreadedLightEngine>(game_context, *world_);
 
-  world_updater_ =
-      std::make_unique<WorldUpdater>(game_context_, main_world_.get(), world_settings_);
-  collusion_detector_ =
-      std::make_unique<CollusionDetector>(game_context_, main_world_->GetChunkMap());
+  world_updater_ = std::make_unique<WorldUpdater>(
+      game_context_, main_world_.get(), world_settings_);
+  collusion_detector_ = std::make_unique<CollusionDetector>(
+      game_context_, main_world_->GetChunkMap());
 
   if (game_context_.generators_->GetGenerator(generator_type_)
           ->use_tall_chunks_) {
@@ -100,17 +100,31 @@ void Dimension::EventTick() {
 }
 
 void Dimension::Update() {
-  std::vector<ChunkPos> requestedChunks = world_updater_->GetRequestedChunks();
-  std::vector<ChunkPos> requestedLights =
-      world_updater_->GetRequestedLightUpdates();
+  const std::vector<ChunkPos>& requested_chunks =
+      world_updater_->GetRequestedChunks();
+  chunk_generator_->Generate(requested_chunks);
 
-  chunk_generator_->Generate(requestedChunks);
-  light_engine_->Generate(requestedLights);
+  const FastHashMap<ChunkPos, std::vector<BlockPos>>& changed_blocks =
+      world_updater_->GetChangedBlocks();
+  for (const auto& [chunk_pos, changed_blocks] : changed_blocks) {
+    light_engine_->UpdateChunk(ChunkLightTask{chunk_pos, changed_blocks});
+  }
 
   std::vector<std::unique_ptr<Chunk>> chunks = chunk_generator_->GetOutput();
-  std::vector<std::unique_ptr<LightStorage>> lights =
-      light_engine_->GetOutput();
-
   world_updater_->SetChunk(std::move(chunks));
-  world_updater_->SetLight(std::move(lights));
+
+  const std::vector<ChunkPos>& created_chunks = world_updater_->GetCreatedChunkPos();
+  for (auto chunk_pos : created_chunks) {
+    light_engine_->LightUpChunk(chunk_pos);
+  }
+
+  
+}
+
+size_t Dimension::GetLightEngineQueueSize() const noexcept {
+  return light_engine_->GetQueueSize();
+}
+
+void Dimension::ResetState() {
+  world_updater_->ResetState();
 }

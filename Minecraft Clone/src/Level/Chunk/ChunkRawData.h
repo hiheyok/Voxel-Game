@@ -5,7 +5,7 @@
 #include "Level/Light/LightStorage.h"
 
 struct ChunkRawData {
-  ChunkRawData(const Palette& chunkData, const LightStorage& lightData,
+  ChunkRawData(const Palette& chunkData, const LightStorage& sky_light, const LightStorage& block_light,
                ChunkPos pos);
   ChunkRawData(const ChunkRawData&);
   ChunkRawData(ChunkRawData&&);
@@ -15,6 +15,7 @@ struct ChunkRawData {
   ChunkRawData& operator=(ChunkRawData&&);
 
   Palette chunk_data_;
-  LightStorage lighting_data_;
+  LightStorage sky_light_;
+  LightStorage block_light_;
   ChunkPos pos_;
 };

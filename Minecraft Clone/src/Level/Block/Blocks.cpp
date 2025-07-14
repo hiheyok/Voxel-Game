@@ -15,7 +15,6 @@
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
 #include "Utils/LogUtils.h"
 
-// TODO(hiheyok): Implement model caching
 using json = nlohmann::json;
 
 BlockList::BlockList(GameContext& game_context)

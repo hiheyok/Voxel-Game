@@ -3,8 +3,12 @@
 #include "Level/Chunk/ChunkRawData.h"
 
 ChunkRawData::ChunkRawData(const Palette& chunkData,
-                           const LightStorage& lightData, ChunkPos pos)
-    : chunk_data_{chunkData}, lighting_data_{lightData}, pos_{pos} {}
+                           const LightStorage& sky_light,
+                           const LightStorage& block_light, ChunkPos pos)
+    : chunk_data_{chunkData},
+      sky_light_{sky_light},
+      block_light_{block_light},
+      pos_{pos} {}
 ChunkRawData::ChunkRawData(const ChunkRawData&) = default;
 ChunkRawData::ChunkRawData(ChunkRawData&&) = default;
 ChunkRawData::~ChunkRawData() = default;

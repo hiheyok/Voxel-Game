@@ -15,7 +15,7 @@ class WorldInterface;
 class CollusionDetector;
 class WorldUpdater;
 class ChunkGenerator;
-class LightEngine;
+class ThreadedLightEngine;
 class GameContext;
 
 class Dimension {
@@ -34,15 +34,17 @@ class Dimension {
   void TickUsed(EventID id, BlockPos pos);
   void EventTick();
   void Update();
+  size_t GetLightEngineQueueSize() const noexcept;
+  void ResetState();
+
   GameContext& game_context_;
   WorldInterface* world_;
   std::unique_ptr<WorldUpdater> world_updater_;
   std::unique_ptr<CollusionDetector> collusion_detector_;
-
  private:
   std::unique_ptr<World> main_world_;
   std::unique_ptr<ChunkGenerator> chunk_generator_;
-  std::unique_ptr<LightEngine> light_engine_;
+  std::unique_ptr<ThreadedLightEngine> light_engine_;
 
   WorldGeneratorID generator_type_;
   DimensionProperties properties_;

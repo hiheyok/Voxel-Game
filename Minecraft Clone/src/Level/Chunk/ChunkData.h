@@ -32,13 +32,15 @@ class ChunkContainer {
 
   BlockID GetBlock(BlockPos pos) const;
   BlockID GetBlockUnsafe(BlockPos pos) const noexcept;
+  
+  void SetLightLvl(BlockPos pos, bool is_sky, int lvl);
+  int GetLightLvl(BlockPos pos, bool is_sky) const;
 
   void SetBlock(BlockID block, BlockPos pos);
   void SetBlockUnsafe(BlockID block, BlockPos pos);
 
   void SetData(const ChunkRawData& data);
   ChunkRawData GetRawData();
-  LightStorage GetLightData();
 
   void SetPosition(ChunkPos pos) noexcept;
 
@@ -47,14 +49,20 @@ class ChunkContainer {
 
   // Check light update request
 
+  // For light updates
   bool CheckLightDirty();
   void SetLightDirty();
+
+  // Signal to relight entire chunk
+  bool IsLightUp() const noexcept;
+  void SetLightUp(bool);
 
   const Palette& GetPalette() const;
 
   GameContext& game_context_;
   ChunkPos position_;
-  std::unique_ptr<LightStorage> lighting_;
+  std::unique_ptr<LightStorage> sky_light_;
+  std::unique_ptr<LightStorage> block_light_;
   std::unique_ptr<HeightMap> heightmap_;
   std::vector<std::vector<SetBlockRelative>> outside_block_to_place_;
 
@@ -65,5 +73,7 @@ class ChunkContainer {
 
  private:
   std::atomic<bool> light_dirty_ = false;
+  std::atomic<bool> is_light_up_ = false;
+  bool light_update_seeding = true; // Parameters to seed newly generated chunks
   Palette block_storage_;
 };

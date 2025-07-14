@@ -4,6 +4,9 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <time.h>
 
+#include <iostream>
+#include <stdexcept>
+
 #include "Core/GameContext/GameContext.h"
 #include "Core/Options/Option.h"
 #include "Utils/stb_image.h"
@@ -14,8 +17,12 @@ int main() {
 
   GameContext game_context;
   game_context.InitializeGameContext();
-
   Client GameClient{game_context};
   GameClient.run();
+  try {
+  } catch (std::exception& e) {
+    std::cout << e.what() << '\n';
+  }
+
   return 0;
 }

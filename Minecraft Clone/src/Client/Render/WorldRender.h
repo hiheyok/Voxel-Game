@@ -48,7 +48,6 @@ class WorldRender : public WorldRenderInfo {
  private:
   void LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks);
   std::unique_ptr<Mesh::ChunkVertexData> Worker(ChunkPos pos);
-  Mesh::ChunkMeshData& GetMesher();
 
   using WorkerReturnType = std::invoke_result_t<decltype(&WorldRender::Worker),
                                                 WorldRender*, ChunkPos>;

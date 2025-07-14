@@ -17,6 +17,7 @@ class ChunkPos final : public Position<ChunkPos> {
  public:
   using Position<ChunkPos>::Position;
 
+  [[nodiscard]] BlockPos GetBlockPosOffset() const noexcept;
   [[nodiscard]] RegionPos ToRegionPos() const noexcept;
   [[nodiscard]] size_t GetIndex() const noexcept;
 };

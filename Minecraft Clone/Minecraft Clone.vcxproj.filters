@@ -177,9 +177,6 @@
     <ClCompile Include="src\Server\Server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\Light\LightEngine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Level\Item\ItemTextureAtlas.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -367,6 +364,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexFormat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Light\BlockLightEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Light\ChunkLightTask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Light\LightEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Light\SkyLightEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Light\ThreadedLightEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\Light\LightEngineCache.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -698,9 +713,6 @@
     <ClInclude Include="src\Server\Server.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\Light\LightEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Level\Chunk\Heightmap\Heightmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -768,9 +780,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Interfaces\InternalInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Utils\Containers\ConcurrentQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Interfaces\ClientInterface.h">
@@ -891,6 +900,39 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexFormat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\DataStructure\concurrentqueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\DataStructure\AtomicNibbleArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\DataStructure\blockingconcurrentqueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\DataStructure\lightweightsemaphore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\DataStructure\OriginalConcurrentQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Light\BlockLightEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Light\ChunkLightTask.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Light\LightEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Light\SkyLightEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Light\ThreadedLightEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\Light\LightEngineCache.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -127,10 +127,13 @@ void ClientPlay::UpdateDebugStats() {
   glm::vec3 player_pos = main_player_->GetEntityProperties().position_;
   BlockPos block_pos{player_pos.x, player_pos.y, player_pos.z};
   BlockPos rel_block_pos = block_pos.GetLocalPos();
-  int light_lvl = -1;
+  int sky_lvl = -1;
+  int block_lvl = -1;
   if (client_level_->cache_.CheckChunk(block_pos.ToChunkPos())) {
-    light_lvl = client_level_->cache_.GetChunk(block_pos.ToChunkPos())
-                    ->lighting_->GetLighting(rel_block_pos);
+    sky_lvl = client_level_->cache_.GetChunk(block_pos.ToChunkPos())
+                  ->sky_light_->GetLighting(rel_block_pos);
+    block_lvl = client_level_->cache_.GetChunk(block_pos.ToChunkPos())
+                    ->block_light_->GetLighting(rel_block_pos);
   }
 
   debug_screen_->EditText(
@@ -174,11 +177,12 @@ void ClientPlay::UpdateDebugStats() {
   debug_screen_->EditText("Stat7",
                           "Mesh Engine Queued: " +
                               std::to_string(terrain_render_->GetQueuedSize()));
-  debug_screen_->EditText("Stat8", "Light Level: " + std::to_string(light_lvl));
+  debug_screen_->EditText("Stat8", "Light Level: " + std::to_string(sky_lvl) + " : " + std::to_string(block_lvl));
   debug_screen_->EditText("Stat9",
                           "Server Tick (MSPT): " + std::to_string(stats.mspt_));
-  debug_screen_->EditText("Stat10",
-                          "Chunk Count: " + std::to_string(stats.chunk_count_));
+  debug_screen_->EditText(
+      "Stat10",
+      "Light Engine Queue: " + std::to_string(stats.light_engine_queue_size_));
   debug_screen_->Update();
 }
 
@@ -223,11 +227,20 @@ void ClientPlay::UpdateChunks() {
   }
 
   for (const auto& light : updateLightPackets) {
-    const LightStorage& l = light.light_;
+    const LightStorage& sky_light = light.sky_light_;
+    const LightStorage& block_light = light.block_light_;
 
-    chunkToUpdateRender.insert(l.position_);
-    client_level_->cache_.GetChunk(l.position_)
-        ->lighting_->ReplaceData(l.GetData());
+    if (!client_level_->cache_.CheckChunk(sky_light.position_)) {
+      continue;
+      game_context_.logger_->LogWarn("ClientPlay::UpdateChunks",
+                                     "Chunk doens't exist!");
+    }
+
+    Chunk* chunk = client_level_->cache_.GetChunk(sky_light.position_);
+
+    *chunk->sky_light_ = sky_light;
+    *chunk->block_light_ = block_light;
+    chunkToUpdateRender.insert(chunk->position_);
   }
 
   std::vector<ChunkPos> toUpdate(chunkToUpdateRender.begin(),

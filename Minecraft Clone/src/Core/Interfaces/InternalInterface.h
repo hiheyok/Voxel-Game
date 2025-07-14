@@ -3,10 +3,11 @@
 #pragma once
 
 #include <string>
+#include <iostream>
 
 #include "ClientInterface.h"
+#include "Core/DataStructure/ConcurrentQueue.h"
 #include "ServerInterface.h"
-#include "Utils/Containers/ConcurrentQueue.h"
 #include "Utils/LogUtils.h"
 
 class InternalInterface : public ServerInterface, public ClientInterface {
@@ -15,7 +16,10 @@ class InternalInterface : public ServerInterface, public ClientInterface {
 
   // Client -> Server
   void SendPlayerAction(const Packet::PlayerAction& action) override {
-    player_action_queue_.Push(action);
+    int attempts = 0;
+    while (!player_action_queue_.enqueue(action) &&
+           attempts++ < kQueueAttempts) {
+    }
   }
 
   bool IsConnected() const override { return is_connected_; }
@@ -34,15 +38,24 @@ class InternalInterface : public ServerInterface, public ClientInterface {
   // Server -> Client
 
   void SendBlockUpdate(const Packet::BlockUpdate& update) override {
-    block_update_queue_.Push(update);
+    int attempts = 0;
+    while (!block_update_queue_.enqueue(update) &&
+           attempts++ < kQueueAttempts) {
+    }
   }
 
   void SendEntityUpdate(const Packet::EntityUpdate& update) override {
-    entity_update_queue_.Push(update);
+    int attempts = 0;
+    while (!entity_update_queue_.enqueue(update) &&
+           attempts++ < kQueueAttempts) {
+    }
   }
 
   void SendChunkUpdates(const Packet::ChunkUpdateData& update) override {
-    chunk_update_queue_.Push(update);
+    int attempts = 0;
+    while (!chunk_update_queue_.enqueue(update) &&
+           attempts++ < kQueueAttempts) {
+    }
   }
 
   void SendServerStats(const ServerStats& stats) override {
@@ -52,5 +65,6 @@ class InternalInterface : public ServerInterface, public ClientInterface {
   void SendTimeLastTick() override { time.Set(); }
 
  private:
+  static constexpr int kQueueAttempts = 16;
   bool is_connected_ = false;
 };

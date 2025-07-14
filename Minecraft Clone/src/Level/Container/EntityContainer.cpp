@@ -27,7 +27,6 @@ std::vector<EntityProperty> EntityContainer::GetSpawnedEntities() {
   for (const auto& entity : spawned_entity_) {
     out.push_back(GetEntity(entity)->properties_);
   }
-  spawned_entity_.clear();
   return out;
 }
 
@@ -40,7 +39,6 @@ EntityContainer::GetUpdatedEntities() {  // change this to past on a vector
 
   for (auto& entity : entities_) {
     if (entity->is_dirty_) {
-      entity->is_dirty_ = false;
       out.emplace_back(entity->properties_);
     }
   }
@@ -49,10 +47,8 @@ EntityContainer::GetUpdatedEntities() {  // change this to past on a vector
 }
 
 std::vector<EntityUUID> EntityContainer::GetRemovedEntities() {
-  std::lock_guard<std::mutex> lock{entity_lock_};
-  std::vector<EntityUUID> out(removed_entity_.begin(), removed_entity_.end());
-  removed_entity_.clear();
-  return out;
+  return std::vector<EntityUUID>(removed_entity_.begin(),
+                                 removed_entity_.end());
 }
 
 void EntityContainer::RemoveEntity(EntityUUID entityId) {
@@ -84,5 +80,14 @@ Entity* EntityContainer::GetEntity(EntityUUID entityId) const {
 void EntityContainer::Tick(Dimension* dimension) {
   for (auto& entity : entities_) {
     entity->Tick(dimension);
+  }
+}
+
+void EntityContainer::ResetState() {
+  spawned_entity_.clear();
+  removed_entity_.clear();
+
+  for (auto& entity : entities_) {
+    entity->is_dirty_ = false;
   }
 }

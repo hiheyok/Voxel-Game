@@ -1,199 +1,246 @@
-// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
-
 #include "Level/Light/LightEngine.h"
 
-#include <memory>
-#include <vector>
+#include <algorithm>
+#include <cassert>
 
 #include "Core/GameContext/GameContext.h"
-#include "Level/Chunk/Chunk.h"
-#include "Level/Chunk/Heightmap/Heightmap.h"
-#include "Level/Light/LightStorage.h"
+#include "Level/Block/Blocks.h"
+#include "Level/Light/ChunkLightTask.h"
+#include "Level/Light/LightEngineCache.h"
 #include "Level/World/WorldInterface.h"
-#include "Utils/Containers/FIFOQueue.h"
 
-static constexpr size_t kDefaultFifoQueueSize = 32768;
-static thread_local FixedFIFOQueue<uint16_t, kDefaultFifoQueueSize> FIFOQueues;
-static constexpr int8_t DIRECTION_OFFSETS[6][3] = {
-    {-1, 0, 0}, {1, 0, 0},  // X: Left, Right
-    {0, -1, 0}, {0, 1, 0},  // Y: Down, Up
-    {0, 0, -1}, {0, 0, 1}   // Z: Back, Front
-};
-
-// Pack light node data into uint16_t
-inline uint16_t PackLightNode(uint8_t x, uint8_t y, uint8_t z, uint8_t light) {
-  return x | (y << 4) | (z << 8) | (light << 12);
+void LightEngine::InternalTask::SetBlockPos(BlockPos pos) noexcept {
+  block_pos_ = pos;
 }
 
-// Unpack light node data
-inline void UnpackLightNode(uint16_t node, uint8_t& x, uint8_t& y, uint8_t& z,
-                            uint8_t& light) {
-  x = node & 0xF;
-  y = (node >> 4) & 0xF;
-  z = (node >> 8) & 0xF;
-  light = (node >> 12) & 0xF;
+void LightEngine::InternalTask::SetChunkPos(ChunkPos pos) noexcept {
+  chunk_pos_ = pos;
 }
 
-LightEngine::LightEngine(GameContext& game_context, size_t thread_count,
-                         WorldInterface* interface)
-    : game_context_{game_context} {
-  lighting_thread_pool_ =
-      std::make_unique<ThreadPool<ChunkPos, WorkerReturnType>>(
-          thread_count, "Light Engine",
-          std::bind_front(&LightEngine::Worker, this), 100);
-
-  world_ = interface;
+void LightEngine::InternalTask::SetDirection(int direction) noexcept {
+  direction_ = direction;
 }
+
+void LightEngine::InternalTask::SetLightLevel(int lvl) noexcept {
+  assert(lvl >= 0 && lvl < 16);
+  light_lvl_ = static_cast<uint8_t>(lvl);
+}
+
+BlockPos LightEngine::InternalTask::GetBlockPos() const noexcept {
+  return block_pos_;
+}
+
+ChunkPos LightEngine::InternalTask::GetChunkPos() const noexcept {
+  return chunk_pos_;
+}
+
+int LightEngine::InternalTask::GetDirection() const noexcept {
+  return direction_;
+}
+
+int LightEngine::InternalTask::GetLightLevel() const noexcept {
+  return light_lvl_;
+}
+
+LightEngine::LightEngine(GameContext& game_context, WorldInterface& world)
+    : game_context_{game_context}, world_{world}, light_cache_{nullptr} {}
 LightEngine::~LightEngine() = default;
 
-void LightEngine::IncreaseLightLevel(std::unique_ptr<LightStorage>& container,
-                                     uint8_t lvl, int x, int y, int z) {
-  uint8_t curr = container->GetLighting(BlockPos{x, y, z});
-  if (curr < lvl) container->EditLight(BlockPos{x, y, z}, lvl);
+void LightEngine::SetCache(LightEngineCache* cache) {
+  assert(cache != nullptr);
+  light_cache_ = cache;
 }
 
-void LightEngine::WorkOnChunkSkylight(Chunk* chunk,
-                                      std::unique_ptr<LightStorage>& light) {
-  const HeightMap& heightmap = *chunk->heightmap_.get();
-  FIFOQueues.ResetData();
+void LightEngine::Propagate(const ChunkLightTask& chunk_task) {
+  assert(light_cache_ != nullptr);
+  PropagateChanges(chunk_task);
+  ResetDecreaseQueue();
+  ResetIncreaseQueue();
+  light_cache_ = nullptr;
+}
 
-  for (int x = 0; x < kChunkDim; x++) {
-    for (int z = 0; z < kChunkDim; z++) {
-      int h = heightmap.Get(x, z);  // it will try to find pivot points
+void LightEngine::PropagateIncrease() {
+  InternalTask task;
+  while (TryDequeueIncrease(task)) {
+    BlockPos block_pos = task.GetBlockPos();
+    ChunkPos chunk_pos = task.GetChunkPos();
+    BlockPos global_pos = block_pos + chunk_pos.GetBlockPosOffset();
+    int direction = task.GetDirection();
+    int propagation_lvl = task.GetLightLevel();
+    int light_lvl = GetLightLvl(global_pos);
 
-      if (h == kChunkDim) continue;
-
-      FIFOQueues.push(PackLightNode(x, kChunkDim - 1, z, 15));
-    }
-  }
-
-  // Look at neighbors too
-
-  for (const auto& side : Directions<ChunkPos>()) {
-    if (side.GetAxis() == Directions<ChunkPos>::kYAxis) continue;
-
-    std::optional<ChunkContainer*> neighbor = chunk->GetNeighbor(side);
-    if (!neighbor.has_value()) {
+    // Light level already changed from somewhere else
+    if (propagation_lvl != light_lvl) {
       continue;
     }
 
-    LightStorage neighborLight = neighbor.value()->GetLightData();
-
-    int axis = side.GetAxis();
-    int direction = side.GetDirection() & 0b1;
-    int orthoPos = (1 - direction) * (kChunkDim - 1);
-    int relativeNeighborPos = direction * (kChunkDim - 1);
-
-    for (int i = 0; i < kChunkDim; ++i) {
-      if (axis == Directions<ChunkPos>::kXAxis) {
-        int h = heightmap.Get(orthoPos, i);
-        if (h != kChunkDim) continue;
-      } else {
-        int h = heightmap.Get(i, orthoPos);
-        if (h != kChunkDim) continue;
-      }
-
-      for (int y = 0; y < kChunkDim; ++y) {
-        if (axis == Directions<ChunkPos>::kXAxis) {
-          int lightLevel =
-              neighborLight.GetLighting(BlockPos{relativeNeighborPos, y, i});
-          if (lightLevel < 1) continue;
-          FIFOQueues.push(PackLightNode(orthoPos, y, i, lightLevel - 1));
-        } else {
-          int lightLevel =
-              neighborLight.GetLighting(BlockPos{i, y, relativeNeighborPos});
-          if (lightLevel < 1) continue;
-          FIFOQueues.push(PackLightNode(i, y, orthoPos, lightLevel - 1));
-        }
-      }
-    }
-  }
-
-  while (!FIFOQueues.IsEmpty()) {
-    // Get node
-    uint16_t node = FIFOQueues.get();
-    uint8_t nodeX, nodeY, nodeZ, nodeLight;
-
-    UnpackLightNode(node, nodeX, nodeY, nodeZ, nodeLight);
-
-    if (heightmap.Get(nodeX, nodeZ) <= nodeY) {
-      nodeLight = 15;
-    }
-
-    if (light->GetLighting(BlockPos{nodeX, nodeY, nodeZ}) >= nodeLight) {
-      continue;
-    }
-    // Set node light level
-    IncreaseLightLevel(light, nodeLight, nodeX, nodeY, nodeZ);
-
-    if (!game_context_.blocks_
-             ->GetBlockProperties(
-                 chunk->GetBlockUnsafe(BlockPos{nodeX, nodeY, nodeZ}))
-             .light_pass_) {
-      continue;
-    }
-
-    if (nodeLight == 0) continue;
-
-    // Spread
-    for (const auto& side : Directions<BlockPos>()) {
-      if (side == Directions<BlockPos>::kUp) continue;  // skip Up direction
-
-      // Case to handle the down direction
-      if (side == Directions<BlockPos>::kDown) {
-        if (nodeY != 0) {
-          FIFOQueues.push(PackLightNode(nodeX, nodeY - 1, nodeZ, nodeLight));
-        }
+    for (const auto& propagation : Directions<BlockPos>()) {
+      if (direction != kAllDirections &&
+          direction == propagation.GetOppositeDirection()) {
         continue;
       }
 
-      uint8_t nx = nodeX + DIRECTION_OFFSETS[side][0];
-      uint8_t ny = nodeY + DIRECTION_OFFSETS[side][1];
-      uint8_t nz = nodeZ + DIRECTION_OFFSETS[side][2];
+      BlockPos offset_pos = global_pos + propagation;
 
-      int8_t newLight = nodeLight - 1;
+      // Light level is already at the expected level or chunk doesn't exist
+      if (!CheckChunk(offset_pos.ToChunkPos())) {
+        continue;
+      }
 
-      // Check if it is in the chunk first
-      if ((nx | ny | nz) >> kChunkDimLog2) continue;
+      int curr_lvl = GetLightLvl(offset_pos);
 
-      // Check if the light level is more or less
-      int currLvl = light->GetLighting(BlockPos{nx, ny, nz});
+      if (curr_lvl >= propagation_lvl - 1) {
+        continue;
+      }
 
-      if (currLvl + 2 > newLight) continue;
+      BlockID offset_block = GetBlock(offset_pos);
+      int block_opacity =
+          game_context_.blocks_->GetBlockProperties(offset_block).opacity_;
+      int target_lvl = propagation_lvl - std::max(1, block_opacity);
+      target_lvl = std::max(0, target_lvl);
+      // Area is already brightly lit
+      if (target_lvl <= curr_lvl) {
+        continue;
+      }
 
-      FIFOQueues.push(PackLightNode(nx, ny, nz, newLight));
+      SetLightLvl(offset_pos, target_lvl);
+
+      // If target lvl is <= 1, then its not going to be able to spread and
+      // value is already set
+      if (target_lvl > 1) {
+        InternalTask next_task;
+        next_task.SetBlockPos(offset_pos.GetLocalPos());
+        next_task.SetChunkPos(offset_pos.ToChunkPos());
+        next_task.SetLightLevel(target_lvl);
+        next_task.SetDirection(propagation);
+        EnqueueIncrease(next_task);
+      }
     }
   }
 }
 
-std::unique_ptr<LightStorage> LightEngine::Worker(ChunkPos pos) {
-  Chunk* chunk = world_->GetChunk(pos);
+void LightEngine::PropagateDecrease() {
+  InternalTask task;
 
-  HeightMap heightmap = *chunk->heightmap_;
+  while (TryDequeueDecrease(task)) {
+    BlockPos block_pos = task.GetBlockPos();
+    ChunkPos chunk_pos = task.GetChunkPos();
+    BlockPos global_pos = block_pos + chunk_pos.GetBlockPosOffset();
+    int propagation_lvl = task.GetLightLevel();
 
-  std::unique_ptr<LightStorage> lighting = std::make_unique<LightStorage>();
-  lighting->ResetLightingCustom(4);
-  lighting->position_.Set(pos.x, pos.y, pos.z);
+    for (const auto& propagation : Directions<BlockPos>()) {
+      BlockPos offset_pos = global_pos + propagation;
+      // Chunk doesnt exist
+      if (!CheckChunk(offset_pos.ToChunkPos())) {
+        continue;
+      }
 
-  WorkOnChunkSkylight(chunk, lighting);
+      int curr_lvl = GetLightLvl(offset_pos);
 
-  return lighting;
+      // Area is already dark
+      if (curr_lvl == 0) {
+        continue;
+      }
+
+      // If neighbor is dimmer, it might have been lit by the removed light.
+      // Remove its light and add it to the decrease queue to propagate
+      // darkness.
+      if (curr_lvl < propagation_lvl) {
+        SetLightLvl(offset_pos, 0);
+        InternalTask next_task;
+        next_task.SetBlockPos(offset_pos.GetLocalPos());
+        next_task.SetChunkPos(offset_pos.ToChunkPos());
+        next_task.SetLightLevel(curr_lvl);
+        next_task.SetDirection(propagation);
+        EnqueueDecrease(next_task);
+      } else {
+        // If neighbor is brighter or equal, it is an independent light source.
+        // Add it to the increase queue to re-light the new darkness.
+        InternalTask next_task;
+        next_task.SetBlockPos(offset_pos.GetLocalPos());
+        next_task.SetChunkPos(offset_pos.ToChunkPos());
+        next_task.SetLightLevel(curr_lvl);
+        next_task.SetDirection(propagation.GetOppositeDirection());
+        EnqueueIncrease(next_task);
+      }
+    }
+  }
+
+  PropagateIncrease();
 }
 
-void LightEngine::Generate(const std::vector<ChunkPos>& tasks) {
-  lighting_thread_pool_->SubmitTask(tasks);
+void LightEngine::EnqueueIncrease(InternalTask task) {
+  if (enqueue_increase_pos_ >= increase_queue_.size()) {
+    EnlargeIncreaseQueue();
+  }
+  increase_queue_[enqueue_increase_pos_++] = task;
 }
 
-std::vector<std::unique_ptr<LightStorage>> LightEngine::GetOutput() {
-  std::vector<std::unique_ptr<LightStorage>> out =
-      lighting_thread_pool_->GetOutput();
-  return out;
+void LightEngine::EnqueueDecrease(InternalTask task) {
+  if (enqueue_decrease_pos_ >= decrease_queue_.size()) {
+    EnlargeDecreaseQueue();
+  }
+  decrease_queue_[enqueue_decrease_pos_++] = task;
 }
 
-void LightEngine::QueueChunk(ChunkPos pos) {
-  lighting_thread_pool_->SubmitTask(pos);
+void LightEngine::EnlargeIncreaseQueue() {
+  increase_queue_.resize(increase_queue_.size() + kQueueSizeIncrement);
 }
 
-size_t LightEngine::GetQueueSize() {
-  return lighting_thread_pool_->GetQueueSize();
+void LightEngine::EnlargeDecreaseQueue() {
+  decrease_queue_.resize(decrease_queue_.size() + kQueueSizeIncrement);
+}
+
+LightEngine::InternalTask LightEngine::DequeueIncrease() noexcept {
+  assert(dequeue_increase_pos_ < enqueue_increase_pos_);
+  return increase_queue_[dequeue_increase_pos_++];
+}
+
+LightEngine::InternalTask LightEngine::DequeueDecrease() noexcept {
+  assert(dequeue_decrease_pos_ < enqueue_decrease_pos_);
+  return decrease_queue_[dequeue_decrease_pos_++];
+}
+
+bool LightEngine::IsIncreaseEmpty() const noexcept {
+  return enqueue_increase_pos_ == dequeue_increase_pos_;
+}
+
+bool LightEngine::IsDecreaseEmpty() const noexcept {
+  return enqueue_decrease_pos_ == dequeue_decrease_pos_;
+}
+
+bool LightEngine::TryDequeueIncrease(InternalTask& task) noexcept {
+  if (IsIncreaseEmpty()) return false;
+  task = DequeueIncrease();
+  return true;
+}
+
+bool LightEngine::TryDequeueDecrease(InternalTask& task) noexcept {
+  if (IsDecreaseEmpty()) return false;
+  task = DequeueDecrease();
+  return true;
+}
+
+void LightEngine::ResetIncreaseQueue() {
+  enqueue_increase_pos_ = 0;
+  dequeue_increase_pos_ = 0;
+  increase_queue_.resize(kQueueSizeIncrement);
+}
+
+void LightEngine::ResetDecreaseQueue() {
+  enqueue_decrease_pos_ = 0;
+  dequeue_decrease_pos_ = 0;
+  decrease_queue_.resize(kQueueSizeIncrement);
+}
+
+BlockID LightEngine::GetBlock(BlockPos pos) {
+  return light_cache_->GetBlock(pos);
+}
+
+bool LightEngine::CheckChunk(ChunkPos pos) {
+  return light_cache_->CheckChunk(pos);
+}
+
+Chunk* LightEngine::GetChunk(ChunkPos pos) {
+  return light_cache_->GetChunk(pos);
 }

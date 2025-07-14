@@ -57,6 +57,8 @@ class Server {
   ClientInterface* client_interface_ = nullptr;
 
  private:
+  void Load();
+  void ResetState();
   void ProcessPacket();
   void ProcessPlayerPackets(ClientInterface* receiver);
   void SendPacket();
