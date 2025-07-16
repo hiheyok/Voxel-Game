@@ -7,6 +7,7 @@
 #include "Core/GameContext/GameContext.h"
 #include "Core/Options/Option.h"
 #include "Level/Light/ChunkLightTask.h"
+#include "Level/Light/LightEngineStats.h"
 #include "Level/Light/ThreadedLightEngine.h"
 #include "Level/TerrainGeneration/ChunkGenerator.h"
 #include "Level/World/WorldUpdater.h"
@@ -113,18 +114,15 @@ void Dimension::Update() {
   std::vector<std::unique_ptr<Chunk>> chunks = chunk_generator_->GetOutput();
   world_updater_->SetChunk(std::move(chunks));
 
-  const std::vector<ChunkPos>& created_chunks = world_updater_->GetCreatedChunkPos();
+  const std::vector<ChunkPos>& created_chunks =
+      world_updater_->GetCreatedChunkPos();
   for (auto chunk_pos : created_chunks) {
     light_engine_->LightUpChunk(chunk_pos);
   }
-
-  
 }
 
-size_t Dimension::GetLightEngineQueueSize() const noexcept {
-  return light_engine_->GetQueueSize();
-}
+void Dimension::ResetState() { world_updater_->ResetState(); }
 
-void Dimension::ResetState() {
-  world_updater_->ResetState();
+LightEngineStats Dimension::GetLightEngineStats() const noexcept {
+  return light_engine_->GetStats();
 }

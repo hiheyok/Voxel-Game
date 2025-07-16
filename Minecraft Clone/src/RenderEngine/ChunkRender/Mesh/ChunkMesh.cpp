@@ -111,9 +111,9 @@ void Mesh::ChunkMeshData::GenerateMesh() {
   greedy_time_ = 0;
   Timer time;
   GenerateCache();
-  cache_time_ = time.GetTimePassed_μs();
+  cache_time_ = time.GetTimePassed_us();
   GenerateFaceCollection();
-  greedy_time_ = time.GetTimePassed_μs() - cache_time_;
+  greedy_time_ = time.GetTimePassed_us() - cache_time_;
 }
 
 void Mesh::ChunkMeshData::GenerateFaceCollection() {

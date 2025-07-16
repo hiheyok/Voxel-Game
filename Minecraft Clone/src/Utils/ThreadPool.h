@@ -181,7 +181,7 @@ inline void ThreadPool<TaskIn, TaskOut>::Worker(std::stop_token stoken,
     if (!working_on_batch) {
       std::unique_lock<std::mutex> lock{worker_locks_[workerId]};
       worker_cv_[workerId].wait_for(
-          lock, std::chrono::milliseconds(100), [this, workerId, &stoken]() {
+          lock, std::chrono::milliseconds(1), [this, workerId, &stoken]() {
             return stoken.stop_requested() || !worker_task_[workerId].empty();
           });
       if (stoken.stop_requested()) break;

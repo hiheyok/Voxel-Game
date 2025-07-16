@@ -11,16 +11,17 @@ class LightEngineCache;
 class Chunk;
 
 class LightEngine {
+
  protected:
+  enum class EngineType : uint8_t { kBlockLight = 0, kSkyLight = 1 };
+
   class InternalTask {
    public:
     void SetBlockPos(BlockPos block_pos) noexcept;
-    void SetChunkPos(ChunkPos chunk_pos) noexcept;
     void SetDirection(int direction) noexcept;
     void SetLightLevel(int lvl) noexcept;
 
     BlockPos GetBlockPos() const noexcept;
-    ChunkPos GetChunkPos() const noexcept;
     int GetDirection() const noexcept;
     int GetLightLevel() const noexcept;
 
@@ -31,7 +32,6 @@ class LightEngine {
     16-19 Direction
     */
     BlockPos block_pos_;
-    ChunkPos chunk_pos_;
     uint8_t direction_ : 4 = 0;
     uint8_t light_lvl_ : 4 = 0;
   };
@@ -58,15 +58,15 @@ class LightEngine {
   void ResetIncreaseQueue();
   void ResetDecreaseQueue();
 
+  void SetLightLvl(BlockPos block_pos, int light_lvl);
+  int GetLightLvl(BlockPos block_pos);
   BlockID GetBlock(BlockPos pos);
   bool CheckChunk(ChunkPos pos);
   Chunk* GetChunk(ChunkPos pos);
 
   virtual void LightChunk(ChunkPos chunk_pos) = 0;
   virtual void CheckNeighborChunk(ChunkPos center_chunk) = 0;
-  virtual void SetLightLvl(BlockPos block_pos, int light_lvl) = 0;
-  virtual int GetLightLvl(BlockPos block_pos) = 0;
-  virtual void CheckBlock(ChunkPos chunk_pos, BlockPos block_pos) = 0;
+  virtual void CheckBlock(BlockPos block_pos) = 0;
   virtual void PropagateChanges(const ChunkLightTask& tasks) = 0;
 
  protected:
@@ -85,4 +85,6 @@ class LightEngine {
 
   size_t dequeue_decrease_pos_ = 0;
   size_t dequeue_increase_pos_ = 0;
+
+  EngineType type_;
 };

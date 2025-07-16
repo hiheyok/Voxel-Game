@@ -49,7 +49,7 @@ std::unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(ChunkPos pos) {
   chunk_mesher.Reset();
   chunk_mesher.SetChunk(chunk);
   chunk_mesher.GenerateMesh();
-  size_t time = static_cast<size_t>(timer.GetTimePassed_μs());
+  size_t time = static_cast<size_t>(timer.GetTimePassed_us());
 
   // Transfer Infomation
   std::unique_ptr<Mesh::ChunkVertexData> data =

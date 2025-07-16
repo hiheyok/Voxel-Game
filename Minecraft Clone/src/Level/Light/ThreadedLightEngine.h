@@ -12,7 +12,7 @@ class GameContext;
 class WorldInterface;
 
 class LightEngine;
-
+struct LightEngineStats;
 /*
  * Handles the lighting engine IO and thread management
  * Each thread handles both sky and block update
@@ -25,6 +25,9 @@ class ThreadedLightEngine {
   void LightUpChunk(ChunkPos);
   void UpdateChunk(const ChunkLightTask&);
   size_t GetQueueSize() const noexcept;
+  double GetAverageLightUpTime() const noexcept;
+
+  LightEngineStats GetStats() const noexcept;
 
  private:
   int WorkerUpdater(const ChunkLightTask&);
@@ -33,6 +36,9 @@ class ThreadedLightEngine {
 
   GameContext& game_context_;
   WorldInterface& world_;
+
+  int light_update_done_ = 0;
+  double total_cpu_time_ = 0.0;
 
   std::unique_ptr<ThreadPool<ChunkLightTask, int>>
       updater_;  // Returns int, placeholder until i can make it so it can

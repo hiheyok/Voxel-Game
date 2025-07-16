@@ -13,9 +13,7 @@ class SkyLightEngine : public LightEngine {
 
   void LightChunk(ChunkPos chunk_pos) override;
   void CheckNeighborChunk(ChunkPos center_chunk) override;
-  void SetLightLvl(BlockPos block_pos, int light_lvl) override;
-  int GetLightLvl(BlockPos block_pos) override;
-  void CheckBlock(ChunkPos chunk_pos, BlockPos block_pos) override;
+  void CheckBlock(BlockPos block_pos) override;
   void PropagateChanges(const ChunkLightTask& tasks) override;
 
  protected:
@@ -25,9 +23,9 @@ class SkyLightEngine : public LightEngine {
   void DelayIncrease();
 
   // Returns bottom when it hit an opaque block
-  int TryPropagateSkylight(ChunkPos chunk_pos, BlockPos block_pos);
+  int TryPropagateSkylight(BlockPos block_pos);
   // Propagate shadow until it hits a block with no light
-  void TryPropagateShadow(ChunkPos chunk_pos, BlockPos block_pos);
+  void TryPropagateShadow(BlockPos block_pos);
 
   std::array<int8_t, kChunkSize2D> heightmap_block_change_;
 };

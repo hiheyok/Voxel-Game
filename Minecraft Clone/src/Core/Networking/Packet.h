@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <concepts>
+#include <type_traits>
 #include <variant>
 
 #include "Core/Networking/BlockUpdate.h"
@@ -11,6 +13,22 @@
 
 namespace Packet {
 
+template <typename T>
+concept IsPlayerUpdate =
+    std::is_base_of_v<PlayerPacket::PlayerPacketBase, std::decay_t<T>>;
+
+template <typename T>
+concept IsBlockUpdate =
+    std::is_base_of_v<BlockUpdatePacket::BlockUpdateBase, std::decay_t<T>>;
+
+template <typename T>
+concept IsChunkUpdate =
+    std::is_base_of_v<ChunkUpdatePacket::ChunkPacketBase, std::decay_t<T>>;
+
+template <typename T>
+concept IsEntityUpdate =
+    std::is_base_of_v<EntityUpdatePacket::EntityPacketBase, std::decay_t<T>>;
+
 struct PlayerAction {
   PlayerPacket::PacketType type_;
   std::variant<PlayerPacket::PlayerDestroyBlock, PlayerPacket::PlayerGetItem,
@@ -18,18 +36,9 @@ struct PlayerAction {
                std::monostate>
       packet_;
 
-  template <class T>
-  PlayerAction(const T& packet) {
-    packet_ = packet;
-    if constexpr (std::is_same_v<T, PlayerPacket::PlayerDestroyBlock>) {
-      type_ = PlayerPacket::DESTROY_BLOCK;
-    } else if constexpr (std::is_same_v<T, PlayerPacket::PlayerGetItem>) {
-      type_ = PlayerPacket::GET_ITEM;
-    } else if constexpr (std::is_same_v<T, PlayerPacket::PlayerMove>) {
-      type_ = PlayerPacket::MOVE;
-    } else if constexpr (std::is_same_v<T, PlayerPacket::PlayerPlaceBlock>) {
-      type_ = PlayerPacket::PLACE_BLOCK;
-    }
+  template <IsPlayerUpdate T>
+  PlayerAction(T&& packet) : packet_{std::forward<T>(packet)} {
+    type_ = std::decay_t<T>::kType;
   }
 
   PlayerAction()
@@ -44,19 +53,9 @@ struct EntityUpdate {
                std::monostate>
       packet_;
 
-  template <class T>
-  EntityUpdate(const T& packet) {
-    packet_ = packet;
-    if constexpr (std::is_same_v<T, EntityUpdatePacket::EntityDespawn>) {
-      type_ = EntityUpdatePacket::ENTITY_DESPAWN;
-    } else if constexpr (std::is_same_v<
-                             T, EntityUpdatePacket::EntityInventoryUpdate>) {
-      type_ = EntityUpdatePacket::ENTITY_INVENTORY_UPDATE;
-    } else if constexpr (std::is_same_v<T, EntityUpdatePacket::EntityMove>) {
-      type_ = EntityUpdatePacket::ENTITY_MOVE;
-    } else if constexpr (std::is_same_v<T, EntityUpdatePacket::EntitySpawn>) {
-      type_ = EntityUpdatePacket::ENTITY_SPAWN;
-    }
+  template <IsEntityUpdate T>
+  EntityUpdate(T&& packet) : packet_{std::forward<T>(packet)} {
+    type_ = std::decay_t<T>::kType;
   }
 
   EntityUpdate()
@@ -64,9 +63,19 @@ struct EntityUpdate {
 };
 
 struct BlockUpdate {
-  std::variant<BlockUpdatePacket::BlockUpdate, std::monostate> packet_;
+  std::variant<BlockUpdatePacket::BlockUpdate,
+               BlockUpdatePacket::BlockMultiUpdate, std::monostate>
+      packet_;
+  BlockUpdatePacket::PacketType type_;
 
-  BlockUpdate() : packet_(std::monostate{}) {}
+  template <IsBlockUpdate T>
+  BlockUpdate(T&& packet) : packet_(std::forward<T>(packet)) {
+    type_ = std::decay_t<T>::kType;
+  }
+
+  BlockUpdate()
+      : type_(BlockUpdatePacket::PacketType::kNull),
+        packet_(std::monostate{}) {}
 };
 
 struct ChunkUpdateData {
@@ -75,18 +84,10 @@ struct ChunkUpdateData {
       packet_;
   ChunkUpdatePacket::PacketType type_;
 
-  template <class T>
-  ChunkUpdateData(const T& packet)
-      : packet_(packet), type_([&]() {
-          if constexpr (std::is_same_v<T, ChunkUpdatePacket::AddChunk>)
-            return ChunkUpdatePacket::ADD_CHUNK;
-          else if constexpr (std::is_same_v<T, ChunkUpdatePacket::DeleteChunk>)
-            return ChunkUpdatePacket::DELETE_CHUNK;
-          else if constexpr (std::is_same_v<T, ChunkUpdatePacket::LightUpdate>)
-            return ChunkUpdatePacket::LIGHT_UPDATE;
-          else
-            return ChunkUpdatePacket::PacketType{};
-        }()) {}
+  template <IsChunkUpdate T>
+  ChunkUpdateData(T&& packet) : packet_(std::forward<T>(packet)) {
+    type_ = std::decay_t<T>::kType;
+  }
 
   ChunkUpdateData()
       : type_(ChunkUpdatePacket::PacketType{}), packet_(std::monostate{}) {}

@@ -143,10 +143,11 @@ class Position {
   }
 
   template <typename T>
-  constexpr void operator*=(const T& other) noexcept {
+  constexpr Position<Derived>& operator*=(const T& other) noexcept {
     x *= other;
     y *= other;
     z *= other;
+    return *this;
   }
 
   friend std::ostream& operator<<(std::ostream& os,
@@ -168,6 +169,34 @@ class Position {
 
   constexpr bool operator!=(const Position<Derived>& other) const noexcept {
     return x != other.x || y != other.y || z != other.z;
+  }
+
+  constexpr Position<Derived>& operator-=(const Position<Derived>& other) noexcept {
+    x -= other.x;
+    y -= other.y;
+    z -= other.z;
+    return *this;
+  }
+
+  constexpr Position<Derived>& operator+=(const Position<Derived>& other) noexcept {
+    x += other.x;
+    y += other.y;
+    z += other.z;
+    return *this;
+  }
+
+  constexpr Position<Derived>& operator*=(const Position<Derived>& other) noexcept {
+    x *= other.x;
+    y *= other.y;
+    z *= other.z;
+    return *this;
+  }
+
+  constexpr Position<Derived>& operator/=(const Position<Derived>& other) noexcept {
+    x = static_cast<int>(floor(static_cast<double>(x) / other.x));
+    y = static_cast<int>(floor(static_cast<double>(y) / other.y));
+    z = static_cast<int>(floor(static_cast<double>(z) / other.z));
+    return *this;
   }
 
   [[nodiscard]] constexpr size_t hash() const noexcept {

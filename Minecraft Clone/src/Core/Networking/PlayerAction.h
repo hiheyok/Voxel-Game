@@ -9,27 +9,29 @@
 
 namespace PlayerPacket {
 
-enum PacketType { GET_ITEM, DESTROY_BLOCK, PLACE_BLOCK, MOVE };
+enum class PacketType { GET_ITEM, DESTROY_BLOCK, PLACE_BLOCK, MOVE };
 
-struct PlayerGetItem {
+struct PlayerPacketBase {};
+
+struct PlayerGetItem : PlayerPacketBase {
   ItemStack item_;
   int slot_;
-  PlayerGetItem() = default;
+  static constexpr PacketType kType = PacketType::GET_ITEM;
 };
 
-struct PlayerDestroyBlock {
+struct PlayerDestroyBlock : PlayerPacketBase {
   BlockPos pos_;
-  PlayerDestroyBlock() = default;
+  static constexpr PacketType kType = PacketType::DESTROY_BLOCK;
 };
 
-struct PlayerPlaceBlock {
+struct PlayerPlaceBlock : PlayerPacketBase {
   BlockPos pos_;
   BlockID block_;
-  PlayerPlaceBlock() = default;
+  static constexpr PacketType kType = PacketType::PLACE_BLOCK;
 };
 
-struct PlayerMove {
+struct PlayerMove : PlayerPacketBase {
   glm::vec3 pos_, vel_, acc_;
-  PlayerMove() = default;
+  static constexpr PacketType kType = PacketType::MOVE;
 };
 }  // namespace PlayerPacket

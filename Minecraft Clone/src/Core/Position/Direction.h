@@ -15,6 +15,10 @@ static constexpr int kSouthDirection = 4;
 static constexpr int kNorthDirection = 5;
 static constexpr int kAllDirections = 6;
 
+static constexpr int kXAxis = 0;
+static constexpr int kYAxis = 1;
+static constexpr int kZAxis = 2;
+
 // Use for offsets
 template <class PositionType>
 class Direction {
@@ -79,6 +83,7 @@ class Directions {
   static constexpr int kXAxis = 0;
   static constexpr int kYAxis = 1;
   static constexpr int kZAxis = 2;
+
  private:
   static constexpr Direction<PositionType> kDirections[6]{
       kEast, kWest, kUp, kDown, kSouth, kNorth};

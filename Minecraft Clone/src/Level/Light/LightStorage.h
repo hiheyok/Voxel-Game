@@ -5,6 +5,7 @@
 
 #include "Core/Typenames.h"
 #include "Core/DataStructure/AtomicNibbleArray.h"
+#include "Core/DataStructure/NibbleArray.h"
 
 class LightStorage {  // Contains all lighting infomation for solid blocks
  public:
@@ -30,5 +31,5 @@ class LightStorage {  // Contains all lighting infomation for solid blocks
   ChunkPos position_;
 
  private:
-  AtomicNibbleArray<kChunkSize3D> data_;
+  NibbleArray<kChunkSize3D> data_;
 };

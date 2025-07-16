@@ -13,10 +13,6 @@ void LightEngine::InternalTask::SetBlockPos(BlockPos pos) noexcept {
   block_pos_ = pos;
 }
 
-void LightEngine::InternalTask::SetChunkPos(ChunkPos pos) noexcept {
-  chunk_pos_ = pos;
-}
-
 void LightEngine::InternalTask::SetDirection(int direction) noexcept {
   direction_ = direction;
 }
@@ -28,10 +24,6 @@ void LightEngine::InternalTask::SetLightLevel(int lvl) noexcept {
 
 BlockPos LightEngine::InternalTask::GetBlockPos() const noexcept {
   return block_pos_;
-}
-
-ChunkPos LightEngine::InternalTask::GetChunkPos() const noexcept {
-  return chunk_pos_;
 }
 
 int LightEngine::InternalTask::GetDirection() const noexcept {
@@ -63,11 +55,9 @@ void LightEngine::PropagateIncrease() {
   InternalTask task;
   while (TryDequeueIncrease(task)) {
     BlockPos block_pos = task.GetBlockPos();
-    ChunkPos chunk_pos = task.GetChunkPos();
-    BlockPos global_pos = block_pos + chunk_pos.GetBlockPosOffset();
     int direction = task.GetDirection();
     int propagation_lvl = task.GetLightLevel();
-    int light_lvl = GetLightLvl(global_pos);
+    int light_lvl = GetLightLvl(block_pos);
 
     // Light level already changed from somewhere else
     if (propagation_lvl != light_lvl) {
@@ -80,7 +70,7 @@ void LightEngine::PropagateIncrease() {
         continue;
       }
 
-      BlockPos offset_pos = global_pos + propagation;
+      BlockPos offset_pos = block_pos + propagation;
 
       // Light level is already at the expected level or chunk doesn't exist
       if (!CheckChunk(offset_pos.ToChunkPos())) {
@@ -109,8 +99,7 @@ void LightEngine::PropagateIncrease() {
       // value is already set
       if (target_lvl > 1) {
         InternalTask next_task;
-        next_task.SetBlockPos(offset_pos.GetLocalPos());
-        next_task.SetChunkPos(offset_pos.ToChunkPos());
+        next_task.SetBlockPos(offset_pos);
         next_task.SetLightLevel(target_lvl);
         next_task.SetDirection(propagation);
         EnqueueIncrease(next_task);
@@ -124,12 +113,10 @@ void LightEngine::PropagateDecrease() {
 
   while (TryDequeueDecrease(task)) {
     BlockPos block_pos = task.GetBlockPos();
-    ChunkPos chunk_pos = task.GetChunkPos();
-    BlockPos global_pos = block_pos + chunk_pos.GetBlockPosOffset();
     int propagation_lvl = task.GetLightLevel();
 
     for (const auto& propagation : Directions<BlockPos>()) {
-      BlockPos offset_pos = global_pos + propagation;
+      BlockPos offset_pos = block_pos + propagation;
       // Chunk doesnt exist
       if (!CheckChunk(offset_pos.ToChunkPos())) {
         continue;
@@ -148,8 +135,7 @@ void LightEngine::PropagateDecrease() {
       if (curr_lvl < propagation_lvl) {
         SetLightLvl(offset_pos, 0);
         InternalTask next_task;
-        next_task.SetBlockPos(offset_pos.GetLocalPos());
-        next_task.SetChunkPos(offset_pos.ToChunkPos());
+        next_task.SetBlockPos(offset_pos);
         next_task.SetLightLevel(curr_lvl);
         next_task.SetDirection(propagation);
         EnqueueDecrease(next_task);
@@ -157,8 +143,7 @@ void LightEngine::PropagateDecrease() {
         // If neighbor is brighter or equal, it is an independent light source.
         // Add it to the increase queue to re-light the new darkness.
         InternalTask next_task;
-        next_task.SetBlockPos(offset_pos.GetLocalPos());
-        next_task.SetChunkPos(offset_pos.ToChunkPos());
+        next_task.SetBlockPos(offset_pos);
         next_task.SetLightLevel(curr_lvl);
         next_task.SetDirection(propagation.GetOppositeDirection());
         EnqueueIncrease(next_task);
@@ -231,6 +216,21 @@ void LightEngine::ResetDecreaseQueue() {
   enqueue_decrease_pos_ = 0;
   dequeue_decrease_pos_ = 0;
   decrease_queue_.resize(kQueueSizeIncrement);
+}
+
+void LightEngine::SetLightLvl(BlockPos block_pos, int light_lvl) {
+  if (type_ == EngineType::kBlockLight) {
+    light_cache_->SetBlockLight(block_pos, light_lvl);
+  } else {
+    light_cache_->SetSkyLight(block_pos, light_lvl);
+  }
+}
+int LightEngine::GetLightLvl(BlockPos block_pos) {
+  if (type_ == EngineType::kBlockLight) {
+    return light_cache_->GetBlockLight(block_pos);
+  } else {
+    return light_cache_->GetSkyLight(block_pos);
+  }
 }
 
 BlockID LightEngine::GetBlock(BlockPos pos) {

@@ -16,7 +16,7 @@ double Timer::GetTimePassed_ms() const noexcept {
       .count();
 }
 
-double Timer::GetTimePassed_μs() const noexcept {
+double Timer::GetTimePassed_us() const noexcept {
   return std::chrono::duration<double, std::chrono::microseconds::period>(
              std::chrono::high_resolution_clock::now() - first_)
       .count();
@@ -36,8 +36,8 @@ std::string Timer::StrGetTimePassed_ms() const {
   return std::to_string(GetTimePassed_ms());
 }
 
-std::string Timer::StrGetTimePassed_μs() const {
-  return std::to_string(GetTimePassed_μs());
+std::string Timer::StrGetTimePassed_us() const {
+  return std::to_string(GetTimePassed_us());
 }
 
 std::string Timer::StrGetTimePassed_ns() const {

@@ -177,45 +177,65 @@ void ClientPlay::UpdateDebugStats() {
   debug_screen_->EditText("Stat7",
                           "Mesh Engine Queued: " +
                               std::to_string(terrain_render_->GetQueuedSize()));
-  debug_screen_->EditText("Stat8", "Light Level: " + std::to_string(sky_lvl) + " : " + std::to_string(block_lvl));
+  debug_screen_->EditText("Stat8", "Light Level: " + std::to_string(sky_lvl) +
+                                       " : " + std::to_string(block_lvl));
   debug_screen_->EditText("Stat9",
                           "Server Tick (MSPT): " + std::to_string(stats.mspt_));
   debug_screen_->EditText(
       "Stat10",
-      "Light Engine Queue: " + std::to_string(stats.light_engine_queue_size_));
+      "Light Engine Queue: " + std::to_string(stats.light_stats_.queue_size_) +
+          " | Update time: " +
+          std::to_string(stats.light_stats_.average_light_update_time_));
   debug_screen_->Update();
 }
 
 void ClientPlay::UpdateChunks() {
-  std::vector<Packet::ChunkUpdateData> packets;
-  interface_->PollChunkUpdates(packets);
+  std::vector<Packet::ChunkUpdateData> chunk_packets;
+  std::vector<Packet::BlockUpdate> block_packets;
+  interface_->PollChunkUpdates(chunk_packets);
+  interface_->PollBlockUpdates(block_packets);
 
-  std::vector<ChunkUpdatePacket::AddChunk> addChunkPackets;
-  std::vector<ChunkUpdatePacket::LightUpdate> updateLightPackets;
+  std::vector<ChunkUpdatePacket::AddChunk> new_chunks;
+  std::vector<ChunkUpdatePacket::LightUpdate> light_updates;
+  std::vector<BlockUpdatePacket::BlockMultiUpdate> block_updates;
 
-  for (const auto& packet : packets) {
+  for (const auto& packet : chunk_packets) {
     switch (packet.type_) {
-      case ChunkUpdatePacket::ADD_CHUNK: {
+      case ChunkUpdatePacket::PacketType::ADD_CHUNK: {
         const ChunkUpdatePacket::AddChunk& p =
             std::get<ChunkUpdatePacket::AddChunk>(packet.packet_);
-        addChunkPackets.push_back(p);
+        new_chunks.push_back(p);
       } break;
-      case ChunkUpdatePacket::DELETE_CHUNK:
+      case ChunkUpdatePacket::PacketType::DELETE_CHUNK:
         throw std::runtime_error("ClientPlay::UpdateChunks - Unimplented type");
         break;
-      case ChunkUpdatePacket::LIGHT_UPDATE: {
+      case ChunkUpdatePacket::PacketType::LIGHT_UPDATE: {
         const ChunkUpdatePacket::LightUpdate& p =
             std::get<ChunkUpdatePacket::LightUpdate>(packet.packet_);
-        updateLightPackets.push_back(p);
+        light_updates.push_back(p);
       } break;
     }
   }
 
-  FastHashSet<ChunkPos> chunkToUpdateRender;
+  FastHashSet<ChunkPos> chunk_render_update;
 
-  for (const auto& chunk : addChunkPackets) {
+  for (auto& packet : block_packets) {
+    switch (packet.type_) {
+      case BlockUpdatePacket::PacketType::kBlockMultiUpdate: {
+        BlockUpdatePacket::BlockMultiUpdate& p =
+            std::get<BlockUpdatePacket::BlockMultiUpdate>(packet.packet_);
+        block_updates.push_back(std::move(p));
+      } break;
+      case BlockUpdatePacket::PacketType::kBlockUpdate:
+        throw std::runtime_error("Not handled yet!");
+      default:
+        throw std::runtime_error("Not supposed to be ran!");
+    }
+  }
+
+  for (const auto& chunk : new_chunks) {
     const ChunkRawData& data = chunk.chunk_;
-    chunkToUpdateRender.insert(data.pos_);
+    chunk_render_update.insert(data.pos_);
     if (client_level_->cache_.CheckChunk(data.pos_)) {
       ChunkContainer* c = client_level_->cache_.GetChunk(data.pos_);
       c->SetData(data);
@@ -226,7 +246,35 @@ void ClientPlay::UpdateChunks() {
     }
   }
 
-  for (const auto& light : updateLightPackets) {
+  for (const auto& block_update : block_updates) {
+    // Additional stuff to make sure the chunks get updates
+    ChunkPos chunk_pos = block_update.chunk_pos_;
+    ChunkContainer* chunk = client_level_->cache_.GetChunk(chunk_pos);
+    bool neighbor_update[6] = {};
+
+    for (auto [block_pos, block] : block_update.updates_) {
+      chunk->SetBlockUnsafe(block, block_pos);
+      // Check if the block update is next to chunk border
+      if (block_pos.x == kChunkDim - 1) neighbor_update[0] = true;
+      if (block_pos.x == 0) neighbor_update[1] = true;
+      if (block_pos.y == kChunkDim - 1) neighbor_update[2] = true;
+      if (block_pos.y == 0) neighbor_update[3] = true;
+      if (block_pos.z == kChunkDim - 1) neighbor_update[4] = true;
+      if (block_pos.z == 0) neighbor_update[5] = true;
+    }
+
+    for (auto direction : Directions<ChunkPos>()) {
+      if (!neighbor_update[direction]) {
+        continue;
+      }
+
+      ChunkPos offset_chunk = chunk_pos + direction;
+      chunk_render_update.insert(offset_chunk);
+    }
+    chunk_render_update.insert(chunk_pos);
+  }
+
+  for (const auto& light : light_updates) {
     const LightStorage& sky_light = light.sky_light_;
     const LightStorage& block_light = light.block_light_;
 
@@ -240,12 +288,12 @@ void ClientPlay::UpdateChunks() {
 
     *chunk->sky_light_ = sky_light;
     *chunk->block_light_ = block_light;
-    chunkToUpdateRender.insert(chunk->position_);
+    chunk_render_update.insert(chunk->position_);
   }
 
-  std::vector<ChunkPos> toUpdate(chunkToUpdateRender.begin(),
-                                 chunkToUpdateRender.end());
-  terrain_render_->Update(toUpdate);
+  std::vector<ChunkPos> to_update(chunk_render_update.begin(),
+                                  chunk_render_update.end());
+  terrain_render_->Update(to_update);
 }
 
 void ClientPlay::UpdateEntities() {
@@ -259,25 +307,25 @@ void ClientPlay::UpdateEntities() {
 
   for (const auto& packet : packets) {
     switch (packet.type_) {
-      case EntityUpdatePacket::ENTITY_DESPAWN: {
+      case EntityUpdatePacket::PacketType::ENTITY_DESPAWN: {
         const EntityUpdatePacket::EntityDespawn& data =
             std::get<EntityUpdatePacket::EntityDespawn>(packet.packet_);
         despawnedEntities.push_back(data.uuid_);
         break;
       }
-      case EntityUpdatePacket::ENTITY_INVENTORY_UPDATE: {
+      case EntityUpdatePacket::PacketType::ENTITY_INVENTORY_UPDATE: {
         // const EntityUpdatePacket::EntityInventoryUpdate& data =
         //     std::get<EntityUpdatePacket::EntityInventoryUpdate>(packet.packet_);
         // N/A
         break;
       }
-      case EntityUpdatePacket::ENTITY_MOVE: {
+      case EntityUpdatePacket::PacketType::ENTITY_MOVE: {
         const EntityUpdatePacket::EntityMove& data =
             std::get<EntityUpdatePacket::EntityMove>(packet.packet_);
         updatedEntities.push_back(data.properties_);
         break;
       }
-      case EntityUpdatePacket::ENTITY_SPAWN: {
+      case EntityUpdatePacket::PacketType::ENTITY_SPAWN: {
         const EntityUpdatePacket::EntitySpawn& data =
             std::get<EntityUpdatePacket::EntitySpawn>(packet.packet_);
         spawnedEntities.push_back(data.properties_);

@@ -22,6 +22,7 @@ void LightEngineCache::BuildCache(BlockPos center) {
   chunk_cache_.resize(3 * 3 * 3);
   block_light_cache_.resize(3 * 3 * 3);
   sky_light_cache_.resize(3 * 3 * 3);
+  block_data_.resize(3 * 3 * 3);
 
   // Go down and level by level
   for (int y = cy; y > cy - 3; --y) {
@@ -44,8 +45,8 @@ int LightEngineCache::GetBlockLight(BlockPos pos) {
     assert(res);
     data = block_light_cache_[idx];
   }
-
-  return data == nullptr ? 0 : data->GetLighting(pos.GetLocalPos());
+  ++stats.get_block_light_;
+  return data->GetLighting(pos.GetLocalPos());
 }
 int LightEngineCache::GetSkyLight(BlockPos pos) {
   ChunkPos chunk_pos = pos.ToChunkPos();
@@ -63,7 +64,8 @@ int LightEngineCache::GetSkyLight(BlockPos pos) {
     data = sky_light_cache_[idx];
   }
 
-  return data == nullptr ? 0 : data->GetLighting(pos.GetLocalPos());
+  ++stats.get_sky_light_;
+  return data->GetLighting(pos.GetLocalPos());
 }
 
 // Setters and getter
@@ -75,9 +77,11 @@ BlockID LightEngineCache::GetBlock(BlockPos pos) {
   if (data == nullptr) {
     TryCacheChunk(chunk_pos);
     data = chunk_cache_[idx].first;
+    assert(data != nullptr);
   }
 
-  return data == nullptr ? 0 : data->GetBlockUnsafe(pos.GetLocalPos());
+  ++stats.get_block_;
+  return block_data_[idx][pos.GetIndex()];
 }
 
 void LightEngineCache::SetBlockLight(BlockPos pos, int lvl) {
@@ -96,6 +100,7 @@ void LightEngineCache::SetBlockLight(BlockPos pos, int lvl) {
     data->EditLight(pos.GetLocalPos(), lvl);
     chunk_cache_[idx].second = true;
   }
+  ++stats.set_block_light_;
 }
 void LightEngineCache::SetSkyLight(BlockPos pos, int lvl) {
   assert(lvl >= 0 && lvl <= kMaxLightLevel);
@@ -118,6 +123,7 @@ void LightEngineCache::SetSkyLight(BlockPos pos, int lvl) {
     data->EditLight(pos.GetLocalPos(), lvl);
     chunk_cache_[idx].second = true;
   }
+  ++stats.set_sky_light_;
 }
 
 bool LightEngineCache::CheckChunk(ChunkPos chunk_pos) {
@@ -130,10 +136,11 @@ bool LightEngineCache::CheckChunk(ChunkPos chunk_pos) {
   }
 
   Chunk* data = chunk_cache_[idx].first;
-  if (data == nullptr) {
+  if (data == nullptr) [[unlikely]] {
     TryCacheChunk(chunk_pos);
     data = chunk_cache_[idx].first;
   }
+  ++stats.check_chunk_;
   return data != nullptr;
 }
 
@@ -153,6 +160,7 @@ Chunk* LightEngineCache::GetChunk(ChunkPos chunk_pos) {
     data = chunk_cache_[idx].first;
   }
 
+  ++stats.get_chunk_;
   return data;
 }
 
@@ -164,10 +172,26 @@ void LightEngineCache::UpdateLight() {
   }
 }
 
+bool LightEngineCache::CheckChunkHasLighting(ChunkPos pos) {
+  size_t idx = CalculateCacheIndex(pos);
+  Chunk* chunk = chunk_cache_[idx].first;
+  if (!CheckChunk(pos)) {
+    return false;
+  }
+  chunk = chunk_cache_[idx].first;
+  return chunk->IsLightUp();
+}
+
+LightEngineCache::LightEngineCacheStats LightEngineCache::GetStats()
+    const noexcept {
+  return stats;
+}
+
 // Helper function for caching
 void LightEngineCache::SetBlockCache(ChunkPos pos, Chunk* data) {
   int idx = CalculateCacheIndex(pos);
   chunk_cache_[idx].first = data;
+  block_data_[idx] = data->GetPalette().UnpackAll();
 }
 void LightEngineCache::SetBlockLightCache(ChunkPos pos, LightStorage* data) {
   int idx = CalculateCacheIndex(pos);
@@ -184,6 +208,7 @@ void LightEngineCache::ExpandDown() {
 
   chunk_cache_.resize(curr_size + 3 * 3);
   sky_light_cache_.resize(curr_size + 3 * 3);
+  block_data_.resize(curr_size + 3 * 3);
 
   for (int x = center_chunk_.x - 1; x <= center_chunk_.x + 1; ++x) {
     for (int z = center_chunk_.z - 1; z <= center_chunk_.z + 1; ++z) {
@@ -208,6 +233,7 @@ bool LightEngineCache::TryCacheChunk(ChunkPos pos) {
   if (y_top - pos.y < 3) {
     SetBlockLightCache(pos, block_light);
   }
+  ++stats.try_cache_chunk_;
   return true;
 }
 

@@ -8,18 +8,23 @@
 
 namespace ChunkUpdatePacket {
 
-enum PacketType { ADD_CHUNK, LIGHT_UPDATE, DELETE_CHUNK };
+enum class PacketType { ADD_CHUNK, LIGHT_UPDATE, DELETE_CHUNK };
 
-struct AddChunk {
+struct ChunkPacketBase {};
+
+struct AddChunk : ChunkPacketBase {
   ChunkRawData chunk_;
+  static constexpr PacketType kType = PacketType::ADD_CHUNK;
 };
 
-struct LightUpdate {
+struct LightUpdate : ChunkPacketBase {
   LightStorage sky_light_;
   LightStorage block_light_;
+  static constexpr PacketType kType = PacketType::LIGHT_UPDATE;
 };
 
-struct DeleteChunk {
+struct DeleteChunk : ChunkPacketBase {
   ChunkPos pos_;
+  static constexpr PacketType kType = PacketType::DELETE_CHUNK;
 };
 }  // namespace ChunkUpdatePacket

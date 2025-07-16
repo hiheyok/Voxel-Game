@@ -270,6 +270,7 @@
     <ClInclude Include="src\Core\DataStructure\blockingconcurrentqueue.h" />
     <ClInclude Include="src\Core\DataStructure\concurrentqueue.h" />
     <ClInclude Include="src\Core\DataStructure\lightweightsemaphore.h" />
+    <ClInclude Include="src\Core\DataStructure\NibbleArray.h" />
     <ClInclude Include="src\Core\DataStructure\OriginalConcurrentQueue.h" />
     <ClInclude Include="src\Core\GameContext\GameContext.h" />
     <ClInclude Include="src\Core\Position\Position.h" />
@@ -281,6 +282,7 @@
     <ClInclude Include="src\Level\Light\ChunkLightTask.h" />
     <ClInclude Include="src\Level\Light\LightEngine.h" />
     <ClInclude Include="src\Level\Light\LightEngineCache.h" />
+    <ClInclude Include="src\Level\Light\LightEngineStats.h" />
     <ClInclude Include="src\Level\Light\SkyLightEngine.h" />
     <ClInclude Include="src\Level\Light\ThreadedLightEngine.h" />
     <ClInclude Include="src\RenderEngine\BlockModel\BlockModelManager.h" />

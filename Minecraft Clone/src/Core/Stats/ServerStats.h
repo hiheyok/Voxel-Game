@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Level/Light/LightEngineStats.h"
+
 struct ServerStats {
   ServerStats() = default;
   ~ServerStats() = default;
@@ -9,5 +11,5 @@ struct ServerStats {
   double mspt_;
   size_t chunk_count_;
   size_t event_queued_;
-  size_t light_engine_queue_size_;
+  LightEngineStats light_stats_;
 };

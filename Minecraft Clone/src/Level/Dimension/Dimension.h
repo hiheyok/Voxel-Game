@@ -18,6 +18,8 @@ class ChunkGenerator;
 class ThreadedLightEngine;
 class GameContext;
 
+struct LightEngineStats;
+
 class Dimension {
  public:
   EventSystem event_manager_;
@@ -34,13 +36,15 @@ class Dimension {
   void TickUsed(EventID id, BlockPos pos);
   void EventTick();
   void Update();
-  size_t GetLightEngineQueueSize() const noexcept;
   void ResetState();
+
+  LightEngineStats GetLightEngineStats() const noexcept;
 
   GameContext& game_context_;
   WorldInterface* world_;
   std::unique_ptr<WorldUpdater> world_updater_;
   std::unique_ptr<CollusionDetector> collusion_detector_;
+
  private:
   std::unique_ptr<World> main_world_;
   std::unique_ptr<ChunkGenerator> chunk_generator_;

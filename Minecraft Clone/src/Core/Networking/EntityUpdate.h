@@ -9,32 +9,38 @@
 #include "Level/Item/ItemStack.h"
 
 namespace EntityUpdatePacket {
-enum PacketType {
+enum class PacketType {
   ENTITY_SPAWN,
   ENTITY_MOVE,
   ENTITY_INVENTORY_UPDATE,
   ENTITY_DESPAWN
 };
 
-struct EntitySpawn {
+struct EntityPacketBase {};
+
+struct EntitySpawn : EntityPacketBase {
   EntitySpawn() = default;
   EntityProperty properties_;
+  static constexpr PacketType kType = PacketType::ENTITY_SPAWN;
 };
 
-struct EntityMove {
+struct EntityMove : EntityPacketBase {
   EntityMove() = default;
   EntityProperty properties_;
+  static constexpr PacketType kType = PacketType::ENTITY_MOVE;
 };
 
-struct EntityInventoryUpdate {
+struct EntityInventoryUpdate : EntityPacketBase {
   EntityInventoryUpdate() = default;
   EntityUUID uuid;
   ItemStack item_;
   int slot_;
+  static constexpr PacketType kType = PacketType::ENTITY_INVENTORY_UPDATE;
 };
 
-struct EntityDespawn {
+struct EntityDespawn : EntityPacketBase {
   EntityDespawn() = default;
   EntityUUID uuid_;
+  static constexpr PacketType kType = PacketType::ENTITY_DESPAWN;
 };
 }  // namespace EntityUpdatePacket

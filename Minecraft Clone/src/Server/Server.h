@@ -64,8 +64,8 @@ class Server {
   void SendPacket();
   void SendEntityUpdatePacket(ClientInterface* receiver);
   void SendChunkUpdatePacket(ClientInterface* receiver);
+  void SendBlockUpdatePacket(ClientInterface* receiver);
   void SendServerStats(ClientInterface* receiver);
-
   bool stop_ = true;
   std::thread main_server_loop_;
   std::unique_ptr<Timer> time_;

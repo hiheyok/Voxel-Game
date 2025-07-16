@@ -80,9 +80,7 @@ EntityUUID Server::SetInternalConnection(InternalInterface* interface) {
   return uuid;
 }
 
-void Server::Load() {
-  level_->main_world_->world_updater_->Load();
-}
+void Server::Load() { level_->main_world_->world_updater_->Load(); }
 
 void Server::ResetState() { level_->main_world_->ResetState(); }
 
@@ -98,7 +96,7 @@ void Server::ProcessPlayerPackets(ClientInterface* receiver) {
 
   for (const auto& packet : player_packets) {
     switch (packet.type_) {
-      case PlayerPacket::GET_ITEM:
+      case PlayerPacket::PacketType::GET_ITEM:
         // Send packet to player
         {
           const PlayerPacket::PlayerGetItem& get_item =
@@ -115,7 +113,7 @@ void Server::ProcessPlayerPackets(ClientInterface* receiver) {
           receiver->SendEntityUpdate(inventory_update);
         }
         break;
-      case PlayerPacket::DESTROY_BLOCK: {
+      case PlayerPacket::PacketType::DESTROY_BLOCK: {
         const PlayerPacket::PlayerDestroyBlock& destroyBlock =
             std::get<PlayerPacket::PlayerDestroyBlock>(packet.packet_);
         BlockEvent block_event;
@@ -124,7 +122,7 @@ void Server::ProcessPlayerPackets(ClientInterface* receiver) {
         block_event.pos_ = destroyBlock.pos_;
         level_->main_world_->event_manager_.AddEvent(block_event);
       } break;
-      case PlayerPacket::PLACE_BLOCK: {
+      case PlayerPacket::PacketType::PLACE_BLOCK: {
         const PlayerPacket::PlayerPlaceBlock& placeBlock =
             std::get<PlayerPacket::PlayerPlaceBlock>(packet.packet_);
         BlockEvent block_event;
@@ -133,7 +131,7 @@ void Server::ProcessPlayerPackets(ClientInterface* receiver) {
         block_event.pos_ = placeBlock.pos_;
         level_->main_world_->event_manager_.AddEvent(block_event);
       } break;
-      case PlayerPacket::MOVE: {
+      case PlayerPacket::PacketType::MOVE: {
         const PlayerPacket::PlayerMove& movePlayer =
             std::get<PlayerPacket::PlayerMove>(packet.packet_);
         Entity* e =
@@ -150,6 +148,7 @@ void Server::SendPacket() {
   if (client_interface_ == nullptr) return;
   SendEntityUpdatePacket(client_interface_);
   SendChunkUpdatePacket(client_interface_);
+  SendBlockUpdatePacket(client_interface_);
   SendServerStats(client_interface_);
   client_interface_->SendTimeLastTick();
 }
@@ -199,19 +198,6 @@ void Server::SendChunkUpdatePacket(ClientInterface* receiver) {
     receiver->SendChunkUpdates(packet);
   }
 
-  const FastHashMap<ChunkPos, std::vector<BlockPos>>& changed_blocks_list =
-      level_->main_world_->world_updater_->GetChangedBlocks();
-
-  // For now just send entire chunk later send individual blocks
-  for (const auto& [chunk_pos, changed_blocks] : changed_blocks_list) {
-    ChunkContainer* chunk = level_->main_world_->world_->GetChunk(chunk_pos);
-    if (chunk == nullptr) continue;  // TODO(hiheyok): Fix this later
-    ChunkRawData data = chunk->GetRawData();
-
-    ChunkUpdatePacket::AddChunk packet = {.chunk_ = data};
-    receiver->SendChunkUpdates(packet);
-  }
-
   for (const auto& pos : updated_lights) {
     ChunkContainer* chunk = level_->main_world_->world_->GetChunk(pos);
     LightStorage sky_light = *chunk->sky_light_.get();
@@ -224,13 +210,37 @@ void Server::SendChunkUpdatePacket(ClientInterface* receiver) {
   }
 }
 
+void Server::SendBlockUpdatePacket(ClientInterface* receiver) {
+  const FastHashMap<ChunkPos, std::vector<BlockPos>>& changed_blocks_ =
+      level_->main_world_->world_updater_->GetChangedBlocks();
+
+  for (const auto& [chunk_pos, updates] : changed_blocks_) {
+    size_t num_updates = updates.size();
+
+    BlockUpdatePacket::BlockMultiUpdate packet;
+    packet.chunk_pos_ = chunk_pos;
+    packet.updates_.resize(num_updates);
+
+    std::array<BlockID, kChunkSize3D> block_data_ =
+        level_->main_world_->world_->GetChunk(chunk_pos)
+            ->GetPalette()
+            .UnpackAll();
+
+    for (int i = 0; i < num_updates; ++i) {
+      packet.updates_[i].first = updates[i]; 
+      packet.updates_[i].second = block_data_[updates[i].GetIndex()];
+    }
+
+    receiver->SendBlockUpdate(std::move(packet));
+  }
+}
+
 void Server::SendServerStats(ClientInterface* receiver) {
   ServerStats stats;
   stats.chunk_count_ = 0;  // level_->level_loader_->GetChunkCount();
                            // TODO(hiheyok): Add chunk counter
   stats.mspt_ = mspt_;
   stats.event_queued_ = 0;
-  stats.light_engine_queue_size_ =
-      level_->main_world_->GetLightEngineQueueSize();
+  stats.light_stats_ = level_->main_world_->GetLightEngineStats();
   receiver->SendServerStats(stats);
 }
