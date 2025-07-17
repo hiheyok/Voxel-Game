@@ -31,5 +31,5 @@ class LightStorage {  // Contains all lighting infomation for solid blocks
   ChunkPos position_;
 
  private:
-  NibbleArray<kChunkSize3D> data_;
+  alignas(64) NibbleArray<kChunkSize3D> data_;
 };

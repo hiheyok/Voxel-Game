@@ -16,14 +16,14 @@ For skylight, it can also dynamically add cache layers
 class LightEngineCache {
  public:
   struct LightEngineCacheStats {
-    size_t set_block_light_ = 0;
-    size_t set_sky_light_ = 0;
-    size_t get_block_light_ = 0;
-    size_t get_sky_light_ = 0;
-    size_t get_block_ = 0;
-    size_t get_chunk_ = 0;
-    size_t check_chunk_ = 0;
-    size_t try_cache_chunk_ = 0;
+    int set_block_light_ = 0;
+    int set_sky_light_ = 0;
+    int get_block_light_ = 0;
+    int get_sky_light_ = 0;
+    int get_block_ = 0;
+    int get_chunk_ = 0;
+    int check_chunk_ = 0;
+    int try_cache_chunk_ = 0;
   };
 
   LightEngineCache(GameContext&, WorldInterface&);
@@ -47,14 +47,50 @@ class LightEngineCache {
   LightEngineCacheStats GetStats() const noexcept;
 
  private:
+  class alignas(16) CacheSlot {
+   public:
+    Chunk* GetChunk() const {
+      // Cast the integer bits back to a pointer
+      return reinterpret_cast<Chunk*>(chunk_);
+    }
+
+    LightStorage* GetBlock() const {
+      return reinterpret_cast<LightStorage*>(block_);
+    }
+
+    LightStorage* GetSky() const {
+      return reinterpret_cast<LightStorage*>(sky_);
+    }
+
+    bool IsDirty() const { return dirty_; }
+
+    void SetChunk(Chunk* chunk) { chunk_ = reinterpret_cast<uintptr_t>(chunk); }
+
+    void SetBlock(LightStorage* block) {
+      block_ = reinterpret_cast<uintptr_t>(block);
+    }
+
+    void SetSky(LightStorage* sky) { sky_ = reinterpret_cast<uintptr_t>(sky); }
+
+    void SetDirty(bool is_dirty) { dirty_ = is_dirty; }
+
+   private:
+    uint64_t chunk_ : 48;
+    uint64_t block_ : 48;
+    uint64_t sky_ : 48;
+    bool dirty_ : 1;
+  };
+
   void SetBlockCache(ChunkPos pos, Chunk* data);
   void SetBlockLightCache(ChunkPos pos, LightStorage* data);
   void SetSkyLightCache(ChunkPos pos, LightStorage* data);
   void ExpandDown();
   bool TryCacheChunk(ChunkPos pos);
   size_t CalculateCacheIndex(ChunkPos pos) const noexcept;
+  [[nodiscard]] bool EnsureLoaded(ChunkPos pos);
 
-  static constexpr size_t kCacheSize = 3;
+  static constexpr int kCacheRadius = 1;
+  static constexpr int kCacheWidth = 1 + 2 * kCacheRadius;
 
   GameContext& game_context_;
   WorldInterface& world_;
@@ -63,12 +99,7 @@ class LightEngineCache {
   int y_top;
   int y_bot;
 
-  LightEngineCacheStats stats;
+  std::vector<CacheSlot> cache_;
 
-  // first index is the top
-  // Chunk, IsLightDirty
-  std::vector<std::pair<Chunk*, bool>> chunk_cache_;
-  std::vector<std::array<BlockID, kChunkSize3D>> block_data_;
-  std::vector<LightStorage*> block_light_cache_;
-  std::vector<LightStorage*> sky_light_cache_;
+  LightEngineCacheStats stats;
 };
