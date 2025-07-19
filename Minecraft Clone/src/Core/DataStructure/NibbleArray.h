@@ -1,14 +1,15 @@
 #include <array>
 #include <cassert>
 #include <cstdint>
+#include <cstring>
 
 template <size_t NumElements>
 class NibbleArray {
  public:
   NibbleArray();
   ~NibbleArray();
-  uint8_t Get(size_t index) const;
-  void Set(size_t index, uint8_t new_val);
+  uint8_t Get(size_t index) const noexcept;
+  void Set(size_t index, uint8_t new_val) noexcept;
   void Fill(uint8_t new_val);
 
   /*
@@ -27,14 +28,14 @@ template <size_t NumElements>
 NibbleArray<NumElements>::~NibbleArray() = default;
 
 template <size_t NumElements>
-uint8_t NibbleArray<NumElements>::Get(size_t index) const {
+uint8_t NibbleArray<NumElements>::Get(size_t index) const noexcept {
   size_t byte_idx = index >> 1;
   int shift = (index & 1) * 4;
   return (data[byte_idx] >> shift) & 0xF;
 }
 
 template <size_t NumElements>
-void NibbleArray<NumElements>::Set(size_t index, uint8_t new_val) {
+void NibbleArray<NumElements>::Set(size_t index, uint8_t new_val) noexcept {
   assert(new_val < 16);
   size_t byte_idx = index >> 1;
   int shift = (index & 1) * 4;
@@ -52,21 +53,22 @@ void NibbleArray<NumElements>::Fill(uint8_t new_val) {
 template <size_t NumElements>
 bool NibbleArray<NumElements>::operator==(
     const NibbleArray<NumElements>& rhs) const noexcept {
-  // Compare using 64 bit for speedup
-
-  const uint64_t* lhs_ptr = reinterpret_cast<const uint64_t*>(data.data());
-  const uint64_t* rhs_ptr = reinterpret_cast<const uint64_t*>(rhs.data.data());
-
-  static constexpr size_t kLen = NumElements / (2 * 8);
-  static constexpr size_t kPadding = (NumElements / 2) - kLen * 8;
-
-  for (size_t i = 0; i < kLen; ++i) {
-    if (*(rhs_ptr++) != *(lhs_ptr++)) return false;
+  constexpr size_t kBytes = sizeof(data);
+  if constexpr (kBytes == 8) {
+    uint64_t a, b;
+    std::memcpy(&a, data.data(), 8);
+    std::memcpy(&b, rhs.data.data(), 8);
+    return a == b;
+  } else if constexpr (kBytes < 8) {
+    // Small sizes: a single 64-bit load is still fine, but we must mask
+    // off the bytes that do not belong to the array.
+    uint64_t a = 0, b = 0;
+    std::memcpy(&a, data.data(), kBytes);
+    std::memcpy(&b, rhs.data.data(), kBytes);
+    uint64_t mask = (1ULL << (8 * kBytes)) - 1ULL;
+    return (a & mask) == (b & mask);
+  } else {
+    // Generic path: memcmp is vectorised and as fast as manual loops.
+    return std::memcmp(data.data(), rhs.data.data(), kBytes) == 0;
   }
-
-  for (size_t i = kLen * 8; i < kLen * 8 + kPadding; ++i) {
-    if (data[i] != rhs.data[i]) return false;
-  }
-
-  return true;
 }

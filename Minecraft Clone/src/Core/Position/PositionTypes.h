@@ -32,3 +32,7 @@ class BlockPos final : public Position<BlockPos> {
   [[nodiscard]] size_t GetIndex() const noexcept;
   [[nodiscard]] BlockPos GetLocalPos() const noexcept;
 };
+
+static_assert(std::is_trivially_copyable_v<RegionPos>);
+static_assert(std::is_trivially_copyable_v<ChunkPos>);
+static_assert(std::is_trivially_copyable_v<BlockPos>);

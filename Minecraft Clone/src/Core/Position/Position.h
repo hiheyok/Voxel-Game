@@ -37,12 +37,16 @@ class Position {
     const int direction = 1 - 2 * (side & 1);
     const int axis = side >> 1;
 
-    (*this)[axis] += direction * val;
+    v[axis] += direction * val;
     return *static_cast<Derived*>(this);
   }
 
   int& operator[](int axis) noexcept {
-    return reinterpret_cast<int*>(this)[axis];
+    return v[axis];
+  }
+
+  const int& operator[](int axis) const noexcept {
+    return v[axis];
   }
 
   [[nodiscard]] constexpr Derived operator-(
@@ -171,28 +175,32 @@ class Position {
     return x != other.x || y != other.y || z != other.z;
   }
 
-  constexpr Position<Derived>& operator-=(const Position<Derived>& other) noexcept {
+  constexpr Position<Derived>& operator-=(
+      const Position<Derived>& other) noexcept {
     x -= other.x;
     y -= other.y;
     z -= other.z;
     return *this;
   }
 
-  constexpr Position<Derived>& operator+=(const Position<Derived>& other) noexcept {
+  constexpr Position<Derived>& operator+=(
+      const Position<Derived>& other) noexcept {
     x += other.x;
     y += other.y;
     z += other.z;
     return *this;
   }
 
-  constexpr Position<Derived>& operator*=(const Position<Derived>& other) noexcept {
+  constexpr Position<Derived>& operator*=(
+      const Position<Derived>& other) noexcept {
     x *= other.x;
     y *= other.y;
     z *= other.z;
     return *this;
   }
 
-  constexpr Position<Derived>& operator/=(const Position<Derived>& other) noexcept {
+  constexpr Position<Derived>& operator/=(
+      const Position<Derived>& other) noexcept {
     x = static_cast<int>(floor(static_cast<double>(x) / other.x));
     y = static_cast<int>(floor(static_cast<double>(y) / other.y));
     z = static_cast<int>(floor(static_cast<double>(z) / other.z));
@@ -215,7 +223,12 @@ class Position {
            std::to_string(z) + "]";
   }
 
-  int x, y, z;
+  union {
+    struct {
+      int x, y, z;
+    };         // keeps .x .y .z syntax
+    int v[3];  // allows operator[](i) and vector load
+  };
 };
 
 // Define a concept to identify types that follow the CRTP pattern with Position

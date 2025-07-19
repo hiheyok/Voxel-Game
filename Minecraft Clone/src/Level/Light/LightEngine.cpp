@@ -61,7 +61,7 @@ void LightEngine::PropagateIncrease() {
 
     // Light level already changed from somewhere else
     if (propagation_lvl != light_lvl) {
-      continue;
+      [[likely]] continue;
     }
 
     for (const auto& propagation : Directions<BlockPos>()) {
@@ -73,14 +73,14 @@ void LightEngine::PropagateIncrease() {
       BlockPos offset_pos = block_pos + propagation;
 
       // Light level is already at the expected level or chunk doesn't exist
-      if (!CheckChunk(offset_pos.ToChunkPos())) {
+      if (!CheckChunk(offset_pos.ToChunkPos())) [[unlikely]] {
         continue;
       }
 
       int curr_lvl = GetLightLvl(offset_pos);
 
       if (curr_lvl >= propagation_lvl - 1) {
-        continue;
+        [[unlikely]] continue;
       }
 
       BlockID offset_block = GetBlock(offset_pos);
@@ -119,14 +119,14 @@ void LightEngine::PropagateDecrease() {
       BlockPos offset_pos = block_pos + propagation;
       // Chunk doesnt exist
       if (!CheckChunk(offset_pos.ToChunkPos())) {
-        continue;
+        [[unlikely]] continue;
       }
 
       int curr_lvl = GetLightLvl(offset_pos);
 
       // Area is already dark
       if (curr_lvl == 0) {
-        continue;
+        [[unlikely]] continue;
       }
 
       // If neighbor is dimmer, it might have been lit by the removed light.

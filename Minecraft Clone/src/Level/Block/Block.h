@@ -17,10 +17,13 @@ struct BlockModel;
 struct BlockProperties {
   BlockProperties();
 
+  BlockProperties& SetIsFluid(bool is_fluid);
+  BlockProperties& SetTransparency(bool is_fluid);
+
   bool is_fluid_ = false;
-  bool transparency_ = false;
   bool is_solid_ = false;
   bool light_pass_ = false;
+  bool transparency_ = false;
   int light_emission = 0;
   int opacity_ = 15;
 };

@@ -19,10 +19,5 @@ int main() {
   game_context.InitializeGameContext();
   Client GameClient{game_context};
   GameClient.run();
-  try {
-  } catch (std::exception& e) {
-    std::cout << e.what() << '\n';
-  }
-
   return 0;
 }

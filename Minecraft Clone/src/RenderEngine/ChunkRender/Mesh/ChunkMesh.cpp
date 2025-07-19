@@ -49,20 +49,26 @@ void Mesh::ChunkMeshData::GenerateCache() {
   std::array<BlockID, kChunkSize3D> chunk_data =
       chunk_->GetPalette().UnpackAll();
 
-  int chunk_data_index = 0;
-  BlockID* base_ptr =
+  const BlockID* restrict src = &chunk_data[0];
+  BlockID* restrict dst =
       &chunk_cache_[kCacheStrideX + kCacheStrideY + kCacheStrideZ];
-  const BlockID* x_ptr_end = base_ptr + kCacheStrideX * kChunkDim;
-  for (BlockID* x_ptr = base_ptr; x_ptr < x_ptr_end; x_ptr += kCacheStrideX) {
-    const BlockID* y_ptr_end = x_ptr + kCacheStrideY * kChunkDim;
-    for (BlockID* y_ptr = x_ptr; y_ptr < y_ptr_end; y_ptr += kCacheStrideY) {
-      memcpy(y_ptr, chunk_data.data() + chunk_data_index,
-             kChunkDim * sizeof(BlockID));
-      chunk_data_index += kChunkDim;
+
+  size_t src_x = 0;
+  size_t dst_x = 0;
+  for (int x = 0; x < kChunkDim; ++x) {
+    size_t src_y = src_x;
+    size_t dst_y = dst_x;
+    for (int y = 0; y < kChunkDim; ++y) {
+      memcpy(dst + dst_y, src + src_y, kChunkDim * sizeof(BlockID));
+
+      src_y += kChunkDim;
+      dst_y += kCacheDim1D;
     }
+    src_x += kChunkSize2D;
+    dst_x += kCacheDim2D;
   }
 
-  for (const auto& side : Directions<ChunkPos>()) {
+  for (auto side : Directions<ChunkPos>()) {
     int axis = side.GetAxis();
     int direction = side.GetDirection() & 0b1;
 
@@ -87,16 +93,19 @@ void Mesh::ChunkMeshData::GenerateCache() {
     const int stride_u = kCacheStride[axis_u];
     const int stride_v = kCacheStride[axis_v];
 
-    base_ptr = &chunk_cache_[stride_slice * (17 - 17 * direction) + stride_u +
-                             stride_v];
+    src = slice_data.data();
+    dst = &chunk_cache_[stride_slice * (kCacheDim1D - 1) * (direction ^ 1) +
+                        stride_u + stride_v];
 
-    const BlockID* slice_ptr = slice_data.data();
-    const BlockID* u_ptr_end = base_ptr + kChunkDim * stride_u;
-    for (BlockID* u_ptr = base_ptr; u_ptr < u_ptr_end; u_ptr += stride_u) {
-      const BlockID* v_ptr_end = u_ptr + kChunkDim * stride_v;
-      for (BlockID* v_ptr = u_ptr; v_ptr < v_ptr_end; v_ptr += stride_v) {
-        *v_ptr = *(slice_ptr++);
+    size_t src_idx = 0;
+    size_t dst_u = 0;
+    for (int u = 0; u < kChunkDim; ++u) {
+      size_t dst_v = dst_u;
+      for (int v = 0; v < kChunkDim; ++v) {
+        *(dst + dst_v) = *(src + src_idx++);
+        dst_v += stride_v;
       }
+      dst_u += stride_u;
     }
   }
 }
@@ -109,6 +118,8 @@ void Mesh::ChunkMeshData::GenerateMesh() {
     return;
   }
   greedy_time_ = 0;
+  add_face_call_count_ = 0;
+  add_face_clock_ = 0;
   Timer time;
   GenerateCache();
   cache_time_ = time.GetTimePassed_us();
@@ -117,8 +128,11 @@ void Mesh::ChunkMeshData::GenerateMesh() {
 }
 
 void Mesh::ChunkMeshData::GenerateFaceCollection() {
-  std::array<uint8_t, 4096> face_visibility;
-  std::array<uint8_t, 4096> face_visibility_back;
+  const BlockModelManager& models = *game_context_.block_model_manager_.get();
+
+  std::array<uint8_t, 1024> face_visibility;
+  std::array<uint8_t, 1024> face_visibility_back;
+
   std::array<uint8_t, kChunkSize2D> used_block{};
 
   static constexpr int chunk_stride_u = kChunkDim;
@@ -136,6 +150,9 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
     const int stride_slice = kCacheStride[axis];
     const int stride_u = kCacheStride[axis_u];
     const int stride_v = kCacheStride[axis_v];
+
+    const int front_side = axis * 2;
+    const int back_side = axis * 2 + 1;
 
     const BlockID* base_ptr =
         &chunk_cache_[kCacheStrideX + kCacheStrideY + kCacheStrideZ];
@@ -162,10 +179,8 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
           BlockID curr_block = *cache_ptr;
           BlockID back_block = *(cache_ptr - stride_slice);
 
-          const BlockModel& curr_model =
-              game_context_.block_model_manager_->GetBlockModel(curr_block);
-          const BlockModel& back_model =
-              game_context_.block_model_manager_->GetBlockModel(back_block);
+          const BlockModel& curr_model = models.GetBlockModel(curr_block);
+          const BlockModel& back_model = models.GetBlockModel(back_block);
 
           bool blank_curr_model =
               !curr_model.is_initialized_ || slice == kChunkDim;
@@ -177,12 +192,12 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
               face_visibility[i] = 0;
               const Cuboid& element = curr_model.elements_[i];
 
-              if (element.faces_[axis * 2 + 1].reference_texture_.size() == 0)
+              if (element.faces_[back_side].reference_texture_.size() == 0)
                 continue;
 
-              if (element.faces_[axis * 2 + 1].cull_face_ != -1) {
+              if (element.faces_[back_side].cull_face_ != -1) {
                 if (!IsFaceVisible(element,
-                                   element.faces_[axis * 2 + 1].cull_face_,
+                                   element.faces_[back_side].cull_face_,
                                    cache_ptr))
                   continue;
               }
@@ -195,11 +210,12 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
               face_visibility_back[i] = 0;
               const Cuboid& element = back_model.elements_[i];
 
-              if (element.faces_[axis * 2].reference_texture_.length() == 0)
+              if (element.faces_[front_side].reference_texture_.length() == 0)
                 continue;
 
-              if (element.faces_[axis * 2].cull_face_ != -1) {
-                if (!IsFaceVisible(element, element.faces_[axis * 2].cull_face_,
+              if (element.faces_[front_side].cull_face_ != -1) {
+                if (!IsFaceVisible(element,
+                                   element.faces_[front_side].cull_face_,
                                    cache_ptr - stride_slice))
                   continue;
               }
@@ -264,9 +280,8 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
             for (size_t i = 0; i < curr_model.elements_.size(); i++) {
               if (!face_visibility[i]) continue;
               const Cuboid& element = curr_model.elements_[i];
-              AddFaceToMesh(element, axis * 2 + 1,
-                            curr_model.ambient_occlusion_, q_pos, u_length,
-                            v_length, cache_ptr);
+              AddFaceToMesh(element, back_side, curr_model.ambient_occlusion_,
+                            q_pos, u_length, v_length, cache_ptr);
             }
           }
           --q_pos[axis];
@@ -274,7 +289,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
             for (size_t i = 0; i < back_model.elements_.size(); i++) {
               if (!face_visibility_back[i]) continue;
               const Cuboid& element = back_model.elements_[i];
-              AddFaceToMesh(element, axis * 2, back_model.ambient_occlusion_,
+              AddFaceToMesh(element, front_side, back_model.ambient_occlusion_,
                             q_pos, u_length, v_length,
                             cache_ptr - stride_slice);
             }
@@ -294,16 +309,18 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
 void Mesh::ChunkMeshData::AddFaceToMesh(const Cuboid& cube, int side,
                                         bool allow_ao, BlockPos pos, int u_size,
                                         int v_size,
-                                        const BlockID* __restrict cache_ptr) {
-  // First get some of the general data
-  int direction = side & 1;
-  int axis = side >> 1;
-  int axis_u = (axis + 1) % 3;
-  int axis_v = (axis + 2) % 3;
-  int new_face_count = u_size * v_size;
+                                        const BlockID* restrict cache_ptr) {
+  // size_t t0 = __rdtsc();
 
-  int stride_u = kCacheStride[axis_u];
-  int stride_v = kCacheStride[axis_v];
+  //  First get some of the general data
+  const int direction = side & 1;
+  const int axis = side >> 1;
+  const int axis_u = (axis + 1) % 3;
+  const int axis_v = (axis + 2) % 3;
+  const int new_face_count = u_size * v_size;
+
+  const int stride_u = kCacheStride[axis_u];
+  const int stride_v = kCacheStride[axis_v];
 
   const BlockFace& face = cube.faces_[side];
   glm::vec3 from = cube.from_;
@@ -339,6 +356,8 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const Cuboid& cube, int side,
     vertex_buffer.resize(vertex_buffer.size() + kBufferStepSize);
   }
 
+  BlockVertexFormat* restrict vertex_dst = vertex_buffer.data() + vertex_index;
+
   // Now calculate the AO, lighting, colors
   BlockVertexFormat v_00, v_10, v_11, v_01;
   float ao_multi[4] = {1.0f};
@@ -354,147 +373,125 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const Cuboid& cube, int side,
 
   BlockPos offset_pos = pos;
   const BlockID* u_ptr = cache_ptr;
-  for (int u = pos[axis_u]; u < pos[axis_u] + u_size; ++u, u_ptr += stride_u) {
+  for (float u = pos[axis_u]; u < pos[axis_u] + u_size; ++u, u_ptr += stride_u) {
     const BlockID* v_ptr = u_ptr;
-    for (int v = pos[axis_v]; v < pos[axis_v] + v_size;
+    for (float v = pos[axis_v]; v < pos[axis_v] + v_size;
          ++v, v_ptr += stride_v) {
       offset_pos[axis_u] = u;
       offset_pos[axis_v] = v;
 
       if (allow_ao) {
-        GetAO(side, v_ptr, ao_multi[0], ao_multi[1], ao_multi[2], ao_multi[3]);
+        GetAO(side, v_ptr, ao_multi);
       }
 
-      glm::vec3 base_pos{offset_pos.x, offset_pos.y, offset_pos.z};
+      float base_slice = offset_pos[axis];
 
       if (direction) {
-        base_pos[axis] += from[axis];
+        base_slice += from[axis];
       } else {
-        base_pos[axis] += to[axis];
+        base_slice += to[axis];
       }
 
-      const auto [sky_light, block_light] = GetLightDirectional(offset_pos, side);
-      
-      CreateVertex(v_00, color, uv_00, ao_multi[0], sky_light, block_light);
-      CreateVertex(v_01, color, uv_01, ao_multi[1], sky_light, block_light);
-      CreateVertex(v_10, color, uv_10, ao_multi[2], sky_light, block_light);
-      CreateVertex(v_11, color, uv_11, ao_multi[3], sky_light, block_light);
+      const auto [sky_light, block_light] =
+          GetLightDirectional(offset_pos, side);
+
+      CreateVertex(v_00, color, uv_00, ao_multi[0b00], sky_light, block_light);
+      CreateVertex(v_01, color, uv_01, ao_multi[0b01], sky_light, block_light);
+      CreateVertex(v_10, color, uv_10, ao_multi[0b10], sky_light, block_light);
+      CreateVertex(v_11, color, uv_11, ao_multi[0b11], sky_light, block_light);
 
       // Now work on positions
       // Set vertices
-      v_00.pos_[axis] = base_pos[axis];
-      v_00.pos_[axis_u] = base_pos[axis_u] + from[axis_u];
-      v_00.pos_[axis_v] = base_pos[axis_v] + from[axis_v];
+      v_00.pos_[axis] = base_slice;
+      v_00.pos_[axis_u] = u + from[axis_u];
+      v_00.pos_[axis_v] = v + from[axis_v];
 
-      v_01.pos_[axis] = base_pos[axis];
-      v_01.pos_[axis_u] = base_pos[axis_u] + from[axis_u];
-      v_01.pos_[axis_v] = base_pos[axis_v] + to[axis_v];
+      v_01.pos_[axis] = base_slice;
+      v_01.pos_[axis_u] = u + from[axis_u];
+      v_01.pos_[axis_v] = v + to[axis_v];
 
-      v_10.pos_[axis] = base_pos[axis];
-      v_10.pos_[axis_u] = base_pos[axis_u] + to[axis_u];
-      v_10.pos_[axis_v] = base_pos[axis_v] + from[axis_v];
+      v_10.pos_[axis] = base_slice;
+      v_10.pos_[axis_u] = u + to[axis_u];
+      v_10.pos_[axis_v] = v + from[axis_v];
 
-      v_11.pos_[axis] = base_pos[axis];
-      v_11.pos_[axis_u] = base_pos[axis_u] + to[axis_u];
-      v_11.pos_[axis_v] = base_pos[axis_v] + to[axis_v];
+      v_11.pos_[axis] = base_slice;
+      v_11.pos_[axis_u] = u + to[axis_u];
+      v_11.pos_[axis_v] = v + to[axis_v];
 
       if (ao_multi[0] + ao_multi[3] > ao_multi[1] + ao_multi[2]) {
         // Flipped quad
-        vertex_buffer[vertex_index + 0] = v_00;
-        vertex_buffer[vertex_index + 1] = v_10;
-        vertex_buffer[vertex_index + 2] = v_11;
+        vertex_dst[0] = v_00;
+        vertex_dst[1] = v_10;
+        vertex_dst[2] = v_11;
 
-        vertex_buffer[vertex_index + 3] = v_00;
-        vertex_buffer[vertex_index + 4] = v_11;
-        vertex_buffer[vertex_index + 5] = v_01;
+        vertex_dst[3] = v_00;
+        vertex_dst[4] = v_11;
+        vertex_dst[5] = v_01;
       } else {
         // Normal quad
-        vertex_buffer[vertex_index + 0] = v_00;
-        vertex_buffer[vertex_index + 1] = v_10;
-        vertex_buffer[vertex_index + 2] = v_01;
+        vertex_dst[0] = v_00;
+        vertex_dst[1] = v_10;
+        vertex_dst[2] = v_01;
 
-        vertex_buffer[vertex_index + 3] = v_01;
-        vertex_buffer[vertex_index + 4] = v_10;
-        vertex_buffer[vertex_index + 5] = v_11;
+        vertex_dst[3] = v_01;
+        vertex_dst[4] = v_10;
+        vertex_dst[5] = v_11;
       }
 
       // Flip vertices for face culling
       if (direction == 0) {
-        std::swap(vertex_buffer[vertex_index + 1],
-                  vertex_buffer[vertex_index + 2]);
-        std::swap(vertex_buffer[vertex_index + 4],
-                  vertex_buffer[vertex_index + 5]);
+        std::swap(vertex_dst[1], vertex_dst[2]);
+        std::swap(vertex_dst[4], vertex_dst[5]);
       }
       ++face_count;
-      vertex_index += 6;
+      vertex_dst += 6;
     }
   }
+
+  // size_t t1 = __rdtsc();
+  // add_face_clock_ += t1 - t0;
+  // ++add_face_call_count_;
 }
 
-void Mesh::ChunkMeshData::GetAO(int side, const BlockID* __restrict cache_ptr,
-                                float& ao_m_00, float& ao_m_01, float& ao_m_10,
-                                float& ao_m_11) {
-  int ao_00 = 3, ao_01 = 3, ao_10 = 3, ao_11 = 3;
+void Mesh::ChunkMeshData::GetAO(int side, const BlockID* restrict cache_ptr,
+                                float* ao_m) {
+  constexpr float kTable[4] = {0.40f, 0.60f, 0.80f, 1.00f};
   const int axis = side >> 1;
   const int stride_u = kCacheStride[(axis + 1) % 3];
   const int stride_v = kCacheStride[(axis + 2) % 3];
 
-  const BlockID* center_ptr = cache_ptr;
+  const BlockID* restrict p = cache_ptr;
   if ((side & 1) == 0) {
-    center_ptr += kCacheStride[axis];
+    p += kCacheStride[axis];
   } else {
-    center_ptr -= kCacheStride[axis];
+    p -= kCacheStride[axis];
   }
+  BlockID air = game_context_.blocks_->AIR;
+  const int s_u = (p[stride_u] != air);
+  const int s_d = (p[-stride_u] != air);
+  const int s_r = (p[stride_v] != air);
+  const int s_l = (p[-stride_v] != air);
 
-  if (*(center_ptr + stride_u) != game_context_.blocks_->AIR) {
-    ao_11--;
-    ao_10--;
-  }
+  int ao_00 = 3 - s_d - s_l;
+  int ao_01 = 3 - s_d - s_r;
+  int ao_10 = 3 - s_u - s_l;
+  int ao_11 = 3 - s_u - s_r;
 
-  if (*(center_ptr - stride_u) != game_context_.blocks_->AIR) {
-    ao_01--;
-    ao_00--;
-  }
-
-  if (*(center_ptr + stride_v) != game_context_.blocks_->AIR) {
-    ao_01--;
-    ao_11--;
-  }
-
-  if (*(center_ptr - stride_v) != game_context_.blocks_->AIR) {
-    ao_10--;
-    ao_00--;
-  }
-
-  if (ao_01 == 1 ||
-      *(center_ptr - stride_u + stride_v) != game_context_.blocks_->AIR) {
-    ao_01--;
-  }
-
-  if (ao_00 == 1 ||
-      *(center_ptr - stride_u - stride_v) != game_context_.blocks_->AIR) {
-    ao_00--;
-  }
-
-  if (ao_11 == 1 ||
-      *(center_ptr + stride_u + stride_v) != game_context_.blocks_->AIR) {
-    ao_11--;
-  }
-
-  if (ao_10 == 1 ||
-      *(center_ptr + stride_u - stride_v) != game_context_.blocks_->AIR) {
-    ao_10--;
-  }
-
-  ao_m_00 = static_cast<float>(2 + ao_00) / 5.0f;
-  ao_m_01 = static_cast<float>(2 + ao_01) / 5.0f;
-  ao_m_10 = static_cast<float>(2 + ao_10) / 5.0f;
-  ao_m_11 = static_cast<float>(2 + ao_11) / 5.0f;
+  const BlockID* q = p - stride_u;
+  ao_00 -= ((ao_00 == 1u) | (*(q - stride_v) != air));
+  ao_01 -= ((ao_01 == 1u) | (*(q + stride_v) != air));
+  q += 2 * stride_u;
+  ao_10 -= ((ao_10 == 1u) | (*(q - stride_v) != air));
+  ao_11 -= ((ao_11 == 1u) | (*(q + stride_v) != air));
+  ao_m[0b00] = kTable[ao_00];
+  ao_m[0b01] = kTable[ao_01];
+  ao_m[0b10] = kTable[ao_10];
+  ao_m[0b11] = kTable[ao_11];
 }
 
 // Checks if a block side is visible to the player
 bool Mesh::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int side,
-                                        const BlockID* __restrict cache) {
+                                        const BlockID* restrict cache) {
   const int axis = (side >> 1);  // Get side
   const int axis_u = (axis + 1) % 3;
   const int axis_v = (axis + 2) % 3;
@@ -548,7 +545,6 @@ std::pair<int, int> Mesh::ChunkMeshData::GetLightDirectional(BlockPos pos,
     auto neigh = chunk->GetNeighbor(side);
     if (!neigh.has_value()) return {0, 0};
     chunk = neigh.value();
-    pos = pos.GetLocalPos();
   }
 
   return {chunk->sky_light_->GetLighting(pos),

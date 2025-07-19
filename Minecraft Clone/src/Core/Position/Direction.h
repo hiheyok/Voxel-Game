@@ -50,7 +50,7 @@ class Direction {
   }
 
   constexpr int GetDirection() const { return direction_; }
-  constexpr int GetOppositeDirection() const { return direction_ ^ 1; }
+  constexpr int GetOppositeDirection() const { return kOpposite[direction_]; }
   constexpr int GetAxis() const { return direction_ >> 1; }
   constexpr bool IsPositive() const { return (direction_ & 1) == 0; }
   constexpr bool IsNegative() const { return (direction_ & 1) == 1; }
@@ -58,7 +58,8 @@ class Direction {
 
  private:
   PositionType offset_;
-  int direction_;
+  uint8_t direction_;
+  static constexpr int kOpposite[6] = {1,0,3,2,5,4};
 };
 
 /*

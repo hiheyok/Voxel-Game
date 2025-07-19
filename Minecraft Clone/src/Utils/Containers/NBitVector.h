@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <vector>
+#include <cassert>
 
 template <typename StorageBit = uint64_t>
 class NBitVector {
@@ -180,32 +181,24 @@ void NBitVector<StorageBit>::UnpackAll(std::vector<T>& out) const {
 template <typename StorageBit>
 template <typename T>
 void NBitVector<StorageBit>::UnpackAll(T* out) const {
+  static_assert(std::is_same_v<StorageBit, uint64_t>);
   size_t out_idx = 0;
   size_t data_idx = 0;
   size_t bit_pos = 0;
-  StorageBit current_word = data_[data_idx];
+
+  const StorageBit* src = data_.data();
 
   while (out_idx < num_elements_) {
-    if (bit_pos + bit_width_ <= kStorageBits) {  // Easy acess
-      out[out_idx++] =
-          static_cast<T>((current_word >> bit_pos) & all_ones_bit_width_);
+    if (bit_pos + bit_width_ < kStorageBits) [[likely]] {  // Easy acess
+      out[out_idx++] = static_cast<T>((src[data_idx] >> bit_pos) & all_ones_bit_width_);
       bit_pos += bit_width_;
-    } else {  // Slower access for values that are stored in 2 separate words
-      StorageBit next_word = data_[++data_idx];
-
-      const StorageBit lower = current_word >> bit_pos;
-      const StorageBit upper = next_word << (kStorageBits - bit_pos);
+    } else {
+      const StorageBit lower = src[data_idx] >> bit_pos;
+      const StorageBit upper = src[++data_idx] << (kStorageBits - bit_pos);
 
       out[out_idx++] = static_cast<T>((lower | upper) & all_ones_bit_width_);
       // Combine them and store
-      current_word = next_word;
       bit_pos = (bit_pos + bit_width_) & KStorageBitRemainderMask;
-    }
-
-    if (bit_pos == kStorageBits) {
-      data_idx++;
-      current_word = data_[data_idx];
-      bit_pos = 0;
     }
   }
 }

@@ -172,7 +172,10 @@ void ClientPlay::UpdateDebugStats() {
                                   terrain_render_->build_time_) +
                    "/" +
                    std::to_string(terrain_render_->build_time_ /
-                                  terrain_render_->amount_of_mesh_generated_));
+                                  terrain_render_->amount_of_mesh_generated_) +
+                   "/" +
+                   std::to_string((double)terrain_render_->set_face_calls_clocks_ /
+                                  terrain_render_->set_face_calls_));
 
   debug_screen_->EditText("Stat7",
                           "Mesh Engine Queued: " +

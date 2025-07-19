@@ -36,11 +36,11 @@ struct BlockFace {
 
   glm::ivec3 normal_ = glm::ivec3(0, 0, 0);
   std::string reference_texture_ = "";  // variables starts with #
-  int cull_face_ = -1;
-  int tint_index_ = -1;
   size_t texture_id_ = 0;
   size_t texture_count_ = 0;  // For amination purposes.
   uint32_t rotation_ = 0;
+  int cull_face_ = -1;
+  int tint_index_ = -1;
   bool partially_transparent_pixel_ = false;
   bool fully_transparent_pixel_ = false;
   bool can_cull = false;
@@ -115,9 +115,9 @@ struct BlockModel {
   void FlattenVariables();
   void BakeTextureRotation();
 
-  std::vector<Cuboid> elements_{};
-  bool ambient_occlusion_ = true;  // default value
   bool is_initialized_ = false;
+  bool ambient_occlusion_ = true;  // default value
+  std::vector<Cuboid> elements_{};
   FastHashMap<std::string, std::string> texture_variable_;
   BlockDisplay display_[8]{};
 };

@@ -10,6 +10,16 @@
 
 #include "Core/Typenames.h"
 
+#if defined(_MSC_VER)
+#include <immintrin.h>
+#define restrict 
+#elif defined(__GNUC__) || defined(__clang__)
+#include <x86intrin.h>
+#define restrict __restrict__
+#else
+#define restrict
+#endif
+
 class Chunk;
 class GameContext;
 
@@ -55,10 +65,32 @@ class ChunkMeshData {
 
   size_t greedy_time_;
   size_t cache_time_;
+  size_t add_face_clock_ = 0;
+  size_t add_face_call_count_ = 0;
 
   bool use_option_ = false;  // for performance debugging purposes
 
  private:
+  struct GreedyFace {
+    GreedyFace(int axis, BlockPos pos, int u_len, int v_len,
+               const BlockID* cache_ptr, BlockID curr, BlockID back)
+        : cache_ptr_{cache_ptr},
+          starting_pos_{pos},
+          axis_{axis},
+          u_len_{u_len},
+          v_len_{v_len},
+          curr_{curr},
+          back_{back} {}
+
+    const BlockID* cache_ptr_;
+    BlockPos starting_pos_;
+    int axis_;
+    int u_len_;
+    int v_len_;
+    BlockID curr_;
+    BlockID back_;
+  };
+
   // Used to generate the cache
   void GenerateCache();
 
@@ -70,15 +102,13 @@ class ChunkMeshData {
 
   // Check if the player can see the mesh
   bool IsFaceVisible(const Cuboid& cube, int side,
-                     const BlockID* __restrict cache);
+                     const BlockID* restrict cache);
 
   // Add faces to the mesh
   void AddFaceToMesh(const Cuboid& cube, int side, bool allow_ao, BlockPos pos,
-                     int u_size, int v_size,
-                     const BlockID* __restrict cache_ptr);
+                     int u_size, int v_size, const BlockID* restrict cache_ptr);
 
-  void GetAO(int side, const BlockID* __restrict cache_ptr, float& ao_m_00,
-             float& ao_m_01, float& ao_m_10, float& ao_m_11);
+  void GetAO(int side, const BlockID* restrict cache_ptr, float* ao_m);
 
   std::pair<int, int> GetLightDirectional(BlockPos pos, int direction);
 

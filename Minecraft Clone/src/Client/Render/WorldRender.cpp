@@ -71,6 +71,9 @@ std::unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(ChunkPos pos) {
   build_stage_1_ += chunk_mesher.cache_time_;
   build_time_ += time;
 
+  set_face_calls_ += chunk_mesher.add_face_call_count_;
+  set_face_calls_clocks_ += chunk_mesher.add_face_clock_;
+
   ++amount_of_mesh_generated_;
 
   return data;

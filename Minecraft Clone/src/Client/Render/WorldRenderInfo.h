@@ -13,6 +13,7 @@ struct WorldRenderInfo {
   size_t is_face_visible_calls_ = 0;
   size_t get_face_calls_ = 0;
   size_t set_face_calls_ = 0;
+  size_t set_face_calls_clocks_ = 0;
   size_t get_texture_calls_ = 0;
   size_t compare_quad_calls_ = 0;
 
