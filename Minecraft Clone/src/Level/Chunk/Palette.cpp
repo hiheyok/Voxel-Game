@@ -21,7 +21,7 @@ Palette& Palette::operator=(Palette&&) noexcept = default;
 
 void Palette::Shrink() {
   int newBitWidth = GetBitWidth(unique_blocks_count_);
-  NBitVector<StorageBit> newData(kChunkSize3D, newBitWidth);
+  NBitVector newData(kChunkSize3D, newBitWidth);
 
   // Repack
 
@@ -57,7 +57,7 @@ void Palette::Shrink() {
 
 void Palette::Grow() {
   int newBitWidth = GetBitWidth(unique_blocks_count_);
-  NBitVector<StorageBit> newData(kChunkSize3D, newBitWidth);
+  NBitVector newData(kChunkSize3D, newBitWidth);
   current_bit_width_ = newBitWidth;
   for (int i = 0; i < kChunkSize3D; ++i) {
     newData.Set(i, data_.Get(i));

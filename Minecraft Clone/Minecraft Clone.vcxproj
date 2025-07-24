@@ -308,6 +308,7 @@
     <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\TextureArray.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\TextureAtlas.cpp" />
     <ClCompile Include="src\RenderEngine\Window.cpp" />
+    <ClCompile Include="src\Utils\Containers\NBitVector.cpp" />
     <ClCompile Include="src\Utils\Math\Probability\Probability.cpp" />
     <ClCompile Include="src\Level\Block\Blocks.cpp" />
     <ClCompile Include="src\Level\Entity\Entity.cpp" />

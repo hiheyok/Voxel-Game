@@ -163,19 +163,20 @@ void ClientPlay::UpdateDebugStats() {
   debug_screen_->EditText("Stat5", "FPS: " + std::to_string(1.0 / frametime_));
 
   debug_screen_->EditText(
-      "Stat6", "Mesh Stats (ms) Total/S0/S1/S2: " +
-                   std::to_string(terrain_render_->build_time_ / 1000.f) + "/" +
-                   std::to_string(100.0 * terrain_render_->build_stage_0_ /
-                                  terrain_render_->build_time_) +
-                   "/" +
-                   std::to_string(100.0 * terrain_render_->build_stage_1_ /
-                                  terrain_render_->build_time_) +
-                   "/" +
-                   std::to_string(terrain_render_->build_time_ /
-                                  terrain_render_->amount_of_mesh_generated_) +
-                   "/" +
-                   std::to_string((double)terrain_render_->set_face_calls_clocks_ /
-                                  terrain_render_->set_face_calls_));
+      "Stat6",
+      "Mesh Stats (ms) Total/S0/S1/S2: " +
+          std::to_string(terrain_render_->build_time_ / 1000.f) + "/" +
+          std::to_string(100.0 * terrain_render_->build_stage_0_ /
+                         terrain_render_->build_time_) +
+          "/" +
+          std::to_string(100.0 * terrain_render_->build_stage_1_ /
+                         terrain_render_->build_time_) +
+          "/" +
+          std::to_string(terrain_render_->build_time_ /
+                         terrain_render_->amount_of_mesh_generated_) +
+          "/" +
+          std::to_string((double)terrain_render_->set_face_calls_clocks_ /
+                         terrain_render_->set_face_calls_));
 
   debug_screen_->EditText("Stat7",
                           "Mesh Engine Queued: " +

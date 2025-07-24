@@ -59,7 +59,7 @@ std::unique_ptr<BlockModel> Fluid::InitializeBlockModel(
 void Fluid::Tick(BlockPos pos, Dimension* currentWorld) {
   BlockID blockType = currentWorld->world_->GetBlock(pos);
 
-  for (const auto& offset : Directions<BlockPos>()) {
+  for (auto offset : Directions<BlockPos>()) {
     BlockPos newPos = pos + offset;
 
     if (offset == Directions<BlockPos>::kUp) {

@@ -24,7 +24,7 @@ template <class PositionType>
 class Direction {
  public:
   constexpr Direction(int x, int y, int z, int direction) noexcept
-      : offset_{x, y, z}, direction_{direction} {}
+      : offset_{x, y, z}, direction_{static_cast<uint8_t>(direction)} { }
 
   constexpr Direction(const Direction&) noexcept = default;
   constexpr Direction(Direction&&) noexcept = default;

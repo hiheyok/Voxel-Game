@@ -61,7 +61,7 @@ class Palette {
   int empty_slot_counter_ = 0;   // This counts the amount of empty entries
                                  // (count == 0) in palette_entries_
 
-  NBitVector<StorageBit> data_;
+  NBitVector data_;
 
   // BlockID -> Block, int_16 -> num of that block
   std::vector<BlockID> palette_entries_id_;

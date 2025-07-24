@@ -27,7 +27,7 @@ void ChunkMap::EraseChunk(ChunkPos pos) {
   RegionPos reg_pos = pos.ToRegionPos();
   Region* reg = GetRegion(reg_pos);
 
-  for (const auto& offset : Directions<ChunkPos>()) {
+  for (auto offset : Directions<ChunkPos>()) {
     ChunkPos neighborPos = pos + offset;
 
     if (CheckChunk(neighborPos)) {
@@ -127,16 +127,16 @@ void ChunkMap::InsertChunk(std::unique_ptr<Chunk> chunk) {
     reg = CreateRegion(reg_pos);
   }
 
-  for (const auto& offset : Directions<ChunkPos>()) {
-    ChunkPos posNeighbor = chunk->position_ + offset;
+  for (auto offset : Directions<ChunkPos>()) {
+    ChunkPos neigh_pos = chunk->position_ + offset;
 
-    if (CheckChunk(posNeighbor)) {
-      chunk->SetNeighbor(static_cast<ChunkContainer*>(GetChunk(posNeighbor)),
+    if (CheckChunk(neigh_pos)) {
+      chunk->SetNeighbor(static_cast<ChunkContainer*>(GetChunk(neigh_pos)),
                          offset);
-      GetChunk(posNeighbor)
-          ->SetNeighbor(static_cast<ChunkContainer*>(chunk.get()), !offset);
+      GetChunk(neigh_pos)->SetNeighbor(
+          static_cast<ChunkContainer*>(chunk.get()), !offset);
       if (neighbor_update_) {
-        GetChunk(posNeighbor)->UpdateGen();
+        GetChunk(neigh_pos)->UpdateGen();
       }
     }
   }

@@ -84,10 +84,10 @@ N2BitVector<StorageBit>::N2BitVector(int numElements, int bitWidth)
     : bit_width_{bitWidth}, num_elements_{numElements} {
   if (bitWidth > storage_bits_)
     throw std::domain_error(
-        "N2BitVector<StorageBit>::NBitVector - Bit width is too wide.");
+        "N2BitVector<StorageBit>::N2BitVector - Bit width is too wide.");
   if ((bitWidth & (bitWidth - 1)) != 0)
     throw std::domain_error(
-        "N2BitVector<StorageBit>::NBitVector - Bit width is not base 2");
+        "N2BitVector<StorageBit>::N2BitVector - Bit width is not base 2");
   data_.resize(numElements * bitWidth / storage_bits_ + 1);
   all_ones_bit_width_ = ~(all_ones_ << bit_width_);
 }

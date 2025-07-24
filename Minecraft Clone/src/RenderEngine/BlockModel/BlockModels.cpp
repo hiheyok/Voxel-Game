@@ -67,7 +67,7 @@ void BlockModel::GetVertices(std::vector<float>& vertices,
   for (const Cuboid& element : elements_) {
     glm::vec3 from = element.from_;
     glm::vec3 to = element.to_;
-    for (const auto& side : Directions<BlockPos>()) {
+    for (auto side : Directions<BlockPos>()) {
       BlockFace face = element.faces_[side];
       if (face.reference_texture_.length() == 0) continue;
 

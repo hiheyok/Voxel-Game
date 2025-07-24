@@ -279,11 +279,11 @@ void WorldUpdater::SetChunk(std::vector<std::unique_ptr<Chunk>> chunks) {
     world_->SetChunk(std::move(chunk));
   }
 
-  for (const auto& pos : updated_pos) {
+  for (auto pos : updated_pos) {
     if (created_chunk_.insert(pos).second) {
       created_chunk_arr_.emplace_back(pos);
 
-      for (const auto& offset : Directions<ChunkPos>()) {
+      for (auto offset : Directions<ChunkPos>()) {
         ChunkPos neighbor_pos = pos + offset;
 
         if (world_->CheckChunk(neighbor_pos) &&

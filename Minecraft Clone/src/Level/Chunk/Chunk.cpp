@@ -4,8 +4,8 @@
 
 #include <algorithm>
 #include <array>
-#include <utility>
 #include <iostream>
+#include <utility>
 
 #include "Core/GameContext/GameContext.h"
 #include "Level/Block/Blocks.h"
@@ -19,7 +19,7 @@ Chunk::Chunk(GameContext& game_context, const ChunkRawData& data)
     : ChunkContainer{game_context, data} {}
 
 void Chunk::UpdateGen() {
-  for (const auto& offset : Directions<ChunkPos>()) {
+  for (auto offset : Directions<ChunkPos>()) {
     if (!neighbors_[offset].has_value() ||
         neighbors_[offset].value()->outside_block_to_place_[!offset].size() ==
             0) {

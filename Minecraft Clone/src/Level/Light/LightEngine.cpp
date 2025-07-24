@@ -64,7 +64,7 @@ void LightEngine::PropagateIncrease() {
       [[likely]] continue;
     }
 
-    for (const auto& propagation : Directions<BlockPos>()) {
+    for (auto propagation : Directions<BlockPos>()) {
       if (direction != kAllDirections &&
           direction == propagation.GetOppositeDirection()) {
         continue;
@@ -115,7 +115,7 @@ void LightEngine::PropagateDecrease() {
     BlockPos block_pos = task.GetBlockPos();
     int propagation_lvl = task.GetLightLevel();
 
-    for (const auto& propagation : Directions<BlockPos>()) {
+    for (auto propagation : Directions<BlockPos>()) {
       BlockPos offset_pos = block_pos + propagation;
       // Chunk doesnt exist
       if (!CheckChunk(offset_pos.ToChunkPos())) {
@@ -225,12 +225,15 @@ void LightEngine::SetLightLvl(BlockPos block_pos, int light_lvl) {
     light_cache_->SetSkyLight(block_pos, light_lvl);
   }
 }
+
 int LightEngine::GetLightLvl(BlockPos block_pos) {
+  int lvl = 0;
   if (type_ == EngineType::kBlockLight) {
-    return light_cache_->GetBlockLight(block_pos);
+    lvl = light_cache_->GetBlockLight(block_pos);
   } else {
-    return light_cache_->GetSkyLight(block_pos);
+    lvl = light_cache_->GetSkyLight(block_pos);
   }
+  return lvl;
 }
 
 BlockID LightEngine::GetBlock(BlockPos pos) {

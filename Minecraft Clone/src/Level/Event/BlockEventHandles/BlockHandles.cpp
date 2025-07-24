@@ -13,7 +13,7 @@
 #include "Level/World/WorldUpdater.h"
 
 void UpdateSurrounding(const BlockEvent& blockEvent, Dimension* dimension) {
-  for (const auto& offset : Directions<BlockPos>()) {
+  for (auto offset : Directions<BlockPos>()) {
     BlockPos new_pos = blockEvent.pos_ + offset;
     BlockID block = dimension->world_->GetBlock(new_pos);
 

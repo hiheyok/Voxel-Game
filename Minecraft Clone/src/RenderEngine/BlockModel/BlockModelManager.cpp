@@ -44,7 +44,7 @@ void BlockModelManager::LoadModels() {
 
   for (auto& model : model_data_) {
     for (auto& element : model.elements_) {
-      for (const auto& side : Directions<BlockPos>()) {
+      for (auto side : Directions<BlockPos>()) {
         const std::string& path = element.faces_[side].reference_texture_;
         if (path.length() == 0) continue;
 

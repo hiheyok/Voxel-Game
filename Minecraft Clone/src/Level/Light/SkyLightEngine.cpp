@@ -54,7 +54,7 @@ void SkyLightEngine::CheckNeighborChunk(ChunkPos center_chunk_pos) {
   assert(CheckChunk(center_chunk_pos));
   Chunk* center_chunk = GetChunk(center_chunk_pos);
 
-  for (const auto& direction : Directions<ChunkPos>()) {
+  for (auto direction : Directions<ChunkPos>()) {
     if (direction == Directions<ChunkPos>::kDown) {
       continue;
     }

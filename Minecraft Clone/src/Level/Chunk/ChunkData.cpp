@@ -137,7 +137,7 @@ void ChunkContainer::SetNeighbor(ChunkContainer* neighbor, int side) {
 }
 
 void ChunkContainer::ClearNeighbors() {
-  for (const auto& side : Directions<ChunkPos>()) {
+  for (auto side : Directions<ChunkPos>()) {
     neighbors_[side].reset();
   }
 }
