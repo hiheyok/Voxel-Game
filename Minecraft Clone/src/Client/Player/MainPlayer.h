@@ -19,7 +19,8 @@ struct EntityProperty;
 
 class MainPlayer {
  public:
-  MainPlayer(GameContext&, Window* window, ServerInterface* server, ClientCache* cache);
+  MainPlayer(GameContext&, Window* window, ServerInterface* server,
+             ClientCache* cache);
   MainPlayer(const MainPlayer&) = delete;
   ~MainPlayer();
 
@@ -33,11 +34,12 @@ class MainPlayer {
   PlayerPOV* GetPlayerPOV();
 
   void RenderGUIs();
-  
+
   GameContext& game_context_;
   std::unique_ptr<Player> player_;
 
  private:
+  static constexpr int kHotbarSlots = 9;
   void PrepareGUIs();
   void InventoryUpdate(const UserInputs& inputs);
 

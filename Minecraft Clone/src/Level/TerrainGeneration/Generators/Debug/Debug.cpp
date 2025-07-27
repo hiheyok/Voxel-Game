@@ -23,39 +23,33 @@ void DebugWorld::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
   int ColLen = 50;
 
   if (gy == 0) {
-    for (int x = 0; x < kChunkDim; x++) {
-      for (int z = 0; z < kChunkDim; z++) {
-        chunk->SetBlockUnsafe(game_context_.blocks_->WHITE_CONCRETE,
-                              BlockPos{x, 0, z});
-      }
+    for (auto [x, z] : Product<2>(kChunkDim)) {
+      chunk->SetBlockUnsafe(game_context_.blocks_->WHITE_CONCRETE,
+                            BlockPos{x, 0, z});
     }
   }
 
-  for (int x = 0; x < kChunkDim; x++) {
-    for (int z = 0; z < kChunkDim; z++) {
-      for (int y = 0; y < kChunkDim; y++) {
-        int px = x + gx;
-        int pz = z + gz;
-        int py = y + gy - 1;
+  for (auto [x, y, z] : Product<3>(kChunkDim)) {
+    int px = x + gx;
+    int pz = z + gz;
+    int py = y + gy - 1;
 
-        if (((px & 0b1) == 1) || ((pz & 0b1) == 1) || ((py & 0b1) == 1)) {
-          continue;
-        }
+    if (((px & 0b1) == 1) || ((pz & 0b1) == 1) || ((py & 0b1) == 1)) {
+      continue;
+    }
 
-        px = px / 2;
-        pz = pz / 2;
-        py = py / 2;
+    px = px / 2;
+    pz = pz / 2;
+    py = py / 2;
 
-        if ((px < 0) || (px >= RowLen) || (pz < 0) || (pz >= ColLen)) {
-          continue;
-        }
+    if ((px < 0) || (px >= RowLen) || (pz < 0) || (pz >= ColLen)) {
+      continue;
+    }
 
-        int b = px + pz * RowLen + py * RowLen * ColLen;
+    int b = px + pz * RowLen + py * RowLen * ColLen;
 
-        if ((b < numBlocks) && (b >= 0)) {
-          chunk->SetBlockUnsafe(b, BlockPos{x, y, z});
-        }
-      }
+    if ((b < numBlocks) && (b >= 0)) {
+      chunk->SetBlockUnsafe(b, BlockPos{x, y, z});
     }
   }
 }

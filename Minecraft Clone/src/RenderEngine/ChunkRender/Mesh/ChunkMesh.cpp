@@ -135,8 +135,8 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
 
   std::array<uint8_t, kChunkSize2D> used_block{};
 
-  static constexpr int chunk_stride_u = kChunkDim;
-  static constexpr int chunk_stride_v = 1;
+  static constexpr int kChunkStrideU = kChunkDim;
+  static constexpr int kChunkStrideV = 1;
 
   for (int axis = 0; axis < 3; axis++) {
     int axis_u = (axis + 1) % 3;
@@ -234,7 +234,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
 
           for (int v_ex = v + 1; v_ex < kChunkDim; ++v_ex) {
             q_cache_ptr += stride_v;
-            q_used_ptr += chunk_stride_v;
+            q_used_ptr += kChunkStrideV;
             // Check if they are the same
             BlockID curr_block_2 = *q_cache_ptr;
             if (curr_block_2 != curr_block) break;
@@ -260,7 +260,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
               }
             }
 
-            q_used_ptr += chunk_stride_u;
+            q_used_ptr += kChunkStrideU;
             memset(q_used_ptr, v_length, v_length);
             ++u_length;
           }

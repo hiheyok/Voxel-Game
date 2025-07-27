@@ -20,25 +20,23 @@ BlockLightEngine::~BlockLightEngine() = default;
 void BlockLightEngine::LightChunk(ChunkPos chunk_pos) {
   assert(light_cache_ != nullptr);
   assert(CheckChunk(chunk_pos));
+
+  const std::vector<BlockProperties>& block_properties =
+      game_context_.blocks_->GetBlockPropertyList();
   Chunk* chunk = GetChunk(chunk_pos);
+  InternalTask task;
+  task.SetDirection(kAllDirections);
 
-  for (int x = 0; x < kChunkDim; ++x) {
-    for (int y = 0; y < kChunkDim; ++y) {
-      for (int z = 0; z < kChunkDim; ++z) {
-        BlockPos block_pos = BlockPos{x, y, z} + chunk_pos.GetBlockPosOffset();
-        BlockID block = GetBlock(block_pos);
+  for (auto [x, y, z] : Product<3>(kChunkDim)) {
+    BlockPos block_pos = BlockPos{x, y, z} + chunk_pos.GetBlockPosOffset();
+    BlockID block = GetBlock(block_pos);
 
-        int block_emission =
-            game_context_.blocks_->GetBlockProperties(block).light_emission;
-        if (block_emission > 0) {
-          InternalTask task;
-          task.SetBlockPos(block_pos);
-          task.SetLightLevel(block_emission);
-          task.SetDirection(kAllDirections);
-          EnqueueIncrease(task);
-          SetLightLvl(block_pos, block_emission);
-        }
-      }
+    int block_emission = block_properties[block].light_emission;
+    if (block_emission > 0) {
+      task.SetBlockPos(block_pos);
+      task.SetLightLevel(block_emission);
+      EnqueueIncrease(task);
+      SetLightLvl(block_pos, block_emission);
     }
   }
 
@@ -70,36 +68,34 @@ void BlockLightEngine::CheckNeighborChunk(ChunkPos center_chunk_pos) {
 
     BlockPos curr_pos;
 
-    for (int u = 0; u < kChunkDim; ++u) {
-      for (int v = 0; v < kChunkDim; ++v) {
-        curr_pos = curr_chunk_pos.GetBlockPosOffset();
-        curr_pos[axis] += slice_offset;
-        curr_pos[axis_u] += u;
-        curr_pos[axis_v] += v;
+    for (auto [u, v] : Product<2>(kChunkDim)) {
+      curr_pos = curr_chunk_pos.GetBlockPosOffset();
+      curr_pos[axis] += slice_offset;
+      curr_pos[axis_u] += u;
+      curr_pos[axis_v] += v;
 
-        int curr_light = GetLightLvl(curr_pos);
+      int curr_light = GetLightLvl(curr_pos);
 
-        if (curr_light <= 1) {
-          continue;
-        }
-
-        BlockPos next_pos = curr_pos;
-        next_pos.IncrementSide(direction.GetOppositeDirection(), 1);
-        BlockID next_block = GetBlock(next_pos);
-
-        int opacity =
-            game_context_.blocks_->GetBlockProperties(next_block).opacity_;
-        int spread_lvl = curr_light - std::max(1, opacity);
-        if (spread_lvl <= 0) {
-          continue;
-        }
-
-        InternalTask task;
-        task.SetBlockPos(next_pos);
-        task.SetLightLevel(spread_lvl);
-        task.SetDirection(direction);
-        EnqueueIncrease(task);
+      if (curr_light <= 1) {
+        continue;
       }
+
+      BlockPos next_pos = curr_pos;
+      next_pos.IncrementSide(direction.GetOppositeDirection(), 1);
+      BlockID next_block = GetBlock(next_pos);
+
+      int opacity =
+          game_context_.blocks_->GetBlockProperties(next_block).opacity_;
+      int spread_lvl = curr_light - std::max(1, opacity);
+      if (spread_lvl <= 0) {
+        continue;
+      }
+
+      InternalTask task;
+      task.SetBlockPos(next_pos);
+      task.SetLightLevel(spread_lvl);
+      task.SetDirection(direction);
+      EnqueueIncrease(task);
     }
   }
 }

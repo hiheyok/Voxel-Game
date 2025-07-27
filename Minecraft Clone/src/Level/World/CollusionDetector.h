@@ -20,6 +20,7 @@ class CollusionDetector {
 
  private:
   static constexpr int kSearchDistance = 5;
+  static constexpr float kOnGroundError = 0.001f;
   GameContext& game_context_;
   ChunkMap* cache_;
 };

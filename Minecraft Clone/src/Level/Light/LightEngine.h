@@ -10,28 +10,26 @@ class GameContext;
 class LightEngineCache;
 class Chunk;
 
+enum class EngineType : uint8_t { kBlockLight = 0, kSkyLight = 1 };
+
+template <EngineType kEngineType>
 class LightEngine {
-
  protected:
-  enum class EngineType : uint8_t { kBlockLight = 0, kSkyLight = 1 };
-
   class InternalTask {
    public:
     void SetBlockPos(BlockPos block_pos) noexcept;
     void SetDirection(int direction) noexcept;
     void SetLightLevel(int lvl) noexcept;
+    void SetRecheckLight(bool) noexcept;
 
     BlockPos GetBlockPos() const noexcept;
     int GetDirection() const noexcept;
     int GetLightLevel() const noexcept;
+    bool GetRecheckLight() const noexcept;
 
    private:
-    /* Structure
-    0-12 Positional Bits
-    12-16 Light lvl
-    16-19 Direction
-    */
     BlockPos block_pos_;
+    bool recheck_light_ : 1 = false;
     uint8_t direction_ : 4 = 0;
     uint8_t light_lvl_ : 4 = 0;
   };

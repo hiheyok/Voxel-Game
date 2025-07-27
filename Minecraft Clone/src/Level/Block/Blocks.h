@@ -12,6 +12,8 @@ class GameContext;
 struct BlockModel;
 struct BlockProperties;
 
+// i hate this file
+// maybe put in some json later
 class BlockList {
  public:
   explicit BlockList(GameContext&);
@@ -19,9 +21,11 @@ class BlockList {
 
   void Initialize();
   Block* GetBlockType(BlockID id);
+  const std::vector<Block*>& GetBlockTypeList() const noexcept;
 
   GameContext& game_context_;
   const BlockProperties& GetBlockProperties(BlockID) const;
+  const std::vector<BlockProperties>& GetBlockPropertyList() const;
 
   FastHashMap<std::string, BlockID> block_id_name_data_;
   std::vector<Block*> block_type_data_;

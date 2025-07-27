@@ -41,3 +41,9 @@ BlockPos BlockPos::GetLocalPos() const noexcept {
 
   return BlockPos{x & mask, y & mask, z & mask};
 }
+
+bool BlockPos::IsInSameChunk(BlockPos other) const noexcept {
+  static constexpr uint32_t mask = ~static_cast<uint32_t>(kChunkDim - 1);
+  return (x & mask) == (other.x & mask) && (y & mask) == (other.y & mask) &&
+         (z & mask) == (other.z & mask);
+}

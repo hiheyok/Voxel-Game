@@ -244,7 +244,6 @@
     <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugPositioning\DebugPositioning.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugSecond\DebugSecond.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\Debug\Debug.cpp" />
-    <ClCompile Include="src\Level\TerrainGeneration\Generators\FastTerrain\FastTerrain.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\Generator.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\GeneratorType.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\Math\MainWorld.cpp" />
@@ -433,6 +432,7 @@
     <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureArray.h" />
     <ClInclude Include="src\RenderEngine\Window.h" />
     <ClInclude Include="src\Utils\Containers\FIFOQueue.h" />
+    <ClInclude Include="src\Utils\Iterators.h" />
     <ClInclude Include="src\Utils\Math\Probability\Probability.h" />
     <ClInclude Include="src\Utils\Math\vectorOperations.h" />
     <ClInclude Include="src\Level\Block\Type\BlockTypes.h" />
@@ -475,7 +475,6 @@
     <ClInclude Include="src\Utils\Timer\Timer.h" />
     <ClInclude Include="src\Level\TerrainGeneration\ChunkGenerator.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Generators\DebugSecond\DebugSecond.h" />
-    <ClInclude Include="src\Level\TerrainGeneration\Generators\FastTerrain\FastTerrain.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Generators\Generators.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Generators\GeneratorType.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Generators\Math\MathWorld.h" />

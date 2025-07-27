@@ -14,6 +14,7 @@
 #include "Core/Registry/ResourceLocation.h"
 #include "Utils/Containers/robin_hood.h"
 #include "Utils/LogUtils.h"
+#include "Utils/Iterators.h"
 
 typedef uint32_t EventID;
 typedef uint16_t BlockID;

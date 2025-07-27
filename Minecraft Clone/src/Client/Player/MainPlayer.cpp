@@ -49,7 +49,7 @@ MainPlayer::MainPlayer(GameContext& game_context, Window* window,
                         game_context_.item_atlas_->GetWidth(),
                         game_context_.item_atlas_->GetHeight());
 
-  for (int i = 0; i < 9; i++) {
+  for (int i = 0; i < kHotbarSlots; i++) {
     itemBar.AddGUIElementNorm(std::to_string(i), "",
                               glm::vec2(kHotbarSize * ItemViewRelativeSize,
                                         kHotbarSize * ItemViewRelativeSize),
@@ -79,7 +79,8 @@ void MainPlayer::PrepareGUIs() {
                       -1.f + kHotbarSize * 0.5f));
   }
 
-  for (int i = 0; i < 9; i++) {
+
+  for (int i = 0; i < kHotbarSlots; i++) {
     ItemStack item = player_->entity_inventory_.GetItem(i);
     ItemUVMapping uv =
         game_context_.item_atlas_->items_uv_map_[item.item_.properties_.id_];

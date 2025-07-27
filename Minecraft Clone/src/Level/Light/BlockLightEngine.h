@@ -2,7 +2,7 @@
 
 #include "Level/Light/LightEngine.h"
 
-class BlockLightEngine : public LightEngine {
+class BlockLightEngine : public LightEngine<EngineType::kBlockLight> {
  public:
   BlockLightEngine(GameContext&, WorldInterface&);
   ~BlockLightEngine() override;

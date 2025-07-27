@@ -7,7 +7,6 @@
 
 OverworldDimension::OverworldDimension(GameContext& game_context,
                                        DimensionProperties properties)
-    : Dimension{game_context, properties, game_context.generators_->MOUNTAINS} {
-}
+    : Dimension{game_context, properties, game_context.generators_->MOUNTAINS} {}
 
 void OverworldDimension::Tick() {}

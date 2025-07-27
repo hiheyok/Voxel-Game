@@ -31,6 +31,7 @@ class BlockPos final : public Position<BlockPos> {
 
   [[nodiscard]] size_t GetIndex() const noexcept;
   [[nodiscard]] BlockPos GetLocalPos() const noexcept;
+  [[nodiscard]] bool IsInSameChunk(BlockPos other) const noexcept;
 };
 
 static_assert(std::is_trivially_copyable_v<RegionPos>);

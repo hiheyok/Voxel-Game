@@ -11,7 +11,6 @@ class ChunkLightTask;
 class GameContext;
 class WorldInterface;
 
-class LightEngine;
 struct LightEngineStats;
 /*
  * Handles the lighting engine IO and thread management

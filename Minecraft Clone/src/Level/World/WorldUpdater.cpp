@@ -79,7 +79,6 @@ bool WorldUpdater::RequestLoad(ChunkPos pos) {
     return true;
   } else {
     return false;
-
   }
 }
 
@@ -98,9 +97,9 @@ void WorldUpdater::loadSurroundedMovedEntityChunk() {
           "WorldLoader::loadSurroundedMovedEntityChunk - " +
           std::string("Entity with UUID " + std::to_string(e) + " not found"));
 
-    int x = static_cast<int>(entity->properties_.position_.x / 16.f);
-    int y = static_cast<int>(entity->properties_.position_.y / 16.f);
-    int z = static_cast<int>(entity->properties_.position_.z / 16.f);
+    int x = static_cast<int>(entity->properties_.position_.x / kChunkDim);
+    int y = static_cast<int>(entity->properties_.position_.y / kChunkDim);
+    int z = static_cast<int>(entity->properties_.position_.z / kChunkDim);
 
     if ((entity->properties_.velocity_.x == 0.f) &&
         (entity->properties_.velocity_.y == 0.f) &&
@@ -114,9 +113,9 @@ void WorldUpdater::loadSurroundedMovedEntityChunk() {
 
   if (center_position_list.empty()) return;
 
-  ivec3 axisTickingDistance{settings_->horizontal_ticking_distance_,
-                            settings_->vertical_ticking_distance_,
-                            settings_->horizontal_ticking_distance_};
+  ivec3 axis_tick_dist{settings_->horizontal_ticking_distance_,
+                       settings_->vertical_ticking_distance_,
+                       settings_->horizontal_ticking_distance_};
 
   int chunk_padding = 4;
 
@@ -137,45 +136,42 @@ void WorldUpdater::loadSurroundedMovedEntityChunk() {
 
       if (side == 0) continue;
 
-      int uDistance = axisTickingDistance[(j + 1) % 3] + chunk_padding;
-      int vDistance = axisTickingDistance[(j + 2) % 3] + chunk_padding;
-      int sideDistanceOffset = axisTickingDistance[j] + 1;
+      int u_d = axis_tick_dist[(j + 1) % 3] + chunk_padding;
+      int v_d = axis_tick_dist[(j + 2) % 3] + chunk_padding;
+      int sideDistanceOffset = axis_tick_dist[j] + 1;
 
-      for (int u = -uDistance; u <= uDistance; u++) {
-        for (int v = -vDistance; v <= uDistance; v++) {
-          ivec3 test_position = pos;
+      for (auto [u, v] : Product<2>({{-u_d, u_d + 1}, {-v_d, v_d + 1}})) {
+        ivec3 test_position = pos;
 
-          test_position[(j + 1) % 3] += u;
-          test_position[(j + 2) % 3] += v;
-          test_position[j] += sideDistanceOffset * side;
+        test_position[(j + 1) % 3] += u;
+        test_position[(j + 2) % 3] += v;
+        test_position[j] += sideDistanceOffset * side;
 
-          // Test if it exist of generating
-          bool isSuccess = RequestLoad(
-              ChunkPos{test_position.x, test_position.y, test_position.z});
-          if (!isSuccess) continue;
-        }
+        // Test if it exist of generating
+        bool isSuccess = RequestLoad(
+            ChunkPos{test_position.x, test_position.y, test_position.z});
+        if (!isSuccess) continue;
       }
     }
   }
 }
 
 void WorldUpdater::loadSpawnChunks() {
-  if (world_ == nullptr)
-    throw std::logic_error(
-        "WorldLoader::loadSpawnChunks - World is not initialized. Couldn't set "
-        "spawn chunks");
-  for (int64_t x = -settings_->spawn_chunk_horizontal_radius_;
-       x <= settings_->spawn_chunk_horizontal_radius_; x++) {
-    for (int64_t z = -settings_->spawn_chunk_horizontal_radius_;
-         z <= settings_->spawn_chunk_horizontal_radius_; z++) {
-      for (int64_t y = -settings_->spawn_chunk_vertical_radius_;
-           y <= settings_->spawn_chunk_vertical_radius_; y++) {
-        if (!RequestLoad(ChunkPos{x, y, z})) {
-          continue;
-        }
-      }
+  assert(world_ != nullptr);
+
+  int x0 = -settings_->spawn_chunk_horizontal_radius_;
+  int x1 = settings_->spawn_chunk_horizontal_radius_ + 1;
+  int y0 = -settings_->spawn_chunk_vertical_radius_;
+  int y1 = settings_->spawn_chunk_vertical_radius_ + 1;
+  int z0 = -settings_->spawn_chunk_horizontal_radius_;
+  int z1 = settings_->spawn_chunk_horizontal_radius_ + 1;
+
+  for (auto [x, y, z] : Product<3>({{x0, x1}, {y0, y1}, {z0, z1}})) {
+    if (!RequestLoad(ChunkPos{x, y, z})) {
+      continue;
     }
   }
+
   is_spawn_chunks_loaded_ = true;
 }
 

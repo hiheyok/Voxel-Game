@@ -75,10 +75,10 @@ class LightEngineCache {
     void SetDirty(bool is_dirty) { dirty_ = is_dirty; }
 
    private:
-    uint64_t chunk_ : 48;
-    uint64_t block_ : 48;
-    uint64_t sky_ : 48;
     bool dirty_ : 1;
+    uintptr_t chunk_ : 48;
+    uintptr_t block_ : 48;
+    uintptr_t sky_ : 48;
   };
 
   void SetBlockCache(ChunkPos pos, Chunk* data);
@@ -88,9 +88,13 @@ class LightEngineCache {
   bool TryCacheChunk(ChunkPos pos);
   size_t CalculateCacheIndex(ChunkPos pos) const noexcept;
   [[nodiscard]] bool EnsureLoaded(ChunkPos pos);
+  [[nodiscard]] LightStorage* EnsureLoadedGetSky(ChunkPos pos);
+  [[nodiscard]] LightStorage* EnsureLoadedGetBlock(ChunkPos pos);
+  [[nodiscard]] Chunk* EnsureLoadedGetChunk(ChunkPos pos);
 
   static constexpr int kCacheRadius = 1;
   static constexpr int kCacheWidth = 1 + 2 * kCacheRadius;
+  static constexpr int kCacheSlice = kCacheWidth * kCacheWidth;
 
   GameContext& game_context_;
   WorldInterface& world_;

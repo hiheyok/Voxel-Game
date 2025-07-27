@@ -17,7 +17,6 @@ GrassBlock::GrassBlock(GameContext& game_context, double spread_chance,
   properties_->is_fluid_ = false;
   properties_->light_pass_ = false;
 
-
   grass_properties_.spread_chance_ = spread_chance;
   grass_properties_.break_chance_ = break_chance;
 }
@@ -70,44 +69,37 @@ bool GrassBlock::GrassDestroyTick(Dimension* currentWorld, BlockPos pos) {
 bool GrassBlock::GrassSpreadTick(Dimension* currentWorld, BlockPos pos) {
   bool dirtExposed = false;
 
-  for (int x1 = -1; x1 <= 1; x1++) {
-    for (int z1 = -1; z1 <= 1; z1++) {
-      if (x1 == 0 && z1 == 0) {
-        continue;
-      }
-
-      for (int y1 = -1; y1 <= 1; y1++) {
-        BlockPos newPos = pos;
-        newPos.x += x1;
-        newPos.y += y1;
-        newPos.z += z1;
-
-        // Checks if block is dirt
-        if (currentWorld->world_->GetBlock(newPos) !=
-            game_context_.blocks_->DIRT) {
-          continue;
-        }
-
-        // Checks if there isnt any block above
-        newPos.y += 1;
-        if (currentWorld->world_->GetBlock(newPos) !=
-            game_context_.blocks_->AIR) {
-          continue;
-        }
-        newPos.y -= 1;
-
-        // Chance it spread
-        if (TestProbability(grass_properties_.spread_chance_)) {
-          BlockEvent blockEvent{newPos, game_context_.blocks_->GRASS,
-                                game_context_.event_handler_->BlockPlace};
-          currentWorld->event_manager_.AddEvent(blockEvent);
-
-          continue;
-        }
-
-        dirtExposed = true;
-      }
+  for (auto [x1, z1, y1] : Product<3>(-1, 2)) {
+    if (x1 == 0 && z1 == 0) {
+      continue;
     }
+    BlockPos newPos = pos;
+    newPos.x += x1;
+    newPos.y += y1;
+    newPos.z += z1;
+
+    // Checks if block is dirt
+    if (currentWorld->world_->GetBlock(newPos) != game_context_.blocks_->DIRT) {
+      continue;
+    }
+
+    // Checks if there isnt any block above
+    newPos.y += 1;
+    if (currentWorld->world_->GetBlock(newPos) != game_context_.blocks_->AIR) {
+      continue;
+    }
+    newPos.y -= 1;
+
+    // Chance it spread
+    if (TestProbability(grass_properties_.spread_chance_)) {
+      BlockEvent blockEvent{newPos, game_context_.blocks_->GRASS,
+                            game_context_.event_handler_->BlockPlace};
+      currentWorld->event_manager_.AddEvent(blockEvent);
+
+      continue;
+    }
+
+    dirtExposed = true;
   }
 
   return !dirtExposed;

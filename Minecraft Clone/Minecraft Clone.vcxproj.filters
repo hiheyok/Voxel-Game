@@ -165,9 +165,6 @@
     <ClCompile Include="src\Level\TerrainGeneration\Generators\Math\MainWorld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Level\TerrainGeneration\Generators\FastTerrain\FastTerrain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugSecond\DebugSecond.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -626,9 +623,6 @@
     <ClInclude Include="src\Level\TerrainGeneration\Generators\Superflat\Superflat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Level\TerrainGeneration\Generators\FastTerrain\FastTerrain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Level\TerrainGeneration\Generators\Math\MathWorld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -942,6 +936,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Light\LightEngineStats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils\Iterators.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -6,7 +6,7 @@
 #include "Level/Light/LightEngine.h"
 
 
-class SkyLightEngine : public LightEngine {
+class SkyLightEngine : public LightEngine<EngineType::kSkyLight> {
  public:
   SkyLightEngine(GameContext&, WorldInterface&);
   ~SkyLightEngine() override;

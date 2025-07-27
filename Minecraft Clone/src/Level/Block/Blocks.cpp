@@ -17,8 +17,7 @@
 
 using json = nlohmann::json;
 
-BlockList::BlockList(GameContext& game_context)
-    : game_context_{game_context} {}
+BlockList::BlockList(GameContext& game_context) : game_context_{game_context} {}
 
 BlockList::~BlockList() {
   for (const auto& obj : block_type_data_) {
@@ -75,6 +74,14 @@ void BlockList::AddAssets(std::string namespaceIn) {
 
 Block* BlockList::GetBlockType(BlockID id) { return block_type_data_[id]; }
 
+const std::vector<Block*>& BlockList::GetBlockTypeList() const noexcept {
+  return block_type_data_;
+}
+
 const BlockProperties& BlockList::GetBlockProperties(BlockID id) const {
   return block_properties_[id];
+}
+
+const std::vector<BlockProperties>& BlockList::GetBlockPropertyList() const {
+  return block_properties_;
 }

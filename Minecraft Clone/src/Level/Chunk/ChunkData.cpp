@@ -155,10 +155,8 @@ ChunkRawData ChunkContainer::GetRawData() {
 }
 
 void ChunkContainer::UpdateHeightMap() {
-  for (int x = 0; x < kChunkDim; ++x) {
-    for (int z = 0; z < kChunkDim; ++z) {
-      UpdateHeightMap(x, z);
-    }
+  for (auto [x, z] : Product<2>(kChunkDim)) {
+    UpdateHeightMap(x, z);
   }
 }
 
@@ -177,7 +175,9 @@ void ChunkContainer::UpdateHeightMap(int x, int z) {
     new_height = kChunkDim;
   } else {
     for (int i = kChunkDim - 1; i >= 0; --i) {
-      if (game_context_.blocks_->GetBlockProperties(GetBlockUnsafe(BlockPos{x, i, z})).opacity_ > 0) {
+      if (game_context_.blocks_
+              ->GetBlockProperties(GetBlockUnsafe(BlockPos{x, i, z}))
+              .opacity_ > 0) {
         new_height = i;
         break;
       }

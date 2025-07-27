@@ -25,8 +25,6 @@ class GeneratorType {
       RegisterWorldGenerator(std::make_unique<DebugWorldSecond>(game_context_));
   WorldGeneratorID DEBUG_POSITIONING =
       RegisterWorldGenerator(std::make_unique<DebugPositioning>(game_context_));
-  WorldGeneratorID FAST_TERRAIN =
-      RegisterWorldGenerator(std::make_unique<FastTerrain>(game_context_));
   WorldGeneratorID MATH_WORLD =
       RegisterWorldGenerator(std::make_unique<MathWorld>(game_context_));
   WorldGeneratorID MOUNTAINS = RegisterWorldGenerator(
