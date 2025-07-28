@@ -195,8 +195,6 @@ std::array<BlockID, kChunkSize2D> Palette::UnpackSlice(int axis,
     std::swap(axis_u, axis_v);
   }
 
-  const BlockID* src = palette_entries_id_.data();
-
   int write_idx = 0;
   for (int u = 0; u < kChunkDim; ++u) {
     int v_block_idx = block_idx;
@@ -204,7 +202,7 @@ std::array<BlockID, kChunkSize2D> Palette::UnpackSlice(int axis,
       const PaletteIndex palette_idx =
           static_cast<PaletteIndex>(data_.GetUnsafe(v_block_idx));
 
-      out_slice[write_idx++] = src[palette_idx];
+      out_slice[write_idx++] = palette_entries_id_[palette_idx];
       v_block_idx += kStrides[axis_v];
     }
 

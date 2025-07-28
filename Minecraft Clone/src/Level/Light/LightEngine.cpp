@@ -55,7 +55,10 @@ bool LightEngine<kEngineType>::InternalTask::GetRecheckLight() const noexcept {
 template <EngineType kEngineType>
 LightEngine<kEngineType>::LightEngine(GameContext& game_context,
                                       WorldInterface& world)
-    : game_context_{game_context}, world_{world}, light_cache_{nullptr} {}
+    : game_context_{game_context},
+      world_{world},
+      properties_{game_context.blocks_->GetBlockPropertyList()},
+      light_cache_{nullptr} {}
 template <EngineType kEngineType>
 LightEngine<kEngineType>::~LightEngine() = default;
 
@@ -77,6 +80,7 @@ void LightEngine<kEngineType>::Propagate(const ChunkLightTask& chunk_task) {
 template <EngineType kEngineType>
 void LightEngine<kEngineType>::PropagateIncrease() {
   InternalTask task;
+  InternalTask next_task;
   // to prevent pointer chasing
   const std::vector<BlockProperties>& block_properties =
       game_context_.blocks_->GetBlockPropertyList();
@@ -102,10 +106,10 @@ void LightEngine<kEngineType>::PropagateIncrease() {
       }
 
       BlockPos offset_pos = block_pos + propagation;
-      //ChunkPos offset_chunk_pos = offset_pos.ToChunkPos();
 
       // Light level is already at the expected level or chunk doesn't exist
-      if (!CheckChunk(offset_pos.ToChunkPos())) [[unlikely]] {
+
+      if (!light_cache_->CheckChunk(offset_pos)) [[unlikely]] {
         continue;
       }
 
@@ -129,7 +133,6 @@ void LightEngine<kEngineType>::PropagateIncrease() {
       // If target lvl is <= 1, then its not going to be able to spread and
       // value is already set
       if (target_lvl > 1) {
-        InternalTask next_task;
         next_task.SetBlockPos(offset_pos);
         next_task.SetLightLevel(target_lvl);
         next_task.SetDirection(propagation);
@@ -152,7 +155,7 @@ void LightEngine<kEngineType>::PropagateDecrease() {
     for (auto propagation : Directions<BlockPos>()) {
       BlockPos offset_pos = block_pos + propagation;
       // Chunk doesnt exist
-      if (!CheckChunk(offset_pos.ToChunkPos())) {
+      if (!light_cache_->CheckChunk(offset_pos)) {
         [[unlikely]] continue;
       }
 

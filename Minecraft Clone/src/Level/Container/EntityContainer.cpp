@@ -25,7 +25,7 @@ std::vector<EntityProperty> EntityContainer::GetSpawnedEntities() {
   std::vector<EntityProperty> out;
 
   for (const auto& entity : spawned_entity_) {
-    out.push_back(GetEntity(entity)->properties_);
+    out.emplace_back(GetEntity(entity)->properties_);
   }
   return out;
 }

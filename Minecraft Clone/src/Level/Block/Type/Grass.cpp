@@ -21,52 +21,53 @@ GrassBlock::GrassBlock(GameContext& game_context, double spread_chance,
   grass_properties_.break_chance_ = break_chance;
 }
 
-void GrassBlock::Tick(BlockPos pos, Dimension* currentWorld) {
+void GrassBlock::Tick(BlockPos pos, Dimension* curr_world) {
+  WorldInterface* world = curr_world->world_;
+
   // Checks if ticking block changes
-  if (currentWorld->world_->GetBlock(pos) != game_context_.blocks_->GRASS) {
+  if (world->GetBlock(pos) != game_context_.blocks_->GRASS) {
     return;
   }
 
-  BlockPos newPos = pos;
-  newPos.y += 1;
+  BlockPos top_pos = pos;
+  top_pos.y += 1;
 
-  bool blockOnTopOfGrass =
-      (currentWorld->world_->GetBlock(newPos) != game_context_.blocks_->AIR);
+  bool top_is_not_air = world->GetBlock(top_pos) != game_context_.blocks_->AIR;
 
-  bool isGrassDestroyed = false;
+  bool destroy_grass = false;
 
-  if (blockOnTopOfGrass) {
-    isGrassDestroyed = GrassDestroyTick(currentWorld, pos);
+  if (top_is_not_air) {
+    destroy_grass = GrassDestroyTick(curr_world, pos);
   }
 
   // If grass destroyed tick ends
-  if (isGrassDestroyed) {
+  if (destroy_grass) {
     return;
   }
 
-  bool onlySurroundedByGrass = GrassSpreadTick(currentWorld, pos);
+  bool onlySurroundedByGrass = GrassSpreadTick(curr_world, pos);
 
-  if (onlySurroundedByGrass && (!blockOnTopOfGrass)) {
+  if (onlySurroundedByGrass && (!top_is_not_air)) {
     return;
   }
 
-  BlockEvent grassSpread{pos, game_context_.blocks_->GRASS,
-                         game_context_.event_handler_->BlockTick};
-  currentWorld->event_manager_.AddEvent(grassSpread);
+  BlockEvent grass_spread{pos, game_context_.blocks_->GRASS,
+                          game_context_.event_handler_->BlockTick};
+  curr_world->event_manager_.AddEvent(grass_spread);
 }
 
-bool GrassBlock::GrassDestroyTick(Dimension* currentWorld, BlockPos pos) {
+bool GrassBlock::GrassDestroyTick(Dimension* curr_world, BlockPos pos) {
   // Chance it -doesn't break-
   if (TestProbability(1 - grass_properties_.break_chance_)) {
     return false;
   }
 
-  currentWorld->world_updater_->SetBlock(game_context_.blocks_->DIRT, pos);
+  curr_world->world_updater_->SetBlock(game_context_.blocks_->DIRT, pos);
 
   return true;
 }
 
-bool GrassBlock::GrassSpreadTick(Dimension* currentWorld, BlockPos pos) {
+bool GrassBlock::GrassSpreadTick(Dimension* curr_world, BlockPos pos) {
   bool dirtExposed = false;
 
   for (auto [x1, z1, y1] : Product<3>(-1, 2)) {
@@ -79,13 +80,13 @@ bool GrassBlock::GrassSpreadTick(Dimension* currentWorld, BlockPos pos) {
     newPos.z += z1;
 
     // Checks if block is dirt
-    if (currentWorld->world_->GetBlock(newPos) != game_context_.blocks_->DIRT) {
+    if (curr_world->world_->GetBlock(newPos) != game_context_.blocks_->DIRT) {
       continue;
     }
 
     // Checks if there isnt any block above
     newPos.y += 1;
-    if (currentWorld->world_->GetBlock(newPos) != game_context_.blocks_->AIR) {
+    if (curr_world->world_->GetBlock(newPos) != game_context_.blocks_->AIR) {
       continue;
     }
     newPos.y -= 1;
@@ -94,7 +95,7 @@ bool GrassBlock::GrassSpreadTick(Dimension* currentWorld, BlockPos pos) {
     if (TestProbability(grass_properties_.spread_chance_)) {
       BlockEvent blockEvent{newPos, game_context_.blocks_->GRASS,
                             game_context_.event_handler_->BlockPlace};
-      currentWorld->event_manager_.AddEvent(blockEvent);
+      curr_world->event_manager_.AddEvent(blockEvent);
 
       continue;
     }

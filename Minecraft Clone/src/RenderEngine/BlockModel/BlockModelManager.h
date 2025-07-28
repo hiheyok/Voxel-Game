@@ -24,6 +24,7 @@ class BlockModelManager {
   void LoadModels();  // Loads all of the models in the block list
 
   const BlockModel& GetBlockModel(BlockID id) const;
+  const std::vector<BlockModel>& GetBlockModelList() const noexcept;
   uint32_t GetTextureAtlasID() const;
   uint32_t GetLightMapID() const;
 

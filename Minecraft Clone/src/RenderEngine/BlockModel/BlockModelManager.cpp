@@ -90,6 +90,11 @@ const BlockModel& BlockModelManager::GetBlockModel(BlockID id) const {
   return model_data_[id];
 }
 
+const std::vector<BlockModel>& BlockModelManager::GetBlockModelList()
+    const noexcept {
+  return model_data_;
+}
+
 uint32_t BlockModelManager::GetTextureAtlasID() const {
   if (block_texture_atlas_ == nullptr) {
     throw std::runtime_error(

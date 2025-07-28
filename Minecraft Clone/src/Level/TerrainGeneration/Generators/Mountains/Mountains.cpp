@@ -95,7 +95,7 @@ void MountainGenerator::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
 }
 
 void MountainGenerator::GenerateEnvironment(ChunkPos pos, Chunk* chunk) {
-  for (auto [x, y, z] : Product<3>({kChunkDim, kChunkDim, kChunkDim})) {
+  for (auto [x, y, z] : Product<3>(kChunkDim)) {
     BlockPos block_pos{x, y, z};
     if (block_pos.y + pos.y * kChunkDim < 34) {
       if ((chunk->GetBlockUnsafe(block_pos) == game_context_.blocks_->AIR)) {

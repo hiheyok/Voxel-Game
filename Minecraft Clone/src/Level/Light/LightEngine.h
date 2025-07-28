@@ -10,6 +10,8 @@ class GameContext;
 class LightEngineCache;
 class Chunk;
 
+struct BlockProperties;
+
 enum class EngineType : uint8_t { kBlockLight = 0, kSkyLight = 1 };
 
 template <EngineType kEngineType>
@@ -68,10 +70,11 @@ class LightEngine {
   virtual void PropagateChanges(const ChunkLightTask& tasks) = 0;
 
  protected:
-  static constexpr size_t kQueueSizeIncrement = 8196;
+  static constexpr size_t kQueueSizeIncrement = 16392;
 
   GameContext& game_context_;
   WorldInterface& world_;
+  const std::vector<BlockProperties>& properties_;
 
   LightEngineCache* light_cache_;
 

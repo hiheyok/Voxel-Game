@@ -61,7 +61,7 @@ void ClientEntities::UpdateEntity(const EntityProperty& entityProperty) {
 
 EntityProperty ClientEntities::GetEntity(const EntityUUID& uuid) const {
   const auto& it = entity_idx_.find(uuid);
-  if (it != entity_idx_.end()) {
+  if (it == entity_idx_.end()) {
     throw std::logic_error(
         "ClientEntities::GetEntity - Tried to get entity that doesn't exist.");
   }

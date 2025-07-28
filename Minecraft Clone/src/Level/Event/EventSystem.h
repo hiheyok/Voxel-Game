@@ -11,7 +11,7 @@ class EventSystem {
   ~EventSystem();
 
   // Gets event; if empty, return null event
-  std::unique_ptr<std::vector<Event>>& GetQueue();
+  std::vector<Event>& GetQueue();
 
   template <class EventType>
   void AddEvent(EventType e) {

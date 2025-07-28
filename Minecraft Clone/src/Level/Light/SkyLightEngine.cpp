@@ -23,7 +23,9 @@ void SkyLightEngine::LightChunk(ChunkPos chunk_pos) {
   assert(CheckChunk(chunk_pos));
 
   Chunk* chunk = GetChunk(chunk_pos);
+  BlockPos chunk_offset = chunk_pos.GetBlockPosOffset();
   const HeightMap& heightmap = *chunk->heightmap_.get();
+  InternalTask task;
 
   for (auto [x, z] : Product<2>(kChunkDim)) {
     int height = heightmap.Get(x, z);
@@ -34,8 +36,7 @@ void SkyLightEngine::LightChunk(ChunkPos chunk_pos) {
     }
 
     for (int y = height + 1; y < kChunkDim; ++y) {
-      InternalTask task;
-      task.SetBlockPos(BlockPos{x, y, z} + chunk_pos.GetBlockPosOffset());
+      task.SetBlockPos(BlockPos{x, y, z} + chunk_offset);
       task.SetDirection(kAllDirections);
       task.SetLightLevel(kMaxLightLevel);
       EnqueueIncrease(task);
@@ -52,12 +53,14 @@ void SkyLightEngine::CheckNeighborChunk(ChunkPos center_chunk_pos) {
   assert(CheckChunk(center_chunk_pos));
   Chunk* center_chunk = GetChunk(center_chunk_pos);
 
+  InternalTask task;
   for (auto direction : Directions<ChunkPos>()) {
     if (direction == Directions<ChunkPos>::kDown) {
       continue;
     }
 
     ChunkPos curr_chunk_pos = center_chunk_pos + direction;
+    BlockPos curr_chunk_offset = curr_chunk_pos.GetBlockPosOffset();
 
     if (!light_cache_->CheckChunkHasLighting(curr_chunk_pos)) {
       continue;
@@ -72,10 +75,10 @@ void SkyLightEngine::CheckNeighborChunk(ChunkPos center_chunk_pos) {
     }
 
     BlockPos curr_pos;
+    curr_pos = curr_chunk_offset;
+    curr_pos[axis] = direction.IsNegative() * (kChunkDim - 1);
 
     for (auto [u, v] : Product<2>(kChunkDim)) {
-      curr_pos = curr_chunk_pos.GetBlockPosOffset();
-      curr_pos[axis] = direction.IsNegative() * (kChunkDim - 1);
       curr_pos[axis_u] = u;
       curr_pos[axis_v] = v;
 
@@ -89,14 +92,12 @@ void SkyLightEngine::CheckNeighborChunk(ChunkPos center_chunk_pos) {
       next_pos.IncrementSide(direction.GetOppositeDirection(), 1);
       BlockID neigh_block = GetBlock(next_pos);
 
-      int opacity =
-          game_context_.blocks_->GetBlockProperties(neigh_block).opacity_;
+      int opacity = properties_[neigh_block].opacity_;
       int spread_lvl = curr_light - std::max(1, opacity);
       if (spread_lvl <= 0) {
         continue;
       }
 
-      InternalTask task;
       task.SetBlockPos(next_pos);
       task.SetLightLevel(spread_lvl);
       task.SetDirection(direction);
@@ -131,13 +132,15 @@ void SkyLightEngine::CheckBlock(BlockPos block_pos) {
 void SkyLightEngine::PropagateChanges(const ChunkLightTask& tasks) {
   // Setup heightmap
   for (const auto& task : tasks.GetLightTask()) {
-    heightmap_block_change_[task.x * kChunkDim + task.z] =
-        std::max(heightmap_block_change_[task.x * kChunkDim + task.z],
-                 static_cast<int8_t>(task.y));
+    const size_t idx = task.x * kChunkDim + task.z;
+    heightmap_block_change_[idx] =
+        std::max(heightmap_block_change_[idx], static_cast<int8_t>(task.y));
   }
 
+  BlockPos chunk_offset = tasks.GetChunkPos().GetBlockPosOffset();
+
   for (auto [x, z] : Product<2>(kChunkDim)) {
-    const int idx = x * kChunkDim + z;
+    const size_t idx = x * kChunkDim + z;
     if (heightmap_block_change_[idx] == INT8_MIN) {
       continue;  // Nothing is changed
     }
@@ -147,8 +150,7 @@ void SkyLightEngine::PropagateChanges(const ChunkLightTask& tasks) {
 
     // Cast a shadow
     int y = max_y;
-    BlockPos pos = tasks.GetChunkPos().GetBlockPosOffset();
-    pos += BlockPos{x, y, z};
+    BlockPos pos = BlockPos{x, y, z} + chunk_offset;
     int max_propagation = TryPropagateSkylight(pos);
     pos.y = max_propagation;
 
@@ -160,7 +162,7 @@ void SkyLightEngine::PropagateChanges(const ChunkLightTask& tasks) {
 
   // Then check blocks now
   for (const auto& task : tasks.GetLightTask()) {
-    CheckBlock(task.GetLocalPos() + tasks.GetChunkPos().GetBlockPosOffset());
+    CheckBlock(task.GetLocalPos() + chunk_offset);
   }
 
   PropagateDecrease();
@@ -181,7 +183,7 @@ void SkyLightEngine::DelayIncrease() {
 }
 
 int SkyLightEngine::TryPropagateSkylight(BlockPos block_pos) {
-  if (!CheckChunk(block_pos.ToChunkPos())) {
+  if (!light_cache_->CheckChunk(block_pos)) {
     return block_pos.y;
   }
 
@@ -189,12 +191,12 @@ int SkyLightEngine::TryPropagateSkylight(BlockPos block_pos) {
   ++block_top_pos.y;
 
   // Check if the top of the column is covered or theres no chunk above
-  if (CheckChunk(block_top_pos.ToChunkPos()) &&
+  if (light_cache_->CheckChunk(block_top_pos) &&
       GetLightLvl(block_top_pos) != kMaxLightLevel) {
     return block_pos.y;
   }
 
-  Chunk* curr_chunk = GetChunk(block_pos.ToChunkPos());
+  Chunk* curr_chunk = light_cache_->GetChunk(block_pos);
   int curr_opacity = 0;
   BlockID curr_block;
 
@@ -219,7 +221,7 @@ int SkyLightEngine::TryPropagateSkylight(BlockPos block_pos) {
       break;
     }
 
-    if (!CheckChunk(block_pos.ToChunkPos())) {
+    if (!light_cache_->CheckChunk(block_pos)) {
       break;
     }
   }
@@ -228,19 +230,19 @@ int SkyLightEngine::TryPropagateSkylight(BlockPos block_pos) {
 }
 
 void SkyLightEngine::TryPropagateShadow(BlockPos block_pos) {
-  if (!CheckChunk(block_pos.ToChunkPos())) {
+  if (!light_cache_->CheckChunk(block_pos)) {
     return;
   }
 
   // Check if the column is already in a shadow
   BlockPos block_top_pos = block_pos;
   ++block_top_pos.y;
-  if (CheckChunk(block_top_pos.ToChunkPos()) &&
+  if (light_cache_->CheckChunk(block_top_pos) &&
       GetLightLvl(block_top_pos) == 0) {
     return;
   }
 
-  Chunk* curr_chunk = GetChunk(block_pos.ToChunkPos());
+  Chunk* curr_chunk = light_cache_->GetChunk(block_pos);
   int curr_opacity = 0;
   int curr_light_lvl;
 
@@ -257,8 +259,8 @@ void SkyLightEngine::TryPropagateShadow(BlockPos block_pos) {
     --block_pos.y;
     if ((block_pos.y & (kChunkDim - 1)) ==
         (kChunkDim - 1)) {  // Enters new chunk
-      if (!CheckChunk(block_pos.ToChunkPos())) break;
-      curr_chunk = GetChunk(block_pos.ToChunkPos());
+      if (!light_cache_->CheckChunk(block_pos)) break;
+      curr_chunk = light_cache_->GetChunk(block_pos);
     }
   }
 }

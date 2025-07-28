@@ -17,8 +17,8 @@ EventSystem::~EventSystem() {
   queue_unactive_->clear();
 }
 
-std::unique_ptr<std::vector<Event>>& EventSystem::GetQueue() {
-  return queue_active_;
+std::vector<Event>& EventSystem::GetQueue() {
+  return *queue_active_.get();
 }
 
 void EventSystem::Swap() {

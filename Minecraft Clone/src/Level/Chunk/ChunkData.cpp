@@ -161,10 +161,12 @@ void ChunkContainer::UpdateHeightMap() {
 }
 
 void ChunkContainer::UpdateHeightMap(int x, int z) {
+  const std::vector<BlockProperties>& properties =
+      game_context_.blocks_->GetBlockPropertyList();
+
   // Check chunk above first, if the heightmap above is > -1, it means that
   // there are block above -1 indicate theirs nothing in the column
-  std::optional<ChunkContainer*> chunk_above =
-      neighbors_[Directions<ChunkPos>::kUp];
+  auto chunk_above = neighbors_[Directions<ChunkPos>::kUp];
 
   int new_height =
       -1;  // -1 is the default height if there is no blocks in the column
@@ -175,9 +177,7 @@ void ChunkContainer::UpdateHeightMap(int x, int z) {
     new_height = kChunkDim;
   } else {
     for (int i = kChunkDim - 1; i >= 0; --i) {
-      if (game_context_.blocks_
-              ->GetBlockProperties(GetBlockUnsafe(BlockPos{x, i, z}))
-              .opacity_ > 0) {
+      if (properties[GetBlockUnsafe(BlockPos{x, i, z})].opacity_ > 0) {
         new_height = i;
         break;
       }
@@ -188,8 +188,7 @@ void ChunkContainer::UpdateHeightMap(int x, int z) {
     light_dirty_ = true;
     heightmap_->Edit(x, z, new_height);
 
-    std::optional<ChunkContainer*> chunk_bottom =
-        neighbors_[Directions<ChunkPos>::kDown];
+    auto chunk_bottom = neighbors_[Directions<ChunkPos>::kDown];
     if (chunk_bottom.has_value() && (old_height == -1 || new_height == -1)) {
       chunk_bottom.value()->UpdateHeightMap(x, z);
     }

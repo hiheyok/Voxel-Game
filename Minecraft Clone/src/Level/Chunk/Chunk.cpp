@@ -20,17 +20,20 @@ Chunk::Chunk(GameContext& game_context, const ChunkRawData& data)
 
 void Chunk::UpdateGen() {
   for (auto offset : Directions<ChunkPos>()) {
-    if (!neighbors_[offset].has_value() ||
-        neighbors_[offset].value()->outside_block_to_place_[!offset].size() ==
-            0) {
+    if (!neighbors_[offset].has_value()) {
       continue;
     }
 
-    for (const auto& block :
-         neighbors_[offset].value()->outside_block_to_place_[!offset]) {
-      SetBlock(block.block_, block.pos_);
+    ChunkContainer* chunk = neighbors_[offset].value();
+
+    if (chunk->outside_block_to_place_[!offset].size() == 0) {
+      continue;
     }
 
-    neighbors_[offset].value()->outside_block_to_place_[!offset].clear();
+    for (auto [block_pos, block] : chunk->outside_block_to_place_[!offset]) {
+      SetBlock(block, block_pos);
+    }
+
+    chunk->outside_block_to_place_[!offset].clear();
   }
 }

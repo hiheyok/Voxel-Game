@@ -44,8 +44,6 @@ void Mesh::ChunkMeshData::Reset() {
 }
 
 void Mesh::ChunkMeshData::GenerateCache() {
-  BlockPos pos{0, 0, 0};
-
   std::array<BlockID, kChunkSize3D> chunk_data =
       chunk_->GetPalette().UnpackAll();
 
@@ -55,9 +53,11 @@ void Mesh::ChunkMeshData::GenerateCache() {
 
   size_t src_x = 0;
   size_t dst_x = 0;
+  size_t src_y;
+  size_t dst_y;
   for (int x = 0; x < kChunkDim; ++x) {
-    size_t src_y = src_x;
-    size_t dst_y = dst_x;
+    src_y = src_x;
+    dst_y = dst_x;
     for (int y = 0; y < kChunkDim; ++y) {
       memcpy(dst + dst_y, src + src_y, kChunkDim * sizeof(BlockID));
 
@@ -68,6 +68,7 @@ void Mesh::ChunkMeshData::GenerateCache() {
     dst_x += kCacheDim2D;
   }
 
+  BlockPos pos{0, 0, 0};
   for (auto side : Directions<ChunkPos>()) {
     int axis = side.GetAxis();
     int direction = side.GetDirection() & 0b1;
@@ -128,7 +129,8 @@ void Mesh::ChunkMeshData::GenerateMesh() {
 }
 
 void Mesh::ChunkMeshData::GenerateFaceCollection() {
-  const BlockModelManager& models = *game_context_.block_model_manager_.get();
+  const std::vector<BlockModel>& models =
+      game_context_.block_model_manager_->GetBlockModelList();
 
   std::array<uint8_t, 1024> face_visibility;
   std::array<uint8_t, 1024> face_visibility_back;
@@ -179,8 +181,8 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
           BlockID curr_block = *cache_ptr;
           BlockID back_block = *(cache_ptr - stride_slice);
 
-          const BlockModel& curr_model = models.GetBlockModel(curr_block);
-          const BlockModel& back_model = models.GetBlockModel(back_block);
+          const BlockModel& curr_model = models[curr_block];
+          const BlockModel& back_model = models[back_block];
 
           bool blank_curr_model =
               !curr_model.is_initialized_ || slice == kChunkDim;
@@ -341,18 +343,18 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const Cuboid& cube, int side,
     std::swap(u_size, v_size);
   }
 
-  std::vector<BlockVertexFormat>& vertex_buffer =
-      face.partially_transparent_pixel_ ? transparent_vertices_buffer_
-                                        : vertices_buffer_;
+  bool is_trans = face.partially_transparent_pixel_;
 
-  size_t& face_count = face.partially_transparent_pixel_
-                           ? transparent_face_count_
-                           : solid_face_count_;
+  std::vector<BlockVertexFormat>& vertex_buffer =
+      is_trans ? transparent_vertices_buffer_ : vertices_buffer_;
+
+  size_t& face_count = is_trans ? transparent_face_count_ : solid_face_count_;
 
   size_t vertex_index = face_count * 6;
+  face_count += new_face_count;
 
   // Resize buffer if it is soo too small
-  while (vertex_buffer.size() <= (face_count + new_face_count) * 6) {
+  while (vertex_buffer.size() <= face_count * 6) {
     vertex_buffer.resize(vertex_buffer.size() + kBufferStepSize);
   }
 
@@ -367,29 +369,36 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const Cuboid& cube, int side,
   }
 
   glm::ivec2 uv_00 = face.uv_coord_00;
-  glm::ivec2 uv_01 = face.uv_coord_10;
-  glm::ivec2 uv_10 = face.uv_coord_01;
+  glm::ivec2 uv_01 = face.uv_coord_10;  // Swapped to match quad orientation
+  glm::ivec2 uv_10 = face.uv_coord_01;  // Swapped to match quad orientation
   glm::ivec2 uv_11 = face.uv_coord_11;
 
   BlockPos offset_pos = pos;
+  float base_slice = offset_pos[axis];
+
+  if (direction) {
+    base_slice += from[axis];
+  } else {
+    base_slice += to[axis];
+  }
+  
+  v_00.pos_[axis] = base_slice;
+  v_01.pos_[axis] = base_slice;
+  v_10.pos_[axis] = base_slice;
+  v_11.pos_[axis] = base_slice;
+
+  const float u1 = pos[axis_u] + u_size;
+  const float v1 = pos[axis_v] + v_size;
   const BlockID* u_ptr = cache_ptr;
-  for (float u = pos[axis_u]; u < pos[axis_u] + u_size; ++u, u_ptr += stride_u) {
+
+  for (float u = pos[axis_u]; u < u1; ++u, u_ptr += stride_u) {
     const BlockID* v_ptr = u_ptr;
-    for (float v = pos[axis_v]; v < pos[axis_v] + v_size;
-         ++v, v_ptr += stride_v) {
+    for (float v = pos[axis_v]; v < v1; ++v, v_ptr += stride_v) {
       offset_pos[axis_u] = u;
       offset_pos[axis_v] = v;
 
       if (allow_ao) {
         GetAO(side, v_ptr, ao_multi);
-      }
-
-      float base_slice = offset_pos[axis];
-
-      if (direction) {
-        base_slice += from[axis];
-      } else {
-        base_slice += to[axis];
       }
 
       const auto [sky_light, block_light] =
@@ -402,19 +411,15 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const Cuboid& cube, int side,
 
       // Now work on positions
       // Set vertices
-      v_00.pos_[axis] = base_slice;
       v_00.pos_[axis_u] = u + from[axis_u];
       v_00.pos_[axis_v] = v + from[axis_v];
 
-      v_01.pos_[axis] = base_slice;
       v_01.pos_[axis_u] = u + from[axis_u];
       v_01.pos_[axis_v] = v + to[axis_v];
 
-      v_10.pos_[axis] = base_slice;
       v_10.pos_[axis_u] = u + to[axis_u];
       v_10.pos_[axis_v] = v + from[axis_v];
 
-      v_11.pos_[axis] = base_slice;
       v_11.pos_[axis_u] = u + to[axis_u];
       v_11.pos_[axis_v] = v + to[axis_v];
 
@@ -443,7 +448,6 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const Cuboid& cube, int side,
         std::swap(vertex_dst[1], vertex_dst[2]);
         std::swap(vertex_dst[4], vertex_dst[5]);
       }
-      ++face_count;
       vertex_dst += 6;
     }
   }

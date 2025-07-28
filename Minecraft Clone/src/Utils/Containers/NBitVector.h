@@ -87,7 +87,7 @@ void NBitVector::SetUnsafe(size_t idx, T val) noexcept {
   data_[data_idx] = (data_[data_idx] & ~low_mask) | (value << bit_pos);
 
   const uint64_t overflow_mask = overflow_table_[bit_width_][bit_pos];
-  if (overflow_mask != 0) {
+  if (overflow_mask != 0) [[unlikely]] {
     const uint64_t high_bits = value >> (kDataWidth - bit_pos);
     data_[data_idx + 1] = (data_[data_idx + 1] & ~overflow_mask) | high_bits;
   }
@@ -115,24 +115,35 @@ void NBitVector::UnpackAll(std::vector<T>& out) const {
 
 template <typename T>
 void NBitVector::UnpackAll(T* out) const {
-  size_t out_idx = 0;
+  const uint64_t* src = data_.data();
+  const uint64_t mask = all_one_bit_width_;
+
+#ifdef __SIZEOF_INT128__
+  size_t bit_offset = 0;
+  for (size_t i = 0; i < num_elements_; ++i) {
+    const size_t data_idx = bit_offset >> kDataWidthLog2;
+    const size_t bit_pos = bit_offset & kDataBitRemainderMask;
+
+    unsigned __int128 chunk =
+        *reinterpret_cast<const unsigned __int128*>(&src[data_idx]);
+    out[i] = static_cast<T>((chunk >> bit_pos) & mask);
+    bit_offset += bit_width_;
+  }
+#else
+  // 64-bit fallback
   size_t data_idx = 0;
   size_t bit_pos = 0;
 
-  const uint64_t* src = data_.data();
-
-  while (out_idx < num_elements_) {
-    if (bit_pos + bit_width_ < kDataWidth) [[likely]] {  // Easy acess
-      out[out_idx++] =
-          static_cast<T>((src[data_idx] >> bit_pos) & all_one_bit_width_);
-      bit_pos += bit_width_;
+  for (size_t i = 0; i < num_elements_; ++i) {
+    if (bit_pos + bit_width_ <= kDataWidth) [[likely]] {
+      out[i] = static_cast<T>((src[data_idx] >> bit_pos) & mask);
     } else {
-      const uint64_t lower = src[data_idx] >> bit_pos;
-      const uint64_t upper = src[++data_idx] << (kDataWidth - bit_pos);
-
-      out[out_idx++] = static_cast<T>((lower | upper) & all_one_bit_width_);
-      // Combine them and store
-      bit_pos = (bit_pos + bit_width_) & kDataBitRemainderMask;
+      const uint64_t lo = src[data_idx] >> bit_pos;
+      const uint64_t hi = src[++data_idx] << (kDataWidth - bit_pos);
+      out[i] = static_cast<T>((lo | hi) & mask);
     }
+    bit_pos = (bit_pos + bit_width_) & kDataBitRemainderMask;
+    data_idx += (bit_pos == 0);
   }
+#endif
 }

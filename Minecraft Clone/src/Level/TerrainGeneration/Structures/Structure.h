@@ -6,7 +6,6 @@
 
 struct SetBlockRelative {
   BlockPos pos_;
-
   BlockID block_;
 
   SetBlockRelative(BlockID block, BlockPos pos);

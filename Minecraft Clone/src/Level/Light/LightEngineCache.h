@@ -40,7 +40,9 @@ class LightEngineCache {
   void SetSkyLight(BlockPos pos, int lvl);
 
   bool CheckChunk(ChunkPos pos);
+  bool CheckChunk(BlockPos pos);
   Chunk* GetChunk(ChunkPos pos);
+  Chunk* GetChunk(BlockPos pos);
 
   void UpdateLight();
   bool CheckChunkHasLighting(ChunkPos pos);
@@ -87,10 +89,15 @@ class LightEngineCache {
   void ExpandDown();
   bool TryCacheChunk(ChunkPos pos);
   size_t CalculateCacheIndex(ChunkPos pos) const noexcept;
+  // Calculate the index for the chunk the block_pos is in
+  size_t CalculateCacheIndex(BlockPos pos) const noexcept; 
   [[nodiscard]] bool EnsureLoaded(ChunkPos pos);
   [[nodiscard]] LightStorage* EnsureLoadedGetSky(ChunkPos pos);
+  [[nodiscard]] LightStorage* EnsureLoadedGetSky(BlockPos pos);
   [[nodiscard]] LightStorage* EnsureLoadedGetBlock(ChunkPos pos);
+  [[nodiscard]] LightStorage* EnsureLoadedGetBlock(BlockPos pos);
   [[nodiscard]] Chunk* EnsureLoadedGetChunk(ChunkPos pos);
+  [[nodiscard]] Chunk* EnsureLoadedGetChunk(BlockPos pos);
 
   static constexpr int kCacheRadius = 1;
   static constexpr int kCacheWidth = 1 + 2 * kCacheRadius;
@@ -100,6 +107,7 @@ class LightEngineCache {
   WorldInterface& world_;
 
   ChunkPos center_chunk_;
+  BlockPos center_block_offset_;
   int y_top;
   int y_bot;
 

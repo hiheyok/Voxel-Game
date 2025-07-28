@@ -41,7 +41,7 @@ bool Options::SetValue(std::string name, std::string value) {
 void Options::ProcessTokens(std::vector<std::string> tokens) {
   bool success = true;
 
-  for (int i = 0; i < static_cast<int>(tokens.size() / 2); i++) {
+  for (size_t i = 0; i < tokens.size() / 2; i++) {
     std::string name = tokens[2 * i];
     std::string val = tokens[2 * i + 1];
     game_context_.logger_->LogDebug("Options::ProcessTokens", name + ":" + val);

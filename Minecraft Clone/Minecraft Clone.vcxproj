@@ -198,6 +198,7 @@
     <ClCompile Include="src\Level\Light\LightEngineCache.cpp" />
     <ClCompile Include="src\Level\Light\SkyLightEngine.cpp" />
     <ClCompile Include="src\Level\Light\ThreadedLightEngine.cpp" />
+    <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugMeshStress\DebugMeshStress.cpp" />
     <ClCompile Include="src\Level\World\CollusionDetector.cpp" />
     <ClCompile Include="src\Level\Container\Region.cpp" />
     <ClCompile Include="src\Client\ClientPlay.cpp" />
@@ -284,6 +285,7 @@
     <ClInclude Include="src\Level\Light\LightEngineStats.h" />
     <ClInclude Include="src\Level\Light\SkyLightEngine.h" />
     <ClInclude Include="src\Level\Light\ThreadedLightEngine.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Generators\DebugMeshStress\DebugMeshStress.h" />
     <ClInclude Include="src\RenderEngine\BlockModel\BlockModelManager.h" />
     <ClInclude Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexFormat.h" />
     <ClInclude Include="src\RenderEngine\EntityRender\MultiEntityRender.h" />

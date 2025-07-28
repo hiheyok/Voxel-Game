@@ -54,10 +54,10 @@ void Dimension::TickUsed(EventID id, BlockPos pos) {  // temp solution
 }
 
 void Dimension::EventTick() {
-  std::unique_ptr<std::vector<Event>>& EventQueue = event_manager_.GetQueue();
+  std::vector<Event>& event_queue = event_manager_.GetQueue();
 
-  for (size_t i = 0; i < EventQueue->size(); i++) {
-    const Event& e = EventQueue->at(i);
+  for (size_t i = 0; i < event_queue.size(); i++) {
+    const Event& e = event_queue[i];
     switch (e.type_) {
       case NULL_EVENT:
         break;
@@ -90,7 +90,7 @@ void Dimension::EventTick() {
     game_context_.event_handler_->ExecuteEvent(e, this);
   }
 
-  EventQueue->clear();
+  event_queue.clear();
   event_manager_.Swap();
 
   tick_usage_.clear();
