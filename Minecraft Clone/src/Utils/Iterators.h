@@ -12,11 +12,11 @@ class Product;
 template <size_t N, typename T>
 class ProductIterator {
  public:
-  using iterator_category = std::forward_iterator_tag;
+  using iterator_category = std::bidirectional_iterator_tag;
   using difference_type = std::ptrdiff_t;
   using value_type = std::array<T, N>;
   using pointer = const value_type*;
-  using reference = const value_type&;
+  using reference = const value_type;
 
   ProductIterator() noexcept = default;
 
@@ -47,6 +47,38 @@ class ProductIterator {
     return tmp;
   }
 
+  ProductIterator& operator--() noexcept {
+    if (idx_ == max_) [[unlikely]] {
+      --idx_;
+      for (size_t i = 0; i < N; ++i) {
+        val_[i] = bounds_[i].second - 1;
+      }
+      return *this;
+    }
+
+    --idx_;
+
+    // Fast path
+    if (--val_[N - 1] >= bounds_[N - 1].first) [[likely]] {
+      return *this;
+    }
+
+    val_[N - 1] = bounds_[N - 1].second - 1;
+    for (size_t i = N - 1; i-- > 0;) {
+      if (--val_[i] >= bounds_[i].first) [[likely]] {
+        return *this;
+      }
+      val_[i] = bounds_[i].second - 1;
+    }
+    return *this;
+  }
+
+  ProductIterator operator--(int) noexcept {
+    ProductIterator tmp = *this;
+    --(*this);
+    return tmp;
+  }
+
   friend bool operator==(const ProductIterator<N, T>& a,
                          const ProductIterator<N, T>& b) noexcept {
     return a.idx_ == b.idx_;
@@ -61,10 +93,12 @@ class ProductIterator {
 
   explicit ProductIterator(size_t idx, const std::pair<T, T>* bounds) noexcept
       : idx_{idx}, bounds_{bounds} {
+    max_ = 1;
     for (size_t i = N; i-- > 0;) {
       size_t size = bounds[i].second - bounds[i].first;
       val_[i] = idx % size;
       idx /= size;
+      max_ *= size;
     }
 
     for (size_t i = 0; i < N; ++i) {
@@ -73,6 +107,7 @@ class ProductIterator {
   }
 
   size_t idx_;
+  size_t max_;
   const std::pair<T, T>* bounds_;
   std::array<T, N> val_{};
 };
@@ -126,13 +161,6 @@ class Product {
     Init(arr);
   }
 
-  ProductIterator<N, T> begin() noexcept {
-    return ProductIterator<N, T>(0, bounds_.data());
-  }
-  ProductIterator<N, T> end() noexcept {
-    return ProductIterator<N, T>(max_, bounds_.data());
-  }
-
   ProductIterator<N, T> begin() const noexcept {
     return ProductIterator<N, T>(0, bounds_.data());
   }
@@ -163,3 +191,6 @@ class Product {
   std::array<Range, N> bounds_;
   size_t max_;
 };
+
+// Assertion just to verify
+static_assert(std::bidirectional_iterator<ProductIterator<2, int>>);

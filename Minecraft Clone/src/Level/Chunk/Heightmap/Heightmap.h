@@ -18,7 +18,7 @@ class HeightMap {
 
   void Edit(int x, int z, int height) noexcept;
 
-  int8_t Get(int x, int z) const noexcept;
+  int Get(int x, int z) const noexcept;
 
   void Clear();
 

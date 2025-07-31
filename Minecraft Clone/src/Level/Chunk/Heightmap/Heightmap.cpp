@@ -11,7 +11,7 @@ void HeightMap::Edit(int x, int z, int height) noexcept {
   data_[x * kChunkDim + z] = static_cast<int8_t>(height);
 }
 
-int8_t HeightMap::Get(int x, int z) const noexcept {
+int HeightMap::Get(int x, int z) const noexcept {
   return data_[x * kChunkDim + z];
 }
 

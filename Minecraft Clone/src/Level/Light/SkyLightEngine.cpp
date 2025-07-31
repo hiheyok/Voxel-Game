@@ -30,6 +30,12 @@ void SkyLightEngine::LightChunk(ChunkPos chunk_pos) {
   for (auto [x, z] : Product<2>(kChunkDim)) {
     int height = heightmap.Get(x, z);
 
+    // Attempts to cast shadow below
+    if (height != -1) {
+      BlockPos pos = BlockPos{x, -1, z} + chunk_offset;
+      TryPropagateShadow(pos);
+    }
+
     // If column is entirely covered
     if (height >= kChunkDim - 1) {
       continue;
@@ -44,8 +50,10 @@ void SkyLightEngine::LightChunk(ChunkPos chunk_pos) {
   }
 
   CheckNeighborChunk(chunk_pos);
+  DelayDecrease();
   DelayIncrease();
-  PropagateIncrease();
+  PropagateDecrease();
+  ResetDecreaseQueue();
   ResetIncreaseQueue();
   light_cache_ = nullptr;
 }

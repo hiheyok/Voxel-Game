@@ -15,8 +15,6 @@
 #include "Level/World/World.h"
 #include "Level/World/WorldParameters.h"
 
-using namespace glm;
-
 WorldUpdater::WorldUpdater(GameContext& game_context, World* w,
                            WorldParameters p)
     : game_context_{game_context},
@@ -32,21 +30,21 @@ void WorldUpdater::loadSummonEntitySurrounding(EntityUUID uuid) {
         std::string("Entity with UUID " + std::to_string(uuid) + " not found"));
     return;
   }
-  vec3 pos = e->properties_.position_ / 16.f;
+  glm::vec3 pos = e->properties_.position_ / 16.f;
   // vec3 velocity = e->Properties.Velocity;
 
-  ivec3 initial_pos{pos.x, pos.y, pos.z};
+  glm::ivec3 initial_pos{pos.x, pos.y, pos.z};
 
   // TODO(hiheyok): Use light engine FIFO
-  std::deque<ivec3> fifo;
+  std::deque<glm::ivec3> fifo;
 
   fifo.push_back(initial_pos);
   while (!fifo.empty()) {
-    ivec3 current_chunk_pos = fifo.front();
+    glm::ivec3 current_chunk_pos = fifo.front();
     fifo.pop_front();
 
     // Gets relative position from the entity
-    ivec3 offset = initial_pos - current_chunk_pos;
+    glm::ivec3 offset = initial_pos - current_chunk_pos;
 
     // Checks if it is in range
     if ((abs(offset.x) > settings_->horizontal_ticking_distance_) ||
@@ -59,7 +57,7 @@ void WorldUpdater::loadSummonEntitySurrounding(EntityUUID uuid) {
     if (!isSuccess) continue;
 
     for (int side = 0; side < 6; side++) {
-      ivec3 neighbor_chunk_pos = current_chunk_pos;
+      glm::ivec3 neighbor_chunk_pos = current_chunk_pos;
 
       neighbor_chunk_pos[side >> 1] += (side & 0b1) * 2 - 1;
 
@@ -84,8 +82,8 @@ bool WorldUpdater::RequestLoad(ChunkPos pos) {
 
 // Only work on loading chunks for not. Unloading for later
 void WorldUpdater::loadSurroundedMovedEntityChunk() {
-  std::vector<ivec3> center_position_list;
-  std::vector<vec3> center_velocity_list;
+  std::vector<glm::ivec3> center_position_list;
+  std::vector<glm::vec3> center_velocity_list;
 
   // Get entity chunk position
 
@@ -113,15 +111,15 @@ void WorldUpdater::loadSurroundedMovedEntityChunk() {
 
   if (center_position_list.empty()) return;
 
-  ivec3 axis_tick_dist{settings_->horizontal_ticking_distance_,
-                       settings_->vertical_ticking_distance_,
-                       settings_->horizontal_ticking_distance_};
+  glm::ivec3 axis_tick_dist{settings_->horizontal_ticking_distance_,
+                            settings_->vertical_ticking_distance_,
+                            settings_->horizontal_ticking_distance_};
 
   int chunk_padding = 4;
 
   for (size_t i = 0; i < center_position_list.size(); i++) {
-    ivec3 pos = center_position_list[i];
-    vec3 vel = center_velocity_list[i];
+    glm::ivec3 pos = center_position_list[i];
+    glm::vec3 vel = center_velocity_list[i];
 
     for (int j = 0; j < 3; j++) {
       int side = 0;
@@ -141,7 +139,7 @@ void WorldUpdater::loadSurroundedMovedEntityChunk() {
       int sideDistanceOffset = axis_tick_dist[j] + 1;
 
       for (auto [u, v] : Product<2>({{-u_d, u_d + 1}, {-v_d, v_d + 1}})) {
-        ivec3 test_position = pos;
+        glm::ivec3 test_position = pos;
 
         test_position[(j + 1) % 3] += u;
         test_position[(j + 2) % 3] += v;
@@ -156,6 +154,8 @@ void WorldUpdater::loadSurroundedMovedEntityChunk() {
   }
 }
 
+#include <ranges>
+
 void WorldUpdater::loadSpawnChunks() {
   assert(world_ != nullptr);
 
@@ -166,7 +166,10 @@ void WorldUpdater::loadSpawnChunks() {
   int z0 = -settings_->spawn_chunk_horizontal_radius_;
   int z1 = settings_->spawn_chunk_horizontal_radius_ + 1;
 
-  for (auto [x, y, z] : Product<3>({{x0, x1}, {y0, y1}, {z0, z1}})) {
+  // Generate chunk in reverse as a temp solution to lighting bug
+  auto it = Product<3>({{x0, x1}, {y0, y1}, {z0, z1}});
+
+  for (const auto& [x, y, z] : it | std::views::reverse) {
     if (!RequestLoad(ChunkPos{x, y, z})) {
       continue;
     }
