@@ -7,14 +7,13 @@
 #include <glm/vec3.hpp>
 
 #include "Client/ClientLevel/ClientCache.h"
-#include "Client/IO/IO.h"
-#include "Client/IO/KEY_CODE.h"
+#include "Client/Inputs/InputManager.h"
 #include "Level/Entity/Mobs/Player.h"
 #include "Utils/Math/vectorOperations.h"
 
-void PlayerMovement::Update(Player* player, const UserInputs& inputs,
+void PlayerMovement::Update(Player* player, const InputManager& inputs,
                             ClientCache* clientWorld) {
-  if (inputs.CheckKeyPress(KEY_C)) {
+  if (inputs.CheckAction(InputAction::kToggleCollusion)) {
     enable_collusion_ = !enable_collusion_;
   }
 
@@ -36,7 +35,7 @@ float PlayerMovement::VelocityMovementCurve(float current, float max,
   return max - expf(-x);
 }
 
-void PlayerMovement::RotatePlayer(Player* player, const UserInputs& Inputs) {
+void PlayerMovement::RotatePlayer(Player* player, const InputManager& Inputs) {
   float CamSensitivity = 0.1f;
 
   player->properties_.rotation_.x +=
@@ -64,8 +63,8 @@ void PlayerMovement::MoveRelative(Player* player, float strafe, float up,
     up = up * f;
     forward = forward * f;
 
-    float zCoord = sin(player->properties_.rotation_.y * 0.017453292f);
-    float xCoord = cos(player->properties_.rotation_.y * 0.017453292f);
+    float zCoord = sin(player->properties_.rotation_.y * kDegToRad);
+    float xCoord = cos(player->properties_.rotation_.y * kDegToRad);
 
     player->properties_.velocity_.x += strafe * xCoord - forward * zCoord;
     player->properties_.velocity_.y += up;
@@ -73,13 +72,13 @@ void PlayerMovement::MoveRelative(Player* player, float strafe, float up,
   }
 }
 
-void PlayerMovement::MovePlayer(Player* player, const UserInputs& inputs,
+void PlayerMovement::MovePlayer(Player* player, const InputManager& inputs,
                                 ClientCache* clientWorld) {
-  glm::vec3 front(cos(player->properties_.rotation_.x * 0.0174533) *
-                      cos(player->properties_.rotation_.y * 0.0174533),
+  glm::vec3 front(cos(player->properties_.rotation_.x * kDegToRad) *
+                      cos(player->properties_.rotation_.y * kDegToRad),
                   0,
-                  sin(player->properties_.rotation_.x * 0.0174533) *
-                      cos(player->properties_.rotation_.y * 0.0174533));
+                  sin(player->properties_.rotation_.x * kDegToRad) *
+                      cos(player->properties_.rotation_.y * kDegToRad));
 
   front = normalize(front);
 
@@ -88,7 +87,7 @@ void PlayerMovement::MovePlayer(Player* player, const UserInputs& inputs,
 
   float velocity = player->properties_.max_speed_;
 
-  if (inputs.CheckKey(KEY_LEFT_CONTROL)) {
+  if (inputs.CheckAction(InputAction::kSprint)) {
     velocity *= 8.f;
   }
 
@@ -98,31 +97,31 @@ void PlayerMovement::MovePlayer(Player* player, const UserInputs& inputs,
 
   player->properties_.velocity_ = glm::vec3(0.f, 0.f, 0.f);
 
-  if (inputs.CheckKey(KEY_W)) {
+  if (inputs.CheckAction(InputAction::kWalkForwards)) {
     player->properties_.velocity_ += front * v;
   }
-  if (inputs.CheckKey(KEY_A)) {
+  if (inputs.CheckAction(InputAction::kStrafeLeft)) {
     player->properties_.velocity_ += -right * v;
   }
-  if (inputs.CheckKey(KEY_S)) {
+  if (inputs.CheckAction(InputAction::kWalkBackwards)) {
     player->properties_.velocity_ += -front * v;
   }
-  if (inputs.CheckKey(KEY_D)) {
+  if (inputs.CheckAction(InputAction::kStrafeRight)) {
     player->properties_.velocity_ += right * v;
   }
 
-  if (inputs.CheckKey(KEY_LEFT_SHIFT)) {
+  if (inputs.CheckAction(InputAction::kMoveDown)) {
     player->properties_.velocity_.y += -VelocityMovementCurve(
         Magnitude(player->properties_.velocity_), velocity, inputs.delta_);
   }
 
-  if (inputs.CheckKey(KEY_SPACE) &&
+  if (inputs.CheckAction(InputAction::kJump) &&
       (clientWorld->collusion_manager_.IsEntityOnGround(player) &&
        enable_collusion_)) {
     player->properties_.velocity_.y += velocity * 4000;
   }
 
-  if (inputs.CheckKey(KEY_SPACE)) {
+  if (inputs.CheckAction(InputAction::kMoveUp)) {
     player->properties_.velocity_.y += velocity;
   }
 
@@ -155,48 +154,5 @@ void PlayerMovement::MovePlayer(Player* player, const UserInputs& inputs,
       player->properties_.velocity_ * inputs.delta_ / 2.f;
   player->properties_.velocity_ =
       player->properties_.velocity_ * powf(3.f / 25.f, inputs.delta_);
-  /*float jumpMovementFactor = 0.02F;
-  float f = 0.91;
 
-  float blockSlipperiness = 0.6;
-
-  if (server->checkPlayerOnGround() && m_EnableCollusion) {
-      f = blockSlipperiness * 0.91;
-  }
-
-  float f2 = 0.16277136F / (f * f * f);
-  float friction = 0.f;
-
-  if (server->checkPlayerOnGround() && m_EnableCollusion) {
-      friction = f2 * 0.08;
-  }
-  else {
-      friction = jumpMovementFactor;
-  }
-
-  float baseAcceleration = 0.1f;
-  if (Inputs.CheckKey(KEY_LEFT_SHIFT)) {
-      baseAcceleration = 0.13f;
-  }
-
-  float strafe = 0.f, forward = 0.f, up = 0.f;
-
-  if (Inputs.CheckKey(KEY_W)) {
-      forward += baseAcceleration;
-  }
-  if (Inputs.CheckKey(KEY_A)) {
-      strafe -= baseAcceleration;
-  }
-  if (Inputs.CheckKey(KEY_S)) {
-      forward -= baseAcceleration;
-  }
-  if (Inputs.CheckKey(KEY_D)) {
-      strafe += baseAcceleration;
-  }
-
-  if (Inputs.CheckKey(KEY_SPACE)) {
-      up += baseAcceleration;
-  }
-
-  MoveRelative(player , strafe, up, forward, friction);*/
 }

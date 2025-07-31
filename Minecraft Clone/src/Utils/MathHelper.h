@@ -2,8 +2,6 @@
 
 #pragma once
 
-#define DEGTORAD 0.017453
-
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 

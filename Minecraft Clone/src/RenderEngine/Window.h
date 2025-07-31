@@ -8,7 +8,7 @@
 
 #include <glm/vec2.hpp>
 
-#include "../Client/IO/IO.h"
+#include "../Client/Inputs/InputManager.h"
 
 class GameContext;
 
@@ -29,7 +29,7 @@ class Window {
   void Refresh();
   void PollInputs();
   WindowProperties& GetProperties();
-  UserInputs& GetUserInputs();
+  InputManager& GetUserInputs();
   GLFWwindow* GetWindow();
 
   void RenderSolid();
@@ -50,7 +50,7 @@ class Window {
   void ScrollCallback(GLFWwindow* win, double xoffset, double yoffset);
   
   GameContext& game_context_;
-  UserInputs inputs_;
+  InputManager inputs_;
   WindowProperties properties_;
 
  private:

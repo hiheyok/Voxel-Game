@@ -4,8 +4,6 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
-double toRadians(double x) { return x * 0.01745329251; }
-
 float FindDistanceNoSqrt(float x, float y, float z, float x1, float y1,
                          float z1) {
   return (x - x1) * (x - x1) + (y - y1) * (y - y1) + (z - z1) * (z - z1);

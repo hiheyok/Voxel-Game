@@ -46,6 +46,7 @@ constexpr int64_t kWorldSeed = -501575345763903LL;
 // -501575345763903LL;//-501575345763903LL;//-1587754402LL
 
 constexpr int8_t kMaxLightLevel = 15;
+constexpr double kDegToRad = 0.017453292;
 
 template <typename Target, typename Base>
 bool instanceof(Base* obj) {

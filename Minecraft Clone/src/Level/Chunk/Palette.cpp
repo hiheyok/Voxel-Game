@@ -191,7 +191,7 @@ std::array<BlockID, kChunkSize2D> Palette::UnpackSlice(int axis,
   int axis_v = (axis + 2) % 3;
 
   // Cache friendly access pattern for y-axis (faster)
-  if (axis == Directions<ChunkPos>::kYAxis) {
+  if (axis == kYAxis) {
     std::swap(axis_u, axis_v);
   }
 

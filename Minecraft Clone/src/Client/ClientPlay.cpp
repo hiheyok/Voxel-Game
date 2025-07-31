@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-#include "Client/IO/IO.h"
+#include "Client/Inputs/InputManager.h"
 #include "Client/Player/MainPlayer.h"
 #include "Client/Profiler/PerformanceProfiler.h"
 #include "Client/Render/DebugScreen/DebugScreen.h"
@@ -98,7 +98,7 @@ void ClientPlay::Update(Window* window) {
         static_cast<float>(game_context_.options_->graphics_scale_));
   }
 
-  if (window->GetUserInputs().CheckKeyPress(GLFW_KEY_R)) {
+  if (window->GetUserInputs().CheckAction(InputAction::kReload)) {
     entity_render_->Reload();
   }
 

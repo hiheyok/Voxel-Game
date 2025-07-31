@@ -53,8 +53,8 @@ class ChunkMeshData {
 
   GameContext& game_context_;
   // Mesh Vertices
-  std::vector<BlockVertexFormat> vertices_buffer_;
-  std::vector<BlockVertexFormat> transparent_vertices_buffer_;
+  std::vector<BlockVertexFormat> solid_vertices_buffer_;
+  std::vector<BlockVertexFormat> trans_vertices_buffer_;
   std::vector<BlockVertexFormat> solid_fluid_vertices_buffer_;
   std::vector<BlockVertexFormat> transparent_fluid_vertices_buffer_;
 

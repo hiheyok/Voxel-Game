@@ -7,7 +7,6 @@
 #include <stdexcept>
 #include <string>
 
-#include "Client/IO/KEY_CODE.h"
 #include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 
@@ -208,12 +207,12 @@ void Window::ResizeWindowCallback(int x, int y) {
 
 void Window::ScrollCallback(GLFWwindow* win, double xOffset, double yOffset) {
   if (yOffset == -1.0) {
-    inputs_.mouse_.scroll_direction_ = inputs_.mouse_.SCROLL_DOWN;
+    inputs_.mouse_.scroll_direction_ = MouseInputs::ScrollState::SCROLL_DOWN;
     return;
   }
 
   if (yOffset == 1.0) {
-    inputs_.mouse_.scroll_direction_ = inputs_.mouse_.SCROLL_UP;
+    inputs_.mouse_.scroll_direction_ = MouseInputs::ScrollState::SCROLL_UP;
     return;
   }
   (void)xOffset;
@@ -226,7 +225,7 @@ void Window::PollInputs() { glfwPollEvents(); }
 
 WindowProperties& Window::GetProperties() { return properties_; }
 
-UserInputs& Window::GetUserInputs() { return inputs_; }
+InputManager& Window::GetUserInputs() { return inputs_; }
 
 void Window::DisableCursor() {
   glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -249,40 +248,43 @@ void Window::KeyboardCallback(GLFWwindow* window, int key, int scancode,
 }
 
 void Window::MouseButtonCallback(int button, int action) {
-  if (button == GLFW_MOUSE_BUTTON_RIGHT) {
-    if (action == GLFW_PRESS) {
-      if (inputs_.mouse_.right_ == inputs_.mouse_.PRESS) {
-        inputs_.mouse_.right_ = inputs_.mouse_.HOLD;
-      } else {
-        inputs_.mouse_.right_ = inputs_.mouse_.PRESS;
-      }
+  MouseInputs::ButtonState state = MouseInputs::ButtonState::RELEASE;
+  MouseInputs::ButtonState hold_state = MouseInputs::ButtonState::HOLD;
 
-    } else {
-      inputs_.mouse_.right_ = inputs_.mouse_.RELEASE;
-    }
+  if (action == GLFW_PRESS) {
+    state = MouseInputs::ButtonState::PRESS;
+  } else {
+    hold_state = state;
   }
-  if (button == GLFW_MOUSE_BUTTON_LEFT) {
-    if (action == GLFW_PRESS) {
-      if (inputs_.mouse_.left_ == inputs_.mouse_.PRESS) {
-        inputs_.mouse_.left_ = inputs_.mouse_.HOLD;
-      } else {
-        inputs_.mouse_.left_ = inputs_.mouse_.PRESS;
-      }
 
-    } else {
-      inputs_.mouse_.left_ = inputs_.mouse_.RELEASE;
+  switch (button) {
+    case GLFW_MOUSE_BUTTON_RIGHT: {
+      if (inputs_.mouse_.right_ == state) {
+        inputs_.mouse_.right_ = hold_state;
+      } else {
+        inputs_.mouse_.right_ = state;
+      }
+      break;
     }
-  }
-  if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
-    if (action == GLFW_PRESS) {
-      if (inputs_.mouse_.middle_ == inputs_.mouse_.PRESS) {
-        inputs_.mouse_.middle_ = inputs_.mouse_.HOLD;
+    case GLFW_MOUSE_BUTTON_LEFT: {
+      if (inputs_.mouse_.left_ == state) {
+        inputs_.mouse_.left_ = hold_state;
       } else {
-        inputs_.mouse_.middle_ = inputs_.mouse_.PRESS;
+        inputs_.mouse_.left_ = state;
       }
-
-    } else {
-      inputs_.mouse_.middle_ = inputs_.mouse_.RELEASE;
+      break;
+    }
+    case GLFW_MOUSE_BUTTON_MIDDLE: {
+      if (inputs_.mouse_.middle_ == state) {
+        inputs_.mouse_.middle_ = hold_state;
+      } else {
+        inputs_.mouse_.middle_ = state;
+      }
+      break;
+    }
+    default: {
+      // TODO(hiheyok): Not handled yet; add more mouse button support later.
+      // https://www.glfw.org/docs/3.3/group__buttons.html
     }
   }
 }

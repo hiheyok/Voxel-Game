@@ -5,8 +5,7 @@
 #include <glm/vec2.hpp>
 #include <utility>
 
-#include "Client/IO/IO.h"
-#include "Client/IO/KEY_CODE.h"
+#include "Client/Inputs/InputManager.h"
 #include "Client/Player/PlayerMovement.h"
 #include "Client/Player/PlayerPOV.h"
 #include "Client/Player/WorldInteraction.h"
@@ -98,7 +97,7 @@ void MainPlayer::PrepareGUIs() {
   player_gui_->PrepareRenderer();
 }
 
-void MainPlayer::Update(const UserInputs& inputs) {
+void MainPlayer::Update(const InputManager& inputs) {
   InventoryUpdate(inputs);
   interactions_->Interact(player_.get(), inputs, internal_interface_,
                           client_cache_);
@@ -123,17 +122,16 @@ void MainPlayer::SetPlayerPosition(float x, float y, float z) {
   player_pov_->SetPosition(glm::vec3(x, y, z));
 }
 
-void MainPlayer::InventoryUpdate(const UserInputs& inputs) {
+void MainPlayer::InventoryUpdate(const InputManager& inputs) {
   int Direction = 0;
-
   switch (inputs.mouse_.scroll_direction_) {
-    case inputs.mouse_.SCROLL_DOWN:
+    case MouseInputs::ScrollState::SCROLL_DOWN:
       Direction = 1;
       break;
-    case inputs.mouse_.SCROLL_UP:
+    case MouseInputs::ScrollState::SCROLL_UP:
       Direction = -1;
       break;
-    case inputs.mouse_.SCROLL_NONE:
+    case MouseInputs::ScrollState::SCROLL_NONE:
       break;
   }
 
@@ -142,20 +140,20 @@ void MainPlayer::InventoryUpdate(const UserInputs& inputs) {
   if (currentInventorySlot + Direction == 9) {
     currentInventorySlot = 0;
   } else if (currentInventorySlot + Direction == -1) {
-    currentInventorySlot = 8;
+    currentInventorySlot = kHotbarSlots - 1;
   } else {
     currentInventorySlot += Direction;
   }
 
-  if (inputs.CheckKeyPress(KEY_1)) currentInventorySlot = 0;
-  if (inputs.CheckKeyPress(KEY_2)) currentInventorySlot = 1;
-  if (inputs.CheckKeyPress(KEY_3)) currentInventorySlot = 2;
-  if (inputs.CheckKeyPress(KEY_4)) currentInventorySlot = 3;
-  if (inputs.CheckKeyPress(KEY_5)) currentInventorySlot = 4;
-  if (inputs.CheckKeyPress(KEY_6)) currentInventorySlot = 5;
-  if (inputs.CheckKeyPress(KEY_7)) currentInventorySlot = 6;
-  if (inputs.CheckKeyPress(KEY_8)) currentInventorySlot = 7;
-  if (inputs.CheckKeyPress(KEY_9)) currentInventorySlot = 8;
+  if (inputs.CheckAction(InputAction::kHotbarSlot1)) currentInventorySlot = 0;
+  if (inputs.CheckAction(InputAction::kHotbarSlot2)) currentInventorySlot = 1;
+  if (inputs.CheckAction(InputAction::kHotbarSlot3)) currentInventorySlot = 2;
+  if (inputs.CheckAction(InputAction::kHotbarSlot4)) currentInventorySlot = 3;
+  if (inputs.CheckAction(InputAction::kHotbarSlot5)) currentInventorySlot = 4;
+  if (inputs.CheckAction(InputAction::kHotbarSlot6)) currentInventorySlot = 5;
+  if (inputs.CheckAction(InputAction::kHotbarSlot7)) currentInventorySlot = 6;
+  if (inputs.CheckAction(InputAction::kHotbarSlot8)) currentInventorySlot = 7;
+  if (inputs.CheckAction(InputAction::kHotbarSlot9)) currentInventorySlot = 8;
 
   player_->entity_inventory_.right_hand_slot_ = currentInventorySlot;
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "Level/TerrainGeneration/Generators/Debug/Debug.h"
 #include "Level/TerrainGeneration/Generators/DebugMeshStress/DebugMeshStress.h"
+#include "Level/TerrainGeneration/Generators/DebugMeshStressFace/DebugMeshStressFace.h"
 #include "Level/TerrainGeneration/Generators/DebugPositioning/DebugPositioning.h"
 #include "Level/TerrainGeneration/Generators/DebugSecond/DebugSecond.h"
 #include "Level/TerrainGeneration/Generators/Math/MathWorld.h"

@@ -13,7 +13,7 @@ class ServerInterface;
 class TexturedFrameBuffer;
 class MainPlayer;
 class WorldRender;
-class UserInputs;
+class InputManager;
 class ClientLevel;
 class PerformanceProfiler;
 class DebugScreen;

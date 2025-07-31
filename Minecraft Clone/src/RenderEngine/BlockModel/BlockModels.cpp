@@ -308,7 +308,7 @@ void BlockModel::BakeTextureRotation() {
         std::swap(face.uv_coord_10, face.uv_coord_11);
       }
 
-      if (direction.GetAxis() == Directions<BlockPos>::kZAxis) {
+      if (direction.GetAxis() == kZAxis) {
         std::swap(face.uv_coord_10, face.uv_coord_01);
       }
     }

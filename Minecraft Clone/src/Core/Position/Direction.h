@@ -24,7 +24,7 @@ template <class PositionType>
 class Direction {
  public:
   constexpr Direction(int x, int y, int z, int direction) noexcept
-      : offset_{x, y, z}, direction_{static_cast<uint8_t>(direction)} { }
+      : offset_{x, y, z}, direction_{static_cast<uint8_t>(direction)} {}
 
   constexpr Direction(const Direction&) noexcept = default;
   constexpr Direction(Direction&&) noexcept = default;
@@ -34,32 +34,35 @@ class Direction {
   constexpr Direction& operator=(const Direction&) noexcept = default;
 
   friend constexpr PositionType operator+(const PositionType& m,
-                                          const Direction& n) {
+                                          const Direction& n) noexcept {
     return m + n.offset_;
   }
 
-  constexpr bool operator==(const Direction& other) const {
+  constexpr bool operator==(const Direction& other) const noexcept {
     return other.direction_ == direction_ && other.offset_ == offset_;
   }
 
-  constexpr Direction operator!() const {
+  constexpr Direction operator!() const noexcept {
     Direction opposite{*this};
     opposite.offset_ *= -1;
     opposite.direction_ = GetOppositeDirection();
     return opposite;
   }
 
-  constexpr int GetDirection() const { return direction_; }
-  constexpr int GetOppositeDirection() const { return kOpposite[direction_]; }
-  constexpr int GetAxis() const { return direction_ >> 1; }
-  constexpr bool IsPositive() const { return (direction_ & 1) == 0; }
-  constexpr bool IsNegative() const { return (direction_ & 1) == 1; }
-  constexpr operator int() const { return direction_; }
+  constexpr int GetDirection() const noexcept { return direction_; }
+  constexpr int GetOppositeDirection() const noexcept {
+    return kOpposite[direction_];
+  }
+  constexpr int GetAxis() const noexcept { return direction_ >> 1; }
+  constexpr bool IsPositive() const noexcept { return (direction_ & 1) == 0; }
+  constexpr bool IsNegative() const noexcept { return (direction_ & 1) == 1; }
+  constexpr operator int() const noexcept { return direction_; }
 
  private:
+  static constexpr int kOpposite[6] = {1, 0, 3, 2, 5, 4};
+
   PositionType offset_;
   uint8_t direction_;
-  static constexpr int kOpposite[6] = {1,0,3,2,5,4};
 };
 
 /*
@@ -80,10 +83,6 @@ class Directions {
   static constexpr Direction<PositionType> kDown{0, -1, 0, kDownDirection};
   static constexpr Direction<PositionType> kSouth{0, 0, 1, kSouthDirection};
   static constexpr Direction<PositionType> kNorth{0, 0, -1, kNorthDirection};
-
-  static constexpr int kXAxis = 0;
-  static constexpr int kYAxis = 1;
-  static constexpr int kZAxis = 2;
 
  private:
   static constexpr Direction<PositionType> kDirections[6]{

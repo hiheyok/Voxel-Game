@@ -4,7 +4,7 @@
 #include "Core/Typenames.h"
 
 class Player;
-class UserInputs;
+class InputManager;
 class ServerInterface;
 class ClientCache;
 class GameContext;
@@ -16,7 +16,7 @@ class WorldInteraction {
   explicit WorldInteraction(GameContext&);
   ~WorldInteraction();
 
-  void Interact(Player* player, const UserInputs& Inputs,
+  void Interact(Player* player, const InputManager& Inputs,
                 ServerInterface* interface, ClientCache* cache);
 
  private:

@@ -198,11 +198,12 @@
     <ClCompile Include="src\Level\Light\LightEngineCache.cpp" />
     <ClCompile Include="src\Level\Light\SkyLightEngine.cpp" />
     <ClCompile Include="src\Level\Light\ThreadedLightEngine.cpp" />
+    <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugMeshStressFace\DebugMeshStressFace.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugMeshStress\DebugMeshStress.cpp" />
     <ClCompile Include="src\Level\World\CollusionDetector.cpp" />
     <ClCompile Include="src\Level\Container\Region.cpp" />
     <ClCompile Include="src\Client\ClientPlay.cpp" />
-    <ClCompile Include="src\Client\IO\IO.cpp" />
+    <ClCompile Include="src\Client\Inputs\InputManager.cpp" />
     <ClCompile Include="src\Client\Player\MainPlayer.cpp" />
     <ClCompile Include="src\Client\Player\PlayerMovement.cpp" />
     <ClCompile Include="src\Client\Player\WorldInteraction.cpp" />
@@ -285,6 +286,7 @@
     <ClInclude Include="src\Level\Light\LightEngineStats.h" />
     <ClInclude Include="src\Level\Light\SkyLightEngine.h" />
     <ClInclude Include="src\Level\Light\ThreadedLightEngine.h" />
+    <ClInclude Include="src\Level\TerrainGeneration\Generators\DebugMeshStressFace\DebugMeshStressFace.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Generators\DebugMeshStress\DebugMeshStress.h" />
     <ClInclude Include="src\RenderEngine\BlockModel\BlockModelManager.h" />
     <ClInclude Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexFormat.h" />
@@ -337,8 +339,8 @@
     <ClInclude Include="src\Client\ClientLevel\ClientLevel.h" />
     <ClInclude Include="src\Client\ClientLevel\Entity\ClientEntities.h" />
     <ClInclude Include="src\Client\ClientPlay.h" />
-    <ClInclude Include="src\Client\IO\IO.h" />
-    <ClInclude Include="src\Client\IO\KEY_CODE.h" />
+    <ClInclude Include="src\Client\Inputs\InputManager.h" />
+    <ClInclude Include="src\Client\Inputs\InputCodes.h" />
     <ClInclude Include="src\Client\Player.h" />
     <ClInclude Include="src\Client\Player\PlayerMovement.h" />
     <ClInclude Include="src\Client\Player\WorldInteraction.h" />

@@ -29,12 +29,12 @@ Mesh::ChunkMeshData::ChunkMeshData(GameContext& game_context)
 Mesh::ChunkMeshData::~ChunkMeshData() = default;
 
 void Mesh::ChunkMeshData::Reset() {
-  if (vertices_buffer_.size() != kBufferStepSize) {
-    vertices_buffer_.resize(kBufferStepSize);
+  if (solid_vertices_buffer_.size() != kBufferStepSize) {
+    solid_vertices_buffer_.resize(kBufferStepSize);
   }
 
-  if (transparent_vertices_buffer_.size() != kBufferStepSize) {
-    transparent_vertices_buffer_.resize(kBufferStepSize);
+  if (trans_vertices_buffer_.size() != kBufferStepSize) {
+    trans_vertices_buffer_.resize(kBufferStepSize);
   }
 
   transparent_face_count_ = 0;
@@ -86,7 +86,7 @@ void Mesh::ChunkMeshData::GenerateCache() {
     int axis_v = (axis + 2) % 3;
 
     // Cache friendly access pattern for y-axis (faster)
-    if (side.GetAxis() == Directions<ChunkPos>::kYAxis) {
+    if (side.GetAxis() == kYAxis) {
       std::swap(axis_u, axis_v);
     }
 
@@ -144,8 +144,8 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
     int axis_u = (axis + 1) % 3;
     int axis_v = (axis + 2) % 3;
 
-    if (axis == Directions<BlockPos>::kYAxis) {  // More cache friendly access
-                                                 // pattern for y-axis
+    if (axis == kYAxis) {  // More cache friendly access
+                           // pattern for y-axis
       std::swap(axis_u, axis_v);
     }
 
@@ -312,8 +312,6 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const Cuboid& cube, int side,
                                         bool allow_ao, BlockPos pos, int u_size,
                                         int v_size,
                                         const BlockID* restrict cache_ptr) {
-  // size_t t0 = __rdtsc();
-
   //  First get some of the general data
   const int direction = side & 1;
   const int axis = side >> 1;
@@ -330,7 +328,7 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const Cuboid& cube, int side,
 
   auto CreateVertex = [&](BlockVertexFormat& v, const glm::vec3& tint_color,
                           const glm::ivec2& uv, float ao_multiplier,
-                          int sky_light, int block_light) {
+                          int sky_light, int block_light) { 
     glm::vec4 color(tint_color * ao_multiplier, 1.0f);
     // Assuming BlockVertexFormat::Set now takes a vec4 for color
     v.SetColor(static_cast<int>(color.r * 255), static_cast<int>(color.g * 255),
@@ -339,14 +337,14 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const Cuboid& cube, int side,
     v.SetLight(sky_light, block_light);
   };
 
-  if (axis == Directions<BlockPos>::kYAxis) {
+  if (axis == kYAxis) {
     std::swap(u_size, v_size);
   }
 
   bool is_trans = face.partially_transparent_pixel_;
 
   std::vector<BlockVertexFormat>& vertex_buffer =
-      is_trans ? transparent_vertices_buffer_ : vertices_buffer_;
+      is_trans ? trans_vertices_buffer_ : solid_vertices_buffer_;
 
   size_t& face_count = is_trans ? transparent_face_count_ : solid_face_count_;
 
@@ -381,7 +379,7 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const Cuboid& cube, int side,
   } else {
     base_slice += to[axis];
   }
-  
+
   v_00.pos_[axis] = base_slice;
   v_01.pos_[axis] = base_slice;
   v_10.pos_[axis] = base_slice;
@@ -451,10 +449,6 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const Cuboid& cube, int side,
       vertex_dst += 6;
     }
   }
-
-  // size_t t1 = __rdtsc();
-  // add_face_clock_ += t1 - t0;
-  // ++add_face_call_count_;
 }
 
 void Mesh::ChunkMeshData::GetAO(int side, const BlockID* restrict cache_ptr,

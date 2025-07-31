@@ -6,8 +6,7 @@
 #include <glm/vec3.hpp>
 
 #include "Client/ClientLevel/ClientCache.h"
-#include "Client/IO/IO.h"
-#include "Client/IO/KEY_CODE.h"
+#include "Client/Inputs/InputManager.h"
 #include "Core/GameContext/GameContext.h"
 #include "Core/Interfaces/ServerInterface.h"
 #include "Core/Networking/PlayerAction.h"
@@ -21,30 +20,30 @@ WorldInteraction::WorldInteraction(GameContext& game_context)
     : game_context_{game_context} {}
 WorldInteraction::~WorldInteraction() = default;
 
-void WorldInteraction::Interact(Player* player, const UserInputs& inputs,
+void WorldInteraction::Interact(Player* player, const InputManager& inputs,
                                 ServerInterface* interface,
                                 ClientCache* cache) {
   Ray ray;
   ray.origin_ = player->properties_.position_;
   ray.direction_ =
-      glm::dvec3(cos(player->properties_.rotation_.x * 0.0174533) *
-                     cos(player->properties_.rotation_.y * 0.0174533),
-                 sin(player->properties_.rotation_.y * 0.0174533),
-                 sin(player->properties_.rotation_.x * 0.0174533) *
-                     cos(player->properties_.rotation_.y * 0.0174533));
+      glm::dvec3(cos(player->properties_.rotation_.x * kDegToRad) *
+                     cos(player->properties_.rotation_.y * kDegToRad),
+                 sin(player->properties_.rotation_.y * kDegToRad),
+                 sin(player->properties_.rotation_.x * kDegToRad) *
+                     cos(player->properties_.rotation_.y * kDegToRad));
 
   BlockID block = player->entity_inventory_
                       .GetItem(player->entity_inventory_.right_hand_slot_)
                       .item_.GetBlock();
 
-  if (inputs.mouse_.right_ == inputs.mouse_.PRESS) {
+  if (inputs.CheckAction(InputAction::kUseItemPlaceBlock)) {
     PlaceBlock(ray, block, interface, cache);
   }
 
-  if (inputs.mouse_.left_ == inputs.mouse_.PRESS) {
+  if (inputs.CheckAction(InputAction::kAttackDestroy)) {
     BreakBlock(ray, interface, cache);
   }
-  if (inputs.mouse_.middle_ == inputs.mouse_.PRESS) {
+  if (inputs.CheckAction(InputAction::kPickBlock)) {
     BlockID newBlock = GetBlock(ray, cache);
     if (newBlock != game_context_.blocks_->AIR) {
       player->entity_inventory_.SetSlot(

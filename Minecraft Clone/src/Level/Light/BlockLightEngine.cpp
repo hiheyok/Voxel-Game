@@ -61,7 +61,7 @@ void BlockLightEngine::CheckNeighborChunk(ChunkPos center_chunk_pos) {
     int axis_u = (axis + 1) % 3;
     int axis_v = (axis + 2) % 3;
 
-    if (axis == Directions<ChunkPos>::kYAxis) {
+    if (axis == kYAxis) {
       std::swap(axis_u, axis_v);  // For better cache access pattern
     }
 

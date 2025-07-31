@@ -23,6 +23,8 @@ class GeneratorType {
       RegisterWorldGenerator(std::make_unique<DebugWorld>(game_context_));
   WorldGeneratorID DEBUG_MESH_STRESS =
       RegisterWorldGenerator(std::make_unique<DebugMeshStress>(game_context_));
+  WorldGeneratorID DEBUG_MESH_STRESS_FACE = RegisterWorldGenerator(
+      std::make_unique<DebugMeshStressFace>(game_context_));
   WorldGeneratorID DEBUG_2 =
       RegisterWorldGenerator(std::make_unique<DebugWorldSecond>(game_context_));
   WorldGeneratorID DEBUG_POSITIONING =

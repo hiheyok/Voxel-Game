@@ -135,9 +135,6 @@
     <ClCompile Include="src\Core\Options\Option.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Client\IO\IO.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\FileManager\Files.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -387,6 +384,12 @@
     <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugMeshStress\DebugMeshStress.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Client\Inputs\InputManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugMeshStressFace\DebugMeshStressFace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Level\Chunk\Chunk.h">
@@ -576,12 +579,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\Item\Items.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Client\IO\IO.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Client\IO\KEY_CODE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Client\Player\WorldInteraction.h">
@@ -945,6 +942,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Level\TerrainGeneration\Generators\DebugMeshStress\DebugMeshStress.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Client\Inputs\InputManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Client\Inputs\InputCodes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Level\TerrainGeneration\Generators\DebugMeshStressFace\DebugMeshStressFace.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

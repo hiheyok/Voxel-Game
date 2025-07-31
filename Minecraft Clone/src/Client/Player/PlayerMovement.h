@@ -3,18 +3,18 @@
 #pragma once
 
 class Player;
-class UserInputs;
+class InputManager;
 class ClientCache;
 
 class PlayerMovement {
  public:
-  void Update(Player* player, const UserInputs& inputs, ClientCache* world);
+  void Update(Player* player, const InputManager& inputs, ClientCache* world);
 
  private:
   float VelocityMovementCurve(float current, float max, float delta);
 
-  void RotatePlayer(Player* player, const UserInputs& inputs);
-  void MovePlayer(Player* player, const UserInputs& inputs,
+  void RotatePlayer(Player* player, const InputManager& inputs);
+  void MovePlayer(Player* player, const InputManager& inputs,
                   ClientCache* server);
   void MoveRelative(Player* player, float strafe, float up, float forward,
                     float friction);

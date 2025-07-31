@@ -2,14 +2,13 @@
 
 #include "Client/Client.h"
 
-#include <gl/glew.h>
 #include <GLFW/glfw3.h>
+#include <gl/glew.h>
 
 #include <chrono>
 #include <memory>
 
 #include "Client/ClientPlay.h"
-#include "Client/IO/KEY_CODE.h"
 #include "Core/GameContext/GameContext.h"
 #include "Core/Interfaces/InternalInterface.h"
 #include "Core/Networking/Packet.h"
@@ -58,8 +57,8 @@ void Client::InitializeServerCom() {
   // Joins the server it should start receiving stuff now
   server_->StartServer(settings);
   player_uuid_ = server_->SetInternalConnection(internal_interface_.get());
-  client_play_ =
-      std::make_unique<ClientPlay>(game_context_, internal_interface_.get(), this, profiler_);
+  client_play_ = std::make_unique<ClientPlay>(
+      game_context_, internal_interface_.get(), this, profiler_);
 }
 
 void Client::Initialize() {
@@ -68,7 +67,6 @@ void Client::Initialize() {
   InitializeServerCom();
 
   /// Initialize game rendering context
-
 }
 
 void Client::run() {
@@ -113,19 +111,19 @@ void Client::GameLoop() {
 void Client::Update() {
   PollInputs();
 
-  if (inputs_.CheckKey(KEY_F)) {
+  if (inputs_.CheckAction(InputAction::kDrawWireFrame)) {
     properties_.draw_solid_ = false;
   }
-  if (inputs_.CheckKey(KEY_G)) {
+  if (inputs_.CheckAction(InputAction::kDrawSolids)) {
     properties_.draw_solid_ = true;
   }
 
-  if (inputs_.CheckKeyPress(KEY_P)) {
+  if (inputs_.CheckAction(InputAction::kPrintProfiler)) {
     profiler_->LoadCache();
     profiler_->Print();
   }
 
-  if (inputs_.CheckKey(KEY_ESCAPE)) {
+  if (inputs_.CheckAction(InputAction::kExit)) {
     glfwSetWindowShouldClose(GetWindow(), true);
   }
 

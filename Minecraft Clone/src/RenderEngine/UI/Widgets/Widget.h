@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-class UserInputs;
+class InputManager;
 
 struct UIVertexFormat;
 
@@ -23,7 +23,7 @@ class Widget {
   void SetScale(double scale) noexcept;
   void SetProportion(double x_proportion, double y_proportion) noexcept;
   void InsertChildWidget(std::unique_ptr<Widget> widget);
-  virtual void Update(const UserInputs&) = 0;
+  virtual void Update(const InputManager&) = 0;
 
  protected:
   // Input is the parent values

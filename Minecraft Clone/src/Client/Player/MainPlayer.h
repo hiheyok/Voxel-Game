@@ -7,7 +7,7 @@
 class ClientCache;
 class ServerInterface;
 class WorldInteraction;
-class UserInputs;
+class InputManager;
 class PlayerMovement;
 class PlayerPOV;
 class Player;
@@ -24,7 +24,7 @@ class MainPlayer {
   MainPlayer(const MainPlayer&) = delete;
   ~MainPlayer();
 
-  void Update(const UserInputs& inputs);
+  void Update(const InputManager& inputs);
 
   EntityProperty GetEntityProperties();
 
@@ -41,7 +41,7 @@ class MainPlayer {
  private:
   static constexpr int kHotbarSlots = 9;
   void PrepareGUIs();
-  void InventoryUpdate(const UserInputs& inputs);
+  void InventoryUpdate(const InputManager& inputs);
 
   std::unique_ptr<PlayerMovement> movement_;
   std::unique_ptr<WorldInteraction> interactions_;
