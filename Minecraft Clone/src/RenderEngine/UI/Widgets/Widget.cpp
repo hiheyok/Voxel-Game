@@ -5,103 +5,152 @@
 #include <algorithm>
 #include <vector>
 
-#include "RenderEngine/UI/Data/UIVertexFormat.h"
+#include "RenderEngine/UI/Components/Component.h"
+#include "RenderEngine/UI/Data/UserInterfaceData.h"
+#include "RenderEngine/UI/UIRenderer.h"
 
-Widget::Widget() = default;
+Widget::Widget() : parent_{nullptr}, self_dirty_{true}, children_dirty_{true} {}
 Widget::~Widget() = default;
-Widget::Widget(Widget&&) noexcept = default;
-Widget& Widget::operator=(Widget&&) noexcept = default;
 
-std::vector<UIVertexFormat> Widget::GetVertices() const {
-  return GetVertices(0.0, 0.0, 1.0, 1.0);
+void Widget::SetPivot(float x, float y) noexcept {
+  pivot_.x = x;
+  pivot_.y = y;
 }
 
-void Widget::SetPosition(double x, double y) noexcept {
-  x_ = x;
-  y_ = y;
+void Widget::SetAnchorBoth(float x, float y) noexcept {
+  SetAnchorMax(x, y);
+  SetAnchorMin(x, y);
+}
+void Widget::SetAnchorMax(float x, float y) noexcept {
+  anchor_max_.x = x;
+  anchor_max_.y = y;
+}
+void Widget::SetAnchorMin(float x, float y) noexcept {
+  anchor_min_.x = x;
+  anchor_min_.y = y;
 }
 
-void Widget::SetScale(double scale) noexcept { scale_ = scale; }
-
-void Widget::SetProportion(double x_proportion, double y_proportion) noexcept {
-  aspect_ = y_proportion / x_proportion;
+void Widget::SetOffsetMax(float x, float y) noexcept {
+  offset_max_.x = x;
+  offset_max_.y = y;
 }
 
-void Widget::InsertChildWidget(std::unique_ptr<Widget> widget) {
-  child_widgets_.push_back(std::move(widget));
+void Widget::SetOffsetMin(float x, float y) noexcept {
+  offset_min_.x = x;
+  offset_min_.y = y;
 }
 
-std::vector<UIVertexFormat> Widget::GetVertices(double x, double y,
-                                                double parent_aspect,
-                                                double parent_scale) const {
-  // Calculate aspect ratios sizes
-
-  double aspect_scale =
-      std::min(aspect_ / parent_aspect, parent_aspect / aspect_);
-
-  double x_offset = x * parent_scale;
-  double y_offset = y * parent_scale * parent_aspect;
-  double new_scale = aspect_scale * parent_scale * scale_;
-
-  double x_new = x + x_offset;
-  double y_new = x + x_offset;
-
-  double x_vert_offset = parent_scale * scale_;
-  double y_vert_offset = new_scale;
-
-  UIVertexFormat v0, v1, v2, v3;
-  v0.x_ = x_new - x_vert_offset;
-  v1.x_ = x_new + x_vert_offset;
-  v2.x_ = x_new - x_vert_offset;
-  v3.x_ = x_new + x_vert_offset;
-
-  v0.y_ = y_new - y_vert_offset;
-  v1.y_ = y_new - y_vert_offset;
-  v2.y_ = y_new + y_vert_offset;
-  v3.y_ = y_new + y_vert_offset;
-
-  v0.use_texture_ = use_texture_;
-  v1.use_texture_ = use_texture_;
-  v2.use_texture_ = use_texture_;
-  v3.use_texture_ = use_texture_;
-
-  v0.uv_x_ = uv_x0_;
-  v0.uv_y_ = uv_y0_;
-  v1.uv_x_ = uv_x1_;
-  v1.uv_y_ = uv_y0_;
-  v2.uv_x_ = uv_x1_;
-  v2.uv_y_ = uv_y1_;
-  v3.uv_x_ = uv_x0_;
-  v3.uv_y_ = uv_y1_;
-
-  v0.r_ = r_;
-  v0.g_ = g_;
-  v0.b_ = b_;
-  v0.a_ = a_;
-
-  v1.r_ = r_;
-  v1.g_ = g_;
-  v1.b_ = b_;
-  v1.a_ = a_;
-
-  v2.r_ = r_;
-  v2.g_ = g_;
-  v2.b_ = b_;
-  v2.a_ = a_;
-
-  v3.r_ = r_;
-  v3.g_ = g_;
-  v3.b_ = b_;
-  v3.a_ = a_;
-
-  std::vector<UIVertexFormat> vertices = {v0, v1, v2, v3};
-
-  for (const auto& widget : child_widgets_) {
-    const auto& child_vertices =
-        widget->GetVertices(x_new, y_new, aspect_, new_scale);
-    vertices.insert(vertices.end(), child_vertices.begin(),
-                    child_vertices.end());
+void Widget::AddChildWidget(std::unique_ptr<Widget> widget) {
+  if (!widget) {  // guard against nullptr
+    return;
   }
 
-  return vertices;
+  widget->SetScreenManager(manager_);
+  widget->parent_ = this;
+  children_.push_back(std::move(widget));
+  SetDirty();
+}
+
+void Widget::AddComponent(std::unique_ptr<Component> component) {
+  if (!component) {
+    return;
+  }
+  components_.push_back(std::move(component));
+}
+
+void Widget::TryUpdateLayout(const UIRectangle& parent) {
+  // Skip if entire branch is not dirty
+  if (!self_dirty_ && !children_dirty_) {
+    return;
+  }
+
+  if (self_dirty_) {
+    glm::vec2 anchor_min_pos = parent.pos_ + anchor_min_ * parent.size_;
+    glm::vec2 anchor_max_pos = parent.pos_ + anchor_max_ * parent.size_;
+
+    screen_.pos_.x = anchor_min_pos.x + offset_min_.x;
+    screen_.pos_.y = anchor_min_pos.y + offset_min_.y;
+
+    screen_.size_.x = (anchor_max_pos.x + offset_max_.x) - screen_.pos_.x;
+    screen_.size_.y = (anchor_max_pos.y + offset_max_.y) - screen_.pos_.y;
+
+    // Pivot is now used to adjust the calculated position if the anchors are
+    // not stretching. (This part gets a bit more complex, but the principle
+    // holds)
+    if (anchor_min_ == anchor_max_) {
+      glm::vec2 pivot_offset = pivot_ * screen_.size_;
+      screen_.pos_ -= pivot_offset;
+    }
+  }
+
+  if (self_dirty_ || children_dirty_) {
+    for (auto& child : children_) {
+      child->TryUpdateLayout(screen_);
+    }
+  }
+
+  self_dirty_ = false;
+  children_dirty_ = false;
+}
+
+void Widget::SubmitToRenderer(UIRenderer& renderer) {
+  std::vector<UIVertexFormat> vertices;
+  std::vector<uint32_t> indices;
+
+  GetGeometry(vertices, indices);
+  renderer.Submit(vertices, indices);
+
+  for (auto& child : children_) {
+    child->SubmitToRenderer(renderer);
+  }
+}
+
+void Widget::AddCallback() {
+  // TODO(hiheyok): Implement later
+}
+
+void Widget::SetDirty() {
+  if (!self_dirty_) {
+    self_dirty_ = true;
+    SetChildDirty();
+  }
+}
+
+void Widget::SetChildDirty() {
+  children_dirty_ = true;
+  if (parent_) {
+    parent_->SetChildDirty();
+  }
+}
+
+void Widget::SetScreenManager(ScreenManager* manager) noexcept {
+  if (manager_ != manager) {
+    manager_ = manager;
+
+    for (auto& child : children_) {
+      child->SetScreenManager(manager);
+    }
+  }
+}
+
+void Widget::GetGeometry(std::vector<UIVertexFormat>& vertices,
+                         std::vector<uint32_t>& indices) {
+  std::vector<UIRectangle> primitives;
+
+  for (const auto& component : components_) {
+    component->GetRectangles(primitives);
+  }
+
+  // Resize rectangles to match with the screen bounds
+  glm::vec2 base_pos = screen_.pos_;
+  glm::vec2 base_size = screen_.size_;
+
+  for (auto& rect : primitives) {
+    rect.pos_ = base_pos + base_size * rect.pos_;
+    rect.size_ *= screen_.size_;
+  }
+
+  for (const auto& rect : primitives) {
+    rect.GetVertices(vertices, indices);
+  }
 }

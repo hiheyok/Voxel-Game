@@ -15,9 +15,14 @@ int main() {
   stbi_set_flip_vertically_on_load(true);
   srand(static_cast<uint32_t>(time(0)));  // Set rng seed
 
-  GameContext game_context;
-  game_context.InitializeGameContext();
-  Client GameClient{game_context};
-  GameClient.run();
+  try {
+    GameContext game_context;
+    game_context.InitializeGameContext();
+    Client GameClient{game_context};
+    GameClient.run();
+  } catch (std::exception& e) {
+    std::cerr << e.what() << '\n';
+  }
+
   return 0;
 }

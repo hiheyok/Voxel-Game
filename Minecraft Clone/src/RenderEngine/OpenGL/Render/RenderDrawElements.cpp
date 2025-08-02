@@ -2,7 +2,9 @@
 
 #include "RenderEngine/OpenGL/Render/RenderDrawElements.h"
 
+#include "Core/GameContext/GameContext.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
+#include "Utils/LogUtils.h"
 
 RenderDrawElements::RenderDrawElements(GameContext& game_context,
                                        uint32_t draw_type)

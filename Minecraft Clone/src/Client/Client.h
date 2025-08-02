@@ -15,6 +15,7 @@ class InternalInterface;
 class ClientLevel;
 class Server;
 class GameContext;
+class UIManager;
 
 class Client : public Window {
  public:
@@ -39,5 +40,6 @@ class Client : public Window {
   std::unique_ptr<Server> server_;
   std::unique_ptr<TextRenderer> text_render_;
   std::unique_ptr<InternalInterface> internal_interface_;
+  std::unique_ptr<UIManager> ui_manager_;
   PerformanceProfiler* profiler_;
 };

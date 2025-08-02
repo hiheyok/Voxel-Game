@@ -28,7 +28,7 @@ class RenderDrawElements : public RenderObject {
  private:
   uint32_t draw_type_ = 0;
   GLenum indices_type_ = 0;
-  size_t indices_count_ = 0;
+  size_t indices_count_ = 0;  // Default indices count to size of input
   size_t indices_offset_ = 0;
   Buffer vbo_, ebo_;
 };
@@ -49,4 +49,5 @@ void RenderDrawElements::SetData(const std::vector<VertexType>& vertices,
   ebo_.Unbind();
 
   indices_type_ = GetDataType<ElementType>();
+  SetIndicesCount(elements.size());
 }

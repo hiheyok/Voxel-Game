@@ -14,7 +14,9 @@ void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, uint32_t id,
                                     GLenum severity, GLsizei length,
                                     const char* message,
                                     const void* userParam) {
-  LogUtils* logger = static_cast<LogUtils*>(const_cast<void*>(userParam));
+  Window* window = static_cast<Window*>(const_cast<void*>(userParam));
+  LogUtils* logger = window->game_context_.logger_.get();
+
   std::stringstream str;
 
   if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
@@ -168,8 +170,7 @@ Window::Window(GameContext& game_context) : game_context_{game_context} {
 
   glEnable(GL_DEBUG_OUTPUT);
   glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-  glDebugMessageCallback(glDebugOutput,
-                         static_cast<const void*>(&game_context_.logger_));
+  glDebugMessageCallback(glDebugOutput, static_cast<const void*>(this));
   glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr,
                         GL_TRUE);
 

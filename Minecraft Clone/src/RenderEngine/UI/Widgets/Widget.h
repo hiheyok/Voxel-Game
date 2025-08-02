@@ -5,47 +5,69 @@
 #include <memory>
 #include <vector>
 
-class InputManager;
+#include "Client/Inputs/InputEvent.h"
+#include "RenderEngine/UI/Data/UserInterfaceData.h"
 
-struct UIVertexFormat;
+class InputManager;
+class Component;
+class ScreenManager;
+class UIRenderer;
+
+struct UIRectangle;
 
 class Widget {
  public:
   Widget();
   virtual ~Widget();
+
   Widget(const Widget&) = delete;
   Widget& operator=(const Widget&) = delete;
-  Widget(Widget&&) noexcept;
-  Widget& operator=(Widget&&) noexcept;
+  Widget(Widget&&) noexcept = default;
+  Widget& operator=(Widget&&) noexcept = default;
 
-  std::vector<UIVertexFormat> GetVertices() const;
-  void SetPosition(double x, double y) noexcept;
-  void SetScale(double scale) noexcept;
-  void SetProportion(double x_proportion, double y_proportion) noexcept;
-  void InsertChildWidget(std::unique_ptr<Widget> widget);
-  virtual void Update(const InputManager&) = 0;
+  // Properties setter
+  void SetPivot(float x, float y) noexcept;
+  void SetAnchorBoth(float x, float y) noexcept;
+  void SetAnchorMax(float x, float y) noexcept;
+  void SetAnchorMin(float x, float y) noexcept;
+  void SetOffsetMax(float x, float y) noexcept;
+  void SetOffsetMin(float x, float y) noexcept;
+
+  void AddChildWidget(std::unique_ptr<Widget> widget);
+  void AddComponent(std::unique_ptr<Component> component);
+  void TryUpdateLayout(const UIRectangle& parent);
+
+
+  void SubmitToRenderer(UIRenderer& renderer);
+  bool OnEvent(const InputManager&);
+  void AddCallback();
+
+  void SetDirty();
 
  protected:
-  // Input is the parent values
-  virtual std::vector<UIVertexFormat> GetVertices(double x, double y,
-                                                  double parent_aspect,
-                                                  double parent_scale) const;
-
-  // Using the proportions, it will first scale up until it fits within the
-  // proportions of the parent widget. Then, it will be scaled using the scale
-  // factor
-
-  double aspect_ = 1.0;       // This is the proportions x_size / y_size
-  double scale_ = 1.0;        // This is the size relative to the parent widget
-  double x_ = 0.0, y_ = 0.0;  // Relative to the parent widget
-
-  // Widget properties
-  int texture_id_ = 0;
-  bool use_texture_ = false;
-  float uv_x0_ = 0.0, uv_y0_ = 0.0;
-  float uv_x1_ = 0.0, uv_y1_ = 0.0;
-  float r_ = 1.0, g_ = 1.0, b_ = 1.0, a_ = 1.0;
+  // --- Layout Properties (set by the user) ---
+  glm::vec2 anchor_min_ = {0.5f, 0.5f};
+  glm::vec2 anchor_max_ = {0.5f, 0.5f};
+  glm::vec2 pivot_ = {0.5f, 0.5f};
+  // ------------
+  glm::vec2 offset_min_ = {0.0f, 0.0f};  // Often called "position"
+  glm::vec2 offset_max_ = {0.0f, 0.0f};  // Often called "size"
 
  private:
-  std::vector<std::unique_ptr<Widget>> child_widgets_;
+  friend class Screen;
+
+  void SetChildDirty();
+  void SetScreenManager(ScreenManager* manager) noexcept;
+  void GetGeometry(std::vector<UIVertexFormat>& vertices,
+                   std::vector<uint32_t>& indices);
+
+  UIRectangle screen_;
+
+  ScreenManager* manager_;
+  Widget* parent_;
+
+  std::vector<std::unique_ptr<Component>> components_;
+  std::vector<std::unique_ptr<Widget>> children_;
+
+  bool self_dirty_, children_dirty_;
 };

@@ -28,6 +28,7 @@
 #include "RenderEngine/EntityRender/MultiEntityRender.h"
 #include "RenderEngine/GUI/TextRenderer.h"
 #include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
+#include "RenderEngine/UI/UIManager.h"
 #include "Server/Server.h"
 #include "Utils/Clock.h"
 #include "Utils/LogUtils.h"
@@ -65,6 +66,9 @@ void Client::Initialize() {
   game_context_.InitializeRenderingContext();
   DisableCursor();
   InitializeServerCom();
+  ui_manager_ = std::make_unique<UIManager>(game_context_);
+  ui_manager_->Initialize();
+  ui_manager_->PushScreen("debug_screen");
 
   /// Initialize game rendering context
 }
@@ -80,6 +84,7 @@ void Client::Cleanup() { server_->Stop(); }
 void Client::Render() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   client_play_->Render(this);
+  // ui_manager_->Render();
 }
 
 void Client::GameLoop() {
