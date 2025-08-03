@@ -183,6 +183,8 @@
     <ClCompile Include="src\Client\ClientLevel\ClientCache.cpp" />
     <ClCompile Include="src\Client\ClientLevel\ClientLevel.cpp" />
     <ClCompile Include="src\Client\ClientLevel\Entity\ClientEntities.cpp" />
+    <ClCompile Include="src\Client\Inputs\KeysInputs.cpp" />
+    <ClCompile Include="src\Client\Inputs\MouseInputs.cpp" />
     <ClCompile Include="src\Core\GameContext\GameContext.cpp" />
     <ClCompile Include="src\Core\Position\PositionTypes.cpp" />
     <ClCompile Include="src\Level\Block\Type\AirBlock.cpp" />
@@ -278,6 +280,8 @@
     <ClCompile Include="src\RenderEngine\EntityRender\Models\EntityModels.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRender\MultiEntityRender.cpp" />
     <ClInclude Include="src\Client\Inputs\InputEvent.h" />
+    <ClInclude Include="src\Client\Inputs\KeysInputs.h" />
+    <ClInclude Include="src\Client\Inputs\MouseInputs.h" />
     <ClInclude Include="src\Core\DataStructure\AtomicNibbleArray.h" />
     <ClInclude Include="src\Core\DataStructure\blockingconcurrentqueue.h" />
     <ClInclude Include="src\Core\DataStructure\concurrentqueue.h" />

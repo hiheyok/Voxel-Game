@@ -1,31 +1,29 @@
 #pragma once
 
-enum class InputEventType {
-  kMouseMove,
-  kMouseButtonDown,
-  kMouseButtonUp,
-  kMouseClick,
-  kKeyDown
-};
+#include <glm/vec2.hpp>
+#include <variant>
 
 struct InputEvent {};
 
 struct MouseMove : InputEvent {
-
+  glm::vec2 new_pos_;
+  glm::vec2 displacemnent_;
 };
 
-struct MouseButtonDown : InputEvent {
+struct MouseButtonHold : InputEvent {};
 
-};
+struct MouseButtonRelease : InputEvent {};
 
-struct MouseButtonUp : InputEvent {
+struct MouseButtonPress : InputEvent {};
 
-};
+struct MouseScroll : InputEvent {};
 
-struct MouseClick : InputEvent {
+struct KeyHold : InputEvent {};
 
-};
+struct KeyPress : InputEvent {};
 
-struct kKeyDown : InputEvent {
+struct KeyRelease : InputEvent {};
 
-};
+using InputEventType = std::variant<MouseMove, MouseButtonHold,
+                                    MouseButtonPress, MouseButtonRelease,
+                                    KeyHold, KeyPress, KeyRelease, MouseScroll>;

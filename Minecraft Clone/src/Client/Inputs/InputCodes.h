@@ -1,6 +1,7 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
 #pragma once
+
 inline constexpr uint16_t KEY_SPACE = 32;
 inline constexpr uint16_t KEY_APOSTROPHE = 39; /* ' */
 inline constexpr uint16_t KEY_COMMA = 44;      /* , */

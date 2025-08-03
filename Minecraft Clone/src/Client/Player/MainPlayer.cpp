@@ -124,14 +124,14 @@ void MainPlayer::SetPlayerPosition(float x, float y, float z) {
 
 void MainPlayer::InventoryUpdate(const InputManager& inputs) {
   int Direction = 0;
-  switch (inputs.mouse_.scroll_direction_) {
-    case MouseInputs::ScrollState::SCROLL_DOWN:
+  switch (inputs.GetScrollState()) {
+    case MouseInputs::ScrollState::kDown:
       Direction = 1;
       break;
-    case MouseInputs::ScrollState::SCROLL_UP:
+    case MouseInputs::ScrollState::kUp:
       Direction = -1;
       break;
-    case MouseInputs::ScrollState::SCROLL_NONE:
+    case MouseInputs::ScrollState::kNone:
       break;
   }
 

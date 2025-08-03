@@ -2,150 +2,123 @@
 
 #include "Client/Inputs/InputManager.h"
 
-#include <gl/glew.h>
+#include <glfw/glfw3.h>
 
 #include "Client/Inputs/InputCodes.h"
 
-void InputManager::UpdateAllKey() {
-  for (const auto& key : keys_) {
-    keys_[key.first] = KeyStatus::HOLD;
-  }
-
-  mouse_.scroll_direction_ = MouseInputs::ScrollState::SCROLL_NONE;
-
-  mouse_.displacement_ = glm::dvec2(0.0, 0.0);
-
-  if (mouse_.left_ == MouseInputs::ButtonState::PRESS) {
-    mouse_.left_ = MouseInputs::ButtonState::HOLD;
-  }
-
-  if (mouse_.right_ == MouseInputs::ButtonState::PRESS) {
-    mouse_.right_ = MouseInputs::ButtonState::HOLD;
-  }
-
-  if (mouse_.middle_ == MouseInputs::ButtonState::PRESS) {
-    mouse_.middle_ = MouseInputs::ButtonState::HOLD;
-  }
+void InputManager::UpdateAllKey() noexcept {
+  keyboard_.Refresh();
+  mouse_.Refresh();
 }
 
-void InputManager::PressIndividualKey(int key) {
-  if (keys_.count(key)) {
-    keys_[key] = KeyStatus::PRESS;
-  } else {
-    keys_[key] = KeyStatus::PRESS;
-  }
-}
-
-void InputManager::ReleaseIndividualKey(int key) {
-  if (keys_.count(key)) {
-    keys_.erase(key);
-  }
-}
-
-bool InputManager::CheckKey(int key) const {
-  if (keys_.count(key)) {
-    return true;
-  }
-  return false;
-}
-
-bool InputManager::CheckKeyPress(int key) const {
-  if (!CheckKey(key)) {
-    return false;
-  }
-  auto it = keys_.find(key);
-  return it->second == KeyStatus::HOLD;
-}
-
-bool InputManager::CheckKeyHold(int key) const {
-  if (!CheckKey(key)) {
-    return false;
-  }
-  auto it = keys_.find(key);
-  return it->second == KeyStatus::HOLD;
-}
-
-bool InputManager::CheckAction(InputAction action) const {
+bool InputManager::CheckAction(InputAction action) const noexcept {
   // TODO(hiheyok): Use a json file later to map these
   switch (action) {
     case InputAction::kDrawWireFrame: {
-      return CheckKey(KEY_F);
+      return keyboard_.CheckKey(KEY_F);
     }
     case InputAction::kDrawSolids: {
-      return CheckKey(KEY_G);
+      return keyboard_.CheckKey(KEY_G);
     }
     case InputAction::kWalkForwards: {
-      return CheckKey(KEY_W);
+      return keyboard_.CheckKey(KEY_W);
     }
     case InputAction::kWalkBackwards: {
-      return CheckKey(KEY_S);
+      return keyboard_.CheckKey(KEY_S);
     }
     case InputAction::kStrafeLeft: {
-      return CheckKey(KEY_A);
+      return keyboard_.CheckKey(KEY_A);
     }
     case InputAction::kStrafeRight: {
-      return CheckKey(KEY_D);
+      return keyboard_.CheckKey(KEY_D);
     }
     case InputAction::kSprint: {
-      return CheckKey(KEY_LEFT_CONTROL);
+      return keyboard_.CheckKey(KEY_LEFT_CONTROL);
     }
     case InputAction::kJump: {
-      return CheckKeyPress(KEY_SPACE);
+      return keyboard_.CheckKeyPress(KEY_SPACE);
     }
     case InputAction::kMoveUp: {
-      return CheckKey(KEY_SPACE);
+      return keyboard_.CheckKey(KEY_SPACE);
     }
     case InputAction::kMoveDown: {
-      return CheckKey(KEY_LEFT_SHIFT);
+      return keyboard_.CheckKey(KEY_LEFT_SHIFT);
     }
     case InputAction::kAttackDestroy: {
-      return mouse_.left_ == MouseInputs::ButtonState::PRESS;
+      return mouse_.CheckButtonPress(MouseInputs::ButtonType::kLeft);
     }
     case InputAction::kPickBlock: {
-      return mouse_.middle_ == MouseInputs::ButtonState::PRESS;
+      return mouse_.CheckButtonPress(MouseInputs::ButtonType::kMiddle);
     }
     case InputAction::kUseItemPlaceBlock: {
-      return mouse_.right_ == MouseInputs::ButtonState::PRESS;
+      return mouse_.CheckButtonPress(MouseInputs::ButtonType::kRight);
     }
     case InputAction::kPrintProfiler: {
-      return CheckKeyPress(KEY_P);
+      return keyboard_.CheckKeyPress(KEY_P);
     }
     case InputAction::kExit: {
-      return CheckKey(KEY_ESCAPE);
+      return keyboard_.CheckKey(KEY_ESCAPE);
     }
     case InputAction::kHotbarSlot1: {
-      return CheckKeyPress(KEY_1);
+      return keyboard_.CheckKeyPress(KEY_1);
     }
     case InputAction::kHotbarSlot2: {
-      return CheckKeyPress(KEY_2);
+      return keyboard_.CheckKeyPress(KEY_2);
     }
     case InputAction::kHotbarSlot3: {
-      return CheckKeyPress(KEY_3);
+      return keyboard_.CheckKeyPress(KEY_3);
     }
     case InputAction::kHotbarSlot4: {
-      return CheckKeyPress(KEY_4);
+      return keyboard_.CheckKeyPress(KEY_4);
     }
     case InputAction::kHotbarSlot5: {
-      return CheckKeyPress(KEY_5);
+      return keyboard_.CheckKeyPress(KEY_5);
     }
     case InputAction::kHotbarSlot6: {
-      return CheckKeyPress(KEY_6);
+      return keyboard_.CheckKeyPress(KEY_6);
     }
     case InputAction::kHotbarSlot7: {
-      return CheckKeyPress(KEY_7);
+      return keyboard_.CheckKeyPress(KEY_7);
     }
     case InputAction::kHotbarSlot8: {
-      return CheckKeyPress(KEY_8);
+      return keyboard_.CheckKeyPress(KEY_8);
     }
     case InputAction::kHotbarSlot9: {
-      return CheckKeyPress(KEY_9);
+      return keyboard_.CheckKeyPress(KEY_9);
     }
     case InputAction::kReload: {
-      return CheckKeyPress(KEY_R);
+      return keyboard_.CheckKeyPress(KEY_R);
     }
     case InputAction::kToggleCollusion: {
-      return CheckKeyPress(KEY_C);
+      return keyboard_.CheckKeyPress(KEY_C);
     }
-    }
+  }
   return false;
+}
+
+glm::vec2 InputManager::GetMouseDisplacement() const noexcept {
+  return mouse_.GetDisplacement();
+}
+
+glm::vec2 InputManager::GetMousePos() const noexcept { return mouse_.GetPos(); }
+
+MouseInputs::ScrollState InputManager::GetScrollState() const noexcept {
+  return mouse_.GetScrollState();
+}
+
+void InputManager::UpdateScroll(float x_offset, float y_offset) noexcept {
+  mouse_.UpdateScroll(x_offset, y_offset);
+}
+
+void InputManager::UpdateMouse(float x_pos, float y_pos) noexcept {
+  mouse_.UpdateMouse(x_pos, y_pos);
+}
+
+void InputManager::UpdateButton(int button, int action) noexcept {
+  mouse_.UpdateButton(button, action);
+}
+
+void InputManager::UpdateKeys(int key, int scancode, int action,
+                              int mods) noexcept {
+  keyboard_.UpdateKeys(key, scancode, action, mods);
 }

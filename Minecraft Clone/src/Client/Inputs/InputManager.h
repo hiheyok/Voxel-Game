@@ -4,6 +4,8 @@
 
 #include <glm/vec2.hpp>
 
+#include "Client/Inputs/MouseInputs.h"
+#include "Client/Inputs/KeysInputs.h"
 #include "Core/Typenames.h"
 
 enum class InputAction {
@@ -35,37 +37,27 @@ enum class InputAction {
   kExit
 };
 
-struct MouseInputs {
-  enum class ButtonState { RELEASE, PRESS, HOLD };
-  enum class ScrollState { SCROLL_NONE, SCROLL_DOWN, SCROLL_UP };
-
-  ButtonState left_ = ButtonState::RELEASE;
-  ButtonState middle_ = ButtonState::RELEASE;
-  ButtonState right_ = ButtonState::RELEASE;
-
-  ScrollState scroll_direction_ = ScrollState::SCROLL_NONE;
-
-  glm::dvec2 displacement_ = glm::dvec2(0.f, 0.f);
-  glm::dvec2 position_ = glm::dvec2(0.f, 0.f);
-};
-
 class InputManager {
  public:
-  void UpdateAllKey();
-  void PressIndividualKey(int key);
-  void ReleaseIndividualKey(int key);
+  void UpdateAllKey() noexcept;
+  bool CheckAction(InputAction action) const noexcept;
 
-  bool CheckKey(int key) const;
-  bool CheckKeyPress(int key) const;
-  bool CheckKeyHold(int key) const;
-  bool CheckAction(InputAction action) const;
+  // Getters for mouse data
+  glm::vec2 GetMouseDisplacement() const noexcept;
+  glm::vec2 GetMousePos() const noexcept;
 
-  MouseInputs mouse_;
+  MouseInputs::ScrollState GetScrollState() const noexcept;
 
   float delta_ = 0.f;
 
  private:
-  enum class KeyStatus { PRESS, HOLD };
+  friend class Window;
 
-  FastHashMap<int, KeyStatus> keys_;
+  void UpdateScroll(float x_offset, float y_offset) noexcept;
+  void UpdateMouse(float x_pos, float y_pos) noexcept;
+  void UpdateButton(int button, int action) noexcept;
+  void UpdateKeys(int key, int scancode, int action, int mods) noexcept;
+
+  KeysInputs keyboard_;
+  MouseInputs mouse_;
 };

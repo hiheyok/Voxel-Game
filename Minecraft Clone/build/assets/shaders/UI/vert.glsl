@@ -6,6 +6,10 @@ out vec4 out_rgb;
 
 void main()
 {
-    gl_Position = vec4(in_pos, 0.0f, 1.0f); 
+    // Transform it form [0, 1] to [-1, 1]
+
+    vec2 pos = in_pos * 2 - 1;
+
+    gl_Position = vec4(pos, 0.0f, 1.0f); 
     out_rgb = in_rgb;
 } 

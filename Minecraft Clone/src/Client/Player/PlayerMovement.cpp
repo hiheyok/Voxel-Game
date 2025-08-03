@@ -35,13 +35,11 @@ float PlayerMovement::VelocityMovementCurve(float current, float max,
   return max - expf(-x);
 }
 
-void PlayerMovement::RotatePlayer(Player* player, const InputManager& Inputs) {
-  float CamSensitivity = 0.1f;
+void PlayerMovement::RotatePlayer(Player* player, const InputManager& inputs) {
+  static constexpr float kCamSens = 0.1f;
 
-  player->properties_.rotation_.x +=
-      static_cast<float>(Inputs.mouse_.displacement_.x * CamSensitivity);
-  player->properties_.rotation_.y -=
-      static_cast<float>(Inputs.mouse_.displacement_.y * CamSensitivity);
+  player->properties_.rotation_ +=
+      inputs.GetMouseDisplacement() * glm::vec2(1.0f, -1.0f) * kCamSens;
 
   if (player->properties_.rotation_.y > 89.9999f)
     player->properties_.rotation_.y = 89.9999f;
@@ -154,5 +152,4 @@ void PlayerMovement::MovePlayer(Player* player, const InputManager& inputs,
       player->properties_.velocity_ * inputs.delta_ / 2.f;
   player->properties_.velocity_ =
       player->properties_.velocity_ * powf(3.f / 25.f, inputs.delta_);
-
 }

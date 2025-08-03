@@ -119,7 +119,7 @@ Window::Window(GameContext& game_context) : game_context_{game_context} {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   window_ = glfwCreateWindow(properties_.window_size_x_,
-                             properties_.window_size_y_, "1.2.0A (DEV)", 0, 0);
+                             properties_.window_size_y_, "1.3.0A (DEV)", 0, 0);
 
   glfwMakeContextCurrent(window_);
 
@@ -181,10 +181,8 @@ Window::Window(GameContext& game_context) : game_context_{game_context} {
 }
 Window::~Window() { glfwDestroyWindow(GetWindow()); }
 
-void Window::MousePositionCallback(double xpos, double ypos) {
-  inputs_.mouse_.displacement_ =
-      glm::dvec2(xpos, ypos) - inputs_.mouse_.position_;
-  inputs_.mouse_.position_ = glm::dvec2(xpos, ypos);
+void Window::MousePositionCallback(double x_pos, double y_pos) {
+  inputs_.UpdateMouse(static_cast<float>(x_pos), static_cast<float>(y_pos));
 }
 
 void Window::UpdateWindowName(std::string name) {
@@ -206,17 +204,8 @@ void Window::ResizeWindowCallback(int x, int y) {
       " Resized Window: " + std::to_string(x) + ", " + std::to_string(y));
 }
 
-void Window::ScrollCallback(GLFWwindow* win, double xOffset, double yOffset) {
-  if (yOffset == -1.0) {
-    inputs_.mouse_.scroll_direction_ = MouseInputs::ScrollState::SCROLL_DOWN;
-    return;
-  }
-
-  if (yOffset == 1.0) {
-    inputs_.mouse_.scroll_direction_ = MouseInputs::ScrollState::SCROLL_UP;
-    return;
-  }
-  (void)xOffset;
+void Window::ScrollCallback(GLFWwindow* win, double x_offset, double y_offset) {
+  inputs_.UpdateScroll(x_offset, y_offset);
   (void)win;
 }
 
@@ -238,54 +227,9 @@ void Window::EnableCursor() {
 
 void Window::KeyboardCallback(GLFWwindow* window, int key, int scancode,
                               int action, int mods) {
-  if (action == GLFW_RELEASE) {
-    inputs_.ReleaseIndividualKey(key);
-    return;
-  }
-
-  if ((action == GLFW_REPEAT) || (action == GLFW_PRESS)) {  // prob irrelevant
-    inputs_.PressIndividualKey(key);
-  }
+  inputs_.UpdateKeys(key, scancode, action, mods);
 }
 
 void Window::MouseButtonCallback(int button, int action) {
-  MouseInputs::ButtonState state = MouseInputs::ButtonState::RELEASE;
-  MouseInputs::ButtonState hold_state = MouseInputs::ButtonState::HOLD;
-
-  if (action == GLFW_PRESS) {
-    state = MouseInputs::ButtonState::PRESS;
-  } else {
-    hold_state = state;
-  }
-
-  switch (button) {
-    case GLFW_MOUSE_BUTTON_RIGHT: {
-      if (inputs_.mouse_.right_ == state) {
-        inputs_.mouse_.right_ = hold_state;
-      } else {
-        inputs_.mouse_.right_ = state;
-      }
-      break;
-    }
-    case GLFW_MOUSE_BUTTON_LEFT: {
-      if (inputs_.mouse_.left_ == state) {
-        inputs_.mouse_.left_ = hold_state;
-      } else {
-        inputs_.mouse_.left_ = state;
-      }
-      break;
-    }
-    case GLFW_MOUSE_BUTTON_MIDDLE: {
-      if (inputs_.mouse_.middle_ == state) {
-        inputs_.mouse_.middle_ = hold_state;
-      } else {
-        inputs_.mouse_.middle_ = state;
-      }
-      break;
-    }
-    default: {
-      // TODO(hiheyok): Not handled yet; add more mouse button support later.
-      // https://www.glfw.org/docs/3.3/group__buttons.html
-    }
-  }
+  inputs_.UpdateButton(button, action);
 }
