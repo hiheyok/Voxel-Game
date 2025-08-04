@@ -4,11 +4,13 @@
 void UIRectangle::GetVertices(std::vector<UIVertexFormat>& vertices,
                               std::vector<uint32_t>& indices) const {
   uint32_t index_offset = vertices.size();
+
   UIVertexFormat v_base;
   v_base.r_ = rgba_.r;
   v_base.g_ = rgba_.g;
   v_base.b_ = rgba_.b;
   v_base.a_ = rgba_.a;
+  
   UIVertexFormat v00 = v_base, v01 = v_base, v10 = v_base, v11 = v_base;
   v00.x_ = pos_.x;
   v00.y_ = pos_.y;

@@ -66,7 +66,7 @@ void Client::Initialize() {
   game_context_.InitializeRenderingContext();
   DisableCursor();
   InitializeServerCom();
-  ui_manager_ = std::make_unique<UIManager>(game_context_);
+  ui_manager_ = std::make_unique<UIManager>(game_context_, inputs_);
   ui_manager_->Initialize();
   ui_manager_->PushScreen("debug_screen");
 

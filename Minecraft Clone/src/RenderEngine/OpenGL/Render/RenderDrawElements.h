@@ -49,5 +49,4 @@ void RenderDrawElements::SetData(const std::vector<VertexType>& vertices,
   ebo_.Unbind();
 
   indices_type_ = GetDataType<ElementType>();
-  SetIndicesCount(elements.size());
 }

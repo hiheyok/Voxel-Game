@@ -13,9 +13,7 @@ void Screen::SetVirtualResolution(glm::ivec2 v_res) { v_res_ = v_res; }
 void Screen::HandleEvent() {
   // Implement later
 }
-void Screen::Update() {
-  // Implement later
-}
+void Screen::Update(const std::vector<InputEvent>& events) {}
 
 void Screen::SubmitToRenderer(UIRenderer& renderer) {
   assert(root_widget_);

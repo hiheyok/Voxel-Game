@@ -65,21 +65,22 @@ void Widget::TryUpdateLayout(const UIRectangle& parent) {
   }
 
   if (self_dirty_) {
-    glm::vec2 anchor_min_pos = parent.pos_ + anchor_min_ * parent.size_;
-    glm::vec2 anchor_max_pos = parent.pos_ + anchor_max_ * parent.size_;
-
-    screen_.pos_.x = anchor_min_pos.x + offset_min_.x;
-    screen_.pos_.y = anchor_min_pos.y + offset_min_.y;
-
-    screen_.size_.x = (anchor_max_pos.x + offset_max_.x) - screen_.pos_.x;
-    screen_.size_.y = (anchor_max_pos.y + offset_max_.y) - screen_.pos_.y;
-
-    // Pivot is now used to adjust the calculated position if the anchors are
-    // not stretching. (This part gets a bit more complex, but the principle
-    // holds)
-    if (anchor_min_ == anchor_max_) {
-      glm::vec2 pivot_offset = pivot_ * screen_.size_;
-      screen_.pos_ -= pivot_offset;
+    if (anchor_max_ == anchor_min_) {
+      glm::vec2 relative_size = offset_max_ - offset_min_;
+      glm::vec2 absolute_size = parent.size_ * relative_size;
+      glm::vec2 anchor_pos = parent.pos_ + anchor_min_ * parent.size_;
+      glm::vec2 pivot_offset = pivot_ * absolute_size;
+      screen_.pos_ = anchor_pos - pivot_offset + offset_min_;
+      screen_.size_ = absolute_size;
+    } else {
+      glm::vec2 anchor_min_pos = parent.pos_ + anchor_min_ * parent.size_;
+      glm::vec2 anchor_max_pos = parent.pos_ + anchor_max_ * parent.size_;
+    
+      glm::vec2 offset_min_pos = anchor_min_pos + offset_min_ * parent.size_;
+      glm::vec2 offset_max_pos = anchor_min_pos - offset_max_ * parent.size_;
+    
+      screen_.size_ = offset_max_ - offset_min_;
+      screen_.pos_ = offset_min_pos;
     }
   }
 

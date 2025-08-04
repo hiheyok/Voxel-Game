@@ -18,7 +18,7 @@ class MouseInputs {
   static_assert(GLFW_MOUSE_BUTTON_LAST == 7);
 
  public:
-  enum class ButtonState { kRelease, kPress, kHold };
+  enum class ButtonState { kRelease, kPress, kHold, kNone };
   enum class ScrollState { kNone, kDown, kUp };
   enum class ButtonType : uint8_t {
     kLeft = GLFW_MOUSE_BUTTON_LEFT,
@@ -49,7 +49,9 @@ class MouseInputs {
 
   ScrollState GetScrollState() const noexcept;
 
-  private:
+ private:
+  friend class InputManager;
+
   // 8 unique buttons
   static constexpr size_t kButtonAmount = 8;
 

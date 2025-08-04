@@ -3,6 +3,7 @@
 #include <memory>
 #include <stack>
 
+#include "Client/Inputs/InputEvent.h"
 #include "RenderEngine/UI/ScreenRegistry.h"
 #include "RenderEngine/UI/Screens/Screen.h"
 
@@ -20,7 +21,7 @@ class ScreenManager {
   template <typename... Args>
   void SwitchScreen(const std::string& name, Args&&... args);
   void PopScreen();
-  void Update();
+  void Update(const std::vector<InputEvent>& events);
   void SubmitToRenderer(UIRenderer&);
 
  private:

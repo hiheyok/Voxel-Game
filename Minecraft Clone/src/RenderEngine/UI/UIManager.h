@@ -8,10 +8,11 @@ class UIRenderer;
 class ScreenRegistry;
 class ScreenManager;
 class GameContext;
+class InputManager;
 
 class UIManager {
  public:
-  explicit UIManager(GameContext&);
+  UIManager(GameContext&, InputManager& input_mgr);
   ~UIManager();
 
   // Populate the screen registry
@@ -28,8 +29,11 @@ class UIManager {
 
   void Render();
 
+  void Update();
+
  private:
   GameContext& game_context_;
+  InputManager& input_mgr_;
 
   std::unique_ptr<UIRenderer> renderer_;
   std::unique_ptr<ScreenRegistry> screen_registry_;

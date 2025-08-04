@@ -12,8 +12,11 @@ void ScreenManager::PopScreen() {
   screens_.pop();
 }
 
-void ScreenManager::Update() {}
+  void ScreenManager::Update(const std::vector<InputEvent>& events) {
+    screens_.top()->Update(events);
+  }
 
 void ScreenManager::SubmitToRenderer(UIRenderer& ui_renderer) {
   screens_.top()->SubmitToRenderer(ui_renderer);
 }
+

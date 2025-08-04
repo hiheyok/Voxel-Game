@@ -106,6 +106,46 @@ MouseInputs::ScrollState InputManager::GetScrollState() const noexcept {
   return mouse_.GetScrollState();
 }
 
+std::vector<InputEvent> InputManager::GetEvents() const {
+  std::vector<InputEvent> events;
+
+  if (cursor_enable_) {
+    // 1. Check for Mouse Movement
+    if (mouse_.GetDisplacement() != glm::vec2(0.0f, 0.0f)) {
+      events.emplace_back(MouseMove{mouse_.GetPos(), mouse_.GetDisplacement()});
+    }
+
+    // 2. Check for Mouse Button Actions
+    for (uint8_t i = 0;
+         i <= static_cast<uint8_t>(MouseInputs::ButtonType::kLast); ++i) {
+      const auto state = mouse_.button_states_[i];
+      if (state == MouseInputs::ButtonState::kPress ||
+          state == MouseInputs::ButtonState::kRelease) {
+        events.emplace_back(
+            MouseButtonAction{static_cast<MouseInputs::ButtonType>(i), state});
+      }
+    }
+  }
+
+  // 3. Check for Mouse Scrolling
+  if (mouse_.GetScrollState() != MouseInputs::ScrollState::kNone) {
+    events.emplace_back(MouseScroll{mouse_.GetScrollState()});
+  }
+
+  // 4. Check for Keyboard Actions
+  for (int i = 0; i < KeysInputs::kKeyCodeRange; ++i) {
+    const auto state = keyboard_.states_[i];
+    // Create events for discrete actions: Press, Release, and Repeat
+    if (state == KeysInputs::KeyState::kPress ||
+        state == KeysInputs::KeyState::kRelease ||
+        state == KeysInputs::KeyState::kRepeat) {
+      events.emplace_back(KeyAction{i, state});
+    }
+  }
+
+  return events;
+}
+
 void InputManager::UpdateScroll(float x_offset, float y_offset) noexcept {
   mouse_.UpdateScroll(x_offset, y_offset);
 }
@@ -122,3 +162,10 @@ void InputManager::UpdateKeys(int key, int scancode, int action,
                               int mods) noexcept {
   keyboard_.UpdateKeys(key, scancode, action, mods);
 }
+
+void InputManager::UpdateResolution(int x, int y) noexcept {
+  current_resolution_.x = x;
+  current_resolution_.y = y;
+}
+
+void InputManager::SetCursor(bool enable) noexcept { cursor_enable_ = enable; }

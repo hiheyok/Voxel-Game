@@ -28,6 +28,8 @@ class KeysInputs {
   bool CheckKeyRepeat(int key_code) const noexcept;
 
  private:
+  friend class InputManager;
+  
   // Max key code value is 348
   static constexpr size_t kKeyCodeRange = 348 + 1;
 

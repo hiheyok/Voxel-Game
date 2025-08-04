@@ -2,13 +2,15 @@
 
 #include <cassert>
 
+#include "Client/Inputs/InputManager.h"
 #include "RenderEngine/UI/ScreenManager.h"
 #include "RenderEngine/UI/ScreenRegistry.h"
 #include "RenderEngine/UI/Screens/MainScreen.h"
 #include "RenderEngine/UI/UIRenderer.h"
 
-UIManager::UIManager(GameContext& game_context)
+UIManager::UIManager(GameContext& game_context, InputManager& input_mgr)
     : game_context_{game_context},
+      input_mgr_{input_mgr},
       renderer_{std::make_unique<UIRenderer>(game_context)},
       screen_registry_{std::make_unique<ScreenRegistry>()},
       screen_manager_{
@@ -24,11 +26,11 @@ void UIManager::Initialize() {
 
 void UIManager::PopScreen() { screen_manager_->PopScreen(); }
 
-#include <iostream>
-
 void UIManager::Render() {
   assert(renderer_ && screen_manager_);
   renderer_->Clear();
   screen_manager_->SubmitToRenderer(*renderer_);
   renderer_->Render();
 }
+
+void UIManager::Update() { screen_manager_->Update(input_mgr_.GetEvents()); }

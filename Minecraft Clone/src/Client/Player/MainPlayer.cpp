@@ -78,7 +78,6 @@ void MainPlayer::PrepareGUIs() {
                       -1.f + kHotbarSize * 0.5f));
   }
 
-
   for (int i = 0; i < kHotbarSlots; i++) {
     ItemStack item = player_->entity_inventory_.GetItem(i);
     ItemUVMapping uv =
@@ -123,26 +122,29 @@ void MainPlayer::SetPlayerPosition(float x, float y, float z) {
 }
 
 void MainPlayer::InventoryUpdate(const InputManager& inputs) {
-  int Direction = 0;
+  int direction = 0;
   switch (inputs.GetScrollState()) {
-    case MouseInputs::ScrollState::kDown:
-      Direction = 1;
+    case MouseInputs::ScrollState::kDown: {
+      direction = 1;
       break;
-    case MouseInputs::ScrollState::kUp:
-      Direction = -1;
+    }
+    case MouseInputs::ScrollState::kUp: {
+      direction = -1;
       break;
-    case MouseInputs::ScrollState::kNone:
+    }
+    case MouseInputs::ScrollState::kNone: {
       break;
+    }
   }
 
   int currentInventorySlot = player_->entity_inventory_.right_hand_slot_;
 
-  if (currentInventorySlot + Direction == 9) {
+  if (currentInventorySlot + direction == 9) {
     currentInventorySlot = 0;
-  } else if (currentInventorySlot + Direction == -1) {
+  } else if (currentInventorySlot + direction == -1) {
     currentInventorySlot = kHotbarSlots - 1;
   } else {
-    currentInventorySlot += Direction;
+    currentInventorySlot += direction;
   }
 
   if (inputs.CheckAction(InputAction::kHotbarSlot1)) currentInventorySlot = 0;

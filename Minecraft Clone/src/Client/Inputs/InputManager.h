@@ -4,8 +4,9 @@
 
 #include <glm/vec2.hpp>
 
-#include "Client/Inputs/MouseInputs.h"
+#include "Client/Inputs/InputEvent.h"
 #include "Client/Inputs/KeysInputs.h"
+#include "Client/Inputs/MouseInputs.h"
 #include "Core/Typenames.h"
 
 enum class InputAction {
@@ -47,6 +48,7 @@ class InputManager {
   glm::vec2 GetMousePos() const noexcept;
 
   MouseInputs::ScrollState GetScrollState() const noexcept;
+  std::vector<InputEvent> GetEvents() const;
 
   float delta_ = 0.f;
 
@@ -57,7 +59,12 @@ class InputManager {
   void UpdateMouse(float x_pos, float y_pos) noexcept;
   void UpdateButton(int button, int action) noexcept;
   void UpdateKeys(int key, int scancode, int action, int mods) noexcept;
+  void UpdateResolution(int x, int y) noexcept;
+  void SetCursor(bool enable) noexcept; // Disable mouse event if cursor is disabled
+
+  bool cursor_enable_;
 
   KeysInputs keyboard_;
   MouseInputs mouse_;
+  glm::vec2 current_resolution_;
 };

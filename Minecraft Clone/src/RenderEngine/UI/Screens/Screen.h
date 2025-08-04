@@ -4,6 +4,9 @@
 
 #include <glm/vec2.hpp>
 #include <memory>
+#include <vector>
+
+#include "Client/Inputs/InputEvent.h"
 
 class Widget;
 class ScreenManager;
@@ -23,7 +26,7 @@ class Screen {
   // input event
   void HandleEvent();
   // input delta time to update stuff like animation
-  void Update();
+  void Update(const std::vector<InputEvent>& events);
 
   void SubmitToRenderer(UIRenderer& renderer);
 

@@ -59,8 +59,8 @@ ClientPlay::ClientPlay(GameContext& game_context, ServerInterface* interface,
   interface->SendPlayerAction(packet);
   terrain_render_->Start(window->GetWindow(), &client_level_->cache_, profiler);
   framebuffer_->GenBuffer(
-      window->GetProperties().window_size_x_,
-      window->GetProperties().window_size_y_,
+      window->GetProperties().res_x_,
+      window->GetProperties().res_y_,
       static_cast<float>(game_context_.options_->graphics_scale_), GL_RGB);
 }
 ClientPlay::~ClientPlay() = default;
@@ -71,7 +71,7 @@ void ClientPlay::Render(Window* window) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   if (!window->GetProperties().draw_solid_) window->RenderLines();
-
+  
   // entity_render_->Render();
   terrain_render_->Render();
   entity_render_->Render();
@@ -88,13 +88,13 @@ void ClientPlay::Render(Window* window) {
 }
 
 void ClientPlay::Update(Window* window) {
-  if (window->GetProperties().window_size_dirty_) {
-    window->GetProperties().window_size_dirty_ = false;
+  if (window->GetProperties().size_dirty_) {
+    window->GetProperties().size_dirty_ = false;
 
     framebuffer_->Clear();
     framebuffer_->GenBuffer(
-        window->GetProperties().window_size_x_,
-        window->GetProperties().window_size_y_,
+        window->GetProperties().res_x_,
+        window->GetProperties().res_y_,
         static_cast<float>(game_context_.options_->graphics_scale_));
   }
 

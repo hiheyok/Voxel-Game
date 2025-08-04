@@ -73,7 +73,9 @@ std::map<size_t, MemoryBlock>::const_reverse_iterator BlockManagement::rend()
 std::map<size_t, MemoryBlock>::const_iterator BlockManagement::lower_bound(
     size_t k) const {  // Get latest element less than k
   auto it = mem_blocks_.lower_bound(k);
-  it--;
+  if (it != mem_blocks_.begin()) {
+    it--;
+    }
   return it;
 }
 

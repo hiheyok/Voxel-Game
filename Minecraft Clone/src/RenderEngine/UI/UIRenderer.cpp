@@ -23,7 +23,7 @@ void UIRenderer::Submit(const std::vector<UIVertexFormat>& vertices,
   indices_.insert(indices_.end(), indices.begin(), indices.end());
 
   // Update the indices
-  for (int i = index_offset; i < end; ++i) {
+  for (int i = start; i < end; ++i) {
     indices_[i] += index_offset;
   }
 
@@ -42,4 +42,7 @@ void UIRenderer::Render() {
   renderer_.Render();
 }
 
-void UIRenderer::UploadToGPU() { renderer_.SetData(vertices_, indices_); }
+void UIRenderer::UploadToGPU() {
+  renderer_.SetData(vertices_, indices_);
+  renderer_.SetIndicesCount(indices_.size());
+}

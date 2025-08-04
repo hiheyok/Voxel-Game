@@ -149,8 +149,10 @@ void ChunkDrawBatch::DeleteChunkVertices(ChunkPos pos) {
     }
 
     size_t idx = render_list_[ChunkMemOffset.mem_offset_];
-    render_list_[render_list_arr_.back().mem_offset_] = idx;
-    std::swap(render_list_arr_.back(), render_list_arr_[idx]);
+    if (idx != render_list_arr_.size() - 1) {
+      render_list_[render_list_arr_.back().mem_offset_] = idx;
+      std::swap(render_list_arr_.back(), render_list_arr_[idx]);
+    }
     render_list_arr_.pop_back();
     render_list_.erase(ChunkMemOffset.mem_offset_);
 

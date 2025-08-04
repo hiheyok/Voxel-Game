@@ -1,8 +1,8 @@
 #include "Client/Inputs/MouseInputs.h"
 
-MouseInputs::MouseInputs() { button_states_.fill(ButtonState::kRelease); }
+MouseInputs::MouseInputs() { button_states_.fill(ButtonState::kNone); }
 MouseInputs::~MouseInputs() = default;
-
+#include <iostream>
 void MouseInputs::Refresh() noexcept {
   scroll_direction_ = ScrollState::kNone;
 
@@ -11,6 +11,10 @@ void MouseInputs::Refresh() noexcept {
   for (auto& state : button_states_) {
     if (state == ButtonState::kPress) {
       state = ButtonState::kHold;
+    }
+
+    if (state == ButtonState::kRelease) {
+      state = ButtonState::kNone;
     }
   }
 }

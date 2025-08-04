@@ -3,27 +3,27 @@
 #include <glm/vec2.hpp>
 #include <variant>
 
-struct InputEvent {};
+#include "Client/Inputs/KeysInputs.h"
+#include "Client/Inputs/MouseInputs.h"
 
-struct MouseMove : InputEvent {
+struct MouseMove {
   glm::vec2 new_pos_;
   glm::vec2 displacemnent_;
 };
 
-struct MouseButtonHold : InputEvent {};
+struct MouseButtonAction {
+  MouseInputs::ButtonType button_type_;
+  MouseInputs::ButtonState state_;
+};
 
-struct MouseButtonRelease : InputEvent {};
+struct MouseScroll {
+  MouseInputs::ScrollState state_;
+};
 
-struct MouseButtonPress : InputEvent {};
+struct KeyAction {
+  int key_code_;
+  KeysInputs::KeyState state_;
+};
 
-struct MouseScroll : InputEvent {};
-
-struct KeyHold : InputEvent {};
-
-struct KeyPress : InputEvent {};
-
-struct KeyRelease : InputEvent {};
-
-using InputEventType = std::variant<MouseMove, MouseButtonHold,
-                                    MouseButtonPress, MouseButtonRelease,
-                                    KeyHold, KeyPress, KeyRelease, MouseScroll>;
+using InputEvent =
+    std::variant<MouseMove, MouseButtonAction, KeyAction, MouseScroll>;

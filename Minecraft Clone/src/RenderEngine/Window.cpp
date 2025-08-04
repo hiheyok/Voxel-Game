@@ -98,11 +98,92 @@ void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, uint32_t id,
   }
 }
 
-GLFWwindow* Window::GetWindow() { return window_; }
+template <typename T, auto MemberFunc>
+auto MakeCallback() {
+  return [](GLFWwindow* win, auto... args) {
+    T* self = static_cast<T*>(glfwGetWindowUserPointer(win));
 
-bool Window::WindowCloseCheck() { return glfwWindowShouldClose(window_); }
+    if (self) {
+      (self->*MemberFunc)(win, std::forward<decltype(args)>(args)...);
+    }
+  };
+}
+
+GLFWwindow* Window::GetWindow() { return win_; }
+
+bool Window::WindowCloseCheck() { return glfwWindowShouldClose(win_); }
 
 Window::Window(GameContext& game_context) : game_context_{game_context} {
+  InitializeGLFW();
+  InitializeCallbacks();
+  InitializeGLEW();
+  InitializeDebugCallback();
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glfwSwapInterval(0);
+}
+Window::~Window() { glfwDestroyWindow(GetWindow()); }
+
+void Window::MousePositionCallback(GLFWwindow* win, double x_pos,
+                                   double y_pos) {
+  inputs_.UpdateMouse(static_cast<float>(x_pos), static_cast<float>(y_pos));
+}
+
+void Window::UpdateWindowName(std::string name) {
+  glfwSetWindowTitle(win_, name.c_str());
+}
+
+void Window::RenderLines() { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
+
+void Window::RenderSolid() { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
+
+void Window::ResizeWindowCallback(GLFWwindow* win, int x, int y) {
+  glViewport(0, 0, x, y);
+  properties_.res_x_ = x;
+  properties_.res_y_ = y;
+  properties_.size_dirty_ = true;
+  inputs_.UpdateResolution(x, y);
+
+  game_context_.logger_->LogInfo(
+      "Window::ResizeWindowCallback",
+      " Resized Window: " + std::to_string(x) + ", " + std::to_string(y));
+}
+
+void Window::ScrollCallback(GLFWwindow* win, double x_offset, double y_offset) {
+  inputs_.UpdateScroll(x_offset, y_offset);
+  (void)win;
+}
+
+void Window::Refresh() { glfwSwapBuffers(win_); }
+
+void Window::PollInputs() { glfwPollEvents(); }
+
+WindowProperties& Window::GetProperties() { return properties_; }
+
+InputManager& Window::GetUserInputs() { return inputs_; }
+
+void Window::DisableCursor() {
+  inputs_.SetCursor(false);
+  glfwSetInputMode(win_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
+
+void Window::EnableCursor() {
+  inputs_.SetCursor(true);
+  glfwSetInputMode(win_, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+void Window::KeyboardCallback(GLFWwindow* window, int key, int scancode,
+                              int action, int mods) {
+  inputs_.UpdateKeys(key, scancode, action, mods);
+}
+
+void Window::MouseButtonCallback(GLFWwindow* win, int button, int action,
+                                 int mods) {
+  inputs_.UpdateButton(button, action);
+}
+
+void Window::InitializeGLFW() {
   if (properties_.initialized_) {
     game_context_.logger_->LogDebug("Window::Start", "Already initialized");
     return;
@@ -118,118 +199,52 @@ Window::Window(GameContext& game_context) : game_context_{game_context} {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  window_ = glfwCreateWindow(properties_.window_size_x_,
-                             properties_.window_size_y_, "1.3.0A (DEV)", 0, 0);
+  win_ = glfwCreateWindow(properties_.res_x_, properties_.res_y_,
+                          "1.3.0A (DEV)", 0, 0);
 
-  glfwMakeContextCurrent(window_);
+  inputs_.UpdateResolution(properties_.res_x_, properties_.res_y_);
+  inputs_.SetCursor(true);
 
-  if (window_ == nullptr) {
+  glfwMakeContextCurrent(win_);
+
+  if (win_ == nullptr) {
     glfwTerminate();
     throw std::runtime_error("Window::Start - Failed to create GLFW Window");
   } else {
     game_context_.logger_->LogInfo("Window::Start", "Created GLFW Window");
   }
+}
 
-  glfwSetWindowUserPointer(window_, this);
-  glfwSetFramebufferSizeCallback(window_, [](GLFWwindow* win, int a, int b) {
-    static_cast<Window*>(glfwGetWindowUserPointer(win))
-        ->ResizeWindowCallback(a, b);
-  });
+void Window::InitializeCallbacks() {
+  glfwSetWindowUserPointer(win_, this);
+  glfwSetFramebufferSizeCallback(
+      win_, MakeCallback<Window, &Window::ResizeWindowCallback>());
   glfwSetCursorPosCallback(
-      window_, +[](GLFWwindow* win, double a, double b) {
-        static_cast<Window*>(glfwGetWindowUserPointer(win))
-            ->MousePositionCallback(a, b);
-      });
+      win_, MakeCallback<Window, &Window::MousePositionCallback>());
   glfwSetMouseButtonCallback(
-      window_, +[](GLFWwindow* win, int a, int b, int c) {
-        static_cast<Window*>(glfwGetWindowUserPointer(win))
-            ->MouseButtonCallback(a, b);
-      });
-  glfwSetKeyCallback(
-      window_,
-      +[](GLFWwindow* win, int key, int scancode, int action, int mods) {
-        static_cast<Window*>(glfwGetWindowUserPointer(win))
-            ->KeyboardCallback(win, key, scancode, action, mods);
-      });
-  glfwSetScrollCallback(
-      window_, +[](GLFWwindow* win, double a, double b) {
-        static_cast<Window*>(glfwGetWindowUserPointer(win))
-            ->ScrollCallback(win, a, b);
-      });
-  glewExperimental = GL_TRUE;
+      win_, MakeCallback<Window, &Window::MouseButtonCallback>());
+  glfwSetKeyCallback(win_, MakeCallback<Window, &Window::KeyboardCallback>());
+  glfwSetScrollCallback(win_, MakeCallback<Window, &Window::ScrollCallback>());
+}
+
+void Window::InitializeGLEW() {
   glewInit();
 
   if (glewInit() != GLEW_OK) {
     throw std::runtime_error("Window::Start - Initialization Failed: GLEW");
     return;
   }
+  glewExperimental = GL_TRUE;
 
   std::stringstream str;
   str << "OpenGL Version: " << glGetString(GL_VERSION);
   game_context_.logger_->LogInfo("Window::Start", str.str());
+}
 
+void Window::InitializeDebugCallback() {
   glEnable(GL_DEBUG_OUTPUT);
   glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
   glDebugMessageCallback(glDebugOutput, static_cast<const void*>(this));
   glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr,
                         GL_TRUE);
-
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-  glfwSwapInterval(0);
-}
-Window::~Window() { glfwDestroyWindow(GetWindow()); }
-
-void Window::MousePositionCallback(double x_pos, double y_pos) {
-  inputs_.UpdateMouse(static_cast<float>(x_pos), static_cast<float>(y_pos));
-}
-
-void Window::UpdateWindowName(std::string name) {
-  glfwSetWindowTitle(window_, name.c_str());
-}
-
-void Window::RenderLines() { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
-
-void Window::RenderSolid() { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
-
-void Window::ResizeWindowCallback(int x, int y) {
-  glViewport(0, 0, x, y);
-  properties_.window_size_x_ = x;
-  properties_.window_size_y_ = y;
-  properties_.window_size_dirty_ = true;
-
-  game_context_.logger_->LogInfo(
-      "Window::ResizeWindowCallback",
-      " Resized Window: " + std::to_string(x) + ", " + std::to_string(y));
-}
-
-void Window::ScrollCallback(GLFWwindow* win, double x_offset, double y_offset) {
-  inputs_.UpdateScroll(x_offset, y_offset);
-  (void)win;
-}
-
-void Window::Refresh() { glfwSwapBuffers(window_); }
-
-void Window::PollInputs() { glfwPollEvents(); }
-
-WindowProperties& Window::GetProperties() { return properties_; }
-
-InputManager& Window::GetUserInputs() { return inputs_; }
-
-void Window::DisableCursor() {
-  glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-}
-
-void Window::EnableCursor() {
-  glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-}
-
-void Window::KeyboardCallback(GLFWwindow* window, int key, int scancode,
-                              int action, int mods) {
-  inputs_.UpdateKeys(key, scancode, action, mods);
-}
-
-void Window::MouseButtonCallback(int button, int action) {
-  inputs_.UpdateButton(button, action);
 }
