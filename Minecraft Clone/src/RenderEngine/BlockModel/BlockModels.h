@@ -34,7 +34,7 @@ struct BlockFace {
   BlockFace(BlockFace&&);
   BlockFace& operator=(const BlockFace&);
 
-  glm::ivec3 normal_ = glm::ivec3(0, 0, 0);
+  glm::ivec3 normal_ = {0, 0, 0};
   std::string reference_texture_ = "";  // variables starts with #
   size_t texture_id_ = 0;
   size_t texture_count_ = 0;  // For amination purposes.
@@ -44,7 +44,7 @@ struct BlockFace {
   bool partially_transparent_pixel_ = false;
   bool fully_transparent_pixel_ = false;
   bool can_cull = false;
-  glm::ivec4 uv_ = glm::ivec4(0, 0, 16, 16);
+  glm::ivec4 uv_{0, 0, 16, 16};
 
   glm::ivec2 uv_coord_00{0, 0};
   glm::ivec2 uv_coord_01{0, 0};
@@ -63,9 +63,9 @@ struct BlockDisplay {  // Positions {thirdperson_righthand,
 
   // fixed = item frame
   DisplayPosition position_;
-  glm::vec3 rotation_ = glm::vec3(0.f, 0.f, 0.f);
-  glm::vec3 translation_ = glm::vec3(0.f, 0.f, 0.f);
-  glm::vec3 scale_ = glm::vec3(0.f, 0.f, 0.f);
+  glm::vec3 rotation_ = {0.0f, 0.0f, 0.0f};
+  glm::vec3 translation_ = {0.0f, 0.0f, 0.0f};
+  glm::vec3 scale_ = {0.0f, 0.0f, 0.0f};
   bool initialized_ = false;
 };
 
@@ -76,7 +76,7 @@ struct CuboidRotationInfo {
   CuboidRotationInfo(CuboidRotationInfo&&);
   CuboidRotationInfo& operator=(const CuboidRotationInfo&);
 
-  glm::vec3 origin_ = glm::vec3(0.f, 0.f, 0.f);
+  glm::vec3 origin_ = {0.0f, 0.0f, 0.0f};
   int axis_ = 0;
   int angle_ = 0;
   bool rescale_ = false;
@@ -92,8 +92,8 @@ struct Cuboid {
 
   void EditFace(int location, BlockFace f);
   // Relative inner block position from -16 to 32
-  glm::vec3 from_ = glm::vec3(0, 0, 0);
-  glm::vec3 to_ = glm::vec3(1, 1, 1);
+  glm::vec3 from_ = {0, 0, 0};
+  glm::vec3 to_ = {1, 1, 1};
   BlockFace faces_[6]{};
   CuboidRotationInfo rotation_;
   std::string comments_ = "";

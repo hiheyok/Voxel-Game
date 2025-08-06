@@ -66,7 +66,7 @@ void BlockItemRender::RenderBlock(Item item) {
 
 void BlockItemRender::SetCamera() {
   camera_->fov_ = 57;
-  camera_->position_ = glm::vec3(1.1f, 1.1f, 1.1f);
+  camera_->position_ = {1.1f, 1.1f, 1.1f};
   camera_->pitch_ = -35;
   camera_->yaw_ = -135;
 

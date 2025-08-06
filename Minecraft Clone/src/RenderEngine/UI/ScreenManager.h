@@ -23,6 +23,7 @@ class ScreenManager {
   void PopScreen();
   void Update(const std::vector<InputEvent>& events);
   void SubmitToRenderer(UIRenderer&);
+  void ChangeVirtualRes(glm::vec2 v_res);
 
  private:
   GameContext& game_context_;
@@ -36,6 +37,7 @@ void ScreenManager::PushScreen(const std::string& name, Args&&... args) {
       screen_registry_.CreateScreen(name, *this, std::forward<Args>(args)...);
   screen->OnEnter();
   screens_.push(std::move(screen));
+  
 }
 template <typename... Args>
 void ScreenManager::SwitchScreen(const std::string& name, Args&&... args) {

@@ -11,10 +11,10 @@ struct EntityProperty {
   EntityProperty(const EntityProperty&) = default;
   ~EntityProperty() = default;
 
-  glm::vec3 velocity_ = glm::vec3(0.f, 0.f, 0.f);
-  glm::vec3 position_ = glm::vec3(0.f, 0.f, 0.f);
-  glm::vec3 acceleration_ = glm::vec3(0.f, 0.f, 0.f);
-  glm::vec2 rotation_ = glm::vec2(0.f, 0.f);
+  glm::vec3 velocity_ = {0.0f, 0.0f, 0.0f};
+  glm::vec3 position_ = {0.0f, 0.0f, 0.0f};
+  glm::vec3 acceleration_ = {0.0f, 0.0f, 0.0f};
+  glm::vec2 rotation_ = {0.0f, 0.0f};
 
   float max_speed_ = 50;
 

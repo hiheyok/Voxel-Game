@@ -4,11 +4,14 @@
 
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
+#include <ostream>
 #include <vector>
 
 struct UIVertexFormat {
   float x_ = 0.0, y_ = 0.0;
   float r_ = 1.0, g_ = 1.0, b_ = 1.0, a_ = 0.0;
+
+  friend std::ostream& operator<<(std::ostream& s, const UIVertexFormat& obj);
 };
 
 static_assert(sizeof(UIVertexFormat) == 4 * 6);

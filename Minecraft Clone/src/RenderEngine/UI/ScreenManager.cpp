@@ -1,6 +1,7 @@
 #include "RenderEngine/UI/ScreenManager.h"
 
 #include "RenderEngine/UI/Screens/Screen.h"
+#include "RenderEngine/UI/UIRenderer.h"
 
 ScreenManager::ScreenManager(GameContext& game_context,
                              ScreenRegistry& screen_registry)
@@ -12,11 +13,15 @@ void ScreenManager::PopScreen() {
   screens_.pop();
 }
 
-  void ScreenManager::Update(const std::vector<InputEvent>& events) {
-    screens_.top()->Update(events);
-  }
+void ScreenManager::Update(const std::vector<InputEvent>& events) {
+  screens_.top()->Update(events);
+}
 
 void ScreenManager::SubmitToRenderer(UIRenderer& ui_renderer) {
   screens_.top()->SubmitToRenderer(ui_renderer);
+  ui_renderer.SetVirtualRes(screens_.top()->GetVirtualRes());
 }
 
+void ScreenManager::ChangeVirtualRes(glm::vec2 v_res) {
+  screens_.top()->ChangeVirtualRes(v_res);
+}

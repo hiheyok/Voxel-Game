@@ -297,10 +297,10 @@ void BlockModel::BakeTextureRotation() {
 
       int rotation_ = face.rotation_;
 
-      face.uv_coord_00 = glm::ivec2(face.uv_.x, face.uv_.y);
-      face.uv_coord_01 = glm::ivec2(face.uv_.x, face.uv_.w);
-      face.uv_coord_11 = glm::ivec2(face.uv_.z, face.uv_.w);
-      face.uv_coord_10 = glm::ivec2(face.uv_.z, face.uv_.y);
+      face.uv_coord_00 = {face.uv_.x, face.uv_.y};
+      face.uv_coord_01 = {face.uv_.x, face.uv_.w};
+      face.uv_coord_11 = {face.uv_.z, face.uv_.w};
+      face.uv_coord_10 = {face.uv_.z, face.uv_.y};
 
       for (int r = 0; r < rotation_; r += 90) {
         std::swap(face.uv_coord_00, face.uv_coord_01);

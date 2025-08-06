@@ -17,10 +17,10 @@ struct GUIElement {
   GUIVertices GetVertices();
 
   std::string text_ = "";
-  glm::vec2 size_ = glm::vec2(0.f, 0.f);
-  glm::vec2 location_ = glm::vec2(0.f, 0.f);
-  glm::vec2 uv_p0_ = glm::vec2(0.f, 0.f);
-  glm::vec2 uv_p1_ = glm::vec2(0.f, 0.f);
+  glm::vec2 size_ = {0.0f, 0.0f};
+  glm::vec2 location_ = {0.0f, 0.0f};
+  glm::vec2 uv_p0_ = {0.0f, 0.0f};
+  glm::vec2 uv_p1_ = {0.0f, 0.0f};
 
   int texture_ = 0;
   bool has_texture_ = false;

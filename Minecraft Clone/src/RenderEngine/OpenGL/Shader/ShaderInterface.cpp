@@ -117,9 +117,9 @@ ShaderInterface& ShaderInterface::SetVec2(const std::string& name, float x,
   auto it = cache_vec2_.find(name);
   if (it != cache_vec2_.end()) {
     if (it->second == glm::vec2(x, y)) return *this;
-    it->second = glm::vec2(x, y);
+    it->second = {x, y};
   } else {
-    cache_vec2_[name] = glm::vec2(x, y);
+    cache_vec2_[name] = {x, y};
   }
   Use();
   glUniform2f(GetUniformLocation(name), x, y);
@@ -145,9 +145,9 @@ ShaderInterface& ShaderInterface::SetVec3(const std::string& name, float x,
   auto it = cache_vec3_.find(name);
   if (it != cache_vec3_.end()) {
     if (it->second == glm::vec3(x, y, z)) return *this;
-    it->second = glm::vec3(x, y, z);
+    it->second = {x, y, z};
   } else {
-    cache_vec3_[name] = glm::vec3(x, y, z);
+    cache_vec3_[name] = {x, y, z};
   }
   Use();
   glUniform3f(GetUniformLocation(name), x, y, z);
@@ -173,9 +173,9 @@ ShaderInterface& ShaderInterface::SetIVec3(const std::string& name, int x,
   auto it = cache_ivec3_.find(name);
   if (it != cache_ivec3_.end()) {
     if (it->second == glm::ivec3(x, y, z)) return *this;
-    it->second = glm::ivec3(x, y, z);
+    it->second = {x, y, z};
   } else {
-    cache_ivec3_[name] = glm::ivec3(x, y, z);
+    cache_ivec3_[name] = {x, y, z};
   }
   Use();
   glUniform3i(GetUniformLocation(name), x, y, z);
@@ -201,9 +201,9 @@ ShaderInterface& ShaderInterface::SetVec4(const std::string& name, float x,
   auto it = cache_vec4_.find(name);
   if (it != cache_vec4_.end()) {
     if (it->second == glm::vec4(x, y, z, w)) return *this;
-    it->second = glm::vec4(x, y, z, w);
+    it->second = {x, y, z, w};
   } else {
-    cache_vec4_[name] = glm::vec4(x, y, z, w);
+    cache_vec4_[name] = {x, y, z, w};
   }
   Use();
   glUniform4f(GetUniformLocation(name), x, y, z, w);

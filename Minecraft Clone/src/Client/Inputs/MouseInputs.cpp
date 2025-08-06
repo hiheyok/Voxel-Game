@@ -6,7 +6,7 @@ MouseInputs::~MouseInputs() = default;
 void MouseInputs::Refresh() noexcept {
   scroll_direction_ = ScrollState::kNone;
 
-  displacement_ = glm::dvec2(0.0, 0.0);
+  displacement_ = {0.0, 0.0};
 
   for (auto& state : button_states_) {
     if (state == ButtonState::kPress) {
@@ -20,8 +20,9 @@ void MouseInputs::Refresh() noexcept {
 }
 
 void MouseInputs::UpdateMouse(float x_pos, float y_pos) noexcept {
-  displacement_ = glm::vec2(x_pos, y_pos) - position_;
-  position_ = glm::vec2(x_pos, y_pos);
+  displacement_ = {x_pos, y_pos};
+  displacement_ -= position_;
+  position_ = {x_pos, y_pos};
 }
 
 void MouseInputs::UpdateScroll(float x_offset, float y_offset) noexcept {

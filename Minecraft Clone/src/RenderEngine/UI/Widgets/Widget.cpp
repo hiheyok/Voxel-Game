@@ -12,33 +12,18 @@
 Widget::Widget() : parent_{nullptr}, self_dirty_{true}, children_dirty_{true} {}
 Widget::~Widget() = default;
 
-void Widget::SetPivot(float x, float y) noexcept {
-  pivot_.x = x;
-  pivot_.y = y;
-}
+void Widget::SetPivot(glm::vec2 pos) noexcept { pivot_ = pos; }
 
-void Widget::SetAnchorBoth(float x, float y) noexcept {
-  SetAnchorMax(x, y);
-  SetAnchorMin(x, y);
+void Widget::SetAnchorBoth(glm::vec2 pos) noexcept {
+  SetAnchorMax(pos);
+  SetAnchorMin(pos);
 }
-void Widget::SetAnchorMax(float x, float y) noexcept {
-  anchor_max_.x = x;
-  anchor_max_.y = y;
-}
-void Widget::SetAnchorMin(float x, float y) noexcept {
-  anchor_min_.x = x;
-  anchor_min_.y = y;
-}
+void Widget::SetAnchorMax(glm::vec2 pos) noexcept { anchor_max_ = pos; }
+void Widget::SetAnchorMin(glm::vec2 pos) noexcept { anchor_min_ = pos; }
 
-void Widget::SetOffsetMax(float x, float y) noexcept {
-  offset_max_.x = x;
-  offset_max_.y = y;
-}
+void Widget::SetOffsetMax(glm::vec2 pos) noexcept { offset_max_ = pos; }
 
-void Widget::SetOffsetMin(float x, float y) noexcept {
-  offset_min_.x = x;
-  offset_min_.y = y;
-}
+void Widget::SetOffsetMin(glm::vec2 pos) noexcept { offset_min_ = pos; }
 
 void Widget::AddChildWidget(std::unique_ptr<Widget> widget) {
   if (!widget) {  // guard against nullptr
@@ -65,22 +50,20 @@ void Widget::TryUpdateLayout(const UIRectangle& parent) {
   }
 
   if (self_dirty_) {
+    glm::vec2 abs_anchor_min = anchor_min_ * parent.size_;
+    glm::vec2 abs_anchor_max = anchor_max_ * parent.size_;
+
     if (anchor_max_ == anchor_min_) {
-      glm::vec2 relative_size = offset_max_ - offset_min_;
-      glm::vec2 absolute_size = parent.size_ * relative_size;
-      glm::vec2 anchor_pos = parent.pos_ + anchor_min_ * parent.size_;
-      glm::vec2 pivot_offset = pivot_ * absolute_size;
-      screen_.pos_ = anchor_pos - pivot_offset + offset_min_;
-      screen_.size_ = absolute_size;
+      glm::vec2 widget_size = offset_max_ - offset_min_;
+      glm::vec2 anchor_pos = parent.pos_ + abs_anchor_min;
+      glm::vec2 abs_pivot_pos = pivot_ * widget_size;
+      screen_.pos_ = anchor_pos - abs_pivot_pos + offset_min_;
+      screen_.size_ = widget_size;
     } else {
-      glm::vec2 anchor_min_pos = parent.pos_ + anchor_min_ * parent.size_;
-      glm::vec2 anchor_max_pos = parent.pos_ + anchor_max_ * parent.size_;
-    
-      glm::vec2 offset_min_pos = anchor_min_pos + offset_min_ * parent.size_;
-      glm::vec2 offset_max_pos = anchor_min_pos - offset_max_ * parent.size_;
-    
-      screen_.size_ = offset_max_ - offset_min_;
-      screen_.pos_ = offset_min_pos;
+      glm::vec2 start_pos = abs_anchor_min + offset_min_;
+      glm::vec2 end_pos = abs_anchor_max - offset_max_;
+      screen_.pos_ = start_pos;
+      screen_.size_ = end_pos - start_pos;
     }
   }
 
@@ -92,6 +75,17 @@ void Widget::TryUpdateLayout(const UIRectangle& parent) {
 
   self_dirty_ = false;
   children_dirty_ = false;
+}
+
+void Widget::SetBranchDirty() noexcept {
+  self_dirty_ = true;
+  if (children_.size() != 0) {
+    children_dirty_ = true;
+
+    for (auto& child : children_) {
+      child->SetBranchDirty();
+    }
+  }
 }
 
 void Widget::SubmitToRenderer(UIRenderer& renderer) {

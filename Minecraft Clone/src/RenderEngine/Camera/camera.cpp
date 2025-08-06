@@ -1,7 +1,7 @@
 #include "RenderEngine/Camera/Camera.h"
 
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
-    : front_(glm::vec3(0.0f, 0.0f, -1.0f)),
+    : front_(0.0f, 0.0f, -1.0f),
       movement_speed_(SPEED),
       mouse_sensitivity_(SENSITIVITY),
       zoom_(ZOOM) {
@@ -14,12 +14,12 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
 
 Camera::Camera(float posX, float posY, float posZ, float upX, float upY,
                float upZ, float yaw, float pitch)
-    : front_(glm::vec3(0.0f, 0.0f, -1.0f)),
+    : front_{0.0f, 0.0f, -1.0f},
       movement_speed_(SPEED),
       mouse_sensitivity_(SENSITIVITY),
       zoom_(ZOOM) {
-  position_ = glm::vec3(posX, posY, posZ);
-  world_up_ = glm::vec3(upX, upY, upZ);
+  position_ = {posX, posY, posZ};
+  world_up_ = {upX, upY, upZ};
   yaw_ = yaw;
   pitch_ = pitch;
   UpdateCameraVectors();

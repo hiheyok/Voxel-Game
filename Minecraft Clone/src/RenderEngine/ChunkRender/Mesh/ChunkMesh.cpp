@@ -363,7 +363,7 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const Cuboid& cube, int side,
   float ao_multi[4] = {1.0f};
   glm::vec3 color{1.0f};
   if (face.tint_index_ != -1) {
-    color = glm::vec3(93.0f / 255.0f, 200.0f / 255.0f, 62.0f / 255.0f);
+    color = {93.0f / 255, 200.0f / 255, 62.0f / 255};
   }
 
   glm::ivec2 uv_00 = face.uv_coord_00;

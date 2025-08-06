@@ -17,8 +17,8 @@ struct ModelData {
 };
 
 struct UV {
-  glm::vec2 p0_ = glm::vec2(0.f, 0.f);
-  glm::vec2 p1_ = glm::vec2(0.f, 0.f);
+  glm::vec2 p0_ = {0.0f, 0.0f};
+  glm::vec2 p1_ = {0.0f, 0.0f};
 };
 
 struct RectangularPrism {
@@ -28,9 +28,9 @@ struct RectangularPrism {
 
   ModelData GetVertices();
 
-  glm::vec3 offset_ = glm::vec3(0.f, 0.f, 0.f);
+  glm::vec3 offset_ = {0.0f, 0.0f, 0.0f};
 
-  glm::vec3 size_ = glm::vec3(0.f, 0.f, 0.f);
+  glm::vec3 size_ = {0.0f, 0.0f, 0.0f};
 
   UV uv_map_[6]{};
 };

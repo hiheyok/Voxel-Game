@@ -33,15 +33,12 @@ MainPlayer::MainPlayer(GameContext& game_context, Window* window,
   GUISet hotbar{game_context};
   hotbar.SetGUITexture("assets/minecraft/textures/gui/widgets.png");
   hotbar.AddGUIElement(
-      "Hotbar", "",
-      glm::vec2(9.f * kHotbarSize * 1.0055555555f, kHotbarSize * 1.05f),
-      glm::vec2(0.f, -1.f + kHotbarSize * 0.5f), glm::vec2(0.5f, 0.5f),
-      glm::vec2(181.5f, 21.5f));
+      "Hotbar", "", {9.f * kHotbarSize * 1.0055555555f, kHotbarSize * 1.05f},
+      {0.f, -1.f + kHotbarSize * 0.5f}, {0.5f, 0.5f}, {181.5f, 21.5f});
 
-  hotbar.AddGUIElement("Select", "",
-                       glm::vec2(kHotbarSize * 1.1f, kHotbarSize * 1.1f),
-                       glm::vec2(-kHotbarSize * 4.f, -1.f + kHotbarSize * 0.5f),
-                       glm::vec2(0.5f, 22.5f), glm::vec2(22.5f, 44.5f));
+  hotbar.AddGUIElement("Select", "", {kHotbarSize * 1.1f, kHotbarSize * 1.1f},
+                       {-kHotbarSize * 4.f, -1.f + kHotbarSize * 0.5f},
+                       {0.5f, 22.5f}, {22.5f, 44.5f});
 
   GUISet itemBar{game_context};
   itemBar.SetGUITexture(game_context_.item_atlas_->Get(),
@@ -49,12 +46,12 @@ MainPlayer::MainPlayer(GameContext& game_context, Window* window,
                         game_context_.item_atlas_->GetHeight());
 
   for (int i = 0; i < kHotbarSlots; i++) {
-    itemBar.AddGUIElementNorm(std::to_string(i), "",
-                              glm::vec2(kHotbarSize * ItemViewRelativeSize,
-                                        kHotbarSize * ItemViewRelativeSize),
-                              glm::vec2(kHotbarSize * static_cast<float>(i - 4),
-                                        -1.f + kHotbarSize * 0.5f),
-                              glm::vec2(0, 0), glm::vec2(1, 1));
+    itemBar.AddGUIElementNorm(
+        std::to_string(i), "",
+        {kHotbarSize * ItemViewRelativeSize,
+         kHotbarSize * ItemViewRelativeSize},
+        {kHotbarSize * static_cast<float>(i - 4), -1.0f + kHotbarSize * 0.5f},
+        {0.0f, 0.0f}, {1.0f, 1.0f});
   }
 
   gui_index_ = player_gui_->AddGUI("PlayerGUI", std::move(hotbar));
@@ -72,10 +69,9 @@ void MainPlayer::PrepareGUIs() {
   if (currentSlotIndex != slot_index_) {
     slot_index_ = currentSlotIndex;
     player_gui_->EditGUISet(gui_index_)
-        .EditElementPosition(
-            "Select",
-            glm::vec2(kHotbarSize * (static_cast<int>(slot_index_) - 4),
-                      -1.f + kHotbarSize * 0.5f));
+        .EditElementPosition("Select",
+                             {kHotbarSize * (static_cast<int>(slot_index_) - 4),
+                              -1.f + kHotbarSize * 0.5f});
   }
 
   for (int i = 0; i < kHotbarSlots; i++) {
@@ -88,8 +84,7 @@ void MainPlayer::PrepareGUIs() {
           .EditElementUVNorm(std::to_string(i), uv.uv_1_, uv.uv_2_);
     } else {
       player_gui_->EditGUISet(item_gui_index_)
-          .EditElementUVNorm(std::to_string(i), glm::vec2(0.f, 0.f),
-                             glm::vec2(0.f, 0.f));
+          .EditElementUVNorm(std::to_string(i), {0.0f, 0.0f}, {0.0f, 0.0f});
     }
   }
 
@@ -112,13 +107,13 @@ EntityProperty MainPlayer::GetEntityProperties() {
 }
 
 void MainPlayer::SetPlayerRotation(float x, float y) {
-  player_->properties_.rotation_ = glm::vec2(x, y);
-  player_pov_->SetRotation(glm::vec2(x, y));
+  player_->properties_.rotation_ = {x, y};
+  player_pov_->SetRotation({x, y});
 }
 
 void MainPlayer::SetPlayerPosition(float x, float y, float z) {
-  player_->properties_.position_ = glm::vec3(x, y, z);
-  player_pov_->SetPosition(glm::vec3(x, y, z));
+  player_->properties_.position_ = {x, y, z};
+  player_pov_->SetPosition({x, y, z});
 }
 
 void MainPlayer::InventoryUpdate(const InputManager& inputs) {

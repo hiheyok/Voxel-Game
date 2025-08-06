@@ -117,7 +117,7 @@ void TerrainRenderer::Update() {
   glfwGetWindowSize(window_, &width, &height);
   glm::mat4 model = glm::mat4(1.f);
 
-  camera_->screen_res_ = glm::vec2(width, height);
+  camera_->screen_res_ = {width, height};
 
   glm::mat4 view = camera_->GetViewMatrix();
 
@@ -127,8 +127,6 @@ void TerrainRenderer::Update() {
       glm::radians(camera_->fov_), static_cast<float>(x) / y, 0.1f, 1000000.0f);
   cubic_shader_->Use();
 
-  float clrMultiplier = 1.0f;
-
   cubic_shader_->SetMat4("view", view)
       .SetMat4("model", model)
       .SetMat4("projection", projection)
@@ -137,7 +135,7 @@ void TerrainRenderer::Update() {
       .SetFloat("VerticalRenderDistance",
                 static_cast<float>(vertical_render_distance_ * kChunkDim))
       .SetVec3("camPos", camera_->position_)
-      .SetVec3("tintColor", glm::vec3(152.0 / 255, 189.0 / 255, 83.0 / 255))
+      .SetVec3("tintColor", {152.0 / 255, 189.0 / 255, 83.0 / 255})
       .SetInt("TextureAimIndex", TextureAminationIndex);
 
   if (time_->GetTimePassed_ms() > 100) {

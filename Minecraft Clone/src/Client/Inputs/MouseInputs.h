@@ -59,8 +59,8 @@ class MouseInputs {
   ScrollState scroll_direction_ = ScrollState::kNone;
 
   // Mouse Data
-  glm::vec2 displacement_ = glm::vec2(0.0f, 0.0f);
-  glm::vec2 position_ = glm::vec2(0.0f, 0.0f);
+  glm::vec2 displacement_ = {0.0f, 0.0f};
+  glm::vec2 position_ = {0.0f, 0.0f};
 
   // Array to store the button data
   std::array<ButtonState, kButtonAmount> button_states_;

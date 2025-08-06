@@ -2,8 +2,8 @@
 
 #include "Client/Client.h"
 
-#include <GLFW/glfw3.h>
 #include <gl/glew.h>
+#include <GLFW/glfw3.h>
 
 #include <chrono>
 #include <memory>
@@ -131,6 +131,8 @@ void Client::Update() {
   if (inputs_.CheckAction(InputAction::kExit)) {
     glfwSetWindowShouldClose(GetWindow(), true);
   }
+
+  ui_manager_->ScreenResChanged(inputs_.GetScreenRes());
 
   client_play_->Update(this);
 

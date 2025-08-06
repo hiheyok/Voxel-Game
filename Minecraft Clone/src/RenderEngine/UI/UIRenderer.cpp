@@ -41,8 +41,11 @@ void UIRenderer::Render() {
   UploadToGPU();
   renderer_.Render();
 }
-
+void UIRenderer::SetVirtualRes(glm::vec2 v_res) { v_res_ = v_res; }
+void UIRenderer::SetScreenRes(glm::vec2 s_res) { s_res_ = s_res; }
 void UIRenderer::UploadToGPU() {
   renderer_.SetData(vertices_, indices_);
   renderer_.SetIndicesCount(indices_.size());
+  renderer_.GetShader().SetVec2("v_res", v_res_);
+  renderer_.GetShader().SetVec2("s_res", s_res_);
 }

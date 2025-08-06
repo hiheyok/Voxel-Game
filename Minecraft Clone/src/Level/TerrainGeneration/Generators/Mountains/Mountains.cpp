@@ -21,22 +21,19 @@ void MountainGenerator::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
   float noiseOffset = 0.3;
 
   for (auto [x, z] : Product<2>(kChunkDim)) {
-    float continental = ContinentialNoise(
-        GetNoise2D(glm::ivec2(pos.x, pos.z), glm::ivec2(x, z), 3, 0.3f));
+    float continental =
+        ContinentialNoise(GetNoise2D({pos.x, pos.z}, {x, z}, 3, 0.3f));
     float erosion =
-        ErosionNoise(GetNoise2D(glm::ivec2(pos.x, pos.z),
-                                glm::ivec2(x + 4345, z + 6443), 3, 1.f)) /
+        ErosionNoise(GetNoise2D({pos.x, pos.z}, {x + 4345, z + 6443}, 3, 1.f)) /
         2.f;
-    float pv =
-        PeaksAndValley(GetNoise2D(glm::ivec2(pos.x, pos.z),
-                                  glm::ivec2(x + 65345, z + 12323), 3, 4.f)) /
-        8;
+    float pv = PeaksAndValley(
+                   GetNoise2D({pos.x, pos.z}, {x + 65345, z + 12323}, 3, 4.f)) /
+               8;
 
     for (int y = 0; y < kChunkDim; y++) {
       float gy = static_cast<float>(y + scaledPos.y);
 
-      float n = GetNoise3D(glm::ivec3{pos.x, pos.y, pos.z}, glm::ivec3(x, y, z),
-                           4, 1.f);
+      float n = GetNoise3D({pos.x, pos.y, pos.z}, {x, y, z}, 4, 1.f);
 
       n = n + noiseOffset;
 
@@ -185,8 +182,8 @@ void MountainGenerator::GenerateDecor(ChunkPos pos, Chunk* chunk) {
 float MountainGenerator::GetNoise3D(glm::ivec3 ChunkCoordinate,
                                     glm::ivec3 RelativeBlockCoords, int samples,
                                     float frequency) {
-  glm::vec3 GlobalBlockPosition =
-      glm::vec3(ChunkCoordinate * kChunkDim + RelativeBlockCoords);
+  glm::vec3 GlobalBlockPosition = {ChunkCoordinate * kChunkDim +
+                                   RelativeBlockCoords};
 
   GlobalBlockPosition *= frequency;
 
@@ -210,8 +207,8 @@ float MountainGenerator::GetNoise3D(glm::ivec3 ChunkCoordinate,
 float MountainGenerator::GetNoise2D(glm::ivec2 ChunkCoordinate,
                                     glm::ivec2 RelativeBlockCoords, int samples,
                                     float frequency) {
-  glm::vec2 GlobalBlockPosition =
-      glm::vec2(ChunkCoordinate * kChunkDim + RelativeBlockCoords);
+  glm::vec2 GlobalBlockPosition = {ChunkCoordinate * kChunkDim +
+                                   RelativeBlockCoords};
 
   GlobalBlockPosition *= frequency;
 

@@ -146,6 +146,10 @@ std::vector<InputEvent> InputManager::GetEvents() const {
   return events;
 }
 
+glm::vec2 InputManager::GetScreenRes() const noexcept {
+  return current_resolution_;
+}
+
 void InputManager::UpdateScroll(float x_offset, float y_offset) noexcept {
   mouse_.UpdateScroll(x_offset, y_offset);
 }

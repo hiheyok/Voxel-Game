@@ -4,6 +4,6 @@
 #include <glm/vec3.hpp>
 
 struct AABB {
-  glm::vec3 size_ = glm::dvec3(0.f, 0.f, 0.f);
-  glm::vec3 offset_ = glm::dvec3(0.f, 0.f, 0.f);
+  glm::vec3 size_ = {0.0f, 0.0f, 0.0f};
+  glm::vec3 offset_ = {0.0f, 0.0f, 0.0f};
 };

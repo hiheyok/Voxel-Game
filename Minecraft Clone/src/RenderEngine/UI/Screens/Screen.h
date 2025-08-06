@@ -14,7 +14,6 @@ class UIRenderer;
 
 class Screen {
  public:
-  explicit Screen(ScreenManager&);
   virtual ~Screen();
 
   Screen(const Screen&) = delete;
@@ -22,13 +21,15 @@ class Screen {
   Screen(Screen&&) = delete;
   Screen& operator=(Screen&&) = delete;
 
-  void SetVirtualResolution(glm::ivec2 v_res);
   // input event
   void HandleEvent();
   // input delta time to update stuff like animation
   void Update(const std::vector<InputEvent>& events);
 
   void SubmitToRenderer(UIRenderer& renderer);
+
+  glm::vec2 GetVirtualRes() const noexcept;
+  void ChangeVirtualRes(glm::vec2 v_res);
 
   // Initialize all of the widgets, component etc
   virtual void OnEnter();
@@ -38,7 +39,10 @@ class Screen {
   virtual void OnExit();
 
  protected:
+  explicit Screen(ScreenManager&, glm::vec2 virtual_res);
+
+  glm::vec2 v_res_;
+
   ScreenManager& screen_mgr_;
   std::unique_ptr<Widget> root_widget_;
-  glm::ivec2 v_res_;
 };

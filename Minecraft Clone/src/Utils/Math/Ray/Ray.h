@@ -4,9 +4,9 @@
 struct Ray {
   float length_ = 0;
 
-  glm::vec3 direction_ = glm::vec3(0., 0., 0.);
-  glm::vec3 origin_ = glm::vec3(0., 0., 0.);
-  glm::vec3 end_point_ = glm::vec3(0., 0., 0.);
+  glm::vec3 direction_ = {0.0f, 0.0f, 0.0f};
+  glm::vec3 origin_ = {0.0f, 0.0f, 0.0f};
+  glm::vec3 end_point_ = {0.0f, 0.0f, 0.0f};
 
   int bounce_surface_ = 0;
 };

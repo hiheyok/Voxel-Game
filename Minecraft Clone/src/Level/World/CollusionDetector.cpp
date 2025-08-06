@@ -62,9 +62,9 @@ glm::dvec3 CollusionDetector::ComputeCollisionTimes(Entity* entity) {
   int iy = static_cast<int>(floor(hitbox.size_.y)) + 1;
   int iz = static_cast<int>(floor(hitbox.size_.z)) + 1;
 
-  glm::ivec3 i_bound = glm::ivec3(ix, iy, iz);
+  glm::ivec3 i_bound{ix, iy, iz};
 
-  glm::vec3 least_time(-1.f, -1.f, -1.f);
+  glm::vec3 least_time{-1.0f, -1.0f, -1.0f};
 
   float least_distance = static_cast<float>(kSearchDistance);
 
@@ -233,7 +233,8 @@ bool CollusionDetector::IsEntityOnGround(Entity* entity) {
   }
 
   for (auto [x, z] : Product<2>({ix + 1, iz + 1})) {
-    glm::vec3 origin = hitbox_start + glm::vec3(x, 0, z);
+    glm::vec3 offset(x, 0.0f, z);
+    glm::vec3 origin = hitbox_start + offset;
 
     if (origin.x > hitbox_end.x) origin.x = hitbox_end.x;
     if (origin.z > hitbox_end.z) origin.z = hitbox_end.z;

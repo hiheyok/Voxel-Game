@@ -37,9 +37,8 @@ void ItemTextureAtlas::StitchTexture(size_t index, ItemID ItemID) {
   uint32_t indices[] = {0, 1, 2, 2, 3, 0};
 
   ItemUVMapping uvMap;
-  uvMap.uv_1_ = glm::vec2((xCoord + 1.f) * 0.5f, (yCoord + 1.f) * 0.5f);
-  uvMap.uv_2_ =
-      glm::vec2((xCoord - Size + 1.f) * 0.5f, (yCoord - Size + 1.f) * 0.5f);
+  uvMap.uv_1_ = {(xCoord + 1.f) * 0.5f, (yCoord + 1.f) * 0.5f};
+  uvMap.uv_2_ = {(xCoord - Size + 1.f) * 0.5f, (yCoord - Size + 1.f) * 0.5f};
 
   uvMap.uv_1_.y = 1.f - uvMap.uv_1_.y;
   uvMap.uv_2_.y = 1.f - uvMap.uv_2_.y;

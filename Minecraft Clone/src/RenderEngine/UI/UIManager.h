@@ -1,5 +1,6 @@
 #pragma once
 
+#include <glm/vec2.hpp>
 #include <memory>
 
 #include "RenderEngine/UI/ScreenManager.h"
@@ -31,9 +32,13 @@ class UIManager {
 
   void Update();
 
+  void ScreenResChanged(glm::vec2 res);
+
  private:
   GameContext& game_context_;
   InputManager& input_mgr_;
+
+  glm::vec2 curr_res_ = {0.0f, 0.0f};
 
   std::unique_ptr<UIRenderer> renderer_;
   std::unique_ptr<ScreenRegistry> screen_registry_;

@@ -34,3 +34,11 @@ void UIManager::Render() {
 }
 
 void UIManager::Update() { screen_manager_->Update(input_mgr_.GetEvents()); }
+
+void UIManager::ScreenResChanged(glm::vec2 res) {
+  if (curr_res_ != res) {
+    curr_res_ = res;
+    renderer_->SetScreenRes(res);
+    screen_manager_->ChangeVirtualRes(res);
+  }
+}

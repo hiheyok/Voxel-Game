@@ -49,6 +49,7 @@ class InputManager {
 
   MouseInputs::ScrollState GetScrollState() const noexcept;
   std::vector<InputEvent> GetEvents() const;
+  glm::vec2 GetScreenRes() const noexcept;
 
   float delta_ = 0.f;
 

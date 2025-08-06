@@ -26,16 +26,17 @@ class Widget {
   Widget& operator=(Widget&&) noexcept = default;
 
   // Properties setter
-  void SetPivot(float x, float y) noexcept;
-  void SetAnchorBoth(float x, float y) noexcept;
-  void SetAnchorMax(float x, float y) noexcept;
-  void SetAnchorMin(float x, float y) noexcept;
-  void SetOffsetMax(float x, float y) noexcept;
-  void SetOffsetMin(float x, float y) noexcept;
+  void SetPivot(glm::vec2 pos) noexcept;
+  void SetAnchorBoth(glm::vec2 pos) noexcept;
+  void SetAnchorMax(glm::vec2 pos) noexcept;
+  void SetAnchorMin(glm::vec2 pos) noexcept;
+  void SetOffsetMax(glm::vec2 pos) noexcept;
+  void SetOffsetMin(glm::vec2 pos) noexcept;
 
   void AddChildWidget(std::unique_ptr<Widget> widget);
   void AddComponent(std::unique_ptr<Component> component);
   void TryUpdateLayout(const UIRectangle& parent);
+  void SetBranchDirty() noexcept;
 
 
   void SubmitToRenderer(UIRenderer& renderer);
@@ -45,14 +46,13 @@ class Widget {
   void SetDirty();
 
  protected:
-  // --- Layout Properties (set by the user) ---
+  // Units are in normalized coordinates [0, 1]
   glm::vec2 anchor_min_ = {0.5f, 0.5f};
   glm::vec2 anchor_max_ = {0.5f, 0.5f};
   glm::vec2 pivot_ = {0.5f, 0.5f};
-  // ------------
+  // Units are in virtual pixels
   glm::vec2 offset_min_ = {0.0f, 0.0f};  // Often called "position"
   glm::vec2 offset_max_ = {0.0f, 0.0f};  // Often called "size"
-
  private:
   friend class Screen;
 

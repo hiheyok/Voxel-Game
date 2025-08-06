@@ -17,7 +17,7 @@ void TexturedFrameBuffer::GenBuffer(GLint x, GLint y, float muti,
   screen_ =
       std::make_unique<Shader>(game_context_, "assets/shaders/screen/vert.glsl",
                                "assets/shaders/screen/frag.glsl");
-  screen_->SetVec2("Resolution", glm::vec2((x), (y)));
+  screen_->SetVec2("Resolution", {x, y});
 
   sy = y;
   sx = x;

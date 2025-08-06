@@ -80,7 +80,7 @@ void PlayerMovement::MovePlayer(Player* player, const InputManager& inputs,
 
   front = normalize(front);
 
-  glm::vec3 right = normalize(cross(front, glm::vec3(0.0, 1.0, 0.0)));
+  glm::vec3 right = normalize(cross(front, {0.0f, 1.0f, 0.0f}));
   right.y = 0;
 
   float velocity = player->properties_.max_speed_;
@@ -93,7 +93,7 @@ void PlayerMovement::MovePlayer(Player* player, const InputManager& inputs,
                                   velocity, inputs.delta_) /
             sqrtf(2);
 
-  player->properties_.velocity_ = glm::vec3(0.f, 0.f, 0.f);
+  player->properties_.velocity_ = {0.0f, 0.0f, 0.0f};
 
   if (inputs.CheckAction(InputAction::kWalkForwards)) {
     player->properties_.velocity_ += front * v;
