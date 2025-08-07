@@ -7,6 +7,7 @@
 
 #include <memory>
 
+#include "Assets/AssetManager.h"
 #include "Client/Player/PlayerPOV.h"
 #include "Client/Profiler/PerformanceProfiler.h"
 #include "Core/GameContext/GameContext.h"
@@ -30,8 +31,8 @@ MultiEntityRender::MultiEntityRender(GameContext& game_context,
       vao_{std::make_unique<VertexArray>(game_context)},
       player_{player},
       shader_{std::make_unique<Shader>(
-          game_context, "assets/shaders/Entity/MultiEntityVert.glsl",
-          "assets/shaders/Entity/MultiEntityFrag.glsl")},
+          game_context,
+          *game_context.assets_->GetShaderSource("entity_render"))},
       renderable_entities_{std::make_unique<EntityRenderCache>()} {}
 
 MultiEntityRender::~MultiEntityRender() = default;

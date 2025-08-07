@@ -25,10 +25,10 @@ typedef uint32_t ItemID;
 typedef uint64_t WorldGeneratorID;
 
 template <class K, class V, class _Hash = robin_hood::hash<K>>
-using FastHashMap = robin_hood::unordered_flat_map<K, V, _Hash>;
+using FastHashMap = robin_hood::unordered_flat_map<K, V, _Hash, std::equal_to<>>;
 
 template <class V, class _Hash = robin_hood::hash<V>>
-using FastHashSet = robin_hood::unordered_flat_set<V, _Hash>;
+using FastHashSet = robin_hood::unordered_flat_set<V, _Hash, std::equal_to<>>;
 
 constexpr int kChunkDim = 16;
 constexpr int kChunkSize2D = kChunkDim * kChunkDim;

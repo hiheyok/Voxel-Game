@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <memory>
 
+#include "Assets/AssetManager.h"
 #include "Core/Options/Option.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Entity/Entities.h"
@@ -23,11 +24,14 @@ GameContext::GameContext()
       items_{std::make_unique<ItemList>(*this)},
       generators_{std::make_unique<GeneratorType>(*this)},
       event_handler_{std::make_unique<EventHandler>(*this)},
+      assets_{std::make_unique<AssetManager>(*this)},
       block_model_manager_{std::make_unique<BlockModelManager>(*this)} {}
 GameContext::~GameContext() = default;
 
 void GameContext::InitializeGameContext() {
   items_->RegisterAll();
+  assets_->Initialize();
+  assets_->Load();
 
   // try {
   //   for (const auto& entry : std::filesystem::directory_iterator("assets")) {

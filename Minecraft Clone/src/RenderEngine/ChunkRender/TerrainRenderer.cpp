@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 
+#include "Assets/AssetManager.h"
 #include "Core/GameContext/GameContext.h"
 #include "Core/Options/Option.h"
 #include "RenderEngine/BlockModel/BlockModelManager.h"
@@ -32,9 +33,9 @@ TerrainRenderer::TerrainRenderer(GameContext& game_context)
       chunk_batch_transparent_lookup_{},
       camera_{nullptr},
       time_{std::make_unique<Timer>()},
-      cubic_shader_{std::make_unique<Shader>(game_context,
-                                             "assets/shaders/vert.glsl",
-                                             "assets/shaders/frag.glsl")} {}
+      cubic_shader_{std::make_unique<Shader>(
+          game_context,
+          *game_context.assets_->GetShaderSource("world_render"))} {}
 
 TerrainRenderer::~TerrainRenderer() = default;
 

@@ -179,6 +179,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Assets\Asset.cpp" />
+    <ClCompile Include="src\Assets\AssetManager.cpp" />
+    <ClCompile Include="src\Assets\Types\ShaderSource.cpp" />
     <ClCompile Include="src\Client\Client.cpp" />
     <ClCompile Include="src\Client\ClientLevel\ClientCache.cpp" />
     <ClCompile Include="src\Client\ClientLevel\ClientLevel.cpp" />
@@ -186,6 +189,7 @@
     <ClCompile Include="src\Client\Inputs\KeysInputs.cpp" />
     <ClCompile Include="src\Client\Inputs\MouseInputs.cpp" />
     <ClCompile Include="src\Core\GameContext\GameContext.cpp" />
+    <ClCompile Include="src\Core\IO\FileUtils.cpp" />
     <ClCompile Include="src\Core\Position\PositionTypes.cpp" />
     <ClCompile Include="src\Level\Block\Type\AirBlock.cpp" />
     <ClCompile Include="src\Level\Block\Type\SolidBlock.cpp" />
@@ -279,6 +283,11 @@
     <ClCompile Include="src\RenderEngine\EntityRender\EntityRenderCache.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRender\Models\EntityModels.cpp" />
     <ClCompile Include="src\RenderEngine\EntityRender\MultiEntityRender.cpp" />
+    <ClInclude Include="src\Assets\Asset.h" />
+    <ClInclude Include="src\Assets\AssetHandle.h" />
+    <ClInclude Include="src\Assets\AssetManager.h" />
+    <ClInclude Include="src\Assets\AssetState.h" />
+    <ClInclude Include="src\Assets\Types\ShaderSource.h" />
     <ClInclude Include="src\Client\Inputs\InputEvent.h" />
     <ClInclude Include="src\Client\Inputs\KeysInputs.h" />
     <ClInclude Include="src\Client\Inputs\MouseInputs.h" />
@@ -289,6 +298,7 @@
     <ClInclude Include="src\Core\DataStructure\NibbleArray.h" />
     <ClInclude Include="src\Core\DataStructure\OriginalConcurrentQueue.h" />
     <ClInclude Include="src\Core\GameContext\GameContext.h" />
+    <ClInclude Include="src\Core\IO\FileUtils.h" />
     <ClInclude Include="src\Core\Position\Position.h" />
     <ClInclude Include="src\Core\Position\PositionTypes.h" />
     <ClInclude Include="src\Level\Block\Type\AirBlock.h" />

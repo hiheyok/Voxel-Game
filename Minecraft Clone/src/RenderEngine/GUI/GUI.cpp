@@ -7,6 +7,8 @@
 #include <string>
 #include <utility>
 
+#include "Assets/AssetManager.h"
+#include "Core/GameContext/GameContext.h"
 #include "RenderEngine/GUI/GUIObject.h"
 #include "RenderEngine/GUI/GUISet.h"
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
@@ -17,9 +19,8 @@
 
 GUI::GUI(GameContext& game_context, Window* win)
     : game_context_{game_context},
-      shader_{std::make_unique<Shader>(game_context,
-                                       "assets/shaders/GUI/GUIVert.glsl",
-                                       "assets/shaders/GUI/GUIFrag.glsl")},
+      shader_{std::make_unique<Shader>(
+          game_context, *game_context.assets_->GetShaderSource("gui_render"))},
       window_{win},
       guis_{} {}
 

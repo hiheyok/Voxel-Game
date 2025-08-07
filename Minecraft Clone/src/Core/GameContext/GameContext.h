@@ -14,6 +14,7 @@ class Options;
 class ItemList;
 class GeneratorType;
 class EventHandler;
+class AssetManager;
 
 // Rendering Context;
 class ItemTextureAtlas;
@@ -37,6 +38,7 @@ class GameContext {
   std::unique_ptr<ItemList> items_;
   std::unique_ptr<GeneratorType> generators_;
   std::unique_ptr<EventHandler> event_handler_;
+  std::unique_ptr<AssetManager> assets_;
 
   // Rendering Context
   std::unique_ptr<ItemTextureAtlas> item_atlas_;
