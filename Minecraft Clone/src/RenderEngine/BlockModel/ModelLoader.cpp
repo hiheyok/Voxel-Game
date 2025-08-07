@@ -46,7 +46,7 @@ std::unique_ptr<BlockModel> ModelLoader::GetModelRecursive(
     }
     JSONData = json::parse(file);
   } catch (const std::exception& e) {
-    context_.logger_->LogWarn("ModelLoader::GetModelRecursive", e.what());
+    LOG_WARN(e.what());
     return nullptr;
   }
 
@@ -112,9 +112,7 @@ void ModelLoader::CacheModel(const ResourceLocation& location,
   // Check if the model is already cached
   const auto& it = cache_.find(location);
   if (it != cache_.find(location)) {
-    context_.logger_->LogDebug(
-        "ModelLoader::CacheModel",
-        "Attempted to cache model that is already cached");
+    LOG_DEBUG("Attempted to cache model that is already cached");
   }
   std::unique_ptr<BlockModel> copiedModel =
       std::make_unique<BlockModel>(*model);
@@ -143,9 +141,7 @@ void ModelLoader::ProcessModelDisplay(std::unique_ptr<BlockModel>& model,
           display.scale_[i] = arr[i];
         }
       } else {
-        context_.logger_->LogWarn(
-            "ProcessModelDisplay",
-            "Unknown display attribute: " + transitions.key());
+        LOG_WARN("Unknown display attribute: " + transitions.key());
       }
     }
 
@@ -166,8 +162,7 @@ void ModelLoader::ProcessModelDisplay(std::unique_ptr<BlockModel>& model,
     } else if (position == "fixed") {
       display.position_ = DisplayPosition::fixed;
     } else {
-      context_.logger_->LogWarn("ProcessModelDisplay",
-                                "Unknown display position: " + position);
+      LOG_WARN("Unknown display position: " + position);
       return;
     }
 
@@ -205,9 +200,7 @@ void ModelLoader::UpdateModelElements(std::unique_ptr<BlockModel>& model,
       } else if (subElements.key() == "shade") {
         cuboid.shade_ = static_cast<bool>(subElements.value());
       } else {
-        context_.logger_->LogWarn(
-            "UpdateModelElements",
-            "Unknown element attribute: " + subElements.key());
+        LOG_WARN("Unknown element attribute: " + subElements.key());
       }
     }
     model->AddElement(cuboid);
@@ -258,10 +251,8 @@ CuboidRotationInfo ModelLoader::GetRotationalData(json JsonData) {
       } else if (axis_ == 'z') {
         rotationInfo.axis_ = 2;
       } else {
-        context_.logger_->LogWarn(
-            "getRotationalData",
-            "Unknown rotational axis: " +
-                static_cast<std::string>(attribute.value()));
+        LOG_WARN("Unknown rotational axis: " +
+                 static_cast<std::string>(attribute.value()));
       }
     } else if (attribute.key() == "axis") {
       int angle_ = attribute.value();
@@ -316,9 +307,7 @@ void ModelLoader::ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
       } else if (faceElements.key() == "rotation") {
         bFace.rotation_ = faceElements.value();
       } else {
-        context_.logger_->LogWarn(
-            "ProcessSingleCubeFaces",
-            "Unknown face attribute: " + faceElements.key());
+        LOG_WARN("Unknown face attribute: " + faceElements.key());
       }
     }
     cube.EditFace(faceIndex, bFace);
@@ -339,8 +328,7 @@ int ModelLoader::ConvertStringFaceToIndex(const std::string& str) {
   } else if (str == "east") {
     return EAST;
   } else {
-    context_.logger_->LogWarn("ModelLoader::ConvertStringFaceToIndex",
-                              "Unknown direction: " + str);
+    LOG_WARN("Unknown direction: " + str);
     return 0;
   }
 }

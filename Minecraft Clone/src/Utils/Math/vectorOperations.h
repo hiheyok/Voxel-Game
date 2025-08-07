@@ -7,7 +7,7 @@
 #include <glm/vec3.hpp>
 
 inline static glm::ivec3 Sign(glm::vec3 vector) {
-  glm::ivec3 signs(0, 0, 0);
+  glm::ivec3 signs{0, 0, 0};
 
   signs[0] = (vector[0] > 0) - (vector[0] < 0);
   signs[1] = (vector[1] > 0) - (vector[1] < 0);
@@ -28,7 +28,7 @@ inline static glm::bvec3 LessThan(glm::vec3 vec1, glm::vec3 vec2) {
 
 inline static glm::bvec3 LessThan(float x, float y, float z, float x1, float y1,
                                   float z1) {
-  glm::bvec3 less(false, false, false);
+  glm::bvec3 less{false, false, false};
 
   less[0] = x < x1;
   less[1] = y < y1;
@@ -38,7 +38,7 @@ inline static glm::bvec3 LessThan(float x, float y, float z, float x1, float y1,
 }
 
 inline static glm::bvec3 LessThanEqual(glm::vec3 vec1, glm::vec3 vec2) {
-  glm::bvec3 less(false, false, false);
+  glm::bvec3 less{false, false, false};
 
   less[0] = vec1[0] <= vec2[0];
   less[1] = vec1[1] <= vec2[1];
@@ -49,7 +49,7 @@ inline static glm::bvec3 LessThanEqual(glm::vec3 vec1, glm::vec3 vec2) {
 
 inline static glm::bvec3 LessThanEqual(float x, float y, float z, float x1,
                                        float y1, float z1) {
-  glm::bvec3 less(false, false, false);
+  glm::bvec3 less{false, false, false};
 
   less[0] = x <= x1;
   less[1] = y <= y1;
@@ -69,7 +69,7 @@ inline static glm::bvec3 Min(glm::vec3 vec1, glm::vec3 vec2) {
 
 inline static glm::bvec3 Min(float x, float y, float z, float x1, float y1,
                              float z1) {
-  glm::vec3 vec1(0.f, 0.f, 0.f);
+  glm::vec3 vec1{0.0f, 0.0f, 0.0f};
 
   vec1[0] = x < x1 ? x : x1;
   vec1[1] = y < y1 ? y : y1;

@@ -56,8 +56,7 @@ void BlockModelManager::LoadModels() {
         int textureId = block_texture_atlas_->AddBlockTexture(location);
 
         if (textureId == -1) {
-          context_.logger_->LogWarn("BlockList::InitializeBlockModels",
-                                    "Unable to load texture.");
+          LOG_WARN("Unable to load texture.");
           continue;
         }
 

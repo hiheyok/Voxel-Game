@@ -176,7 +176,7 @@ void ChunkContainer::UpdateHeightMap(int x, int z) {
     new_height = kChunkDim;
   } else {
     for (int i = kChunkDim - 1; i >= 0; --i) {
-      if (properties[GetBlockUnsafe(BlockPos{x, i, z})].opacity_ > 0) {
+      if (properties[GetBlockUnsafe({x, i, z})].opacity_ > 0) {
         new_height = i;
         break;
       }

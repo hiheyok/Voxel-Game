@@ -45,10 +45,10 @@ void MountainGenerator::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
 
       if (n > 0.5f) {
         if (n < 0.54f) {
-          chunk->SetBlockUnsafe(context_.blocks_->GRASS, BlockPos{x, y, z});
-          chunk->SetBlock(context_.blocks_->DIRT, BlockPos{x, y - 1, z});
+          chunk->SetBlockUnsafe(context_.blocks_->GRASS, {x, y, z});
+          chunk->SetBlock(context_.blocks_->DIRT, {x, y - 1, z});
         } else {
-          chunk->SetBlockUnsafe(context_.blocks_->STONE, BlockPos{x, y, z});
+          chunk->SetBlockUnsafe(context_.blocks_->STONE, {x, y, z});
         }
       }
     }
@@ -82,7 +82,7 @@ void MountainGenerator::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
       int b = px + pz * 20;
 
       if ((b < numBlocks) && (b >= 0)) {
-        chunk->SetBlockUnsafe(b, BlockPos{x, 3, z});
+        chunk->SetBlockUnsafe(b, {x, 3, z});
       }
     }
   }
@@ -117,14 +117,14 @@ void MountainGenerator::GenerateDecor(ChunkPos pos, Chunk* chunk) {
          1.f) /
         2.f;
     for (int y = 0; y < kChunkDim; y++) {
-      if (chunk->GetBlock(BlockPos{x, y - 1, z}) == context_.blocks_->GRASS) {
+      if (chunk->GetBlock({x, y - 1, z}) == context_.blocks_->GRASS) {
         if (TREE_MAP <= 0.04) {
           for (auto [tx, tz] : Product<2>(-2, 3)) {
             if ((abs(tx) == 2) && (abs(tz) == 2)) continue;
 
             for (int ty = tree_height; ty <= tree_height + 1; ty++)
               chunk->SetBlock(context_.blocks_->OAK_LEAF,
-                              BlockPos{x + tx, y + ty, z + tz});
+                              {x + tx, y + ty, z + tz});
           }
           for (auto [tx, tz, ty] : Product<3>(
                    {{-1, 2}, {-1, 2}, {tree_height + 2, tree_height + 4}})) {
@@ -132,11 +132,11 @@ void MountainGenerator::GenerateDecor(ChunkPos pos, Chunk* chunk) {
               continue;
             }
             chunk->SetBlock(context_.blocks_->OAK_LEAF,
-                            BlockPos{x + tx, y + ty, z + tz});
+                            {x + tx, y + ty, z + tz});
           }
 
           for (int ty = 0; ty < tree_height + 2; ty++) {
-            chunk->SetBlock(context_.blocks_->OAK_LOG, BlockPos{x, y + ty, z});
+            chunk->SetBlock(context_.blocks_->OAK_LOG, {x, y + ty, z});
           }
         }
       }
@@ -154,8 +154,8 @@ void MountainGenerator::GenerateDecor(ChunkPos pos, Chunk* chunk) {
   for (auto [x, y, z] : Product<3>({{x0, x1}, {y0, y1}, {z0, z1}})) {
     if ((x * x) + (y - 140) * (y - 140) + z * z <= radius * radius) {
       chunk->SetBlock(context_.blocks_->SAND,
-                      BlockPos{x - pos.x * kChunkDim, y - pos.y * kChunkDim,
-                               z - pos.z * kChunkDim});
+                      {x - pos.x * kChunkDim, y - pos.y * kChunkDim,
+                       z - pos.z * kChunkDim});
     }
   }
 
@@ -163,9 +163,8 @@ void MountainGenerator::GenerateDecor(ChunkPos pos, Chunk* chunk) {
   if (pos.y != 5) return;
   for (auto [x, z] : Product<2>({{x0, x1}, {z0, z1}})) {
     if ((x - 100) * (x - 100) + (z - 100) * (z - 100) <= 100 * 100) {
-      chunk->SetBlock(
-          context_.blocks_->WHITE_CONCRETE,
-          BlockPos{x - pos.x * kChunkDim, 10, z - pos.z * kChunkDim});
+      chunk->SetBlock(context_.blocks_->WHITE_CONCRETE,
+                      {x - pos.x * kChunkDim, 10, z - pos.z * kChunkDim});
     }
 
     // if (y == 90) {

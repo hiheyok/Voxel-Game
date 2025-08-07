@@ -80,9 +80,7 @@ void TexturedFrameBuffer::GenBuffer(GLint x, GLint y, float muti,
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
                         reinterpret_cast<void*>(2 * sizeof(float)));
 
-  context_.logger_->LogDebug(
-      "TexturedFrameBuffer::GenBuffer",
-      "Created new framebuffer: " + std::to_string(fbo_));
+  LOG_DEBUG("Created new framebuffer: " + std::to_string(fbo_));
 }
 
 void TexturedFrameBuffer::UpdateResolution(GLint x, GLint y, float muti) {

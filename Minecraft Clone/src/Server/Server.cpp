@@ -38,7 +38,7 @@ void Server::Stop() {
 }
 
 void Server::Loop() {
-  context_.logger_->LogDebug("Server::Loop", "Started main server loop");
+  LOG_DEBUG("Started main server loop");
   while (!stop_) {
     time_->Set();
     // Process Client -> Server events
@@ -57,7 +57,7 @@ void Server::Loop() {
 
     mspt_ = time_->GetTimePassed_ms();
   }
-  context_.logger_->LogDebug("Server::Loop", "Shutting down main server loop");
+  LOG_DEBUG("Shutting down main server loop");
 }
 
 void Server::Tick() {

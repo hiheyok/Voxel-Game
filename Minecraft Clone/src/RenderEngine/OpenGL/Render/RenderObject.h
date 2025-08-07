@@ -33,7 +33,7 @@ class RenderObject {
   virtual void Render() = 0;
 
   void SetShader(std::unique_ptr<ShaderInterface> shader);
-  void SetShader(std::string vertex, std::string fragment);
+  void SetShader(const std::string&);
 
   // Use to configure shader before rendering
   ShaderInterface& GetShader();

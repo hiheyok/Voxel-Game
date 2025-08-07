@@ -12,8 +12,7 @@ void DebugMeshStressFace::Generate(ChunkPos pos,
   (void)pos;
   for (auto [x, y, z] : Product<3>(0, kChunkDim)) {
     if ((y & 1)) {
-      chunk->SetBlockUnsafe(context_.blocks_->WHITE_CONCRETE,
-                            BlockPos{x, y, z});
+      chunk->SetBlockUnsafe(context_.blocks_->WHITE_CONCRETE, {x, y, z});
     }
   }
 }

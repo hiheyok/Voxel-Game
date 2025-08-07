@@ -44,11 +44,11 @@ void FallingBlock::Tick(Entity* entity, Dimension* dimension) {
   entity->is_dirty_ = true;
 
   if (collideWithGround) {
-    BlockEvent addBlock{BlockPos{entity->properties_.position_.x,
-                                 entity->properties_.position_.y,
-                                 entity->properties_.position_.z},
-                        context_.blocks_->SAND,
-                        context_.event_handler_->BlockPlace};
+    BlockEvent addBlock{
+        {entity->properties_.position_.x, entity->properties_.position_.y,
+         entity->properties_.position_.z},
+        context_.blocks_->SAND,
+        context_.event_handler_->BlockPlace};
     dimension->event_manager_.AddEvent(addBlock);
 
     EntityEvent removeEntity;

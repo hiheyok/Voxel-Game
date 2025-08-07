@@ -11,8 +11,7 @@ BlockPos ChunkPos::GetBlockPosOffset() const noexcept {
 }
 
 RegionPos ChunkPos::ToRegionPos() const noexcept {
-  return RegionPos{x >> kRegionDimLog2, y >> kRegionDimLog2,
-                   z >> kRegionDimLog2};
+  return RegionPos{x, y, z} >> kRegionDimLog2;
 }
 
 size_t ChunkPos::GetIndex() const noexcept {
@@ -22,12 +21,11 @@ size_t ChunkPos::GetIndex() const noexcept {
 }
 
 RegionPos BlockPos::ToRegionPos() const noexcept {
-  return RegionPos{x >> kBlockToRegionLog2, y >> kBlockToRegionLog2,
-                   z >> kBlockToRegionLog2};
+  return RegionPos{x, y, z} >> kBlockToRegionLog2;
 }
 
 ChunkPos BlockPos::ToChunkPos() const noexcept {
-  return ChunkPos{x >> kChunkDimLog2, y >> kChunkDimLog2, z >> kChunkDimLog2};
+  return ChunkPos{x, y, z} >> kChunkDimLog2;
 }
 
 size_t BlockPos::GetIndex() const noexcept {
@@ -39,7 +37,7 @@ size_t BlockPos::GetIndex() const noexcept {
 BlockPos BlockPos::GetLocalPos() const noexcept {
   static constexpr uint32_t mask = kChunkDim - 1;
 
-  return BlockPos{x & mask, y & mask, z & mask};
+  return {x & mask, y & mask, z & mask};
 }
 
 bool BlockPos::IsInSameChunk(BlockPos other) const noexcept {

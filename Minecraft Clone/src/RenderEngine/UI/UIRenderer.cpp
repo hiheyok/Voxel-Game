@@ -9,8 +9,7 @@ UIRenderer::UIRenderer(GameContext& context)
     : context_{context}, renderer_{context} {
   renderer_.SetDataAttribute(0, 2, GL_FLOAT, 6, 0);
   renderer_.SetDataAttribute(1, 4, GL_FLOAT, 6, 2);
-  renderer_.SetShader("assets/shaders/UI/vert.glsl",
-                      "assets/shaders/UI/frag.glsl");
+  renderer_.SetShader("ui_render");
 }
 UIRenderer::~UIRenderer() = default;
 

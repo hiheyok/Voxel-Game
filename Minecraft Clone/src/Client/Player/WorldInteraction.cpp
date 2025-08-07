@@ -69,8 +69,8 @@ void WorldInteraction::BreakBlock(Ray ray, ServerInterface* interface,
   if (cache->collusion_manager_.CheckRayIntersection(ray)) {
     // Send block break packet
     PlayerPacket::PlayerDestroyBlock packet;
-    packet.pos_ = BlockPos{floor(ray.end_point_.x), floor(ray.end_point_.y),
-                           floor(ray.end_point_.z)};
+    packet.pos_ = {floor(ray.end_point_.x), floor(ray.end_point_.y),
+                   floor(ray.end_point_.z)};
 
     interface->SendPlayerAction(packet);
   }
@@ -90,7 +90,7 @@ void WorldInteraction::PlaceBlock(Ray ray, BlockID block,
          0b1);  // Offsets block location to be placed by 1 block
     PlayerPacket::PlayerPlaceBlock packet;
     packet.block_ = block;
-    packet.pos_ = BlockPos{placePos.x, placePos.y, placePos.z};
+    packet.pos_ = {placePos.x, placePos.y, placePos.z};
     interface->SendPlayerAction(packet);
   }
 }

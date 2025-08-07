@@ -5,12 +5,29 @@
 #include <stdexcept>
 #include <string>
 
+#include "Assets/Types/ShaderSource.h"
+
 ComputeShader::ComputeShader(GameContext& context, std::string source)
     : ShaderInterface{context} {
   std::string shaderSource = ReadFile(source);
 
   shader_id_ = glCreateProgram();
   GLuint shader = CompileShader(shaderSource, "Compute", GL_COMPUTE_SHADER);
+
+  glAttachShader(shader_id_, shader);
+  glLinkProgram(shader_id_);
+
+  CheckCompileErrors(shader_id_, "PROGRAM");
+
+  glDeleteShader(shader);  // Cleanup
+}
+
+ComputeShader::ComputeShader(GameContext& context, ShaderSource& src)
+    : ShaderInterface{context} {
+  std::string shader_src = src.GetCompute();
+
+  shader_id_ = glCreateProgram();
+  GLuint shader = CompileShader(shader_src, "Compute", GL_COMPUTE_SHADER);
 
   glAttachShader(shader_id_, shader);
   glLinkProgram(shader_id_);

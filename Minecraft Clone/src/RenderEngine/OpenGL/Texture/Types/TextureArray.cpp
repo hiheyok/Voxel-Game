@@ -26,9 +26,7 @@ void TextureArray::LoadToGPU() {
                   static_cast<GLsizei>(height_), layers_, GL_RGBA,
                   GL_UNSIGNED_BYTE, array_data_.data());
   glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
-  context_.logger_->LogDebug(
-      "TextureArray::LoadToGPU",
-      "Loaded Texture Array: " + std::to_string(texture_id_));
+  LOG_DEBUG("Loaded Texture Array: " + std::to_string(texture_id_));
 }
 
 void TextureArray::SetSize(int width, int height) {
@@ -78,13 +76,12 @@ void TextureArray::AddData(std::vector<uint8_t> data, size_t width,
 bool TextureArray::AddTextureToArray(RawTextureData* data) {
   format_ = GL_RGBA;
   if (!data->data_) {
-    context_.logger_->LogError("TextureArray::AddTextureToArray", "No texture");
+    LOG_ERROR("No texture");
     return false;
   }
 
   if (((data->width_ % width_) != 0) || ((data->height_ % height_) != 0)) {
-    context_.logger_->LogError("TextureArray::AddTextureToArray",
-                               "Width or height doesn't match");
+    LOG_ERROR("Width or height doesn't match");
     return false;
   }
 
@@ -127,15 +124,12 @@ std::optional<RawTextureData> TextureArray::AddTextureToArray(
   std::optional<RawTextureData> data;
   RawTextureData tex{file};
   if (AddTextureToArray(&tex)) {
-    context_.logger_->LogInfo("TextureArray::AddTextureToArray",
-                              "Loaded: " + file +
-                                  " | Size: " + std::to_string(tex.height_) +
-                                  ", " + std::to_string(tex.width_));
+    LOG_INFO("Loaded: " + file + " | Size: " + std::to_string(tex.height_) +
+             ", " + std::to_string(tex.width_));
     data = std::move(tex);
     return data;
   } else {
-    context_.logger_->LogError("TextureArray::AddTextureToArray",
-                               "Unable to load: " + file);
+    LOG_ERROR("Unable to load: " + file);
     return data;
   }
 }

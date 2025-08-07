@@ -8,11 +8,11 @@ DebugWorldSecond::DebugWorldSecond(GameContext& context)
 DebugWorldSecond::~DebugWorldSecond() = default;
 
 void DebugWorldSecond::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
-  chunk->SetBlock(context_.blocks_->COBBLESTONE, BlockPos{8, 8, 8});
+  chunk->SetBlock(context_.blocks_->COBBLESTONE, {8, 8, 8});
 
-  BlockPos scaled_pos = BlockPos{pos.x, pos.y, pos.z} * kChunkDim;
+  BlockPos chunk_offset = pos.GetBlockPosOffset();
 
-  BlockPos local_pos{0, 0, 0};
+  BlockPos local_pos;
 
   for (local_pos.x = 0; local_pos.x < kChunkDim; ++local_pos.x) {
     for (local_pos.y = 0; local_pos.y < kChunkDim; ++local_pos.y) {
@@ -23,7 +23,7 @@ void DebugWorldSecond::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
           continue;
         }
 
-        BlockPos global_pos = local_pos + scaled_pos;
+        BlockPos global_pos = local_pos + chunk_offset;
 
         if ((abs(global_pos.x) >= abs(global_pos.z)) &&
             (abs(global_pos.x) >= abs(global_pos.y))) {

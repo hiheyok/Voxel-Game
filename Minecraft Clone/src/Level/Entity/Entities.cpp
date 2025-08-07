@@ -37,9 +37,8 @@ EntityTypeID EntitiesList::RegisterEntity(std::string EntityName,
 
   newEntity->entity_name_ = EntityName;
 
-  context_.logger_->LogInfo("EntitiesList::RegisterEntity",
-                            "Registered new entity: " + EntityName +
-                                " | EntityID: " + std::to_string(ID));
+  LOG_INFO("Registered new entity: " + EntityName +
+           " | EntityID: " + std::to_string(ID));
 
   newEntity->id_ = ID;
 
@@ -60,9 +59,8 @@ void EntitiesList::InitializeModels() {
     json::iterator d = b.value().begin();
 
     if (d.value().is_string()) {
-      context_.logger_->LogInfo("EntitiesList::InitializeModels",
-                                "Entity: " + b.key() + " | Texture Loading: " +
-                                    (std::string)d.value());
+      LOG_INFO("Entity: " + b.key() +
+               " | Texture Loading: " + (std::string)d.value());
       RawTextureData TexData{d.value()};
       entity_type_list_[entityType]->texture_ =
           std::make_unique<Texture2D>(context_, TexData);

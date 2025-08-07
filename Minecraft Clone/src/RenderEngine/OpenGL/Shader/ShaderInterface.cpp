@@ -299,17 +299,15 @@ void ShaderInterface::CheckCompileErrors(GLuint shader, std::string type) {
     if (!success) {
       glGetShaderInfoLog(shader, 2048, 0, infoLog);
       std::cout << infoLog << '\n';
-      context_.logger_->LogError("Shader::CheckCompileErrors",
-                                 "Failed to compile" + type + " Shader: \n" +
-                                     std::string(infoLog) + "\n");
+      LOG_ERROR("Failed to compile" + type + " Shader: \n" +
+                std::string(infoLog) + "\n");
     }
   } else {
     glGetProgramiv(shader, GL_LINK_STATUS, &success);
     if (!success) {
       glGetProgramInfoLog(shader, 1024, 0, infoLog);
-      context_.logger_->LogError(
-          "Shader::CheckCompileErrors",
-          "Failed to link Shader Program: \n" + std::string(infoLog) + "\n");
+      LOG_ERROR("Failed to link Shader Program: \n" + std::string(infoLog) +
+                "\n");
     }
   }
 }
@@ -325,9 +323,8 @@ std::string ShaderInterface::ReadFile(std::string path) {
     file.close();
     code = shaderStream.str();
   } catch (std::ifstream::failure& e) {
-    context_.logger_->LogError("Shader::ReadFile",
-                               "Failed to read file: " + std::string(path));
-    context_.logger_->LogError("Shader::ReadFile", e.what());
+    LOG_ERROR("Failed to read file: " + std::string(path));
+    LOG_ERROR(e.what());
   }
 
   return code;

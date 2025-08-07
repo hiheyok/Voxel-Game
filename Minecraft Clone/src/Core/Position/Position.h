@@ -19,7 +19,7 @@ class Position {
 
   constexpr Position(int px, int py, int pz) noexcept : x{px}, y{py}, z{pz} {}
 
-  constexpr Position() noexcept = default;
+  constexpr Position() noexcept : Position(0, 0, 0) {};
 
   constexpr Position(const Position<Derived>& m) noexcept = default;
   constexpr Position(Position<Derived>&&) noexcept = default;

@@ -2,6 +2,9 @@
 
 #include "Level/Item/ItemTextureAtlas.h"
 
+#include "Assets/AssetManager.h"
+#include "Core/GameContext/GameContext.h"
+
 void ItemTextureAtlas::RenderBlockItem(Item item) {
   framebuffer_single_block_render_.BindFBO();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -74,8 +77,7 @@ ItemTextureAtlas::~ItemTextureAtlas() = default;
 
 void ItemTextureAtlas::Initialize(int atlasItemSize, int individualItemSize) {
   stitching_shader_ =
-      Shader(context_, "assets/shaders/ItemRender/AtlasStitchVert.glsl",
-             "assets/shaders/ItemRender/AtlasStitchFrag.glsl");
+      Shader(context_, *context_.assets_->GetShaderSource("atlas_stitch_shader"));
 
   individual_size_ = individualItemSize;
   atlas_size_ = atlasItemSize;

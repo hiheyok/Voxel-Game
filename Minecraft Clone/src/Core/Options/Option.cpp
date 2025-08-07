@@ -29,7 +29,7 @@ bool Options::SetValue(std::string name, std::string value) {
   size_t val = stoll(value);
 
   if (!option_name_.count(name)) {
-    context_.logger_->LogError("Options::SetValue", "Unknown option: " + name);
+    LOG_ERROR("Unknown option: " + name);
     return false;
   }
 
@@ -43,7 +43,7 @@ void Options::ProcessTokens(std::vector<std::string> tokens) {
   for (size_t i = 0; i < tokens.size() / 2; i++) {
     std::string name = tokens[2 * i];
     std::string val = tokens[2 * i + 1];
-    context_.logger_->LogDebug("Options::ProcessTokens", name + ":" + val);
+    LOG_DEBUG(name + ":" + val);
     if (!SetValue(name, val)) {
       success = false;
     }
@@ -77,6 +77,5 @@ void Options::GenerateOptionFile() {  // Generate file if deleted
   }
 
   file.close();
-  context_.logger_->LogDebug("Options::GenerateOptionFile",
-                             "Generated option file");
+  LOG_DEBUG("Generated option file");
 }

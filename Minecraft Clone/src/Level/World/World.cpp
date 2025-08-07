@@ -15,8 +15,7 @@ World::~World() = default;
 
 void World::SetBlock(BlockID block, BlockPos pos) {
   if (!chunks_->SetBlock(block, pos)) {
-    context_.logger_->LogWarn("World::SetBlock",
-                              "Tried to place block outside of the world");
+    LOG_WARN("Tried to place block outside of the world");
   }
 }
 

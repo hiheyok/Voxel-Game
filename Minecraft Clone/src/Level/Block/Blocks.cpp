@@ -36,8 +36,7 @@ BlockID BlockList::RegisterBlock(std::string blockName, Block* block) {
 
   block_id_name_data_[blockName] = id;
 
-  context_.logger_->LogInfo("BlockList::RegisterBlock",
-                            "Registered new block (ID): " + std::to_string(id));
+  LOG_INFO("Registered new block (ID): " + std::to_string(id));
   return id;
 }
 
@@ -67,7 +66,7 @@ void BlockList::AddAssets(std::string namespaceIn) {
     }
 
   } catch (std::filesystem::filesystem_error& e) {
-    context_.logger_->LogWarn("BlockList::AddAssets", e.what());
+    LOG_WARN(e.what());
   }
 }
 

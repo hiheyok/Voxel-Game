@@ -24,13 +24,12 @@ bool Texture2D::Load(const RawTextureData& data) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     GL_NEAREST_MIPMAP_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    context_.logger_->LogDebug(
-        "Texture2D::Load", "Loaded 2D Texture: " + std::to_string(texture_id_));
+    LOG_DEBUG("Loaded 2D Texture: " + std::to_string(texture_id_));
     width_ = data.width_;
     height_ = data.height_;
     return true;
   } else {
-    context_.logger_->LogError("Texture2D::Load", "Image is not loaded");
+    LOG_ERROR("Image is not loaded");
     return false;
   }
 }

@@ -74,7 +74,7 @@ glm::dvec3 CollusionDetector::ComputeCollisionTimes(Entity* entity) {
     int v_axis = (axis + 2) % 3;
 
     for (auto [u, v] : Product<2>({i_bound[u_axis] + 1, i_bound[v_axis] + 1})) {
-      glm::ivec3 offset(0, 0, 0);
+      glm::ivec3 offset;
 
       offset[axis] = i_bound[axis] * (entity->properties_.velocity_[axis] >= 0);
       offset[u_axis] = u;
@@ -170,7 +170,7 @@ bool CollusionDetector::CheckRayIntersection(Ray& ray) {
     iterations++;
 
     BlockID b =
-        cache_->GetBlock(BlockPos{block_pos.x, block_pos.y, block_pos.z});
+        cache_->GetBlock({block_pos.x, block_pos.y, block_pos.z});
 
     if (context_.blocks_->GetBlockType(b)->properties_->is_solid_) {
       ray.end_point_ = (glm::vec3)block_pos;

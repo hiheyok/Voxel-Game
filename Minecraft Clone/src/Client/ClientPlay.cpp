@@ -281,8 +281,7 @@ void ClientPlay::UpdateChunks() {
 
     if (!client_level_->cache_.CheckChunk(sky_light.position_)) {
       continue;
-      context_.logger_->LogWarn("ClientPlay::UpdateChunks",
-                                "Chunk doens't exist!");
+      LOG_WARN("Chunk doens't exist!");
     }
 
     Chunk* chunk = client_level_->cache_.GetChunk(sky_light.position_);
@@ -333,7 +332,7 @@ void ClientPlay::UpdateEntities() {
         break;
       }
       default:
-        context_.logger_->LogDebug("ClientPlay::UpdateEntities", "Default");
+        LOG_DEBUG("Default");
     }
   }
 

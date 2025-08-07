@@ -4,6 +4,8 @@
 
 #include <utility>
 
+#include "Assets/AssetManager.h"
+#include "Core/GameContext/GameContext.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 
@@ -24,8 +26,9 @@ void RenderObject::SetShader(std::unique_ptr<ShaderInterface> shader) {
   shader_ = std::move(shader);
 }
 
-void RenderObject::SetShader(std::string vertex, std::string fragment) {
-  shader_ = std::make_unique<Shader>(context_, vertex, fragment);
+void RenderObject::SetShader(const std::string& asset_key) {
+  shader_ = std::make_unique<Shader>(
+      context_, *context_.assets_->GetShaderSource(asset_key));
 }
 
 ShaderInterface& RenderObject::GetShader() { return *shader_; }

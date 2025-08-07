@@ -67,7 +67,7 @@ void Mesh::ChunkMeshData::GenerateCache() {
     dst_x += kCacheDim2D;
   }
 
-  BlockPos pos{0, 0, 0};
+  BlockPos pos;
   for (auto side : Directions<ChunkPos>()) {
     int axis = side.GetAxis();
     int direction = side.GetDirection() & 0b1;
@@ -78,8 +78,10 @@ void Mesh::ChunkMeshData::GenerateCache() {
       continue;
     }
 
+    int side_idx = direction * (kChunkDim - 1);
+
     std::array<BlockID, kChunkSize2D> slice_data =
-        neighbor.value()->GetPalette().UnpackSlice(axis, direction * 15);
+        neighbor.value()->GetPalette().UnpackSlice(axis, side_idx);
 
     int axis_u = (axis + 1) % 3;
     int axis_v = (axis + 2) % 3;

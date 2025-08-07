@@ -16,8 +16,5 @@ class Shader : public ShaderInterface {
  public:
   explicit Shader(
       GameContext&);  // TODO(hiheyok): tmp solution delete this later
-  [[deprecated]]
-  Shader(GameContext&, std::string vertexPath, std::string fragmentPath,
-         std::string geometryPath = "");
   Shader(GameContext&, ShaderSource&);
 };

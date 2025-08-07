@@ -13,9 +13,12 @@
 #include "RenderEngine/OpenGL/Shader/ShaderInterface.h"
 #include "Utils/LogUtils.h"
 
+class ShaderSource;
+
 class ComputeShader : public ShaderInterface {
  public:
   explicit ComputeShader(GameContext&, std::string source);
+  explicit ComputeShader(GameContext&, ShaderSource&);
 
   void DispatchCompute(int x, int y, int z);
 };

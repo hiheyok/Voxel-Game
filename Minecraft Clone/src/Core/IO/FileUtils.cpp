@@ -5,22 +5,20 @@
 #include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 
-std::vector<char> FileUtils::ReadFileToBuffer(GameContext& context,
+std::vector<char> FileUtils::ReadFileToBuffer(GameContext& context_,
                                               std::string filepath) {
   // Open the file at the end to easily get its size.
   std::ifstream file(filepath, std::ios::binary | std::ios::ate);
   file.exceptions(std::fstream::badbit | std::fstream::failbit);
 
   if (!file.is_open()) {
-    context.logger_->LogError("FileUtils::ReadFileToBuffer",
-                              "Failed to open file: " + filepath);
+    LOG_ERROR("Failed to open file: " + filepath);
     return {};  // Return empty vector on failure
   }
 
   std::streamsize size = file.tellg();
   if (size == 0) {
-    context.logger_->LogWarn("FileUtils::ReadFileToBuffer",
-                             "File is empty: " + filepath);
+    LOG_WARN("File is empty: " + filepath);
     return {};
   }
 
@@ -28,8 +26,7 @@ std::vector<char> FileUtils::ReadFileToBuffer(GameContext& context,
 
   std::vector<char> buffer(size);
   if (!file.read(buffer.data(), size)) {
-    context.logger_->LogError("FileUtils::ReadFileToBuffer",
-                              "Failed to read file: " + filepath);
+    LOG_ERROR("Failed to read file: " + filepath);
     return {};  // Return empty vector on failure
   }
 

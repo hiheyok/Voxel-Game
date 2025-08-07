@@ -194,8 +194,7 @@ void TerrainRenderer::AddChunk(ChunkPos pos,
   }
 
   if (!success) {
-    context_.logger_->LogInfo("TerrainRenderer::AddChunk",
-                              "Unable to add chunk. Solid buffers are full!");
+    LOG_INFO("Unable to add chunk. Solid buffers are full!");
   }
 }
 

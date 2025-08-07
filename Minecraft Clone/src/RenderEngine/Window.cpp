@@ -145,9 +145,7 @@ void Window::ResizeWindowCallback(GLFWwindow* win, int x, int y) {
   properties_.size_dirty_ = true;
   inputs_.UpdateResolution(x, y);
 
-  context_.logger_->LogInfo(
-      "Window::ResizeWindowCallback",
-      " Resized Window: " + std::to_string(x) + ", " + std::to_string(y));
+  LOG_INFO(" Resized Window: " + std::to_string(x) + ", " + std::to_string(y));
 }
 
 void Window::ScrollCallback(GLFWwindow* win, double x_offset, double y_offset) {
@@ -185,13 +183,13 @@ void Window::MouseButtonCallback(GLFWwindow* win, int button, int action,
 
 void Window::InitializeGLFW() {
   if (properties_.initialized_) {
-    context_.logger_->LogDebug("Window::Start", "Already initialized");
+    LOG_DEBUG("Already initialized");
     return;
   }
 
   glfwInit();
   if (!glfwInit()) {
-    throw std::runtime_error("Window::Start - Initialization Failed: GLFW");
+    LOG_ERROR("Initialization Failed: GLFW");
     return;
   }
 
@@ -209,9 +207,9 @@ void Window::InitializeGLFW() {
 
   if (win_ == nullptr) {
     glfwTerminate();
-    throw std::runtime_error("Window::Start - Failed to create GLFW Window");
+    LOG_ERROR("Failed to create GLFW Window");
   } else {
-    context_.logger_->LogInfo("Window::Start", "Created GLFW Window");
+    LOG_INFO("Created GLFW Window");
   }
 }
 
@@ -231,14 +229,14 @@ void Window::InitializeGLEW() {
   glewInit();
 
   if (glewInit() != GLEW_OK) {
-    throw std::runtime_error("Window::Start - Initialization Failed: GLEW");
+    LOG_ERROR("Window::Start - Initialization Failed: GLEW");
     return;
   }
   glewExperimental = GL_TRUE;
 
   std::stringstream str;
   str << "OpenGL Version: " << glGetString(GL_VERSION);
-  context_.logger_->LogInfo("Window::Start", str.str());
+  LOG_INFO(str.str());
 }
 
 void Window::InitializeDebugCallback() {

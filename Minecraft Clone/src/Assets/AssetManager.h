@@ -28,8 +28,14 @@ class AssetManager {
   void Load();
 
  private:
+  // Discovery functions
+  void DiscoverShaders();
+
   template <IsAsset AssetType, typename... Args>
   void CreateAsset(std::string key, Args&&... args);
+
+  template <IsAsset AssetType>
+  void PutAsset(std::string key, std::unique_ptr<AssetType> asset);
 
   template <IsAsset AssetType>
   AssetHandle<AssetType> GetAsset(std::string key);
@@ -61,6 +67,12 @@ void AssetManager::CreateAsset(std::string key, Args&&... args) {
   auto obj =
       std::make_unique<AssetType>(context_, key, std::forward<Args>(args)...);
   cache.emplace(key, std::move(obj));
+}
+
+template <IsAsset AssetType>
+void AssetManager::PutAsset(std::string key, std::unique_ptr<AssetType> asset) {
+  auto& cache = GetCache<AssetType>();
+  cache.emplace(key, std::move(asset));
 }
 
 template <IsAsset AssetType>

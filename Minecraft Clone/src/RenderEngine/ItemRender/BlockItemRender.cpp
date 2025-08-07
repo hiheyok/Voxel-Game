@@ -26,8 +26,7 @@ BlockItemRender::BlockItemRender(GameContext& context)
 BlockItemRender::~BlockItemRender() = default;
 
 void BlockItemRender::Initialize() {
-  render_->SetShader("assets/shaders/ItemRender/BlockModelVert.glsl",
-                     "assets/shaders/ItemRender/BlockModelFrag.glsl");
+  render_->SetShader("block_render");
 
   render_->SetDataAttribute(0, 3, GL_FLOAT, 7, 0);
   render_->SetDataAttribute(1, 2, GL_FLOAT, 7, 3);

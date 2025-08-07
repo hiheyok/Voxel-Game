@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 
+#include "Assets/AssetManager.h"
 #include "Core/GameContext/GameContext.h"
 #include "RenderEngine/GUI/Font.h"
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
@@ -42,25 +43,22 @@ void TextRenderer::InitializeTextRenderer(GLFWwindow* w) {
   background_render_->SetDataAttribute(2, 4, GL_FLOAT, 8, 4);
 
   // Initialize shaders
-  font_render_->SetShader("assets/shaders/Font/FontVert.glsl",
-                          "assets/shaders/Font/FontFrag.glsl");
-  background_render_->SetShader("assets/shaders/Font/FontBackgroundVert.glsl",
-                                "assets/shaders/Font/FontBackgroundFrag.glsl");
+  font_render_->SetShader("font_render");
+  background_render_->SetShader("font_background_render");
 
   // Load textures
   RawTextureData RawTexture{"assets/minecraft/textures/font/ascii.png"};
   font_texture_->Load(RawTexture);
   font_render_->SetTexture2D(0, font_texture_->Get(), "FontTexture");
   window_ = w;
-  context_.logger_->LogDebug("TextRenderer::InitializeTextRenderer",
-                             "Initialized font renderer");
+  LOG_DEBUG("Initialized font renderer");
 }
 
 void TextRenderer::InsertFontObject(const std::string& name,
                                     RenderableFont font) {
   if (font_map_.count(name)) {
     throw std::logic_error(
-        "TextRenderer::InsertFontObject - " +
+        FUNC_SIGNATURE +
         std::string("Font with the name " + name + " already exist!"));
   }
 

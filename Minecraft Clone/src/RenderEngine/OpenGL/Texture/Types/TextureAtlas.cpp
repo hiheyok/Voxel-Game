@@ -35,9 +35,7 @@ void TextureAtlas::LoadToGPU() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 4);
 
-  context_.logger_->LogDebug(
-      "TextureAtlas::LoadToGPU",
-      "Loaded Texture Atlas: " + std::to_string(texture_id_));
+  LOG_DEBUG("Loaded Texture Atlas: " + std::to_string(texture_id_));
 }
 
 void TextureAtlas::SetPixel(int r, int g, int b, int a, size_t w, size_t h) {
@@ -103,8 +101,7 @@ void TextureAtlas::AddData(
       count_++;
       break;
     default:
-      context_.logger_->LogError("TextureAtlas::AddData",
-                                 "Invalid image format!");
+      LOG_ERROR("Invalid image format!");
       break;
   }
 }
@@ -112,15 +109,13 @@ void TextureAtlas::AddData(
 bool TextureAtlas::AddTextureToAtlasHelper(const RawTextureData& data) {
   format_ = GL_RGBA;
   if (!data.data_) {
-    context_.logger_->LogWarn("TextureAtlas::AddTextureToAtlasHelper",
-                              "No texture");
+    LOG_WARN("No texture");
     return false;
   }
 
   if (((data.width_ % individual_tex_width_) != 0) ||
       ((data.height_ % individual_tex_height_) != 0)) {
-    context_.logger_->LogError("TextureAtlas::AddTextureToAtlasHelper",
-                               "Width or height doesn't match");
+    LOG_ERROR("Width or height doesn't match");
     return false;
   }
 
@@ -164,15 +159,12 @@ std::optional<RawTextureData> TextureAtlas::AddTextureToAtlas(
   std::optional<RawTextureData> data;
   RawTextureData tex{file};
   if (AddTextureToAtlasHelper(tex)) {
-    context_.logger_->LogInfo("TextureAtlas::AddTextureToAtlas",
-                              "Loaded: " + file +
-                                  " | Size: " + std::to_string(tex.height_) +
-                                  ", " + std::to_string(tex.width_));
+    LOG_INFO("Loaded: " + file + " | Size: " + std::to_string(tex.height_) +
+             ", " + std::to_string(tex.width_));
     data = std::move(tex);
     return data;
   } else {
-    context_.logger_->LogWarn("TextureAtlas::AddTextureToAtlas",
-                              "Unable to load: " + file);
+    LOG_WARN("Unable to load: " + file);
     return data;
   }
 }

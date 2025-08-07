@@ -22,8 +22,7 @@ void DebugWorld::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
 
   if (gy == 0) {
     for (auto [x, z] : Product<2>(kChunkDim)) {
-      chunk->SetBlockUnsafe(context_.blocks_->WHITE_CONCRETE,
-                            BlockPos{x, 0, z});
+      chunk->SetBlockUnsafe(context_.blocks_->WHITE_CONCRETE, {x, 0, z});
     }
   }
 
@@ -47,7 +46,7 @@ void DebugWorld::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
     int b = px + pz * RowLen + py * RowLen * ColLen;
 
     if ((b < numBlocks) && (b >= 0)) {
-      chunk->SetBlockUnsafe(b, BlockPos{x, y, z});
+      chunk->SetBlockUnsafe(b, {x, y, z});
     }
   }
 }

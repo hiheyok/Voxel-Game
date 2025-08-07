@@ -21,8 +21,7 @@ void EventHandler::ExecuteEvent(Event event, Dimension* dimension) {
       break;
     }
     default: {
-      context_.logger_->LogWarn("EventHandler::ExecuteEvent",
-                                "Tried to handle unimplemented case");
+      LOG_WARN("Tried to handle unimplemented case");
       break;
     }
   }

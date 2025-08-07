@@ -25,7 +25,7 @@ LogUtils::LogUtils() : buffer_{'\0'} {
   file_.open(str);
 
   logging_thread_ = std::jthread(std::bind_front(&LogUtils::MainLogger, this));
-  LogInfo("Logger", "Started Logger");
+  LogInfo(FUNC_SIGNATURE, "Started Logger");
 }
 
 LogUtils::~LogUtils() { logging_thread_.request_stop(); }

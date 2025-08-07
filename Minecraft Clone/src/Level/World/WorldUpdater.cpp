@@ -51,8 +51,8 @@ void WorldUpdater::loadSummonEntitySurrounding(EntityUUID uuid) {
       continue;
     if (abs(offset.y) > settings_->vertical_ticking_distance_) continue;
 
-    bool isSuccess = RequestLoad(ChunkPos{
-        current_chunk_pos.x, current_chunk_pos.y, current_chunk_pos.z});
+    bool isSuccess = RequestLoad(
+        {current_chunk_pos.x, current_chunk_pos.y, current_chunk_pos.z});
     if (!isSuccess) continue;
 
     for (int side = 0; side < 6; side++) {
@@ -145,8 +145,8 @@ void WorldUpdater::loadSurroundedMovedEntityChunk() {
         test_position[j] += sideDistanceOffset * side;
 
         // Test if it exist of generating
-        bool isSuccess = RequestLoad(
-            ChunkPos{test_position.x, test_position.y, test_position.z});
+        bool isSuccess =
+            RequestLoad({test_position.x, test_position.y, test_position.z});
         if (!isSuccess) continue;
       }
     }
@@ -169,7 +169,7 @@ void WorldUpdater::loadSpawnChunks() {
   auto it = Product<3>({{x0, x1}, {y0, y1}, {z0, z1}});
 
   for (const auto& [x, y, z] : it | std::views::reverse) {
-    if (!RequestLoad(ChunkPos{x, y, z})) {
+    if (!RequestLoad({x, y, z})) {
       continue;
     }
   }
