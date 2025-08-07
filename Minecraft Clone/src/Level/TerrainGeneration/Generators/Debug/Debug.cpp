@@ -3,8 +3,7 @@
 #include "Core/GameContext/GameContext.h"
 #include "Level/Block/Blocks.h"
 
-DebugWorld::DebugWorld(GameContext& game_context)
-    : WorldGenerator{game_context} {}
+DebugWorld::DebugWorld(GameContext& context) : WorldGenerator{context} {}
 DebugWorld::~DebugWorld() = default;
 
 void DebugWorld::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
@@ -16,15 +15,14 @@ void DebugWorld::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
     return;
   }
 
-  int numBlocks =
-      static_cast<int>(game_context_.blocks_->block_type_data_.size());
+  int numBlocks = static_cast<int>(context_.blocks_->block_type_data_.size());
 
   int RowLen = 50;
   int ColLen = 50;
 
   if (gy == 0) {
     for (auto [x, z] : Product<2>(kChunkDim)) {
-      chunk->SetBlockUnsafe(game_context_.blocks_->WHITE_CONCRETE,
+      chunk->SetBlockUnsafe(context_.blocks_->WHITE_CONCRETE,
                             BlockPos{x, 0, z});
     }
   }

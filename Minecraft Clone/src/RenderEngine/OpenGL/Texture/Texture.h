@@ -59,7 +59,7 @@ class Texture {
   int GetFormat() const;
 
  protected:
-  GameContext& game_context_;
+  GameContext& context_;
   GLuint texture_id_ = 0;
   size_t width_ = 0;
   size_t height_ = 0;

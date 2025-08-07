@@ -25,7 +25,7 @@ class UIRenderer {
   void UploadToGPU();
   bool is_dirty_ = false;
 
-  GameContext& game_context_;
+  GameContext& context_;
 
   std::vector<UIVertexFormat> vertices_;
   std::vector<uint32_t> indices_;

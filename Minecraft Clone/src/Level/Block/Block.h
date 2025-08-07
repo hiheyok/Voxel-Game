@@ -40,7 +40,7 @@ class Block {
       ModelLoader& modelLoader);
   void InitializeTexture(BlockTextureAtlas& textureAtlas);
 
-  GameContext& game_context_;
+  GameContext& context_;
   BlockID id_ = 0;
   std::unique_ptr<BlockProperties> properties_;
   std::string block_name_ = "";

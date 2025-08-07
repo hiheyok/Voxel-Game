@@ -27,7 +27,7 @@ class ClientCache {
   void UpdateEntity(const EntityProperty& entity);
   void RemoveEntity(const EntityUUID& uuid);
 
-  GameContext& game_context_;
+  GameContext& context_;
   ClientEntities entities_;
   CollusionDetector collusion_manager_;
 

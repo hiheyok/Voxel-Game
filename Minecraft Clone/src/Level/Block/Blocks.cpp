@@ -17,7 +17,7 @@
 
 using json = nlohmann::json;
 
-BlockList::BlockList(GameContext& game_context) : game_context_{game_context} {}
+BlockList::BlockList(GameContext& context) : context_{context} {}
 
 BlockList::~BlockList() {
   for (const auto& obj : block_type_data_) {
@@ -36,9 +36,8 @@ BlockID BlockList::RegisterBlock(std::string blockName, Block* block) {
 
   block_id_name_data_[blockName] = id;
 
-  game_context_.logger_->LogInfo(
-      "BlockList::RegisterBlock",
-      "Registered new block (ID): " + std::to_string(id));
+  context_.logger_->LogInfo("BlockList::RegisterBlock",
+                            "Registered new block (ID): " + std::to_string(id));
   return id;
 }
 
@@ -64,11 +63,11 @@ void BlockList::AddAssets(std::string namespaceIn) {
     }
 
     for (std::string& name : allOtherBlocks) {
-      RegisterBlock(name, new DefaultBlock(game_context_));
+      RegisterBlock(name, new DefaultBlock(context_));
     }
 
   } catch (std::filesystem::filesystem_error& e) {
-    game_context_.logger_->LogWarn("BlockList::AddAssets", e.what());
+    context_.logger_->LogWarn("BlockList::AddAssets", e.what());
   }
 }
 

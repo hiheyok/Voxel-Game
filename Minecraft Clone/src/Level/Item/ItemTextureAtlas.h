@@ -25,7 +25,7 @@ class ItemTextureAtlas {
 
   explicit ItemTextureAtlas(GameContext&);
   ~ItemTextureAtlas();
-  
+
   void Initialize(int atlasItemSize, int individualItemSize);
   GLuint Get() const;
   size_t GetHeight() const;
@@ -37,7 +37,7 @@ class ItemTextureAtlas {
   void RenderBlockItem(Item item);
   void StitchTexture(size_t index, ItemID ItemID);
 
-  GameContext& game_context_;
+  GameContext& context_;
 
   std::unique_ptr<VertexArray> vao_;
   std::unique_ptr<Buffer> ebo_;

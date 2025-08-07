@@ -3,10 +3,10 @@
 #pragma once
 #include <gl/glew.h>
 
+#include <glm/vec2.hpp>
 #include <memory>
 #include <string>
 #include <vector>
-#include <glm/vec2.hpp>
 
 #include "Core/Typenames.h"
 
@@ -38,8 +38,8 @@ class GUISet {
   void PrepareRenderer();
   size_t GetNumRenderableObjects() const;
   GLuint GetGUITextureID() const;
-  
-  GameContext& game_context_;
+
+  GameContext& context_;
   std::vector<Buffer> ebos_;
   std::vector<VertexArray> vaos_;
   std::vector<size_t> vbo_size_;

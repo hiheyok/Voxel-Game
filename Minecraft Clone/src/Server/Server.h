@@ -51,7 +51,7 @@ class Server {
   // This will cause the player to join and return a uuid for the player
   EntityUUID SetInternalConnection(InternalInterface* conn);
 
-  GameContext& game_context_;
+  GameContext& context_;
   std::unique_ptr<Level> level_ = nullptr;
   std::unique_ptr<ServerSettings> settings_ = nullptr;
   ClientInterface* client_interface_ = nullptr;

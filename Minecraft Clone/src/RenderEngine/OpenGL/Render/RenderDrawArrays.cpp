@@ -4,9 +4,8 @@
 
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 
-RenderDrawArrays::RenderDrawArrays(GameContext& game_context,
-                                   uint32_t draw_type)
-    : RenderObject{game_context}, vbo_{game_context} {
+RenderDrawArrays::RenderDrawArrays(GameContext& context, uint32_t draw_type)
+    : RenderObject{context}, vbo_{context} {
   draw_type_ = draw_type;
   vbo_.SetType(GL_ARRAY_BUFFER);
   vbo_.SetUsage(GL_STATIC_DRAW);

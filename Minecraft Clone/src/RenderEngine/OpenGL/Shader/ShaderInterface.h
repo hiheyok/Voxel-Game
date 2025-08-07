@@ -70,7 +70,7 @@ class ShaderInterface {
   uint32_t shader_id_ = 0;
 
  protected:
-  GameContext& game_context_;
+  GameContext& context_;
   FastHashMap<std::string, int> cache_;
 
   // Value cache | Used to make sure to not update if the values are the same

@@ -23,7 +23,7 @@ class DebugScreen {
   void Initialize(GLFWwindow* w);
 
  private:
-  GameContext& game_context_;
+  GameContext& context_;
   GLFWwindow* window_{nullptr};
   std::unique_ptr<TextRenderer> renderer_;
   std::unique_ptr<Timer> timer_;

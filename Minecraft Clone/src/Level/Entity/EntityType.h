@@ -22,7 +22,7 @@ class EntityType {
 
   virtual void Tick(Entity* entity, Dimension* dimension) = 0;
 
-  GameContext& game_context_;
+  GameContext& context_;
   EntityTypeID id_ = 0;
   EntityModel render_model_;
   std::unique_ptr<Texture2D> texture_;

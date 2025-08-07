@@ -1,8 +1,8 @@
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <vector>
-#include <atomic>
 
 #include "Core/Typenames.h"
 #include "Utils/ThreadPool.h"
@@ -33,7 +33,7 @@ class ThreadedLightEngine {
   // Handles newly created chunks
   int WorkerLighter(ChunkPos pos);
 
-  GameContext& game_context_;
+  GameContext& context_;
   WorldInterface& world_;
 
   int light_update_done_ = 0;

@@ -9,14 +9,14 @@
 #include "Level/Entity/Entity.h"
 #include "Utils/LogUtils.h"
 
-World::World(GameContext& game_context) : WorldInterface{game_context} {}
+World::World(GameContext& context) : WorldInterface{context} {}
 
 World::~World() = default;
 
 void World::SetBlock(BlockID block, BlockPos pos) {
   if (!chunks_->SetBlock(block, pos)) {
-    game_context_.logger_->LogWarn("World::SetBlock",
-                                   "Tried to place block outside of the world");
+    context_.logger_->LogWarn("World::SetBlock",
+                              "Tried to place block outside of the world");
   }
 }
 

@@ -2,8 +2,7 @@
 
 #include <stdexcept>
 
-WorldGenerator::WorldGenerator(GameContext& game_context)
-    : game_context_{game_context} {}
+WorldGenerator::WorldGenerator(GameContext& context) : context_{context} {}
 
 WorldGenerator::~WorldGenerator() = default;
 

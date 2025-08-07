@@ -4,10 +4,10 @@
 
 #include <stdexcept>
 
-BlockTextureAtlas::BlockTextureAtlas(GameContext& game_context, int imagesX,
+BlockTextureAtlas::BlockTextureAtlas(GameContext& context, int imagesX,
                                      int imagesY, int individual_image_x_,
                                      int individual_image_y_)
-    : TextureAtlas{game_context, imagesX * individual_image_x_,
+    : TextureAtlas{context, imagesX * individual_image_x_,
                    imagesY * individual_image_y_, individual_image_x_,
                    individual_image_x_} {}
 

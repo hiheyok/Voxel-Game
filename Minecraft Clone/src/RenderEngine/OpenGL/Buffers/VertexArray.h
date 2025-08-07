@@ -60,6 +60,6 @@ class VertexArray {
     }
   }
 
-  GameContext& game_context_;
+  GameContext& context_;
   uint32_t array_id_ = 0;
 };

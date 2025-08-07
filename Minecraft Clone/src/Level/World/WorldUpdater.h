@@ -55,7 +55,7 @@ class WorldUpdater {
   void loadSummonEntitySurrounding(EntityUUID uuid);
   void loadSurroundedMovedEntityChunk();
 
-  GameContext& game_context_;
+  GameContext& context_;
   std::unique_ptr<WorldParameters> settings_;
   World* world_ = nullptr;
   FastHashSet<ChunkPos> generating_chunk_;

@@ -26,7 +26,7 @@ class ClientEntities {
   size_t GetChangedEntityCount() const;
 
  private:
-  GameContext& game_context_;
+  GameContext& context_;
 
   FastHashMap<EntityUUID, size_t> changed_entities_;
   std::vector<EntityProperty> changed_entities_list_;

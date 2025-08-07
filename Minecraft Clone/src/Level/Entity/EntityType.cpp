@@ -2,8 +2,7 @@
 
 #include "Level/Entity/EntityType.h"
 
-EntityType::EntityType(GameContext& game_context)
-    : game_context_{game_context} {}
+EntityType::EntityType(GameContext& context) : context_{context} {}
 EntityType::~EntityType() = default;
 void EntityType::ChangeHitboxSize(glm::vec3 size) { hitbox_.size_ = size; }
 

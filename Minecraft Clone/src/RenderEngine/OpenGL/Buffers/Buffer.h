@@ -61,7 +61,7 @@ class Buffer {
   uint32_t GetId() const noexcept;
 
  private:
-  GameContext& game_context_;
+  GameContext& context_;
   size_t max_size_ = 0;
   uint32_t buffer_id_ = 0;
   uint32_t type_ = 0, usage_ = 0;

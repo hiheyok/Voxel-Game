@@ -64,17 +64,17 @@ void ItemTextureAtlas::StitchTexture(size_t index, ItemID ItemID) {
   glDisable(GL_BLEND);
   atlas_framebuffer_.UnbindFBO();
 }
-ItemTextureAtlas::ItemTextureAtlas(GameContext& game_context)
-    : game_context_{game_context},
-      stitching_shader_{game_context},
-      atlas_framebuffer_{game_context},
-      framebuffer_single_block_render_{game_context},
-      block_item_renderer_{game_context} {}
+ItemTextureAtlas::ItemTextureAtlas(GameContext& context)
+    : context_{context},
+      stitching_shader_{context},
+      atlas_framebuffer_{context},
+      framebuffer_single_block_render_{context},
+      block_item_renderer_{context} {}
 ItemTextureAtlas::~ItemTextureAtlas() = default;
 
 void ItemTextureAtlas::Initialize(int atlasItemSize, int individualItemSize) {
   stitching_shader_ =
-      Shader(game_context_, "assets/shaders/ItemRender/AtlasStitchVert.glsl",
+      Shader(context_, "assets/shaders/ItemRender/AtlasStitchVert.glsl",
              "assets/shaders/ItemRender/AtlasStitchFrag.glsl");
 
   individual_size_ = individualItemSize;
@@ -84,9 +84,9 @@ void ItemTextureAtlas::Initialize(int atlasItemSize, int individualItemSize) {
   framebuffer_single_block_render_.GenBuffer(individual_size_, individual_size_,
                                              2, GL_RGBA);
 
-  vbo_ = std::make_unique<Buffer>(game_context_);
-  ebo_ = std::make_unique<Buffer>(game_context_);
-  vao_ = std::make_unique<VertexArray>(game_context_);
+  vbo_ = std::make_unique<Buffer>(context_);
+  ebo_ = std::make_unique<Buffer>(context_);
+  vao_ = std::make_unique<VertexArray>(context_);
 
   vbo_->SetType(GL_ARRAY_BUFFER);
   ebo_->SetType(GL_ELEMENT_ARRAY_BUFFER);

@@ -34,7 +34,7 @@ class Client : public Window {
 
   double frametime_ = 0.5;
 
-  GameContext& game_context_;
+  GameContext& context_;
   EntityUUID player_uuid_;
   std::unique_ptr<ClientPlay> client_play_;
   std::unique_ptr<Server> server_;

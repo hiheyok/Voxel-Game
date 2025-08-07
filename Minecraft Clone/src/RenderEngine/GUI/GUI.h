@@ -28,7 +28,7 @@ class GUI {
   void SetupDrawCalls();
   void Update();
 
-  GameContext& game_context_;
+  GameContext& context_;
   Window* window_;
   std::vector<GUISet> guis_;
   std::unique_ptr<Shader> shader_;

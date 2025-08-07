@@ -5,9 +5,9 @@
 #include "Level/Container/ChunkMap.h"
 #include "Level/Container/EntityContainer.h"
 
-WorldInterface::WorldInterface(GameContext& game_context)
-    : game_context_{game_context},
-      chunks_{std::make_unique<ChunkMap>(game_context, true, true)},
+WorldInterface::WorldInterface(GameContext& context)
+    : context_{context},
+      chunks_{std::make_unique<ChunkMap>(context, true, true)},
       entities_{std::make_unique<EntityContainer>()} {}
 
 WorldInterface::~WorldInterface() = default;

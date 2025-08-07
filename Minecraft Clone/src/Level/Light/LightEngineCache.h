@@ -90,7 +90,7 @@ class LightEngineCache {
   bool TryCacheChunk(ChunkPos pos);
   size_t CalculateCacheIndex(ChunkPos pos) const noexcept;
   // Calculate the index for the chunk the block_pos is in
-  size_t CalculateCacheIndex(BlockPos pos) const noexcept; 
+  size_t CalculateCacheIndex(BlockPos pos) const noexcept;
   [[nodiscard]] bool EnsureLoaded(ChunkPos pos);
   [[nodiscard]] LightStorage* EnsureLoadedGetSky(ChunkPos pos);
   [[nodiscard]] LightStorage* EnsureLoadedGetSky(BlockPos pos);
@@ -103,7 +103,7 @@ class LightEngineCache {
   static constexpr int kCacheWidth = 1 + 2 * kCacheRadius;
   static constexpr int kCacheSlice = kCacheWidth * kCacheWidth;
 
-  GameContext& game_context_;
+  GameContext& context_;
   WorldInterface& world_;
 
   ChunkPos center_chunk_;

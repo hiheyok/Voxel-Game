@@ -24,5 +24,5 @@ class WorldInteraction {
   void BreakBlock(Ray ray, ServerInterface* interface, ClientCache* cache);
   void PlaceBlock(Ray ray, BlockID block, ServerInterface* interface,
                   ClientCache* cache);
-  GameContext& game_context_;
+  GameContext& context_;
 };

@@ -44,7 +44,7 @@ class BufferStorage {
  private:
   static constexpr int kWorkGroupSize = 512;
 
-  GameContext& game_context_;
+  GameContext& context_;
   uint32_t buffer_storage_id_ = 0;
   uint64_t max_size_ = 0;
   GLenum target_ = 0;

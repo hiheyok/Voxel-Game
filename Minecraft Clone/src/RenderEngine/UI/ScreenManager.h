@@ -26,7 +26,7 @@ class ScreenManager {
   void ChangeVirtualRes(glm::vec2 v_res);
 
  private:
-  GameContext& game_context_;
+  GameContext& context_;
   ScreenRegistry& screen_registry_;
   std::stack<std::unique_ptr<Screen>> screens_;
 };
@@ -37,7 +37,6 @@ void ScreenManager::PushScreen(const std::string& name, Args&&... args) {
       screen_registry_.CreateScreen(name, *this, std::forward<Args>(args)...);
   screen->OnEnter();
   screens_.push(std::move(screen));
-  
 }
 template <typename... Args>
 void ScreenManager::SwitchScreen(const std::string& name, Args&&... args) {

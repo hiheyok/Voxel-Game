@@ -15,9 +15,8 @@
 #include "Level/World/World.h"
 #include "Level/World/WorldParameters.h"
 
-WorldUpdater::WorldUpdater(GameContext& game_context, World* w,
-                           WorldParameters p)
-    : game_context_{game_context},
+WorldUpdater::WorldUpdater(GameContext& context, World* w, WorldParameters p)
+    : context_{context},
       settings_{std::make_unique<WorldParameters>(p)},
       world_{w} {}
 

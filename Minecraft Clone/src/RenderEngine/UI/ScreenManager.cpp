@@ -3,9 +3,9 @@
 #include "RenderEngine/UI/Screens/Screen.h"
 #include "RenderEngine/UI/UIRenderer.h"
 
-ScreenManager::ScreenManager(GameContext& game_context,
+ScreenManager::ScreenManager(GameContext& context,
                              ScreenRegistry& screen_registry)
-    : game_context_{game_context}, screen_registry_{screen_registry} {}
+    : context_{context}, screen_registry_{screen_registry} {}
 ScreenManager::~ScreenManager() = default;
 
 void ScreenManager::PopScreen() {

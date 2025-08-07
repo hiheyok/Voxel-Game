@@ -17,9 +17,9 @@
 #include "Utils/Clock.h"
 #include "Utils/Timer/Timer.h"
 
-WorldRender::WorldRender(GameContext& game_context, PlayerPOV* player)
-    : game_context_{game_context},
-      renderer_{std::make_unique<TerrainRenderer>(game_context)},
+WorldRender::WorldRender(GameContext& context, PlayerPOV* player)
+    : context_{context},
+      renderer_{std::make_unique<TerrainRenderer>(context)},
       player_{player} {}
 
 WorldRender::~WorldRender() = default;
@@ -41,10 +41,9 @@ void WorldRender::LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks) {
 
 std::unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(ChunkPos pos) {
   Chunk* chunk = WorldRender::cache_->GetChunk(pos);
-  thread_local Mesh::ChunkMeshData chunk_mesher{game_context_};
+  thread_local Mesh::ChunkMeshData chunk_mesher{context_};
   Timer timer;
   chunk_mesher.use_option_ = false;
-
 
   chunk_mesher.Reset();
   chunk_mesher.SetChunk(chunk);
@@ -109,11 +108,10 @@ void WorldRender::Update(std::vector<ChunkPos> updatedChunks) {
 
 void WorldRender::Start(GLFWwindow* window, ClientCache* cache,
                         PerformanceProfiler* profiler) {
-  horizontal_render_distance_ =
-      game_context_.options_->horizontal_render_distance_;
-  vertical_render_distance_ = game_context_.options_->vertical_render_distance_;
+  horizontal_render_distance_ = context_.options_->horizontal_render_distance_;
+  vertical_render_distance_ = context_.options_->vertical_render_distance_;
 
-  size_t threadCount = game_context_.options_->mesh_threads_;
+  size_t threadCount = context_.options_->mesh_threads_;
 
   mesh_thread_pool_ = std::make_unique<ThreadPool<ChunkPos, WorkerReturnType>>(
       threadCount, "Mesher", std::bind_front(&WorldRender::Worker, this), 250);

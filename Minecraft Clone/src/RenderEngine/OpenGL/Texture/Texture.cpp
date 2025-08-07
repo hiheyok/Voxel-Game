@@ -120,15 +120,14 @@ void RawTextureData::Reload() {
   Load(image_path_);
 }
 
-Texture::Texture(GameContext& game_context) : game_context_{game_context} {
+Texture::Texture(GameContext& context) : context_{context} {
   glGenTextures(1, &texture_id_);
   if (texture_id_ == 0) {
     throw std::runtime_error("Texture::Texture - Failed to generate texture.");
   }
 }
 
-Texture::Texture(Texture&& other) noexcept
-    : game_context_{other.game_context_} {
+Texture::Texture(Texture&& other) noexcept : context_{other.context_} {
   *this = std::move(other);
 }
 

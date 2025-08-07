@@ -5,9 +5,8 @@
 #include "Level/Light/LightStorage.h"
 #include "Level/World/WorldInterface.h"
 
-LightEngineCache::LightEngineCache(GameContext& game_context,
-                                   WorldInterface& world)
-    : game_context_{game_context}, world_{world} {}
+LightEngineCache::LightEngineCache(GameContext& context, WorldInterface& world)
+    : context_{context}, world_{world} {}
 
 void LightEngineCache::BuildCache(BlockPos center) {
   cache_.resize(kCacheSlice * kCacheWidth);

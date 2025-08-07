@@ -7,15 +7,14 @@
 #include "Level/TerrainGeneration/Generators/Generators.h"
 #include "Utils/LogUtils.h"
 
-GeneratorType::GeneratorType(GameContext& game_context)
-    : game_context_{game_context} {}
+GeneratorType::GeneratorType(GameContext& context) : context_{context} {}
 
 GeneratorType::~GeneratorType() = default;
 
 WorldGeneratorID GeneratorType::RegisterWorldGenerator(
     std::unique_ptr<WorldGenerator> generator) {
   generator_list_.push_back(std::move(generator));
-  game_context_.logger_->LogInfo(
+  context_.logger_->LogInfo(
       "GeneratorType::RegisterWorldGenerator",
       "Registered Generator: " + std::to_string(generator_list_.size() - 1));
   return generator_list_.size() - 1;

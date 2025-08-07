@@ -33,13 +33,14 @@ class ChunkDrawBatch {
   void SetupBuffers();
   void Reset();
   void GenDrawCommands(int RenderDistance, int verticalRenderDistance);
-  bool AddChunkVertices(const std::vector<BlockVertexFormat>& data, ChunkPos pos);
+  bool AddChunkVertices(const std::vector<BlockVertexFormat>& data,
+                        ChunkPos pos);
   void DeleteChunkVertices(ChunkPos ID);
   void Draw(Shader* shader);
   void Defrag(size_t iterations);
   void UpdateCommandBufferSize();
-  
-  GameContext& game_context_;
+
+  GameContext& context_;
   Camera* camera_ = nullptr;
   FastHashMap<size_t, size_t> render_list_;
   double debug_time_ = 0.0;

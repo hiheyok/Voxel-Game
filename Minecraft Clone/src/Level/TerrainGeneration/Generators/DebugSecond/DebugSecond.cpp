@@ -3,12 +3,12 @@
 #include "Core/GameContext/GameContext.h"
 #include "Level/Block/Blocks.h"
 
-DebugWorldSecond::DebugWorldSecond(GameContext& game_context)
-    : WorldGenerator{game_context} {}
+DebugWorldSecond::DebugWorldSecond(GameContext& context)
+    : WorldGenerator{context} {}
 DebugWorldSecond::~DebugWorldSecond() = default;
 
 void DebugWorldSecond::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
-  chunk->SetBlock(game_context_.blocks_->COBBLESTONE, BlockPos{8, 8, 8});
+  chunk->SetBlock(context_.blocks_->COBBLESTONE, BlockPos{8, 8, 8});
 
   BlockPos scaled_pos = BlockPos{pos.x, pos.y, pos.z} * kChunkDim;
 
@@ -27,15 +27,15 @@ void DebugWorldSecond::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
 
         if ((abs(global_pos.x) >= abs(global_pos.z)) &&
             (abs(global_pos.x) >= abs(global_pos.y))) {
-          chunk->SetBlock(game_context_.blocks_->BLUE_STAINED_GLASS, local_pos);
+          chunk->SetBlock(context_.blocks_->BLUE_STAINED_GLASS, local_pos);
         }
         if ((abs(global_pos.z) >= abs(global_pos.x)) &&
             (abs(global_pos.z) >= abs(global_pos.y))) {
-          chunk->SetBlock(game_context_.blocks_->DARK_OAK_PLANKS, local_pos);
+          chunk->SetBlock(context_.blocks_->DARK_OAK_PLANKS, local_pos);
         }
         if ((abs(global_pos.y) >= abs(global_pos.x)) &&
             (abs(global_pos.y) >= abs(global_pos.z))) {
-          chunk->SetBlock(game_context_.blocks_->ORANGE_CONCRETE, local_pos);
+          chunk->SetBlock(context_.blocks_->ORANGE_CONCRETE, local_pos);
         }
       }
     }

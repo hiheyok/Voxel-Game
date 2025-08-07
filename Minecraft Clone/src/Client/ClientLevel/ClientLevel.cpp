@@ -2,5 +2,5 @@
 
 #include "Client/ClientLevel/ClientLevel.h"
 
-ClientLevel::ClientLevel(GameContext& game_context) : cache_{game_context} {}
+ClientLevel::ClientLevel(GameContext& context) : cache_{context} {}
 ClientLevel::~ClientLevel() = default;

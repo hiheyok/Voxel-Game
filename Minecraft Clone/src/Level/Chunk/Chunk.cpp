@@ -13,10 +13,10 @@
 #include "Level/Light/LightStorage.h"
 #include "Level/TerrainGeneration/Structures/Structure.h"
 
-Chunk::Chunk(GameContext& game_context) : ChunkContainer{game_context} {}
+Chunk::Chunk(GameContext& context) : ChunkContainer{context} {}
 Chunk::~Chunk() = default;
-Chunk::Chunk(GameContext& game_context, const ChunkRawData& data)
-    : ChunkContainer{game_context, data} {}
+Chunk::Chunk(GameContext& context, const ChunkRawData& data)
+    : ChunkContainer{context, data} {}
 
 void Chunk::UpdateGen() {
   for (auto offset : Directions<ChunkPos>()) {

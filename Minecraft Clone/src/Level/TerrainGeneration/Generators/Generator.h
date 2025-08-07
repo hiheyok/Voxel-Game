@@ -18,7 +18,7 @@ class WorldGenerator {
   virtual void Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk);
   virtual void GenerateTall(ChunkPos pos, std::unique_ptr<TallChunk>& chunk);
 
-  GameContext& game_context_;
+  GameContext& context_;
   bool use_tall_chunks_ = false;
 
   static int64_t world_seed_;

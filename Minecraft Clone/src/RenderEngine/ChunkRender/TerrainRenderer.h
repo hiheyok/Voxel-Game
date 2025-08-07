@@ -49,7 +49,7 @@ class TerrainRenderer {
   void CreateNewSolidBatch();
   void CreateNewTransparentBatch();
 
-  GameContext& game_context_;
+  GameContext& context_;
   int horizontal_render_distance_ = 16;
   int vertical_render_distance_ = 16;
   float fov_ = 80.f;

@@ -35,7 +35,7 @@ class UIManager {
   void ScreenResChanged(glm::vec2 res);
 
  private:
-  GameContext& game_context_;
+  GameContext& context_;
   InputManager& input_mgr_;
 
   glm::vec2 curr_res_ = {0.0f, 0.0f};

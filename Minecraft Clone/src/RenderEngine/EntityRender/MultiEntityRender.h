@@ -26,7 +26,7 @@ class MultiEntityRender {
   int vertical_render_distance_ = 16;
   int horizontal_render_distance_ = 16;
 
-  MultiEntityRender(GameContext& game_context, PlayerPOV*);
+  MultiEntityRender(GameContext& context, PlayerPOV*);
   ~MultiEntityRender();
 
   void Clean();
@@ -52,7 +52,7 @@ class MultiEntityRender {
   void Reload();
 
  private:
-  GameContext& game_context_;
+  GameContext& context_;
 
   std::vector<float> entity_vertices_;
   std::vector<uint32_t> entity_indices_;

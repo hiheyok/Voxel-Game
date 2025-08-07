@@ -32,7 +32,7 @@ class ChunkContainer {
 
   BlockID GetBlock(BlockPos pos) const;
   BlockID GetBlockUnsafe(BlockPos pos) const noexcept;
-  
+
   void SetLightLvl(BlockPos pos, bool is_sky, int lvl);
   int GetLightLvl(BlockPos pos, bool is_sky) const;
 
@@ -59,7 +59,7 @@ class ChunkContainer {
 
   const Palette& GetPalette() const;
 
-  GameContext& game_context_;
+  GameContext& context_;
   ChunkPos position_;
   std::unique_ptr<LightStorage> sky_light_;
   std::unique_ptr<LightStorage> block_light_;
@@ -74,6 +74,7 @@ class ChunkContainer {
  private:
   std::atomic<bool> light_dirty_ = false;
   std::atomic<bool> is_light_up_ = false;
-  bool light_update_seeding = true; // Parameters to seed newly generated chunks
+  bool light_update_seeding =
+      true;  // Parameters to seed newly generated chunks
   Palette block_storage_;
 };

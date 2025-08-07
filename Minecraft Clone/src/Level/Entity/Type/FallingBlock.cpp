@@ -6,8 +6,7 @@
 #include "Level/Dimension/Dimension.h"
 #include "Level/Entity/Entity.h"
 
-FallingBlock::FallingBlock(GameContext& game_context)
-    : EntityType{game_context} {}
+FallingBlock::FallingBlock(GameContext& context) : EntityType{context} {}
 FallingBlock::~FallingBlock() = default;
 
 void FallingBlock::Tick(Entity* entity, Dimension* dimension) {
@@ -48,12 +47,12 @@ void FallingBlock::Tick(Entity* entity, Dimension* dimension) {
     BlockEvent addBlock{BlockPos{entity->properties_.position_.x,
                                  entity->properties_.position_.y,
                                  entity->properties_.position_.z},
-                        game_context_.blocks_->SAND,
-                        game_context_.event_handler_->BlockPlace};
+                        context_.blocks_->SAND,
+                        context_.event_handler_->BlockPlace};
     dimension->event_manager_.AddEvent(addBlock);
 
     EntityEvent removeEntity;
-    removeEntity.id_ = game_context_.event_handler_->RemoveEntity;
+    removeEntity.id_ = context_.event_handler_->RemoveEntity;
     removeEntity.entity_uuid_ = entity->properties_.entity_uuid_;
     removeEntity.unique_id_ = 50;
 

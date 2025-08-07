@@ -13,8 +13,7 @@
 #include "FileManager/Files.h"
 #include "Utils/LogUtils.h"
 
-ModelLoader::ModelLoader(GameContext& game_context)
-    : game_context_{game_context} {}
+ModelLoader::ModelLoader(GameContext& context) : context_{context} {}
 ModelLoader::~ModelLoader() = default;
 
 std::unique_ptr<BlockModel> ModelLoader::GetModel(
@@ -47,7 +46,7 @@ std::unique_ptr<BlockModel> ModelLoader::GetModelRecursive(
     }
     JSONData = json::parse(file);
   } catch (const std::exception& e) {
-    game_context_.logger_->LogWarn("ModelLoader::GetModelRecursive", e.what());
+    context_.logger_->LogWarn("ModelLoader::GetModelRecursive", e.what());
     return nullptr;
   }
 
@@ -113,7 +112,7 @@ void ModelLoader::CacheModel(const ResourceLocation& location,
   // Check if the model is already cached
   const auto& it = cache_.find(location);
   if (it != cache_.find(location)) {
-    game_context_.logger_->LogDebug(
+    context_.logger_->LogDebug(
         "ModelLoader::CacheModel",
         "Attempted to cache model that is already cached");
   }
@@ -144,7 +143,7 @@ void ModelLoader::ProcessModelDisplay(std::unique_ptr<BlockModel>& model,
           display.scale_[i] = arr[i];
         }
       } else {
-        game_context_.logger_->LogWarn(
+        context_.logger_->LogWarn(
             "ProcessModelDisplay",
             "Unknown display attribute: " + transitions.key());
       }
@@ -167,8 +166,8 @@ void ModelLoader::ProcessModelDisplay(std::unique_ptr<BlockModel>& model,
     } else if (position == "fixed") {
       display.position_ = DisplayPosition::fixed;
     } else {
-      game_context_.logger_->LogWarn("ProcessModelDisplay",
-                                     "Unknown display position: " + position);
+      context_.logger_->LogWarn("ProcessModelDisplay",
+                                "Unknown display position: " + position);
       return;
     }
 
@@ -206,7 +205,7 @@ void ModelLoader::UpdateModelElements(std::unique_ptr<BlockModel>& model,
       } else if (subElements.key() == "shade") {
         cuboid.shade_ = static_cast<bool>(subElements.value());
       } else {
-        game_context_.logger_->LogWarn(
+        context_.logger_->LogWarn(
             "UpdateModelElements",
             "Unknown element attribute: " + subElements.key());
       }
@@ -259,7 +258,7 @@ CuboidRotationInfo ModelLoader::GetRotationalData(json JsonData) {
       } else if (axis_ == 'z') {
         rotationInfo.axis_ = 2;
       } else {
-        game_context_.logger_->LogWarn(
+        context_.logger_->LogWarn(
             "getRotationalData",
             "Unknown rotational axis: " +
                 static_cast<std::string>(attribute.value()));
@@ -317,7 +316,7 @@ void ModelLoader::ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
       } else if (faceElements.key() == "rotation") {
         bFace.rotation_ = faceElements.value();
       } else {
-        game_context_.logger_->LogWarn(
+        context_.logger_->LogWarn(
             "ProcessSingleCubeFaces",
             "Unknown face attribute: " + faceElements.key());
       }
@@ -340,8 +339,8 @@ int ModelLoader::ConvertStringFaceToIndex(const std::string& str) {
   } else if (str == "east") {
     return EAST;
   } else {
-    game_context_.logger_->LogWarn("ModelLoader::ConvertStringFaceToIndex",
-                                   "Unknown direction: " + str);
+    context_.logger_->LogWarn("ModelLoader::ConvertStringFaceToIndex",
+                              "Unknown direction: " + str);
     return 0;
   }
 }

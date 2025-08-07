@@ -3,8 +3,8 @@
 #include "Core/GameContext/GameContext.h"
 #include "Level/Block/Blocks.h"
 
-DebugMeshStress::DebugMeshStress(GameContext& game_context)
-    : WorldGenerator{game_context} {}
+DebugMeshStress::DebugMeshStress(GameContext& context)
+    : WorldGenerator{context} {}
 DebugMeshStress::~DebugMeshStress() = default;
 
 void DebugMeshStress::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
@@ -16,13 +16,11 @@ void DebugMeshStress::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
     return;
   }
 
-  int numBlocks =
-      static_cast<int>(game_context_.blocks_->block_type_data_.size());
-
+  int numBlocks = static_cast<int>(context_.blocks_->block_type_data_.size());
 
   if (gy == 0) {
     for (auto [x, z] : Product<2>(kChunkDim)) {
-      chunk->SetBlockUnsafe(game_context_.blocks_->WHITE_CONCRETE,
+      chunk->SetBlockUnsafe(context_.blocks_->WHITE_CONCRETE,
                             BlockPos{x, 0, z});
     }
   }

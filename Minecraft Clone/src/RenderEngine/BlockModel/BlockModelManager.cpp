@@ -16,10 +16,10 @@
 #include "RenderEngine/OpenGL/Texture/Types/Texture2D.h"
 #include "Utils/LogUtils.h"
 
-BlockModelManager::BlockModelManager(GameContext& game_context)
-    : game_context_{game_context},
+BlockModelManager::BlockModelManager(GameContext& context)
+    : context_{context},
       is_loaded_{false},
-      model_loader_{std::make_unique<ModelLoader>(game_context)} {}
+      model_loader_{std::make_unique<ModelLoader>(context)} {}
 BlockModelManager::~BlockModelManager() = default;
 
 void BlockModelManager::LoadModels() {
@@ -30,11 +30,10 @@ void BlockModelManager::LoadModels() {
         "BlockModelManager::LoadModels - Models already loaded!");
   }
   block_texture_atlas_ = std::make_unique<BlockTextureAtlas>(
-      game_context_, 512, 512, kIndividualTexSize, kIndividualTexSize);
+      context_, 512, 512, kIndividualTexSize, kIndividualTexSize);
 
-  for (BlockID id = 0; id < game_context_.blocks_->block_type_data_.size();
-       ++id) {
-    Block* block = game_context_.blocks_->block_type_data_[id];
+  for (BlockID id = 0; id < context_.blocks_->block_type_data_.size(); ++id) {
+    Block* block = context_.blocks_->block_type_data_[id];
     std::unique_ptr<BlockModel> model =
         block->InitializeBlockModel(*model_loader_.get());
     model_data_.emplace_back(*model.get());
@@ -57,8 +56,8 @@ void BlockModelManager::LoadModels() {
         int textureId = block_texture_atlas_->AddBlockTexture(location);
 
         if (textureId == -1) {
-          game_context_.logger_->LogWarn("BlockList::InitializeBlockModels",
-                                         "Unable to load texture.");
+          context_.logger_->LogWarn("BlockList::InitializeBlockModels",
+                                    "Unable to load texture.");
           continue;
         }
 
@@ -82,8 +81,7 @@ void BlockModelManager::LoadModels() {
   is_loaded_ = true;
 
   light_map_ = std::make_unique<Texture2D>(
-      game_context_,
-      RawTextureData("assets/minecraft/textures/colormap/light.png"));
+      context_, RawTextureData("assets/minecraft/textures/colormap/light.png"));
 }
 
 const BlockModel& BlockModelManager::GetBlockModel(BlockID id) const {

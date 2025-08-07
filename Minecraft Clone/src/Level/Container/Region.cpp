@@ -8,7 +8,7 @@
 #include "Level/Chunk/Chunk.h"
 #include "Utils/LogUtils.h"
 
-Region::Region(GameContext& game_context) : game_context_{game_context} {
+Region::Region(GameContext& context) : context_{context} {
   chunk_count_ = 0;
   usage_ = 0;
   region_data_.resize(kRegionSize3D);

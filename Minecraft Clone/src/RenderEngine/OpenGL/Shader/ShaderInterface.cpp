@@ -9,8 +9,7 @@
 #include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 
-ShaderInterface::ShaderInterface(GameContext& game_context)
-    : game_context_{game_context} {}
+ShaderInterface::ShaderInterface(GameContext& context) : context_{context} {}
 
 ShaderInterface::~ShaderInterface() {
   if (shader_id_) {
@@ -19,7 +18,7 @@ ShaderInterface::~ShaderInterface() {
 }
 
 ShaderInterface::ShaderInterface(ShaderInterface&& other) noexcept
-    : game_context_{other.game_context_} {
+    : context_{other.context_} {
   shader_id_ = other.shader_id_;
   other.shader_id_ = 0;
   cache_ = std::move(other.cache_);
@@ -300,16 +299,15 @@ void ShaderInterface::CheckCompileErrors(GLuint shader, std::string type) {
     if (!success) {
       glGetShaderInfoLog(shader, 2048, 0, infoLog);
       std::cout << infoLog << '\n';
-      game_context_.logger_->LogError("Shader::CheckCompileErrors",
-                                      "Failed to compile" + type +
-                                          " Shader: \n" + std::string(infoLog) +
-                                          "\n");
+      context_.logger_->LogError("Shader::CheckCompileErrors",
+                                 "Failed to compile" + type + " Shader: \n" +
+                                     std::string(infoLog) + "\n");
     }
   } else {
     glGetProgramiv(shader, GL_LINK_STATUS, &success);
     if (!success) {
       glGetProgramInfoLog(shader, 1024, 0, infoLog);
-      game_context_.logger_->LogError(
+      context_.logger_->LogError(
           "Shader::CheckCompileErrors",
           "Failed to link Shader Program: \n" + std::string(infoLog) + "\n");
     }
@@ -327,9 +325,9 @@ std::string ShaderInterface::ReadFile(std::string path) {
     file.close();
     code = shaderStream.str();
   } catch (std::ifstream::failure& e) {
-    game_context_.logger_->LogError(
-        "Shader::ReadFile", "Failed to read file: " + std::string(path));
-    game_context_.logger_->LogError("Shader::ReadFile", e.what());
+    context_.logger_->LogError("Shader::ReadFile",
+                               "Failed to read file: " + std::string(path));
+    context_.logger_->LogError("Shader::ReadFile", e.what());
   }
 
   return code;

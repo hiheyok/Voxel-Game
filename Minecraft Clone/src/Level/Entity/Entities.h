@@ -21,7 +21,7 @@ class EntitiesList {
   EntityTypeID RegisterEntity(std::string entityName, EntityTypeEnums type_);
   EntityType* GetEntity(EntityTypeID id);
 
-  GameContext& game_context_;
+  GameContext& context_;
   std::vector<EntityType*> entity_type_list_;
 
   EntityTypeID HUMAN = RegisterEntity("human", ENTITY_PASSIVE);
@@ -30,4 +30,3 @@ class EntitiesList {
   EntityTypeID SAND_GRAVITY_BLOCK =
       RegisterEntity("sand", ENTITY_FALLING_BLOCK);
 };
-

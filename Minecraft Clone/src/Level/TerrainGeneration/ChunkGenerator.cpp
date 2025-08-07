@@ -10,13 +10,13 @@
 #include "Level/TerrainGeneration/Generators/GeneratorType.h"
 #include "Level/TerrainGeneration/Generators/Generators.h"
 
-ChunkGenerator::ChunkGenerator(GameContext& game_context, int64_t world_seed,
+ChunkGenerator::ChunkGenerator(GameContext& context, int64_t world_seed,
                                WorldGeneratorID gen_type)
-    : game_context_{game_context} {
+    : context_{context} {
   world_generator_type_ = gen_type;
 
   gen_pool_ = std::make_unique<ThreadPool<ChunkPos, WorkerReturnType>>(
-      game_context_.options_->world_gen_threads_, "World Generator",
+      context_.options_->world_gen_threads_, "World Generator",
       std::bind_front(&ChunkGenerator::Worker, this), 100);
 
   WorldGenerator::SetSeed(world_seed);
@@ -42,18 +42,18 @@ std::vector<std::unique_ptr<Chunk>> ChunkGenerator::Worker(ChunkPos task) {
   ChunkPos pos = task;
   std::vector<std::unique_ptr<Chunk>> output;
 
-  if (!game_context_.generators_->GetGenerator(world_generator_type_)
+  if (!context_.generators_->GetGenerator(world_generator_type_)
            ->use_tall_chunks_) {
-    std::unique_ptr<Chunk> chunk = std::make_unique<Chunk>(game_context_);
+    std::unique_ptr<Chunk> chunk = std::make_unique<Chunk>(context_);
     chunk->SetPosition(pos);
-    game_context_.generators_->GetGenerator(world_generator_type_)
+    context_.generators_->GetGenerator(world_generator_type_)
         ->Generate(pos, chunk);
 
     output.push_back(std::move(chunk));
   } else {
-    std::unique_ptr<TallChunk> chunk = std::make_unique<TallChunk>(game_context_);
+    std::unique_ptr<TallChunk> chunk = std::make_unique<TallChunk>(context_);
     if (pos.y == 0) {
-      game_context_.generators_->GetGenerator(world_generator_type_)
+      context_.generators_->GetGenerator(world_generator_type_)
           ->GenerateTall(pos, chunk);
     }
     output.insert(output.end(),

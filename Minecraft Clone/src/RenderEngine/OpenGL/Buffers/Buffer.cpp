@@ -8,12 +8,12 @@
 #include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 
-Buffer::Buffer(GameContext& game_context) : game_context_{game_context} {
+Buffer::Buffer(GameContext& context) : context_{context} {
   glGenBuffers(1, &buffer_id_);
   if (buffer_id_ == 0) {
     throw std::runtime_error("Buffer::GenBuffer - glGenBuffers failed!");
   }
-  game_context_.logger_->LogDebug(
+  context_.logger_->LogDebug(
       "Buffer::GenBuffer", "Created buffer. ID: " + std::to_string(buffer_id_));
 }
 
@@ -23,7 +23,7 @@ Buffer::~Buffer() {
   }
 }
 
-Buffer::Buffer(Buffer&& buffer) noexcept : game_context_(buffer.game_context_) {
+Buffer::Buffer(Buffer&& buffer) noexcept : context_(buffer.context_) {
   (*this) = std::move(buffer);
 }
 

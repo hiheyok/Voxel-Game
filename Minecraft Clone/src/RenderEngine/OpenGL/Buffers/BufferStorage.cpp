@@ -12,13 +12,13 @@
 #include "RenderEngine/OpenGL/Shader/ComputeShader.h"
 #include "Utils/LogUtils.h"
 
-BufferStorage::BufferStorage(GameContext& game_context, GLuint bufferTarget,
+BufferStorage::BufferStorage(GameContext& context, GLuint bufferTarget,
                              uint64_t size, bool dynamic, const void* data)
-    : game_context_{game_context},
+    : context_{context},
       copy_shader_{std::make_unique<ComputeShader>(
-          game_context_, "assets/shaders/Buffers/CopyData.glsl")},
+          context_, "assets/shaders/Buffers/CopyData.glsl")},
       move_shader_{std::make_unique<ComputeShader>(
-          game_context_, "assets/shaders/Buffers/MoveData.glsl")} {
+          context_, "assets/shaders/Buffers/MoveData.glsl")} {
   target_ = bufferTarget;
   max_size_ = size;
 
@@ -28,7 +28,7 @@ BufferStorage::BufferStorage(GameContext& game_context, GLuint bufferTarget,
     throw std::runtime_error("BufferStorage::Create - glGenBuffers failed!");
   }
 
-  game_context_.logger_->LogDebug(
+  context_.logger_->LogDebug(
       "BufferStorage::Create",
       "Generated buffer storage. ID: " + std::to_string(buffer_storage_id_));
   Bind();
@@ -53,7 +53,7 @@ BufferStorage::BufferStorage(GameContext& game_context, GLuint bufferTarget,
             "OpenGL error after glBufferStorage: "));  // std::string(err)
   }
 
-  game_context_.logger_->LogInfo(
+  context_.logger_->LogInfo(
       "BufferStorage::Create",
       "Created buffer storage ID: " + std::to_string(buffer_storage_id_) +
           " Size: " + std::to_string(size) + " bytes, Target: " +
@@ -66,7 +66,7 @@ BufferStorage::~BufferStorage() {
     buffer_storage_id_ = 0;  // Use 0 to indicate deleted/uninitialized
     max_size_ = 0;
     target_ = 0;
-    game_context_.logger_->LogDebug(
+    context_.logger_->LogDebug(
         "BufferStorage::Delete",
         "Deleted buffer storage. ID was: " +
             std::to_string(buffer_storage_id_));  // Log before setting to 0
@@ -74,7 +74,7 @@ BufferStorage::~BufferStorage() {
 }
 
 BufferStorage::BufferStorage(BufferStorage&& buffer) noexcept
-    : game_context_{buffer.game_context_} {
+    : context_{buffer.context_} {
   (*this) = std::move(buffer);
 }
 
@@ -95,7 +95,7 @@ void BufferStorage::Bind() {
   if (buffer_storage_id_ != 0) {
     glBindBuffer(target_, buffer_storage_id_);
   } else {
-    game_context_.logger_->LogWarn(
+    context_.logger_->LogWarn(
         "BufferStorage::Bind",
         "Attempted to bind an uninitialized/deleted buffer storage.");
   }
@@ -163,7 +163,7 @@ void BufferStorage::CopyFrom(BufferStorage* sourceBuffer, size_t readOffset,
 void BufferStorage::CopyTo(BufferStorage* destinationBuffer, size_t readOffset,
                            size_t writeOffset, size_t size) {
   if (buffer_storage_id_ == 0 || destinationBuffer->buffer_storage_id_ == 0) {
-    game_context_.logger_->LogError(
+    context_.logger_->LogError(
         "BufferStorage::CopyTo",
         "Attempted CopyTo with uninitialized buffer(s).");
     return;

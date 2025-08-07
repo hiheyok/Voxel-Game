@@ -18,13 +18,13 @@ void UpdateSurrounding(const BlockEvent& blockEvent, Dimension* dimension) {
     BlockID block = dimension->world_->GetBlock(new_pos);
 
     BlockEvent tickNeighbor{new_pos, block,
-                            dimension->game_context_.event_handler_->BlockTick};
+                            dimension->context_.event_handler_->BlockTick};
     dimension->event_manager_.AddEvent(tickNeighbor);
   }
 
   BlockEvent tickMain{blockEvent.pos_,
                       dimension->world_->GetBlock(blockEvent.pos_),
-                      dimension->game_context_.event_handler_->BlockTick};
+                      dimension->context_.event_handler_->BlockTick};
   dimension->event_manager_.AddEvent(tickMain);
 }
 
@@ -34,6 +34,6 @@ void HandlePlaceBlock(const BlockEvent& blockEvent, Dimension* dimension) {
 }
 
 void HandleBlockTick(const BlockEvent& blockEvent, Dimension* dimension) {
-  Block* b = dimension->game_context_.blocks_->GetBlockType(blockEvent.block_);
+  Block* b = dimension->context_.blocks_->GetBlockType(blockEvent.block_);
   b->Tick(blockEvent.pos_, dimension);
 }

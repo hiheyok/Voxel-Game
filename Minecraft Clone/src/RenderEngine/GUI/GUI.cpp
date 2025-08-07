@@ -17,10 +17,10 @@
 #include "RenderEngine/Window.h"
 #include "Utils/LogUtils.h"
 
-GUI::GUI(GameContext& game_context, Window* win)
-    : game_context_{game_context},
+GUI::GUI(GameContext& context, Window* win)
+    : context_{context},
       shader_{std::make_unique<Shader>(
-          game_context, *game_context.assets_->GetShaderSource("gui_render"))},
+          context, *context.assets_->GetShaderSource("gui_render"))},
       window_{win},
       guis_{} {}
 

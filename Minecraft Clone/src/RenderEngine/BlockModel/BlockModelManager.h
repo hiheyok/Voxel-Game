@@ -29,7 +29,7 @@ class BlockModelManager {
   uint32_t GetLightMapID() const;
 
  private:
-  GameContext& game_context_;
+  GameContext& context_;
   bool is_loaded_;
   std::unique_ptr<ModelLoader> model_loader_;
   std::unique_ptr<BlockTextureAtlas> block_texture_atlas_;

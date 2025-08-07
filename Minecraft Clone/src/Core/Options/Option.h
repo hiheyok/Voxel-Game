@@ -30,6 +30,6 @@ class Options {
 
   void GenerateOptionFile();  // Generate file if deleted
 
-  GameContext& game_context_;
+  GameContext& context_;
   FastHashMap<std::string, size_t*> option_name_;  // name -> ptr
 };

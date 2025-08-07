@@ -112,7 +112,7 @@ class ChunkGPUMemoryPool {
   void Update();
   size_t GetSize() const noexcept;
 
-  GameContext& game_context_;
+  GameContext& context_;
   MemoryManagement::MemoryPoolStatistics statistics_;
   std::unique_ptr<BufferStorage> stagging_buffer_;
   std::unique_ptr<BufferStorage> buffer_;

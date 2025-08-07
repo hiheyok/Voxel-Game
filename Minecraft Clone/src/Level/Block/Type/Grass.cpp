@@ -9,9 +9,9 @@
 #include "Level/World/WorldUpdater.h"
 #include "Utils/Math/Probability/Probability.h"
 
-GrassBlock::GrassBlock(GameContext& game_context, double spread_chance,
+GrassBlock::GrassBlock(GameContext& context, double spread_chance,
                        double break_chance)
-    : Block{game_context} {
+    : Block{context} {
   properties_->is_solid_ = true;
   properties_->transparency_ = false;
   properties_->is_fluid_ = false;
@@ -25,14 +25,14 @@ void GrassBlock::Tick(BlockPos pos, Dimension* curr_world) {
   WorldInterface* world = curr_world->world_;
 
   // Checks if ticking block changes
-  if (world->GetBlock(pos) != game_context_.blocks_->GRASS) {
+  if (world->GetBlock(pos) != context_.blocks_->GRASS) {
     return;
   }
 
   BlockPos top_pos = pos;
   top_pos.y += 1;
 
-  bool top_is_not_air = world->GetBlock(top_pos) != game_context_.blocks_->AIR;
+  bool top_is_not_air = world->GetBlock(top_pos) != context_.blocks_->AIR;
 
   bool destroy_grass = false;
 
@@ -51,8 +51,8 @@ void GrassBlock::Tick(BlockPos pos, Dimension* curr_world) {
     return;
   }
 
-  BlockEvent grass_spread{pos, game_context_.blocks_->GRASS,
-                          game_context_.event_handler_->BlockTick};
+  BlockEvent grass_spread{pos, context_.blocks_->GRASS,
+                          context_.event_handler_->BlockTick};
   curr_world->event_manager_.AddEvent(grass_spread);
 }
 
@@ -62,7 +62,7 @@ bool GrassBlock::GrassDestroyTick(Dimension* curr_world, BlockPos pos) {
     return false;
   }
 
-  curr_world->world_updater_->SetBlock(game_context_.blocks_->DIRT, pos);
+  curr_world->world_updater_->SetBlock(context_.blocks_->DIRT, pos);
 
   return true;
 }
@@ -80,21 +80,21 @@ bool GrassBlock::GrassSpreadTick(Dimension* curr_world, BlockPos pos) {
     newPos.z += z1;
 
     // Checks if block is dirt
-    if (curr_world->world_->GetBlock(newPos) != game_context_.blocks_->DIRT) {
+    if (curr_world->world_->GetBlock(newPos) != context_.blocks_->DIRT) {
       continue;
     }
 
     // Checks if there isnt any block above
     newPos.y += 1;
-    if (curr_world->world_->GetBlock(newPos) != game_context_.blocks_->AIR) {
+    if (curr_world->world_->GetBlock(newPos) != context_.blocks_->AIR) {
       continue;
     }
     newPos.y -= 1;
 
     // Chance it spread
     if (TestProbability(grass_properties_.spread_chance_)) {
-      BlockEvent blockEvent{newPos, game_context_.blocks_->GRASS,
-                            game_context_.event_handler_->BlockPlace};
+      BlockEvent blockEvent{newPos, context_.blocks_->GRASS,
+                            context_.event_handler_->BlockPlace};
       curr_world->event_manager_.AddEvent(blockEvent);
 
       continue;

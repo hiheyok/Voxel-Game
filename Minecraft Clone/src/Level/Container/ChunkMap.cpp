@@ -13,9 +13,9 @@
 #include "Level/Chunk/ChunkRawData.h"
 #include "Level/Container/Region.h"
 
-ChunkMap::ChunkMap(GameContext& game_context, bool neighborUpdate,
+ChunkMap::ChunkMap(GameContext& context, bool neighborUpdate,
                    bool heightmapUpdate)
-    : game_context_{game_context},
+    : context_{context},
       heightmap_update_{heightmapUpdate},
       neighbor_update_{neighborUpdate} {
   region_cache_.reserve(kRegionCacheSize);
@@ -89,10 +89,10 @@ BlockID ChunkMap::GetBlock(BlockPos pos) const {
   BlockPos local_block_pos = pos.GetLocalPos();
 
   Region* reg = GetRegionUncheck(reg_pos);
-  if (reg == nullptr) return game_context_.blocks_->AIR;
+  if (reg == nullptr) return context_.blocks_->AIR;
 
   if (!reg->CheckChunk(chunk_pos)) {
-    return game_context_.blocks_->AIR;
+    return context_.blocks_->AIR;
   }
 
   Chunk* chunk = reg->GetChunk(chunk_pos);
@@ -184,7 +184,7 @@ Region* ChunkMap::CreateRegion(RegionPos pos) {
   assert(!CheckRegion(pos) &&
          "ChunkMap::CreateRegion - Tried to create region when one already "
          "exist!");
-  std::unique_ptr<Region> newRegion = std::make_unique<Region>(game_context_);
+  std::unique_ptr<Region> newRegion = std::make_unique<Region>(context_);
   Region* region = newRegion.get();
   regions_.emplace(pos, std::move(newRegion));
   return region;

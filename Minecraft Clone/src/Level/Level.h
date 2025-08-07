@@ -16,5 +16,5 @@ class Level {
   void UpdateDimensions();
   void ResetState();
 
-  GameContext& game_context_;
+  GameContext& context_;
 };

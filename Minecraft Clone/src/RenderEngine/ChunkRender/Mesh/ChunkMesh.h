@@ -12,7 +12,7 @@
 
 #if defined(_MSC_VER)
 #include <immintrin.h>
-#define restrict 
+#define restrict
 #elif defined(__GNUC__) || defined(__clang__)
 #include <x86intrin.h>
 #define restrict __restrict__
@@ -51,7 +51,7 @@ class ChunkMeshData {
   // Generate the Mesh
   void GenerateMesh();
 
-  GameContext& game_context_;
+  GameContext& context_;
   // Mesh Vertices
   std::vector<BlockVertexFormat> solid_vertices_buffer_;
   std::vector<BlockVertexFormat> trans_vertices_buffer_;

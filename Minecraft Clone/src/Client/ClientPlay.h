@@ -25,14 +25,14 @@ struct GLFWwindow;
 
 class ClientPlay {
  public:
-  ClientPlay(GameContext& game_context, ServerInterface* interface,
-             Window* window, PerformanceProfiler* profiler);
+  ClientPlay(GameContext& context, ServerInterface* interface, Window* window,
+             PerformanceProfiler* profiler);
   ~ClientPlay();
 
   void Update(Window* window);
   void Render(Window* window);
-  
-  GameContext& game_context_;
+
+  GameContext& context_;
   ServerInterface* interface_;
   std::unique_ptr<TexturedFrameBuffer> framebuffer_;
   std::unique_ptr<ClientLevel> client_level_;

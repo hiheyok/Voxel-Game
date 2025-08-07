@@ -8,8 +8,8 @@
 #include "Level/Chunk/Heightmap/Heightmap.h"
 #include "Level/TerrainGeneration/Structures/Structure.h"
 
-ChunkContainer::ChunkContainer(GameContext& game_context)
-    : game_context_{game_context},
+ChunkContainer::ChunkContainer(GameContext& context)
+    : context_{context},
       sky_light_{std::make_unique<LightStorage>()},
       block_light_{std::make_unique<LightStorage>()},
       heightmap_{std::make_unique<HeightMap>()},
@@ -22,7 +22,7 @@ ChunkContainer::ChunkContainer(GameContext& game_context)
 
 ChunkContainer::~ChunkContainer() = default;
 ChunkContainer::ChunkContainer(ChunkContainer&& other)
-    : game_context_{other.game_context_},
+    : context_{other.context_},
       sky_light_{std::move(other.sky_light_)},
       block_light_{std::move(other.block_light_)},
       heightmap_{std::move(other.heightmap_)},
@@ -33,9 +33,8 @@ ChunkContainer::ChunkContainer(ChunkContainer&& other)
                      std::memory_order_acquire);
 }
 
-ChunkContainer::ChunkContainer(GameContext& game_context,
-                               const ChunkRawData& data)
-    : ChunkContainer(game_context) {
+ChunkContainer::ChunkContainer(GameContext& context, const ChunkRawData& data)
+    : ChunkContainer(context) {
   SetData(data);
 }
 
@@ -57,7 +56,7 @@ BlockID ChunkContainer::GetBlock(BlockPos pos) const {
       return neighbors_[dz].value()->GetBlock(
           pos.IncrementSide(dz, -kChunkDim));
 
-    return game_context_.blocks_->AIR;
+    return context_.blocks_->AIR;
   } else {
     return GetBlockUnsafe(pos);
   }
@@ -162,7 +161,7 @@ void ChunkContainer::UpdateHeightMap() {
 
 void ChunkContainer::UpdateHeightMap(int x, int z) {
   const std::vector<BlockProperties>& properties =
-      game_context_.blocks_->GetBlockPropertyList();
+      context_.blocks_->GetBlockPropertyList();
 
   // Check chunk above first, if the heightmap above is > -1, it means that
   // there are block above -1 indicate theirs nothing in the column

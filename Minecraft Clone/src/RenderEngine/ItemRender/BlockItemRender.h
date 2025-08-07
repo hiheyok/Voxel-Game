@@ -20,8 +20,7 @@ class BlockItemRender {
   void RenderBlock(Item item);
 
  private:
-
-  GameContext& game_context_;
+  GameContext& context_;
   std::unique_ptr<RenderDrawElements> render_;
   std::unique_ptr<Camera> camera_;
 

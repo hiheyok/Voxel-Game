@@ -11,11 +11,11 @@
 #include "Level/Container/Region.h"
 #include "Level/World/CollusionDetector.h"
 
-ClientCache::ClientCache(GameContext& game_context)
-    : game_context_{game_context},
-      entities_{game_context},
-      collusion_manager_{game_context, &chunk_cache_},
-      chunk_cache_{game_context} {}
+ClientCache::ClientCache(GameContext& context)
+    : context_{context},
+      entities_{context},
+      collusion_manager_{context, &chunk_cache_},
+      chunk_cache_{context} {}
 ClientCache::~ClientCache() = default;
 
 void ClientCache::AddChunk(std::unique_ptr<Chunk> chunk) {

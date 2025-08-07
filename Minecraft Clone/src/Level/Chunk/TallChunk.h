@@ -16,5 +16,5 @@ struct TallChunk {
   void SetBlockUnsafe(int x, int y, int z, BlockID block);
   BlockID GetBlockUnsafe(int x, int y, int z);
 
-  GameContext& game_context_;
+  GameContext& context_;
 };

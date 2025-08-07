@@ -37,7 +37,7 @@ class ChunkGenerator {
       std::invoke_result_t<decltype(&ChunkGenerator::Worker), ChunkGenerator*,
                            ChunkPos>;
 
-  GameContext& game_context_;
+  GameContext& context_;
   std::unique_ptr<ThreadPool<ChunkPos, WorkerReturnType>> gen_pool_;
 
   WorldGeneratorID world_generator_type_;

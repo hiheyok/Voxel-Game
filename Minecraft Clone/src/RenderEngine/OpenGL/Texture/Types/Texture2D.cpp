@@ -5,12 +5,12 @@
 #include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 
-Texture2D::Texture2D(GameContext& game_context, const RawTextureData& data)
-    : Texture{game_context} {
+Texture2D::Texture2D(GameContext& context, const RawTextureData& data)
+    : Texture{context} {
   Load(data);
 }
 
-Texture2D::Texture2D(GameContext& game_context) : Texture{game_context} {}
+Texture2D::Texture2D(GameContext& context) : Texture{context} {}
 Texture2D::~Texture2D() = default;
 
 bool Texture2D::Load(const RawTextureData& data) {
@@ -24,13 +24,13 @@ bool Texture2D::Load(const RawTextureData& data) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     GL_NEAREST_MIPMAP_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    game_context_.logger_->LogDebug("Texture2D::Load",
-                      "Loaded 2D Texture: " + std::to_string(texture_id_));
+    context_.logger_->LogDebug(
+        "Texture2D::Load", "Loaded 2D Texture: " + std::to_string(texture_id_));
     width_ = data.width_;
     height_ = data.height_;
     return true;
   } else {
-    game_context_.logger_->LogError("Texture2D::Load", "Image is not loaded");
+    context_.logger_->LogError("Texture2D::Load", "Image is not loaded");
     return false;
   }
 }

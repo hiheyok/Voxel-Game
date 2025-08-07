@@ -16,9 +16,9 @@ int main() {
   srand(static_cast<uint32_t>(time(0)));  // Set rng seed
 
   try {
-    GameContext game_context;
-    game_context.InitializeGameContext();
-    Client GameClient{game_context};
+    GameContext context;
+    context.InitializeGameContext();
+    Client GameClient{context};
     GameClient.run();
   } catch (std::exception& e) {
     std::cerr << e.what() << '\n';

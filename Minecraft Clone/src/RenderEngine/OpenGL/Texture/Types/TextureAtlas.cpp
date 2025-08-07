@@ -9,9 +9,9 @@
 #include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 
-TextureAtlas::TextureAtlas(GameContext& game_context, int width, int height,
+TextureAtlas::TextureAtlas(GameContext& context, int width, int height,
                            int individualWidth, int individualHeight)
-    : Texture{game_context} {
+    : Texture{context} {
   width_ = width;
   height_ = height;
   individual_tex_height_ = individualHeight;
@@ -35,8 +35,9 @@ void TextureAtlas::LoadToGPU() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 4);
 
-  game_context_.logger_->LogDebug("TextureAtlas::LoadToGPU",
-                    "Loaded Texture Atlas: " + std::to_string(texture_id_));
+  context_.logger_->LogDebug(
+      "TextureAtlas::LoadToGPU",
+      "Loaded Texture Atlas: " + std::to_string(texture_id_));
 }
 
 void TextureAtlas::SetPixel(int r, int g, int b, int a, size_t w, size_t h) {
@@ -102,7 +103,8 @@ void TextureAtlas::AddData(
       count_++;
       break;
     default:
-      game_context_.logger_->LogError("TextureAtlas::AddData", "Invalid image format!");
+      context_.logger_->LogError("TextureAtlas::AddData",
+                                 "Invalid image format!");
       break;
   }
 }
@@ -110,14 +112,15 @@ void TextureAtlas::AddData(
 bool TextureAtlas::AddTextureToAtlasHelper(const RawTextureData& data) {
   format_ = GL_RGBA;
   if (!data.data_) {
-    game_context_.logger_->LogWarn("TextureAtlas::AddTextureToAtlasHelper", "No texture");
+    context_.logger_->LogWarn("TextureAtlas::AddTextureToAtlasHelper",
+                              "No texture");
     return false;
   }
 
   if (((data.width_ % individual_tex_width_) != 0) ||
       ((data.height_ % individual_tex_height_) != 0)) {
-    game_context_.logger_->LogError("TextureAtlas::AddTextureToAtlasHelper",
-                      "Width or height doesn't match");
+    context_.logger_->LogError("TextureAtlas::AddTextureToAtlasHelper",
+                               "Width or height doesn't match");
     return false;
   }
 
@@ -161,15 +164,15 @@ std::optional<RawTextureData> TextureAtlas::AddTextureToAtlas(
   std::optional<RawTextureData> data;
   RawTextureData tex{file};
   if (AddTextureToAtlasHelper(tex)) {
-    game_context_.logger_->LogInfo("TextureAtlas::AddTextureToAtlas",
-                     "Loaded: " + file +
-                         " | Size: " + std::to_string(tex.height_) + ", " +
-                         std::to_string(tex.width_));
+    context_.logger_->LogInfo("TextureAtlas::AddTextureToAtlas",
+                              "Loaded: " + file +
+                                  " | Size: " + std::to_string(tex.height_) +
+                                  ", " + std::to_string(tex.width_));
     data = std::move(tex);
     return data;
   } else {
-    game_context_.logger_->LogWarn("TextureAtlas::AddTextureToAtlas",
-                     "Unable to load: " + file);
+    context_.logger_->LogWarn("TextureAtlas::AddTextureToAtlas",
+                              "Unable to load: " + file);
     return data;
   }
 }

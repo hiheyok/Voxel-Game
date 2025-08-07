@@ -8,13 +8,13 @@
 #include "RenderEngine/UI/Screens/MainScreen.h"
 #include "RenderEngine/UI/UIRenderer.h"
 
-UIManager::UIManager(GameContext& game_context, InputManager& input_mgr)
-    : game_context_{game_context},
+UIManager::UIManager(GameContext& context, InputManager& input_mgr)
+    : context_{context},
       input_mgr_{input_mgr},
-      renderer_{std::make_unique<UIRenderer>(game_context)},
+      renderer_{std::make_unique<UIRenderer>(context)},
       screen_registry_{std::make_unique<ScreenRegistry>()},
       screen_manager_{
-          std::make_unique<ScreenManager>(game_context, *screen_registry_)} {}
+          std::make_unique<ScreenManager>(context, *screen_registry_)} {}
 
 UIManager::~UIManager() = default;
 

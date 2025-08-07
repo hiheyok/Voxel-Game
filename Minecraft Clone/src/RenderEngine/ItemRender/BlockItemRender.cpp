@@ -19,9 +19,9 @@
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
 
-BlockItemRender::BlockItemRender(GameContext& game_context)
-    : game_context_{game_context},
-      render_{std::make_unique<RenderDrawElements>(game_context)},
+BlockItemRender::BlockItemRender(GameContext& context)
+    : context_{context},
+      render_{std::make_unique<RenderDrawElements>(context)},
       camera_{std::make_unique<Camera>()} {}
 BlockItemRender::~BlockItemRender() = default;
 
@@ -46,8 +46,7 @@ void BlockItemRender::Initialize() {
       .SetMat4("view", view)
       .SetMat4("model", modelMat)
       .SetMat4("projection", orthoProj);
-  uint32_t texture_atlas =
-      game_context_.block_model_manager_->GetTextureAtlasID();
+  uint32_t texture_atlas = context_.block_model_manager_->GetTextureAtlasID();
   render_->SetTexture2D(0, texture_atlas, "BlockTexture");
 }
 
@@ -55,7 +54,7 @@ void BlockItemRender::RenderBlock(Item item) {
   std::vector<float> vertices{};
   std::vector<uint32_t> indices{};
 
-  game_context_.block_model_manager_->GetBlockModel(item.GetBlock())
+  context_.block_model_manager_->GetBlockModel(item.GetBlock())
       .GetVertices(vertices, indices);
   render_->SetData(vertices, indices);
 

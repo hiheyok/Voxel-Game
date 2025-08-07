@@ -10,9 +10,9 @@
 #include "RenderEngine/GUI/TextRenderer.h"
 #include "Utils/Timer/Timer.h"
 
-DebugScreen::DebugScreen(GameContext& game_context)
-    : game_context_{game_context},
-      renderer_{std::make_unique<TextRenderer>(game_context)},
+DebugScreen::DebugScreen(GameContext& context)
+    : context_{context},
+      renderer_{std::make_unique<TextRenderer>(context)},
       timer_{std::make_unique<Timer>()} {}
 
 DebugScreen::~DebugScreen() = default;

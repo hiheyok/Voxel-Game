@@ -9,7 +9,7 @@
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
 #include "Utils/LogUtils.h"
 
-Block::Block(GameContext& game_context) : game_context_{game_context} {
+Block::Block(GameContext& context) : context_{context} {
   properties_ = std::make_unique<BlockProperties>();
 }
 Block::~Block() = default;

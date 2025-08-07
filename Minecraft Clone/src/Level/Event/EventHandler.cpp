@@ -5,8 +5,7 @@
 #include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 
-EventHandler::EventHandler(GameContext& game_context)
-    : game_context_{game_context} {}
+EventHandler::EventHandler(GameContext& context) : context_{context} {}
 EventHandler::~EventHandler() = default;
 
 void EventHandler::ExecuteEvent(Event event, Dimension* dimension) {
@@ -22,8 +21,8 @@ void EventHandler::ExecuteEvent(Event event, Dimension* dimension) {
       break;
     }
     default: {
-      game_context_.logger_->LogWarn("EventHandler::ExecuteEvent",
-                                     "Tried to handle unimplemented case");
+      context_.logger_->LogWarn("EventHandler::ExecuteEvent",
+                                "Tried to handle unimplemented case");
       break;
     }
   }

@@ -10,9 +10,8 @@
 #include "Level/Light/LightEngineCache.h"
 #include "Level/World/WorldInterface.h"
 
-BlockLightEngine::BlockLightEngine(GameContext& game_context,
-                                   WorldInterface& world)
-    : LightEngine{game_context, world} {
+BlockLightEngine::BlockLightEngine(GameContext& context, WorldInterface& world)
+    : LightEngine{context, world} {
   type_ = EngineType::kBlockLight;
 }
 BlockLightEngine::~BlockLightEngine() = default;
@@ -103,8 +102,7 @@ void BlockLightEngine::CheckBlock(BlockPos block_pos) {
   // Get info
   assert(CheckChunk(block_pos.ToChunkPos()));
   BlockID block = GetBlock(block_pos);
-  int emission_lvl =
-      game_context_.blocks_->GetBlockProperties(block).light_emission;
+  int emission_lvl = context_.blocks_->GetBlockProperties(block).light_emission;
   int curr_lvl = GetLightLvl(block_pos);
 
   SetLightLvl(block_pos, emission_lvl);

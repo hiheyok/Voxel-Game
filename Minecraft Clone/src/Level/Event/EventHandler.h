@@ -21,7 +21,7 @@ class EventHandler {
 
   void ExecuteEvent(Event event, Dimension* dimension);
 
-  GameContext& game_context_;
+  GameContext& context_;
 
   EventID BlockPlace = RegisterBlockEvent(HandlePlaceBlock);
   EventID BlockTick = RegisterBlockEvent(HandleBlockTick);
@@ -39,5 +39,4 @@ class EventHandler {
   int event_count_ = 0;
   EventID RegisterBlockEvent(void (*func)(const BlockEvent&, Dimension*));
   EventID RegisterEntityEvent(void (*func)(const EntityEvent&, Dimension*));
-
 };

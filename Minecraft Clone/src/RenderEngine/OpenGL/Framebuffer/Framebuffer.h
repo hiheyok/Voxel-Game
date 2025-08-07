@@ -30,7 +30,7 @@ class TexturedFrameBuffer {
   GLuint texture_ = 0;
 
  private:
-  GameContext& game_context_;
+  GameContext& context_;
   std::unique_ptr<Shader> screen_;
   GLuint fbo_ = 0, rbo_ = 0, shader_id_ = 0;
   GLint sx = 0;

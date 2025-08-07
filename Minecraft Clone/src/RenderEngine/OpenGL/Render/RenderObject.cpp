@@ -7,8 +7,8 @@
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 
-RenderObject::RenderObject(GameContext& game_context) noexcept
-    : game_context_{game_context}, shader_{nullptr}, vao_{game_context} {}
+RenderObject::RenderObject(GameContext& context) noexcept
+    : context_{context}, shader_{nullptr}, vao_{context} {}
 RenderObject::RenderObject(RenderObject&&) noexcept = default;
 RenderObject& RenderObject::operator=(RenderObject&& other) noexcept {
   if (this != &other) {
@@ -25,7 +25,7 @@ void RenderObject::SetShader(std::unique_ptr<ShaderInterface> shader) {
 }
 
 void RenderObject::SetShader(std::string vertex, std::string fragment) {
-  shader_ = std::make_unique<Shader>(game_context_, vertex, fragment);
+  shader_ = std::make_unique<Shader>(context_, vertex, fragment);
 }
 
 ShaderInterface& RenderObject::GetShader() { return *shader_; }

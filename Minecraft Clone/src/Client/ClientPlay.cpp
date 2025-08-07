@@ -30,19 +30,19 @@
 #include "RenderEngine/Window.h"
 #include "Utils/LogUtils.h"
 
-ClientPlay::ClientPlay(GameContext& game_context, ServerInterface* interface,
+ClientPlay::ClientPlay(GameContext& context, ServerInterface* interface,
                        Window* window, PerformanceProfiler* profiler)
-    : game_context_{game_context},
+    : context_{context},
       interface_{interface},
-      framebuffer_{std::make_unique<TexturedFrameBuffer>(game_context)},
-      client_level_{std::make_unique<ClientLevel>(game_context)},
-      main_player_{std::make_unique<MainPlayer>(game_context, window, interface,
+      framebuffer_{std::make_unique<TexturedFrameBuffer>(context)},
+      client_level_{std::make_unique<ClientLevel>(context)},
+      main_player_{std::make_unique<MainPlayer>(context, window, interface,
                                                 &client_level_->cache_)},
-      debug_screen_{std::make_unique<DebugScreen>(game_context)},
+      debug_screen_{std::make_unique<DebugScreen>(context)},
       entity_render_{std::make_unique<MultiEntityRender>(
-          game_context, main_player_->GetPlayerPOV())},
+          context, main_player_->GetPlayerPOV())},
       terrain_render_{std::make_unique<WorldRender>(
-          game_context, main_player_->GetPlayerPOV())} {
+          context, main_player_->GetPlayerPOV())} {
   main_player_->SetPlayerPosition(0., 50, 0.);
   main_player_->SetPlayerRotation(-135.f, -30.);
 
@@ -59,9 +59,8 @@ ClientPlay::ClientPlay(GameContext& game_context, ServerInterface* interface,
   interface->SendPlayerAction(packet);
   terrain_render_->Start(window->GetWindow(), &client_level_->cache_, profiler);
   framebuffer_->GenBuffer(
-      window->GetProperties().res_x_,
-      window->GetProperties().res_y_,
-      static_cast<float>(game_context_.options_->graphics_scale_), GL_RGB);
+      window->GetProperties().res_x_, window->GetProperties().res_y_,
+      static_cast<float>(context_.options_->graphics_scale_), GL_RGB);
 }
 ClientPlay::~ClientPlay() = default;
 
@@ -71,7 +70,7 @@ void ClientPlay::Render(Window* window) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   if (!window->GetProperties().draw_solid_) window->RenderLines();
-  
+
   // entity_render_->Render();
   terrain_render_->Render();
   entity_render_->Render();
@@ -93,9 +92,8 @@ void ClientPlay::Update(Window* window) {
 
     framebuffer_->Clear();
     framebuffer_->GenBuffer(
-        window->GetProperties().res_x_,
-        window->GetProperties().res_y_,
-        static_cast<float>(game_context_.options_->graphics_scale_));
+        window->GetProperties().res_x_, window->GetProperties().res_y_,
+        static_cast<float>(context_.options_->graphics_scale_));
   }
 
   if (window->GetUserInputs().CheckAction(InputAction::kReload)) {
@@ -244,8 +242,7 @@ void ClientPlay::UpdateChunks() {
       ChunkContainer* c = client_level_->cache_.GetChunk(data.pos_);
       c->SetData(data);
     } else {
-      std::unique_ptr<Chunk> newChunk =
-          std::make_unique<Chunk>(game_context_, data);
+      std::unique_ptr<Chunk> newChunk = std::make_unique<Chunk>(context_, data);
       client_level_->cache_.AddChunk(std::move(newChunk));
     }
   }
@@ -284,8 +281,8 @@ void ClientPlay::UpdateChunks() {
 
     if (!client_level_->cache_.CheckChunk(sky_light.position_)) {
       continue;
-      game_context_.logger_->LogWarn("ClientPlay::UpdateChunks",
-                                     "Chunk doens't exist!");
+      context_.logger_->LogWarn("ClientPlay::UpdateChunks",
+                                "Chunk doens't exist!");
     }
 
     Chunk* chunk = client_level_->cache_.GetChunk(sky_light.position_);
@@ -336,8 +333,7 @@ void ClientPlay::UpdateEntities() {
         break;
       }
       default:
-        game_context_.logger_->LogDebug("ClientPlay::UpdateEntities",
-                                        "Default");
+        context_.logger_->LogDebug("ClientPlay::UpdateEntities", "Default");
     }
   }
 

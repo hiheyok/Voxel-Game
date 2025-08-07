@@ -31,6 +31,6 @@ class Region {
   int chunk_count_;
   int usage_;  // use for finding region with the most usage and caching them
   // for faster access
-  GameContext& game_context_;
+  GameContext& context_;
   std::vector<std::unique_ptr<Chunk>> region_data_;
 };

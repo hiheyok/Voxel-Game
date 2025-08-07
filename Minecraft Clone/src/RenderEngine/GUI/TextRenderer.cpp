@@ -20,11 +20,11 @@
 #include "RenderEngine/OpenGL/Texture/Types/Texture2D.h"
 #include "Utils/LogUtils.h"
 
-TextRenderer::TextRenderer(GameContext& game_context)
-    : game_context_{game_context},
-      font_texture_{std::make_unique<Texture2D>(game_context_)},
-      background_render_{std::make_unique<RenderDrawArrays>(game_context_)},
-      font_render_{std::make_unique<RenderDrawArrays>(game_context_)} {}
+TextRenderer::TextRenderer(GameContext& context)
+    : context_{context},
+      font_texture_{std::make_unique<Texture2D>(context_)},
+      background_render_{std::make_unique<RenderDrawArrays>(context_)},
+      font_render_{std::make_unique<RenderDrawArrays>(context_)} {}
 
 TextRenderer::~TextRenderer() = default;
 
@@ -52,8 +52,8 @@ void TextRenderer::InitializeTextRenderer(GLFWwindow* w) {
   font_texture_->Load(RawTexture);
   font_render_->SetTexture2D(0, font_texture_->Get(), "FontTexture");
   window_ = w;
-  game_context_.logger_->LogDebug("TextRenderer::InitializeTextRenderer",
-                                  "Initialized font renderer");
+  context_.logger_->LogDebug("TextRenderer::InitializeTextRenderer",
+                             "Initialized font renderer");
 }
 
 void TextRenderer::InsertFontObject(const std::string& name,

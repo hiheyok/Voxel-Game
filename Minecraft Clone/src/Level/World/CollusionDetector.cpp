@@ -10,15 +10,15 @@
 #include "Utils/Math/Ray/Ray.h"
 #include "Utils/Math/vectorOperations.h"
 
-CollusionDetector::CollusionDetector(GameContext& game_context, ChunkMap* cache)
-    : game_context_{game_context}, cache_{cache} {}
+CollusionDetector::CollusionDetector(GameContext& context, ChunkMap* cache)
+    : context_{context}, cache_{cache} {}
 CollusionDetector::~CollusionDetector() = default;
 
 float CollusionDetector::TraceSingleAxisCollision(glm::vec3 origin,
                                                   int direction,
                                                   int distance_test) {
   const std::vector<BlockProperties>& properties =
-      game_context_.blocks_->GetBlockPropertyList();
+      context_.blocks_->GetBlockPropertyList();
 
   float displacement = 0;
 
@@ -51,9 +51,8 @@ float CollusionDetector::TraceSingleAxisCollision(glm::vec3 origin,
 }
 
 glm::dvec3 CollusionDetector::ComputeCollisionTimes(Entity* entity) {
-  AABB hitbox =
-      game_context_.entities_list_->GetEntity(entity->properties_.type_)
-          ->GetHitbox();
+  AABB hitbox = context_.entities_list_->GetEntity(entity->properties_.type_)
+                    ->GetHitbox();
 
   glm::vec3 hitbox_start = entity->properties_.position_ - (hitbox.size_ / 2.f);
   glm::vec3 hitbox_end = entity->properties_.position_ + (hitbox.size_ / 2.f);
@@ -173,7 +172,7 @@ bool CollusionDetector::CheckRayIntersection(Ray& ray) {
     BlockID b =
         cache_->GetBlock(BlockPos{block_pos.x, block_pos.y, block_pos.z});
 
-    if (game_context_.blocks_->GetBlockType(b)->properties_->is_solid_) {
+    if (context_.blocks_->GetBlockType(b)->properties_->is_solid_) {
       ray.end_point_ = (glm::vec3)block_pos;
 
       ray.length_ = sqrtf(powf(ray.end_point_.x - ray.origin_.x, 2) +
@@ -216,9 +215,8 @@ bool CollusionDetector::CheckRayIntersection(Ray& ray) {
 
 bool CollusionDetector::IsEntityOnGround(Entity* entity) {
   static constexpr int search_buffer = 2;
-  AABB hitbox =
-      game_context_.entities_list_->GetEntity(entity->properties_.type_)
-          ->GetHitbox();
+  AABB hitbox = context_.entities_list_->GetEntity(entity->properties_.type_)
+                    ->GetHitbox();
 
   glm::vec3 hitbox_start = entity->properties_.position_ - (hitbox.size_ / 2.f);
   glm::vec3 hitbox_end = entity->properties_.position_ + (hitbox.size_ / 2.f);

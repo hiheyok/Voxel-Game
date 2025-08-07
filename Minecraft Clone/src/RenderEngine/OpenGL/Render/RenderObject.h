@@ -91,7 +91,7 @@ class RenderObject {
  protected:
   void SetupTexture();
 
-  GameContext& game_context_;
+  GameContext& context_;
   std::unique_ptr<ShaderInterface> shader_;
   VertexArray vao_;
 

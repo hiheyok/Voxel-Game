@@ -72,7 +72,7 @@ class LightEngine {
  protected:
   static constexpr size_t kQueueSizeIncrement = 16392;
 
-  GameContext& game_context_;
+  GameContext& context_;
   WorldInterface& world_;
   const std::vector<BlockProperties>& properties_;
 

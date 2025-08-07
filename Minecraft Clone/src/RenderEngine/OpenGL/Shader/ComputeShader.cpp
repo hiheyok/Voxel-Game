@@ -5,8 +5,8 @@
 #include <stdexcept>
 #include <string>
 
-ComputeShader::ComputeShader(GameContext& game_context, std::string source)
-    : ShaderInterface{game_context} {
+ComputeShader::ComputeShader(GameContext& context, std::string source)
+    : ShaderInterface{context} {
   std::string shaderSource = ReadFile(source);
 
   shader_id_ = glCreateProgram();

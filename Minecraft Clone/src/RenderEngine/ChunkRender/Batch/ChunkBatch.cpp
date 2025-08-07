@@ -14,12 +14,12 @@
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "Utils/Timer/Timer.h"
 
-ChunkDrawBatch::ChunkDrawBatch(GameContext& game_context, size_t maxSize)
-    : game_context_{game_context},
-      memory_pool_{game_context, maxSize},
-      ibo_{game_context},
-      ssbo_{game_context},
-      array_{game_context},
+ChunkDrawBatch::ChunkDrawBatch(GameContext& context, size_t maxSize)
+    : context_{context},
+      memory_pool_{context, maxSize},
+      ibo_{context},
+      ssbo_{context},
+      array_{context},
       max_buffer_size_{maxSize} {}
 
 ChunkDrawBatch::ChunkDrawBatch(ChunkDrawBatch&&) = default;
@@ -38,10 +38,10 @@ void ChunkDrawBatch::SetupBuffers() {
   array_
       .EnableAttriPtr(memory_pool_.buffer_.get(), 0, 3, GL_FLOAT, GL_FALSE, 5,
                       0)
-      .EnableAttriPtr(memory_pool_.buffer_.get(), 1, 1, GL_FLOAT,
-                      GL_FALSE, 5, 3)
-      .EnableAttriPtr(memory_pool_.buffer_.get(), 2, 1, GL_FLOAT,
-                      GL_FALSE, 5, 4);
+      .EnableAttriPtr(memory_pool_.buffer_.get(), 1, 1, GL_FLOAT, GL_FALSE, 5,
+                      3)
+      .EnableAttriPtr(memory_pool_.buffer_.get(), 2, 1, GL_FLOAT, GL_FALSE, 5,
+                      4);
 
   ssbo_.SetMaxSize(max_buffer_size_ / 100);
   ssbo_.InitializeData();
@@ -91,8 +91,10 @@ void ChunkDrawBatch::GenDrawCommands(int renderDistance,
                                    static_cast<float>(z << kChunkDimLog2),
                                    24.3f)) {
         draw_commands_[index - 1].set(
-            static_cast<uint32_t>(data.mem_size_ / sizeof(BlockVertexFormat)), 1,
-            static_cast<uint32_t>(data.mem_offset_ / sizeof(BlockVertexFormat)), index);
+            static_cast<uint32_t>(data.mem_size_ / sizeof(BlockVertexFormat)),
+            1,
+            static_cast<uint32_t>(data.mem_offset_ / sizeof(BlockVertexFormat)),
+            index);
         chunk_shader_pos_[(index - 1) * 3 + 0] = x;
         chunk_shader_pos_[(index - 1) * 3 + 1] = y;
         chunk_shader_pos_[(index - 1) * 3 + 2] = z;

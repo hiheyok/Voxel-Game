@@ -38,7 +38,7 @@ class ModelLoader {
   std::vector<float> GetJSONArrayValuesFloat(json JsonData);
   std::vector<int> GetJSONArrayValues(json JsonData);
 
-  GameContext& game_context_;
+  GameContext& context_;
   // Model cache to cache repeated parents
   FastHashMap<ResourceLocation, std::unique_ptr<BlockModel>> cache_;
   const std::string kDefaultNamespace = "minecraft";

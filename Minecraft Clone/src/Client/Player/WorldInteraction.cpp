@@ -16,8 +16,7 @@
 #include "Utils/Math/Ray/Ray.h"
 #include "Utils/Math/vectorOperations.h"
 
-WorldInteraction::WorldInteraction(GameContext& game_context)
-    : game_context_{game_context} {}
+WorldInteraction::WorldInteraction(GameContext& context) : context_{context} {}
 WorldInteraction::~WorldInteraction() = default;
 
 void WorldInteraction::Interact(Player* player, const InputManager& inputs,
@@ -45,11 +44,11 @@ void WorldInteraction::Interact(Player* player, const InputManager& inputs,
   }
   if (inputs.CheckAction(InputAction::kPickBlock)) {
     BlockID newBlock = GetBlock(ray, cache);
-    if (newBlock != game_context_.blocks_->AIR) {
+    if (newBlock != context_.blocks_->AIR) {
       player->entity_inventory_.SetSlot(
           player->entity_inventory_.right_hand_slot_,
-          ItemStack{game_context_.items_->GetItem(
-              game_context_.items_->GetBlockItem(newBlock))});
+          ItemStack{context_.items_->GetItem(
+              context_.items_->GetBlockItem(newBlock))});
     }
   }
 }
@@ -62,7 +61,7 @@ BlockID WorldInteraction::GetBlock(Ray ray, ClientCache* cache) {
                  floor(ray.end_point_.z)};
     return cache->GetBlock(pos);
   }
-  return game_context_.blocks_->AIR;
+  return context_.blocks_->AIR;
 }
 
 void WorldInteraction::BreakBlock(Ray ray, ServerInterface* interface,

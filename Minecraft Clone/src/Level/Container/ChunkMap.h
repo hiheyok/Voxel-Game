@@ -13,7 +13,8 @@ class GameContext;
 
 class ChunkMap {
  public:
-  ChunkMap(GameContext&, bool neighborUpdate = false, bool heightmapUpdate = false);
+  ChunkMap(GameContext&, bool neighborUpdate = false,
+           bool heightmapUpdate = false);
   ~ChunkMap();
 
   BlockID GetBlock(BlockPos pos) const;
@@ -33,8 +34,8 @@ class ChunkMap {
   void DeleteRegion(RegionPos pos);
   Region* FindAndCacheRegion(RegionPos pos) const;
   void TryDeleteFromCache(RegionPos pos);
-  
-  GameContext& game_context_;
+
+  GameContext& context_;
   bool heightmap_update_ = false;
   bool neighbor_update_ = false;
 

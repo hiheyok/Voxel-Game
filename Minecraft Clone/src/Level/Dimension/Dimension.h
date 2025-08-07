@@ -40,7 +40,7 @@ class Dimension {
 
   LightEngineStats GetLightEngineStats() const noexcept;
 
-  GameContext& game_context_;
+  GameContext& context_;
   WorldInterface* world_;
   std::unique_ptr<WorldUpdater> world_updater_;
   std::unique_ptr<CollusionDetector> collusion_detector_;

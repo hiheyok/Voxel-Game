@@ -6,9 +6,8 @@
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "Utils/LogUtils.h"
 
-RenderDrawElements::RenderDrawElements(GameContext& game_context,
-                                       uint32_t draw_type)
-    : RenderObject{game_context}, vbo_{game_context}, ebo_{game_context} {
+RenderDrawElements::RenderDrawElements(GameContext& context, uint32_t draw_type)
+    : RenderObject{context}, vbo_{context}, ebo_{context} {
   draw_type_ = draw_type;
   vbo_.SetType(GL_ARRAY_BUFFER);
   vbo_.SetUsage(GL_STATIC_DRAW);

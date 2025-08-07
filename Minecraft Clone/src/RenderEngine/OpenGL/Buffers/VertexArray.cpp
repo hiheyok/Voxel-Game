@@ -12,12 +12,10 @@
 #include "RenderEngine/OpenGL/Buffers/BufferStorage.h"
 #include "Utils/LogUtils.h"
 
-VertexArray::VertexArray(GameContext& game_context)
-    : game_context_{game_context} {
+VertexArray::VertexArray(GameContext& context) : context_{context} {
   glGenVertexArrays(1, &array_id_);
-  game_context_.logger_->LogDebug(
-      "VertexArray::GenArray",
-      "Created array. ID: " + std::to_string(array_id_));
+  context_.logger_->LogDebug("VertexArray::GenArray",
+                             "Created array. ID: " + std::to_string(array_id_));
 }
 
 VertexArray::~VertexArray() {
@@ -27,7 +25,7 @@ VertexArray::~VertexArray() {
 }
 
 VertexArray::VertexArray(VertexArray&& buffer) noexcept
-    : game_context_{buffer.game_context_} {
+    : context_{buffer.context_} {
   (*this) = std::move(buffer);
 }
 

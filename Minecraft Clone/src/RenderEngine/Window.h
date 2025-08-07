@@ -49,7 +49,7 @@ class Window {
   void ResizeWindowCallback(GLFWwindow* w, int x, int y);
   void ScrollCallback(GLFWwindow* win, double xoffset, double yoffset);
 
-  GameContext& game_context_;
+  GameContext& context_;
   InputManager inputs_;
   WindowProperties properties_;
 

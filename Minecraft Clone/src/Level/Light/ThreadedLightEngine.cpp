@@ -12,15 +12,15 @@
 #include "Utils/ThreadPool.h"
 #include "Utils/Timer/Timer.h"
 
-ThreadedLightEngine::ThreadedLightEngine(GameContext& game_context,
+ThreadedLightEngine::ThreadedLightEngine(GameContext& context,
                                          WorldInterface& world)
-    : game_context_{game_context},
+    : context_{context},
       world_{world},
       updater_{std::make_unique<ThreadPool<ChunkLightTask, int>>(
-          game_context.options_->light_engine_threads_, "Light Updater",
+          context.options_->light_engine_threads_, "Light Updater",
           std::bind_front(&ThreadedLightEngine::WorkerUpdater, this), 250)},
       lighter_{std::make_unique<ThreadPool<ChunkPos, int>>(
-          game_context.options_->light_engine_threads_, "Lighter",
+          context.options_->light_engine_threads_, "Lighter",
           std::bind_front(&ThreadedLightEngine::WorkerLighter, this), 250)} {}
 
 ThreadedLightEngine::~ThreadedLightEngine() = default;
@@ -52,11 +52,11 @@ LightEngineStats ThreadedLightEngine::GetStats() const noexcept {
 }
 
 int ThreadedLightEngine::WorkerUpdater(const ChunkLightTask& tasks) {
-  thread_local SkyLightEngine skylight_engine{game_context_, world_};
-  thread_local BlockLightEngine blocklight_engine{game_context_, world_};
+  thread_local SkyLightEngine skylight_engine{context_, world_};
+  thread_local BlockLightEngine blocklight_engine{context_, world_};
 
   Timer time;
-  LightEngineCache cache{game_context_, world_};
+  LightEngineCache cache{context_, world_};
   cache.BuildCache(tasks.GetChunkPos().GetBlockPosOffset());
 
   skylight_engine.SetCache(&cache);
@@ -66,18 +66,18 @@ int ThreadedLightEngine::WorkerUpdater(const ChunkLightTask& tasks) {
   blocklight_engine.Propagate(tasks);
 
   cache.UpdateLight();
-  double cpu_time = time.GetTimePassed_us(); 
+  double cpu_time = time.GetTimePassed_us();
   total_cpu_time_ += cpu_time;
   ++light_update_done_;
   return 987654321;
 }
 
 int ThreadedLightEngine::WorkerLighter(ChunkPos pos) {
-  thread_local SkyLightEngine skylight_engine{game_context_, world_};
-  thread_local BlockLightEngine blocklight_engine{game_context_, world_};
+  thread_local SkyLightEngine skylight_engine{context_, world_};
+  thread_local BlockLightEngine blocklight_engine{context_, world_};
 
   Timer time;
-  LightEngineCache cache{game_context_, world_};
+  LightEngineCache cache{context_, world_};
   cache.BuildCache(pos.GetBlockPosOffset());
 
   skylight_engine.SetCache(&cache);

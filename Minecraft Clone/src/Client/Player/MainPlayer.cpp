@@ -18,19 +18,19 @@
 #include "RenderEngine/GUI/GUISet.h"
 #include "RenderEngine/Window.h"
 
-MainPlayer::MainPlayer(GameContext& game_context, Window* window,
+MainPlayer::MainPlayer(GameContext& context, Window* window,
                        ServerInterface* interface, ClientCache* cache)
-    : game_context_{game_context},
+    : context_{context},
       player_{std::make_unique<Player>()},
       movement_{std::make_unique<PlayerMovement>()},
-      interactions_{std::make_unique<WorldInteraction>(game_context)},
+      interactions_{std::make_unique<WorldInteraction>(context)},
       player_pov_{std::make_unique<PlayerPOV>()},
-      player_gui_{std::make_unique<GUI>(game_context, window)},
+      player_gui_{std::make_unique<GUI>(context, window)},
       internal_interface_{interface},
       client_cache_{cache} {
   float ItemViewRelativeSize = 0.85f;
 
-  GUISet hotbar{game_context};
+  GUISet hotbar{context};
   hotbar.SetGUITexture("assets/minecraft/textures/gui/widgets.png");
   hotbar.AddGUIElement(
       "Hotbar", "", {9.f * kHotbarSize * 1.0055555555f, kHotbarSize * 1.05f},
@@ -40,10 +40,10 @@ MainPlayer::MainPlayer(GameContext& game_context, Window* window,
                        {-kHotbarSize * 4.f, -1.f + kHotbarSize * 0.5f},
                        {0.5f, 22.5f}, {22.5f, 44.5f});
 
-  GUISet itemBar{game_context};
-  itemBar.SetGUITexture(game_context_.item_atlas_->Get(),
-                        game_context_.item_atlas_->GetWidth(),
-                        game_context_.item_atlas_->GetHeight());
+  GUISet itemBar{context};
+  itemBar.SetGUITexture(context_.item_atlas_->Get(),
+                        context_.item_atlas_->GetWidth(),
+                        context_.item_atlas_->GetHeight());
 
   for (int i = 0; i < kHotbarSlots; i++) {
     itemBar.AddGUIElementNorm(
@@ -77,7 +77,7 @@ void MainPlayer::PrepareGUIs() {
   for (int i = 0; i < kHotbarSlots; i++) {
     ItemStack item = player_->entity_inventory_.GetItem(i);
     ItemUVMapping uv =
-        game_context_.item_atlas_->items_uv_map_[item.item_.properties_.id_];
+        context_.item_atlas_->items_uv_map_[item.item_.properties_.id_];
 
     if (item.IsInitialized()) {
       player_gui_->EditGUISet(item_gui_index_)

@@ -9,10 +9,10 @@
 #include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 
-Shader::Shader(GameContext& game_context) : ShaderInterface{game_context} {}
-Shader::Shader(GameContext& game_context, std::string vertexPath,
+Shader::Shader(GameContext& context) : ShaderInterface{context} {}
+Shader::Shader(GameContext& context, std::string vertexPath,
                std::string fragmentPath, std::string geometryPath)
-    : ShaderInterface{game_context} {
+    : ShaderInterface{context} {
   // 1. retrieve the vertex/fragment source code from filePath
   std::string vertexCode = ReadFile(vertexPath);
   std::string fragmentCode = ReadFile(fragmentPath);
@@ -22,7 +22,7 @@ Shader::Shader(GameContext& game_context, std::string vertexPath,
     geometryCode = ReadFile(geometryPath);
   }
 
-  game_context_.logger_->LogDebug(
+  context_.logger_->LogDebug(
       "Shader::Init", "Compiling shader: " + std::string(vertexPath) + ", " +
                           std::string(fragmentPath));
 
@@ -54,12 +54,11 @@ Shader::Shader(GameContext& game_context, std::string vertexPath,
   }
 }
 
-Shader::Shader(GameContext& game_context, ShaderSource& src)
-    : ShaderInterface{game_context} {
+Shader::Shader(GameContext& context, ShaderSource& src)
+    : ShaderInterface{context} {
   const std::string& vertexCode = src.GetVertex();
   const std::string& fragmentCode = src.GetFragment();
   const std::string& geometryCode = src.GetGeometry();
-
 
   uint32_t vertex = CompileShader(vertexCode, "Vertex", GL_VERTEX_SHADER);
   uint32_t fragment =

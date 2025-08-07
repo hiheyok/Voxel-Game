@@ -53,11 +53,11 @@ bool LightEngine<kEngineType>::InternalTask::GetRecheckLight() const noexcept {
 }
 
 template <EngineType kEngineType>
-LightEngine<kEngineType>::LightEngine(GameContext& game_context,
+LightEngine<kEngineType>::LightEngine(GameContext& context,
                                       WorldInterface& world)
-    : game_context_{game_context},
+    : context_{context},
       world_{world},
-      properties_{game_context.blocks_->GetBlockPropertyList()},
+      properties_{context.blocks_->GetBlockPropertyList()},
       light_cache_{nullptr} {}
 template <EngineType kEngineType>
 LightEngine<kEngineType>::~LightEngine() = default;
@@ -83,7 +83,7 @@ void LightEngine<kEngineType>::PropagateIncrease() {
   InternalTask next_task;
   // to prevent pointer chasing
   const std::vector<BlockProperties>& block_properties =
-      game_context_.blocks_->GetBlockPropertyList();
+      context_.blocks_->GetBlockPropertyList();
 
   while (TryDequeueIncrease(task)) {
     BlockPos block_pos = task.GetBlockPos();

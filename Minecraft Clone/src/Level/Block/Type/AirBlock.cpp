@@ -2,7 +2,7 @@
 
 #include "Level/Block/Type/AirBlock.h"
 
-AirBlock::AirBlock(GameContext& game_context) : Block{game_context} {
+AirBlock::AirBlock(GameContext& context) : Block{context} {
   properties_->is_solid_ = false;
   properties_->transparency_ = true;
   properties_->is_fluid_ = false;

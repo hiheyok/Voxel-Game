@@ -27,7 +27,7 @@ class WorldInterface {
   ChunkMap* GetChunkMap() const;
   EntityContainer* GetEntityContainer() const;
 
-  GameContext& game_context_;
+  GameContext& context_;
   WorldParameters parameters;
 
  protected:

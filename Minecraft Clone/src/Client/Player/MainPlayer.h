@@ -35,7 +35,7 @@ class MainPlayer {
 
   void RenderGUIs();
 
-  GameContext& game_context_;
+  GameContext& context_;
   std::unique_ptr<Player> player_;
 
  private:

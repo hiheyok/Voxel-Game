@@ -12,9 +12,8 @@
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "RenderEngine/OpenGL/Texture/Types/Texture2D.h"
 
-GUISet::GUISet(GameContext& game_context)
-    : game_context_{game_context},
-      gui_texture_{std::make_unique<Texture2D>(game_context)} {}
+GUISet::GUISet(GameContext& context)
+    : context_{context}, gui_texture_{std::make_unique<Texture2D>(context)} {}
 GUISet::~GUISet() = default;
 GUISet::GUISet(GUISet&& other) = default;
 
@@ -90,8 +89,7 @@ void GUISet::EditElementUVNorm(std::string Name, glm::vec2 UV0, glm::vec2 UV1) {
 }
 
 void GUISet::SetGUITexture(std::string file) {
-  gui_texture_ =
-      std::make_unique<Texture2D>(game_context_, RawTextureData(file));
+  gui_texture_ = std::make_unique<Texture2D>(context_, RawTextureData(file));
 }
 
 void GUISet::SetGUITexture(GLuint textureId, size_t x, size_t y) {
@@ -118,9 +116,9 @@ size_t GUISet::GetNumRenderableObjects() const {
 GLuint GUISet::GetGUITextureID() const { return gui_texture_->Get(); }
 
 size_t GUISet::AddRenderingObj() {
-  vaos_.emplace_back(game_context_);
-  ebos_.emplace_back(game_context_);
-  vbos_.emplace_back(game_context_);
+  vaos_.emplace_back(context_);
+  ebos_.emplace_back(context_);
+  vbos_.emplace_back(context_);
 
   vbos_.back().SetType(GL_ARRAY_BUFFER);
   ebos_.back().SetType(GL_ELEMENT_ARRAY_BUFFER);

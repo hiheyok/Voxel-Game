@@ -10,8 +10,8 @@
 #include "Level/Light/LightEngineCache.h"
 #include "Level/World/WorldInterface.h"
 
-SkyLightEngine::SkyLightEngine(GameContext& game_context, WorldInterface& world)
-    : LightEngine{game_context, world} {
+SkyLightEngine::SkyLightEngine(GameContext& context, WorldInterface& world)
+    : LightEngine{context, world} {
   heightmap_block_change_.fill(INT8_MIN);
   type_ = EngineType::kSkyLight;
 }

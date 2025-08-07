@@ -10,7 +10,7 @@
 #include "RenderEngine/BlockModel/ModelLoader.h"
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
 
-Fluid::Fluid(GameContext& game_context, int spread_rate) : Block{game_context} {
+Fluid::Fluid(GameContext& context, int spread_rate) : Block{context} {
   properties_->is_solid_ = false;
   properties_->is_fluid_ = true;
   properties_->light_pass_ = false;
@@ -48,7 +48,7 @@ std::unique_ptr<BlockModel> Fluid::InitializeBlockModel(
   side.cull_face_ = Directions<BlockPos>::kDown;
   cuboid.EditFace(Directions<BlockPos>::kDown, side);
 
-  cuboid.to_.y = 15.f/16;
+  cuboid.to_.y = 15.f / 16;
 
   block_model->AddElement(cuboid);
   block_model->is_initialized_ = true;
@@ -68,22 +68,21 @@ void Fluid::Tick(BlockPos pos, Dimension* currentWorld) {
 
     BlockID block = currentWorld->world_->GetBlock(newPos);
 
-    if (block != game_context_.blocks_->AIR) {
+    if (block != context_.blocks_->AIR) {
       continue;
     }
 
-    if (block == game_context_.blocks_->WATER) {
+    if (block == context_.blocks_->WATER) {
       continue;
     }
 
-    if (currentWorld->CheckTickUsed(game_context_.event_handler_->BlockPlace,
-                                    pos)) {
+    if (currentWorld->CheckTickUsed(context_.event_handler_->BlockPlace, pos)) {
       return;
     }
 
-    currentWorld->TickUsed(game_context_.event_handler_->BlockPlace, pos);
+    currentWorld->TickUsed(context_.event_handler_->BlockPlace, pos);
     BlockEvent blockEvent{newPos, blockType,
-                          game_context_.event_handler_->BlockPlace};
+                          context_.event_handler_->BlockPlace};
     currentWorld->event_manager_.AddEvent(blockEvent);
   }
 }

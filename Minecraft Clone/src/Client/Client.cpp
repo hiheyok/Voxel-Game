@@ -34,11 +34,11 @@
 #include "Utils/LogUtils.h"
 #include "Utils/Timer/Timer.h"
 
-Client::Client(GameContext& game_context)
-    : Window{game_context},
-      game_context_{game_context},
-      server_{std::make_unique<Server>(game_context)},
-      text_render_{std::make_unique<TextRenderer>(game_context)},
+Client::Client(GameContext& context)
+    : Window{context},
+      context_{context},
+      server_{std::make_unique<Server>(context)},
+      text_render_{std::make_unique<TextRenderer>(context)},
       internal_interface_{std::make_unique<InternalInterface>()},
       profiler_{new PerformanceProfiler()} {}
 
@@ -47,26 +47,26 @@ Client::~Client() = default;
 void Client::InitializeServerCom() {
   // Start Server First
   ServerSettings settings;
-  settings.gen_thread_count_ = game_context_.options_->world_gen_threads_;
+  settings.gen_thread_count_ = context_.options_->world_gen_threads_;
   settings.light_engine_thread_count_ =
-      game_context_.options_->light_engine_threads_;
+      context_.options_->light_engine_threads_;
   settings.horizontal_ticking_distance_ =
-      game_context_.options_->horizontal_render_distance_;
+      context_.options_->horizontal_render_distance_;
   settings.vertical_ticking_distance_ =
-      game_context_.options_->vertical_render_distance_;
+      context_.options_->vertical_render_distance_;
 
   // Joins the server it should start receiving stuff now
   server_->StartServer(settings);
   player_uuid_ = server_->SetInternalConnection(internal_interface_.get());
   client_play_ = std::make_unique<ClientPlay>(
-      game_context_, internal_interface_.get(), this, profiler_);
+      context_, internal_interface_.get(), this, profiler_);
 }
 
 void Client::Initialize() {
-  game_context_.InitializeRenderingContext();
+  context_.InitializeRenderingContext();
   DisableCursor();
   InitializeServerCom();
-  ui_manager_ = std::make_unique<UIManager>(game_context_, inputs_);
+  ui_manager_ = std::make_unique<UIManager>(context_, inputs_);
   ui_manager_->Initialize();
   ui_manager_->PushScreen("debug_screen");
 

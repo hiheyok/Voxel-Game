@@ -21,9 +21,8 @@
 #include "RenderEngine/ChunkRender/Mesh/BlockVertexFormat.h"
 #include "Utils/Timer/Timer.h"
 
-Mesh::ChunkMeshData::ChunkMeshData(GameContext& game_context)
-    : game_context_{game_context} {
-  chunk_cache_.fill(game_context_.blocks_->AIR);
+Mesh::ChunkMeshData::ChunkMeshData(GameContext& context) : context_{context} {
+  chunk_cache_.fill(context_.blocks_->AIR);
 }
 
 Mesh::ChunkMeshData::~ChunkMeshData() = default;
@@ -40,7 +39,7 @@ void Mesh::ChunkMeshData::Reset() {
   transparent_face_count_ = 0;
   solid_face_count_ = 0;
 
-  chunk_cache_.fill(game_context_.blocks_->AIR);
+  chunk_cache_.fill(context_.blocks_->AIR);
 }
 
 void Mesh::ChunkMeshData::GenerateCache() {
@@ -130,7 +129,7 @@ void Mesh::ChunkMeshData::GenerateMesh() {
 
 void Mesh::ChunkMeshData::GenerateFaceCollection() {
   const std::vector<BlockModel>& models =
-      game_context_.block_model_manager_->GetBlockModelList();
+      context_.block_model_manager_->GetBlockModelList();
 
   std::array<uint8_t, 1024> face_visibility;
   std::array<uint8_t, 1024> face_visibility_back;
@@ -328,7 +327,7 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const Cuboid& cube, int side,
 
   auto CreateVertex = [&](BlockVertexFormat& v, const glm::vec3& tint_color,
                           const glm::ivec2& uv, float ao_multiplier,
-                          int sky_light, int block_light) { 
+                          int sky_light, int block_light) {
     glm::vec4 color(tint_color * ao_multiplier, 1.0f);
     // Assuming BlockVertexFormat::Set now takes a vec4 for color
     v.SetColor(static_cast<int>(color.r * 255), static_cast<int>(color.g * 255),
@@ -464,7 +463,7 @@ void Mesh::ChunkMeshData::GetAO(int side, const BlockID* restrict cache_ptr,
   } else {
     p -= kCacheStride[axis];
   }
-  BlockID air = game_context_.blocks_->AIR;
+  BlockID air = context_.blocks_->AIR;
   const int s_u = (p[stride_u] != air);
   const int s_d = (p[-stride_u] != air);
   const int s_r = (p[stride_v] != air);
@@ -502,7 +501,7 @@ bool Mesh::ChunkMeshData::IsFaceVisible(const Cuboid& cube, int side,
   }
 
   const BlockModel& model =
-      game_context_.block_model_manager_->GetBlockModel(*cache);
+      context_.block_model_manager_->GetBlockModel(*cache);
 
   if (!model.is_initialized_) return true;
 

@@ -19,11 +19,11 @@
 #include "Utils/Math/Ray/Ray.h"
 #include "Utils/Timer/Timer.h"
 
-Server::Server(GameContext& game_context) : game_context_{game_context} {}
+Server::Server(GameContext& context) : context_{context} {}
 Server::~Server() = default;
 
 void Server::StartServer(ServerSettings serverSettings) {
-  level_ = std::make_unique<Level>(game_context_);
+  level_ = std::make_unique<Level>(context_);
   level_->Start();
   time_ = std::make_unique<Timer>();
   stop_ = false;
@@ -38,7 +38,7 @@ void Server::Stop() {
 }
 
 void Server::Loop() {
-  game_context_.logger_->LogDebug("Server::Loop", "Started main server loop");
+  context_.logger_->LogDebug("Server::Loop", "Started main server loop");
   while (!stop_) {
     time_->Set();
     // Process Client -> Server events
@@ -57,8 +57,7 @@ void Server::Loop() {
 
     mspt_ = time_->GetTimePassed_ms();
   }
-  game_context_.logger_->LogDebug("Server::Loop",
-                                  "Shutting down main server loop");
+  context_.logger_->LogDebug("Server::Loop", "Shutting down main server loop");
 }
 
 void Server::Tick() {
@@ -117,8 +116,8 @@ void Server::ProcessPlayerPackets(ClientInterface* receiver) {
         const PlayerPacket::PlayerDestroyBlock& destroyBlock =
             std::get<PlayerPacket::PlayerDestroyBlock>(packet.packet_);
         BlockEvent block_event;
-        block_event.block_ = game_context_.blocks_->AIR;
-        block_event.id_ = game_context_.event_handler_->BlockPlace;
+        block_event.block_ = context_.blocks_->AIR;
+        block_event.id_ = context_.event_handler_->BlockPlace;
         block_event.pos_ = destroyBlock.pos_;
         level_->main_world_->event_manager_.AddEvent(block_event);
       } break;
@@ -127,7 +126,7 @@ void Server::ProcessPlayerPackets(ClientInterface* receiver) {
             std::get<PlayerPacket::PlayerPlaceBlock>(packet.packet_);
         BlockEvent block_event;
         block_event.block_ = placeBlock.block_;
-        block_event.id_ = game_context_.event_handler_->BlockPlace;
+        block_event.id_ = context_.event_handler_->BlockPlace;
         block_event.pos_ = placeBlock.pos_;
         level_->main_world_->event_manager_.AddEvent(block_event);
       } break;
@@ -227,7 +226,7 @@ void Server::SendBlockUpdatePacket(ClientInterface* receiver) {
             .UnpackAll();
 
     for (int i = 0; i < num_updates; ++i) {
-      packet.updates_[i].first = updates[i]; 
+      packet.updates_[i].first = updates[i];
       packet.updates_[i].second = block_data_[updates[i].GetIndex()];
     }
 

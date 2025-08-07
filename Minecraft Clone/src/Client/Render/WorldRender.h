@@ -41,7 +41,7 @@ class WorldRender : public WorldRenderInfo {
   void Update(std::vector<ChunkPos> updatedChunks);
   size_t GetQueuedSize() const noexcept;
 
-  GameContext& game_context_;
+  GameContext& context_;
   std::unique_ptr<TerrainRenderer> renderer_;
   PerformanceProfiler* profiler_;
 

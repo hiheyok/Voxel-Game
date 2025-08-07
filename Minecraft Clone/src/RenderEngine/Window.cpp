@@ -15,7 +15,7 @@ void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, uint32_t id,
                                     const char* message,
                                     const void* userParam) {
   Window* window = static_cast<Window*>(const_cast<void*>(userParam));
-  LogUtils* logger = window->game_context_.logger_.get();
+  LogUtils* logger = window->context_.logger_.get();
 
   std::stringstream str;
 
@@ -113,7 +113,7 @@ GLFWwindow* Window::GetWindow() { return win_; }
 
 bool Window::WindowCloseCheck() { return glfwWindowShouldClose(win_); }
 
-Window::Window(GameContext& game_context) : game_context_{game_context} {
+Window::Window(GameContext& context) : context_{context} {
   InitializeGLFW();
   InitializeCallbacks();
   InitializeGLEW();
@@ -145,7 +145,7 @@ void Window::ResizeWindowCallback(GLFWwindow* win, int x, int y) {
   properties_.size_dirty_ = true;
   inputs_.UpdateResolution(x, y);
 
-  game_context_.logger_->LogInfo(
+  context_.logger_->LogInfo(
       "Window::ResizeWindowCallback",
       " Resized Window: " + std::to_string(x) + ", " + std::to_string(y));
 }
@@ -185,7 +185,7 @@ void Window::MouseButtonCallback(GLFWwindow* win, int button, int action,
 
 void Window::InitializeGLFW() {
   if (properties_.initialized_) {
-    game_context_.logger_->LogDebug("Window::Start", "Already initialized");
+    context_.logger_->LogDebug("Window::Start", "Already initialized");
     return;
   }
 
@@ -211,7 +211,7 @@ void Window::InitializeGLFW() {
     glfwTerminate();
     throw std::runtime_error("Window::Start - Failed to create GLFW Window");
   } else {
-    game_context_.logger_->LogInfo("Window::Start", "Created GLFW Window");
+    context_.logger_->LogInfo("Window::Start", "Created GLFW Window");
   }
 }
 
@@ -238,7 +238,7 @@ void Window::InitializeGLEW() {
 
   std::stringstream str;
   str << "OpenGL Version: " << glGetString(GL_VERSION);
-  game_context_.logger_->LogInfo("Window::Start", str.str());
+  context_.logger_->LogInfo("Window::Start", str.str());
 }
 
 void Window::InitializeDebugCallback() {

@@ -20,19 +20,17 @@
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 
-MultiEntityRender::MultiEntityRender(GameContext& game_context,
-                                     PlayerPOV* player)
-    : game_context_{game_context},
-      vbo_{std::make_unique<Buffer>(game_context)},
-      ebo_{std::make_unique<Buffer>(game_context)},
-      ssbo_pos_{std::make_unique<Buffer>(game_context)},
-      ssbo_vel_{std::make_unique<Buffer>(game_context)},
-      ssbo_acc_{std::make_unique<Buffer>(game_context)},
-      vao_{std::make_unique<VertexArray>(game_context)},
+MultiEntityRender::MultiEntityRender(GameContext& context, PlayerPOV* player)
+    : context_{context},
+      vbo_{std::make_unique<Buffer>(context)},
+      ebo_{std::make_unique<Buffer>(context)},
+      ssbo_pos_{std::make_unique<Buffer>(context)},
+      ssbo_vel_{std::make_unique<Buffer>(context)},
+      ssbo_acc_{std::make_unique<Buffer>(context)},
+      vao_{std::make_unique<VertexArray>(context)},
       player_{player},
       shader_{std::make_unique<Shader>(
-          game_context,
-          *game_context.assets_->GetShaderSource("entity_render"))},
+          context, *context.assets_->GetShaderSource("entity_render"))},
       renderable_entities_{std::make_unique<EntityRenderCache>()} {}
 
 MultiEntityRender::~MultiEntityRender() = default;
@@ -50,21 +48,20 @@ void MultiEntityRender::RemoveEntity(EntityUUID entityUUID) {
 }
 
 void MultiEntityRender::Clean() {
-  vbo_ = std::make_unique<Buffer>(game_context_);
-  ebo_ = std::make_unique<Buffer>(game_context_);
-  ssbo_pos_ = std::make_unique<Buffer>(game_context_);
-  ssbo_vel_ = std::make_unique<Buffer>(game_context_);
-  ssbo_acc_ = std::make_unique<Buffer>(game_context_);
-  vao_ = std::make_unique<VertexArray>(game_context_);
+  vbo_ = std::make_unique<Buffer>(context_);
+  ebo_ = std::make_unique<Buffer>(context_);
+  ssbo_pos_ = std::make_unique<Buffer>(context_);
+  ssbo_vel_ = std::make_unique<Buffer>(context_);
+  ssbo_acc_ = std::make_unique<Buffer>(context_);
+  vao_ = std::make_unique<VertexArray>(context_);
 }
 
 void MultiEntityRender::Initialize(PerformanceProfiler* pProfilerIn) {
   static constexpr int kMaxEntityCount = 10000000;
 
-  for (int i = 0; i < game_context_.entities_list_->entity_type_list_.size();
-       i++) {
+  for (int i = 0; i < context_.entities_list_->entity_type_list_.size(); i++) {
     EntityModel model =
-        game_context_.entities_list_->entity_type_list_[i]->render_model_;
+        context_.entities_list_->entity_type_list_[i]->render_model_;
     entity_cached_models_[i] = model;
     profiler_ = pProfilerIn;
   }
@@ -170,7 +167,7 @@ void MultiEntityRender::Render() {
     shader_->Use();
     shader_->BindTexture2D(
         0,
-        game_context_.entities_list_->entity_type_list_[entityarr.first]
+        context_.entities_list_->entity_type_list_[entityarr.first]
             ->texture_->Get(),
         "EntityTexture");
 
@@ -232,16 +229,16 @@ void MultiEntityRender::Update() {
 
 void MultiEntityRender::Reload() {
   // reset gpu data
-  vbo_ = std::make_unique<Buffer>(game_context_);
-  ebo_ = std::make_unique<Buffer>(game_context_);
-  vao_ = std::make_unique<VertexArray>(game_context_);
+  vbo_ = std::make_unique<Buffer>(context_);
+  ebo_ = std::make_unique<Buffer>(context_);
+  vao_ = std::make_unique<VertexArray>(context_);
 
   // reset entity models
-  for (auto e : game_context_.entities_list_->entity_type_list_) {
+  for (auto e : context_.entities_list_->entity_type_list_) {
     e->render_model_.Clear();
   }
 
-  game_context_.entities_list_->Initialize();
+  context_.entities_list_->Initialize();
 
   Initialize(profiler_);
 }

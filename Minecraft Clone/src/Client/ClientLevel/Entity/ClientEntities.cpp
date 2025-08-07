@@ -10,8 +10,7 @@
 #include "Core/Typenames.h"
 #include "Level/Entity/Entity.h"
 
-ClientEntities::ClientEntities(GameContext& game_context)
-    : game_context_{game_context} {}
+ClientEntities::ClientEntities(GameContext& context) : context_{context} {}
 ClientEntities::~ClientEntities() = default;
 
 void ClientEntities::InsertEntity(const EntityProperty& entityProperty) {
