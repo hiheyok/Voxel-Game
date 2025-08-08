@@ -14,9 +14,9 @@ GeneratorType::~GeneratorType() = default;
 WorldGeneratorID GeneratorType::RegisterWorldGenerator(
     std::unique_ptr<WorldGenerator> generator) {
   generator_list_.push_back(std::move(generator));
-  LOG_INFO("Registered Generator: " +
-           std::to_string(generator_list_.size() - 1));
-  return generator_list_.size() - 1;
+  size_t id = generator_list_.size() - 1;
+  LOG_INFO("Registered Generator: {}", id);
+  return id;
 }
 
 WorldGenerator* GeneratorType::GetGenerator(WorldGeneratorID ID) {

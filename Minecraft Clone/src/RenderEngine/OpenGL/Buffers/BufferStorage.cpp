@@ -29,8 +29,7 @@ BufferStorage::BufferStorage(GameContext& context, GLuint bufferTarget,
     throw std::runtime_error("BufferStorage::Create - glGenBuffers failed!");
   }
 
-  LOG_DEBUG("Generated buffer storage. ID: " +
-            std::to_string(buffer_storage_id_));
+  LOG_DEBUG("Generated buffer storage. ID: {}", buffer_storage_id_);
   Bind();
 
   // *** Use glBufferStorage ***
@@ -53,9 +52,9 @@ BufferStorage::BufferStorage(GameContext& context, GLuint bufferTarget,
             "OpenGL error after glBufferStorage: "));  // std::string(err)
   }
 
-  LOG_INFO("Created buffer storage ID: " + std::to_string(buffer_storage_id_) +
-           " Size: " + std::to_string(size) + " bytes, Target: " +
-           std::to_string(target_) + ", Dynamic: " + (dynamic ? "Yes" : "No"));
+  LOG_INFO(
+      "Created buffer storage ID: {}, Size: {} bytes, Target: {}, Dynamic: {}",
+      buffer_storage_id_, size, target_, dynamic);
 }
 
 BufferStorage::~BufferStorage() {
@@ -64,8 +63,8 @@ BufferStorage::~BufferStorage() {
     buffer_storage_id_ = 0;  // Use 0 to indicate deleted/uninitialized
     max_size_ = 0;
     target_ = 0;
-    LOG_DEBUG("Deleted buffer storage. ID was: " +
-              std::to_string(buffer_storage_id_));  // Log before setting to 0
+    LOG_DEBUG("Deleted buffer storage. ID was: {}",
+                buffer_storage_id_);  // Log before setting to 0
   }
 }
 

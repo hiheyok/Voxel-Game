@@ -26,16 +26,14 @@ ShaderSource::ShaderSource(GameContext& context, const std::string& asset_key,
 std::unique_ptr<ShaderSource> ShaderSource::CreateShader(
     GameContext& context, const std::string& asset_key, std::string vertex,
     std::string fragment, std::string geometry) {
-  context.logger_->LogDebug("ShaderSource::CreateShader", "Loaded graphics shader: " + asset_key);
-  
-  return std::make_unique<ShaderSource>(context, asset_key, vertex,
-                                                fragment, geometry);
+  LOG_STATIC_DEBUG(context.logger_, "Loaded graphics shader: {}", asset_key);
+  return std::make_unique<ShaderSource>(context, asset_key, vertex, fragment,
+                                        geometry);
 }
 
 std::unique_ptr<ShaderSource> ShaderSource::CreateComputeShader(
     GameContext& context, const std::string& asset_key, std::string compute) {
-  context.logger_->LogDebug("ShaderSource::CreateShader", "Loaded compute shader: " + asset_key);
-  
+  LOG_STATIC_DEBUG(context.logger_, "Loaded compute shader: {}", asset_key);
   return std::make_unique<ShaderSource>(context, asset_key, compute);
 }
 

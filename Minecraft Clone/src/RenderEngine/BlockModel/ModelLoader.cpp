@@ -46,7 +46,7 @@ std::unique_ptr<BlockModel> ModelLoader::GetModelRecursive(
     }
     JSONData = json::parse(file);
   } catch (const std::exception& e) {
-    LOG_WARN(e.what());
+    LOG_WARN("{}", e.what());
     return nullptr;
   }
 
@@ -127,21 +127,22 @@ void ModelLoader::ProcessModelDisplay(std::unique_ptr<BlockModel>& model,
 
     for (auto& transitions : displayPlaces.value().items()) {
       std::vector<float> arr = GetJSONArrayValuesFloat(transitions.value());
+      std::string attrib = transitions.key();
 
-      if (transitions.key() == "rotation") {
+      if (attrib == "rotation") {
         for (int i = 0; i < 3; i++) {
           display.rotation_[i] = arr[i];
         }
-      } else if (transitions.key() == "translation") {
+      } else if (attrib == "translation") {
         for (int i = 0; i < 3; i++) {
           display.translation_[i] = arr[i];
         }
-      } else if (transitions.key() == "scale") {
+      } else if (attrib == "scale") {
         for (int i = 0; i < 3; i++) {
           display.scale_[i] = arr[i];
         }
       } else {
-        LOG_WARN("Unknown display attribute: " + transitions.key());
+        LOG_WARN("Unknown display attribute: {}", attrib);
       }
     }
 
@@ -162,7 +163,7 @@ void ModelLoader::ProcessModelDisplay(std::unique_ptr<BlockModel>& model,
     } else if (position == "fixed") {
       display.position_ = DisplayPosition::fixed;
     } else {
-      LOG_WARN("Unknown display position: " + position);
+      LOG_WARN("Unknown display position: {}", position);
       return;
     }
 
@@ -178,29 +179,30 @@ void ModelLoader::UpdateModelElements(std::unique_ptr<BlockModel>& model,
     Cuboid cuboid;
 
     for (auto& subElements : item.value().items()) {
-      if (subElements.key() == "from") {
+      std::string key = subElements.key();
+      if (key == "from") {
         std::vector<float> arr = GetJSONArrayValuesFloat(subElements.value());
         for (int i = 0; i < 3; i++) {
           cuboid.from_[i] = arr[i] / 16;
         }
         arr.clear();
-      } else if (subElements.key() == "to") {
+      } else if (key == "to") {
         std::vector<float> arr = GetJSONArrayValuesFloat(subElements.value());
         for (int i = 0; i < 3; i++) {
           cuboid.to_[i] = arr[i] / 16;
         }
         arr.clear();
-      } else if (subElements.key() == "faces") {
+      } else if (key == "faces") {
         ProcessSingleCubeFaces(cuboid, subElements.value());
-      } else if (subElements.key() == "rotation") {
+      } else if (key == "rotation") {
         CuboidRotationInfo rotation = GetRotationalData(subElements.value());
         cuboid.rotation_ = rotation;
-      } else if (subElements.key() == "__comment") {
+      } else if (key == "__comment") {
         cuboid.comments_ = subElements.value();
-      } else if (subElements.key() == "shade") {
+      } else if (key == "shade") {
         cuboid.shade_ = static_cast<bool>(subElements.value());
       } else {
-        LOG_WARN("Unknown element attribute: " + subElements.key());
+        LOG_WARN("Unknown element attribute: {}", key);
       }
     }
     model->AddElement(cuboid);
@@ -235,29 +237,29 @@ void ModelLoader::ProcessCuboidTexture(std::unique_ptr<BlockModel>& model,
 CuboidRotationInfo ModelLoader::GetRotationalData(json JsonData) {
   CuboidRotationInfo rotationInfo;
   for (auto& attribute : JsonData.items()) {
-    if (attribute.key() == "origin") {
+    const std::string& key = attribute.key();
+    if (key == "origin") {
       std::vector<float> arr = GetJSONArrayValuesFloat(attribute.value());
 
       for (int i = 0; i < 3; i++) {
         rotationInfo.origin_[i] = arr[i] / 16;
       }
-    } else if (attribute.key() == "axis") {
-      char axis_ = static_cast<std::string>(attribute.value())[0];
+    } else if (key == "axis") {
+      char axis = key[0];
 
-      if (axis_ == 'x') {
+      if (axis == 'x') {
         rotationInfo.axis_ = 0;
-      } else if (axis_ == 'y') {
+      } else if (axis == 'y') {
         rotationInfo.axis_ = 1;
-      } else if (axis_ == 'z') {
+      } else if (axis == 'z') {
         rotationInfo.axis_ = 2;
       } else {
-        LOG_WARN("Unknown rotational axis: " +
-                 static_cast<std::string>(attribute.value()));
+        LOG_WARN("Unknown rotational axis: {}", key);
       }
-    } else if (attribute.key() == "axis") {
+    } else if (key == "axis") {
       int angle_ = attribute.value();
       rotationInfo.angle_ = angle_;
-    } else if (attribute.key() == "rescale") {
+    } else if (key == "rescale") {
       rotationInfo.rescale_ = true;
     }
     rotationInfo.initialized_ = true;
@@ -271,7 +273,8 @@ void ModelLoader::ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
     int faceIndex = ConvertStringFaceToIndex(face.key());
     BlockFace bFace;
     for (auto& faceElements : face.value().items()) {
-      if (faceElements.key() == "uv") {
+      const std::string& key = faceElements.key(); 
+      if (key == "uv") {
         std::vector<int> arr = GetJSONArrayValues(faceElements.value());
 
         // flip
@@ -283,7 +286,7 @@ void ModelLoader::ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
         for (int i = 0; i < 4; i++) {
           bFace.uv_[i] = arr[i];
         }
-      } else if (faceElements.key() == "texture") {
+      } else if (key == "texture") {
         auto tokens = Tokenize(faceElements.value(), ':');
 
         std::string texName = tokens.back();
@@ -300,14 +303,14 @@ void ModelLoader::ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
         } else {
           bFace.reference_texture_ = texName + ":" + texNamespace;
         }
-      } else if (faceElements.key() == "cullface") {
+      } else if (key == "cullface") {
         bFace.cull_face_ = ConvertStringFaceToIndex(faceElements.value());
-      } else if (faceElements.key() == "tintindex") {
+      } else if (key == "tintindex") {
         bFace.tint_index_ = faceElements.value();
-      } else if (faceElements.key() == "rotation") {
+      } else if (key == "rotation") {
         bFace.rotation_ = faceElements.value();
       } else {
-        LOG_WARN("Unknown face attribute: " + faceElements.key());
+        LOG_WARN("Unknown face attribute: {}", key);
       }
     }
     cube.EditFace(faceIndex, bFace);
@@ -328,7 +331,7 @@ int ModelLoader::ConvertStringFaceToIndex(const std::string& str) {
   } else if (str == "east") {
     return EAST;
   } else {
-    LOG_WARN("Unknown direction: " + str);
+    LOG_WARN("Unknown direction: {}", str);
     return 0;
   }
 }

@@ -13,7 +13,7 @@ Buffer::Buffer(GameContext& context) : context_{context} {
   if (buffer_id_ == 0) {
     throw std::runtime_error("Buffer::GenBuffer - glGenBuffers failed!");
   }
-  LOG_DEBUG("Created buffer. ID: " + std::to_string(buffer_id_));
+  LOG_DEBUG("Created buffer. ID: {}", buffer_id_);
 }
 
 Buffer::~Buffer() {

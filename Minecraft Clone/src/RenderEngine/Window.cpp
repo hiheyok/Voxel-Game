@@ -145,7 +145,7 @@ void Window::ResizeWindowCallback(GLFWwindow* win, int x, int y) {
   properties_.size_dirty_ = true;
   inputs_.UpdateResolution(x, y);
 
-  LOG_INFO(" Resized Window: " + std::to_string(x) + ", " + std::to_string(y));
+  LOG_INFO("Resized Window: {}, {}", x, y);
 }
 
 void Window::ScrollCallback(GLFWwindow* win, double x_offset, double y_offset) {
@@ -229,14 +229,14 @@ void Window::InitializeGLEW() {
   glewInit();
 
   if (glewInit() != GLEW_OK) {
-    LOG_ERROR("Window::Start - Initialization Failed: GLEW");
+    LOG_ERROR("Initialization Failed: GLEW");
     return;
   }
   glewExperimental = GL_TRUE;
 
   std::stringstream str;
   str << "OpenGL Version: " << glGetString(GL_VERSION);
-  LOG_INFO(str.str());
+  LOG_INFO("{}",str.str());
 }
 
 void Window::InitializeDebugCallback() {

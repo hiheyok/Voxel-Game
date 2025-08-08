@@ -23,8 +23,8 @@ Item ItemList::RegisterBlockItem(BlockID block) {
 
   item_count_++;
 
-  LOG_INFO("Registered Block Item: " + std::to_string(item_count_) +
-           " | Name: " + item.properties_.name_);
+  LOG_INFO("Registered Block Item: {} | Name: {}", item_count_,
+           item.properties_.name_);
 
   return item;
 }

@@ -35,7 +35,7 @@ void TextureAtlas::LoadToGPU() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 4);
 
-  LOG_DEBUG("Loaded Texture Atlas: " + std::to_string(texture_id_));
+  LOG_DEBUG("Loaded Texture Atlas: {}", texture_id_);
 }
 
 void TextureAtlas::SetPixel(int r, int g, int b, int a, size_t w, size_t h) {
@@ -159,12 +159,11 @@ std::optional<RawTextureData> TextureAtlas::AddTextureToAtlas(
   std::optional<RawTextureData> data;
   RawTextureData tex{file};
   if (AddTextureToAtlasHelper(tex)) {
-    LOG_INFO("Loaded: " + file + " | Size: " + std::to_string(tex.height_) +
-             ", " + std::to_string(tex.width_));
+    LOG_INFO("Loaded: {} | Size: {} x {}", file, tex.height_, tex.width_);
     data = std::move(tex);
     return data;
   } else {
-    LOG_WARN("Unable to load: " + file);
+    LOG_WARN("Unable to load: {}", file);
     return data;
   }
 }

@@ -26,7 +26,7 @@ void TextureArray::LoadToGPU() {
                   static_cast<GLsizei>(height_), layers_, GL_RGBA,
                   GL_UNSIGNED_BYTE, array_data_.data());
   glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
-  LOG_DEBUG("Loaded Texture Array: " + std::to_string(texture_id_));
+  LOG_DEBUG("Loaded Texture Array: {}", texture_id_);
 }
 
 void TextureArray::SetSize(int width, int height) {
@@ -81,7 +81,9 @@ bool TextureArray::AddTextureToArray(RawTextureData* data) {
   }
 
   if (((data->width_ % width_) != 0) || ((data->height_ % height_) != 0)) {
-    LOG_ERROR("Width or height doesn't match");
+    LOG_ERROR(
+        "Width or height doesn't match, ({}, {}) doesn't align to  ({}, {})",
+        width_, height_, data->width_, data->height_);
     return false;
   }
 
@@ -124,12 +126,11 @@ std::optional<RawTextureData> TextureArray::AddTextureToArray(
   std::optional<RawTextureData> data;
   RawTextureData tex{file};
   if (AddTextureToArray(&tex)) {
-    LOG_INFO("Loaded: " + file + " | Size: " + std::to_string(tex.height_) +
-             ", " + std::to_string(tex.width_));
+    LOG_INFO("Loaded: {} | Size: {} x {}", file, tex.height_, tex.width_);
     data = std::move(tex);
     return data;
   } else {
-    LOG_ERROR("Unable to load: " + file);
+    LOG_ERROR("Unable to load: {}", file);
     return data;
   }
 }

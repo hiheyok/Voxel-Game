@@ -259,16 +259,14 @@ ChunkGPUMemoryPool::ChunkGPUMemoryPool(GameContext& context,
   }
 
   memory_pool_.Initialize(memory_pool_size_);
-  LOG_INFO("Allocated GPU memory pool. Size: " +
-           std::to_string(memory_pool_size_) + " bytes.");
+  LOG_INFO("Allocated GPU memory pool. Size: {} bytes", memory_pool_size_);
 }
 
 ChunkGPUMemoryPool::~ChunkGPUMemoryPool() = default;
 
 void ChunkGPUMemoryPool::DeleteChunk(ChunkPos pos) {
   if (!chunk_memory_offsets_.count(pos)) {
-    LOG_DEBUG("Attempted to delete non-existant chunk with ID " +
-              std::to_string(pos));
+    LOG_DEBUG("Attempted to delete non-existant chunk with ID: {}", pos);
     return;
   }
 

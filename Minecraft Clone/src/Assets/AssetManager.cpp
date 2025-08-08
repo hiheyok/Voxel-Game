@@ -33,21 +33,22 @@ void AssetManager::DiscoverShaders() {
   try {
     manifest = json::parse(json_data);
   } catch (const json::parse_error& e) {
-    LOG_ERROR("Failed to parse shader manifest '" + manifest_path +
-              "': " + e.what());
+    LOG_ERROR("Failed to parse shader manifest '{}': {}", manifest_path,
+              e.what());
     return;
   }
 
   if (!manifest.contains("shaders") || !manifest["shaders"].is_array()) {
-    LOG_WARN("Shader manifest '" + manifest_path +
-             "' is missing a 'shaders' array.");
+    LOG_WARN("Shader manifesst '{}' is missing a 'shaders' array",
+             manifest_path);
     return;
   }
 
   for (const auto& shader_def : manifest["shaders"]) {
     if (!shader_def.contains("name") || !shader_def.contains("type")) {
-      LOG_WARN("Skipping shader definition in '" + manifest_path +
-               "' due to missing 'name' or 'type'.");
+      LOG_WARN(
+          "Skipping shader definition in '{}' due to missing 'name' or 'type'.",
+          manifest_path);
       continue;
     }
 
@@ -60,8 +61,10 @@ void AssetManager::DiscoverShaders() {
       if (type == "graphics") {
         if (!shader_def.contains("vertex") ||
             !shader_def.contains("fragment")) {
-          LOG_WARN("Skipping shader definition in '" + manifest_path +
-                   "' due to missing 'name' or 'type'.");
+          LOG_WARN(
+              "Skipping shader definition in '{}' due to missing 'name' or "
+              "'type'.",
+              manifest_path);
           continue;
         }
 
@@ -74,23 +77,24 @@ void AssetManager::DiscoverShaders() {
 
       } else if (type == "compute") {
         if (!shader_def.contains("compute")) {
-          LOG_WARN("Skipping shader definition in '" + manifest_path +
-                   "' due to missing 'name' or 'type'.");
+          LOG_WARN(
+              "Skipping shader definition in '{}' due to missing 'name' or "
+              "'type'.",
+              manifest_path);
           continue;
         }
 
         source = ShaderSource::CreateComputeShader(
             context_, name, shader_def["compute"].get<std::string>());
       } else {
-        LOG_WARN("Skipping shader '" + name + "' with unknown type: " + type);
+        LOG_WARN("Skipping shader '{}' with unknown type: {}", name, type);
         continue;
       }
 
       PutAsset(name, std::move(source));
 
     } catch (const json::type_error& e) {
-      LOG_WARN("Type error in shader definition for '" + name +
-               "': " + e.what());
+      LOG_WARN("Type error in shader definition for '{}': {}", name, e.what());
     }
   }
 }

@@ -13,9 +13,9 @@ using json = nlohmann::json;
 
 EntitiesList::EntitiesList(GameContext& context) : context_{context} {}
 
-EntityTypeID EntitiesList::RegisterEntity(std::string EntityName,
+EntityTypeID EntitiesList::RegisterEntity(std::string entity_name,
                                           EntityTypeEnums type_) {
-  EntityTypeID ID = static_cast<EntityTypeID>(entity_type_list_.size());
+  EntityTypeID id = static_cast<EntityTypeID>(entity_type_list_.size());
   EntityType* newEntity = nullptr;
 
   switch (type_) {
@@ -35,17 +35,16 @@ EntityTypeID EntitiesList::RegisterEntity(std::string EntityName,
         "EntitiesList::RegisterEntity - Failed to register entity");
   }
 
-  newEntity->entity_name_ = EntityName;
+  newEntity->entity_name_ = entity_name;
 
-  LOG_INFO("Registered new entity: " + EntityName +
-           " | EntityID: " + std::to_string(ID));
+  LOG_INFO("Registered new entity: {} | EntityID: {}", entity_name, id);
 
-  newEntity->id_ = ID;
+  newEntity->id_ = id;
 
   entity_type_list_.emplace_back(newEntity);
-  entity_name_id_[EntityName] = ID;
+  entity_name_id_[entity_name] = id;
 
-  return ID;
+  return id;
 }
 
 void EntitiesList::InitializeModels() {
@@ -57,10 +56,11 @@ void EntitiesList::InitializeModels() {
     EntityTypeID entityType = entity_name_id_[b.key()];
 
     json::iterator d = b.value().begin();
+    std::string val = d.value();
+    std::string key = b.key();
 
     if (d.value().is_string()) {
-      LOG_INFO("Entity: " + b.key() +
-               " | Texture Loading: " + (std::string)d.value());
+      LOG_INFO("Entity: {} | Texture Loading: {}", key, val);
       RawTextureData TexData{d.value()};
       entity_type_list_[entityType]->texture_ =
           std::make_unique<Texture2D>(context_, TexData);

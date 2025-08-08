@@ -4,8 +4,10 @@
 
 #include <cmath>
 #include <cstddef>
+#include <format>
 #include <ostream>
 #include <string>
+#include <string_view>
 #include <type_traits>
 
 template <typename Derived>
@@ -41,13 +43,9 @@ class Position {
     return *static_cast<Derived*>(this);
   }
 
-  int& operator[](int axis) noexcept {
-    return v[axis];
-  }
+  int& operator[](int axis) noexcept { return v[axis]; }
 
-  const int& operator[](int axis) const noexcept {
-    return v[axis];
-  }
+  const int& operator[](int axis) const noexcept { return v[axis]; }
 
   [[nodiscard]] constexpr Derived operator-(
       const Derived& other) const noexcept {
@@ -226,7 +224,7 @@ class Position {
   union {
     struct {
       int x, y, z;
-    };         // keeps .x .y .z syntax
+    };  // keeps .x .y .z syntax
     int v[3];  // allows operator[](i) and vector load
   };
 };
@@ -250,4 +248,14 @@ string to_string(const T& obj) {
   return "[" + to_string(obj.x) + "," + to_string(obj.y) + "," +
          to_string(obj.z) + "]";
 }
+
+template <PositionDerived T>
+struct formatter<T> {
+  constexpr auto parse(format_parse_context& ctx) { return ctx.begin(); }
+
+  template <typename FormatContext>
+  auto format(const T& pos, FormatContext& ctx) const {
+    return std::format_to(ctx.out(), "[{}, {}, {}]", pos.x, pos.y, pos.z);
+  }
+};
 }  // namespace std

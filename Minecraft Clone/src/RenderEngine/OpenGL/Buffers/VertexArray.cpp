@@ -14,7 +14,7 @@
 
 VertexArray::VertexArray(GameContext& context) : context_{context} {
   glGenVertexArrays(1, &array_id_);
-  LOG_DEBUG("Created array. ID: " + std::to_string(array_id_));
+  LOG_DEBUG("Created array. ID: {}", array_id_);
 }
 
 VertexArray::~VertexArray() {

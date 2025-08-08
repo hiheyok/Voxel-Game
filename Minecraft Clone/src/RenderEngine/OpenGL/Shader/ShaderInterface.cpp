@@ -293,21 +293,19 @@ GLuint ShaderInterface::CompileShader(std::string source, std::string type,
 
 void ShaderInterface::CheckCompileErrors(GLuint shader, std::string type) {
   GLint success;
-  GLchar infoLog[2048];
+  GLchar log[2048];
   if (type != "PROGRAM") {
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success) {
-      glGetShaderInfoLog(shader, 2048, 0, infoLog);
-      std::cout << infoLog << '\n';
-      LOG_ERROR("Failed to compile" + type + " Shader: \n" +
-                std::string(infoLog) + "\n");
+      glGetShaderInfoLog(shader, 2048, 0, log);
+      LOG_ERROR("Failed to compile {} Shader: \n {} \n", type,
+                std::string(log));
     }
   } else {
     glGetProgramiv(shader, GL_LINK_STATUS, &success);
     if (!success) {
-      glGetProgramInfoLog(shader, 1024, 0, infoLog);
-      LOG_ERROR("Failed to link Shader Program: \n" + std::string(infoLog) +
-                "\n");
+      glGetProgramInfoLog(shader, 1024, 0, log);
+      LOG_ERROR("Failed to link Shader Program: \n {} \n", std::string(log));
     }
   }
 }
@@ -323,8 +321,7 @@ std::string ShaderInterface::ReadFile(std::string path) {
     file.close();
     code = shaderStream.str();
   } catch (std::ifstream::failure& e) {
-    LOG_ERROR("Failed to read file: " + std::string(path));
-    LOG_ERROR(e.what());
+    LOG_ERROR("Failed to read file: {}, {}", path, e.what());
   }
 
   return code;

@@ -5,9 +5,11 @@
 #include <condition_variable>
 #include <cstdarg>
 #include <deque>
+#include <format>
 #include <fstream>
 #include <mutex>
 #include <string>
+#include <string_view>
 #include <thread>
 
 #if defined(__GNUC__) || defined(__clang__)
@@ -18,10 +20,23 @@
 #define FUNC_SIGNATURE __func__
 #endif
 
-#define LOG_ERROR(msg) context_.logger_->LogError(FUNC_SIGNATURE, (msg))
-#define LOG_WARN(msg) context_.logger_->LogWarn(FUNC_SIGNATURE, (msg))
-#define LOG_INFO(msg) context_.logger_->LogInfo(FUNC_SIGNATURE, (msg))
-#define LOG_DEBUG(msg) context_.logger_->LogDebug(FUNC_SIGNATURE, (msg))
+#define LOG_ERROR(fmt, ...) \
+  context_.logger_->LogError(FUNC_SIGNATURE, std::format(fmt, ##__VA_ARGS__))
+#define LOG_WARN(fmt, ...) \
+  context_.logger_->LogWarn(FUNC_SIGNATURE, std::format(fmt, ##__VA_ARGS__))
+#define LOG_INFO(fmt, ...) \
+  context_.logger_->LogInfo(FUNC_SIGNATURE, std::format(fmt, ##__VA_ARGS__))
+#define LOG_DEBUG(fmt, ...) \
+  context_.logger_->LogDebug(FUNC_SIGNATURE, std::format(fmt, ##__VA_ARGS__))
+
+#define LOG_STATIC_ERROR(logger, fmt, ...) \
+  logger->LogError(FUNC_SIGNATURE, std::format(fmt, ##__VA_ARGS__))
+#define LOG_STATIC_WARN(logger, fmt, ...) \
+  logger->LogWarn(FUNC_SIGNATURE, std::format(fmt, ##__VA_ARGS__))
+#define LOG_STATIC_INFO(logger, fmt, ...) \
+  logger->LogInfo(FUNC_SIGNATURE, std::format(fmt, ##__VA_ARGS__))
+#define LOG_STATIC_DEBUG(logger, fmt, ...) \
+  logger->LogDebug(FUNC_SIGNATURE, std::format(fmt, ##__VA_ARGS__))
 
 inline constexpr int LOG_TYPE_DEBUG = 0x00;
 inline constexpr int LOG_TYPE_INFO = 0x01;
@@ -48,6 +63,18 @@ class LogUtils {
   void LogDebug(std::string subtype, std::string message);
   void LogDebugf(std::string subtype, std::string message, ...);
 
+  template <typename... Args>
+  void LogErrorf(std::string_view func, std::string_view fmt, Args&&... args);
+
+  template <typename... Args>
+  void LogWarnf(std::string_view func, std::string_view fmt, Args&&... args);
+
+  template <typename... Args>
+  void LogInfof(std::string_view func, std::string_view fmt, Args&&... args);
+
+  template <typename... Args>
+  void LogDebugf(std::string_view func, std::string_view fmt, Args&&... args);
+
  private:
   void MainLogger(std::stop_token stoken);
 
@@ -70,3 +97,35 @@ class LogUtils {
   std::ofstream file_;
   std::array<char, kBufferSize> buffer_;
 };
+
+template <typename... Args>
+void LogUtils::LogInfof(std::string_view func, std::string_view fmt,
+                        Args&&... args) {
+  std::string msg =
+      std::vformat(fmt, std::make_format_args(std::forward<Args>(args)...));
+  LogInfo(std::string(func), msg);
+}
+
+template <typename... Args>
+void LogUtils::LogWarnf(std::string_view func, std::string_view fmt,
+                        Args&&... args) {
+  std::string msg =
+      std::vformat(fmt, std::make_format_args(std::forward<Args>(args)...));
+  LogWarn(std::string(func), msg);
+}
+
+template <typename... Args>
+void LogUtils::LogDebugf(std::string_view func, std::string_view fmt,
+                         Args&&... args) {
+  std::string msg =
+      std::vformat(fmt, std::make_format_args(std::forward<Args>(args)...));
+  LogDebug(std::string(func), msg);
+}
+
+template <typename... Args>
+void LogUtils::LogErrorf(std::string_view func, std::string_view fmt,
+                         Args&&... args) {
+  std::string msg =
+      std::vformat(fmt, std::make_format_args(std::forward<Args>(args)...));
+  LogError(std::string(func), msg);
+}
