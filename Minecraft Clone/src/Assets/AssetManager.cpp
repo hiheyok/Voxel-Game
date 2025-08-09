@@ -13,6 +13,10 @@ AssetHandle<ShaderSource> AssetManager::GetShaderSource(std::string key) {
   return GetAsset<ShaderSource>(key);
 }
 
+std::vector<AssetHandle<ShaderSource>> AssetManager::GetAllShaderSource() {
+  return GetAllAsset<ShaderSource>();
+}
+
 void AssetManager::Initialize() { DiscoverShaders(); }
 
 void AssetManager::Load() {

@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <memory>
 
+#include "RenderEngine/RenderResources/RenderHandle.h"
+
 class ComputeShader;
 class GameContext;
 
@@ -48,6 +50,6 @@ class BufferStorage {
   uint32_t buffer_storage_id_ = 0;
   uint64_t max_size_ = 0;
   GLenum target_ = 0;
-  std::unique_ptr<ComputeShader> copy_shader_;
-  std::unique_ptr<ComputeShader> move_shader_;
+  RenderHandle<ComputeShader> copy_shader_;
+  RenderHandle<ComputeShader> move_shader_;
 };

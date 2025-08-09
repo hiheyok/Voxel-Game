@@ -11,9 +11,10 @@
 #include <vector>
 
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
-#include "RenderEngine/OpenGL/Shader/ShaderInterface.h"
+#include "RenderEngine/RenderResources/RenderHandle.h"
 
 class GameContext;
+class Shader;
 
 /*
 Top abstract class for OpenGL Rendeirng
@@ -32,11 +33,10 @@ class RenderObject {
 
   virtual void Render() = 0;
 
-  void SetShader(std::unique_ptr<ShaderInterface> shader);
   void SetShader(const std::string&);
 
   // Use to configure shader before rendering
-  ShaderInterface& GetShader();
+  RenderHandle<Shader> GetShader();
   void SetTexture2D(int index, int id, const std::string& name);
 
  protected:
@@ -92,7 +92,7 @@ class RenderObject {
   void SetupTexture();
 
   GameContext& context_;
-  std::unique_ptr<ShaderInterface> shader_;
+  RenderHandle<Shader> shader_;
   VertexArray vao_;
 
  private:

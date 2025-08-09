@@ -11,7 +11,7 @@ ShaderSource::ShaderSource(GameContext& context, const std::string& asset_key,
                            std::string geometry)
     : Asset{asset_key},
       context_{context},
-      type{ShaderType::kShader},
+      type_{ShaderType::kShader},
       vert_path_{vertex},
       frag_path_{fragment},
       geo_path_{geometry} {}
@@ -20,7 +20,7 @@ ShaderSource::ShaderSource(GameContext& context, const std::string& asset_key,
                            std::string compute)
     : Asset{asset_key},
       context_{context},
-      type{ShaderType::kCompute},
+      type_{ShaderType::kCompute},
       comp_path_{compute} {}
 
 std::unique_ptr<ShaderSource> ShaderSource::CreateShader(
@@ -38,7 +38,7 @@ std::unique_ptr<ShaderSource> ShaderSource::CreateComputeShader(
 }
 
 void ShaderSource::Load() {
-  if (type == ShaderType::kShader) {
+  if (type_ == ShaderType::kShader) {
     LoadShader();
   } else {
     LoadCompute();
@@ -46,23 +46,27 @@ void ShaderSource::Load() {
 }
 
 const std::string& ShaderSource::GetVertex() const noexcept {
-  assert(type == ShaderType::kShader);
+  assert(type_ == ShaderType::kShader);
   return vert_src_;
 }
 
 const std::string& ShaderSource::GetFragment() const noexcept {
-  assert(type == ShaderType::kShader);
+  assert(type_ == ShaderType::kShader);
   return frag_src_;
 }
 
 const std::string& ShaderSource::GetGeometry() const noexcept {
-  assert(type == ShaderType::kShader);
+  assert(type_ == ShaderType::kShader);
   return geo_src_;
 }
 
 const std::string& ShaderSource::GetCompute() const noexcept {
-  assert(type == ShaderType::kCompute);
+  assert(type_ == ShaderType::kCompute);
   return comp_src_;
+}
+
+ShaderSource::ShaderType ShaderSource::GetType() const noexcept {
+  return type_;
 }
 
 void ShaderSource::LoadCompute() {

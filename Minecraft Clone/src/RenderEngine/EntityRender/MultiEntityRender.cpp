@@ -7,7 +7,6 @@
 
 #include <memory>
 
-#include "Assets/AssetManager.h"
 #include "Client/Player/PlayerPOV.h"
 #include "Client/Profiler/PerformanceProfiler.h"
 #include "Core/GameContext/GameContext.h"
@@ -19,6 +18,7 @@
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "RenderEngine/RenderResources/RenderResourceManager.h"
 
 MultiEntityRender::MultiEntityRender(GameContext& context, PlayerPOV* player)
     : context_{context},
@@ -29,8 +29,7 @@ MultiEntityRender::MultiEntityRender(GameContext& context, PlayerPOV* player)
       ssbo_acc_{std::make_unique<Buffer>(context)},
       vao_{std::make_unique<VertexArray>(context)},
       player_{player},
-      shader_{std::make_unique<Shader>(
-          context, *context.assets_->GetShaderSource("entity_render"))},
+      shader_{context_.render_resource_manager_->GetShader("entity_render")},
       renderable_entities_{std::make_unique<EntityRenderCache>()} {}
 
 MultiEntityRender::~MultiEntityRender() = default;

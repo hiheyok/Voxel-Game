@@ -4,10 +4,11 @@
 
 #include <utility>
 
-#include "Assets/AssetManager.h"
 #include "Core/GameContext/GameContext.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "RenderEngine/RenderResources/RenderHandle.h"
+#include "RenderEngine/RenderResources/RenderResourceManager.h"
 
 RenderObject::RenderObject(GameContext& context) noexcept
     : context_{context}, shader_{nullptr}, vao_{context} {}
@@ -22,16 +23,11 @@ RenderObject& RenderObject::operator=(RenderObject&& other) noexcept {
 }
 RenderObject::~RenderObject() noexcept = default;
 
-void RenderObject::SetShader(std::unique_ptr<ShaderInterface> shader) {
-  shader_ = std::move(shader);
-}
-
 void RenderObject::SetShader(const std::string& asset_key) {
-  shader_ = std::make_unique<Shader>(
-      context_, *context_.assets_->GetShaderSource(asset_key));
+  shader_ = context_.render_resource_manager_->GetShader(asset_key);
 }
 
-ShaderInterface& RenderObject::GetShader() { return *shader_; }
+RenderHandle<Shader> RenderObject::GetShader() { return shader_; }
 
 void RenderObject::SetTexture2D(int index, int id, const std::string& name) {
   shader_->BindTexture2D(index, id, name);

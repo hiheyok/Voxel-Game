@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Core/Typenames.h"
+#include "RenderEngine/RenderResources/RenderHandle.h"
 
 class Timer;
 class Camera;
@@ -67,5 +68,5 @@ class TerrainRenderer {
   Camera* camera_;
   GLFWwindow* window_ = nullptr;
   std::unique_ptr<Timer> time_;
-  std::unique_ptr<Shader> cubic_shader_;
+  RenderHandle<Shader> cubic_shader_;
 };

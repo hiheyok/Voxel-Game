@@ -42,7 +42,7 @@ void BlockItemRender::Initialize() {
   glm::mat4 orthoProj = glm::ortho(-dimensions, dimensions, -dimensions,
                                    dimensions, 0.001f, 3.0f);
   render_->GetShader()
-      .SetMat4("view", view)
+      ->SetMat4("view", view)
       .SetMat4("model", modelMat)
       .SetMat4("projection", orthoProj);
   uint32_t texture_atlas = context_.block_model_manager_->GetTextureAtlasID();

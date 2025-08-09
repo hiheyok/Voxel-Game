@@ -19,6 +19,7 @@ class AssetManager;
 // Rendering Context;
 class ItemTextureAtlas;
 class BlockModelManager;
+class RenderResourceManager;
 
 class GameContext {
  public:
@@ -43,4 +44,5 @@ class GameContext {
   // Rendering Context
   std::unique_ptr<ItemTextureAtlas> item_atlas_;
   std::unique_ptr<BlockModelManager> block_model_manager_;
+  std::unique_ptr<RenderResourceManager> render_resource_manager_;
 };

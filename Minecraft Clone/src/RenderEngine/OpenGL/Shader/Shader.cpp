@@ -9,13 +9,14 @@
 #include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 
-Shader::Shader(GameContext& context) : ShaderInterface{context} {}
+Shader::Shader(GameContext& context, const std::string& name,
+               AssetHandle<ShaderSource> shader_src)
+    : ShaderInterface{context, name, shader_src} {}
 
-Shader::Shader(GameContext& context, ShaderSource& src)
-    : ShaderInterface{context} {
-  const std::string& vertexCode = src.GetVertex();
-  const std::string& fragmentCode = src.GetFragment();
-  const std::string& geometryCode = src.GetGeometry();
+void Shader::Load() {
+  const std::string& vertexCode = shader_src_->GetVertex();
+  const std::string& fragmentCode = shader_src_->GetFragment();
+  const std::string& geometryCode = shader_src_->GetGeometry();
 
   uint32_t vertex = CompileShader(vertexCode, "Vertex", GL_VERTEX_SHADER);
   uint32_t fragment =

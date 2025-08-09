@@ -3,22 +3,23 @@
 #include <string>
 #include <vector>
 
-#include "Assets/AssetHandle.h"
 #include "Assets/AssetState.h"
+#include "RenderEngine/RenderResources/RenderResourceState.h"
+
 /*
 The purpose of this class is to give a universal interface for loading,
 building, and interacting with assets
 */
 
-class Asset {
+class RenderResource {
  public:
-  Asset(const std::string& key);
-  virtual ~Asset();
+  RenderResource(const std::string& key);
+  virtual ~RenderResource();
   const std::string& GetKey() const noexcept;
 
   virtual void Load() = 0;
 
  protected:
   std::string key_;
-  AssetState state;
+  RenderResourceState state;
 };

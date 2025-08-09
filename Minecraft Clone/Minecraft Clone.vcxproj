@@ -247,6 +247,8 @@
     <ClCompile Include="src\RenderEngine\OpenGL\Render\RenderDrawArrays.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Render\RenderDrawElements.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Render\RenderObject.cpp" />
+    <ClCompile Include="src\RenderEngine\RenderResources\RenderResource.cpp" />
+    <ClCompile Include="src\RenderEngine\RenderResources\RenderResourceManager.cpp" />
     <ClCompile Include="src\RenderEngine\UI\Components\ColoredComponent.cpp" />
     <ClCompile Include="src\RenderEngine\UI\Components\Component.cpp" />
     <ClCompile Include="src\RenderEngine\UI\Components\ImageComponent.cpp" />
@@ -400,6 +402,10 @@
     <ClInclude Include="src\RenderEngine\OpenGL\Render\RenderDrawArrays.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Render\RenderDrawElements.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Render\RenderObject.h" />
+    <ClInclude Include="src\RenderEngine\RenderResources\RenderHandle.h" />
+    <ClInclude Include="src\RenderEngine\RenderResources\RenderResource.h" />
+    <ClInclude Include="src\RenderEngine\RenderResources\RenderResourceManager.h" />
+    <ClInclude Include="src\RenderEngine\RenderResources\RenderResourceState.h" />
     <ClInclude Include="src\RenderEngine\UI\Components\ColoredComponent.h" />
     <ClInclude Include="src\RenderEngine\UI\Components\Component.h" />
     <ClInclude Include="src\RenderEngine\UI\Components\ImageComponent.h" />

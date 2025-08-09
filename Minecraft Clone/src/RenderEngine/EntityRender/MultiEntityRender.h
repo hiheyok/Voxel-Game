@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "Core/Typenames.h"
+#include "RenderEngine/RenderResources/RenderHandle.h"
 
 class Buffer;
 class VertexArray;
@@ -69,7 +70,7 @@ class MultiEntityRender {
   PlayerPOV* player_;
   GLFWwindow* window_;
 
-  std::unique_ptr<Shader> shader_;
+  RenderHandle<Shader> shader_;
   std::unique_ptr<EntityRenderCache> renderable_entities_;
 
   std::vector<float> position_arr_;

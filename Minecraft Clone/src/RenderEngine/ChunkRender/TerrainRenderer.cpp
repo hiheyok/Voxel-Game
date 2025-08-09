@@ -8,7 +8,6 @@
 #include <memory>
 #include <vector>
 
-#include "Assets/AssetManager.h"
 #include "Core/GameContext/GameContext.h"
 #include "Core/Options/Option.h"
 #include "RenderEngine/BlockModel/BlockModelManager.h"
@@ -22,6 +21,7 @@
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "RenderEngine/OpenGL/Texture/Texture.h"
 #include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
+#include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "Utils/MathHelper.h"
 #include "Utils/Timer/Timer.h"
 
@@ -33,8 +33,8 @@ TerrainRenderer::TerrainRenderer(GameContext& context)
       chunk_batch_transparent_lookup_{},
       camera_{nullptr},
       time_{std::make_unique<Timer>()},
-      cubic_shader_{std::make_unique<Shader>(
-          context, *context.assets_->GetShaderSource("world_render"))} {}
+      cubic_shader_{
+          context_.render_resource_manager_->GetShader("world_render")} {}
 
 TerrainRenderer::~TerrainRenderer() = default;
 
@@ -88,13 +88,13 @@ void TerrainRenderer::Render() {
   SetupCallSolid();
 
   for (ChunkDrawBatch& DrawBatch : chunk_solid_batches_) {
-    DrawBatch.Draw(cubic_shader_.get());
+    DrawBatch.Draw(cubic_shader_.Get());
   }
 
   SetupCallTransparent();
 
   for (ChunkDrawBatch& DrawBatch : chunk_transparent_batches_) {
-    DrawBatch.Draw(cubic_shader_.get());
+    DrawBatch.Draw(cubic_shader_.Get());
   }
 
   glDepthMask(GL_TRUE);

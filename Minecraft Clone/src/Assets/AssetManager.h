@@ -20,6 +20,7 @@ class AssetManager {
   ~AssetManager();
 
   AssetHandle<ShaderSource> GetShaderSource(std::string key);
+  std::vector<AssetHandle<ShaderSource>> GetAllShaderSource();
 
   // This will load in all of the keys
   void Initialize();
@@ -39,6 +40,9 @@ class AssetManager {
 
   template <IsAsset AssetType>
   AssetHandle<AssetType> GetAsset(std::string key);
+
+  template <IsAsset AssetType>
+  std::vector<AssetHandle<AssetType>> GetAllAsset();
 
   template <IsAsset AssetType>
   FastHashMap<std::string, std::unique_ptr<AssetType>>& GetCache() noexcept;
@@ -85,4 +89,15 @@ AssetHandle<AssetType> AssetManager::GetAsset(std::string key) {
   } else {
     return AssetHandle<AssetType>{};
   }
+}
+
+template <IsAsset AssetType>
+std::vector<AssetHandle<AssetType>> AssetManager::GetAllAsset() {
+  auto& cache = GetCache<AssetType>();
+  std::vector<AssetHandle<AssetType>> out;
+  out.reserve(cache.size());
+  for (auto& [key, asset] : cache) {
+    out.emplace_back(asset.get());
+  }
+  return out;
 }

@@ -14,6 +14,7 @@
 #include "Level/Item/Items.h"
 #include "Level/TerrainGeneration/Generators/GeneratorType.h"
 #include "RenderEngine/BlockModel/BlockModelManager.h"
+#include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "Utils/LogUtils.h"
 
 GameContext::GameContext()
@@ -47,6 +48,10 @@ void GameContext::InitializeGameContext() {
 }
 void GameContext::InitializeRenderingContext() {
   // Initialize objects
+  render_resource_manager_ = std::make_unique<RenderResourceManager>(*this);
+  render_resource_manager_->Initialize();
+  render_resource_manager_->Load();
+
   item_atlas_ = std::make_unique<ItemTextureAtlas>(*this);
 
   block_model_manager_->LoadModels();

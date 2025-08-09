@@ -114,11 +114,11 @@ void TextRenderer::Prepare() {
   int height, width;
   glfwGetWindowSize(window_, &width, &height);
 
-  font_render_->GetShader().SetFloat("AspectRatio",
-                                     static_cast<float>(height) / width);
+  font_render_->GetShader()->SetFloat("AspectRatio",
+                                      static_cast<float>(height) / width);
 
-  background_render_->GetShader().SetFloat("AspectRatio",
-                                           static_cast<float>(height) / width);
+  background_render_->GetShader()->SetFloat("AspectRatio",
+                                            static_cast<float>(height) / width);
 }
 
 void TextRenderer::RenderFont() {

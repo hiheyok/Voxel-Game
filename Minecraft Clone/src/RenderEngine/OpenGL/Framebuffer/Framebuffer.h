@@ -6,6 +6,8 @@
 #include <memory>
 #include <vector>
 
+#include "RenderEngine/RenderResources/RenderHandle.h"
+
 class Shader;
 class RenderDrawArrays;
 class GameContext;
@@ -31,7 +33,7 @@ class TexturedFrameBuffer {
 
  private:
   GameContext& context_;
-  std::unique_ptr<Shader> screen_;
+  RenderHandle<Shader> screen_;
   GLuint fbo_ = 0, rbo_ = 0, shader_id_ = 0;
   GLint sx = 0;
   GLint sy = 0;

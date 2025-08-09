@@ -2,6 +2,7 @@
 
 #pragma once
 #include <glm/vec2.hpp>
+#include <memory>
 
 #include "Level/Item/Item.h"
 #include "RenderEngine/ItemRender/BlockItemRender.h"
@@ -9,9 +10,10 @@
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
-#include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "RenderEngine/RenderResources/RenderHandle.h"
 
 class GameContext;
+class Shader;
 
 struct ItemUVMapping {
   glm::vec2 uv_1_;
@@ -44,7 +46,7 @@ class ItemTextureAtlas {
   std::unique_ptr<Buffer> vbo_;
 
   BlockItemRender block_item_renderer_;
-  Shader stitching_shader_;
+  RenderHandle<Shader> stitching_shader_;
   int individual_size_ = 0;
   int atlas_size_ = 0;
   TexturedFrameBuffer atlas_framebuffer_;

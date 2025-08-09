@@ -10,11 +10,8 @@
 #include "Core/Typenames.h"
 #include "RenderEngine/OpenGL/Shader/ShaderInterface.h"
 
-class ShaderSource;
-
 class Shader : public ShaderInterface {
  public:
-  explicit Shader(
-      GameContext&);  // TODO(hiheyok): tmp solution delete this later
-  Shader(GameContext&, ShaderSource&);
+  Shader(GameContext&, const std::string& name, AssetHandle<ShaderSource>);
+  void Load() override;
 };

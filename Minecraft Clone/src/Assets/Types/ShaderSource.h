@@ -33,12 +33,14 @@ class ShaderSource : public Asset {
   const std::string& GetGeometry() const noexcept;
   const std::string& GetCompute() const noexcept;
 
+  ShaderType GetType() const noexcept;
+
  private:
   void LoadCompute();
   void LoadShader();
 
   GameContext& context_;
-  ShaderType type;
+  ShaderType type_;
 
   std::string vert_path_;
   std::string frag_path_;

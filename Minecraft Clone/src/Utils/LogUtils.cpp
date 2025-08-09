@@ -25,7 +25,7 @@ LogUtils::LogUtils() : buffer_{'\0'} {
   file_.open(str);
 
   logging_thread_ = std::jthread(std::bind_front(&LogUtils::MainLogger, this));
-  LogInfo(FUNC_SIGNATURE, "Started Logger");
+  Log(LogType::kInfo, FUNC_SIGNATURE, "Started Logger");
 }
 
 LogUtils::~LogUtils() { logging_thread_.request_stop(); }
@@ -46,18 +46,29 @@ void LogUtils::MainLogger(std::stop_token stoken) {
       std::string str = "";
       std::string message_severity = "";
 
-      if (log.type_ == 0x01) {
+      if (log.type_ == LogType::kInfo) {
         message_severity = "INFO";
-      } else if (log.type_ == 0x03) {
+      } else if (log.type_ == LogType::kWarn) {
         message_severity = "WARNING";
-      } else if (log.type_ == 0x02) {
+      } else if (log.type_ == LogType::kError) {
         message_severity = "ERROR";
-      } else if (log.type_ == 0x00) {
+      } else if (log.type_ == LogType::kDebug) {
         message_severity = "DEBUG";
       }
 
-      str = FormatMessage(message_severity, log.r_time_, timestamp,
-                          log.subtype_, log.message_);
+      // "[ %lld NS ] [ %s ] [ %s / %s ]: %s"
+
+      std::string_view fmt = "[ {} ] [ {} ] [ {} / {}]: {}";
+
+      int64_t ns_time = log.r_time_;
+      std::string date = timestamp;
+      std::string_view func = log.func_;
+      std::string msg = log.message_;
+      std::string severity = message_severity;
+
+      str = std::vformat(
+          fmt, std::make_format_args(ns_time, date, severity, func, msg));
+
       print_output += str + "\n";
 
       if (print_output.size() > kPrintLimit) {
@@ -83,96 +94,15 @@ void LogUtils::MainLogger(std::stop_token stoken) {
   }
 }
 
-void LogUtils::LogError(std::string subtype, std::string message) {
+void LogUtils::Log(LogType type, std::string_view func, std::string msg) {
   LogData log;
-  log.type_ = LOG_TYPE_ERROR;
-  log.message_ = message;
+  log.type_ = type;
+  log.message_ = msg;
   log.time_ = std::chrono::system_clock::now();
-  log.subtype_ = subtype;
+  log.func_ = func;
   log.r_time_ =
-      (std::chrono::high_resolution_clock::now() - init_time_).count();
+      (std::chrono::high_resolution_clock::now() - start_time_).count();
   std::lock_guard<std::mutex> lock{mutex_};
   logs_.emplace_back(log);
   cv_.notify_one();
-  // throw std::runtime_error(subtype + " - " + message);
-}
-
-void LogUtils::LogWarn(std::string subtype, std::string message) {
-  LogData log;
-  log.type_ = LOG_TYPE_WARN;
-  log.message_ = message;
-  log.time_ = std::chrono::system_clock::now();
-  log.subtype_ = subtype;
-  log.r_time_ =
-      (std::chrono::high_resolution_clock::now() - init_time_).count();
-  std::lock_guard<std::mutex> lock{mutex_};
-  logs_.emplace_back(log);
-  cv_.notify_one();
-}
-
-void LogUtils::LogInfo(std::string subtype, std::string message) {
-  LogData log;
-  log.type_ = LOG_TYPE_INFO;
-  log.message_ = message;
-  log.time_ = std::chrono::system_clock::now();
-  log.subtype_ = subtype;
-  log.r_time_ =
-      (std::chrono::high_resolution_clock::now() - init_time_).count();
-  std::lock_guard<std::mutex> lock{mutex_};
-  logs_.emplace_back(log);
-  cv_.notify_one();
-}
-
-void LogUtils::LogDebug(std::string subtype, std::string message) {
-  LogData log;
-  log.type_ = LOG_TYPE_DEBUG;
-  log.message_ = message;
-  log.time_ = std::chrono::system_clock::now();
-  log.subtype_ = subtype;
-  log.r_time_ =
-      (std::chrono::high_resolution_clock::now() - init_time_).count();
-  std::lock_guard<std::mutex> lock{mutex_};
-  logs_.emplace_back(log);
-  cv_.notify_one();
-}
-
-void LogUtils::LogDebugf(std::string subtype, std::string message, ...) {
-  va_list args;
-  va_start(args, message);
-
-  std::string formated_string = FormatString(message, args);
-
-  va_end(args);
-
-  LogData log;
-  log.type_ = LOG_TYPE_DEBUG;
-  log.message_ = formated_string;
-  log.time_ = std::chrono::system_clock::now();
-  log.subtype_ = subtype;
-  log.r_time_ =
-      (std::chrono::high_resolution_clock::now() - init_time_).count();
-  std::lock_guard<std::mutex> lock{mutex_};
-  logs_.emplace_back(log);
-  cv_.notify_one();
-}
-
-std::string LogUtils::FormatString(std::string in, ...) {
-  va_list args;
-  va_start(args, in);
-
-  vsnprintf(buffer_.data(), kBufferSize, in.c_str(), args);
-
-  va_end(args);
-
-  std::string out(buffer_.data());
-  memset(buffer_.data(), 0, out.size());
-  return out;
-}
-
-std::string LogUtils::FormatMessage(std::string severity, int64_t time,
-                                    std::string timestamp, std::string subtype,
-                                    std::string message) {
-  return FormatString("[ %lld NS ] [ %s ] [ %s / %s ]: %s", time,
-                      timestamp.c_str(), severity.c_str(), subtype.c_str(),
-                      message.c_str());
 }

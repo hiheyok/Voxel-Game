@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <vector>
 
+#include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "RenderEngine/RenderResources/RenderHandle.h"
 #include "RenderEngine/UI/Data/UserInterfaceData.h"
 
 UIRenderer::UIRenderer(GameContext& context)
@@ -45,6 +47,6 @@ void UIRenderer::SetScreenRes(glm::vec2 s_res) { s_res_ = s_res; }
 void UIRenderer::UploadToGPU() {
   renderer_.SetData(vertices_, indices_);
   renderer_.SetIndicesCount(indices_.size());
-  renderer_.GetShader().SetVec2("v_res", v_res_);
-  renderer_.GetShader().SetVec2("s_res", s_res_);
+  renderer_.GetShader()->SetVec2("v_res", v_res_);
+  renderer_.GetShader()->SetVec2("s_res", s_res_);
 }

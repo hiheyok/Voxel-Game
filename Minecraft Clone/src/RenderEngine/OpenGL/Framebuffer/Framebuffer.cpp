@@ -4,9 +4,9 @@
 
 #include <memory>
 
-#include "Assets/AssetManager.h"
 #include "Core/GameContext/GameContext.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "Utils/LogUtils.h"
 
 TexturedFrameBuffer::TexturedFrameBuffer(GameContext& context)
@@ -15,8 +15,7 @@ TexturedFrameBuffer::~TexturedFrameBuffer() = default;
 
 void TexturedFrameBuffer::GenBuffer(GLint x, GLint y, float muti,
                                     GLuint format) {
-  screen_ = std::make_unique<Shader>(
-      context_, *context_.assets_->GetShaderSource("fb_render"));
+  screen_ = context_.render_resource_manager_->GetShader("fb_render");
   screen_->SetVec2("Resolution", {x, y});
 
   sy = y;

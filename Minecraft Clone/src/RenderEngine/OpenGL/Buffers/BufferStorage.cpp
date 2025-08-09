@@ -8,18 +8,18 @@
 #include <string>
 #include <utility>
 
-#include "Assets/AssetManager.h"
 #include "Core/GameContext/GameContext.h"
 #include "RenderEngine/OpenGL/Shader/ComputeShader.h"
+#include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "Utils/LogUtils.h"
 
 BufferStorage::BufferStorage(GameContext& context, GLuint bufferTarget,
                              uint64_t size, bool dynamic, const void* data)
     : context_{context},
-      copy_shader_{std::make_unique<ComputeShader>(
-          context_, *context.assets_->GetShaderSource("copy_shader"))},
-      move_shader_{std::make_unique<ComputeShader>(
-          context_, *context.assets_->GetShaderSource("move_shader"))} {
+      copy_shader_{
+          context_.render_resource_manager_->GetComputeShader("copy_shader")},
+      move_shader_{
+          context_.render_resource_manager_->GetComputeShader("move_shader")} {
   target_ = bufferTarget;
   max_size_ = size;
 
@@ -64,7 +64,7 @@ BufferStorage::~BufferStorage() {
     max_size_ = 0;
     target_ = 0;
     LOG_DEBUG("Deleted buffer storage. ID was: {}",
-                buffer_storage_id_);  // Log before setting to 0
+              buffer_storage_id_);  // Log before setting to 0
   }
 }
 

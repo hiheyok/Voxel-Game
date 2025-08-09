@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "RenderEngine/RenderResources/RenderHandle.h"
+
 class GUISet;
 class Shader;
 class Window;
@@ -31,5 +33,5 @@ class GUI {
   GameContext& context_;
   Window* window_;
   std::vector<GUISet> guis_;
-  std::unique_ptr<Shader> shader_;
+  RenderHandle<Shader> shader_;
 };

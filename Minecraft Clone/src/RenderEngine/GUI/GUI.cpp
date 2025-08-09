@@ -7,20 +7,19 @@
 #include <string>
 #include <utility>
 
-#include "Assets/AssetManager.h"
 #include "Core/GameContext/GameContext.h"
 #include "RenderEngine/GUI/GUIObject.h"
 #include "RenderEngine/GUI/GUISet.h"
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "RenderEngine/Window.h"
 #include "Utils/LogUtils.h"
 
 GUI::GUI(GameContext& context, Window* win)
     : context_{context},
-      shader_{std::make_unique<Shader>(
-          context, *context.assets_->GetShaderSource("gui_render"))},
+      shader_{context_.render_resource_manager_->GetShader("gui_render")},
       window_{win},
       guis_{} {}
 

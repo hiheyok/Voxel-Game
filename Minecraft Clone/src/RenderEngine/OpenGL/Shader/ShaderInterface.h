@@ -10,20 +10,24 @@
 #include <string>
 #include <variant>
 
+#include "Assets/AssetHandle.h"
 #include "Core/Typenames.h"
+#include "RenderEngine/RenderResources/RenderResource.h"
 
 class GameContext;
+class ShaderSource;
 
-class ShaderInterface {
+class ShaderInterface : public RenderResource {
  public:
-  explicit ShaderInterface(GameContext&);
+  explicit ShaderInterface(GameContext&, const std::string& name,
+                           AssetHandle<ShaderSource> shader_src);
   virtual ~ShaderInterface();
 
   ShaderInterface(const ShaderInterface&) = delete;
   ShaderInterface& operator=(const ShaderInterface&) = delete;
 
-  ShaderInterface(ShaderInterface&&) noexcept;
-  ShaderInterface& operator=(ShaderInterface&&) noexcept;
+  ShaderInterface(ShaderInterface&&) = delete;
+  ShaderInterface& operator=(ShaderInterface&&) = delete;
 
   void Use();
 
@@ -71,6 +75,7 @@ class ShaderInterface {
 
  protected:
   GameContext& context_;
+  AssetHandle<ShaderSource> shader_src_;
   FastHashMap<std::string, int> cache_;
 
   // Value cache | Used to make sure to not update if the values are the same
@@ -85,8 +90,6 @@ class ShaderInterface {
   FastHashMap<std::string, glm::mat2> cache_mat2_;
   FastHashMap<std::string, glm::mat3> cache_mat3_;
   FastHashMap<std::string, glm::mat4> cache_mat4_;
-
-  std::string ReadFile(std::string path);
 
   GLint GetUniformLocation(std::string name);
   void CheckCompileErrors(GLuint shader, std::string type);

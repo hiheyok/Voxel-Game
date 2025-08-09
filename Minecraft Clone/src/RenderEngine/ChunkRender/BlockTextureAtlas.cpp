@@ -36,43 +36,27 @@ int BlockTextureAtlas::AddBlockTexture(const ResourceLocation& location) {
 
 int BlockTextureAtlas::GetTextureID(const ResourceLocation& location) const {
   const auto& it = texture_metadata_.find(location);
-  if (it == texture_metadata_.end()) {
-    throw std::logic_error(
-        "BlockTextureAtlas::GetTextureID - Tried to search for invalid "
-        "texture!");
-  }
+  assert(it != texture_metadata_.end());
   return it->second.texture_id_;
 }
 
 int BlockTextureAtlas::GetBlockTextureCount(
     const ResourceLocation& location) const {
   const auto& it = texture_metadata_.find(location);
-  if (it == texture_metadata_.end()) {
-    throw std::logic_error(
-        "BlockTextureAtlas::GetTextureID - Tried to search for invalid "
-        "texture!");
-  }
+  assert(it != texture_metadata_.end());
   return it->second.texture_count_;
 }
 
 bool BlockTextureAtlas::IsTexturePartiallyTransparent(
     const ResourceLocation& location) const {
   const auto& it = texture_metadata_.find(location);
-  if (it == texture_metadata_.end()) {
-    throw std::logic_error(
-        "BlockTextureAtlas::IsTexturePartiallyTransparent - Tried to search "
-        "for invalid texture!");
-  }
+  assert(it != texture_metadata_.end());
   return it->second.partially_transparent_;
 }
 
 bool BlockTextureAtlas::IsTextureFullyTransparent(
     const ResourceLocation& location) const {
   const auto& it = texture_metadata_.find(location);
-  if (it == texture_metadata_.end()) {
-    throw std::logic_error(
-        "BlockTextureAtlas::IsTextureFullyTransparent - Tried to search for "
-        "invalid texture!");
-  }
+  assert(it != texture_metadata_.end());
   return it->second.fully_transparent_;
 }

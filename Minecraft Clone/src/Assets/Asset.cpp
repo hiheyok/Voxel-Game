@@ -1,8 +1,8 @@
 #include "Assets/Asset.h"
 
-Asset::Asset(const std::string& asset_key)
-    : asset_key_{asset_key}, state{AssetState::kUnloaded} {}
+Asset::Asset(const std::string& key)
+    : key_{key}, state{AssetState::kUnloaded} {}
 
 Asset::~Asset() = default;
 
-const std::string& Asset::GetAssetKey() const noexcept { return asset_key_; }
+const std::string& Asset::GetKey() const noexcept { return key_; }

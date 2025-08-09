@@ -2,8 +2,9 @@
 
 #include "Level/Item/ItemTextureAtlas.h"
 
-#include "Assets/AssetManager.h"
 #include "Core/GameContext/GameContext.h"
+#include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "RenderEngine/RenderResources/RenderResourceManager.h"
 
 void ItemTextureAtlas::RenderBlockItem(Item item) {
   framebuffer_single_block_render_.BindFBO();
@@ -31,10 +32,10 @@ void ItemTextureAtlas::StitchTexture(size_t index, ItemID ItemID) {
 
   // Insert Data
   float vertices[] = {
-      xCoord - 0.f,  yCoord - 0.f,  0.f, 1.f,
-      xCoord - Size, yCoord - 0.f,  1.f, 1.f,
-      xCoord - Size, yCoord - Size, 1.f, 0.f,
-      xCoord - 0.f,  yCoord - Size, 0.f, 0.f,
+      xCoord - 0.0f, yCoord - 0.0f, 0.0f, 1.0f,
+      xCoord - Size, yCoord - 0.0f, 1.0f, 1.0f,
+      xCoord - Size, yCoord - Size, 1.0f, 0.0f,
+      xCoord - 0.0f, yCoord - Size, 0.0f, 0.0f,
   };
 
   uint32_t indices[] = {0, 1, 2, 2, 3, 0};
@@ -52,8 +53,8 @@ void ItemTextureAtlas::StitchTexture(size_t index, ItemID ItemID) {
   ebo_->InsertData(sizeof(indices), indices, GL_STATIC_DRAW);
   // Render
   atlas_framebuffer_.BindFBO();
-  stitching_shader_.BindTexture2D(0, framebuffer_single_block_render_.texture_,
-                                  "ItemTexture");
+  stitching_shader_->BindTexture2D(0, framebuffer_single_block_render_.texture_,
+                                   "ItemTexture");
 
   glEnable(GL_BLEND);
 
@@ -69,7 +70,6 @@ void ItemTextureAtlas::StitchTexture(size_t index, ItemID ItemID) {
 }
 ItemTextureAtlas::ItemTextureAtlas(GameContext& context)
     : context_{context},
-      stitching_shader_{context},
       atlas_framebuffer_{context},
       framebuffer_single_block_render_{context},
       block_item_renderer_{context} {}
@@ -77,7 +77,7 @@ ItemTextureAtlas::~ItemTextureAtlas() = default;
 
 void ItemTextureAtlas::Initialize(int atlasItemSize, int individualItemSize) {
   stitching_shader_ =
-      Shader(context_, *context_.assets_->GetShaderSource("atlas_stitch_shader"));
+      context_.render_resource_manager_->GetShader("atlas_stitch_shader");
 
   individual_size_ = individualItemSize;
   atlas_size_ = atlasItemSize;

@@ -9,50 +9,14 @@
 #include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 
-ShaderInterface::ShaderInterface(GameContext& context) : context_{context} {}
+ShaderInterface::ShaderInterface(GameContext& context, const std::string& name,
+                                 AssetHandle<ShaderSource> shader_src)
+    : RenderResource{name}, context_{context}, shader_src_{shader_src} {}
 
 ShaderInterface::~ShaderInterface() {
   if (shader_id_) {
     glDeleteProgram(shader_id_);
   }
-}
-
-ShaderInterface::ShaderInterface(ShaderInterface&& other) noexcept
-    : context_{other.context_} {
-  shader_id_ = other.shader_id_;
-  other.shader_id_ = 0;
-  cache_ = std::move(other.cache_);
-  cache_bool_ = std::move(other.cache_bool_);
-  cache_int_ = std::move(other.cache_int_);
-  cache_float_ = std::move(other.cache_float_);
-  cache_vec2_ = std::move(other.cache_vec2_);
-  cache_vec3_ = std::move(other.cache_vec3_);
-  cache_vec4_ = std::move(other.cache_vec4_);
-  cache_ivec2_ = std::move(other.cache_ivec2_);
-  cache_ivec3_ = std::move(other.cache_ivec3_);
-  cache_mat2_ = std::move(other.cache_mat2_);
-  cache_mat3_ = std::move(other.cache_mat3_);
-  cache_mat4_ = std::move(other.cache_mat4_);
-}
-
-ShaderInterface& ShaderInterface::operator=(ShaderInterface&& other) noexcept {
-  if (this != &other) {
-    shader_id_ = other.shader_id_;
-    other.shader_id_ = 0;
-    cache_ = std::move(other.cache_);
-    cache_bool_ = std::move(other.cache_bool_);
-    cache_int_ = std::move(other.cache_int_);
-    cache_float_ = std::move(other.cache_float_);
-    cache_vec2_ = std::move(other.cache_vec2_);
-    cache_vec3_ = std::move(other.cache_vec3_);
-    cache_vec4_ = std::move(other.cache_vec4_);
-    cache_ivec2_ = std::move(other.cache_ivec2_);
-    cache_ivec3_ = std::move(other.cache_ivec3_);
-    cache_mat2_ = std::move(other.cache_mat2_);
-    cache_mat3_ = std::move(other.cache_mat3_);
-    cache_mat4_ = std::move(other.cache_mat4_);
-  }
-  return *this;
 }
 
 void ShaderInterface::Use() { glUseProgram(shader_id_); }
@@ -308,23 +272,6 @@ void ShaderInterface::CheckCompileErrors(GLuint shader, std::string type) {
       LOG_ERROR("Failed to link Shader Program: \n {} \n", std::string(log));
     }
   }
-}
-
-std::string ShaderInterface::ReadFile(std::string path) {
-  std::ifstream file;
-  std::string code;
-
-  try {
-    file.open(path);
-    std::stringstream shaderStream;
-    shaderStream << file.rdbuf();
-    file.close();
-    code = shaderStream.str();
-  } catch (std::ifstream::failure& e) {
-    LOG_ERROR("Failed to read file: {}, {}", path, e.what());
-  }
-
-  return code;
 }
 
 ShaderInterface& ShaderInterface::BindBufferAsSSBO(GLuint buffer, int idx) {
