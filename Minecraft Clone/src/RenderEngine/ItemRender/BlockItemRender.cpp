@@ -17,7 +17,7 @@
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "RenderEngine/OpenGL/Render/RenderDrawElements.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
-#include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
+#include "RenderEngine/OpenGL/Texture/Types/TextureAtlasOld.h"
 
 BlockItemRender::BlockItemRender(GameContext& context)
     : context_{context},

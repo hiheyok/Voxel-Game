@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
-#include "RenderEngine/OpenGL/Texture/Texture.h"
+#include "RenderEngine/OpenGL/Texture/TextureOld.h"
 
 #include <stdexcept>
 #include <string>

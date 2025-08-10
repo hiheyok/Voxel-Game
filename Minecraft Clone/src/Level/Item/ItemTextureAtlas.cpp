@@ -75,6 +75,7 @@ ItemTextureAtlas::ItemTextureAtlas(GameContext& context)
       block_item_renderer_{context} {}
 ItemTextureAtlas::~ItemTextureAtlas() = default;
 
+// TODO(hiheyok): Need to move atlas stitching to CPU
 void ItemTextureAtlas::Initialize(int atlasItemSize, int individualItemSize) {
   stitching_shader_ =
       context_.render_resource_manager_->GetShader("atlas_stitch_shader");

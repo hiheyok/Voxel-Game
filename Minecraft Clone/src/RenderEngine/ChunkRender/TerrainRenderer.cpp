@@ -19,9 +19,10 @@
 #include "RenderEngine/Frustum/frustum.h"
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
-#include "RenderEngine/OpenGL/Texture/Texture.h"
-#include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
+#include "RenderEngine/OpenGL/Texture/TextureOld.h"
+#include "RenderEngine/OpenGL/Texture/Types/TextureAtlasOld.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
+#include "RenderEngine/RenderResources/Types/Texture/Texture2D.h"
 #include "Utils/MathHelper.h"
 #include "Utils/Timer/Timer.h"
 
@@ -158,8 +159,7 @@ void TerrainRenderer::SetSettings(uint32_t renderDistance,
 void TerrainRenderer::LoadAssets() {
   cubic_shader_->BindTexture2D(
       0, context_.block_model_manager_->GetTextureAtlasID(), "BlockTexture");
-  cubic_shader_->BindTexture2D(
-      1, context_.block_model_manager_->GetLightMapID(), "LightMap");
+  cubic_shader_->BindTexture(1, context_.block_model_manager_->GetLightMap());
 }
 
 void TerrainRenderer::AddChunk(ChunkPos pos,

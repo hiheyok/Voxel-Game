@@ -10,7 +10,7 @@
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
-#include "RenderEngine/OpenGL/Texture/Types/Texture2D.h"
+#include "RenderEngine/OpenGL/Texture/Types/Texture2DOld.h"
 
 GUISet::GUISet(GameContext& context)
     : context_{context}, gui_texture_{std::make_unique<Texture2D>(context)} {}

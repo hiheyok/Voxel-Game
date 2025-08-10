@@ -20,6 +20,8 @@ class TextureSource : public Asset {
 
   int GetWidth() const noexcept;
   int GetHeight() const noexcept;
+  int GetFormat() const noexcept;
+  virtual const uint8_t* GetData() const noexcept = 0;
 
  protected:
   // This just contain the image data and methods to access its properties

@@ -7,6 +7,7 @@
 #include <string>
 
 #include "Core/GameContext/GameContext.h"
+#include "RenderEngine/RenderResources/Types/Texture/Texture.h"
 #include "Utils/LogUtils.h"
 
 ShaderInterface::ShaderInterface(GameContext& context, const std::string& name,
@@ -230,6 +231,15 @@ ShaderInterface& ShaderInterface::BindTextureArray2D(GLuint index, GLuint img,
   Use();
   glActiveTexture(GL_TEXTURE0 + index);
   glBindTexture(GL_TEXTURE_2D_ARRAY, img);
+  return *this;
+}
+
+ShaderInterface& ShaderInterface::BindTexture(GLuint index,
+                                              RenderHandle<TextureV2> texture) {
+  SetInt(texture->GetKey(), index);
+  Use();
+  glActiveTexture(GL_TEXTURE0 + index);
+  glBindTexture(texture->GetTarget(), texture->GetId());
   return *this;
 }
 

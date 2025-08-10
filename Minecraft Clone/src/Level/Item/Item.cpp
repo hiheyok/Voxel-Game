@@ -2,7 +2,7 @@
 
 #include "Level/Item/Item.h"
 
-#include "RenderEngine/OpenGL/Texture/Texture.h"
+#include "RenderEngine/OpenGL/Texture/TextureOld.h"
 
 Item::Item() = default;
 Item::~Item() = default;

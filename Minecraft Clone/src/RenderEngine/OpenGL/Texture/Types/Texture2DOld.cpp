@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
-#include "RenderEngine/OpenGL/Texture/Types/Texture2D.h"
+#include "RenderEngine/OpenGL/Texture/Types/Texture2DOld.h"
 
 #include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"

@@ -8,11 +8,19 @@
 /*
 The purpose of this class is to give a universal interface for loading,
 building, and interacting with assets
+
+Assets aren't copiable and movable and should be own by AssetManager
 */
 
 class Asset {
  public:
-  Asset(const std::string& key);
+  explicit Asset(const std::string& key);
+
+  Asset(const Asset&) = delete;
+  Asset& operator=(const Asset&) = delete;
+  Asset(Asset&&) = delete;
+  Asset& operator=(Asset&&) = delete;
+  
   virtual ~Asset();
   const std::string& GetKey() const noexcept;
 

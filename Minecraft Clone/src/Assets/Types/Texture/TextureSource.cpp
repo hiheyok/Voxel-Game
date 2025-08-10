@@ -1,4 +1,4 @@
-#include "Assets/Types/Texture.h"
+#include "Assets/Types/Texture/TextureSource.h"
 
 #include <cstdint>
 #include <vector>
@@ -16,6 +16,8 @@ TextureSource::~TextureSource() = default;
 int TextureSource::GetWidth() const noexcept { return image_size_.x; }
 
 int TextureSource::GetHeight() const noexcept { return image_size_.y; }
+
+int TextureSource::GetFormat() const noexcept { return format_; }
 
 std::unique_ptr<TextureSource::TextureData> TextureSource::LoadTexture(
     const std::string& filepath) {
@@ -60,7 +62,7 @@ TextureSource::TextureData::TextureData(GameContext& context,
   }
 
   success_ = true;
-  
+
   LOG_STATIC_DEBUG(context.logger_, "Successfully loaded in texture: {}",
                    filepath);
 }

@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "RenderEngine/OpenGL/Texture/Texture.h"
+#include "RenderEngine/OpenGL/Texture/TextureOld.h"
 
 class TextureAtlas : public Texture {
  public:

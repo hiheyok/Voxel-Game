@@ -11,7 +11,6 @@ class VertexArray;
 class Buffer;
 class Shader;
 class RenderableFont;
-class Texture2D;
 class RenderDrawArrays;
 class GameContext;
 
@@ -39,7 +38,6 @@ class TextRenderer {
  private:
   GameContext& context_;
   FastHashMap<std::string, RenderableFont> font_map_;
-  std::unique_ptr<Texture2D> font_texture_;
   std::unique_ptr<RenderDrawArrays> background_render_;
   std::unique_ptr<RenderDrawArrays> font_render_;
   GLFWwindow* window_ = nullptr;

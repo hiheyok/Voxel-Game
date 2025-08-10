@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 
 #include "Assets/Types/ShaderSource.h"
+#include "Assets/Types/Texture/Texture2DSource.h"
 #include "Core/GameContext/GameContext.h"
 #include "Core/IO/FileUtils.h"
 
@@ -17,10 +18,25 @@ std::vector<AssetHandle<ShaderSource>> AssetManager::GetAllShaderSource() {
   return GetAllAsset<ShaderSource>();
 }
 
-void AssetManager::Initialize() { DiscoverShaders(); }
+AssetHandle<Texture2DSource> AssetManager::GetTexture2DSource(std::string key) {
+  return GetAsset<Texture2DSource>(key);
+}
+
+std::vector<AssetHandle<Texture2DSource>> AssetManager::GetTexture2DSource() {
+  return GetAllAsset<Texture2DSource>();
+}
+
+void AssetManager::Initialize() {
+  DiscoverShaders();
+  DiscoverTextures();
+}
 
 void AssetManager::Load() {
-  for (auto& [key, asset] : shader_cache_) {
+  for (auto& [key, asset] : GetCache<ShaderSource>()) {
+    asset->Load();
+  }
+
+  for (auto& [key, asset] : GetCache<Texture2DSource>()) {
     asset->Load();
   }
 }
@@ -101,4 +117,13 @@ void AssetManager::DiscoverShaders() {
       LOG_WARN("Type error in shader definition for '{}': {}", name, e.what());
     }
   }
+}
+
+void AssetManager::DiscoverTextures() {
+  CreateAsset<Texture2DSource>("ascii_font",
+                               "assets/minecraft/textures/font/ascii.png");
+  CreateAsset<Texture2DSource>("light_map",
+                               "assets/minecraft/textures/colormap/light.png");
+  CreateAsset<Texture2DSource>("widgets",
+                               "assets/minecraft/textures/gui/widgets.png");
 }

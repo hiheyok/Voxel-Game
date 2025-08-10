@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "RenderEngine/OpenGL/Texture/Texture.h"
+#include "RenderEngine/OpenGL/Texture/TextureOld.h"
 
 class TextureArray : public Texture {
  public:

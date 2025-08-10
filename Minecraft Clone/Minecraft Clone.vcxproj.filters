@@ -249,16 +249,16 @@
     <ClCompile Include="src\Level\Container\EntityContainer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Texture.cpp">
+    <ClCompile Include="src\RenderEngine\OpenGL\Texture\TextureOld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\Texture2D.cpp">
+    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\Texture2DOld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\TextureArray.cpp">
+    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\TextureArrayOld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\TextureAtlas.cpp">
+    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\TextureAtlasOld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\OpenGL\Framebuffer\Framebuffer.cpp">
@@ -444,6 +444,21 @@
     <ClCompile Include="src\RenderEngine\RenderResources\RenderResourceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\RenderEngine\RenderResources\Types\Texture\Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\RenderResources\Types\Texture\Texture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\RenderResources\Types\Texture\Texture2DBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Types\Texture\TextureSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Types\Texture\Texture2DSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Level\Chunk\Chunk.h">
@@ -500,13 +515,13 @@
     <ClInclude Include="src\RenderEngine\OpenGL\Shader\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\Texture2D.h">
+    <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\Texture2DOld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureArray.h">
+    <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureArrayOld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\OpenGL\Texture\Texture.h">
+    <ClInclude Include="src\RenderEngine\OpenGL\Texture\TextureOld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\OpenGL\OpenGL.h">
@@ -785,7 +800,7 @@
     <ClInclude Include="src\Level\TerrainGeneration\Generators\Debug\Debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureAtlas.h">
+    <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureAtlasOld.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Client\Profiler\PerformanceProfiler.h">
@@ -1062,6 +1077,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\RenderResources\RenderResourceState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\RenderResources\Types\Texture\Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\RenderResources\Types\Texture\Texture2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\RenderResources\Types\Texture\Texture2DBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Assets\Types\Texture\TextureSource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Assets\Types\Texture\Texture2DSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -4,7 +4,7 @@
 #include <optional>
 
 #include "Core/Typenames.h"
-#include "RenderEngine/OpenGL/Texture/Types/TextureAtlas.h"
+#include "RenderEngine/OpenGL/Texture/Types/TextureAtlasOld.h"
 
 class GameContext;
 

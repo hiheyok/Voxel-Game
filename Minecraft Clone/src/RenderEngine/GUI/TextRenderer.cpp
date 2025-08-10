@@ -18,12 +18,13 @@
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "RenderEngine/OpenGL/Render/RenderDrawArrays.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
-#include "RenderEngine/OpenGL/Texture/Types/Texture2D.h"
+#include "RenderEngine/RenderResources/RenderHandle.h"
+#include "RenderEngine/RenderResources/RenderResourceManager.h"
+#include "RenderEngine/RenderResources/Types/Texture/Texture2D.h"
 #include "Utils/LogUtils.h"
 
 TextRenderer::TextRenderer(GameContext& context)
     : context_{context},
-      font_texture_{std::make_unique<Texture2D>(context_)},
       background_render_{std::make_unique<RenderDrawArrays>(context_)},
       font_render_{std::make_unique<RenderDrawArrays>(context_)} {}
 
@@ -47,9 +48,9 @@ void TextRenderer::InitializeTextRenderer(GLFWwindow* w) {
   background_render_->SetShader("font_background_render");
 
   // Load textures
-  RawTextureData RawTexture{"assets/minecraft/textures/font/ascii.png"};
-  font_texture_->Load(RawTexture);
-  font_render_->SetTexture2D(0, font_texture_->Get(), "FontTexture");
+  RenderHandle<Texture2DV2> tex_handle =
+      context_.render_resource_manager_->GetTexture2D("ascii_font");
+  font_render_->SetTexture(0, tex_handle);
   window_ = w;
   LOG_DEBUG("Initialized font renderer");
 }

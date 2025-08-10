@@ -2,17 +2,25 @@
 
 #include "Assets/AssetManager.h"
 #include "Assets/Types/ShaderSource.h"
+#include "Assets/Types/Texture/Texture2DSource.h"
 #include "Core/GameContext/GameContext.h"
 #include "RenderEngine/OpenGL/Shader/ComputeShader.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "RenderEngine/RenderResources/Types/Texture/Texture2D.h"
 
 RenderResourceManager::RenderResourceManager(GameContext& context)
     : context_{context} {}
 RenderResourceManager::~RenderResourceManager() = default;
 
-void RenderResourceManager::Initialize() { FindShaders(); }
+void RenderResourceManager::Initialize() {
+  FindShaders();
+  FindTextures();
+}
 
-void RenderResourceManager::Load() { LoadShaders(); }
+void RenderResourceManager::Load() {
+  LoadShaders();
+  LoadTextures();
+}
 
 RenderHandle<Shader> RenderResourceManager::GetShader(const std::string& key) {
   return GetResource<Shader>(key);
@@ -21,6 +29,11 @@ RenderHandle<Shader> RenderResourceManager::GetShader(const std::string& key) {
 RenderHandle<ComputeShader> RenderResourceManager::GetComputeShader(
     const std::string& key) {
   return GetResource<ComputeShader>(key);
+}
+
+RenderHandle<Texture2DV2> RenderResourceManager::GetTexture2D(
+    const std::string& key) {
+  return GetResource<Texture2DV2>(key);
 }
 
 void RenderResourceManager::LoadShaders() {
@@ -36,6 +49,14 @@ void RenderResourceManager::LoadShaders() {
   }
 }
 
+void RenderResourceManager::LoadTextures() {
+  auto& texture2d_cache = GetCache<Texture2DV2>();
+
+  for (auto& [key, texture] : texture2d_cache) {
+    texture->Load();
+  }
+}
+
 void RenderResourceManager::FindShaders() {
   AssetManager& assets = *context_.assets_;
   std::vector<AssetHandle<ShaderSource>> sources = assets.GetAllShaderSource();
@@ -46,5 +67,15 @@ void RenderResourceManager::FindShaders() {
     } else {
       CreateResource<ComputeShader>(source->GetKey(), source);
     }
+  }
+}
+
+void RenderResourceManager::FindTextures() {
+  AssetManager& assets = *context_.assets_;
+  std::vector<AssetHandle<Texture2DSource>> sources =
+      assets.GetTexture2DSource();
+
+  for (auto& source : sources) {
+    CreateResource<Texture2DV2>(source->GetKey(), source);
   }
 }

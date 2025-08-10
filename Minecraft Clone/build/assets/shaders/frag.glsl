@@ -14,7 +14,7 @@ uniform vec3 camPos;
 uniform float RenderDistance;
 uniform float VerticalRenderDistance;
 uniform sampler2D BlockTexture;
-uniform sampler2D LightMap;
+uniform sampler2D light_map;
 uniform vec3 tintColor;
 
 float near = 0.25; 
@@ -31,7 +31,7 @@ vec4 SampleLighting() {
     // 16 by 16 image
     float block_samp = block_light * (15.f / 16.f) + (1.f / 32.f);
     float sky_samp = sky_light * (15.f / 16.f) + (1.f / 32.f);
-    return texture(LightMap, vec2(block_samp, sky_samp));
+    return texture(light_map, vec2(block_samp, sky_samp));
 }
 
 void main() {
@@ -44,12 +44,12 @@ void main() {
     depth = 1 - depth;
 
     vec4 block_texture =  texture(BlockTexture, texture_uv);
-    vec4 light_map =  SampleLighting();
+    vec4 light =  SampleLighting();
 
     if (block_texture.a == 0.0f)
         discard;
 
-    vec4 block_color = block_texture  * color * light_map;
+    vec4 block_color = block_texture  * color * light;
     
     if (depth < -0.1f) {
         discard;

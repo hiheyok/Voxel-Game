@@ -130,6 +130,7 @@
       <StructMemberAlignment>8Bytes</StructMemberAlignment>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -168,6 +169,7 @@
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -182,6 +184,8 @@
     <ClCompile Include="src\Assets\Asset.cpp" />
     <ClCompile Include="src\Assets\AssetManager.cpp" />
     <ClCompile Include="src\Assets\Types\ShaderSource.cpp" />
+    <ClCompile Include="src\Assets\Types\Texture\TextureSource.cpp" />
+    <ClCompile Include="src\Assets\Types\Texture\Texture2DSource.cpp" />
     <ClCompile Include="src\Client\Client.cpp" />
     <ClCompile Include="src\Client\ClientLevel\ClientCache.cpp" />
     <ClCompile Include="src\Client\ClientLevel\ClientLevel.cpp" />
@@ -249,6 +253,9 @@
     <ClCompile Include="src\RenderEngine\OpenGL\Render\RenderObject.cpp" />
     <ClCompile Include="src\RenderEngine\RenderResources\RenderResource.cpp" />
     <ClCompile Include="src\RenderEngine\RenderResources\RenderResourceManager.cpp" />
+    <ClCompile Include="src\RenderEngine\RenderResources\Types\Texture\Texture.cpp" />
+    <ClCompile Include="src\RenderEngine\RenderResources\Types\Texture\Texture2D.cpp" />
+    <ClCompile Include="src\RenderEngine\RenderResources\Types\Texture\Texture2DBase.cpp" />
     <ClCompile Include="src\RenderEngine\UI\Components\ColoredComponent.cpp" />
     <ClCompile Include="src\RenderEngine\UI\Components\Component.cpp" />
     <ClCompile Include="src\RenderEngine\UI\Components\ImageComponent.cpp" />
@@ -290,6 +297,8 @@
     <ClInclude Include="src\Assets\AssetManager.h" />
     <ClInclude Include="src\Assets\AssetState.h" />
     <ClInclude Include="src\Assets\Types\ShaderSource.h" />
+    <ClInclude Include="src\Assets\Types\Texture\TextureSource.h" />
+    <ClInclude Include="src\Assets\Types\Texture\Texture2DSource.h" />
     <ClInclude Include="src\Client\Inputs\InputEvent.h" />
     <ClInclude Include="src\Client\Inputs\KeysInputs.h" />
     <ClInclude Include="src\Client\Inputs\MouseInputs.h" />
@@ -321,7 +330,10 @@
     <ClCompile Include="src\RenderEngine\Frustum\frustum.cpp" />
     <ClCompile Include="src\RenderEngine\GUI\GUI.cpp" />
     <ClCompile Include="src\RenderEngine\GUI\Font.cpp" />
-    <ClCompile Include="src\RenderEngine\GUI\GUIObject.cpp" />
+    <ClCompile Include="src\RenderEngine\GUI\GUIObject.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="src\RenderEngine\GUI\GUISet.cpp" />
     <ClCompile Include="src\RenderEngine\GUI\TextRenderer.cpp" />
     <ClCompile Include="src\RenderEngine\ItemRender\BlockItemRender.cpp" />
@@ -333,10 +345,10 @@
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\ComputeShader.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\Shader.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\ShaderInterface.cpp" />
-    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Texture.cpp" />
-    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\Texture2D.cpp" />
-    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\TextureArray.cpp" />
-    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\TextureAtlas.cpp" />
+    <ClCompile Include="src\RenderEngine\OpenGL\Texture\TextureOld.cpp" />
+    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\Texture2DOld.cpp" />
+    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\TextureArrayOld.cpp" />
+    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\TextureAtlasOld.cpp" />
     <ClCompile Include="src\RenderEngine\Window.cpp" />
     <ClCompile Include="src\Utils\Containers\NBitVector.cpp" />
     <ClCompile Include="src\Utils\Math\Probability\Probability.cpp" />
@@ -406,6 +418,9 @@
     <ClInclude Include="src\RenderEngine\RenderResources\RenderResource.h" />
     <ClInclude Include="src\RenderEngine\RenderResources\RenderResourceManager.h" />
     <ClInclude Include="src\RenderEngine\RenderResources\RenderResourceState.h" />
+    <ClInclude Include="src\RenderEngine\RenderResources\Types\Texture\Texture.h" />
+    <ClInclude Include="src\RenderEngine\RenderResources\Types\Texture\Texture2D.h" />
+    <ClInclude Include="src\RenderEngine\RenderResources\Types\Texture\Texture2DBase.h" />
     <ClInclude Include="src\RenderEngine\UI\Components\ColoredComponent.h" />
     <ClInclude Include="src\RenderEngine\UI\Components\Component.h" />
     <ClInclude Include="src\RenderEngine\UI\Components\ImageComponent.h" />
@@ -448,7 +463,7 @@
     <ClInclude Include="src\RenderEngine\GUI\Font.h" />
     <ClInclude Include="src\RenderEngine\GUI\TextRenderer.h" />
     <ClInclude Include="src\RenderEngine\ItemRender\BlockItemRender.h" />
-    <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureAtlas.h" />
+    <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureAtlasOld.h" />
     <ClInclude Include="src\Level\Light\LightStorage.h" />
     <ClInclude Include="src\Level\Entity\Mobs\Player.h" />
     <ClInclude Include="src\Level\Event\ChunkEventHandles\ChunkHandles.h" />
@@ -468,9 +483,9 @@
     <ClInclude Include="src\RenderEngine\OpenGL\Framebuffer\Framebuffer.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\OpenGL.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Shader\Shader.h" />
-    <ClInclude Include="src\RenderEngine\OpenGL\Texture\Texture.h" />
-    <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\Texture2D.h" />
-    <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureArray.h" />
+    <ClInclude Include="src\RenderEngine\OpenGL\Texture\TextureOld.h" />
+    <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\Texture2DOld.h" />
+    <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureArrayOld.h" />
     <ClInclude Include="src\RenderEngine\Window.h" />
     <ClInclude Include="src\Utils\Containers\FIFOQueue.h" />
     <ClInclude Include="src\Utils\Iterators.h" />

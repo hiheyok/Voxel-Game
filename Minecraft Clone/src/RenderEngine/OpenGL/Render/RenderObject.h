@@ -15,6 +15,7 @@
 
 class GameContext;
 class Shader;
+class TextureV2;
 
 /*
 Top abstract class for OpenGL Rendeirng
@@ -38,6 +39,8 @@ class RenderObject {
   // Use to configure shader before rendering
   RenderHandle<Shader> GetShader();
   void SetTexture2D(int index, int id, const std::string& name);
+
+  void SetTexture(int idx, RenderHandle<TextureV2> handle);
 
  protected:
   static constexpr size_t GetDataTypeSize(uint32_t data_type) {
@@ -99,4 +102,6 @@ class RenderObject {
   // Texture cache states
   std::vector<std::tuple<int, int, std::string>>
       texture_2d_cache_;  // <index, id, name>
+
+  std::vector<std::pair<int, RenderHandle<TextureV2>>> texture_cache_;
 };

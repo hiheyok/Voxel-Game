@@ -4,13 +4,14 @@
 #include "Core/Typenames.h"
 #include "Level/Entity/Collusion/Hitbox.h"
 #include "RenderEngine/EntityRender/Models/EntityModel.h"
-#include "RenderEngine/OpenGL/Texture/Types/Texture2D.h"
+#include "RenderEngine/OpenGL/Texture/Types/Texture2DOld.h"
 
 class Dimension;
 class GameContext;
 
 struct Entity;
 
+// TODO(hiheyok): why did i put texture stuff here
 class EntityType {
  public:
   explicit EntityType(GameContext&);

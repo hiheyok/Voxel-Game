@@ -12,6 +12,7 @@ class GameContext;
 
 class Shader;
 class ComputeShader;
+class Texture2DV2;
 
 template <typename T>
 concept IsResource = std::is_base_of_v<RenderResource, std::decay_t<T>>;
@@ -29,10 +30,14 @@ class RenderResourceManager {
 
   RenderHandle<Shader> GetShader(const std::string& key);
   RenderHandle<ComputeShader> GetComputeShader(const std::string& key);
+  RenderHandle<Texture2DV2> GetTexture2D(const std::string& key);
 
  private:
   void LoadShaders();
+  void LoadTextures();
+
   void FindShaders();
+  void FindTextures();
 
   template <IsResource ResourceType, typename... Args>
   void CreateResource(std::string key, Args&&... args);
@@ -48,6 +53,7 @@ class RenderResourceManager {
 
   FastHashMap<std::string, std::unique_ptr<Shader>> shaders_cache_;
   FastHashMap<std::string, std::unique_ptr<ComputeShader>> compute_cache_;
+  FastHashMap<std::string, std::unique_ptr<Texture2DV2>> texture2d_;
 
   GameContext& context_;
 };
@@ -61,6 +67,8 @@ RenderResourceManager::GetCache() noexcept {
     return shaders_cache_;
   } else if constexpr (std::is_same_v<ComputeShader, Type>) {
     return compute_cache_;
+  } else if constexpr (std::is_same_v<Texture2DV2, Type>) {
+    return texture2d_;
   } else {
     static_assert(
         std::is_void_v<Type>,

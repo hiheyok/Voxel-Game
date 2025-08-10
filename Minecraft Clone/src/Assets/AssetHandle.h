@@ -1,16 +1,25 @@
 #pragma once
 
-template <typename AssetType>
+#include <concepts>
+#include <type_traits>
+
+template <typename T>
 class AssetHandle {
  public:
   AssetHandle() : p_{nullptr} {}
-  explicit AssetHandle(AssetType* p) : p_{p} {}
+  explicit AssetHandle(T* p) : p_{p} {}
 
-  AssetType* operator->() const { return p_; }
-  AssetType& operator*() const { return *p_; }
-  AssetType* Get() const { return p_; }
+  template <typename Derived>
+    requires std::is_base_of_v<T, Derived>
+  explicit AssetHandle(const AssetHandle<Derived>& other)
+      : AssetHandle{static_cast<T*>(other.Get())} {}
+
+  T* operator->() const { return p_; }
+  T& operator*() const { return *p_; }
+  T* Get() const { return p_; }
 
   explicit operator bool() const { return p_ != nullptr; }
+
  private:
-  AssetType* p_;
+  T* p_;
 };

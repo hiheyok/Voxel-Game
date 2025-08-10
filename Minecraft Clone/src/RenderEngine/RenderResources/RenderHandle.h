@@ -1,17 +1,25 @@
 #pragma once
 
-template <typename RenderResourceType>
+#include <concepts>
+#include <type_traits>
+
+template <typename T>
 class RenderHandle {
  public:
   RenderHandle() : p_{nullptr} {}
-  explicit RenderHandle(RenderResourceType* p) : p_{p} {}
+  explicit RenderHandle(T* p) : p_{p} {}
 
-  RenderResourceType* operator->() const { return p_; }
-  RenderResourceType& operator*() const { return *p_; }
-  RenderResourceType* Get() const { return p_; }
+  template <typename Derived>
+    requires std::is_base_of_v<T, std::decay_t<Derived>>
+  RenderHandle(const RenderHandle<Derived>& p)
+      : RenderHandle{static_cast<T*>(p.Get())} {}
+
+  T* operator->() const { return p_; }
+  T& operator*() const { return *p_; }
+  T* Get() const { return p_; }
 
   explicit operator bool() const { return p_ != nullptr; }
 
  private:
-  RenderResourceType* p_;
+  T* p_;
 };

@@ -44,8 +44,26 @@ void RenderObject::SetTexture2D(int index, int id, const std::string& name) {
   texture_2d_cache_.emplace_back(index, id, name);
 }
 
+void RenderObject::SetTexture(int idx, RenderHandle<TextureV2> handle) {
+  shader_->BindTexture(idx, handle);
+
+  // Tries to search for the the index first
+  for (auto& [tex_idx, tex_handle] : texture_cache_) {
+    if (tex_idx == idx) {
+      tex_handle = handle;
+      return;
+    }
+  }
+
+  texture_cache_.emplace_back(idx, handle);
+}
+
 void RenderObject::SetupTexture() {
   for (const auto& [index, id, name] : texture_2d_cache_) {
     shader_->BindTexture2D(index, id, name);
+  }
+
+  for (const auto& [idx, handle] : texture_cache_) {
+    shader_->BindTexture(idx, handle);
   }
 }

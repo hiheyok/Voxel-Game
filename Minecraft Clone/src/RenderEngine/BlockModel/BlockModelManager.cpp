@@ -13,7 +13,8 @@
 #include "RenderEngine/BlockModel/BlockModels.h"
 #include "RenderEngine/BlockModel/ModelLoader.h"
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
-#include "RenderEngine/OpenGL/Texture/Types/Texture2D.h"
+#include "RenderEngine/OpenGL/Texture/Types/Texture2DOld.h"
+#include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "Utils/LogUtils.h"
 
 BlockModelManager::BlockModelManager(GameContext& context)
@@ -79,8 +80,7 @@ void BlockModelManager::LoadModels() {
   block_texture_atlas_->LoadToGPU();
   is_loaded_ = true;
 
-  light_map_ = std::make_unique<Texture2D>(
-      context_, RawTextureData("assets/minecraft/textures/colormap/light.png"));
+  light_map_ = context_.render_resource_manager_->GetTexture2D("light_map");
 }
 
 const BlockModel& BlockModelManager::GetBlockModel(BlockID id) const {
@@ -101,11 +101,6 @@ uint32_t BlockModelManager::GetTextureAtlasID() const {
   return block_texture_atlas_->Get();
 }
 
-uint32_t BlockModelManager::GetLightMapID() const {
-  if (light_map_ == nullptr) {
-    throw std::runtime_error(
-        "BlockModelManager::GetLightMapID - tried to access unloaded "
-        "texture");
-  }
-  return light_map_->Get();
+RenderHandle<Texture2DV2> BlockModelManager::GetLightMap() const {
+  return light_map_;
 }
