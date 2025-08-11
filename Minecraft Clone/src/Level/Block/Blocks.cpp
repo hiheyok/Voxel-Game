@@ -36,7 +36,7 @@ BlockID BlockList::RegisterBlock(std::string blockName, Block* block) {
 
   block_id_name_data_[blockName] = id;
 
-  LOG_INFO("Registered new block (ID) {}: ", id);
+  LOG_INFO("Registered new block (ID) {}: {}", id, blockName);
   return id;
 }
 
