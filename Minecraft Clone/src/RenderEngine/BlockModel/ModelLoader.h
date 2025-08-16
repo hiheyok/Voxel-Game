@@ -16,8 +16,12 @@ class ModelLoader {
  public:
   explicit ModelLoader(GameContext&);
   ~ModelLoader();
+
   ModelLoader(const ModelLoader&) = delete;
+  ModelLoader& operator=(const ModelLoader&) = delete;
+
   ModelLoader(ModelLoader&&) = delete;
+  ModelLoader& operator=(ModelLoader&&) = delete;
 
   std::unique_ptr<BlockModel> GetModel(const ResourceLocation& location);
 
@@ -29,14 +33,12 @@ class ModelLoader {
 
   void CacheModel(const ResourceLocation& location,
                   const std::unique_ptr<BlockModel>& model);
-  void ProcessModelDisplay(std::unique_ptr<BlockModel>& model, json JsonData);
-  void UpdateModelElements(std::unique_ptr<BlockModel>& model, json JsonData);
-  void ProcessCuboidTexture(std::unique_ptr<BlockModel>& model, json JsonData);
-  CuboidRotationInfo GetRotationalData(json JsonData);
-  void ProcessSingleCubeFaces(Cuboid& cube, json JsonData);
+  void ProcessModelDisplay(std::unique_ptr<BlockModel>& model, const json&);
+  void UpdateModelElements(std::unique_ptr<BlockModel>& model, const json&);
+  void ProcessCuboidTexture(std::unique_ptr<BlockModel>& model, const json&);
+  CuboidRotationInfo GetRotationalData(const json&);
+  void ProcessSingleCubeFaces(Cuboid& cube, const json&);
   int ConvertStringFaceToIndex(const std::string& str);
-  std::vector<float> GetJSONArrayValuesFloat(json JsonData);
-  std::vector<int> GetJSONArrayValues(json JsonData);
 
   GameContext& context_;
   // Model cache to cache repeated parents

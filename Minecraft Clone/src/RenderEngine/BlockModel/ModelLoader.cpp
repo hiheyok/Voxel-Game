@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "Core/GameContext/GameContext.h"
+#include "Core/IO/FileUtils.h"
 #include "FileManager/Files.h"
 #include "Utils/LogUtils.h"
 
@@ -18,92 +19,85 @@ ModelLoader::~ModelLoader() = default;
 
 std::unique_ptr<BlockModel> ModelLoader::GetModel(
     const ResourceLocation& location) {
-  // Check if the model is already in the cache
-  const auto& it = cache_.find(location);
-
-  if (it != cache_.end()) {
-    return std::make_unique<BlockModel>(*it->second);
-  }
-
   std::unique_ptr<BlockModel> model = GetModelRecursive(location);
-  if (model == nullptr) return nullptr;
-  std::reverse(model->elements_.begin(), model->elements_.end());
-  CacheModel(location, model);
   return model;
 }
 
 std::unique_ptr<BlockModel> ModelLoader::GetModelRecursive(
     const ResourceLocation& location) {
-  std::unique_ptr<BlockModel> model = nullptr;
+  // Checks if it exist in the cache first
+  const auto& it = cache_.find(location);
+  if (it != cache_.end()) {
+    return std::make_unique<BlockModel>(*it->second);
+  }
 
-  std::string jsonPath = location.GetPath();
-  json JSONData;
+  std::unique_ptr<BlockModel> model = nullptr;
+  std::string path = location.GetPath();
+  std::vector<char> manifest_data = FileUtils::ReadFileToBuffer(context_, path);
+  json manifest;
 
   try {
-    std::ifstream file(jsonPath);
-    if (!file.good()) {  // checks if  it exist
+    if (manifest_data.empty()) {
       return nullptr;
     }
-    JSONData = json::parse(file);
-  } catch (const std::exception& e) {
+
+    manifest = json::parse(manifest_data);
+  } catch (const json::exception& e) {
     LOG_WARN("{}", e.what());
     return nullptr;
   }
 
-  // Search for the parent
-  for (auto& item : JSONData.items()) {
-    if (item.key() == "parent") {
-      std::string parentData = item.value();
+  if (manifest.contains("parent")) {
+    std::string parent = manifest["parent"].get<std::string>();
 
-      // Parse for the parent json
+    // Parse for the parent json
+    // This assumes that the parent is
+    // always in the same folder
+    size_t idx = parent.find(':');
 
-      std::vector<std::string> tokens =
-          Tokenize(parentData, ':');  // This assumes that the parent is
-                                      // always in the same folder
-      std::string parentJSON = tokens.back();
-      std::string parentNamespace = tokens.front();
+    std::string parent_location;
+    std::string parent_namespace;
 
-      if (tokens.size() == 1) {
-        parentNamespace = "";
-      }
-
-      // First check if the model is in the cache
-      ResourceLocation parentLocation =
-          ResourceLocation("models/" + parentJSON + ".json", parentNamespace);
-      const auto& it = cache_.find(parentLocation);
-      if (it != cache_.end()) {
-        model = std::make_unique<BlockModel>(*it->second);
-      } else {
-        model = GetModelRecursive(parentLocation);
-        if (model != nullptr) {
-          CacheModel(parentLocation, model);
-        }
-      }
-
-      break;
+    if (idx != std::string::npos) {
+      parent_location = parent.substr(idx + 1);
+      parent_namespace = parent.substr(0, idx);
+    } else {
+      parent_location = parent;
+      parent_namespace = kDefaultNamespace;
     }
+
+    // First check if the model is in the cache
+    ResourceLocation parent_path{"models/" + parent_location + ".json",
+                                 parent_namespace};
+
+    model = GetModelRecursive(parent_path);
   }
 
-  if (model == nullptr) {
+  if (!model) {
     model = std::make_unique<BlockModel>();
   }
 
-  // Searches for the other stuff like textures and elements
-
-  for (auto& item : JSONData.items()) {
-    if (item.key() == "elements") {
-      model->elements_.clear();  // Child elements override parent
-                                 // elements
-      UpdateModelElements(model, item.value());
-    } else if (item.key() == "textures") {
-      ProcessCuboidTexture(model, item.value());
-    } else if (item.key() == "display") {
-      ProcessModelDisplay(model, item.value());
-    } else if (item.key() == "ambientocclusion") {
-      model->ambient_occlusion_ = static_cast<bool>(item.value());
-    }
+  if (manifest.contains("elements")) {
+    // Child elements override parent
+    // elements
+    model->elements_.clear();
+    UpdateModelElements(model, manifest["elements"]);
   }
 
+  if (manifest.contains("textures")) {
+    ProcessCuboidTexture(model, manifest["textures"]);
+  }
+
+  if (manifest.contains("display")) {
+    ProcessModelDisplay(model, manifest["display"]);
+  }
+
+  if (manifest.contains("ambientocclusion")) {
+    model->ambient_occlusion_ = manifest["ambientocclusion"].get<bool>();
+  }
+
+  std::reverse(model->elements_.begin(), model->elements_.end());
+  CacheModel(location, model);
   return model;
 }
 
@@ -113,245 +107,241 @@ void ModelLoader::CacheModel(const ResourceLocation& location,
   const auto& it = cache_.find(location);
   if (it != cache_.find(location)) {
     LOG_DEBUG("Attempted to cache model that is already cached");
+  } else {
+    // Make copy
+    cache_[location] = std::make_unique<BlockModel>(*model);
   }
-  std::unique_ptr<BlockModel> copiedModel =
-      std::make_unique<BlockModel>(*model);
-  cache_[location] = std::move(copiedModel);
 }
 
 void ModelLoader::ProcessModelDisplay(std::unique_ptr<BlockModel>& model,
-                                      json JsonData) {
-  for (auto& displayPlaces : JsonData.items()) {
-    std::string position = displayPlaces.key();
+                                      const json& displays) {
+  for (const auto& [display_pos, info] : displays.items()) {
     BlockDisplay display;
-
-    for (auto& transitions : displayPlaces.value().items()) {
-      std::vector<float> arr = GetJSONArrayValuesFloat(transitions.value());
-      std::string attrib = transitions.key();
-
-      if (attrib == "rotation") {
-        for (int i = 0; i < 3; i++) {
-          display.rotation_[i] = arr[i];
-        }
-      } else if (attrib == "translation") {
-        for (int i = 0; i < 3; i++) {
-          display.translation_[i] = arr[i];
-        }
-      } else if (attrib == "scale") {
-        for (int i = 0; i < 3; i++) {
-          display.scale_[i] = arr[i];
-        }
-      } else {
-        LOG_WARN("Unknown display attribute: {}", attrib);
+    if (info.contains("rotation")) {
+      auto vals = info["rotation"].get<std::array<float, 3>>();
+      for (int i = 0; i < 3; i++) {
+        display.rotation_[i] = vals[i];
       }
     }
 
-    if (position == "thirdperson_righthand") {
+    if (info.contains("translation")) {
+      auto vals = info["translation"].get<std::array<float, 3>>();
+      for (int i = 0; i < 3; i++) {
+        display.translation_[i] = vals[i];
+      }
+    }
+
+    if (info.contains("scale")) {
+      auto vals = info["scale"].get<std::array<float, 3>>();
+      for (int i = 0; i < 3; i++) {
+        display.scale_[i] = vals[i];
+      }
+    }
+
+    if (display_pos == "thirdperson_righthand") {
       display.position_ = DisplayPosition::thirdperson_righthand;
-    } else if (position == "thirdperson_lefthand") {
+    } else if (display_pos == "thirdperson_lefthand") {
       display.position_ = DisplayPosition::thirdperson_lefthand;
-    } else if (position == "firstperson_righthand") {
+    } else if (display_pos == "firstperson_righthand") {
       display.position_ = DisplayPosition::firstperson_righthand;
-    } else if (position == "firstperson_lefthand") {
+    } else if (display_pos == "firstperson_lefthand") {
       display.position_ = DisplayPosition::firstperson_lefthand;
-    } else if (position == "gui") {
+    } else if (display_pos == "gui") {
       display.position_ = DisplayPosition::gui;
-    } else if (position == "head") {
+    } else if (display_pos == "head") {
       display.position_ = DisplayPosition::head;
-    } else if (position == "ground") {
+    } else if (display_pos == "ground") {
       display.position_ = DisplayPosition::ground;
-    } else if (position == "fixed") {
+    } else if (display_pos == "fixed") {
       display.position_ = DisplayPosition::fixed;
     } else {
-      LOG_WARN("Unknown display position: {}", position);
-      return;
+      LOG_WARN("Unknown display position: {}", display_pos);
     }
 
     display.initialized_ = true;
-
     model->AddDisplay(display, display.position_);
   }
 }
 
 void ModelLoader::UpdateModelElements(std::unique_ptr<BlockModel>& model,
-                                      json JsonData) {
-  for (auto& item : JsonData.items()) {
+                                      const json& elements) {
+  for (const auto& element : elements) {
     Cuboid cuboid;
 
-    for (auto& subElements : item.value().items()) {
-      std::string key = subElements.key();
-      if (key == "from") {
-        std::vector<float> arr = GetJSONArrayValuesFloat(subElements.value());
-        for (int i = 0; i < 3; i++) {
-          cuboid.from_[i] = arr[i] / 16;
-        }
-        arr.clear();
-      } else if (key == "to") {
-        std::vector<float> arr = GetJSONArrayValuesFloat(subElements.value());
-        for (int i = 0; i < 3; i++) {
-          cuboid.to_[i] = arr[i] / 16;
-        }
-        arr.clear();
-      } else if (key == "faces") {
-        ProcessSingleCubeFaces(cuboid, subElements.value());
-      } else if (key == "rotation") {
-        CuboidRotationInfo rotation = GetRotationalData(subElements.value());
-        cuboid.rotation_ = rotation;
-      } else if (key == "__comment") {
-        cuboid.comments_ = subElements.value();
-      } else if (key == "shade") {
-        cuboid.shade_ = static_cast<bool>(subElements.value());
-      } else {
-        LOG_WARN("Unknown element attribute: {}", key);
+    if (element.contains("from")) {
+      auto vals = element["from"].get<std::array<float, 3>>();
+      for (int i = 0; i < 3; i++) {
+        cuboid.from_[i] = vals[i] / 16.0f;
       }
+    }
+
+    if (element.contains("to")) {
+      auto vals = element["to"].get<std::array<float, 3>>();
+      for (int i = 0; i < 3; i++) {
+        cuboid.to_[i] = vals[i] / 16.0f;
+      }
+    }
+
+    if (element.contains("faces")) {
+      ProcessSingleCubeFaces(cuboid, element["faces"]);
+    }
+
+    if (element.contains("rotation")) {
+      cuboid.rotation_ = GetRotationalData(element["rotation"]);
+    }
+
+    if (element.contains("__comment")) {
+      cuboid.comments_ = element["__comment"].get<std::string>();
+    }
+
+    if (element.contains("shade")) {
+      cuboid.shade_ = element["shade"].get<bool>();
     }
     model->AddElement(cuboid);
   }
 }
 
 void ModelLoader::ProcessCuboidTexture(std::unique_ptr<BlockModel>& model,
-                                       json JsonData) {
-  for (auto& TextureElement : JsonData.items()) {
-    auto tokens = Tokenize(TextureElement.value(), ':');
+                                       const json& textures) {
+  for (const auto& [name, path] : textures.items()) {
+    std::string texture_def = path.get<std::string>();
 
-    std::string textureName = tokens.back();
-    std::string textureNamespace = tokens.front();
+    size_t idx = texture_def.find(':');
 
-    if (tokens.size() == 1) {
-      textureNamespace = kDefaultNamespace;
-    }
+    std::string texture_location;
+    std::string texture_namespace;
 
-    std::string textureVariableName = TextureElement.key();
-
-    bool isVariable = textureName[0] == '#';
-
-    if (isVariable) {
-      model->texture_variable_[textureVariableName] = textureName;
+    if (idx != std::string::npos) {
+      texture_location = texture_def.substr(idx + 1);
+      texture_namespace = texture_def.substr(0, idx);
     } else {
-      model->texture_variable_[textureVariableName] =
-          textureName + ":" + textureNamespace;
+      texture_location = texture_def;
+      texture_namespace = kDefaultNamespace;
+    }
+
+    bool is_variable = texture_location[0] == '#';
+    if (is_variable) {
+      model->texture_variable_[name] = texture_location;
+    } else {
+      model->texture_variable_[name] =
+          texture_namespace + ":" + texture_location;
     }
   }
 }
 
-CuboidRotationInfo ModelLoader::GetRotationalData(json JsonData) {
-  CuboidRotationInfo rotationInfo;
-  for (auto& attribute : JsonData.items()) {
-    const std::string& key = attribute.key();
-    if (key == "origin") {
-      std::vector<float> arr = GetJSONArrayValuesFloat(attribute.value());
+CuboidRotationInfo ModelLoader::GetRotationalData(const json& rotation_data) {
+  CuboidRotationInfo rotation_info;
 
-      for (int i = 0; i < 3; i++) {
-        rotationInfo.origin_[i] = arr[i] / 16;
-      }
-    } else if (key == "axis") {
-      char axis = key[0];
+  if (rotation_data.contains("origin")) {
+    auto vals = rotation_data["origin"].get<std::array<float, 3>>();
 
-      if (axis == 'x') {
-        rotationInfo.axis_ = 0;
-      } else if (axis == 'y') {
-        rotationInfo.axis_ = 1;
-      } else if (axis == 'z') {
-        rotationInfo.axis_ = 2;
-      } else {
-        LOG_WARN("Unknown rotational axis: {}", key);
-      }
-    } else if (key == "axis") {
-      int angle_ = attribute.value();
-      rotationInfo.angle_ = angle_;
-    } else if (key == "rescale") {
-      rotationInfo.rescale_ = true;
+    for (int i = 0; i < 3; i++) {
+      rotation_info.origin_[i] = vals[i] / 16;
     }
-    rotationInfo.initialized_ = true;
   }
 
-  return rotationInfo;
+  if (rotation_data.contains("axis")) {
+    char axis = rotation_data["axis"].get<std::string>()[0];
+
+    if (axis == 'x') {
+      rotation_info.axis_ = 0;
+    } else if (axis == 'y') {
+      rotation_info.axis_ = 1;
+    } else if (axis == 'z') {
+      rotation_info.axis_ = 2;
+    }
+  }
+
+  if (rotation_data.contains("angle")) {
+    rotation_info.angle_ = rotation_data["angle"].get<float>();
+  }
+
+  if (rotation_data.contains("rescale")) {
+    rotation_info.rescale_ = rotation_data["rescale"].get<bool>();
+  }
+
+  rotation_info.initialized_ = true;
+
+  return rotation_info;
 }
 
-void ModelLoader::ProcessSingleCubeFaces(Cuboid& cube, json JsonData) {
-  for (auto& face : JsonData.items()) {
-    int faceIndex = ConvertStringFaceToIndex(face.key());
-    BlockFace bFace;
-    for (auto& faceElements : face.value().items()) {
-      const std::string& key = faceElements.key(); 
-      if (key == "uv") {
-        std::vector<int> arr = GetJSONArrayValues(faceElements.value());
+void ModelLoader::ProcessSingleCubeFaces(Cuboid& cube, const json& faces) {
+  for (const auto& [direction, face] : faces.items()) {
+    BlockFace face_data;
+    int face_idx = ConvertStringFaceToIndex(direction);
 
-        // flip
-        arr[1] = 16 - arr[1];
-        arr[3] = 16 - arr[3];
+    if (face.contains("uv")) {
+      auto arr = face["uv"].get<std::array<float, 4>>();
 
-        std::swap(arr[1], arr[3]);
+      // flip
+      arr[1] = 16 - arr[1];
+      arr[3] = 16 - arr[3];
 
-        for (int i = 0; i < 4; i++) {
-          bFace.uv_[i] = arr[i];
-        }
-      } else if (key == "texture") {
-        auto tokens = Tokenize(faceElements.value(), ':');
+      std::swap(arr[1], arr[3]);
 
-        std::string texName = tokens.back();
-        std::string texNamespace = kDefaultNamespace;
-
-        if (tokens.size() == 2) {
-          texNamespace = tokens.front();
-        }
-
-        bool isVariable = texName[0] == '#';
-
-        if (isVariable) {
-          bFace.reference_texture_ = texName;
-        } else {
-          bFace.reference_texture_ = texName + ":" + texNamespace;
-        }
-      } else if (key == "cullface") {
-        bFace.cull_face_ = ConvertStringFaceToIndex(faceElements.value());
-      } else if (key == "tintindex") {
-        bFace.tint_index_ = faceElements.value();
-      } else if (key == "rotation") {
-        bFace.rotation_ = faceElements.value();
-      } else {
-        LOG_WARN("Unknown face attribute: {}", key);
+      for (int i = 0; i < 4; i++) {
+        face_data.uv_[i] = arr[i];
       }
     }
-    cube.EditFace(faceIndex, bFace);
+
+    if (face.contains("texture")) {
+      std::string texture_def = face["texture"].get<std::string>();
+
+      size_t idx = texture_def.find(':');
+
+      std::string texture_location;
+      std::string texture_namespace;
+
+      if (idx != std::string::npos) {
+        texture_location = texture_def.substr(idx + 1);
+        texture_namespace = texture_def.substr(0, idx);
+      } else {
+        texture_location = texture_def;
+        texture_namespace = kDefaultNamespace;
+      }
+
+      bool isVariable = texture_location[0] == '#';
+
+      if (isVariable) {
+        face_data.reference_texture_ = texture_location;
+      } else {
+        face_data.reference_texture_ =
+            texture_namespace + ":" + texture_location;
+      }
+    }
+
+    if (face.contains("cullface")) {
+      face_data.cull_face_ =
+          ConvertStringFaceToIndex(face["cullface"].get<std::string>());
+    }
+
+    if (face.contains("tintindex")) {
+      face_data.tint_index_ = face["tintindex"].get<int>();
+    }
+
+    if (face.contains("rotation")) {
+      // Todo(hiheyok): change to int later
+      face_data.rotation_ = face["rotation"].get<uint32_t>();
+    }
+    cube.EditFace(face_idx, face_data);
   }
 }
 
 int ModelLoader::ConvertStringFaceToIndex(const std::string& str) {
   if (str == "down") {
-    return DOWN;
+    return kDownDirection;
   } else if (str == "up") {
-    return UP;
+    return kUpDirection;
   } else if (str == "north") {
-    return NORTH;
+    return kNorthDirection;
   } else if (str == "south") {
-    return SOUTH;
+    return kSouthDirection;
   } else if (str == "west") {
-    return WEST;
+    return kWestDirection;
   } else if (str == "east") {
-    return EAST;
+    return kEastDirection;
   } else {
     LOG_WARN("Unknown direction: {}", str);
     return 0;
   }
-}
-
-std::vector<float> ModelLoader::GetJSONArrayValuesFloat(json JsonData) {
-  std::vector<float> arr{};
-
-  for (auto& value : JsonData.items()) {
-    arr.push_back(value.value());
-  }
-
-  return arr;
-}
-
-std::vector<int> ModelLoader::GetJSONArrayValues(json JsonData) {
-  std::vector<int> arr{};
-
-  for (auto& value : JsonData.items()) {
-    arr.push_back(value.value());
-  }
-
-  return arr;
 }

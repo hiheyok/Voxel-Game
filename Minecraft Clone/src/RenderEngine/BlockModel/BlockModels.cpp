@@ -316,49 +316,41 @@ void BlockModel::BakeTextureRotation() {
 }
 
 void BlockModel::FlattenVariables() {
-  FastHashMap<std::string, std::string> variableMatcher{};
-  FastHashSet<std::string> variableNames{};
-
-  // This will set all of the texture variables
+  // To cache matched variables to be used for other variables
+  FastHashMap<std::string, std::string> matched_variables;
+  FastHashSet<std::string> variables;
 
   for (const auto& [key, value] : texture_variable_) {
     // Check if there is a # at the beginning
-    variableNames.insert('#' + key);
+    variables.insert('#' + key);
     if (value[0] == '#') {
-      variableNames.insert(value);
+      variables.insert(value);
     }
-
-    // In this case, i am inserting both key and values because a variable
-    // could be referencing another variable
   }
 
   // Then it will find the absolute value corresponding to those variables
 
-  for (const std::string& variable : variableNames) {
-    std::string textureName = variable;
-    std::vector<std::string> variableCorrspondingToSameTexture = {};
+  for (const std::string& variable : variables) {
+    std::string name = variable;
+    std::vector<std::string> variables_same_texture;
 
-    FastHashSet<std::string> variableVisitMap{};
+    // To break cycles
+    FastHashSet<std::string> used;
 
-    int i = 0;
-    while (textureName[0] == '#') {
-      if (variableMatcher.count(textureName)) {  // top down memorization
-        textureName = variableMatcher[textureName];
+    while (name[0] == '#' && !used.contains(name)) {
+      if (matched_variables.count(name)) {
+        name = matched_variables[name];
         break;
       }
-      if (i > 10000) {  // TODO(hiheyok): Investigate this infinite loop bug 
-        break;
-      }
-      i++;
-      variableCorrspondingToSameTexture.push_back(textureName);
-      textureName =
-          texture_variable_[textureName.substr(1, textureName.length() - 1)];
+      used.insert(name);
+      variables_same_texture.push_back(name);
+      name = texture_variable_[name.substr(1, name.length() - 1)];
     }
 
-    for (const std::string& var : variableCorrspondingToSameTexture) {
-      variableMatcher[var] = textureName;
+    for (const std::string& var : variables_same_texture) {
+      matched_variables[var] = name;
     }
-    variableCorrspondingToSameTexture.clear();
+    variables_same_texture.clear();
   }
 
   // After all of the texture are flatten it will go through the faces and set
@@ -369,7 +361,7 @@ void BlockModel::FlattenVariables() {
         continue;  // if there is no texture face is not initialized
                    // (skip)
       if (face.reference_texture_[0] != '#') continue;
-      face.reference_texture_ = variableMatcher[face.reference_texture_];
+      face.reference_texture_ = matched_variables[face.reference_texture_];
     }
   }
 }

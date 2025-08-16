@@ -78,7 +78,7 @@ struct CuboidRotationInfo {
 
   glm::vec3 origin_ = {0.0f, 0.0f, 0.0f};
   int axis_ = 0;
-  int angle_ = 0;
+  float angle_ = 0;
   bool rescale_ = false;
   bool initialized_ = false;
 };

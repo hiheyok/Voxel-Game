@@ -48,20 +48,22 @@ void BlockModelManager::LoadModels() {
         const std::string& path = element.faces_[side].reference_texture_;
         if (path.length() == 0) continue;
 
-        auto tokens = Tokenize(path, ':');
+        size_t idx = path.find(':');
+        std::string texture_location = path.substr(idx + 1);
+        std::string texture_namespace = path.substr(0, idx);
 
         // Load texture
-        ResourceLocation location{"/textures/" + tokens.front() + ".png",
-                                  tokens.back()};
+        ResourceLocation location{"/textures/" + texture_location + ".png",
+                                  texture_namespace};
 
-        int textureId = block_texture_atlas_->AddBlockTexture(location);
+        int id = block_texture_atlas_->AddBlockTexture(location);
 
-        if (textureId == -1) {
+        if (id == -1) {
           LOG_WARN("Unable to load texture.");
           continue;
         }
 
-        element.faces_[side].texture_id_ = textureId;
+        element.faces_[side].texture_id_ = id;
         element.faces_[side].texture_count_ =
             block_texture_atlas_->GetBlockTextureCount(location);
         element.faces_[side].partially_transparent_pixel_ =
