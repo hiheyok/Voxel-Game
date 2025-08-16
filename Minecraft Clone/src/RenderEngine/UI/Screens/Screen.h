@@ -11,6 +11,7 @@
 class Widget;
 class ScreenManager;
 class UIRenderer;
+class GameContext;
 
 class Screen {
  public:
@@ -29,7 +30,7 @@ class Screen {
   void SubmitToRenderer(UIRenderer& renderer);
 
   glm::vec2 GetVirtualRes() const noexcept;
-  void ChangeVirtualRes(glm::vec2 v_res);
+  void SetVirtualRes(glm::vec2 v_res);
 
   // Initialize all of the widgets, component etc
   virtual void OnEnter();
@@ -39,8 +40,9 @@ class Screen {
   virtual void OnExit();
 
  protected:
-  explicit Screen(ScreenManager&, glm::vec2 virtual_res);
+  explicit Screen(GameContext&, ScreenManager&, glm::vec2 virtual_res);
 
+  GameContext& context_;
   glm::vec2 v_res_;
 
   ScreenManager& screen_mgr_;

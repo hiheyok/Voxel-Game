@@ -1,8 +1,7 @@
 #include "RenderEngine/RenderResources/Types/Texture/Texture2DBase.h"
 
-Texture2DBase::Texture2DBase(GameContext& context, const std::string& key,
-                             GLenum target)
-    : TextureV2{context, key, target}, width_{0}, height_{0} {}
+Texture2DBase::Texture2DBase(GameContext& context, const std::string& key)
+    : TextureV2{context, key, GL_TEXTURE_2D}, width_{0}, height_{0} {}
 
 Texture2DBase::~Texture2DBase() = default;
 

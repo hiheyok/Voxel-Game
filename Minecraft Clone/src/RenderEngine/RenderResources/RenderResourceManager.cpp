@@ -3,10 +3,12 @@
 #include "Assets/AssetManager.h"
 #include "Assets/Types/ShaderSource.h"
 #include "Assets/Types/Texture/Texture2DSource.h"
+#include "Assets/Types/Texture/TextureAtlasSource.h"
 #include "Core/GameContext/GameContext.h"
 #include "RenderEngine/OpenGL/Shader/ComputeShader.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "RenderEngine/RenderResources/Types/Texture/Texture2D.h"
+#include "RenderEngine/RenderResources/Types/Texture/TextureAtlas.h"
 
 RenderResourceManager::RenderResourceManager(GameContext& context)
     : context_{context} {}
@@ -36,6 +38,11 @@ RenderHandle<Texture2DV2> RenderResourceManager::GetTexture2D(
   return GetResource<Texture2DV2>(key);
 }
 
+RenderHandle<TextureAtlasV2> RenderResourceManager::GetAtlas(
+    const std::string& key) {
+  return GetResource<TextureAtlasV2>(key);
+}
+
 void RenderResourceManager::LoadShaders() {
   auto& shader_cache = GetCache<Shader>();
   auto& compute_cache = GetCache<ComputeShader>();
@@ -50,10 +57,13 @@ void RenderResourceManager::LoadShaders() {
 }
 
 void RenderResourceManager::LoadTextures() {
-  auto& texture2d_cache = GetCache<Texture2DV2>();
 
-  for (auto& [key, texture] : texture2d_cache) {
-    texture->Load();
+  for (auto& [key, resource] : GetCache<Texture2DV2>()) {
+    resource->Load();
+  }
+
+  for (auto& [key, resource] : GetCache<TextureAtlasV2>()) {
+    resource->Load();
   }
 }
 
@@ -72,10 +82,17 @@ void RenderResourceManager::FindShaders() {
 
 void RenderResourceManager::FindTextures() {
   AssetManager& assets = *context_.assets_;
-  std::vector<AssetHandle<Texture2DSource>> sources =
-      assets.GetTexture2DSource();
+  std::vector<AssetHandle<Texture2DSource>> tex_2d =
+      assets.GetAllTexture2DSource();
 
-  for (auto& source : sources) {
+  std::vector<AssetHandle<TextureAtlasSource>> atlas =
+      assets.GetAllAtlasSource();
+
+  for (auto& source : tex_2d) {
     CreateResource<Texture2DV2>(source->GetKey(), source);
+  }
+
+  for (auto& source : atlas) {
+    CreateResource<TextureAtlasV2>(source->GetKey(), source);
   }
 }

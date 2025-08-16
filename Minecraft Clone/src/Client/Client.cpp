@@ -37,7 +37,6 @@
 Client::Client(GameContext& context)
     : Window{context},
       context_{context},
-      server_{std::make_unique<Server>(context)},
       text_render_{std::make_unique<TextRenderer>(context)},
       internal_interface_{std::make_unique<InternalInterface>()},
       profiler_{new PerformanceProfiler()} {}
@@ -56,6 +55,7 @@ void Client::InitializeServerCom() {
       context_.options_->vertical_render_distance_;
 
   // Joins the server it should start receiving stuff now
+  server_ = std::make_unique<Server>(context_);
   server_->StartServer(settings);
   player_uuid_ = server_->SetInternalConnection(internal_interface_.get());
   client_play_ = std::make_unique<ClientPlay>(
@@ -68,7 +68,7 @@ void Client::Initialize() {
   InitializeServerCom();
   ui_manager_ = std::make_unique<UIManager>(context_, inputs_);
   ui_manager_->Initialize();
-  ui_manager_->PushScreen("debug_screen");
+  ui_manager_->PushScreen("player_hud");
 
   /// Initialize game rendering context
 }
@@ -84,7 +84,7 @@ void Client::Cleanup() { server_->Stop(); }
 void Client::Render() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   client_play_->Render(this);
-  // ui_manager_->Render();
+  //ui_manager_->Render();
 }
 
 void Client::GameLoop() {

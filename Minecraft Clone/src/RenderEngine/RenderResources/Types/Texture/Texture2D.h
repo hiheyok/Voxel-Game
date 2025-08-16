@@ -8,11 +8,11 @@ class Texture2DSource;
 class Texture2DV2 : public Texture2DBase {
  public:
   Texture2DV2(GameContext& context, const std::string& key,
-              AssetHandle<Texture2DSource> handle);
+              AssetHandle<Texture2DSource> source);
   ~Texture2DV2();
 
-  void Load() override;
-
  private:
-  AssetHandle<Texture2DSource> handle_;
+  void LoadTexture() override;
+
+  AssetHandle<Texture2DSource> source_;
 };

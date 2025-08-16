@@ -26,16 +26,19 @@ Buffer::Buffer(Buffer&& buffer) noexcept : context_(buffer.context_) {
   (*this) = std::move(buffer);
 }
 
-Buffer& Buffer::operator=(Buffer&& buffer) noexcept {
-  max_size_ = buffer.max_size_;
-  buffer_id_ = buffer.buffer_id_;
-  type_ = buffer.type_;
-  usage_ = buffer.usage_;
+Buffer& Buffer::operator=(Buffer&& other) noexcept {
+  if (this != &other) {
+    max_size_ = other.max_size_;
+    buffer_id_ = other.buffer_id_;
+    type_ = other.type_;
+    usage_ = other.usage_;
 
-  buffer.max_size_ = 0;
-  buffer.buffer_id_ = 0;
-  buffer.type_ = 0;
-  buffer.usage_ = 0;
+    other.max_size_ = 0;
+    other.buffer_id_ = 0;
+    other.type_ = 0;
+    other.usage_ = 0;
+  }
+
   return *this;
 }
 

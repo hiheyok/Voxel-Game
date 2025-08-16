@@ -3,8 +3,9 @@
 #include "RenderEngine/UI/Data/UserInterfaceData.h"
 #include "RenderEngine/UI/Widgets/Widget.h"
 
-Screen::Screen(ScreenManager& screen_mgr, glm::vec2 v_res)
-    : screen_mgr_{screen_mgr},
+Screen::Screen(GameContext& context, ScreenManager& screen_mgr, glm::vec2 v_res)
+    : context_{context},
+      screen_mgr_{screen_mgr},
       v_res_{v_res},
       root_widget_{std::make_unique<Widget>()} {
   root_widget_->manager_ = &screen_mgr;
@@ -30,7 +31,7 @@ void Screen::SubmitToRenderer(UIRenderer& renderer) {
 
 glm::vec2 Screen::GetVirtualRes() const noexcept { return v_res_; }
 
-void Screen::ChangeVirtualRes(glm::vec2 v_res) {
+void Screen::SetVirtualRes(glm::vec2 v_res) {
   assert(v_res != v_res_);
   v_res_ = v_res;
   root_widget_->SetOffsetMax(v_res);

@@ -17,7 +17,6 @@ bool LightStorage::operator==(const LightStorage& other) const noexcept {
 }
 
 void LightStorage::EditLight(BlockPos pos, uint8_t lighting_info) noexcept {
-  static constexpr uint64_t mask = kChunkDim - 1;
   size_t idx = pos.GetIndex();
   data_.Set(idx, lighting_info);
 }

@@ -8,13 +8,14 @@
 #include <vector>
 
 struct UIVertexFormat {
-  float x_ = 0.0, y_ = 0.0;
-  float r_ = 1.0, g_ = 1.0, b_ = 1.0, a_ = 0.0;
-
+  float x_ = 0.0f, y_ = 0.0f;
+  float u_ = 0.0f, v_ = 0.0f;
+  float r_ = 1.0f, g_ = 1.0f, b_ = 1.0f, a_ = 0.0f;
+  int tex_idx_ = -1; // -1 default for no texture
   friend std::ostream& operator<<(std::ostream& s, const UIVertexFormat& obj);
 };
 
-static_assert(sizeof(UIVertexFormat) == 4 * 6);
+static_assert(sizeof(UIVertexFormat) == 4 * 9);
 
 struct UIRectangle {
   UIRectangle() = default;
@@ -31,5 +32,6 @@ struct UIRectangle {
   glm::vec2 size_;
   glm::vec2 uv_beg_, uv_end_;
   glm::vec4 rgba_;  // TODO(hiheyok): later have it more specific to each corner
-  bool use_texture_ = false;
+  int tex_idx_ = -1;
+  uint64_t tex_handle_ = 0;
 };

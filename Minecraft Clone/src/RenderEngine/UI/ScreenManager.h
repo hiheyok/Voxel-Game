@@ -29,6 +29,7 @@ class ScreenManager {
   GameContext& context_;
   ScreenRegistry& screen_registry_;
   std::stack<std::unique_ptr<Screen>> screens_;
+  float ui_scaling_;
 };
 
 template <typename... Args>

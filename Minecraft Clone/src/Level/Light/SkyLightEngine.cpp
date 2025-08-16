@@ -147,9 +147,16 @@ void SkyLightEngine::PropagateChanges(const ChunkLightTask& tasks) {
 
   BlockPos chunk_offset = tasks.GetChunkPos().GetBlockPosOffset();
 
-  for (auto [x, z] : Product<2>(kChunkDim)) {
-    const size_t idx = x * kChunkDim + z;
+  size_t idx = 0;
+  const int x_beg = chunk_offset.x;
+  const int z_beg = chunk_offset.z;
+
+  const int x_end = chunk_offset.x + kChunkDim;
+  const int z_end = chunk_offset.z + kChunkDim;
+
+  for (auto [x, z] : Product<2>({{x_beg, x_end}, {z_beg, z_end}})) {
     if (heightmap_block_change_[idx] == INT8_MIN) {
+      idx++;
       continue;  // Nothing is changed
     }
 
@@ -157,12 +164,15 @@ void SkyLightEngine::PropagateChanges(const ChunkLightTask& tasks) {
     heightmap_block_change_[idx] = INT8_MIN;
 
     // Cast a shadow
-    int y = max_y;
-    BlockPos pos = BlockPos{x, y, z} + chunk_offset;
+    int y = max_y + chunk_offset.y;
+    BlockPos pos = {x, y, z};
     int max_propagation = TryPropagateSkylight(pos);
     pos.y = max_propagation;
 
     TryPropagateShadow(pos);
+
+    // Instead of multiplying to get index, increment by 1 instead
+    idx++;  // Propagation loops through z axis first then x axis
   }
 
   DelayIncrease();
@@ -205,7 +215,6 @@ int SkyLightEngine::TryPropagateSkylight(BlockPos block_pos) {
   }
 
   Chunk* curr_chunk = light_cache_->GetChunk(block_pos);
-  int curr_opacity = 0;
   BlockID curr_block;
 
   int local_x = block_pos.x & (kChunkDim - 1);

@@ -4,7 +4,7 @@
 
 class MainScreen : public Screen {
  public:
-  explicit MainScreen(ScreenManager&);
+  explicit MainScreen(GameContext&, ScreenManager&);
   ~MainScreen() override;
 
   // Initialize all of the widgets, component etc

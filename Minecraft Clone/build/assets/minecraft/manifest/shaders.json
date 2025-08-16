@@ -1,0 +1,67 @@
+{
+  "shaders": [ {
+    "name" : "ui_render",
+    "type" : "graphics",
+    "vertex" : "assets/minecraft/shaders/UI/vert.glsl",
+    "fragment" : "assets/minecraft/shaders/UI/frag.glsl"
+  },
+  {
+    "name" : "block_render",
+    "type" : "graphics",
+    "vertex" : "assets/minecraft/shaders/ItemRender/BlockModelVert.glsl",
+    "fragment" : "assets/minecraft/shaders/ItemRender/BlockModelFrag.glsl"
+  },
+  {
+    "name" : "atlas_stitch_shader",
+    "type" : "graphics",
+    "vertex" : "assets/minecraft/shaders/ItemRender/AtlasStitchVert.glsl",
+    "fragment" : "assets/minecraft/shaders/ItemRender/AtlasStitchFrag.glsl"
+  },
+  {
+    "name" : "font_background_render",
+    "type" : "graphics",
+    "vertex" : "assets/minecraft/shaders/Font/FontBackgroundVert.glsl",
+    "fragment" : "assets/minecraft/shaders/Font/FontBackgroundFrag.glsl"
+  },
+  {
+    "name" : "font_render",
+    "type" : "graphics",
+    "vertex" : "assets/minecraft/shaders/Font/FontVert.glsl",
+    "fragment" : "assets/minecraft/shaders/Font/FontFrag.glsl"
+  },
+  {
+    "name" : "fb_render",
+    "type" : "graphics",
+    "vertex" : "assets/minecraft/shaders/screen/vert.glsl",
+    "fragment" : "assets/minecraft/shaders/screen/frag.glsl"
+  },
+  {
+    "name" : "gui_render",
+    "type" : "graphics",
+    "vertex" : "assets/minecraft/shaders/GUI/GUIVert.glsl",
+    "fragment" : "assets/minecraft/shaders/GUI/GUIFrag.glsl"
+  },
+  {
+    "name" : "entity_render",
+    "type" : "graphics",
+    "vertex" : "assets/minecraft/shaders/Entity/MultiEntityVert.glsl",
+    "fragment" : "assets/minecraft/shaders/Entity/MultiEntityFrag.glsl"
+  },
+  {
+    "name" : "world_render",
+    "type" : "graphics",
+    "vertex" : "assets/minecraft/shaders/vert.glsl",
+    "fragment" : "assets/minecraft/shaders/frag.glsl"
+  },
+  {
+    "name" : "copy_shader",
+    "type" : "compute",
+    "compute" : "assets/minecraft/shaders/Buffers/CopyData.glsl"
+  },
+  {
+    "name" : "move_shader",
+    "type" : "compute",
+    "compute" : "assets/minecraft/shaders/Buffers/MoveData.glsl"
+  }
+  ]
+}

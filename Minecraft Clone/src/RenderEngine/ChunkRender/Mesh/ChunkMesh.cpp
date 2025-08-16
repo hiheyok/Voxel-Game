@@ -67,7 +67,6 @@ void Mesh::ChunkMeshData::GenerateCache() {
     dst_x += kCacheDim2D;
   }
 
-  BlockPos pos;
   for (auto side : Directions<ChunkPos>()) {
     int axis = side.GetAxis();
     int direction = side.GetDirection() & 0b1;
@@ -195,7 +194,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
               face_visibility[i] = 0;
               const Cuboid& element = curr_model.elements_[i];
 
-              if (element.faces_[back_side].reference_texture_.size() == 0)
+              if (element.faces_[back_side].reference_texture_.empty())
                 continue;
 
               if (element.faces_[back_side].cull_face_ != -1) {
@@ -213,7 +212,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
               face_visibility_back[i] = 0;
               const Cuboid& element = back_model.elements_[i];
 
-              if (element.faces_[front_side].reference_texture_.length() == 0)
+              if (element.faces_[front_side].reference_texture_.empty())
                 continue;
 
               if (element.faces_[front_side].cull_face_ != -1) {
@@ -299,6 +298,9 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
           }
 
           v += v_length;
+#if defined(__GNUC__) || defined(__clang__)
+          __builtin_prefetch(v_ptr + stride_v * 8, 0, 1);
+#endif
           v_ptr += v_length * stride_v;
           used_ptr += v_length;
         }

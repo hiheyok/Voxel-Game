@@ -35,7 +35,7 @@ class Position {
     z = pz;
   }
 
-  Derived& IncrementSide(int side, int val) noexcept {
+  constexpr Derived& IncrementSide(int side, int val) noexcept {
     const int direction = 1 - 2 * (side & 1);
     const int axis = side >> 1;
 
@@ -64,9 +64,7 @@ class Position {
 
   template <typename T>  // Division will floor the nums
   [[nodiscard]] constexpr Derived operator/(const T& other) const noexcept {
-    return Derived{floor(static_cast<double>(x) / other),
-                   floor(static_cast<double>(y) / other),
-                   floor(static_cast<double>(z) / other)};
+    return Derived{FloorDiv(x, other), FloorDiv(y, other), FloorDiv(z, other)};
   }
 
   template <typename T>
@@ -105,7 +103,7 @@ class Position {
     x <<= other;
     y <<= other;
     z <<= other;
-    return *this;
+    return *static_cast<Derived*>(this);
   }
 
   template <typename T>
@@ -114,7 +112,7 @@ class Position {
     x >>= other;
     y >>= other;
     z >>= other;
-    return *this;
+    return *static_cast<Derived*>(this);
   }
 
   template <typename T>
@@ -123,7 +121,7 @@ class Position {
     x &= other;
     y &= other;
     z &= other;
-    return *this;
+    return *static_cast<Derived*>(this);
   }
 
   template <typename T>
@@ -132,7 +130,7 @@ class Position {
     x ^= other;
     y ^= other;
     z ^= other;
-    return *this;
+    return *static_cast<Derived*>(this);
   }
 
   template <typename T>
@@ -141,7 +139,7 @@ class Position {
     x |= other;
     y |= other;
     z |= other;
-    return *this;
+    return *static_cast<Derived*>(this);
   }
 
   template <typename T>
@@ -149,7 +147,7 @@ class Position {
     x *= other;
     y *= other;
     z *= other;
-    return *this;
+    return *static_cast<Derived*>(this);
   }
 
   friend std::ostream& operator<<(std::ostream& os,
@@ -178,7 +176,7 @@ class Position {
     x -= other.x;
     y -= other.y;
     z -= other.z;
-    return *this;
+    return *static_cast<Derived*>(this);
   }
 
   constexpr Position<Derived>& operator+=(
@@ -186,7 +184,7 @@ class Position {
     x += other.x;
     y += other.y;
     z += other.z;
-    return *this;
+    return *static_cast<Derived*>(this);
   }
 
   constexpr Position<Derived>& operator*=(
@@ -194,15 +192,15 @@ class Position {
     x *= other.x;
     y *= other.y;
     z *= other.z;
-    return *this;
+    return *static_cast<Derived*>(this);
   }
 
   constexpr Position<Derived>& operator/=(
       const Position<Derived>& other) noexcept {
-    x = static_cast<int>(floor(static_cast<double>(x) / other.x));
-    y = static_cast<int>(floor(static_cast<double>(y) / other.y));
-    z = static_cast<int>(floor(static_cast<double>(z) / other.z));
-    return *this;
+    x = FloorDiv(x, other.x);
+    y = FloorDiv(y, other.y);
+    z = FloorDiv(z, other.z);
+    return *static_cast<Derived*>(this);
   }
 
   [[nodiscard]] constexpr size_t hash() const noexcept {
@@ -227,6 +225,13 @@ class Position {
     };  // keeps .x .y .z syntax
     int v[3];  // allows operator[](i) and vector load
   };
+
+ private:
+  static constexpr int FloorDiv(int x, int y) noexcept {
+    int q = x / y;
+    int r = x % y;
+    return q - (r != 0) * (x < 0 != y < 0);
+  }
 };
 
 // Define a concept to identify types that follow the CRTP pattern with Position

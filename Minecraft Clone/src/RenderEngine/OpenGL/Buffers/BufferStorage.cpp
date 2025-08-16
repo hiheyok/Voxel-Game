@@ -13,6 +13,29 @@
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "Utils/LogUtils.h"
 
+namespace {
+const char* glErrorToString(GLenum err) {
+  switch (err) {
+    case GL_INVALID_ENUM:
+      return "GL_INVALID_ENUM";
+    case GL_INVALID_VALUE:
+      return "GL_INVALID_VALUE";
+    case GL_INVALID_OPERATION:
+      return "GL_INVALID_OPERATION";
+    case GL_STACK_OVERFLOW:
+      return "GL_STACK_OVERFLOW";
+    case GL_STACK_UNDERFLOW:
+      return "GL_STACK_UNDERFLOW";
+    case GL_OUT_OF_MEMORY:
+      return "GL_OUT_OF_MEMORY";
+    case GL_INVALID_FRAMEBUFFER_OPERATION:
+      return "GL_INVALID_FRAMEBUFFER_OPERATION";
+    default:
+      return "Unknown OpenGL Error";
+  }
+}
+}
+
 BufferStorage::BufferStorage(GameContext& context, GLuint bufferTarget,
                              uint64_t size, bool dynamic, const void* data)
     : context_{context},
@@ -46,10 +69,7 @@ BufferStorage::BufferStorage(GameContext& context, GLuint bufferTarget,
   // Check for OpenGL errors after buffer storage creation
   GLenum err;
   if ((err = glGetError()) != GL_NO_ERROR) {
-    throw std::runtime_error(
-        "BufferStorage::Create - " +
-        std::string(
-            "OpenGL error after glBufferStorage: "));  // std::string(err)
+    LOG_ERROR("OpenGL error after glBufferStorage: {}", glErrorToString(err));
   }
 
   LOG_INFO(

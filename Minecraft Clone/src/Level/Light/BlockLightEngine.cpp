@@ -25,8 +25,16 @@ void BlockLightEngine::LightChunk(ChunkPos chunk_pos) {
   task.SetDirection(kAllDirections);
   BlockPos chunk_offset = chunk_pos.GetBlockPosOffset();
 
-  for (auto [x, y, z] : Product<3>(kChunkDim)) {
-    BlockPos block_pos = BlockPos{x, y, z} + chunk_offset;
+  int x0 = chunk_offset.x;
+  int y0 = chunk_offset.y;
+  int z0 = chunk_offset.z;
+
+  int x1 = chunk_offset.x + kChunkDim;
+  int y1 = chunk_offset.y + kChunkDim;
+  int z1 = chunk_offset.z + kChunkDim;
+
+  for (auto [x, y, z] : Product<3>({{x0, x1}, {y0, y1}, {z0, z1}})) {
+    BlockPos block_pos{x, y, z};
     BlockID block = GetBlock(block_pos);
 
     int block_emission = properties_[block].light_emission;
@@ -41,7 +49,7 @@ void BlockLightEngine::LightChunk(ChunkPos chunk_pos) {
   CheckNeighborChunk(chunk_pos);
   PropagateIncrease();
   ResetIncreaseQueue();
-  light_cache_ = 0;
+  light_cache_ = nullptr;
 }
 void BlockLightEngine::CheckNeighborChunk(ChunkPos center_chunk_pos) {
   assert(CheckChunk(center_chunk_pos));

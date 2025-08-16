@@ -38,7 +38,6 @@ class Widget {
   void TryUpdateLayout(const UIRectangle& parent);
   void SetBranchDirty() noexcept;
 
-
   void SubmitToRenderer(UIRenderer& renderer);
   bool OnEvent(const InputManager&);
   void AddCallback();
@@ -58,8 +57,7 @@ class Widget {
 
   void SetChildDirty();
   void SetScreenManager(ScreenManager* manager) noexcept;
-  void GetGeometry(std::vector<UIVertexFormat>& vertices,
-                   std::vector<uint32_t>& indices);
+  void GetPrimitives(std::vector<UIRectangle>& primitives);
 
   UIRectangle screen_;
 

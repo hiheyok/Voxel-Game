@@ -9,13 +9,14 @@
 #include "Core/Typenames.h"
 
 class Screen;
+class GameContext;
 
 template <typename T>
 concept ScreenType = std::is_base_of_v<Screen, std::decay_t<T>>;
 
 class ScreenRegistry {
  public:
-  ScreenRegistry() = default;
+  explicit ScreenRegistry(GameContext&);
 
   template <ScreenType, typename... ContextArgs>
   void RegisterScreen(const std::string& screen_name);
@@ -25,6 +26,7 @@ class ScreenRegistry {
                                        Args&&... args) const;
 
  private:
+  GameContext& context_;
   FastHashMap<std::string, std::any> screens_;
 };
 
@@ -37,8 +39,9 @@ void ScreenRegistry::RegisterScreen(const std::string& screen_name) {
   }
 
   std::function<std::unique_ptr<Screen>(ContextArgs...)> factory =
-      [](ContextArgs... args) -> std::unique_ptr<Screen> {
-    return std::make_unique<TScreen>(std::forward<ContextArgs>(args)...);
+      [&](ContextArgs... args) -> std::unique_ptr<Screen> {
+    return std::make_unique<TScreen>(context_,
+                                     std::forward<ContextArgs>(args)...);
   };
 
   screens_[screen_name] = factory;

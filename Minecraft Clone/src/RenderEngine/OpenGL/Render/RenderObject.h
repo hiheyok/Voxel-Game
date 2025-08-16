@@ -16,6 +16,7 @@
 class GameContext;
 class Shader;
 class TextureV2;
+class Buffer;
 
 /*
 Top abstract class for OpenGL Rendeirng
@@ -41,6 +42,7 @@ class RenderObject {
   void SetTexture2D(int index, int id, const std::string& name);
 
   void SetTexture(int idx, RenderHandle<TextureV2> handle);
+  void BindSSBO(int locatiom, Buffer);
 
  protected:
   static constexpr size_t GetDataTypeSize(uint32_t data_type) {

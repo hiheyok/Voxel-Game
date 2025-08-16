@@ -5,16 +5,16 @@
 #include "Utils/LogUtils.h"
 
 Texture2DV2::Texture2DV2(GameContext& context, const std::string& key,
-                         AssetHandle<Texture2DSource> handle)
-    : Texture2DBase{context, key, GL_TEXTURE_2D}, handle_{handle} {}
+                         AssetHandle<Texture2DSource> source)
+    : Texture2DBase{context, key}, source_{source} {}
 
 Texture2DV2::~Texture2DV2() = default;
 
-void Texture2DV2::Load() {
+void Texture2DV2::LoadTexture() {
   glBindTexture(target_, id_);
-  glTexImage2D(target_, 0, handle_->GetFormat(), handle_->GetWidth(),
-               handle_->GetHeight(), 0, handle_->GetFormat(), GL_UNSIGNED_BYTE,
-               handle_->GetData());
+  glTexImage2D(target_, 0, source_->GetFormat(), source_->GetWidth(),
+               source_->GetHeight(), 0, source_->GetFormat(), GL_UNSIGNED_BYTE,
+               source_->GetData());
 
   glGenerateMipmap(target_);
   glTexParameteri(target_, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -23,6 +23,6 @@ void Texture2DV2::Load() {
   glTexParameteri(target_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
   LOG_DEBUG("Loaded 2D Texture: {}", id_);
-  width_ = handle_->GetWidth();
-  height_ = handle_->GetHeight();
+  width_ = source_->GetWidth();
+  height_ = source_->GetHeight();
 }

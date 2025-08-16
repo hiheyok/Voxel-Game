@@ -2,6 +2,8 @@
 
 #include <gl/glew.h>
 
+#include <cstdint>
+
 #include "RenderEngine/RenderResources/RenderResource.h"
 
 class GameContext;
@@ -15,12 +17,18 @@ class TextureV2 : public RenderResource {
 
   GLuint GetId() const noexcept;
   GLenum GetTarget() const noexcept;
+  GLuint64 GetHandle() const noexcept;
+
+  void Load() override;
 
  protected:
   TextureV2(GameContext& context, const std::string& key, GLenum target);
+
+  virtual void LoadTexture() = 0;
 
   GameContext& context_;
 
   GLuint id_;
   GLenum target_;
+  GLuint64 handle_;
 };

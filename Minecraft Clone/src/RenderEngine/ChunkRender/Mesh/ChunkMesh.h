@@ -128,7 +128,7 @@ class ChunkMeshData {
   static constexpr int kChunkStrideZ = 1;
   static constexpr int kChunkStride[3]{kChunkStrideX, kChunkStrideY,
                                        kChunkStrideZ};
-  std::array<BlockID, kCacheDim3D> chunk_cache_;
+  alignas(64) std::array<BlockID, kCacheDim3D> chunk_cache_;
   Chunk* chunk_;
 };
 }  // namespace Mesh

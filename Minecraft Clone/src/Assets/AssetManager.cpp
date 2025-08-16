@@ -4,6 +4,7 @@
 
 #include "Assets/Types/ShaderSource.h"
 #include "Assets/Types/Texture/Texture2DSource.h"
+#include "Assets/Types/Texture/TextureAtlasSource.h"
 #include "Core/GameContext/GameContext.h"
 #include "Core/IO/FileUtils.h"
 
@@ -22,8 +23,17 @@ AssetHandle<Texture2DSource> AssetManager::GetTexture2DSource(std::string key) {
   return GetAsset<Texture2DSource>(key);
 }
 
-std::vector<AssetHandle<Texture2DSource>> AssetManager::GetTexture2DSource() {
+std::vector<AssetHandle<Texture2DSource>>
+AssetManager::GetAllTexture2DSource() {
   return GetAllAsset<Texture2DSource>();
+}
+
+AssetHandle<TextureAtlasSource> AssetManager::GetAtlasSource(std::string key) {
+  return GetAsset<TextureAtlasSource>(key);
+}
+
+std::vector<AssetHandle<TextureAtlasSource>> AssetManager::GetAllAtlasSource() {
+  return GetAllAsset<TextureAtlasSource>();
 }
 
 void AssetManager::Initialize() {
@@ -39,12 +49,16 @@ void AssetManager::Load() {
   for (auto& [key, asset] : GetCache<Texture2DSource>()) {
     asset->Load();
   }
+
+  for (auto& [key, asset] : GetCache<TextureAtlasSource>()) {
+    asset->Load();
+  }
 }
 
 void AssetManager::DiscoverShaders() {
   using json = nlohmann::json;
 
-  const std::string manifest_path = "assets/manifest/shaders.json";
+  const std::string manifest_path = "assets/minecraft/manifest/shaders.json";
 
   std::vector<char> json_data =
       FileUtils::ReadFileToBuffer(context_, manifest_path);
@@ -59,7 +73,7 @@ void AssetManager::DiscoverShaders() {
   }
 
   if (!manifest.contains("shaders") || !manifest["shaders"].is_array()) {
-    LOG_WARN("Shader manifesst '{}' is missing a 'shaders' array",
+    LOG_WARN("Shader manifest '{}' is missing a 'shaders' array",
              manifest_path);
     return;
   }
@@ -126,4 +140,14 @@ void AssetManager::DiscoverTextures() {
                                "assets/minecraft/textures/colormap/light.png");
   CreateAsset<Texture2DSource>("widgets",
                                "assets/minecraft/textures/gui/widgets.png");
+
+  CreateAsset<TextureAtlasSource>("blocks",
+                                  "assets/minecraft/atlases/blocks.json");
+  CreateAsset<TextureAtlasSource>("gui", "assets/minecraft/atlases/gui.json");
+  CreateAsset<TextureAtlasSource>("paintings",
+                                  "assets/minecraft/atlases/paintings.json");
+  CreateAsset<TextureAtlasSource>("particles",
+                                  "assets/minecraft/atlases/particles.json");
+  CreateAsset<TextureAtlasSource>("signs",
+                                  "assets/minecraft/atlases/signs.json");
 }

@@ -10,7 +10,7 @@ class Texture2DBase : public TextureV2 {
   int GetHeight() const noexcept;
 
  protected:
-  Texture2DBase(GameContext& context, const std::string& key, GLenum target);
+  Texture2DBase(GameContext& context, const std::string& key);
 
   int width_;
   int height_;

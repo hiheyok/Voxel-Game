@@ -143,7 +143,7 @@ void LightEngineCache::ExpandDown() {
 }
 
 bool LightEngineCache::TryCacheChunk(ChunkPos pos) {
-  if (!world_.CheckChunk(pos)) {
+  if (!world_.CheckChunk(pos)) [[unlikely]] {
     return false;
   }
 

@@ -13,16 +13,26 @@ TextureSource::TextureSource(GameContext& context, const std::string& asset_key)
 
 TextureSource::~TextureSource() = default;
 
-int TextureSource::GetWidth() const noexcept { return image_size_.x; }
-
-int TextureSource::GetHeight() const noexcept { return image_size_.y; }
-
 int TextureSource::GetFormat() const noexcept { return format_; }
 
-std::unique_ptr<TextureSource::TextureData> TextureSource::LoadTexture(
+TextureSource::TextureData TextureSource::LoadTexture(
     const std::string& filepath) {
-  return std::make_unique<TextureData>(context_, filepath);
+  return {context_, filepath};
 }
+
+int TextureSource::GetFormat(int channel) noexcept {
+  switch (channel) {
+    case 1:
+      return GL_RED;
+    case 2:
+      return GL_RG;
+    case 3:
+      return GL_RGB;
+    case 4:
+      return GL_RGBA;
+  }
+}
+
 
 TextureSource::TextureData::TextureData(GameContext& context,
                                         const std::string& filepath) {
@@ -69,7 +79,41 @@ TextureSource::TextureData::TextureData(GameContext& context,
 TextureSource::TextureData::~TextureData() {
   if (data_) {
     stbi_image_free(data_);
+    data_ = nullptr;
   }
+}
+
+TextureSource::TextureData::TextureData() = default;
+
+TextureSource::TextureData::TextureData(TextureData&& other) noexcept
+    : data_(other.data_),
+      img_size_(other.img_size_),
+      format_(other.format_),
+      channels_(other.channels_),
+      success_(other.success_) {
+  other.data_ = nullptr;
+  other.img_size_ = {0, 0};
+  other.format_ = 0;
+  other.channels_ = 0;
+  other.success_ = 0;
+}
+
+TextureSource::TextureData& TextureSource::TextureData::operator=(
+    TextureData&& other) noexcept {
+  if (this != &other) {
+    data_ = std::move(other.data_);
+    img_size_ = std::move(other.img_size_);
+    format_ = std::move(other.format_);
+    channels_ = std::move(other.channels_);
+    success_ = std::move(other.success_);
+
+    other.data_ = nullptr;
+    other.img_size_ = {0, 0};
+    other.format_ = 0;
+    other.channels_ = 0;
+    other.success_ = 0;
+  }
+  return *this;
 }
 
 size_t TextureSource::TextureData::GetSize() const noexcept {
@@ -103,6 +147,22 @@ int TextureSource::TextureData::GetChannels() const noexcept {
 }
 
 bool TextureSource::TextureData::IsSuccess() const noexcept { return success_; }
+
+glm::u8vec4 TextureSource::TextureData::GetPixel(int x, int y) const noexcept {
+  int stride_x = x * channels_;
+  int stride_y = y * img_size_.x * channels_;
+
+  glm::u8vec4 rgba;
+  for (int i = 0; i < channels_; ++i) {
+    rgba[i] = data_[stride_x + stride_y + i];
+  }
+
+  if (channels_ != 4) {
+    rgba.a = 255;
+  }
+
+  return rgba;
+}
 
 const uint8_t* TextureSource::TextureData::GetData() const noexcept {
   return data_;

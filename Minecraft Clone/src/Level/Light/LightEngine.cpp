@@ -85,10 +85,14 @@ void LightEngine<kEngineType>::PropagateIncrease() {
   const std::vector<BlockProperties>& block_properties =
       context_.blocks_->GetBlockPropertyList();
 
+  BlockPos block_pos;
+  int direction;
+  int propagation_lvl;
+
   while (TryDequeueIncrease(task)) {
-    BlockPos block_pos = task.GetBlockPos();
-    int direction = task.GetDirection();
-    int propagation_lvl = task.GetLightLevel();
+    block_pos = task.GetBlockPos();
+    direction = task.GetDirection();
+    propagation_lvl = task.GetLightLevel();
 
     // Light level already changed from somewhere else
     if (task.GetRecheckLight() && propagation_lvl != GetLightLvl(block_pos)) {
@@ -96,8 +100,10 @@ void LightEngine<kEngineType>::PropagateIncrease() {
     }
 
     for (auto propagation : Directions<BlockPos>()) {
-      if (kEngineType == EngineType::kSkyLight && propagation == kUpDirection) {
-        continue;
+      if constexpr (kEngineType == EngineType::kSkyLight) {
+        if (propagation == kUpDirection) {
+          continue;
+        }
       }
 
       if (direction != kAllDirections &&
@@ -116,7 +122,7 @@ void LightEngine<kEngineType>::PropagateIncrease() {
       int curr_lvl = GetLightLvl(offset_pos);
 
       if (curr_lvl >= propagation_lvl - 1) {
-        [[unlikely]] continue;
+        continue;
       }
 
       BlockID offset_block = GetBlock(offset_pos);
@@ -132,7 +138,7 @@ void LightEngine<kEngineType>::PropagateIncrease() {
 
       // If target lvl is <= 1, then its not going to be able to spread and
       // value is already set
-      if (target_lvl > 1) {
+      if (target_lvl > 1) [[likely]] {
         next_task.SetBlockPos(offset_pos);
         next_task.SetLightLevel(target_lvl);
         next_task.SetDirection(propagation);
@@ -155,15 +161,15 @@ void LightEngine<kEngineType>::PropagateDecrease() {
     for (auto propagation : Directions<BlockPos>()) {
       BlockPos offset_pos = block_pos + propagation;
       // Chunk doesnt exist
-      if (!light_cache_->CheckChunk(offset_pos)) {
-        [[unlikely]] continue;
+      if (!light_cache_->CheckChunk(offset_pos)) [[unlikely]] {
+        continue;
       }
 
       int curr_lvl = GetLightLvl(offset_pos);
 
       // Area is already dark
       if (curr_lvl == 0) {
-        [[unlikely]] continue;
+        continue;
       }
 
       // If neighbor is dimmer, it might have been lit by the removed light.
@@ -192,7 +198,7 @@ void LightEngine<kEngineType>::PropagateDecrease() {
 
 template <EngineType kEngineType>
 void LightEngine<kEngineType>::EnqueueIncrease(InternalTask task) {
-  if (enqueue_increase_pos_ >= increase_queue_.size()) {
+  if (enqueue_increase_pos_ >= increase_queue_.size()) [[unlikely]] {
     EnlargeIncreaseQueue();
   }
   increase_queue_[enqueue_increase_pos_++] = task;
@@ -200,7 +206,7 @@ void LightEngine<kEngineType>::EnqueueIncrease(InternalTask task) {
 
 template <EngineType kEngineType>
 void LightEngine<kEngineType>::EnqueueDecrease(InternalTask task) {
-  if (enqueue_decrease_pos_ >= decrease_queue_.size()) {
+  if (enqueue_decrease_pos_ >= decrease_queue_.size()) [[unlikely]] {
     EnlargeDecreaseQueue();
   }
   decrease_queue_[enqueue_decrease_pos_++] = task;
@@ -242,14 +248,18 @@ bool LightEngine<kEngineType>::IsDecreaseEmpty() const noexcept {
 
 template <EngineType kEngineType>
 bool LightEngine<kEngineType>::TryDequeueIncrease(InternalTask& task) noexcept {
-  if (IsIncreaseEmpty()) return false;
+  if (IsIncreaseEmpty()) [[unlikely]] {
+    return false;
+  }
   task = DequeueIncrease();
   return true;
 }
 
 template <EngineType kEngineType>
 bool LightEngine<kEngineType>::TryDequeueDecrease(InternalTask& task) noexcept {
-  if (IsDecreaseEmpty()) return false;
+  if (IsDecreaseEmpty()) [[unlikely]] {
+    return false;
+  }
   task = DequeueDecrease();
   return true;
 }

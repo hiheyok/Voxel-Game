@@ -92,7 +92,31 @@ void Widget::SubmitToRenderer(UIRenderer& renderer) {
   std::vector<UIVertexFormat> vertices;
   std::vector<uint32_t> indices;
 
-  GetGeometry(vertices, indices);
+  std::vector<UIRectangle> primitives;
+  GetPrimitives(primitives);
+
+  // Populate handle idx
+  GLuint64 curr_handle = 0;
+  size_t idx = -1;
+
+  for (auto& rect : primitives) {
+    if (rect.tex_handle_ != curr_handle && rect.tex_handle_ != 0) {
+      curr_handle = rect.tex_handle_;
+      idx = renderer.FindOrPutHandleIdx(curr_handle);
+    }
+
+    if (rect.tex_handle_ == 0) {
+      curr_handle = 0;
+      idx = -1;
+    }
+
+    rect.tex_idx_ = idx;
+  }
+
+  for (const auto& rect : primitives) {
+    rect.GetVertices(vertices, indices);
+  }
+
   renderer.Submit(vertices, indices);
 
   for (auto& child : children_) {
@@ -128,9 +152,8 @@ void Widget::SetScreenManager(ScreenManager* manager) noexcept {
   }
 }
 
-void Widget::GetGeometry(std::vector<UIVertexFormat>& vertices,
-                         std::vector<uint32_t>& indices) {
-  std::vector<UIRectangle> primitives;
+void Widget::GetPrimitives(std::vector<UIRectangle>& primitives) {
+  size_t beg = primitives.size();
 
   for (const auto& component : components_) {
     component->GetRectangles(primitives);
@@ -140,12 +163,9 @@ void Widget::GetGeometry(std::vector<UIVertexFormat>& vertices,
   glm::vec2 base_pos = screen_.pos_;
   glm::vec2 base_size = screen_.size_;
 
-  for (auto& rect : primitives) {
+  for (size_t i = beg; i < primitives.size(); ++i) {
+    UIRectangle& rect = primitives[i];
     rect.pos_ = base_pos + base_size * rect.pos_;
     rect.size_ *= screen_.size_;
-  }
-
-  for (const auto& rect : primitives) {
-    rect.GetVertices(vertices, indices);
   }
 }

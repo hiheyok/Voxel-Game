@@ -13,7 +13,7 @@ class InputManager;
 
 class UIManager {
  public:
-  UIManager(GameContext&, InputManager& input_mgr);
+  explicit UIManager(GameContext&, InputManager& input_mgr);
   ~UIManager();
 
   // Populate the screen registry

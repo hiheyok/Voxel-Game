@@ -237,6 +237,10 @@ void Window::InitializeGLEW() {
   std::stringstream str;
   str << "OpenGL Version: " << glGetString(GL_VERSION);
   LOG_INFO("{}",str.str());
+
+  if (!GL_ARB_bindless_texture) {
+    return;
+  }
 }
 
 void Window::InitializeDebugCallback() {

@@ -3,14 +3,14 @@
 #include <memory>
 #include <string>
 
-#include "Assets/Types/Texture/TextureSource.h"
+#include "Assets/Types/Texture/Texture2DBaseSource.h"
 
 class GameContext;
 /*
 RenderResourceManager will take this handle and use it to upload the texture to
 the GPU
 */
-class Texture2DSource : public TextureSource {
+class Texture2DSource : public Texture2DBaseSource {
  public:
   Texture2DSource(GameContext& context, const std::string& asset_key,
                   const std::string& path);
@@ -21,6 +21,6 @@ class Texture2DSource : public TextureSource {
   const uint8_t* GetData() const noexcept override;
 
  private:
-  std::unique_ptr<TextureSource::TextureData> img_data_;
+  TextureData img_data_;
   std::string filepath;
 };

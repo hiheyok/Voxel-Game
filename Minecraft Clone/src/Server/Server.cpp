@@ -20,7 +20,11 @@
 #include "Utils/Timer/Timer.h"
 
 Server::Server(GameContext& context) : context_{context} {}
-Server::~Server() = default;
+Server::~Server() {
+  if (!stop_) {
+    Stop();
+  }
+}
 
 void Server::StartServer(ServerSettings serverSettings) {
   level_ = std::make_unique<Level>(context_);

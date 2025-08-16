@@ -14,6 +14,7 @@ concept IsAsset = std::is_base_of_v<Asset, std::decay_t<T>>;
 
 class ShaderSource;
 class Texture2DSource;
+class TextureAtlasSource;
 
 class AssetManager {
  public:
@@ -24,7 +25,10 @@ class AssetManager {
   std::vector<AssetHandle<ShaderSource>> GetAllShaderSource();
 
   AssetHandle<Texture2DSource> GetTexture2DSource(std::string key);
-  std::vector<AssetHandle<Texture2DSource>> GetTexture2DSource();
+  std::vector<AssetHandle<Texture2DSource>> GetAllTexture2DSource();
+
+  AssetHandle<TextureAtlasSource> GetAtlasSource(std::string key);
+  std::vector<AssetHandle<TextureAtlasSource>> GetAllAtlasSource();
 
   // This will load in all of the keys
   void Initialize();
@@ -56,6 +60,7 @@ class AssetManager {
 
   FastHashMap<std::string, std::unique_ptr<ShaderSource>> shader_cache_;
   FastHashMap<std::string, std::unique_ptr<Texture2DSource>> texture2d_cache_;
+  FastHashMap<std::string, std::unique_ptr<TextureAtlasSource>> atlas_cache_;
 };
 
 template <IsAsset T>
@@ -67,6 +72,8 @@ AssetManager::GetCache() noexcept {
     return shader_cache_;
   } else if constexpr (std::is_same_v<Texture2DSource, Type>) {
     return texture2d_cache_;
+  } else if constexpr (std::is_same_v<TextureAtlasSource, Type>) {
+    return atlas_cache_;
   } else {
     static_assert(std::is_void_v<Type>,
                   "AssetManager::GetCache: Unsupported asset type requested.");

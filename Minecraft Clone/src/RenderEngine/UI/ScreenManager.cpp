@@ -5,7 +5,7 @@
 
 ScreenManager::ScreenManager(GameContext& context,
                              ScreenRegistry& screen_registry)
-    : context_{context}, screen_registry_{screen_registry} {}
+    : context_{context}, screen_registry_{screen_registry}, ui_scaling_{3.0f} {}
 ScreenManager::~ScreenManager() = default;
 
 void ScreenManager::PopScreen() {
@@ -23,5 +23,5 @@ void ScreenManager::SubmitToRenderer(UIRenderer& ui_renderer) {
 }
 
 void ScreenManager::ChangeVirtualRes(glm::vec2 v_res) {
-  screens_.top()->ChangeVirtualRes(v_res);
+  screens_.top()->SetVirtualRes(v_res / ui_scaling_);
 }
