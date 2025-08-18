@@ -7,8 +7,8 @@
 #include "Level/Block/Blocks.h"
 #include "Level/Dimension/Dimension.h"
 #include "Level/Event/EventHandler.h"
-#include "RenderEngine/BlockModel/ModelLoader.h"
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
+#include "RenderEngine/Models/Block/BlockModelLoader.h"
 
 Fluid::Fluid(GameContext& context, int spread_rate) : Block{context} {
   properties_->is_solid_ = false;
@@ -19,7 +19,7 @@ Fluid::Fluid(GameContext& context, int spread_rate) : Block{context} {
 }
 
 std::unique_ptr<BlockModel> Fluid::InitializeBlockModel(
-    ModelLoader& modelLoader) {
+    BlockModelLoader& modelLoader) {
   (void)modelLoader;
   auto tokens = Tokenize(block_name_, ':');
   std::unique_ptr<BlockModel> block_model = std::make_unique<BlockModel>();

@@ -192,10 +192,10 @@
     <ClCompile Include="src\Level\Chunk\Heightmap\Heightmap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\BlockModel\ModelLoader.cpp">
+    <ClCompile Include="src\RenderEngine\Models\Block\BlockModelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\BlockModel\BlockModels.cpp">
+    <ClCompile Include="src\RenderEngine\Models\Block\BlockModels.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\ChunkRender\Mesh\ChunkMesh.cpp">
@@ -351,7 +351,7 @@
     <ClCompile Include="src\Level\Dimension\Dimensions\Overworld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\BlockModel\BlockModelManager.cpp">
+    <ClCompile Include="src\RenderEngine\Models\Block\BlockModelManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexFormat.cpp">
@@ -484,6 +484,36 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\RenderEngine\UI\Screens\PlayerHud.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\Models\Item\ModelEvaluators\BundleSelectedItemEvaluator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\Models\Item\ModelEvaluators\CompositeEvaluator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\Models\Item\ModelEvaluators\ConditionEvaluator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\Models\Item\ModelEvaluators\EmptyEvaluator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\Models\Item\ModelEvaluators\Evaluator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\Models\Item\ModelEvaluators\ModelEvaluator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\Models\Item\ModelEvaluators\RangeDispatchEvaluator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\Models\Item\ModelEvaluators\SelectEvaluator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\Models\Item\ModelEvaluators\SpecialEvaluator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderEngine\Models\Item\ItemModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -749,7 +779,7 @@
     <ClInclude Include="src\RenderEngine\BlockModel\RectangularModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\BlockModel\BlockModels.h">
+    <ClInclude Include="src\RenderEngine\Models\Block\BlockModels.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Registry\Registry.h">
@@ -818,7 +848,7 @@
     <ClInclude Include="src\Level\TerrainGeneration\MapGen\MapGenBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\BlockModel\ModelLoader.h">
+    <ClInclude Include="src\RenderEngine\Models\Block\BlockModelLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\ChunkRender\Mesh\ChunkMesh.h">
@@ -971,7 +1001,7 @@
     <ClInclude Include="src\RenderEngine\OpenGL\Render\RenderDrawElements.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\BlockModel\BlockModelManager.h">
+    <ClInclude Include="src\RenderEngine\Models\Block\BlockModelManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexFormat.h">
@@ -1146,6 +1176,42 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\RenderEngine\UI\Screens\PlayerHud.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\Property\PropertyValueProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\BundleSelectedItemEvaluator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\CompositeEvaluator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\ConditionEvaluator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\EmptyEvaluator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\Evaluator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\ModelEvaluator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\RangeDispatchEvaluator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\SelectEvaluator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\SpecialEvaluator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderEngine\Models\Item\ItemModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\DataStructure\BijectiveMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

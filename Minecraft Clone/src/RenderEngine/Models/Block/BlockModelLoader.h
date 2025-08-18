@@ -7,21 +7,21 @@
 #include <vector>
 
 #include "Core/Typenames.h"
-#include "RenderEngine/BlockModel/BlockModels.h"
+#include "RenderEngine/Models/Block/BlockModels.h"
 
 class GameContext;
 class ResourceLocation;
 
-class ModelLoader {
+class BlockModelLoader {
  public:
-  explicit ModelLoader(GameContext&);
-  ~ModelLoader();
+  explicit BlockModelLoader(GameContext&);
+  ~BlockModelLoader();
 
-  ModelLoader(const ModelLoader&) = delete;
-  ModelLoader& operator=(const ModelLoader&) = delete;
+  BlockModelLoader(const BlockModelLoader&) = delete;
+  BlockModelLoader& operator=(const BlockModelLoader&) = delete;
 
-  ModelLoader(ModelLoader&&) = delete;
-  ModelLoader& operator=(ModelLoader&&) = delete;
+  BlockModelLoader(BlockModelLoader&&) = delete;
+  BlockModelLoader& operator=(BlockModelLoader&&) = delete;
 
   std::unique_ptr<BlockModel> GetModel(const ResourceLocation& location);
 

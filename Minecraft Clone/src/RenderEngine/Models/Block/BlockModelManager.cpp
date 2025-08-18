@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
-#include "RenderEngine/BlockModel/BlockModelManager.h"
+#include "RenderEngine/Models/Block/BlockModelManager.h"
 
 #include <cstdint>
 #include <memory>
@@ -10,8 +10,8 @@
 #include "Core/GameContext/GameContext.h"
 #include "FileManager/Files.h"
 #include "Level/Block/Blocks.h"
-#include "RenderEngine/BlockModel/BlockModels.h"
-#include "RenderEngine/BlockModel/ModelLoader.h"
+#include "RenderEngine/Models/Block/BlockModels.h"
+#include "RenderEngine/Models/Block/BlockModelLoader.h"
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
 #include "RenderEngine/OpenGL/Texture/Types/Texture2DOld.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
@@ -20,7 +20,7 @@
 BlockModelManager::BlockModelManager(GameContext& context)
     : context_{context},
       is_loaded_{false},
-      model_loader_{std::make_unique<ModelLoader>(context)} {}
+      model_loader_{std::make_unique<BlockModelLoader>(context)} {}
 BlockModelManager::~BlockModelManager() = default;
 
 void BlockModelManager::LoadModels() {

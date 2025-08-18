@@ -13,6 +13,6 @@ struct Fluid : Block {
   FluidProperties fluid_properties_;
   // Use custom block model for fluids
   std::unique_ptr<BlockModel> InitializeBlockModel(
-      ModelLoader& modelLoader) override;
+      BlockModelLoader& modelLoader) override;
   void Tick(BlockPos pos, Dimension* currentWorld) override;
 };

@@ -9,7 +9,7 @@
 
 class Dimension;
 class BlockTextureAtlas;
-class ModelLoader;
+class BlockModelLoader;
 class GameContext;
 
 struct BlockModel;
@@ -37,7 +37,7 @@ class Block {
 
   // For client side
   virtual std::unique_ptr<BlockModel> InitializeBlockModel(
-      ModelLoader& modelLoader);
+      BlockModelLoader& modelLoader);
   void InitializeTexture(BlockTextureAtlas& textureAtlas);
 
   GameContext& context_;

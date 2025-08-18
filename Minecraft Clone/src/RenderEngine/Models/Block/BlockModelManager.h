@@ -9,7 +9,7 @@
 #include "RenderEngine/RenderResources/RenderHandle.h"
 
 class GameContext;
-class ModelLoader;
+class BlockModelLoader;
 class BlockTextureAtlas;
 class Texture2DV2;
 
@@ -32,7 +32,7 @@ class BlockModelManager {
  private:
   GameContext& context_;
   bool is_loaded_;
-  std::unique_ptr<ModelLoader> model_loader_;
+  std::unique_ptr<BlockModelLoader> model_loader_;
   std::unique_ptr<BlockTextureAtlas> block_texture_atlas_;
   RenderHandle<Texture2DV2> light_map_;
   std::vector<BlockModel> model_data_;

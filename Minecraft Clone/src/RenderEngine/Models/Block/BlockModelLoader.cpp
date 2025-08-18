@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
-#include "RenderEngine/BlockModel/ModelLoader.h"
+#include "RenderEngine/Models/Block/BlockModelLoader.h"
 
 #include <fstream>
 #include <iostream>
@@ -14,16 +14,16 @@
 #include "FileManager/Files.h"
 #include "Utils/LogUtils.h"
 
-ModelLoader::ModelLoader(GameContext& context) : context_{context} {}
-ModelLoader::~ModelLoader() = default;
+BlockModelLoader::BlockModelLoader(GameContext& context) : context_{context} {}
+BlockModelLoader::~BlockModelLoader() = default;
 
-std::unique_ptr<BlockModel> ModelLoader::GetModel(
+std::unique_ptr<BlockModel> BlockModelLoader::GetModel(
     const ResourceLocation& location) {
   std::unique_ptr<BlockModel> model = GetModelRecursive(location);
   return model;
 }
 
-std::unique_ptr<BlockModel> ModelLoader::GetModelRecursive(
+std::unique_ptr<BlockModel> BlockModelLoader::GetModelRecursive(
     const ResourceLocation& location) {
   // Checks if it exist in the cache first
   const auto& it = cache_.find(location);
@@ -101,8 +101,8 @@ std::unique_ptr<BlockModel> ModelLoader::GetModelRecursive(
   return model;
 }
 
-void ModelLoader::CacheModel(const ResourceLocation& location,
-                             const std::unique_ptr<BlockModel>& model) {
+void BlockModelLoader::CacheModel(const ResourceLocation& location,
+                                  const std::unique_ptr<BlockModel>& model) {
   // Check if the model is already cached
   const auto& it = cache_.find(location);
   if (it != cache_.find(location)) {
@@ -113,8 +113,8 @@ void ModelLoader::CacheModel(const ResourceLocation& location,
   }
 }
 
-void ModelLoader::ProcessModelDisplay(std::unique_ptr<BlockModel>& model,
-                                      const json& displays) {
+void BlockModelLoader::ProcessModelDisplay(std::unique_ptr<BlockModel>& model,
+                                           const json& displays) {
   for (const auto& [display_pos, info] : displays.items()) {
     BlockDisplay display;
     if (info.contains("rotation")) {
@@ -163,8 +163,8 @@ void ModelLoader::ProcessModelDisplay(std::unique_ptr<BlockModel>& model,
   }
 }
 
-void ModelLoader::UpdateModelElements(std::unique_ptr<BlockModel>& model,
-                                      const json& elements) {
+void BlockModelLoader::UpdateModelElements(std::unique_ptr<BlockModel>& model,
+                                           const json& elements) {
   for (const auto& element : elements) {
     Cuboid cuboid;
 
@@ -201,8 +201,8 @@ void ModelLoader::UpdateModelElements(std::unique_ptr<BlockModel>& model,
   }
 }
 
-void ModelLoader::ProcessCuboidTexture(std::unique_ptr<BlockModel>& model,
-                                       const json& textures) {
+void BlockModelLoader::ProcessCuboidTexture(std::unique_ptr<BlockModel>& model,
+                                            const json& textures) {
   for (const auto& [name, path] : textures.items()) {
     std::string texture_def = path.get<std::string>();
 
@@ -229,7 +229,8 @@ void ModelLoader::ProcessCuboidTexture(std::unique_ptr<BlockModel>& model,
   }
 }
 
-CuboidRotationInfo ModelLoader::GetRotationalData(const json& rotation_data) {
+CuboidRotationInfo BlockModelLoader::GetRotationalData(
+    const json& rotation_data) {
   CuboidRotationInfo rotation_info;
 
   if (rotation_data.contains("origin")) {
@@ -265,7 +266,7 @@ CuboidRotationInfo ModelLoader::GetRotationalData(const json& rotation_data) {
   return rotation_info;
 }
 
-void ModelLoader::ProcessSingleCubeFaces(Cuboid& cube, const json& faces) {
+void BlockModelLoader::ProcessSingleCubeFaces(Cuboid& cube, const json& faces) {
   for (const auto& [direction, face] : faces.items()) {
     BlockFace face_data;
     int face_idx = ConvertStringFaceToIndex(direction);
@@ -327,7 +328,7 @@ void ModelLoader::ProcessSingleCubeFaces(Cuboid& cube, const json& faces) {
   }
 }
 
-int ModelLoader::ConvertStringFaceToIndex(const std::string& str) {
+int BlockModelLoader::ConvertStringFaceToIndex(const std::string& str) {
   if (str == "down") {
     return kDownDirection;
   } else if (str == "up") {

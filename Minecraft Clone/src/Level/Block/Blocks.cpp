@@ -10,9 +10,9 @@
 #include "Core/GameContext/GameContext.h"
 #include "FileManager/Files.h"
 #include "Level/Block/Type/BlockTypes.h"
-#include "RenderEngine/BlockModel/BlockModels.h"
-#include "RenderEngine/BlockModel/ModelLoader.h"
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
+#include "RenderEngine/Models/Block/BlockModelLoader.h"
+#include "RenderEngine/Models/Block/BlockModels.h"
 #include "Utils/LogUtils.h"
 
 using json = nlohmann::json;

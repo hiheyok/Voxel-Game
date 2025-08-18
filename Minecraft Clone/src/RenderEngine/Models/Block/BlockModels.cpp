@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
-#include "RenderEngine/BlockModel/BlockModels.h"
+#include "RenderEngine/Models/Block/BlockModels.h"
 
 #include <string>
 #include <utility>

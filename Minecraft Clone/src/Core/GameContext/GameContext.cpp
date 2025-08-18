@@ -13,7 +13,7 @@
 #include "Level/Item/ItemTextureAtlas.h"
 #include "Level/Item/Items.h"
 #include "Level/TerrainGeneration/Generators/GeneratorType.h"
-#include "RenderEngine/BlockModel/BlockModelManager.h"
+#include "RenderEngine/Models/Block/BlockModelManager.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "Utils/LogUtils.h"
 

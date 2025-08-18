@@ -16,8 +16,8 @@
 #include "Level/Chunk/Chunk.h"
 #include "Level/Chunk/Palette.h"
 #include "Level/Light/LightStorage.h"
-#include "RenderEngine/BlockModel/BlockModelManager.h"
-#include "RenderEngine/BlockModel/BlockModels.h"
+#include "RenderEngine/Models/Block/BlockModelManager.h"
+#include "RenderEngine/Models/Block/BlockModels.h"
 #include "RenderEngine/ChunkRender/Mesh/BlockVertexFormat.h"
 #include "Utils/Timer/Timer.h"
 

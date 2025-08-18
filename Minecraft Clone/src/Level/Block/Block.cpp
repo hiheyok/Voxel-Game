@@ -4,9 +4,9 @@
 
 #include "Core/GameContext/GameContext.h"
 #include "FileManager/Files.h"
-#include "RenderEngine/BlockModel/BlockModels.h"
-#include "RenderEngine/BlockModel/ModelLoader.h"
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
+#include "RenderEngine/Models/Block/BlockModelLoader.h"
+#include "RenderEngine/Models/Block/BlockModels.h"
 #include "Utils/LogUtils.h"
 
 Block::Block(GameContext& context) : context_{context} {
@@ -15,7 +15,7 @@ Block::Block(GameContext& context) : context_{context} {
 Block::~Block() = default;
 
 std::unique_ptr<BlockModel> Block::InitializeBlockModel(
-    ModelLoader& model_loader) {
+    BlockModelLoader& model_loader) {
   auto tokens = Tokenize(block_name_, ':');
   std::unique_ptr<BlockModel> model = model_loader.GetModel(ResourceLocation(
       "models/block/" + tokens.back() + ".json", tokens.front()));
