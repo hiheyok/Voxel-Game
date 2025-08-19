@@ -486,34 +486,64 @@
     <ClCompile Include="src\RenderEngine\UI\Screens\PlayerHud.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\Models\Item\ModelEvaluators\BundleSelectedItemEvaluator.cpp">
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\BundleSelectedItemEvaluator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\Models\Item\ModelEvaluators\CompositeEvaluator.cpp">
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\CompositeEvaluator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\Models\Item\ModelEvaluators\ConditionEvaluator.cpp">
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\ConditionEvaluator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\Models\Item\ModelEvaluators\EmptyEvaluator.cpp">
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\EmptyEvaluator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\Models\Item\ModelEvaluators\Evaluator.cpp">
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\Evaluator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\Models\Item\ModelEvaluators\ModelEvaluator.cpp">
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\ModelEvaluator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\Models\Item\ModelEvaluators\RangeDispatchEvaluator.cpp">
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\RangeDispatchEvaluator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\Models\Item\ModelEvaluators\SelectEvaluator.cpp">
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\SelectEvaluator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\Models\Item\ModelEvaluators\SpecialEvaluator.cpp">
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\SpecialEvaluator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderEngine\Models\Item\ItemModel.cpp">
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\Property\BlockStateProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\Property\ChargeTypeProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\Property\ComponentProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\Property\ContextDimensionProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\Property\ContextEntityTypeProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\Property\CustomModelDataProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\Property\DisplayContextProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\Property\LocalTimeProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\Property\MainHandProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\Property\PropertyValueProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\Property\TrimMaterialProvider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1178,40 +1208,67 @@
     <ClInclude Include="src\RenderEngine\UI\Screens\PlayerHud.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\Property\PropertyValueProvider.h">
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\Property\PropertyValueProvider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\BundleSelectedItemEvaluator.h">
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\BundleSelectedItemEvaluator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\CompositeEvaluator.h">
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\CompositeEvaluator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\ConditionEvaluator.h">
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\ConditionEvaluator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\EmptyEvaluator.h">
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\EmptyEvaluator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\Evaluator.h">
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\Evaluator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\ModelEvaluator.h">
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\ModelEvaluator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\RangeDispatchEvaluator.h">
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\RangeDispatchEvaluator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\SelectEvaluator.h">
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\SelectEvaluator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\RenderEngine\Models\Item\ModelEvaluators\SpecialEvaluator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RenderEngine\Models\Item\ItemModel.h">
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\SpecialEvaluator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\DataStructure\BijectiveMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\Property\BlockStateProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\Property\ChargeTypeProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\Property\ComponentProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\Property\ContextDimensionProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\Property\ContextEntityTypeProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\Property\CustomModelDataProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\Property\DisplayContextProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\Property\LocalTimeProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\Property\MainHandProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Assets\Types\Models\Evaluators\Item\Property\TrimMaterialProvider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
