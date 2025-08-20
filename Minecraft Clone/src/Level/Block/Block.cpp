@@ -17,8 +17,8 @@ Block::~Block() = default;
 std::unique_ptr<BlockModel> Block::InitializeBlockModel(
     BlockModelLoader& model_loader) {
   auto tokens = Tokenize(block_name_, ':');
-  std::unique_ptr<BlockModel> model = model_loader.GetModel(ResourceLocation(
-      "models/block/" + tokens.back() + ".json", tokens.front()));
+  std::unique_ptr<BlockModel> model =
+      model_loader.GetModel(ResourceLocation(block_name_, "models/block/"));
   if (model == nullptr) {
     model = std::make_unique<BlockModel>();
   }

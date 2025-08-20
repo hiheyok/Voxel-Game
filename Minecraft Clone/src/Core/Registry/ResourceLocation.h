@@ -9,14 +9,11 @@
 class ResourceLocation {
  public:
   ResourceLocation();
-  ResourceLocation(std::string path,
-                   std::string namespaceIn = std::string(kDefaultNamespace));
+  ResourceLocation(std::string location, std::string prefix = "");
   ~ResourceLocation();
   ResourceLocation(ResourceLocation&&) noexcept;
   ResourceLocation(const ResourceLocation&);
 
-  void SetPath(std::string path,
-               std::string namespaceIn = std::string(kDefaultNamespace));
   std::string GetPath() const;
   bool operator==(const ResourceLocation&) const;
   ResourceLocation& operator=(const ResourceLocation&);
@@ -27,7 +24,9 @@ class ResourceLocation {
   static constexpr std::string_view kDefaultNamespace = "minecraft";
   static constexpr std::string_view kAssetPath = "./assets";
 
-  std::string path_ = "";
+  std::string namespace_;
+  std::string location_ = "";
+  std::string prefix_;
 };
 
 namespace std {

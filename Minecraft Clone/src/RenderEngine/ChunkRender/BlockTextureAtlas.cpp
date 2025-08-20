@@ -20,7 +20,7 @@ int BlockTextureAtlas::AddBlockTexture(const ResourceLocation& location) {
   } else {
     size_t textureCount = GetTextureCount();
     std::optional<RawTextureData> texture =
-        AddTextureToAtlas(location.GetPath());
+        AddTextureToAtlas(location.GetPath() + ".png");
     if (!texture.has_value()) return -1;
 
     TextureMetadata metadata;

@@ -32,7 +32,7 @@ std::unique_ptr<BlockModel> BlockModelLoader::GetModelRecursive(
   }
 
   std::unique_ptr<BlockModel> model = nullptr;
-  std::string path = location.GetPath();
+  std::string path = location.GetPath() + ".json";
   std::vector<char> manifest_data = FileUtils::ReadFileToBuffer(context_, path);
   json manifest;
 
@@ -67,8 +67,7 @@ std::unique_ptr<BlockModel> BlockModelLoader::GetModelRecursive(
     }
 
     // First check if the model is in the cache
-    ResourceLocation parent_path{"models/" + parent_location + ".json",
-                                 parent_namespace};
+    ResourceLocation parent_path{parent, "models/"};
 
     model = GetModelRecursive(parent_path);
   }

@@ -10,9 +10,9 @@
 #include "Core/GameContext/GameContext.h"
 #include "FileManager/Files.h"
 #include "Level/Block/Blocks.h"
-#include "RenderEngine/Models/Block/BlockModels.h"
-#include "RenderEngine/Models/Block/BlockModelLoader.h"
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"
+#include "RenderEngine/Models/Block/BlockModelLoader.h"
+#include "RenderEngine/Models/Block/BlockModels.h"
 #include "RenderEngine/OpenGL/Texture/Types/Texture2DOld.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "Utils/LogUtils.h"
@@ -53,8 +53,7 @@ void BlockModelManager::LoadModels() {
         std::string texture_namespace = path.substr(0, idx);
 
         // Load texture
-        ResourceLocation location{"/textures/" + texture_location + ".png",
-                                  texture_namespace};
+        ResourceLocation location{path, "textures/"};
 
         int id = block_texture_atlas_->AddBlockTexture(location);
 
