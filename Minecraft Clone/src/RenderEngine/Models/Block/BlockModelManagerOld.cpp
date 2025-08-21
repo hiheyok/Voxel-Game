@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
-#include "RenderEngine/Models/Block/BlockModelManager.h"
+#include "RenderEngine/Models/Block/BlockModelManagerOld.h"
 
 #include <cstdint>
 #include <memory>

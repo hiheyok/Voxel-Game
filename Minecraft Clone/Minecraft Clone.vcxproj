@@ -183,6 +183,7 @@
   <ItemGroup>
     <ClCompile Include="src\Assets\Asset.cpp" />
     <ClCompile Include="src\Assets\AssetManager.cpp" />
+    <ClCompile Include="src\Assets\Types\Models\Data\RenderableModel.cpp" />
     <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\BundleSelectedItemEvaluator.cpp" />
     <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\CompositeEvaluator.cpp" />
     <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\ConditionEvaluator.cpp" />
@@ -203,7 +204,9 @@
     <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\RangeDispatchEvaluator.cpp" />
     <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\SelectEvaluator.cpp" />
     <ClCompile Include="src\Assets\Types\Models\Evaluators\Item\SpecialEvaluator.cpp" />
+    <ClCompile Include="src\Assets\Types\Models\Managers\BlockModelManager.cpp" />
     <ClCompile Include="src\Assets\Types\Models\Managers\ModelLoader.cpp" />
+    <ClCompile Include="src\Assets\Types\Models\Managers\ModelManager.cpp" />
     <ClCompile Include="src\Assets\Types\ShaderSource.cpp" />
     <ClCompile Include="src\Assets\Types\Texture\Atlas\AtlasSprite.cpp" />
     <ClCompile Include="src\Assets\Types\Texture\Atlas\Stitcher.cpp" />
@@ -271,9 +274,9 @@
     <ClCompile Include="src\Level\Item\ItemTextureAtlas.cpp" />
     <ClCompile Include="src\Level\Level.cpp" />
     <ClCompile Include="src\Level\World\WorldInterface.cpp" />
-    <ClCompile Include="src\RenderEngine\Models\Block\BlockModelManager.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRender\BlockTextureAtlas.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexFormat.cpp" />
+    <ClCompile Include="src\RenderEngine\Models\Block\BlockModelManagerOld.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Render\RenderDrawArrays.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Render\RenderDrawElements.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Render\RenderObject.cpp" />
@@ -351,6 +354,7 @@
     <ClInclude Include="src\Assets\Types\Models\Managers\BlockModelManager.h" />
     <ClInclude Include="src\Assets\Types\Models\Managers\ItemModelManager.h" />
     <ClInclude Include="src\Assets\Types\Models\Managers\ModelLoader.h" />
+    <ClInclude Include="src\Assets\Types\Models\Managers\ModelManager.h" />
     <ClInclude Include="src\Assets\Types\ShaderSource.h" />
     <ClInclude Include="src\Assets\Types\Texture\Atlas\AtlasSprite.h" />
     <ClInclude Include="src\Assets\Types\Texture\Atlas\Sticher.h" />
@@ -386,7 +390,6 @@
     <ClInclude Include="src\Level\Light\ThreadedLightEngine.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Generators\DebugMeshStressFace\DebugMeshStressFace.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Generators\DebugMeshStress\DebugMeshStress.h" />
-    <ClInclude Include="src\RenderEngine\Models\Block\BlockModelManager.h" />
     <ClInclude Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexFormat.h" />
     <ClInclude Include="src\RenderEngine\EntityRender\MultiEntityRender.h" />
     <ClCompile Include="src\RenderEngine\Frustum\frustum.cpp" />
@@ -473,6 +476,7 @@
     <ClInclude Include="src\Level\World\WorldInterface.h" />
     <ClInclude Include="src\RenderEngine\ChunkRender\BlockTextureAtlas.h" />
     <ClInclude Include="src\RenderEngine\GUI\Item\ItemRender.h" />
+    <ClInclude Include="src\RenderEngine\Models\Block\BlockModelManagerOld.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Render\RenderDrawArrays.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Render\RenderDrawElements.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Render\RenderObject.h" />

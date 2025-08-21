@@ -15,6 +15,7 @@ class ResourceLocation {
   ResourceLocation(const ResourceLocation&);
 
   std::string GetPath() const;
+  std::string ToString() const;
   bool operator==(const ResourceLocation&) const;
   ResourceLocation& operator=(const ResourceLocation&);
   ResourceLocation& operator=(ResourceLocation&&) noexcept;

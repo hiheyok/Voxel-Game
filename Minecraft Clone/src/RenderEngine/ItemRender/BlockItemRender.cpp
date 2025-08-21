@@ -9,7 +9,7 @@
 #include "Level/Block/Block.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Item/Item.h"
-#include "RenderEngine/Models/Block/BlockModelManager.h"
+#include "RenderEngine/Models/Block/BlockModelManagerOld.h"
 #include "RenderEngine/Models/Block/BlockModels.h"
 #include "RenderEngine/Camera/camera.h"
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"

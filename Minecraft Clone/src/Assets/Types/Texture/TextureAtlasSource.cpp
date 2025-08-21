@@ -9,23 +9,37 @@
 #include "Utils/LogUtils.h"
 
 using json = nlohmann::json;
+using namespace std::filesystem;
+using std::move;
+using std::nullopt;
+using std::optional;
+using std::string;
+using std::vector;
 
-TextureAtlasSource::TextureAtlasSource(GameContext& context,
-                                       const std::string& key,
-                                       const std::string& atlas_def)
+TextureAtlasSource::TextureAtlasSource(GameContext& context, const string& key,
+                                       const string& atlas_def)
     : Texture2DBaseSource{context, key}, atlas_def_{atlas_def} {}
 
 void TextureAtlasSource::Load() {
   LOG_INFO("Loading texture atlas: {}", atlas_def_);
-  std::vector<SpritePath> sprites = GetPathList();
+  vector<SpritePath> sprites = GetPathList();
   sprites_.reserve(sprites.size());
   // Now load in all of the images in memory
   for (auto [sprite_path, sprite_name] : sprites) {
     TextureData data = LoadTexture(sprite_path);
     SpriteData sprite;
-    sprite.data_ = std::move(data);
+    sprite.data_ = move(data);
     sprite.name_ = sprite_name;
-    sprites_.push_back(std::move(sprite));
+
+    Sprite s;
+    s.name_ = sprite.name_;
+    s.uv_beg_.x = static_cast<float>(sprite.x_) / width_;
+    s.uv_beg_.y = static_cast<float>(sprite.y_) / height_;
+    s.uv_end_.x = static_cast<float>(sprite.x_ + sprite.width_) / width_;
+    s.uv_end_.y = static_cast<float>(sprite.y_ + sprite.height_) / height_;
+    sprites_map_.insert({ResourceLocation{sprite.name_}, s});
+
+    sprites_.push_back(move(sprite));
   }
 
   // Now stitch the data together
@@ -33,9 +47,8 @@ void TextureAtlasSource::Load() {
   format_ = GetFormat(channels_);
 }
 
-std::vector<TextureAtlasSource::Sprite> TextureAtlasSource::GetAllSprites()
-    const {
-  std::vector<Sprite> sprites;
+vector<TextureAtlasSource::Sprite> TextureAtlasSource::GetAllSprites() const {
+  vector<Sprite> sprites;
   sprites.reserve(sprites_.size());
   for (const auto& sprite : sprites_) {
     Sprite s;
@@ -44,21 +57,28 @@ std::vector<TextureAtlasSource::Sprite> TextureAtlasSource::GetAllSprites()
     s.uv_beg_.y = static_cast<float>(sprite.y_) / height_;
     s.uv_end_.x = static_cast<float>(sprite.x_ + sprite.width_) / width_;
     s.uv_end_.y = static_cast<float>(sprite.y_ + sprite.height_) / height_;
-    sprites.push_back(std::move(s));
+    sprites.push_back(move(s));
   }
   return sprites;
+}
+
+optional<TextureAtlasSource::Sprite> TextureAtlasSource::GetSprite(
+    const ResourceLocation& location) {
+  const auto& it = sprites_map_.find(location);
+  if (it != sprites_map_.end()) {
+    return it->second;
+  } else {
+    return nullopt;
+  }
 }
 
 const uint8_t* TextureAtlasSource::GetData() const noexcept {
   return data_.data();
 }
 
-#include <iostream>
-
-std::vector<TextureAtlasSource::SpritePath> TextureAtlasSource::GetPathList()
-    const {
-  std::vector<char> data = FileUtils::ReadFileToBuffer(context_, atlas_def_);
-  std::vector<SpritePath> sprites;
+vector<TextureAtlasSource::SpritePath> TextureAtlasSource::GetPathList() const {
+  vector<char> data = FileUtils::ReadFileToBuffer(context_, atlas_def_);
+  vector<SpritePath> sprites;
 
   json manifest;
 
@@ -75,14 +95,13 @@ std::vector<TextureAtlasSource::SpritePath> TextureAtlasSource::GetPathList()
   }
 
   for (const auto& source : manifest["sources"]) {
-    std::cerr << source << '\n';
     if (!source.contains("type")) {
       LOG_WARN("Skipping source in '{}', source doesn't contain valid type",
                atlas_def_);
       continue;
     }
 
-    std::string type = source["type"].get<std::string>();
+    string type = source["type"].get<string>();
 
     if (type == "minecraft:directory") {
       if (!source.contains("source") || !source.contains("prefix")) {
@@ -91,8 +110,8 @@ std::vector<TextureAtlasSource::SpritePath> TextureAtlasSource::GetPathList()
             atlas_def_);
         continue;
       }
-      std::string path = source["source"].get<std::string>();
-      std::string prefix = source["prefix"].get<std::string>();
+      string path = source["source"].get<string>();
+      string prefix = source["prefix"].get<string>();
 
       ParseTypeDirectory(sprites, path, prefix);
     } else if (type == "minecraft:single") {
@@ -102,8 +121,8 @@ std::vector<TextureAtlasSource::SpritePath> TextureAtlasSource::GetPathList()
         continue;
       }
 
-      std::string resource = source["resource"].get<std::string>();
-      std::string sprite_name = source.value("sprite", "");
+      string resource = source["resource"].get<string>();
+      string sprite_name = source.value("sprite", "");
 
       ParseTypeSingle(sprites, resource, sprite_name);
     } else {
@@ -115,9 +134,9 @@ std::vector<TextureAtlasSource::SpritePath> TextureAtlasSource::GetPathList()
   return sprites;
 }
 
-void TextureAtlasSource::ParseTypeDirectory(std::vector<SpritePath>& out,
-                                            std::string source,
-                                            std::string prefix) const {
+void TextureAtlasSource::ParseTypeDirectory(vector<SpritePath>& out,
+                                            string source,
+                                            string prefix) const {
   // Iterate through all of the namespaces
   // Source is relative to the /texture
 
@@ -129,20 +148,19 @@ void TextureAtlasSource::ParseTypeDirectory(std::vector<SpritePath>& out,
     }
   }
 
-  for (const auto& space : std::filesystem::directory_iterator("assets")) {
+  for (const auto& space : directory_iterator("assets")) {
     if (!space.is_directory()) {
       continue;
     }
 
-    std::string namespace_name = space.path().filename().string();
+    string namespace_name = space.path().filename().string();
 
-    std::filesystem::path texture_path = space.path() / "textures";
-    std::filesystem::path source_path = texture_path / source;
+    path texture_path = space.path() / "textures";
+    path source_path = texture_path / source;
 
-    std::string source_path_str = source_path.string();
+    string source_path_str = source_path.string();
 
-    for (const auto& file :
-         std::filesystem::recursive_directory_iterator(source_path)) {
+    for (const auto& file : recursive_directory_iterator(source_path)) {
       if (file.is_directory()) {
         continue;
       }
@@ -154,12 +172,12 @@ void TextureAtlasSource::ParseTypeDirectory(std::vector<SpritePath>& out,
 
       // Get the filepath relative to texture/source
 
-      std::string sprite_path = file.path().string();
-      std::string sprite_name = namespace_name + ":" + prefix +
-                                file.path()
-                                    .lexically_relative(source_path)
-                                    .replace_extension()
-                                    .string();
+      string sprite_path = file.path().string();
+      string sprite_name = namespace_name + ":" + prefix +
+                           file.path()
+                               .lexically_relative(source_path)
+                               .replace_extension()
+                               .string();
 
       for (char& c : sprite_name) {
         if (c == '\\') {
@@ -172,11 +190,10 @@ void TextureAtlasSource::ParseTypeDirectory(std::vector<SpritePath>& out,
   }
 }
 
-void TextureAtlasSource::ParseTypeSingle(std::vector<SpritePath>& out,
-                                         std::string resource,
-                                         std::string sprite) const {
+void TextureAtlasSource::ParseTypeSingle(vector<SpritePath>& out,
+                                         string resource, string sprite) const {
   // Get the namespace of the atlas source
-  std::filesystem::path manifest_path = atlas_def_;
+  path manifest_path = atlas_def_;
   auto it = manifest_path.begin();
   if (manifest_path.has_root_directory()) {
     ++it;
@@ -189,16 +206,16 @@ void TextureAtlasSource::ParseTypeSingle(std::vector<SpritePath>& out,
 
   ++it;
 
-  std::string namespace_name = it->string();
+  string namespace_name = it->string();
   size_t idx = resource.find(':');
-  if (idx != std::string::npos) {
+  if (idx != string::npos) {
     resource = resource.substr(idx + 1, resource.size() - idx - 1);
   }
 
   // Now build path to resource
-  std::string resource_path =
+  string resource_path =
       "assets/" + namespace_name + "/textures/" + resource + ".png";
-  std::string sprite_name;
+  string sprite_name;
   if (sprite.size()) {
     sprite_name = sprite;
   } else {
@@ -213,7 +230,7 @@ void TextureAtlasSource::ParseTypeSingle(std::vector<SpritePath>& out,
 
   // Then check if the file actually exist
 
-  if (std::filesystem::exists(resource_path)) {
+  if (exists(resource_path)) {
     out.emplace_back(resource_path, sprite_name);
   }
 }
@@ -226,7 +243,7 @@ void TextureAtlasSource::Stitch() {
 
   for (auto& sprite : sprites_) {
     TextureData& data = sprite.data_;
-    const std::string& name = sprite.name_;
+    const string& name = sprite.name_;
 
     auto [x, y] = stitcher.PlaceItem(data.GetWidth(), data.GetHeight());
 

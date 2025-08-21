@@ -39,6 +39,11 @@ string ResourceLocation::GetPath() const {
   return full_path;
 }
 
+string ResourceLocation::ToString() const {
+  string out = namespace_ + ":" + prefix_ + location_;
+  return out;
+}
+
 bool ResourceLocation::operator==(const ResourceLocation& other) const {
   return GetPath() == other.GetPath();
 }

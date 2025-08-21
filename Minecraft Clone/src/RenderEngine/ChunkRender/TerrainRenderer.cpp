@@ -10,7 +10,7 @@
 
 #include "Core/GameContext/GameContext.h"
 #include "Core/Options/Option.h"
-#include "RenderEngine/Models/Block/BlockModelManager.h"
+#include "RenderEngine/Models/Block/BlockModelManagerOld.h"
 #include "RenderEngine/Camera/camera.h"
 #include "RenderEngine/ChunkRender/Batch/ChunkBatch.h"
 #include "RenderEngine/ChunkRender/BlockTextureAtlas.h"

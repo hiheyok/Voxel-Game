@@ -1,8 +1,12 @@
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include "Assets/Types/Texture/Texture2DBaseSource.h"
+#include "Core/Typenames.h"
+
+class ResourceLocation;
 
 class TextureAtlasSource : public Texture2DBaseSource {
  public:
@@ -18,6 +22,7 @@ class TextureAtlasSource : public Texture2DBaseSource {
   void Load() override;
 
   std::vector<Sprite> GetAllSprites() const;
+  std::optional<Sprite> GetSprite(const ResourceLocation& location);
   const uint8_t* GetData() const noexcept override;
 
  private:
@@ -49,4 +54,5 @@ class TextureAtlasSource : public Texture2DBaseSource {
 
   std::vector<uint8_t> data_;
   std::vector<SpriteData> sprites_;
+  FastHashMap<ResourceLocation, Sprite> sprites_map_;
 };

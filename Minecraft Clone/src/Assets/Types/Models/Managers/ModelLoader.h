@@ -18,10 +18,17 @@ class ModelLoader {
   ModelLoader(GameContext&);
   ~ModelLoader();
 
+  ModelLoader(const ModelLoader&) = delete;
+  ModelLoader& operator=(const ModelLoader&) = delete;
+
+  ModelLoader(ModelLoader&&) = delete;
+  ModelLoader& operator=(ModelLoader&&) = delete;
+
   std::optional<ModelData> GetModel(const ResourceLocation& location);
 
   // Use for adding buildin models
-  void AddDefaultModel(const ResourceLocation& location, ModelData default_model);
+  void AddDefaultModel(const ResourceLocation& location,
+                       ModelData default_model);
 
  private:
   // Helper functions

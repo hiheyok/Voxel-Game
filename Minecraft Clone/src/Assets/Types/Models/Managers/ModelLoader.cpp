@@ -10,12 +10,12 @@
 
 using namespace model;
 
+using glm::vec3;
 using std::array;
 using std::nullopt;
 using std::optional;
 using std::string;
 using std::vector;
-using glm::vec3;
 
 decltype(ModelLoader::kStringDisplayMap) ModelLoader::kStringDisplayMap = {
     {"thirdperson_righthand", DisplayPosition::kThirdPersonRighthand},
@@ -150,18 +150,21 @@ void ModelLoader::ProcessElement(ModelData& model, const json& data) {
   for (const auto& element : data) {
     Element model_element;
 
+    // Used to normalize these coordinates
+    static constexpr float kBlockLength = 16.0f;
+
     if (element.contains("from")) {
       auto vals = element["from"].get<array<float, 3>>();
-      model_element.from_.x = vals[0];
-      model_element.from_.y = vals[1];
-      model_element.from_.z = vals[2];
+      model_element.from_.x = vals[0] / kBlockLength;
+      model_element.from_.y = vals[1] / kBlockLength;
+      model_element.from_.z = vals[2] / kBlockLength;
     }
 
     if (element.contains("to")) {
       auto vals = element["to"].get<array<float, 3>>();
-      model_element.to_.x = vals[0];
-      model_element.to_.y = vals[1];
-      model_element.to_.z = vals[2];
+      model_element.to_.x = vals[0] / kBlockLength;
+      model_element.to_.y = vals[1] / kBlockLength;
+      model_element.to_.z = vals[2] / kBlockLength;
     }
 
     if (element.contains("rotation")) {

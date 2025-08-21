@@ -4,6 +4,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <optional>
 #include <string>
 #include <utility>
 
@@ -55,7 +56,7 @@ struct Element {
   int light_emission_ = 0;  // Default: 0
 
   // 6 faces as there are only 6 possible faces
-  std::array<Face, 6> faces_;
+  std::array<std::optional<Face>, 6> faces_;
 };
 
 // Used for item model rendering
