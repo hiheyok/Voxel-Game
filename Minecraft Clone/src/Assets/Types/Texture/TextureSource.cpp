@@ -33,9 +33,16 @@ int TextureSource::GetFormat(int channel) noexcept {
   }
 }
 
-
 TextureSource::TextureData::TextureData(GameContext& context,
                                         const std::string& filepath) {
+  Load(context, filepath);
+  if (success_) {
+    Analyze();
+  }
+}
+
+void TextureSource::TextureData::Load(GameContext& context,
+                                      const std::string& filepath) {
   std::vector<char> data = FileUtils::ReadFileToBuffer(context, filepath);
 
   if (data.size() == 0) {
@@ -76,6 +83,27 @@ TextureSource::TextureData::TextureData(GameContext& context,
   LOG_STATIC_DEBUG(context.logger_, "Successfully loaded in texture: {}",
                    filepath);
 }
+
+void TextureSource::TextureData::Analyze() {
+  // Analyze the transparency
+  if (channels_ == 4) {
+    for (int i = 0; i < img_size_.x * img_size_.y; ++i) {
+      int alpha = data_[i * 4 + 3];
+      if (alpha > 0 && alpha < 255) {
+        partial_trans_ = true;
+      }
+
+      if (alpha == 0) {
+        full_trans_ = true;
+      }
+
+      if (full_trans_ && partial_trans_) {
+        break;
+      }
+    }
+  }
+}
+
 TextureSource::TextureData::~TextureData() {
   if (data_) {
     stbi_image_free(data_);
@@ -90,12 +118,14 @@ TextureSource::TextureData::TextureData(TextureData&& other) noexcept
       img_size_(other.img_size_),
       format_(other.format_),
       channels_(other.channels_),
-      success_(other.success_) {
+      success_(other.success_),
+      partial_trans_(other.partial_trans_) {
   other.data_ = nullptr;
   other.img_size_ = {0, 0};
   other.format_ = 0;
   other.channels_ = 0;
-  other.success_ = 0;
+  other.success_ = false;
+  other.partial_trans_ = false;
 }
 
 TextureSource::TextureData& TextureSource::TextureData::operator=(
@@ -106,12 +136,14 @@ TextureSource::TextureData& TextureSource::TextureData::operator=(
     format_ = std::move(other.format_);
     channels_ = std::move(other.channels_);
     success_ = std::move(other.success_);
+    partial_trans_ = std::move(other.partial_trans_);
 
     other.data_ = nullptr;
     other.img_size_ = {0, 0};
     other.format_ = 0;
     other.channels_ = 0;
     other.success_ = 0;
+    other.partial_trans_ = false;
   }
   return *this;
 }
@@ -148,6 +180,14 @@ int TextureSource::TextureData::GetChannels() const noexcept {
 
 bool TextureSource::TextureData::IsSuccess() const noexcept { return success_; }
 
+bool TextureSource::TextureData::IsPartialTrans() const noexcept {
+  return partial_trans_;
+}
+
+bool TextureSource::TextureData::IsFullTrans() const noexcept {
+  return full_trans_;
+}
+
 glm::u8vec4 TextureSource::TextureData::GetPixel(int x, int y) const noexcept {
   int stride_x = x * channels_;
   int stride_y = y * img_size_.x * channels_;
@@ -159,6 +199,11 @@ glm::u8vec4 TextureSource::TextureData::GetPixel(int x, int y) const noexcept {
 
   if (channels_ != 4) {
     rgba.a = 255;
+  }
+
+  if (channels_ == 1) {
+    rgba.g = rgba.r;
+    rgba.b = rgba.r;
   }
 
   return rgba;

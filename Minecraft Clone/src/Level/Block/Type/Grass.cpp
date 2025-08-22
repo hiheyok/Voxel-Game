@@ -25,7 +25,7 @@ void GrassBlock::Tick(BlockPos pos, Dimension* curr_world) {
   WorldInterface* world = curr_world->world_;
 
   // Checks if ticking block changes
-  if (world->GetBlock(pos) != context_.blocks_->GRASS) {
+  if (world->GetBlock(pos) != context_.blocks_->GRASS_BLOCK) {
     return;
   }
 
@@ -51,7 +51,7 @@ void GrassBlock::Tick(BlockPos pos, Dimension* curr_world) {
     return;
   }
 
-  BlockEvent grass_spread{pos, context_.blocks_->GRASS,
+  BlockEvent grass_spread{pos, context_.blocks_->GRASS_BLOCK,
                           context_.event_handler_->BlockTick};
   curr_world->event_manager_.AddEvent(grass_spread);
 }

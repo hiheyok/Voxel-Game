@@ -37,6 +37,8 @@ class ModelLoader {
   void ProcessDisplay(ModelData& model, const json& data);
   void ProcessElement(ModelData& model, const json& data);
   void ProcessFace(Element& model, const json& data);
+  
+  static constexpr float kBlockLength = 16.0f;
 
   static const FastHashMap<std::string, DisplayPosition> kStringDisplayMap;
   static const FastHashMap<std::string, size_t> kStringDirectionMap;

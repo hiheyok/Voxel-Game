@@ -10,10 +10,12 @@
 
 using namespace model;
 
+using glm::vec2;
 using glm::vec3;
 using std::array;
 using std::nullopt;
 using std::optional;
+using std::reverse;
 using std::string;
 using std::vector;
 
@@ -43,8 +45,10 @@ optional<ModelData> ModelLoader::GetModel(const ResourceLocation& location) {
     return it->second;
   }
 
+  std::string filepath = location.GetPath() + ".json";
+
   // Loads up the json def
-  vector<char> data = FileUtils::ReadFileToBuffer(context_, location.GetPath());
+  vector<char> data = FileUtils::ReadFileToBuffer(context_, filepath);
   if (data.empty()) {
     return nullopt;
   }
@@ -62,15 +66,12 @@ optional<ModelData> ModelLoader::GetModel(const ResourceLocation& location) {
   ModelData model;
   if (manifest.contains("parent")) {
     const string& parent_resource = manifest["parent"].get<string>();
-    ResourceLocation parent{parent_resource, "/models"};
+    ResourceLocation parent{parent_resource, "models/"};
     auto parent_model = GetModel(parent);
     if (parent_model.has_value()) {
       model = parent_model.value();
     }
   }
-
-  // Elements in the current model overrides the parent
-  model.elements_.clear();
 
   if (manifest.contains("textures")) {
     ProcessTexture(model, manifest["textures"]);
@@ -84,6 +85,12 @@ optional<ModelData> ModelLoader::GetModel(const ResourceLocation& location) {
     ProcessDisplay(model, manifest["display"]);
   }
 
+  if (manifest.contains("elements")) {
+    // Elements in the current model overrides the parent
+    model.elements_.clear();
+    ProcessElement(model, manifest["elements"]);
+  }
+
   if (manifest.contains("gui_light")) {
     const std::string& type = manifest["gui_light"].get<string>();
     if (type == "front") {
@@ -94,6 +101,10 @@ optional<ModelData> ModelLoader::GetModel(const ResourceLocation& location) {
       LOG_WARN("Unknown gui light option: {}", type);
     }
   }
+
+  reverse(model.elements_.begin(), model.elements_.end());
+  cache_.insert({location, model});
+  return model;
 }
 
 void ModelLoader::ProcessTexture(ModelData& model, const json& data) {
@@ -149,9 +160,7 @@ void ModelLoader::ProcessDisplay(ModelData& model, const json& data) {
 void ModelLoader::ProcessElement(ModelData& model, const json& data) {
   for (const auto& element : data) {
     Element model_element;
-
     // Used to normalize these coordinates
-    static constexpr float kBlockLength = 16.0f;
 
     if (element.contains("from")) {
       auto vals = element["from"].get<array<float, 3>>();
@@ -170,19 +179,19 @@ void ModelLoader::ProcessElement(ModelData& model, const json& data) {
     if (element.contains("rotation")) {
       const json& rot_data = element["rotation"];
       vec3 origin{0.0f, 0.0f, 0.0f};
-      char axis;
+      char axis = '\0';
       float angle = 0.0f;
       bool rescale = false;
 
       if (rot_data.contains("origin")) {
         auto vals = rot_data["origin"].get<array<float, 3>>();
-        origin.x = vals[0];
-        origin.y = vals[1];
-        origin.z = vals[2];
+        origin.x = vals[0] / kBlockLength;
+        origin.y = vals[1] / kBlockLength;
+        origin.z = vals[2] / kBlockLength;
       }
 
       if (rot_data.contains("axis")) {
-        axis = rot_data["axis"].get<char>();
+        axis = rot_data["axis"].get<string>()[0];
       }
 
       if (rot_data.contains("angle")) {
@@ -234,9 +243,18 @@ void ModelLoader::ProcessFace(Element& element, const json& data) {
     if (face_data.contains("uv")) {
       auto vals = face_data["uv"].get<array<float, 4>>();
       face.uv_[0] = vals[0];
-      face.uv_[1] = 16.0f - vals[2];  // Swap
-      face.uv_[2] = 16.0f - vals[1];  // Swap
-      face.uv_[3] = vals[3];
+      face.uv_[1] = vals[1];  // Swap
+      face.uv_[2] = vals[2];
+      face.uv_[3] = vals[3];  // Swap
+    } else {                  // Default values based on the element position
+      // Find the face values
+      vec2 from = element.from_;
+      vec2 to = element.to_;
+
+      face.uv_[0] = element.from_.x * kBlockLength;
+      face.uv_[1] = element.from_.y * kBlockLength;
+      face.uv_[2] = element.to_.x * kBlockLength;
+      face.uv_[3] = element.to_.y * kBlockLength;
     }
 
     if (face_data.contains("texture")) {

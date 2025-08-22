@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <optional>
@@ -17,8 +18,14 @@ namespace baked_model {
 struct Face {
   // Sprite data
   glm::vec4 uv_;
-  int cull_face_;
+  glm::vec2 uv_00_;
+  glm::vec2 uv_01_;
+  glm::vec2 uv_10_;
+  glm::vec2 uv_11_;
+  int cull_face_ = -1;
   int tint_index_ = -1;
+  bool partial_trans_ = false;
+  bool full_trans_ = false;
 };
 
 struct Element {

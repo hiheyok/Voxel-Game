@@ -14,6 +14,8 @@ class TextureAtlasSource : public Texture2DBaseSource {
     std::string name_;
     glm::vec2 uv_beg_;
     glm::vec2 uv_end_;
+    bool partial_trans_ = false;
+    bool full_trans_ = false;
   };
 
   TextureAtlasSource(GameContext& context, const std::string& key,
@@ -36,6 +38,8 @@ class TextureAtlasSource : public Texture2DBaseSource {
     int x_, y_;
     int width_, height_;
     TextureData data_;
+    bool partial_trans_;
+    bool full_trans_;
   };
 
   std::vector<SpritePath> GetPathList() const;

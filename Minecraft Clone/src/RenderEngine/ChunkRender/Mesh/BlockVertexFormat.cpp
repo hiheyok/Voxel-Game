@@ -5,11 +5,11 @@
 #include <cstdint>
 
 void BlockVertexFormat::Set(float x, float y, float z, int r, int g, int b,
-                            int a, int index, int u, int v, int sky_light,
+                            int a, float u, float v, int sky_light,
                             int block_light) noexcept {
   SetPos(x, y, z);
   SetColor(r, g, b, a);
-  SetUV(index, u, v);
+  SetUV(u, v);
   SetLight(sky_light, block_light);
 }
 
@@ -27,14 +27,13 @@ void BlockVertexFormat::SetColor(int r, int g, int b, int a) noexcept {
   color_ |= (a << 24);
 }
 
-void BlockVertexFormat::SetUV(int index, int u, int v) noexcept { // 5 bits for UV coordinates
-  uv_light_ &= (static_cast<uint32_t>(-1) << 24);  // clears the first 24 bits;
-  uv_light_ |= index;
-  uv_light_ |= u << 14;
-  uv_light_ |= v << 19;
+void BlockVertexFormat::SetUV(float u, float v) noexcept {
+  u_ = u;
+  v_ = v;
 }
 
 void BlockVertexFormat::SetLight(int sky_light, int block_light) noexcept {
-  uv_light_ &= (static_cast<uint32_t>(-1) >> 8);
-  uv_light_ |= (sky_light << 24) | (block_light << 28);
+  light_ = 0;
+  light_ |= sky_light;
+  light_ |= block_light << 4;
 }

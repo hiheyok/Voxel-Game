@@ -1,13 +1,11 @@
 #version 450 core
 
-layout (location = 0) in vec3 Vertices;
-layout (location = 1) in vec2 UV;
-layout (location = 2) in float TexturePosition;
-layout (location = 3) in float light;
+layout (location = 0) in vec3 in_vertices;
+layout (location = 1) in vec2 in_uv;
+layout (location = 2) in float in_light;
 
-out float Light;
-out float texturePosition;
-out vec2 UVa;
+out float light;
+out vec2 uv;
 
 uniform mat4 model;
 uniform mat4 projection;
@@ -15,8 +13,7 @@ uniform mat4 view;
 
 void main()
 {
-    UVa = UV;
-    texturePosition = float(TexturePosition);
-    Light = light / 16.f;
-    gl_Position = projection * view * model * vec4(Vertices, 1.f);
+    uv = in_uv;
+    light = in_light / 15.f;
+    gl_Position = projection * view * model * vec4(in_vertices, 1.f);
 }

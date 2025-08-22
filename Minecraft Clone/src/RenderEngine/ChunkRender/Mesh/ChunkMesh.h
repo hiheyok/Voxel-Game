@@ -22,11 +22,17 @@
 
 class Chunk;
 class GameContext;
+class BlockModelManager;
 
 struct Cuboid;
 struct BlockFace;
 struct BlockModel;
 struct BlockVertexFormat;
+
+namespace baked_model {
+struct Face;
+struct Element;
+}  // namespace baked_model
 
 namespace Mesh {
 struct ChunkVertexData {
@@ -53,12 +59,12 @@ class ChunkMeshData {
 
   GameContext& context_;
   // Mesh Vertices
-  std::vector<BlockVertexFormat> solid_vertices_buffer_;
-  std::vector<BlockVertexFormat> trans_vertices_buffer_;
+  std::vector<BlockVertexFormat> solid_buffer_;
+  std::vector<BlockVertexFormat> trans_buffer_;
   std::vector<BlockVertexFormat> solid_fluid_vertices_buffer_;
   std::vector<BlockVertexFormat> transparent_fluid_vertices_buffer_;
 
-  size_t transparent_face_count_ = 0;
+  size_t trans_face_count_ = 0;
   size_t solid_face_count_ = 0;
   size_t solid_fluid_face_count_ = 0;
   size_t transparent_fluid_face_count_ = 0;
@@ -101,12 +107,13 @@ class ChunkMeshData {
   void GenerateFluidMesh();
 
   // Check if the player can see the mesh
-  bool IsFaceVisible(const Cuboid& cube, int side,
+  bool IsFaceVisible(const baked_model::Element& element, int side,
                      const BlockID* restrict cache);
 
   // Add faces to the mesh
-  void AddFaceToMesh(const Cuboid& cube, int side, bool allow_ao, BlockPos pos,
-                     int u_size, int v_size, const BlockID* restrict cache_ptr);
+  void AddFaceToMesh(const baked_model::Element& element, int side,
+                     bool allow_ao, BlockPos pos, int u_size, int v_size,
+                     const BlockID* restrict cache_ptr);
 
   void GetAO(int side, const BlockID* restrict cache_ptr, float* ao_m);
 
@@ -130,5 +137,6 @@ class ChunkMeshData {
                                        kChunkStrideZ};
   alignas(64) std::array<BlockID, kCacheDim3D> chunk_cache_;
   Chunk* chunk_;
+  const BlockModelManager* model_manager_;
 };
 }  // namespace Mesh

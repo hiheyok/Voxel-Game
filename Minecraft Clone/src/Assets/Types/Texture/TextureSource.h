@@ -43,15 +43,22 @@ class TextureSource : public Asset {
     int GetFormat() const noexcept;
     int GetChannels() const noexcept;
     bool IsSuccess() const noexcept;
+    bool IsPartialTrans() const noexcept;
+    bool IsFullTrans() const noexcept;
     glm::u8vec4 GetPixel(int x, int y) const noexcept;
     const uint8_t* GetData() const noexcept;
 
    private:
+    void Load(GameContext& context, const std::string& path);
+    void Analyze();
+
     uint8_t* data_ = nullptr;
     glm::ivec2 img_size_ = {0, 0};
     int format_ = 0;
     int channels_ = 0;
     bool success_ = 0;
+    bool partial_trans_ = false;
+    bool full_trans_ = false;
   };
 
   explicit TextureSource(GameContext& context, const std::string& asset_key);

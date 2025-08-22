@@ -10,11 +10,11 @@ class TextureAtlasSource;
 
 struct TextureSprite;
 
-class TextureAtlasV2 : public Texture2DBase {
+class TextureAtlas : public Texture2DBase {
  public:
-  TextureAtlasV2(GameContext&, const std::string&,
-                 AssetHandle<TextureAtlasSource>);
-  ~TextureAtlasV2();
+  TextureAtlas(GameContext&, const std::string&,
+               AssetHandle<TextureAtlasSource>);
+  ~TextureAtlas();
 
   TextureSprite GetSprite(const std::string& sprite_name) const;
 

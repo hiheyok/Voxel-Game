@@ -45,7 +45,7 @@ void MountainGenerator::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
 
       if (n > 0.5f) {
         if (n < 0.54f) {
-          chunk->SetBlockUnsafe(context_.blocks_->GRASS, {x, y, z});
+          chunk->SetBlockUnsafe(context_.blocks_->GRASS_BLOCK, {x, y, z});
           chunk->SetBlock(context_.blocks_->DIRT, {x, y - 1, z});
         } else {
           chunk->SetBlockUnsafe(context_.blocks_->STONE, {x, y, z});
@@ -96,7 +96,7 @@ void MountainGenerator::GenerateEnvironment(ChunkPos pos, Chunk* chunk) {
         chunk->SetBlockUnsafe(context_.blocks_->BLUE_CONCRETE, block_pos);
       }
 
-      if ((chunk->GetBlockUnsafe(block_pos) == context_.blocks_->GRASS)) {
+      if ((chunk->GetBlockUnsafe(block_pos) == context_.blocks_->GRASS_BLOCK)) {
         chunk->SetBlockUnsafe(context_.blocks_->SAND, block_pos);
       }
     }
@@ -117,7 +117,7 @@ void MountainGenerator::GenerateDecor(ChunkPos pos, Chunk* chunk) {
          1.f) /
         2.f;
     for (int y = 0; y < kChunkDim; y++) {
-      if (chunk->GetBlock({x, y - 1, z}) == context_.blocks_->GRASS) {
+      if (chunk->GetBlock({x, y - 1, z}) == context_.blocks_->GRASS_BLOCK) {
         if (TREE_MAP <= 0.04) {
           for (auto [tx, tz] : Product<2>(-2, 3)) {
             if ((abs(tx) == 2) && (abs(tz) == 2)) continue;

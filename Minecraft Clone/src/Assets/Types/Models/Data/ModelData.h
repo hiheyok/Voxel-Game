@@ -42,7 +42,7 @@ struct Rotation {
 struct Face {
   glm::vec4 uv_{0.0f, 0.0f, 0.0f, 0.0f};  // Optional
   std::string texture_;
-  int cull_face_;
+  int cull_face_ = -1;        // Default: -1 no culling
   int texture_rotation_ = 0;  // Default: 0
   int tint_index_ = -1;       // Default: -1
 };
@@ -51,7 +51,7 @@ struct Element {
   std::string name_;  // Optional
   glm::vec3 from_{0.0f, 0.0f, 0.0f};
   glm::vec3 to_{16.0f, 16.0f, 16.0f};
-  Rotation rotation_;
+  std::optional<Rotation> rotation_;
   bool shade_ = true;       // Default: true
   int light_emission_ = 0;  // Default: 0
 

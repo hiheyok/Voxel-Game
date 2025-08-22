@@ -38,7 +38,7 @@ class BlockList {
   BlockID DIRT = RegisterBlock("minecraft:dirt", new DirtBlock(context_));
   BlockID WATER = RegisterBlock("minecraft:water", new Fluid(context_, 5));
   BlockID LAVA = RegisterBlock("minecraft:lava", new Fluid(context_, 5));
-  BlockID GRASS = RegisterBlock("minecraft:grass_block",
+  BlockID GRASS_BLOCK = RegisterBlock("minecraft:grass_block",
                                 new GrassBlock(context_, 0.1, 0.1));
   BlockID SAND = RegisterBlock("minecraft:sand", new GravityBlock(context_));
   BlockID OAK_LOG =
@@ -690,6 +690,7 @@ class BlockList {
       RegisterBlock("minecraft:smooth_quartz", new DefaultBlock(context_));
 
   BlockID ANVIL = RegisterBlock("minecraft:anvil", new DefaultBlock(context_));
+  BlockID GRASS = RegisterBlock("minecraft:short_grass", new DefaultBlock(context_));
 
   void AddAssets(std::string namespaceIn);
 

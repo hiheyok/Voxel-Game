@@ -19,6 +19,7 @@ class AssetHandle {
   T* Get() const { return p_; }
 
   explicit operator bool() const { return p_ != nullptr; }
+  bool HasValue() const noexcept { return p_ != nullptr; }
 
  private:
   T* p_;

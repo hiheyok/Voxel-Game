@@ -7,13 +7,13 @@
 #include "RenderEngine/RenderResources/Types/Texture/TextureSprite.h"
 #include "Utils/LogUtils.h"
 
-TextureAtlasV2::TextureAtlasV2(GameContext& context, const std::string& key,
-                               AssetHandle<TextureAtlasSource> source)
+TextureAtlas::TextureAtlas(GameContext& context, const std::string& key,
+                           AssetHandle<TextureAtlasSource> source)
     : Texture2DBase{context, key}, source_{source} {}
 
-TextureAtlasV2::~TextureAtlasV2() = default;
+TextureAtlas::~TextureAtlas() = default;
 
-TextureSprite TextureAtlasV2::GetSprite(const std::string& sprite_name) const {
+TextureSprite TextureAtlas::GetSprite(const std::string& sprite_name) const {
   const auto& it = sprites_.find(sprite_name);
   assert(it != sprites_.end());
   TextureSprite sprite = it->second;
@@ -21,7 +21,7 @@ TextureSprite TextureAtlasV2::GetSprite(const std::string& sprite_name) const {
   return sprite;
 }
 
-void TextureAtlasV2::LoadTexture() {
+void TextureAtlas::LoadTexture() {
   // Load it to the gpu
   glBindTexture(target_, id_);
   glTexImage2D(target_, 0, source_->GetFormat(), source_->GetWidth(),

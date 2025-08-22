@@ -20,7 +20,7 @@ PlayerHud::~PlayerHud() = default;
 
 void PlayerHud::OnEnter() {
   RenderResourceManager& resources = *context_.render_resource_manager_;
-  RenderHandle<TextureAtlasV2> gui = resources.GetAtlas("gui");
+  RenderHandle<TextureAtlas> gui = resources.GetAtlas("gui");
 
   auto hotbar_tex = std::make_unique<TextureComponent>(
       gui->GetSprite("minecraft:hud/hotbar"));

@@ -25,6 +25,7 @@ using std::make_unique;
 using std::move;
 using std::optional;
 using std::string;
+using std::swap;
 using std::unique_ptr;
 using std::vector;
 
@@ -43,6 +44,11 @@ AssetHandle<RenderableModel> ModelManager::LoadModel(
   }
 
   optional<model::ModelData> data = loader_->GetModel(location);
+  bool is_valid = data.has_value();
+
+  if (!is_valid) {
+    return AssetHandle<RenderableModel>{nullptr};
+  }
 
   auto model = make_unique<RenderableModel>(context_, location.ToString());
 
@@ -58,6 +64,7 @@ void ModelManager::BakeModel(RenderableModel& model,
   // Use for getting the UVs for the model
 
   model.ambient_occlusion_ = data.ambient_occlusion_;
+  BakeElement(model, data);
 }
 
 void ModelManager::BakeElement(RenderableModel& model,
@@ -77,7 +84,7 @@ void ModelManager::BakeElement(RenderableModel& model,
 
     // Iterate through the 8 corners
     for (int i = 0; i < 8; ++i) {
-      if (i & 0b100) {
+      if (i & 0b001) {
         baked_element.corners_[i].x = to.x;
       } else {
         baked_element.corners_[i].x = from.x;
@@ -89,47 +96,52 @@ void ModelManager::BakeElement(RenderableModel& model,
         baked_element.corners_[i].y = from.y;
       }
 
-      if (i & 0b001) {
+      if (i & 0b100) {
         baked_element.corners_[i].z = to.z;
       } else {
         baked_element.corners_[i].z = from.z;
       }
     }
 
-    // Rotate the 8 models
-    // Get rotational matrix
-    mat4 rotation_matrix{1.0f};
-    vec3 rotation_direction{0.0f, 0.0f, 0.0f};
+    if (element.rotation_.has_value()) {
+      const model::Rotation& rotation = element.rotation_.value();
 
-    if (element.rotation_.axis_ == 'x') {
-      rotation_direction.x = 1.0f;
-    } else if (element.rotation_.axis_ == 'y') {
-      rotation_direction.y = 1.0f;
-    } else {  // if direction is none, angle is 0 so nothing change. if
-              // direction is z, rotate in that direction
-      rotation_direction.z = 1.0f;
-    }
+      // Rotate the 8 models
+      // Get rotational matrix
+      mat4 rotation_matrix{1.0f};
+      vec3 rotation_axis{0.0f, 0.0f, 0.0f};
 
-    rotation_matrix = rotate(rotation_matrix, radians(element.rotation_.angle_),
-                             rotation_direction);
-    // Apply offsets
+      if (rotation.axis_ == 'x') {
+        rotation_axis.x = 1.0f;
+      } else if (rotation.axis_ == 'y') {
+        rotation_axis.y = 1.0f;
+      } else if (rotation.axis_ == 'z') {
+        rotation_axis.z = 1.0f;
+      } else {
+        LOG_WARN("Invalid rotational axis: {}", rotation.axis_);
+      }
 
-    vec3 offset = element.rotation_.origin_;
-    for (int i = 0; i < 8; ++i) {
-      baked_element.corners_[i] -= offset;
-    }
+      rotation_matrix =
+          rotate(rotation_matrix, radians(rotation.angle_), rotation_axis);
+      // Apply offsets
 
-    for (int i = 0; i < 8; ++i) {
-      vec4 rotated_vec =
-          rotation_matrix * vec4(baked_element.corners_[i], 1.0f);
-      baked_element.corners_[i].x = rotated_vec.x;
-      baked_element.corners_[i].y = rotated_vec.y;
-      baked_element.corners_[i].z = rotated_vec.z;
-    }
+      vec3 offset = rotation.origin_;
+      for (int i = 0; i < 8; ++i) {
+        baked_element.corners_[i] -= offset;
+      }
 
-    // Undo offsets
-    for (int i = 0; i < 8; ++i) {
-      baked_element.corners_[i] += offset;
+      for (int i = 0; i < 8; ++i) {
+        vec4 rotated_vec =
+            rotation_matrix * vec4(baked_element.corners_[i], 1.0f);
+        baked_element.corners_[i].x = rotated_vec.x;
+        baked_element.corners_[i].y = rotated_vec.y;
+        baked_element.corners_[i].z = rotated_vec.z;
+      }
+
+      // Undo offsets
+      for (int i = 0; i < 8; ++i) {
+        baked_element.corners_[i] += offset;
+      }
     }
 
     // Now work on the faces
@@ -163,11 +175,33 @@ void ModelManager::BakeFace(
     }
 
     optional<TextureAtlasSource::Sprite> sprite = atlas_->GetSprite(location);
+    const int atlas_x = atlas_->GetWidth();
+    const int atlas_y = atlas_->GetHeight();
+
     if (sprite.has_value()) {
-      baked_face.uv_[0] = sprite->uv_beg_.x;
-      baked_face.uv_[1] = sprite->uv_beg_.y;
-      baked_face.uv_[2] = sprite->uv_end_.x;
-      baked_face.uv_[3] = sprite->uv_end_.y;
+      vec4 uv;
+      uv[0] = sprite->uv_beg_.x + face->uv_[0] / atlas_x;
+      uv[1] = sprite->uv_beg_.y + face->uv_[1] / atlas_y;
+      uv[2] = sprite->uv_beg_.x + face->uv_[2] / atlas_x;
+      uv[3] = sprite->uv_beg_.y + face->uv_[3] / atlas_y;
+
+      baked_face.uv_00_ = {uv[0], uv[1]};
+      baked_face.uv_01_ = {uv[2], uv[1]};  // Swap
+      baked_face.uv_10_ = {uv[0], uv[3]};  // Swap
+      baked_face.uv_11_ = {uv[2], uv[3]};
+
+      for (int r = 0; r < face->texture_rotation_; r += 90) {
+        swap(baked_face.uv_00_, baked_face.uv_01_);
+        swap(baked_face.uv_00_, baked_face.uv_10_);
+        swap(baked_face.uv_10_, baked_face.uv_11_);
+      }
+
+      if ((i >> 1) == kZAxis) {
+        swap(baked_face.uv_10_, baked_face.uv_01_);
+      }
+
+      baked_face.partial_trans_ = sprite->partial_trans_;
+      baked_face.full_trans_ = sprite->full_trans_;
     }
 
     baked_face.cull_face_ = face.value().cull_face_;
@@ -183,10 +217,10 @@ FastHashMap<string, ResourceLocation> ModelManager::DecodeModelTextures(
   FastHashMap<string, string> original_mapping;
 
   for (const auto& [key, val] : model.texture_variables_) {
-    original_mapping.insert({key, val});
+    original_mapping.insert({"#" + key, val});
   }
 
-  for (const auto& [key, val] : model.texture_variables_) {
+  for (const auto& [key, val] : original_mapping) {
     if (mapping.contains(key)) {
       continue;
     }

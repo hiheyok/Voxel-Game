@@ -274,9 +274,7 @@
     <ClCompile Include="src\Level\Item\ItemTextureAtlas.cpp" />
     <ClCompile Include="src\Level\Level.cpp" />
     <ClCompile Include="src\Level\World\WorldInterface.cpp" />
-    <ClCompile Include="src\RenderEngine\ChunkRender\BlockTextureAtlas.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexFormat.cpp" />
-    <ClCompile Include="src\RenderEngine\Models\Block\BlockModelManagerOld.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Render\RenderDrawArrays.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Render\RenderDrawElements.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Render\RenderObject.cpp" />
@@ -315,8 +313,6 @@
     <ClCompile Include="src\Level\World\World.cpp" />
     <ClCompile Include="src\Level\World\WorldUpdater.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\RenderEngine\Models\Block\BlockModels.cpp" />
-    <ClCompile Include="src\RenderEngine\Models\Block\BlockModelLoader.cpp" />
     <ClCompile Include="src\RenderEngine\Camera\Camera.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRender\Batch\ChunkBatch.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRender\MemoryPool\ChunkMemoryPool.cpp" />
@@ -412,8 +408,6 @@
     <ClCompile Include="src\RenderEngine\OpenGL\Shader\ShaderInterface.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Texture\TextureOld.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\Texture2DOld.cpp" />
-    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\TextureArrayOld.cpp" />
-    <ClCompile Include="src\RenderEngine\OpenGL\Texture\Types\TextureAtlasOld.cpp" />
     <ClCompile Include="src\RenderEngine\Window.cpp" />
     <ClCompile Include="src\Utils\Containers\NBitVector.cpp" />
     <ClCompile Include="src\Utils\Math\Probability\Probability.cpp" />
@@ -474,9 +468,7 @@
     <ClInclude Include="src\Core\Networking\Packet.h" />
     <ClInclude Include="src\Core\Networking\PlayerAction.h" />
     <ClInclude Include="src\Level\World\WorldInterface.h" />
-    <ClInclude Include="src\RenderEngine\ChunkRender\BlockTextureAtlas.h" />
     <ClInclude Include="src\RenderEngine\GUI\Item\ItemRender.h" />
-    <ClInclude Include="src\RenderEngine\Models\Block\BlockModelManagerOld.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Render\RenderDrawArrays.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Render\RenderDrawElements.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Render\RenderObject.h" />
@@ -520,9 +512,7 @@
     <ClInclude Include="src\Utils\Containers\NBitVector.h" />
     <ClInclude Include="src\Utils\Containers\PackedBitArray.h" />
     <ClInclude Include="src\Utils\Containers\robin_hood.h" />
-    <ClInclude Include="src\RenderEngine\Models\Block\BlockModelLoader.h" />
     <ClInclude Include="src\RenderEngine\BlockModel\RectangularModel.h" />
-    <ClInclude Include="src\RenderEngine\Models\Block\BlockModels.h" />
     <ClInclude Include="src\RenderEngine\ChunkRender\Batch\RenderCommandBuffer.h" />
     <ClInclude Include="src\RenderEngine\ChunkRender\MemoryPool\ChunkMemoryPool.h" />
     <ClInclude Include="src\RenderEngine\ChunkRender\Mesh\ChunkMesh.h" />
@@ -532,7 +522,6 @@
     <ClInclude Include="src\RenderEngine\GUI\Font.h" />
     <ClInclude Include="src\RenderEngine\GUI\TextRenderer.h" />
     <ClInclude Include="src\RenderEngine\ItemRender\BlockItemRender.h" />
-    <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureAtlasOld.h" />
     <ClInclude Include="src\Level\Light\LightStorage.h" />
     <ClInclude Include="src\Level\Entity\Mobs\Player.h" />
     <ClInclude Include="src\Level\Event\ChunkEventHandles\ChunkHandles.h" />
@@ -554,7 +543,6 @@
     <ClInclude Include="src\RenderEngine\OpenGL\Shader\Shader.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Texture\TextureOld.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\Texture2DOld.h" />
-    <ClInclude Include="src\RenderEngine\OpenGL\Texture\Types\TextureArrayOld.h" />
     <ClInclude Include="src\RenderEngine\Window.h" />
     <ClInclude Include="src\Utils\Containers\FIFOQueue.h" />
     <ClInclude Include="src\Utils\Iterators.h" />

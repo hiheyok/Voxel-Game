@@ -3,16 +3,15 @@
 #extension GL_ARB_shader_draw_parameters : enable
 const float kMultiplier = 0.001953125;
 const uint kColorMask = 255;
-const uint kTextureMask = (1 << 14) - 1;
-const uint kUVMask = (1 << 5) - 1;
-const uint kLightMask = (1 << 4) - 1;
+const uint kLightMask = 15;
 
 layout (location = 0) in vec3 vertices_positions;
 layout (location = 1) in uint color_data;
-layout (location = 2) in uint tex_uv_light_data;
+layout (location = 2) in vec2 uv;
+layout (location = 3) in uint light;
 
 layout (std430, binding = 2) buffer ChunkPosBuffer {
-     int chunk_pos[100000];
+     int chunk_pos[];
 };
 
 out uint texture_id;
@@ -35,21 +34,10 @@ void main() {
     float a = float((color_data >> 24) & 255) / 255.f;
     color = vec4(r, g, b, a);
 
-    // Unpack the texture uv light
-    texture_id = (tex_uv_light_data & kTextureMask) - 1;
+    texture_uv = uv;
 
-    // Work on uv coordinates
-    float u = float((tex_uv_light_data >> 14) & kUVMask) / 16.f;
-    float v = float((tex_uv_light_data >> 19) & kUVMask) / 16.f;
-    u *= kMultiplier;
-    v *= kMultiplier;
-    float u_offset = float(texture_id & 511) * kMultiplier;
-    float v_offset = float(texture_id >> 9) * kMultiplier;
-    texture_uv = vec2(u + u_offset, v + v_offset);
-
-    // Work on lighting
-    sky_light = float((tex_uv_light_data >> 24) & kLightMask) / 15.f;
-    block_light = float((tex_uv_light_data >> 28) & kLightMask) / 15.f;
+    sky_light = float(light & kLightMask) / 15.f;
+    block_light = float((light >> 4) & kLightMask) / 15.f;
 
     gl_Position = projection * view * model * vec4(global_vert, 1.f);
 }

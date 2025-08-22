@@ -11,8 +11,5 @@ struct FluidProperties {
 struct Fluid : Block {
   Fluid(GameContext&, int spread_rate);
   FluidProperties fluid_properties_;
-  // Use custom block model for fluids
-  std::unique_ptr<BlockModel> InitializeBlockModel(
-      BlockModelLoader& modelLoader) override;
   void Tick(BlockPos pos, Dimension* currentWorld) override;
 };

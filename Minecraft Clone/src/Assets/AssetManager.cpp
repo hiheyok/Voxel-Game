@@ -2,13 +2,18 @@
 
 #include <nlohmann/json.hpp>
 
+#include "Assets/Types/Models/Managers/BlockModelManager.h"
 #include "Assets/Types/ShaderSource.h"
 #include "Assets/Types/Texture/Texture2DSource.h"
 #include "Assets/Types/Texture/TextureAtlasSource.h"
 #include "Core/GameContext/GameContext.h"
 #include "Core/IO/FileUtils.h"
 
-AssetManager::AssetManager(GameContext& context) : context_{context} {}
+using std::make_unique;
+
+AssetManager::AssetManager(GameContext& context)
+    : context_{context},
+      block_models_{make_unique<BlockModelManager>(context)} {}
 AssetManager::~AssetManager() = default;
 
 AssetHandle<ShaderSource> AssetManager::GetShaderSource(std::string key) {
@@ -36,6 +41,10 @@ std::vector<AssetHandle<TextureAtlasSource>> AssetManager::GetAllAtlasSource() {
   return GetAllAsset<TextureAtlasSource>();
 }
 
+const BlockModelManager& AssetManager::GetBlockModelManager() const {
+  return *block_models_;
+}
+
 void AssetManager::Initialize() {
   DiscoverShaders();
   DiscoverTextures();
@@ -53,6 +62,8 @@ void AssetManager::Load() {
   for (auto& [key, asset] : GetCache<TextureAtlasSource>()) {
     asset->Load();
   }
+
+  block_models_->Load();
 }
 
 void AssetManager::DiscoverShaders() {

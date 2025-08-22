@@ -55,14 +55,14 @@ std::unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(ChunkPos pos) {
       std::make_unique<Mesh::ChunkVertexData>();
 
   data->solid_vertices_.insert(data->solid_vertices_.end(),
-                               chunk_mesher.solid_vertices_buffer_.begin(),
-                               chunk_mesher.solid_vertices_buffer_.begin() +
+                               chunk_mesher.solid_buffer_.begin(),
+                               chunk_mesher.solid_buffer_.begin() +
                                    chunk_mesher.solid_face_count_ * 6);
   data->transparent_vertices_.insert(
       data->transparent_vertices_.end(),
-      chunk_mesher.trans_vertices_buffer_.begin(),
-      chunk_mesher.trans_vertices_buffer_.begin() +
-          chunk_mesher.transparent_face_count_ * 6);
+      chunk_mesher.trans_buffer_.begin(),
+      chunk_mesher.trans_buffer_.begin() +
+          chunk_mesher.trans_face_count_ * 6);
 
   data->position_ = pos;
 

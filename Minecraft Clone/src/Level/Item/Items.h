@@ -30,7 +30,7 @@ class ItemList {
   Item DIRT = RegisterBlockItem(context_.blocks_->DIRT);
   Item WATER = RegisterBlockItem(context_.blocks_->WATER);
   Item LAVA = RegisterBlockItem(context_.blocks_->LAVA);
-  Item GRASS = RegisterBlockItem(context_.blocks_->GRASS);
+  Item GRASS_BLOCK = RegisterBlockItem(context_.blocks_->GRASS_BLOCK);
   Item SAND = RegisterBlockItem(context_.blocks_->SAND);
   Item OAK_LOG = RegisterBlockItem(context_.blocks_->OAK_LOG);
   Item STRIPPED_OAK_LOG = RegisterBlockItem(context_.blocks_->STRIPPED_OAK_LOG);
@@ -491,4 +491,5 @@ class ItemList {
   Item SMOOTH_QUARTZ = RegisterBlockItem(context_.blocks_->SMOOTH_QUARTZ);
 
   Item ANVIL = RegisterBlockItem(context_.blocks_->ANVIL);
+  Item GRASS = RegisterBlockItem(context_.blocks_->GRASS);
 };

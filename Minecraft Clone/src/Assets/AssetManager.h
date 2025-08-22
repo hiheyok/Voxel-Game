@@ -15,6 +15,7 @@ concept IsAsset = std::is_base_of_v<Asset, std::decay_t<T>>;
 class ShaderSource;
 class Texture2DSource;
 class TextureAtlasSource;
+class BlockModelManager;
 
 class AssetManager {
  public:
@@ -29,6 +30,8 @@ class AssetManager {
 
   AssetHandle<TextureAtlasSource> GetAtlasSource(std::string key);
   std::vector<AssetHandle<TextureAtlasSource>> GetAllAtlasSource();
+
+  const BlockModelManager& GetBlockModelManager() const;
 
   // This will load in all of the keys
   void Initialize();
@@ -61,6 +64,7 @@ class AssetManager {
   FastHashMap<std::string, std::unique_ptr<ShaderSource>> shader_cache_;
   FastHashMap<std::string, std::unique_ptr<Texture2DSource>> texture2d_cache_;
   FastHashMap<std::string, std::unique_ptr<TextureAtlasSource>> atlas_cache_;
+  std::unique_ptr<BlockModelManager> block_models_;
 };
 
 template <IsAsset T>

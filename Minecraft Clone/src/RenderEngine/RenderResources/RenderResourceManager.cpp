@@ -38,9 +38,9 @@ RenderHandle<Texture2DV2> RenderResourceManager::GetTexture2D(
   return GetResource<Texture2DV2>(key);
 }
 
-RenderHandle<TextureAtlasV2> RenderResourceManager::GetAtlas(
+RenderHandle<TextureAtlas> RenderResourceManager::GetAtlas(
     const std::string& key) {
-  return GetResource<TextureAtlasV2>(key);
+  return GetResource<TextureAtlas>(key);
 }
 
 void RenderResourceManager::LoadShaders() {
@@ -57,12 +57,11 @@ void RenderResourceManager::LoadShaders() {
 }
 
 void RenderResourceManager::LoadTextures() {
-
   for (auto& [key, resource] : GetCache<Texture2DV2>()) {
     resource->Load();
   }
 
-  for (auto& [key, resource] : GetCache<TextureAtlasV2>()) {
+  for (auto& [key, resource] : GetCache<TextureAtlas>()) {
     resource->Load();
   }
 }
@@ -93,6 +92,6 @@ void RenderResourceManager::FindTextures() {
   }
 
   for (auto& source : atlas) {
-    CreateResource<TextureAtlasV2>(source->GetKey(), source);
+    CreateResource<TextureAtlas>(source->GetKey(), source);
   }
 }

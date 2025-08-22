@@ -13,7 +13,7 @@ in vec4 color;
 uniform vec3 camPos;
 uniform float RenderDistance;
 uniform float VerticalRenderDistance;
-uniform sampler2D BlockTexture;
+uniform sampler2D blocks;
 uniform sampler2D light_map;
 uniform vec3 tintColor;
 
@@ -43,7 +43,7 @@ void main() {
     depth = depth * depth;
     depth = 1 - depth;
 
-    vec4 block_texture =  texture(BlockTexture, texture_uv);
+    vec4 block_texture =  texture(blocks, texture_uv);
     vec4 light =  SampleLighting();
 
     if (block_texture.a == 0.0f)

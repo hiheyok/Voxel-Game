@@ -28,23 +28,28 @@ void TextureAtlasSource::Load() {
   for (auto [sprite_path, sprite_name] : sprites) {
     TextureData data = LoadTexture(sprite_path);
     SpriteData sprite;
+    sprite.partial_trans_ = data.IsPartialTrans();
+    sprite.full_trans_ = data.IsFullTrans();
     sprite.data_ = move(data);
     sprite.name_ = sprite_name;
-
-    Sprite s;
-    s.name_ = sprite.name_;
-    s.uv_beg_.x = static_cast<float>(sprite.x_) / width_;
-    s.uv_beg_.y = static_cast<float>(sprite.y_) / height_;
-    s.uv_end_.x = static_cast<float>(sprite.x_ + sprite.width_) / width_;
-    s.uv_end_.y = static_cast<float>(sprite.y_ + sprite.height_) / height_;
-    sprites_map_.insert({ResourceLocation{sprite.name_}, s});
-
     sprites_.push_back(move(sprite));
   }
 
   // Now stitch the data together
   Stitch();
   format_ = GetFormat(channels_);
+
+  for (const auto& sprite : sprites_) {
+    Sprite s;
+    s.name_ = sprite.name_;
+    s.uv_beg_.x = static_cast<float>(sprite.x_) / width_;
+    s.uv_beg_.y = static_cast<float>(sprite.y_) / height_;
+    s.uv_end_.x = static_cast<float>(sprite.x_ + sprite.width_) / width_;
+    s.uv_end_.y = static_cast<float>(sprite.y_ + sprite.height_) / height_;
+    s.partial_trans_ = sprite.partial_trans_;
+    s.full_trans_ = sprite.full_trans_;
+    sprites_map_.insert({ResourceLocation{sprite.name_}, s});
+  }
 }
 
 vector<TextureAtlasSource::Sprite> TextureAtlasSource::GetAllSprites() const {

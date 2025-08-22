@@ -13,7 +13,6 @@
 #include "Level/Item/ItemTextureAtlas.h"
 #include "Level/Item/Items.h"
 #include "Level/TerrainGeneration/Generators/GeneratorType.h"
-#include "RenderEngine/Models/Block/BlockModelManagerOld.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "Utils/LogUtils.h"
 
@@ -25,8 +24,7 @@ GameContext::GameContext()
       items_{std::make_unique<ItemList>(*this)},
       generators_{std::make_unique<GeneratorType>(*this)},
       event_handler_{std::make_unique<EventHandler>(*this)},
-      assets_{std::make_unique<AssetManager>(*this)},
-      block_model_manager_{std::make_unique<BlockModelManager>(*this)} {}
+      assets_{std::make_unique<AssetManager>(*this)} {}
 GameContext::~GameContext() = default;
 
 void GameContext::InitializeGameContext() {
@@ -53,8 +51,6 @@ void GameContext::InitializeRenderingContext() {
   render_resource_manager_->Load();
 
   item_atlas_ = std::make_unique<ItemTextureAtlas>(*this);
-
-  block_model_manager_->LoadModels();
   item_atlas_->Initialize(512 * 16 * 2, 16 * 2 * 8);
   for (auto& item : items_->item_container_) {
     item_atlas_->AddItem(item.second);

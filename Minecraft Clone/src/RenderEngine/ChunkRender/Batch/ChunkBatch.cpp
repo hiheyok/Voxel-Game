@@ -36,12 +36,14 @@ void ChunkDrawBatch::SetupBuffers() {
   ibo_.InitializeData();
 
   array_
-      .EnableAttriPtr(memory_pool_.buffer_.get(), 0, 3, GL_FLOAT, GL_FALSE, 5,
+      .EnableAttriPtr(memory_pool_.buffer_.get(), 0, 3, GL_FLOAT, GL_FALSE, 7,
                       0)
-      .EnableAttriPtr(memory_pool_.buffer_.get(), 1, 1, GL_FLOAT, GL_FALSE, 5,
+      .EnableAttriPtr(memory_pool_.buffer_.get(), 1, 1, GL_FLOAT, GL_FALSE, 7,
                       3)
-      .EnableAttriPtr(memory_pool_.buffer_.get(), 2, 1, GL_FLOAT, GL_FALSE, 5,
-                      4);
+      .EnableAttriPtr(memory_pool_.buffer_.get(), 2, 2, GL_FLOAT, GL_FALSE, 7,
+                      4)
+      .EnableAttriPtr(memory_pool_.buffer_.get(), 3, 1, GL_FLOAT, GL_FALSE, 7,
+                      6);
 
   ssbo_.SetMaxSize(max_buffer_size_ / 100);
   ssbo_.InitializeData();
