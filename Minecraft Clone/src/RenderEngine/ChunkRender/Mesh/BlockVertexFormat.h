@@ -14,7 +14,6 @@ struct BlockVertexFormat {
   void SetLight(int sky_light, int block_light) noexcept;
 
   glm::vec3 pos_{0.0f, 0.0f, 0.0f};  // 32 bit float for each position, might change to 16 bit
-                       // float later
   uint32_t color_ = 0;  // Each channel is 8 bit r, g, b, a
   float u_ = 0.0f;
   float v_ = 0.0f;

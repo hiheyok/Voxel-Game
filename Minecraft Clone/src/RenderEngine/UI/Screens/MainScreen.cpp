@@ -30,13 +30,12 @@ void MainScreen::OnEnter() {
   auto atlas = std::make_unique<TextureComponent>(
       context_.render_resource_manager_->GetAtlas("gui"));
 
-  auto widget1 = std::make_unique<Widget>();
+  auto widget1 = std::make_unique<Widget>(context_);
   widget1->SetAnchorMin({0.0f, 0.0f});
   widget1->SetAnchorMax({1.0f, 1.0f});
   widget1->SetPivot({0.0f, 0.0f});
   widget1->AddComponent(std::move(red));
   widget1->AddComponent(std::move(atlas));
-
 
   root_widget_->AddChildWidget(std::move(widget1));
 }

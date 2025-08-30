@@ -24,8 +24,8 @@ struct Face {
   glm::vec2 uv_11_;
   int cull_face_ = -1;
   int tint_index_ = -1;
-  bool partial_trans_ = false;
-  bool full_trans_ = false;
+  bool partial_trans_ : 1 = false;
+  bool full_trans_ : 1 = false;
 };
 
 struct Element {
@@ -36,7 +36,7 @@ struct Element {
   // block-local space [0,1]
   // corners indexed convention
   // 0b000 -> 0b111
-  // 0b[x][y][z] where 1 means to_ and 0 means from_
+  // 0b[z][y][x] where 1 means to_ and 0 means from_
   std::array<glm::vec3, 8> corners_;
   std::array<std::optional<Face>, 6> faces_;
   int min_light_emission_ = 0;

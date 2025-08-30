@@ -12,18 +12,19 @@ class InputManager;
 class Component;
 class ScreenManager;
 class UIRenderer;
+class GameContext;
 
 struct UIRectangle;
 
 class Widget {
  public:
-  Widget();
+  Widget(GameContext&);
   virtual ~Widget();
 
   Widget(const Widget&) = delete;
   Widget& operator=(const Widget&) = delete;
-  Widget(Widget&&) noexcept = default;
-  Widget& operator=(Widget&&) noexcept = default;
+  Widget(Widget&&) noexcept = delete;
+  Widget& operator=(Widget&&) noexcept = delete;
 
   // Properties setter
   void SetPivot(glm::vec2 pos) noexcept;
@@ -45,6 +46,8 @@ class Widget {
   void SetDirty();
 
  protected:
+  GameContext& context_;
+
   // Units are in normalized coordinates [0, 1]
   glm::vec2 anchor_min_ = {0.5f, 0.5f};
   glm::vec2 anchor_max_ = {0.5f, 0.5f};
@@ -52,6 +55,9 @@ class Widget {
   // Units are in virtual pixels
   glm::vec2 offset_min_ = {0.0f, 0.0f};  // Often called "position"
   glm::vec2 offset_max_ = {0.0f, 0.0f};  // Often called "size"
+
+  std::vector<std::unique_ptr<Component>> components_;
+
  private:
   friend class Screen;
 
@@ -64,7 +70,6 @@ class Widget {
   ScreenManager* manager_;
   Widget* parent_;
 
-  std::vector<std::unique_ptr<Component>> components_;
   std::vector<std::unique_ptr<Widget>> children_;
 
   bool self_dirty_, children_dirty_;

@@ -4,6 +4,7 @@
 
 #include <cstdint>
 
+#include "RenderEngine/API/TextureBase.h"
 #include "RenderEngine/RenderResources/RenderResource.h"
 
 class GameContext;
@@ -11,13 +12,14 @@ class TextureSource;
 
 // This is designed as an interface to manage all of the different types
 // textures (e.g. TextureArray, Texture2D, TextureAtlas)
-class TextureV2 : public RenderResource {
+class TextureV2 : public RenderResource, public TextureBase {
  public:
   virtual ~TextureV2();
 
-  GLuint GetId() const noexcept;
-  GLenum GetTarget() const noexcept;
-  GLuint64 GetHandle() const noexcept;
+  GLuint GetId() const noexcept override;
+  GLenum GetTarget() const noexcept override;
+  GLuint64 GetHandle() const noexcept override;
+  GLuint GetFormat() const noexcept override;
 
   void Load() override;
 

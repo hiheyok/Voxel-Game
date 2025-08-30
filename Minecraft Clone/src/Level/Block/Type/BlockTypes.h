@@ -7,3 +7,4 @@
 #include "Level/Block/Type/Fluid.h"
 #include "Level/Block/Type/Grass.h"
 #include "Level/Block/Type/GravityBlock.h"
+#include "Level/Block/Type/PlantBlock.h"

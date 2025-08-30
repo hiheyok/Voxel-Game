@@ -59,6 +59,7 @@ LightEngine<kEngineType>::LightEngine(GameContext& context,
       world_{world},
       properties_{context.blocks_->GetBlockPropertyList()},
       light_cache_{nullptr} {}
+      
 template <EngineType kEngineType>
 LightEngine<kEngineType>::~LightEngine() = default;
 

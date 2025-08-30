@@ -9,8 +9,12 @@
 #include "Assets/Types/Texture/Atlas/StitchingRectangle.h"
 #include "Core/Typenames.h"
 
-Stitcher::Stitcher(GameContext& context, int initial_width, int initial_height)
+using std::pair;
+
+Stitcher::Stitcher(GameContext& context, int initial_width, int initial_height,
+                   bool can_expand)
     : context_{context},
+      kCanExpand{can_expand},
       place_heuristic_{std::make_unique<BestShortSideFit>()},
       split_heuristic_{std::make_unique<ShorterAxisSplit>()},
       width_{initial_width},
@@ -20,8 +24,9 @@ Stitcher::Stitcher(GameContext& context, int initial_width, int initial_height)
 
 Stitcher::~Stitcher() = default;
 
-std::pair<int, int> Stitcher::PlaceItem(int item_width, int item_height) {
-  while (width_ < kMaxSize || height_ < kMaxSize) {
+pair<int, int> Stitcher::PlaceItem(const ResourceLocation& location,
+                                   int item_width, int item_height) {
+  do {
     int idx =
         place_heuristic_->FindBestSpot(item_width, item_height, free_bins_);
 
@@ -42,15 +47,25 @@ std::pair<int, int> Stitcher::PlaceItem(int item_width, int item_height) {
       }
 
       MergeBins();
+
+      StitchingRectangle used_bin;
+      used_bin.width_ = item_width;
+      used_bin.height_ = item_height;
+      used_bin.x_ = rect.x_;
+      used_bin.y_ = rect.y_;
+
+      used_bins_.emplace(location, used_bin);
       return {rect.x_, rect.y_};
     } else {
       Expand(item_width, item_height);
       MergeBins();
     }
-  }
+  } while ((width_ < kMaxSize || height_ < kMaxSize) && kCanExpand);
 
   return {-1, -1};
 }
+
+void Stitcher::RemoveItem(const ResourceLocation& location) {}
 
 int Stitcher::GetWidth() const noexcept { return width_; }
 

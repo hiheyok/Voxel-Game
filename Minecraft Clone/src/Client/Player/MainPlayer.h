@@ -8,7 +8,8 @@ class ClientCache;
 class ServerInterface;
 class WorldInteraction;
 class InputManager;
-class PlayerMovement;
+class PlayerMovement; 
+
 class PlayerPOV;
 class Player;
 class GUI;

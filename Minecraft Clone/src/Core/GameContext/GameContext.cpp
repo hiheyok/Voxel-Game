@@ -44,6 +44,7 @@ void GameContext::InitializeGameContext() {
   //   logger_->LogWarn("File System", e.what());
   // }
 }
+
 void GameContext::InitializeRenderingContext() {
   // Initialize objects
   render_resource_manager_ = std::make_unique<RenderResourceManager>(*this);

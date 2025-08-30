@@ -12,7 +12,6 @@ GravityBlock::GravityBlock(GameContext& context) : Block{context} {
   properties_->is_solid_ = true;
   properties_->transparency_ = false;
   properties_->is_fluid_ = false;
-  properties_->light_pass_ = false;
 }
 
 void GravityBlock::Tick(BlockPos pos, Dimension* currentWorld) {

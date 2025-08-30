@@ -2,8 +2,8 @@
 
 #include "Client/Client.h"
 
-#include <gl/glew.h>
 #include <GLFW/glfw3.h>
+#include <gl/glew.h>
 
 #include <chrono>
 #include <memory>

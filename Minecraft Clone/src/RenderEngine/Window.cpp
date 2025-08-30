@@ -94,7 +94,7 @@ void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, uint32_t id,
   str.seekg(0, std::ios::end);
 
   if (str.str().size() != 0) {
-    LOG_STATIC_DEBUG(logger, "{}", str.str());
+    LOG_STATIC_WARN(logger, "{}", str.str());
   }
 }
 

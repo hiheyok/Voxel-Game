@@ -225,6 +225,7 @@
     <ClCompile Include="src\Core\IO\FileUtils.cpp" />
     <ClCompile Include="src\Core\Position\PositionTypes.cpp" />
     <ClCompile Include="src\Level\Block\Type\AirBlock.cpp" />
+    <ClCompile Include="src\Level\Block\Type\PlantBlock.cpp" />
     <ClCompile Include="src\Level\Block\Type\SolidBlock.cpp" />
     <ClCompile Include="src\Level\Chunk\ChunkRawData.cpp" />
     <ClCompile Include="src\Level\Container\ChunkMap.cpp" />
@@ -275,11 +276,19 @@
     <ClCompile Include="src\Level\Level.cpp" />
     <ClCompile Include="src\Level\World\WorldInterface.cpp" />
     <ClCompile Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexFormat.cpp" />
+    <ClCompile Include="src\RenderEngine\Framebuffer\Attachments\Attachment.cpp" />
+    <ClCompile Include="src\RenderEngine\Framebuffer\Attachments\ColorAttachment.cpp" />
+    <ClCompile Include="src\RenderEngine\Framebuffer\Attachments\DepthStencilAttachment.cpp" />
+    <ClCompile Include="src\RenderEngine\Framebuffer\RenderTarget.cpp" />
+    <ClCompile Include="src\RenderEngine\Framebuffer\RenderTargetTexture.cpp" />
+    <ClCompile Include="src\RenderEngine\ItemRender\ItemRender.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Render\RenderDrawArrays.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Render\RenderDrawElements.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Render\RenderObject.cpp" />
+    <ClCompile Include="src\RenderEngine\RenderResources\Manager\ItemIconManager.cpp" />
     <ClCompile Include="src\RenderEngine\RenderResources\RenderResource.cpp" />
     <ClCompile Include="src\RenderEngine\RenderResources\RenderResourceManager.cpp" />
+    <ClCompile Include="src\RenderEngine\RenderResources\Types\Texture\DynamicAtlas.cpp" />
     <ClCompile Include="src\RenderEngine\RenderResources\Types\Texture\Texture.cpp" />
     <ClCompile Include="src\RenderEngine\RenderResources\Types\Texture\Texture2D.cpp" />
     <ClCompile Include="src\RenderEngine\RenderResources\Types\Texture\Texture2DBase.cpp" />
@@ -297,6 +306,7 @@
     <ClCompile Include="src\RenderEngine\UI\Screens\Screen.cpp" />
     <ClCompile Include="src\RenderEngine\UI\UIManager.cpp" />
     <ClCompile Include="src\RenderEngine\UI\UIRenderer.cpp" />
+    <ClCompile Include="src\RenderEngine\UI\Widgets\SlotWidget.cpp" />
     <ClCompile Include="src\RenderEngine\UI\Widgets\Widget.cpp" />
     <ClCompile Include="src\Server\Server.cpp" />
     <ClCompile Include="src\Level\TerrainGeneration\Generators\DebugPositioning\DebugPositioning.cpp" />
@@ -371,10 +381,14 @@
     <ClInclude Include="src\Core\DataStructure\NibbleArray.h" />
     <ClInclude Include="src\Core\DataStructure\OriginalConcurrentQueue.h" />
     <ClInclude Include="src\Core\GameContext\GameContext.h" />
+    <ClInclude Include="src\Core\Handle\Handle.h" />
+    <ClInclude Include="src\Core\Handle\HandleControlBlock.h" />
+    <ClInclude Include="src\Core\Handle\HandleSource.h" />
     <ClInclude Include="src\Core\IO\FileUtils.h" />
     <ClInclude Include="src\Core\Position\Position.h" />
     <ClInclude Include="src\Core\Position\PositionTypes.h" />
     <ClInclude Include="src\Level\Block\Type\AirBlock.h" />
+    <ClInclude Include="src\Level\Block\Type\PlantBlock.h" />
     <ClInclude Include="src\Level\Block\Type\SolidBlock.h" />
     <ClInclude Include="src\Level\Entity\EntityType.h" />
     <ClInclude Include="src\Level\Light\BlockLightEngine.h" />
@@ -386,6 +400,7 @@
     <ClInclude Include="src\Level\Light\ThreadedLightEngine.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Generators\DebugMeshStressFace\DebugMeshStressFace.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Generators\DebugMeshStress\DebugMeshStress.h" />
+    <ClInclude Include="src\RenderEngine\API\TextureBase.h" />
     <ClInclude Include="src\RenderEngine\ChunkRender\Mesh\BlockVertexFormat.h" />
     <ClInclude Include="src\RenderEngine\EntityRender\MultiEntityRender.h" />
     <ClCompile Include="src\RenderEngine\Frustum\frustum.cpp" />
@@ -397,7 +412,6 @@
     </ClCompile>
     <ClCompile Include="src\RenderEngine\GUI\GUISet.cpp" />
     <ClCompile Include="src\RenderEngine\GUI\TextRenderer.cpp" />
-    <ClCompile Include="src\RenderEngine\ItemRender\BlockItemRender.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Buffers\Buffer.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Buffers\BufferStorage.cpp" />
     <ClCompile Include="src\RenderEngine\OpenGL\Buffers\VertexArray.cpp" />
@@ -468,14 +482,22 @@
     <ClInclude Include="src\Core\Networking\Packet.h" />
     <ClInclude Include="src\Core\Networking\PlayerAction.h" />
     <ClInclude Include="src\Level\World\WorldInterface.h" />
+    <ClInclude Include="src\RenderEngine\Framebuffer\Attachments\Attachment.h" />
+    <ClInclude Include="src\RenderEngine\Framebuffer\Attachments\ColorAttachment.h" />
+    <ClInclude Include="src\RenderEngine\Framebuffer\Attachments\DepthStencilAttachment.h" />
+    <ClInclude Include="src\RenderEngine\Framebuffer\RenderTarget.h" />
+    <ClInclude Include="src\RenderEngine\Framebuffer\RenderTargetTexture.h" />
     <ClInclude Include="src\RenderEngine\GUI\Item\ItemRender.h" />
+    <ClInclude Include="src\RenderEngine\ItemRender\ItemRender.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Render\RenderDrawArrays.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Render\RenderDrawElements.h" />
     <ClInclude Include="src\RenderEngine\OpenGL\Render\RenderObject.h" />
+    <ClInclude Include="src\RenderEngine\RenderResources\Manager\ItemIconManager.h" />
     <ClInclude Include="src\RenderEngine\RenderResources\RenderHandle.h" />
     <ClInclude Include="src\RenderEngine\RenderResources\RenderResource.h" />
     <ClInclude Include="src\RenderEngine\RenderResources\RenderResourceManager.h" />
     <ClInclude Include="src\RenderEngine\RenderResources\RenderResourceState.h" />
+    <ClInclude Include="src\RenderEngine\RenderResources\Types\Texture\DynamicAtlas.h" />
     <ClInclude Include="src\RenderEngine\RenderResources\Types\Texture\Texture.h" />
     <ClInclude Include="src\RenderEngine\RenderResources\Types\Texture\Texture2D.h" />
     <ClInclude Include="src\RenderEngine\RenderResources\Types\Texture\Texture2DBase.h" />
@@ -494,6 +516,7 @@
     <ClInclude Include="src\RenderEngine\UI\Screens\Screen.h" />
     <ClInclude Include="src\RenderEngine\UI\UIManager.h" />
     <ClInclude Include="src\RenderEngine\UI\UIRenderer.h" />
+    <ClInclude Include="src\RenderEngine\UI\Widgets\SlotWidget.h" />
     <ClInclude Include="src\RenderEngine\UI\Widgets\Widget.h" />
     <ClInclude Include="src\Server\Server.h" />
     <ClInclude Include="src\Level\TerrainGeneration\Generators\DebugPositioning\DebugPositioning.h" />
@@ -521,7 +544,6 @@
     <ClInclude Include="src\RenderEngine\GUI\GUISet.h" />
     <ClInclude Include="src\RenderEngine\GUI\Font.h" />
     <ClInclude Include="src\RenderEngine\GUI\TextRenderer.h" />
-    <ClInclude Include="src\RenderEngine\ItemRender\BlockItemRender.h" />
     <ClInclude Include="src\Level\Light\LightStorage.h" />
     <ClInclude Include="src\Level\Entity\Mobs\Player.h" />
     <ClInclude Include="src\Level\Event\ChunkEventHandles\ChunkHandles.h" />

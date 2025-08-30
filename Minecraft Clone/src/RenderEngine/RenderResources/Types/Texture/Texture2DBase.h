@@ -11,6 +11,7 @@ class Texture2DBase : public TextureV2 {
 
  protected:
   Texture2DBase(GameContext& context, const std::string& key);
+  Texture2DBase(GameContext& context, const std::string& key, int width, int height);
 
   int width_;
   int height_;

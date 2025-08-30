@@ -250,7 +250,8 @@ void TextureAtlasSource::Stitch() {
     TextureData& data = sprite.data_;
     const string& name = sprite.name_;
 
-    auto [x, y] = stitcher.PlaceItem(data.GetWidth(), data.GetHeight());
+    auto [x, y] = stitcher.PlaceItem(ResourceLocation{name}, data.GetWidth(),
+                                     data.GetHeight());
 
     channels = std::max(channels, data.GetChannels());
 

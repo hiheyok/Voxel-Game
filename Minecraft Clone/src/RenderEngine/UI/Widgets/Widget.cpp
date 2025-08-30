@@ -9,7 +9,11 @@
 #include "RenderEngine/UI/Data/UserInterfaceData.h"
 #include "RenderEngine/UI/UIRenderer.h"
 
-Widget::Widget() : parent_{nullptr}, self_dirty_{true}, children_dirty_{true} {}
+Widget::Widget(GameContext& context)
+    : context_{context},
+      parent_{nullptr},
+      self_dirty_{true},
+      children_dirty_{true} {}
 Widget::~Widget() = default;
 
 void Widget::SetPivot(glm::vec2 pos) noexcept { pivot_ = pos; }
@@ -19,6 +23,7 @@ void Widget::SetAnchorBoth(glm::vec2 pos) noexcept {
   SetAnchorMin(pos);
 }
 void Widget::SetAnchorMax(glm::vec2 pos) noexcept { anchor_max_ = pos; }
+
 void Widget::SetAnchorMin(glm::vec2 pos) noexcept { anchor_min_ = pos; }
 
 void Widget::SetOffsetMax(glm::vec2 pos) noexcept { offset_max_ = pos; }

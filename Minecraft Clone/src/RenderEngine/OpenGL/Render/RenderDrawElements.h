@@ -33,8 +33,6 @@ class RenderDrawElements : public RenderObject {
   Buffer vbo_, ebo_;
 };
 
-#include <iostream>
-
 template <typename VertexType, typename ElementType>
 void RenderDrawElements::SetData(const std::vector<VertexType>& vertices,
                                  const std::vector<ElementType>& elements) {

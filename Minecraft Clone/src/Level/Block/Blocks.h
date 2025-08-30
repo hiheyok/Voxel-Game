@@ -690,7 +690,7 @@ class BlockList {
       RegisterBlock("minecraft:smooth_quartz", new DefaultBlock(context_));
 
   BlockID ANVIL = RegisterBlock("minecraft:anvil", new DefaultBlock(context_));
-  BlockID GRASS = RegisterBlock("minecraft:short_grass", new DefaultBlock(context_));
+  BlockID GRASS = RegisterBlock("minecraft:short_grass", new PlantBlock(context_));
 
   void AddAssets(std::string namespaceIn);
 

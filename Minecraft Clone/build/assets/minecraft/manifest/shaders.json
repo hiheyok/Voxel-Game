@@ -6,7 +6,7 @@
     "fragment" : "assets/minecraft/shaders/UI/frag.glsl"
   },
   {
-    "name" : "block_render",
+    "name" : "item_render",
     "type" : "graphics",
     "vertex" : "assets/minecraft/shaders/ItemRender/BlockModelVert.glsl",
     "fragment" : "assets/minecraft/shaders/ItemRender/BlockModelFrag.glsl"

@@ -3,42 +3,47 @@
 #include "Level/Item/ItemTextureAtlas.h"
 
 #include "Core/GameContext/GameContext.h"
+#include "RenderEngine/ItemRender/ItemRender.h"
+#include "RenderEngine/OpenGL/Render/RenderDrawElements.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 
 void ItemTextureAtlas::RenderBlockItem(Item item) {
   framebuffer_single_block_render_.BindFBO();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  block_item_renderer_.RenderBlock(item);
+  item_render_->RenderModel(item);
   framebuffer_single_block_render_.UnbindFBO();
 }
 
 void ItemTextureAtlas::StitchTexture(size_t index, ItemID ItemID) {
   int ratio = atlas_size_ / individual_size_;
   float xCoord = static_cast<float>((index % ratio));
-  float yCoord = floor(static_cast<float>(index) / ratio);
+  float yCoord = static_cast<float>(index / ratio);
 
   // Normalize
-
   xCoord = xCoord / ratio;
   yCoord = yCoord / ratio;
 
   float Size = 2.f / ratio;
 
   // Map to NDC
-
   xCoord = -(xCoord * 2.f - 1.f);
   yCoord = -(yCoord * 2.f - 1.f);
 
   // Insert Data
-  float vertices[] = {
+  std::vector<float> vertices = {
       xCoord - 0.0f, yCoord - 0.0f, 0.0f, 1.0f,
       xCoord - Size, yCoord - 0.0f, 1.0f, 1.0f,
       xCoord - Size, yCoord - Size, 1.0f, 0.0f,
       xCoord - 0.0f, yCoord - Size, 0.0f, 0.0f,
   };
 
-  uint32_t indices[] = {0, 1, 2, 2, 3, 0};
+  std::vector<uint32_t> indices = {0, 1, 2, 2, 3, 0};
+
+  render_->SetData(vertices, indices);
+  render_->SetIndicesCount(indices.size());
+  render_->GetShader()->BindTexture2D(
+      0, framebuffer_single_block_render_.texture_, "ItemTexture");
 
   ItemUVMapping uvMap;
   uvMap.uv_1_ = {(xCoord + 1.f) * 0.5f, (yCoord + 1.f) * 0.5f};
@@ -49,36 +54,23 @@ void ItemTextureAtlas::StitchTexture(size_t index, ItemID ItemID) {
 
   items_uv_map_[ItemID] = uvMap;
 
-  vbo_->InsertData(sizeof(vertices), vertices, GL_STATIC_DRAW);
-  ebo_->InsertData(sizeof(indices), indices, GL_STATIC_DRAW);
   // Render
   atlas_framebuffer_.BindFBO();
-  stitching_shader_->BindTexture2D(0, framebuffer_single_block_render_.texture_,
-                                   "ItemTexture");
-
-  glEnable(GL_BLEND);
-
-  vao_->Bind();
-  ebo_->Bind();
-  glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(uint32_t),
-                 GL_UNSIGNED_INT, 0);
-  vao_->Unbind();
-  ebo_->Unbind();
+  render_->Render();
 
   glDisable(GL_BLEND);
   atlas_framebuffer_.UnbindFBO();
 }
+
 ItemTextureAtlas::ItemTextureAtlas(GameContext& context)
     : context_{context},
       atlas_framebuffer_{context},
-      framebuffer_single_block_render_{context},
-      block_item_renderer_{context} {}
+      framebuffer_single_block_render_{context} {}
 ItemTextureAtlas::~ItemTextureAtlas() = default;
 
 // TODO(hiheyok): Need to move atlas stitching to CPU
 void ItemTextureAtlas::Initialize(int atlasItemSize, int individualItemSize) {
-  stitching_shader_ =
-      context_.render_resource_manager_->GetShader("atlas_stitch_shader");
+  item_render_ = std::make_unique<ItemRender>(context_);
 
   individual_size_ = individualItemSize;
   atlas_size_ = atlasItemSize;
@@ -87,20 +79,10 @@ void ItemTextureAtlas::Initialize(int atlasItemSize, int individualItemSize) {
   framebuffer_single_block_render_.GenBuffer(individual_size_, individual_size_,
                                              2, GL_RGBA);
 
-  vbo_ = std::make_unique<Buffer>(context_);
-  ebo_ = std::make_unique<Buffer>(context_);
-  vao_ = std::make_unique<VertexArray>(context_);
-
-  vbo_->SetType(GL_ARRAY_BUFFER);
-  ebo_->SetType(GL_ELEMENT_ARRAY_BUFFER);
-
-  vbo_->SetUsage(GL_STATIC_DRAW);
-  ebo_->SetUsage(GL_STATIC_DRAW);
-
-  vao_->EnableAttriPtr(vbo_.get(), 0, 2, GL_FLOAT, GL_FALSE, 4, 0)
-      .EnableAttriPtr(vbo_.get(), 1, 2, GL_FLOAT, GL_FALSE, 4, 2);
-
-  block_item_renderer_.Initialize();
+  render_ = std::make_unique<RenderDrawElements>(context_);
+  render_->SetDataAttribute(0, 2, GL_FLOAT, 4, 0);
+  render_->SetDataAttribute(1, 2, GL_FLOAT, 4, 2);
+  render_->SetShader("atlas_stitch_shader");
 }
 
 void ItemTextureAtlas::AddItem(Item item) {

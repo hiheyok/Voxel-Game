@@ -1,48 +1,67 @@
-// Copyright (c) 2025 Voxel-Game Author. All rights reserved.
+#include "RenderEngine/ItemRender/ItemRender.h"
 
-#include "RenderEngine/ItemRender/BlockItemRender.h"
-
-#include <memory>
-#include <vector>
-
-#include "Assets/AssetHandle.h"
 #include "Assets/AssetManager.h"
 #include "Assets/Types/Models/Data/RenderableModel.h"
 #include "Assets/Types/Models/Managers/BlockModelManager.h"
 #include "Core/GameContext/GameContext.h"
-#include "Level/Block/Block.h"
-#include "Level/Block/Blocks.h"
 #include "Level/Item/Item.h"
-#include "RenderEngine/Camera/camera.h"
-#include "RenderEngine/OpenGL/Buffers/Buffer.h"
-#include "RenderEngine/OpenGL/Buffers/VertexArray.h"
+#include "RenderEngine/Camera/Camera.h"
 #include "RenderEngine/OpenGL/Render/RenderDrawElements.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
-#include "RenderEngine/RenderResources/RenderHandle.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "RenderEngine/RenderResources/Types/Texture/TextureAtlas.h"
 
-BlockItemRender::BlockItemRender(GameContext& context)
+using std::make_unique;
+
+ItemRender::ItemRender(GameContext& context)
     : context_{context},
-      render_{std::make_unique<RenderDrawElements>(context)},
-      camera_{std::make_unique<Camera>()} {}
-BlockItemRender::~BlockItemRender() = default;
+      render_{make_unique<RenderDrawElements>(context)},
+      camera_{make_unique<Camera>()} {
+  Initialize();
+}
+ItemRender::~ItemRender() = default;
 
-void BlockItemRender::Initialize() {
-  render_->SetShader("block_render");
+void ItemRender::RenderModel(const Item& item) {
+  auto [index_offset, model_size] = item_model_info_[item.GetBlock()];
 
+  // TODO(hiheyok): Add support for null model
+  if (model_size == 0) {
+    return;
+  }
+
+  SetDrawCalls();
+  render_->SetIndicesCount(model_size);
+  render_->SetIndicesOffset(index_offset * 4);
+  RenderHandle<TextureAtlas> atlas =
+      context_.render_resource_manager_->GetAtlas("blocks");
+
+  render_->SetTexture(0, atlas);
+  render_->Render();
+}
+
+void ItemRender::Initialize() {
+  SetUpRenderer();
+  SetUpData();
+}
+
+void ItemRender::SetUpRenderer() {
+  render_->SetShader("item_render");
   render_->SetDataAttribute(0, 3, GL_FLOAT, 6, 0);
   render_->SetDataAttribute(1, 2, GL_FLOAT, 6, 3);
   render_->SetDataAttribute(2, 1, GL_FLOAT, 6, 5);
 
-  SetCamera();
+  camera_->fov_ = 57;
+  camera_->position_ = {1.1f, 1.1f, 1.1f};
+  camera_->pitch_ = -35;
+  camera_->yaw_ = -135;
+  camera_->UpdateCameraVectors();
 
   float dimensions = 0.85f;
-
   glm::mat4 view = camera_->GetViewMatrix();
   glm::mat4 modelMat = glm::mat4(1.f);
   glm::mat4 orthoProj = glm::ortho(-dimensions, dimensions, -dimensions,
                                    dimensions, 0.001f, 3.0f);
+
   render_->GetShader()
       ->SetMat4("view", view)
       .SetMat4("model", modelMat)
@@ -54,28 +73,36 @@ void BlockItemRender::Initialize() {
   render_->SetTexture(0, atlas);
 }
 
-void BlockItemRender::RenderBlock(Item item) {
-  std::vector<VertexFormat> vertices{};
-  std::vector<uint32_t> indices{};
-  std::vector<Block*> blocks = context_.blocks_->block_type_data_;
+void ItemRender::SetUpData() {
+  const BlockModelManager::ModelList& models =
+      context_.assets_->GetBlockModelManager().GetModels();
 
-  const BlockModelManager& model_manager =
-      context_.assets_->GetBlockModelManager();
-  const BlockModelManager::ModelList& models = model_manager.GetModels();
+  std::vector<VertexFormat> vertices;
+  std::vector<uint32_t> indices;
+  item_model_info_.resize(models.size());
 
-  AssetHandle<RenderableModel> model = models[item.GetBlock()];
+  for (int id = 0; id < models.size(); ++id) {
+    size_t base_index = indices.size();
 
-  ExtractVertices(model, vertices, indices);
+    AssetHandle<RenderableModel> model = models[id];
+
+    GetVertices(model, vertices, indices);
+    size_t model_size = indices.size() - base_index;
+
+    item_model_info_[id] = {base_index, model_size};
+  }
+
   render_->SetData(vertices, indices);
-  render_->SetIndicesCount(indices.size());
-
-  setDrawCalls();
-  render_->Render();
 }
 
-void BlockItemRender::ExtractVertices(AssetHandle<RenderableModel> model,
-                                      std::vector<VertexFormat>& vertices,
-                                      std::vector<uint32_t>& indices) {
+void ItemRender::SetDrawCalls() {
+  glEnable(GL_BLEND);
+  glDepthMask(GL_TRUE);
+}
+
+void ItemRender::GetVertices(AssetHandle<RenderableModel> model,
+                             std::vector<VertexFormat>& vertices,
+                             std::vector<uint32_t>& indices) {
   if (!model.HasValue()) {
     return;  // Render nothing
   }
@@ -134,19 +161,4 @@ void BlockItemRender::ExtractVertices(AssetHandle<RenderableModel> model,
                       vertex_idx + 2, vertex_idx + 1, vertex_idx + 3});
     }
   }
-}
-
-void BlockItemRender::SetCamera() {
-  camera_->fov_ = 57;
-  camera_->position_ = {1.1f, 1.1f, 1.1f};
-  camera_->pitch_ = -35;
-  camera_->yaw_ = -135;
-
-  camera_->UpdateCameraVectors();
-}
-
-void BlockItemRender::setDrawCalls() {
-  glEnable(GL_BLEND);
-  glDepthMask(GL_TRUE);
-  // glDisable(GL_CULL_FACE);
 }

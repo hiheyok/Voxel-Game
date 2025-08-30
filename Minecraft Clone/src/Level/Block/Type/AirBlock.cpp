@@ -6,7 +6,6 @@ AirBlock::AirBlock(GameContext& context) : Block{context} {
   properties_->is_solid_ = false;
   properties_->transparency_ = true;
   properties_->is_fluid_ = false;
-  properties_->light_pass_ = true;
   properties_->opacity_ = 0;
 }
 

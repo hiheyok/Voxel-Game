@@ -7,7 +7,7 @@ Screen::Screen(GameContext& context, ScreenManager& screen_mgr, glm::vec2 v_res)
     : context_{context},
       screen_mgr_{screen_mgr},
       v_res_{v_res},
-      root_widget_{std::make_unique<Widget>()} {
+      root_widget_{std::make_unique<Widget>(context)} {
   root_widget_->manager_ = &screen_mgr;
 }
 Screen::~Screen() { OnExit(); }

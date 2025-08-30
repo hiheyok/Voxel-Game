@@ -378,7 +378,7 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const baked_model::Element& element,
   v_10.pos_ = element.corners_[slice_mask | u_mask];
   v_11.pos_ = element.corners_[slice_mask | u_mask | v_mask];
 
-  float ao_multi[4] = {1.0f};
+  float ao_multi[4] = {1.0f, 1.0f, 1.0f, 1.0f};
   glm::vec3 color{1.0f};
   if (tint_index != -1) {
     color = {93.0f / 255, 200.0f / 255, 62.0f / 255};
@@ -405,8 +405,7 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const baked_model::Element& element,
         GetAO(side, v_ptr, ao_multi);
       }
 
-      const auto [sky_light, block_light] =
-          GetLightDirectional(offset_pos, side);
+      auto [sky_light, block_light] = GetLightDirectional(offset_pos, side);
 
       CreateVertex(v_00, color, uv_00, ao_multi[0b00], sky_light, block_light);
       CreateVertex(v_01, color, uv_01, ao_multi[0b01], sky_light, block_light);

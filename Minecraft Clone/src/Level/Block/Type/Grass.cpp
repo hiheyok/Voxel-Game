@@ -15,7 +15,6 @@ GrassBlock::GrassBlock(GameContext& context, double spread_chance,
   properties_->is_solid_ = true;
   properties_->transparency_ = false;
   properties_->is_fluid_ = false;
-  properties_->light_pass_ = false;
 
   grass_properties_.spread_chance_ = spread_chance;
   grass_properties_.break_chance_ = break_chance;
@@ -93,7 +92,7 @@ bool GrassBlock::GrassSpreadTick(Dimension* curr_world, BlockPos pos) {
 
     // Chance it spread
     if (TestProbability(grass_properties_.spread_chance_)) {
-      BlockEvent blockEvent{newPos, context_.blocks_->GRASS,
+      BlockEvent blockEvent{newPos, context_.blocks_->GRASS_BLOCK,
                             context_.event_handler_->BlockPlace};
       curr_world->event_manager_.AddEvent(blockEvent);
 

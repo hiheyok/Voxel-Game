@@ -23,7 +23,7 @@ TextureSource::TextureData TextureSource::LoadTexture(
 int TextureSource::GetFormat(int channel) noexcept {
   switch (channel) {
     case 1:
-      return GL_RED;
+      return GL_R;
     case 2:
       return GL_RG;
     case 3:

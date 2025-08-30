@@ -14,6 +14,7 @@ class Shader;
 class ComputeShader;
 class Texture2DV2;
 class TextureAtlas;
+class ItemIconManager;
 
 template <typename T>
 concept IsResource = std::is_base_of_v<RenderResource, std::decay_t<T>>;
@@ -34,6 +35,8 @@ class RenderResourceManager {
   RenderHandle<Texture2DV2> GetTexture2D(const std::string& key);
   RenderHandle<TextureAtlas> GetAtlas(const std::string& key);
 
+  ItemIconManager& GetItemIconManager();
+
  private:
   void LoadShaders();
   void LoadTextures();
@@ -52,13 +55,16 @@ class RenderResourceManager {
 
   template <IsResource ResourceType>
   FastHashMap<std::string, std::unique_ptr<ResourceType>>& GetCache() noexcept;
+  
+  GameContext& context_;
 
   FastHashMap<std::string, std::unique_ptr<Shader>> shaders_cache_;
   FastHashMap<std::string, std::unique_ptr<ComputeShader>> compute_cache_;
   FastHashMap<std::string, std::unique_ptr<Texture2DV2>> texture2d_;
   FastHashMap<std::string, std::unique_ptr<TextureAtlas>> atlas_;
 
-  GameContext& context_;
+  std::unique_ptr<ItemIconManager> item_icon_manager_;
+
 };
 
 template <IsResource ResourceType>

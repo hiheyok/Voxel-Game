@@ -5,7 +5,6 @@
 #include <memory>
 
 #include "Level/Item/Item.h"
-#include "RenderEngine/ItemRender/BlockItemRender.h"
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
@@ -13,6 +12,8 @@
 
 class GameContext;
 class Shader;
+class ItemRender;
+class RenderDrawElements;
 
 struct ItemUVMapping {
   glm::vec2 uv_1_;
@@ -40,12 +41,9 @@ class ItemTextureAtlas {
 
   GameContext& context_;
 
-  std::unique_ptr<VertexArray> vao_;
-  std::unique_ptr<Buffer> ebo_;
-  std::unique_ptr<Buffer> vbo_;
+  std::unique_ptr<RenderDrawElements> render_;
 
-  BlockItemRender block_item_renderer_;
-  RenderHandle<Shader> stitching_shader_;
+  std::unique_ptr<ItemRender> item_render_;
   int individual_size_ = 0;
   int atlas_size_ = 0;
   TexturedFrameBuffer atlas_framebuffer_;
