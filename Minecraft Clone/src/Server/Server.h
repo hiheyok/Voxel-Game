@@ -65,6 +65,7 @@ class Server {
   void SendEntityUpdatePacket(ClientInterface* receiver);
   void SendChunkUpdatePacket(ClientInterface* receiver);
   void SendBlockUpdatePacket(ClientInterface* receiver);
+  void SendECSUpdatePacket(ClientInterface* receiver);
   void SendServerStats(ClientInterface* receiver);
   bool stop_ = true;
   std::thread main_server_loop_;

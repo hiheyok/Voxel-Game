@@ -9,6 +9,7 @@
 #include "Core/Networking/BlockUpdate.h"
 #include "Core/Networking/ChunkUpdate.h"
 #include "Core/Networking/EntityUpdate.h"
+#include "Core/Networking/ECSUpdate.h"
 #include "Core/Networking/PlayerAction.h"
 
 namespace Packet {

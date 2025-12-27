@@ -10,6 +10,10 @@
 
 #include "FileManager/Files.h"
 #include "Utils/Clock.h"
+
+static constexpr std::array<std::string_view, 4> kSeverityStrings = {
+    "DEBUG", "INFO", "ERROR", "WARNING"};
+
 LogUtils::LogUtils() : buffer_{'\0'} {
   if (!FileManager::CheckFolder("Logs")) {
     FileManager::CreateFolder("Logs");
@@ -30,55 +34,38 @@ LogUtils::LogUtils() : buffer_{'\0'} {
 
 LogUtils::~LogUtils() { logging_thread_.request_stop(); }
 
+
+
 void LogUtils::MainLogger(std::stop_token stoken) {
-  std::string print_output = "";
+  std::string print_output;
+  print_output.reserve(kPrintLimit + 512);
+  
+  char timestamp_buffer[32];
+  
   while (!stoken.stop_requested()) {
     if (!logs_cache_.empty()) {
-      LogData log = logs_cache_.front();
-      logs_cache_.pop_front();
+      LogData& log = logs_cache_.front();
 
       auto time_t = std::chrono::system_clock::to_time_t(log.time_);
       std::tm tm = *std::localtime(&time_t);
-      std::ostringstream oss;
-      oss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
-      std::string timestamp = oss.str();
+      std::strftime(timestamp_buffer, sizeof(timestamp_buffer), "%Y-%m-%d %H:%M:%S", &tm);
 
-      std::string str = "";
-      std::string message_severity = "";
+      std::string_view severity = kSeverityStrings[static_cast<size_t>(log.type_)];
 
-      if (log.type_ == LogType::kInfo) {
-        message_severity = "INFO";
-      } else if (log.type_ == LogType::kWarn) {
-        message_severity = "WARNING";
-      } else if (log.type_ == LogType::kError) {
-        message_severity = "ERROR";
-      } else if (log.type_ == LogType::kDebug) {
-        message_severity = "DEBUG";
-      }
+      print_output += std::format("[ {} ] [ {} ] [ {} / {}]: {}\n",
+                                   log.r_time_, timestamp_buffer, severity, 
+                                   log.func_, log.message_);
 
-      // "[ %lld NS ] [ %s ] [ %s / %s ]: %s"
-
-      std::string_view fmt = "[ {} ] [ {} ] [ {} / {}]: {}";
-
-      int64_t ns_time = log.r_time_;
-      std::string date = timestamp;
-      std::string_view func = log.func_;
-      std::string msg = log.message_;
-      std::string severity = message_severity;
-
-      str = std::vformat(
-          fmt, std::make_format_args(ns_time, date, severity, func, msg));
-
-      print_output += str + "\n";
+      logs_cache_.pop_front();
 
       if (print_output.size() > kPrintLimit) {
-        printf("%s", print_output.c_str());
+        fputs(print_output.c_str(), stdout);
         file_ << print_output;
         print_output.clear();
       }
     } else {
-      if (print_output.size() != 0) {
-        printf("%s", print_output.c_str());
+      if (!print_output.empty()) {
+        fputs(print_output.c_str(), stdout);
         file_ << print_output;
         print_output.clear();
       }
@@ -94,15 +81,15 @@ void LogUtils::MainLogger(std::stop_token stoken) {
   }
 }
 
-void LogUtils::Log(LogType type, std::string_view func, std::string msg) {
+void LogUtils::Log(LogType type, std::string_view func, std::string&& msg) {
   LogData log;
   log.type_ = type;
-  log.message_ = msg;
+  log.message_ = std::move(msg);
   log.time_ = std::chrono::system_clock::now();
   log.func_ = func;
   log.r_time_ =
       (std::chrono::high_resolution_clock::now() - start_time_).count();
   std::lock_guard<std::mutex> lock{mutex_};
-  logs_.emplace_back(log);
+  logs_.emplace_back(std::move(log));
   cv_.notify_one();
 }

@@ -57,7 +57,7 @@ class LogUtils {
   LogUtils();
   ~LogUtils();
 
-  void Log(LogType type, std::string_view func, std::string msg);
+  void Log(LogType type, std::string_view func, std::string&& msg);
 
  private:
   void MainLogger(std::stop_token stoken);

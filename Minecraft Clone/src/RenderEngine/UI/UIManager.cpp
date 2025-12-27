@@ -8,6 +8,7 @@
 #include "RenderEngine/UI/Screens/MainScreen.h"
 #include "RenderEngine/UI/Screens/PlayerHud.h"
 #include "RenderEngine/UI/UIRenderer.h"
+#include "Utils/Assert.h"
 
 UIManager::UIManager(GameContext& context, InputManager& input_mgr)
     : context_{context},
@@ -20,8 +21,7 @@ UIManager::UIManager(GameContext& context, InputManager& input_mgr)
 UIManager::~UIManager() = default;
 
 void UIManager::Initialize() {
-  assert(screen_registry_ != nullptr &&
-         "Screen Registry hasn't been created yet");
+  GAME_ASSERT(screen_registry_ != nullptr, "Screen Registry hasn't been created yet");
   screen_registry_->RegisterScreen<MainScreen, ScreenManager&>("debug_screen");
   screen_registry_->RegisterScreen<PlayerHud, ScreenManager&>("player_hud");
 }
@@ -29,7 +29,7 @@ void UIManager::Initialize() {
 void UIManager::PopScreen() { screen_manager_->PopScreen(); }
 
 void UIManager::Render() {
-  assert(renderer_ && screen_manager_);
+  GAME_ASSERT(renderer_ && screen_manager_, "Renderer or screen manager is null");
   renderer_->Clear();
   screen_manager_->SubmitToRenderer(*renderer_);
   renderer_->Render();

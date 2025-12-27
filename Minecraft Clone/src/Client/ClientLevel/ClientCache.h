@@ -10,19 +10,18 @@
 #include "Level/Container/ChunkMap.h"
 #include "Level/Container/Region.h"
 #include "Level/World/CollusionDetector.h"
+#include "Level/World/WorldInterface.h"
 
 class GameContext;
 
-class ClientCache {
+class ClientCache : public WorldInterface {
  public:
   ClientCache(GameContext&);
   ~ClientCache();
   
   void AddChunk(std::unique_ptr<Chunk> chunk);
   void EraseChunk(ChunkPos pos);
-  Chunk* GetChunk(ChunkPos pos) const;
-  BlockID GetBlock(BlockPos pos) const;
-  bool CheckChunk(ChunkPos pos) const;
+  
   void InsertEntity(const EntityProperty& entity);
   void UpdateEntity(const EntityProperty& entity);
   void RemoveEntity(const EntityUUID& uuid);
@@ -30,7 +29,4 @@ class ClientCache {
   GameContext& context_;
   ClientEntities entities_;
   CollusionDetector collusion_manager_;
-
- private:
-  ChunkMap chunk_cache_;
 };

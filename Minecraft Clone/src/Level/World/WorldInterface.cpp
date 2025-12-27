@@ -4,11 +4,16 @@
 
 #include "Level/Container/ChunkMap.h"
 #include "Level/Container/EntityContainer.h"
+#include "Level/ECS/ECSManager.h"
 
-WorldInterface::WorldInterface(GameContext& context)
+WorldInterface::WorldInterface(GameContext& context, bool neighbor_update,
+                               bool heightmap_update)
     : context_{context},
       chunks_{std::make_unique<ChunkMap>(context, true, true)},
-      entities_{std::make_unique<EntityContainer>()} {}
+      entities_{std::make_unique<EntityContainer>()} {
+  // Initialize ECS after base construction to avoid using *this too early
+  ecs_manager_ = std::make_unique<ECSManager>(context, *this);
+}
 
 WorldInterface::~WorldInterface() = default;
 
@@ -37,3 +42,5 @@ ChunkMap* WorldInterface::GetChunkMap() const { return chunks_.get(); }
 EntityContainer* WorldInterface::GetEntityContainer() const {
   return entities_.get();
 }
+
+ECSManager& WorldInterface::GetECSManager() { return *ecs_manager_; }

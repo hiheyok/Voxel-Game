@@ -2,12 +2,14 @@
 
 #include <algorithm>
 #include <cassert>
+#include <iostream>
 
 #include "Core/GameContext/GameContext.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Light/ChunkLightTask.h"
 #include "Level/Light/LightEngineCache.h"
 #include "Level/World/WorldInterface.h"
+#include "Utils/Assert.h"
 
 template <EngineType kEngineType>
 void LightEngine<kEngineType>::InternalTask::SetBlockPos(
@@ -23,7 +25,7 @@ void LightEngine<kEngineType>::InternalTask::SetDirection(
 
 template <EngineType kEngineType>
 void LightEngine<kEngineType>::InternalTask::SetLightLevel(int lvl) noexcept {
-  assert(lvl >= 0 && lvl < 16);
+  GAME_ASSERT(lvl >= 0 && lvl < 16, "Light level out of range");
   light_lvl_ = static_cast<uint8_t>(lvl);
 }
 
@@ -58,20 +60,21 @@ LightEngine<kEngineType>::LightEngine(GameContext& context,
     : context_{context},
       world_{world},
       properties_{context.blocks_->GetBlockPropertyList()},
-      light_cache_{nullptr} {}
-      
+      light_cache_{nullptr} {
+}
+
 template <EngineType kEngineType>
 LightEngine<kEngineType>::~LightEngine() = default;
 
 template <EngineType kEngineType>
 void LightEngine<kEngineType>::SetCache(LightEngineCache* cache) {
-  assert(cache != nullptr);
+  GAME_ASSERT(cache != nullptr, "Cache is null");
   light_cache_ = cache;
 }
 
 template <EngineType kEngineType>
 void LightEngine<kEngineType>::Propagate(const ChunkLightTask& chunk_task) {
-  assert(light_cache_ != nullptr);
+  GAME_ASSERT(light_cache_ != nullptr, "Light cache is null");
   PropagateChanges(chunk_task);
   ResetDecreaseQueue();
   ResetIncreaseQueue();
@@ -100,7 +103,9 @@ void LightEngine<kEngineType>::PropagateIncrease() {
       continue;
     }
 
-    for (auto propagation : Directions<BlockPos>()) {
+    // Static reference to avoid any template instantiation overhead
+    static constexpr auto& kDirs = Directions<BlockPos>::kDirections;
+    for (const auto& propagation : kDirs) {
       if constexpr (kEngineType == EngineType::kSkyLight) {
         if (propagation == kUpDirection) {
           continue;
@@ -159,7 +164,8 @@ void LightEngine<kEngineType>::PropagateDecrease() {
     BlockPos block_pos = task.GetBlockPos();
     int propagation_lvl = task.GetLightLevel();
 
-    for (auto propagation : Directions<BlockPos>()) {
+    static constexpr auto& kDirs = Directions<BlockPos>::kDirections;
+    for (const auto& propagation : kDirs) {
       BlockPos offset_pos = block_pos + propagation;
       // Chunk doesnt exist
       if (!light_cache_->CheckChunk(offset_pos)) [[unlikely]] {
@@ -215,25 +221,29 @@ void LightEngine<kEngineType>::EnqueueDecrease(InternalTask task) {
 
 template <EngineType kEngineType>
 void LightEngine<kEngineType>::EnlargeIncreaseQueue() {
-  increase_queue_.resize(increase_queue_.size() + kQueueSizeIncrement);
+  // Exponential growth (2x) for fewer reallocations
+  size_t new_size = increase_queue_.empty() ? kQueueSizeIncrement : increase_queue_.size() * 2;
+  increase_queue_.resize(new_size);
 }
 
 template <EngineType kEngineType>
 void LightEngine<kEngineType>::EnlargeDecreaseQueue() {
-  decrease_queue_.resize(decrease_queue_.size() + kQueueSizeIncrement);
+  // Exponential growth (2x) for fewer reallocations
+  size_t new_size = decrease_queue_.empty() ? kQueueSizeIncrement : decrease_queue_.size() * 2;
+  decrease_queue_.resize(new_size);
 }
 
 template <EngineType kEngineType>
 LightEngine<kEngineType>::InternalTask
 LightEngine<kEngineType>::DequeueIncrease() noexcept {
-  assert(dequeue_increase_pos_ < enqueue_increase_pos_);
+  GAME_ASSERT(dequeue_increase_pos_ < enqueue_increase_pos_, "Invalid queue state");
   return increase_queue_[dequeue_increase_pos_++];
 }
 
 template <EngineType kEngineType>
 LightEngine<kEngineType>::InternalTask
 LightEngine<kEngineType>::DequeueDecrease() noexcept {
-  assert(dequeue_decrease_pos_ < enqueue_decrease_pos_);
+  GAME_ASSERT(dequeue_decrease_pos_ < enqueue_decrease_pos_, "Invalid queue state");
   return decrease_queue_[dequeue_decrease_pos_++];
 }
 
@@ -269,14 +279,22 @@ template <EngineType kEngineType>
 void LightEngine<kEngineType>::ResetIncreaseQueue() {
   enqueue_increase_pos_ = 0;
   dequeue_increase_pos_ = 0;
-  increase_queue_.resize(kQueueSizeIncrement);
+  // Keep capacity - only shrink if significantly oversized (>4x initial)
+  if (increase_queue_.size() > kQueueSizeIncrement * 4) {
+    increase_queue_.resize(kQueueSizeIncrement);
+    increase_queue_.shrink_to_fit();
+  }
 }
 
 template <EngineType kEngineType>
 void LightEngine<kEngineType>::ResetDecreaseQueue() {
   enqueue_decrease_pos_ = 0;
   dequeue_decrease_pos_ = 0;
-  decrease_queue_.resize(kQueueSizeIncrement);
+  // Keep capacity - only shrink if significantly oversized (>4x initial)
+  if (decrease_queue_.size() > kQueueSizeIncrement * 4) {
+    decrease_queue_.resize(kQueueSizeIncrement);
+    decrease_queue_.shrink_to_fit();
+  }
 }
 
 template <EngineType kEngineType>

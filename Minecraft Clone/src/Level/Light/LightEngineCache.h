@@ -99,7 +99,7 @@ class LightEngineCache {
   [[nodiscard]] Chunk* EnsureLoadedGetChunk(ChunkPos pos);
   [[nodiscard]] Chunk* EnsureLoadedGetChunk(BlockPos pos);
 
-  static constexpr int kCacheRadius = 1;
+  static constexpr int kCacheRadius = 2;
   static constexpr int kCacheWidth = 1 + 2 * kCacheRadius;
   static constexpr int kCacheSlice = kCacheWidth * kCacheWidth;
 

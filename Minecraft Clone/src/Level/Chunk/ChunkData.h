@@ -1,6 +1,7 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
 #pragma once
+#include <array>
 
 #include <atomic>
 #include <glm/vec3.hpp>
@@ -64,7 +65,7 @@ class ChunkContainer {
   std::unique_ptr<LightStorage> sky_light_;
   std::unique_ptr<LightStorage> block_light_;
   std::unique_ptr<HeightMap> heightmap_;
-  std::vector<std::vector<SetBlockRelative>> outside_block_to_place_;
+  std::array<std::vector<SetBlockRelative>, 6> outside_block_to_place_;
 
   bool is_empty_ = true;
 

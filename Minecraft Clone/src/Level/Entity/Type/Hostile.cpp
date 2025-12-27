@@ -5,7 +5,7 @@
 #include "Level/Dimension/Dimension.h"
 #include "Level/Entity/Entity.h"
 
-Hostile::Hostile(GameContext& context) : EntityType{context} {}
+Hostile::Hostile(GameContext& context) : EntityTypeData{context} {}
 Hostile::~Hostile() = default;
 
 void Hostile::Tick(Entity* entity, Dimension* dimension) {

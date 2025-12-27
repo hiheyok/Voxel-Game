@@ -14,7 +14,7 @@ using std::optional;
 DynamicAtlas::DynamicAtlas(GameContext& context, const std::string& key,
                            int width, int height)
     : Texture2DBase{context, key, width, height},
-      stitcher_{make_unique<Stitcher>(context, width, height, false)} {}
+      stitcher_{make_unique<Stitcher>(context, width, height, 16, false)} {}
 
 DynamicAtlas::~DynamicAtlas() = default;
 

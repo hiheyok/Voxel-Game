@@ -24,7 +24,7 @@ struct StitchingRectangle;
 
 class Stitcher {
  public:
-  Stitcher(GameContext&, int initial_width, int initial_height,
+  Stitcher(GameContext&, int initial_width, int initial_height, int alignment,
            bool can_expand = true);
   ~Stitcher();
   // Returns the position of the placed sprite
@@ -48,4 +48,5 @@ class Stitcher {
   std::unique_ptr<SplitHeuristic> split_heuristic_;
   FastHashMap<ResourceLocation, StitchingRectangle> used_bins_;
   int width_, height_;
+  int alignment_;
 };

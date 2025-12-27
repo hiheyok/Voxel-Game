@@ -1,6 +1,5 @@
 #include "Level/Light/BlockLightEngine.h"
 
-#include <cassert>
 #include <utility>
 
 #include "Core/GameContext/GameContext.h"
@@ -9,6 +8,7 @@
 #include "Level/Light/ChunkLightTask.h"
 #include "Level/Light/LightEngineCache.h"
 #include "Level/World/WorldInterface.h"
+#include "Utils/Assert.h"
 
 BlockLightEngine::BlockLightEngine(GameContext& context, WorldInterface& world)
     : LightEngine{context, world} {
@@ -17,8 +17,8 @@ BlockLightEngine::BlockLightEngine(GameContext& context, WorldInterface& world)
 BlockLightEngine::~BlockLightEngine() = default;
 
 void BlockLightEngine::LightChunk(ChunkPos chunk_pos) {
-  assert(light_cache_ != nullptr);
-  assert(CheckChunk(chunk_pos));
+  GAME_ASSERT(light_cache_ != nullptr, "Light cache is null");
+  GAME_ASSERT(CheckChunk(chunk_pos), "Chunk not found");
 
   Chunk* chunk = GetChunk(chunk_pos);
   InternalTask task;
@@ -52,7 +52,7 @@ void BlockLightEngine::LightChunk(ChunkPos chunk_pos) {
   light_cache_ = nullptr;
 }
 void BlockLightEngine::CheckNeighborChunk(ChunkPos center_chunk_pos) {
-  assert(CheckChunk(center_chunk_pos));
+  GAME_ASSERT(CheckChunk(center_chunk_pos), "Center chunk not found");
 
   Chunk* center_chunk = GetChunk(center_chunk_pos);
   InternalTask task;
@@ -108,7 +108,7 @@ void BlockLightEngine::CheckNeighborChunk(ChunkPos center_chunk_pos) {
 
 void BlockLightEngine::CheckBlock(BlockPos block_pos) {
   // Get info
-  assert(CheckChunk(block_pos.ToChunkPos()));
+  GAME_ASSERT(CheckChunk(block_pos.ToChunkPos()), "Block chunk not found");
   BlockID block = GetBlock(block_pos);
   int emission_lvl = context_.blocks_->GetBlockProperties(block).light_emission;
   int curr_lvl = GetLightLvl(block_pos);

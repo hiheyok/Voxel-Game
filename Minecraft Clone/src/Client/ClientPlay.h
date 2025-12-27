@@ -19,6 +19,7 @@ class PerformanceProfiler;
 class DebugScreen;
 class Window;
 class MultiEntityRender;
+class ECSEntityRender;
 
 struct WindowProperties;
 struct GLFWwindow;
@@ -39,6 +40,7 @@ class ClientPlay {
   std::unique_ptr<MainPlayer> main_player_;
   std::unique_ptr<DebugScreen> debug_screen_;
   std::unique_ptr<MultiEntityRender> entity_render_;
+  std::unique_ptr<ECSEntityRender> ecs_entity_render_;
   std::unique_ptr<WorldRender> terrain_render_;
 
   double frametime_ = 1;
@@ -47,4 +49,5 @@ class ClientPlay {
   void UpdateDebugStats();
   void UpdateChunks();
   void UpdateEntities();
+  void ProcessECSUpdates();
 };

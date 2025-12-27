@@ -6,14 +6,16 @@
 #include <vector>
 
 #include "Core/Typenames.h"
+#include "Level/ECS/EntityType.h"
+
 struct EntityProperty;
 
 struct EntityRenderCache {  // stores all entity to be rendered
   void AddEntity(const EntityProperty& entity);
   void RemoveEntity(EntityUUID entityUUID);
-  FastHashMap<EntityTypeID, std::vector<EntityProperty>>&
+  FastHashMap<EntityType, std::vector<EntityProperty>>&
   GetEntitiesTypeSeparated();
 
-  FastHashMap<EntityUUID, std::pair<size_t, EntityTypeID>> entity_idx_;
-  FastHashMap<EntityTypeID, std::vector<EntityProperty>> entity_separated_;
+  FastHashMap<EntityUUID, std::pair<size_t, EntityType>> entity_idx_;
+  FastHashMap<EntityType, std::vector<EntityProperty>> entity_separated_;
 };

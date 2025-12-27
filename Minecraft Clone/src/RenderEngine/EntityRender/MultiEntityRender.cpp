@@ -7,11 +7,12 @@
 
 #include <memory>
 
+#include "Assets/AssetManager.h"
 #include "Client/Player/PlayerPOV.h"
 #include "Client/Profiler/PerformanceProfiler.h"
 #include "Core/GameContext/GameContext.h"
 #include "Level/Entity/Entities.h"
-#include "Level/Entity/EntityType.h"
+#include "Level/Entity/EntityTypeData.h"
 #include "Level/Entity/Properties/EntityProperties.h"
 #include "RenderEngine/Camera/camera.h"
 #include "RenderEngine/EntityRender/EntityRenderCache.h"
@@ -19,6 +20,7 @@
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
+#include "RenderEngine/RenderResources/Types/Texture/Texture2D.h"
 
 MultiEntityRender::MultiEntityRender(GameContext& context, PlayerPOV* player)
     : context_{context},
@@ -58,26 +60,31 @@ void MultiEntityRender::Clean() {
 void MultiEntityRender::Initialize(PerformanceProfiler* pProfilerIn) {
   static constexpr int kMaxEntityCount = 10000000;
 
-  for (int i = 0; i < context_.entities_list_->entity_type_list_.size(); i++) {
-    EntityModel model =
-        context_.entities_list_->entity_type_list_[i]->render_model_;
-    entity_cached_models_[i] = model;
+  const std::vector<EntityTypeData*> entity_type_list =
+      context_.entities_list_->entity_type_list_;
+
+  for (int i = 0; i < entity_type_list.size(); i++) {
+    if (entity_type_list[i] == nullptr) continue;
+    const std::string& name = entity_type_list[i]->entity_name_;
+    AssetHandle<EntityModel> model = context_.assets_->GetEntityModel(name);
+    entity_cached_models_[entity_type_list[i]->id_] = model;
     profiler_ = pProfilerIn;
   }
 
   // Initialize Buffers
 
-  for (auto& EntityModels : entity_cached_models_) {
-    Model::ModelData model = EntityModels.second.GetVertices();
+  for (auto& [entity_type, entity_model] : entity_cached_models_) {
+    Model::ModelData model = entity_model->GetVertices();
 
-    uint32_t ModelIndex = static_cast<uint32_t>(entity_vertices_.size() / 5);
+    uint32_t model_index = static_cast<uint32_t>(entity_vertices_.size() / 5);
 
-    entity_element_index_[EntityModels.first] =
+    entity_element_index_[entity_type] =
         entity_indices_.size();  // temp solution
-    entity_element_size_[EntityModels.first] = model.indices_.size();
+    entity_element_size_[entity_type] =
+        model.indices_.size();
 
     for (int i = 0; i < model.indices_.size(); i++) {
-      entity_indices_.emplace_back(ModelIndex + model.indices_[i]);
+      entity_indices_.emplace_back(model_index + model.indices_[i]);
     }
 
     entity_vertices_.insert(entity_vertices_.end(), model.vertices_.begin(),
@@ -164,11 +171,15 @@ void MultiEntityRender::Render() {
                              acceleration_arr_.data());
 
     shader_->Use();
-    shader_->BindTexture2D(
-        0,
-        context_.entities_list_->entity_type_list_[entityarr.first]
-            ->texture_->Get(),
-        "EntityTexture");
+
+    const std::string& model_name =
+        context_.entities_list_->entity_type_list_[static_cast<size_t>(entityarr.first)]
+            ->entity_name_;
+
+    RenderHandle<Texture2DV2> texture =
+        context_.render_resource_manager_->GetTexture2D(model_name);
+
+    shader_->BindTexture2D(0, texture->GetId(), "EntityTexture");
 
     vao_->Bind();
     ebo_->Bind();
@@ -227,17 +238,19 @@ void MultiEntityRender::Update() {
 }
 
 void MultiEntityRender::Reload() {
-  // reset gpu data
-  vbo_ = std::make_unique<Buffer>(context_);
-  ebo_ = std::make_unique<Buffer>(context_);
-  vao_ = std::make_unique<VertexArray>(context_);
+  // doenst exist rn
 
-  // reset entity models
-  for (auto e : context_.entities_list_->entity_type_list_) {
-    e->render_model_.Clear();
-  }
+  // // reset gpu data
+  // vbo_ = std::make_unique<Buffer>(context_);
+  // ebo_ = std::make_unique<Buffer>(context_);
+  // vao_ = std::make_unique<VertexArray>(context_);
 
-  context_.entities_list_->Initialize();
+  // // reset entity models
+  // for (auto e : context_.entities_list_->entity_type_list_) {
+  //   e->render_model.Clear();
+  // }
 
-  Initialize(profiler_);
+  // context_.entities_list_->Initialize();
+
+  // Initialize(profiler_);
 }

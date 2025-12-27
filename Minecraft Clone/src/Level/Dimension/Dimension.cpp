@@ -11,6 +11,7 @@
 #include "Level/Light/ThreadedLightEngine.h"
 #include "Level/TerrainGeneration/ChunkGenerator.h"
 #include "Level/World/WorldUpdater.h"
+#include "Level/ECS/ECSManager.h"
 
 Dimension::Dimension(GameContext& context, DimensionProperties properties,
                      WorldGeneratorID generatorType)
@@ -30,8 +31,8 @@ Dimension::Dimension(GameContext& context, DimensionProperties properties,
 
   world_updater_ = std::make_unique<WorldUpdater>(context_, main_world_.get(),
                                                   world_settings_);
-  collusion_detector_ =
-      std::make_unique<CollusionDetector>(context_, main_world_->GetChunkMap());
+  collusion_detector_ = std::make_unique<CollusionDetector>(
+      context_, *main_world_->GetChunkMap());
 
   if (context_.generators_->GetGenerator(generator_type_)->use_tall_chunks_) {
     world_updater_->tall_generation_ = true;
@@ -97,6 +98,7 @@ void Dimension::EventTick() {
   // Tick all entities
 
   world_->GetEntityContainer()->Tick(this);
+  world_->GetECSManager().Tick();
 }
 
 void Dimension::Update() {

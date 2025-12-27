@@ -4,6 +4,7 @@
 #include <variant>
 
 #include "Core/Typenames.h"
+#include "Level/ECS/EntityType.h"
 #include "Level/Entity/Entity.h"
 
 constexpr size_t MAX_EVENT_SIZE = 32;
@@ -27,7 +28,7 @@ struct ChunkEvent {
 
 struct EntityEvent {
   BlockPos pos_{0, 0, 0};
-  EntityTypeID entity_type_ = 0;
+  EntityType entity_type_ = EntityType::kInvalidEntity;
   EntityUUID entity_uuid_ = 0;
   EventID id_ = 0;
   char unique_id_ = 0;

@@ -39,9 +39,10 @@ void WorldRender::LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks) {
   mesh_thread_pool_->SubmitTask(chunks);
 }
 
-std::unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(ChunkPos pos) {
+std::unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(ChunkPos pos,
+                                                         int worker_id) {
   Chunk* chunk = WorldRender::cache_->GetChunk(pos);
-  thread_local Mesh::ChunkMeshData chunk_mesher{context_};
+  Mesh::ChunkMeshData& chunk_mesher = *meshers_[worker_id];
   Timer timer;
   chunk_mesher.use_option_ = false;
 
@@ -112,6 +113,10 @@ void WorldRender::Start(GLFWwindow* window, ClientCache* cache,
   vertical_render_distance_ = context_.options_->vertical_render_distance_;
 
   size_t threadCount = context_.options_->mesh_threads_;
+
+  for (size_t i = 0; i < threadCount; ++i) {
+    meshers_.emplace_back(std::make_unique<Mesh::ChunkMeshData>(context_));
+  }
 
   mesh_thread_pool_ = std::make_unique<ThreadPool<ChunkPos, WorkerReturnType>>(
       threadCount, "Mesher", std::bind_front(&WorldRender::Worker, this), 250);

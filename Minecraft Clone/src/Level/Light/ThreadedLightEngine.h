@@ -10,6 +10,8 @@
 class ChunkLightTask;
 class GameContext;
 class WorldInterface;
+class SkyLightEngine;
+class BlockLightEngine;
 
 struct LightEngineStats;
 /*
@@ -29,15 +31,18 @@ class ThreadedLightEngine {
   LightEngineStats GetStats() const noexcept;
 
  private:
-  int WorkerUpdater(const ChunkLightTask&);
+  int WorkerUpdater(const ChunkLightTask&, int);
   // Handles newly created chunks
-  int WorkerLighter(ChunkPos pos);
+  int WorkerLighter(ChunkPos pos, int);
 
   GameContext& context_;
   WorldInterface& world_;
 
   int light_update_done_ = 0;
   double total_cpu_time_ = 0.0;
+
+  std::vector<std::unique_ptr<SkyLightEngine>> skylight_engines_;
+  std::vector<std::unique_ptr<BlockLightEngine>> blocklight_engines_;
 
   std::unique_ptr<ThreadPool<ChunkLightTask, int>>
       updater_;  // Returns int, placeholder until i can make it so it can

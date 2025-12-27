@@ -6,7 +6,9 @@
 #include <memory>
 #include <vector>
 
+#include "Assets/AssetHandle.h"
 #include "Core/Typenames.h"
+#include "Level/ECS/EntityType.h"
 #include "RenderEngine/RenderResources/RenderHandle.h"
 
 class Buffer;
@@ -58,9 +60,9 @@ class MultiEntityRender {
   std::vector<float> entity_vertices_;
   std::vector<uint32_t> entity_indices_;
 
-  FastHashMap<EntityTypeID, EntityModel> entity_cached_models_;
-  FastHashMap<EntityTypeID, size_t> entity_element_index_;
-  FastHashMap<EntityTypeID, size_t> entity_element_size_;
+  FastHashMap<EntityType, AssetHandle<EntityModel>> entity_cached_models_;
+  FastHashMap<EntityType, size_t> entity_element_index_;
+  FastHashMap<EntityType, size_t> entity_element_size_;
 
   std::unique_ptr<Buffer> vbo_;
   std::unique_ptr<Buffer> ebo_;

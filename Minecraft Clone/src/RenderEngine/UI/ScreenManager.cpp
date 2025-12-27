@@ -1,6 +1,7 @@
 #include "RenderEngine/UI/ScreenManager.h"
 
 #include "RenderEngine/UI/Screens/Screen.h"
+#include "Utils/Assert.h"
 #include "RenderEngine/UI/UIRenderer.h"
 
 ScreenManager::ScreenManager(GameContext& context,
@@ -9,7 +10,7 @@ ScreenManager::ScreenManager(GameContext& context,
 ScreenManager::~ScreenManager() = default;
 
 void ScreenManager::PopScreen() {
-  assert(screens_.empty() && "No screens to pop");
+  GAME_ASSERT(screens_.empty(), "No screens to pop");
   screens_.pop();
 }
 

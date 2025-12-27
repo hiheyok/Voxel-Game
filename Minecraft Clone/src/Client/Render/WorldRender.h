@@ -22,7 +22,7 @@ struct GLFWwindow;
 namespace Mesh {
 struct ChunkVertexData;
 class ChunkMeshData;
-}
+}  // namespace Mesh
 
 class WorldRender : public WorldRenderInfo {
  public:
@@ -47,11 +47,12 @@ class WorldRender : public WorldRenderInfo {
 
  private:
   void LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks);
-  std::unique_ptr<Mesh::ChunkVertexData> Worker(ChunkPos pos);
+  std::unique_ptr<Mesh::ChunkVertexData> Worker(ChunkPos pos, int workerId);
 
   using WorkerReturnType = std::invoke_result_t<decltype(&WorldRender::Worker),
-                                                WorldRender*, ChunkPos>;
+                                                WorldRender*, ChunkPos, int>;
 
+  std::vector<std::unique_ptr<Mesh::ChunkMeshData>> meshers_;
   std::unique_ptr<ThreadPool<ChunkPos, WorkerReturnType>> mesh_thread_pool_;
   std::vector<std::unique_ptr<Mesh::ChunkVertexData>> mesh_add_queue_;
 

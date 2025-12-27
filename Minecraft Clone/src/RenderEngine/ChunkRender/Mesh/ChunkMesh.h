@@ -135,6 +135,12 @@ class ChunkMeshData {
   static constexpr int kChunkStrideZ = 1;
   static constexpr int kChunkStride[3]{kChunkStrideX, kChunkStrideY,
                                        kChunkStrideZ};
+
+  // Visibility arrays as class members to avoid repeated stack allocation
+  std::array<uint8_t, 1024> face_visibility_;
+  std::array<uint8_t, 1024> face_visibility_back_;
+  std::array<uint8_t, kChunkSize2D> used_block_;
+
   alignas(64) std::array<BlockID, kCacheDim3D> chunk_cache_;
   Chunk* chunk_;
   const BlockModelManager* model_manager_;

@@ -9,7 +9,7 @@ struct Ray;
 
 class CollusionDetector {
  public:
-  CollusionDetector(GameContext&, ChunkMap* cache);
+  CollusionDetector(GameContext&, const ChunkMap& cache);
   ~CollusionDetector();
 
   bool CheckRayIntersection(Ray& ray);
@@ -22,5 +22,5 @@ class CollusionDetector {
   static constexpr int kSearchDistance = 5;
   static constexpr float kOnGroundError = 0.001f;
   GameContext& context_;
-  ChunkMap* cache_;
+  const ChunkMap& cache_;
 };

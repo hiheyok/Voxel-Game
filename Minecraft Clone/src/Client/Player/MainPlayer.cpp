@@ -37,7 +37,8 @@ MainPlayer::MainPlayer(GameContext& context, Window* window,
       {0.f, -1.f + kHotbarSize * 0.5f}, {0.5f, 0.5f}, {181.5f, 21.5f});
 
   hotbar.AddGUIElement("Select", "", {kHotbarSize * 1.1f, kHotbarSize * 1.1f},
-                       {-kHotbarSize * 4.f, -1.f + kHotbarSize * 0.5f},
+                       {-kHotbarSize * 4.f, -1.f + kHotbarSize * 0.5f},  
+                       
                        {0.5f, 22.5f}, {22.5f, 44.5f});
 
   GUISet itemBar{context};

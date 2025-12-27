@@ -4,13 +4,13 @@
 #include "Level/Block/Block.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Container/ChunkMap.h"
-#include "Level/Entity/Collusion/Hitbox.h"
 #include "Level/Entity/Entities.h"
 #include "Level/Entity/Entity.h"
 #include "Utils/Math/Ray/Ray.h"
 #include "Utils/Math/vectorOperations.h"
 
-CollusionDetector::CollusionDetector(GameContext& context, ChunkMap* cache)
+CollusionDetector::CollusionDetector(GameContext& context,
+                                     const ChunkMap& cache)
     : context_{context}, cache_{cache} {}
 CollusionDetector::~CollusionDetector() = default;
 
@@ -40,7 +40,7 @@ float CollusionDetector::TraceSingleAxisCollision(glm::vec3 origin,
       floored_pos[axis] += move;
     }
 
-    BlockID b = cache_->GetBlock(floored_pos);
+    BlockID b = cache_.GetBlock(floored_pos);
 
     if (properties[b].is_solid_) {
       return static_cast<float>(i) + displacement - 1.0f;
@@ -54,12 +54,12 @@ glm::dvec3 CollusionDetector::ComputeCollisionTimes(Entity* entity) {
   AABB hitbox = context_.entities_list_->GetEntity(entity->properties_.type_)
                     ->GetHitbox();
 
-  glm::vec3 hitbox_start = entity->properties_.position_ - (hitbox.size_ / 2.f);
-  glm::vec3 hitbox_end = entity->properties_.position_ + (hitbox.size_ / 2.f);
+  glm::vec3 hitbox_start = entity->properties_.position_ - (hitbox.max_ / 2.f);
+  glm::vec3 hitbox_end = entity->properties_.position_ + (hitbox.max_ / 2.f);
 
-  int ix = static_cast<int>(floor(hitbox.size_.x)) + 1;
-  int iy = static_cast<int>(floor(hitbox.size_.y)) + 1;
-  int iz = static_cast<int>(floor(hitbox.size_.z)) + 1;
+  int ix = static_cast<int>(floor(hitbox.max_.x)) + 1;
+  int iy = static_cast<int>(floor(hitbox.max_.y)) + 1;
+  int iz = static_cast<int>(floor(hitbox.max_.z)) + 1;
 
   glm::ivec3 i_bound{ix, iy, iz};
 
@@ -169,8 +169,7 @@ bool CollusionDetector::CheckRayIntersection(Ray& ray) {
   while (iterations < kMaxIterations) {
     iterations++;
 
-    BlockID b =
-        cache_->GetBlock({block_pos.x, block_pos.y, block_pos.z});
+    BlockID b = cache_.GetBlock({block_pos.x, block_pos.y, block_pos.z});
 
     if (context_.blocks_->GetBlockType(b)->properties_->is_solid_) {
       ray.end_point_ = (glm::vec3)block_pos;
@@ -218,11 +217,11 @@ bool CollusionDetector::IsEntityOnGround(Entity* entity) {
   AABB hitbox = context_.entities_list_->GetEntity(entity->properties_.type_)
                     ->GetHitbox();
 
-  glm::vec3 hitbox_start = entity->properties_.position_ - (hitbox.size_ / 2.f);
-  glm::vec3 hitbox_end = entity->properties_.position_ + (hitbox.size_ / 2.f);
+  glm::vec3 hitbox_start = entity->properties_.position_ - (hitbox.max_ / 2.f);
+  glm::vec3 hitbox_end = entity->properties_.position_ + (hitbox.max_ / 2.f);
 
-  int ix = static_cast<int>(floor(hitbox.size_.x)) + 1;
-  int iz = static_cast<int>(floor(hitbox.size_.z)) + 1;
+  int ix = static_cast<int>(floor(hitbox.max_.x)) + 1;
+  int iz = static_cast<int>(floor(hitbox.max_.z)) + 1;
 
   float least_length = static_cast<float>(kSearchDistance);
 

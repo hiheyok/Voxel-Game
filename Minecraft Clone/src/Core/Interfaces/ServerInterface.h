@@ -66,6 +66,20 @@ class ServerInterface {
     return dequeue_count;
   }
 
+  size_t PollECSUpdates(std::vector<ECSUpdatePacket::ECSUpdate>& out_updates) {
+    const int queue_size = ecs_update_queue_.size_approx();
+    if (queue_size == 0) return 0;
+    
+    std::vector<ECSUpdatePacket::ECSUpdate> temp(queue_size);
+
+    size_t dequeue_count =
+        ecs_update_queue_.wait_dequeue_bulk(temp.data(), queue_size);
+
+    out_updates.insert(out_updates.end(), std::make_move_iterator(temp.begin()),
+                       std::make_move_iterator(temp.begin() + dequeue_count));
+    return dequeue_count;
+  }
+
   ServerStats GetServerStats() { return server_stats_; }
 
   EntityUUID GetPlayerUUID() const { return client_player_uuid_; }
@@ -79,6 +93,8 @@ class ServerInterface {
       entity_update_queue_;
   moodycamel::BlockingConcurrentQueue<Packet::ChunkUpdateData>
       chunk_update_queue_;
+  moodycamel::BlockingConcurrentQueue<ECSUpdatePacket::ECSUpdate>
+      ecs_update_queue_;
 
   ServerStats server_stats_;
   EntityUUID client_player_uuid_;

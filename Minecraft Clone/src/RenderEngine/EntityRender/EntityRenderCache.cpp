@@ -8,7 +8,7 @@
 #include "Level/Entity/Entity.h"
 
 void EntityRenderCache::AddEntity(const EntityProperty& entity) {
-  const EntityTypeID& type = entity.type_;
+  const EntityType& type = entity.type_;
   const EntityUUID& uuid = entity.entity_uuid_;
 
   auto it = entity_idx_.find(uuid);
@@ -39,7 +39,7 @@ void EntityRenderCache::RemoveEntity(EntityUUID entityUUID) {
   entity_idx_.erase(it);
 }
 
-FastHashMap<EntityTypeID, std::vector<EntityProperty>>&
+FastHashMap<EntityType, std::vector<EntityProperty>>&
 EntityRenderCache::GetEntitiesTypeSeparated() {
   return entity_separated_;
 }

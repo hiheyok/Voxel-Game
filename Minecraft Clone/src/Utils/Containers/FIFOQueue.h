@@ -3,7 +3,9 @@
 #ifndef UTILS_CONTAINERS_FIFO_QUEUE_H
 #define UTILS_CONTAINERS_FIFO_QUEUE_H
 
-#include <vector>
+#include <array>
+
+#include "Utils/Assert.h"
 template <class T, size_t kQueueSize>
 class FixedFIFOQueue {
   static_assert(kQueueSize > 0, "kQueueSize must be greater than 0");
@@ -41,7 +43,7 @@ FixedFIFOQueue<T, kQueueSize>::~FixedFIFOQueue() = default;
 
 template <class T, size_t kQueueSize>
 void FixedFIFOQueue<T, kQueueSize>::push(const T& obj) noexcept {
-  assert(!IsFull() && "Attempt to push to a full queue");
+  GAME_ASSERT(!IsFull(), "Attempt to push to a full queue");
   buffer_[end_ptr_++] = obj;
   end_ptr_ = end_ptr_ % kQueueSize;
   ++element_count_;
@@ -49,7 +51,7 @@ void FixedFIFOQueue<T, kQueueSize>::push(const T& obj) noexcept {
 
 template <class T, size_t kQueueSize>
 T FixedFIFOQueue<T, kQueueSize>::get() noexcept {
-  assert(!IsEmpty() && "Attempt to get from an empty queue");
+  GAME_ASSERT(!IsEmpty(), "Attempt to get from an empty queue");
   T out = buffer_[start_ptr_++];
   start_ptr_ = start_ptr_ % kQueueSize;
   --element_count_;

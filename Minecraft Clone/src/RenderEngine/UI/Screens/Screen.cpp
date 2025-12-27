@@ -2,6 +2,8 @@
 
 #include "RenderEngine/UI/Data/UserInterfaceData.h"
 #include "RenderEngine/UI/Widgets/Widget.h"
+#include "RenderEngine/UI/UIRenderer.h"
+#include "Utils/Assert.h"
 
 Screen::Screen(GameContext& context, ScreenManager& screen_mgr, glm::vec2 v_res)
     : context_{context},
@@ -18,7 +20,7 @@ void Screen::HandleEvent() {
 void Screen::Update(const std::vector<InputEvent>& events) {}
 
 void Screen::SubmitToRenderer(UIRenderer& renderer) {
-  assert(root_widget_);
+  GAME_ASSERT(root_widget_, "Root widget is null");
   UIRectangle bounds;
   bounds.pos_.x = 0.0f;
   bounds.pos_.y = 0.0f;
@@ -32,7 +34,7 @@ void Screen::SubmitToRenderer(UIRenderer& renderer) {
 glm::vec2 Screen::GetVirtualRes() const noexcept { return v_res_; }
 
 void Screen::SetVirtualRes(glm::vec2 v_res) {
-  assert(v_res != v_res_);
+  GAME_ASSERT(v_res != v_res_, "Vertical resolution unchanged");
   v_res_ = v_res;
   root_widget_->SetOffsetMax(v_res);
   root_widget_->SetBranchDirty();

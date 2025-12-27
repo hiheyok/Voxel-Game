@@ -6,11 +6,11 @@
 #include "Level/Dimension/Dimension.h"
 #include "Level/Entity/Entity.h"
 
-FallingBlock::FallingBlock(GameContext& context) : EntityType{context} {}
+FallingBlock::FallingBlock(GameContext& context) : EntityTypeData{context} {}
 FallingBlock::~FallingBlock() = default;
 
 void FallingBlock::Tick(Entity* entity, Dimension* dimension) {
-  float mspt = 1.0f / static_cast<float>(dimension->tick_rate_);
+  float mspt = 1.0f / static_cast<float>(dimension->world_->parameters.world_tps_);
 
   // Physics
 

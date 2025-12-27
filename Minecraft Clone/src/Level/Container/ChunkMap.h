@@ -2,7 +2,6 @@
 
 #pragma once
 #include <memory>
-#include <optional>
 #include <utility>
 
 class Chunk;
@@ -13,8 +12,8 @@ class GameContext;
 
 class ChunkMap {
  public:
-  ChunkMap(GameContext&, bool neighborUpdate = false,
-           bool heightmapUpdate = false);
+  ChunkMap(GameContext&, bool neighbor_update = false,
+           bool heightmap_update = false);
   ~ChunkMap();
 
   BlockID GetBlock(BlockPos pos) const;

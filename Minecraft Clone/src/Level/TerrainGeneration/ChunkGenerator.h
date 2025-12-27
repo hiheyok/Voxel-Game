@@ -31,11 +31,11 @@ class ChunkGenerator {
    * Worker submitting output as std::vector<Chunk*> to handle tall chunks
    * with multiple sub chunks for now
    */
-  std::vector<std::unique_ptr<Chunk>> Worker(ChunkPos task);
+  std::vector<std::unique_ptr<Chunk>> Worker(ChunkPos task, int workerId);
 
   using WorkerReturnType =
       std::invoke_result_t<decltype(&ChunkGenerator::Worker), ChunkGenerator*,
-                           ChunkPos>;
+                           ChunkPos, int>;
 
   GameContext& context_;
   std::unique_ptr<ThreadPool<ChunkPos, WorkerReturnType>> gen_pool_;

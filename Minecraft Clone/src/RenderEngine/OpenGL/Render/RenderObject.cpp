@@ -67,3 +67,12 @@ void RenderObject::SetupTexture() {
     shader_->BindTexture(idx, handle);
   }
 }
+
+void RenderObject::EnableDepthTest() { glEnable(GL_DEPTH_TEST); }
+void RenderObject::DisableDepthTest() { glDisable(GL_DEPTH_TEST); }
+void RenderObject::SetDepthMask(bool mask) { glDepthMask(mask ? GL_TRUE : GL_FALSE); }
+void RenderObject::EnableBlend() { glEnable(GL_BLEND); }
+void RenderObject::DisableBlend() { glDisable(GL_BLEND); }
+void RenderObject::EnableCullFace() { glEnable(GL_CULL_FACE); }
+void RenderObject::DisableCullFace() { glDisable(GL_CULL_FACE); }
+void RenderObject::SetCullFace(GLenum mode) { glCullFace(mode); }

@@ -44,6 +44,15 @@ class RenderObject {
   void SetTexture(int idx, RenderHandle<TextureV2> handle);
   void BindSSBO(int locatiom, Buffer);
 
+  void EnableDepthTest();
+  void DisableDepthTest();
+  void SetDepthMask(bool mask);
+  void EnableBlend();
+  void DisableBlend();
+  void EnableCullFace();
+  void DisableCullFace();
+  void SetCullFace(GLenum mode);
+
  protected:
   static constexpr size_t GetDataTypeSize(uint32_t data_type) {
     switch (data_type) {

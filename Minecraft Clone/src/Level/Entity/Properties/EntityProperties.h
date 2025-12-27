@@ -5,6 +5,7 @@
 #include <glm/vec3.hpp>
 
 #include "Core/Typenames.h"
+#include "Level/ECS/EntityType.h"
 
 struct EntityProperty {
   EntityProperty() = default;
@@ -23,7 +24,7 @@ struct EntityProperty {
   bool is_chunk_loader_ = false;
 
   EntityUUID entity_uuid_ = 0;
-  EntityTypeID type_ = 0;  // State what type of entity is it. Zombie? Human??
+  EntityType type_ = EntityType::kInvalidEntity;
 
   bool operator==(const EntityProperty& other) {
     return entity_uuid_ == other.entity_uuid_;

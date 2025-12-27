@@ -20,7 +20,9 @@ class TextureSource : public Asset {
   ~TextureSource();
 
   int GetFormat() const noexcept;
+  int GetMipmapLayerCount() const noexcept;
   virtual const uint8_t* GetData() const noexcept = 0;
+  virtual const uint8_t* GetMipmapLayer(int layer) const noexcept = 0;
 
  protected:
   // This just contain the image data and methods to access its properties
@@ -70,4 +72,5 @@ class TextureSource : public Asset {
   glm::ivec2 image_size_ = {0, 0};
   int format_ = 0;
   int channels_ = 0;
+  int mipmap_layer_count_ = 0;
 };

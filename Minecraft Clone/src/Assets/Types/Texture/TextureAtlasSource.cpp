@@ -1,6 +1,8 @@
 #include "Assets/Types/Texture/TextureAtlasSource.h"
 
+#include <cstring>
 #include <filesystem>
+#include <future>
 #include <nlohmann/json.hpp>
 
 #include "Assets/Types/Texture/Atlas/Sticher.h"
@@ -15,6 +17,9 @@ using std::nullopt;
 using std::optional;
 using std::string;
 using std::vector;
+using std::future;
+using std::async;
+using std::sort;
 
 TextureAtlasSource::TextureAtlasSource(GameContext& context, const string& key,
                                        const string& atlas_def)
@@ -24,14 +29,26 @@ void TextureAtlasSource::Load() {
   LOG_INFO("Loading texture atlas: {}", atlas_def_);
   vector<SpritePath> sprites = GetPathList();
   sprites_.reserve(sprites.size());
-  // Now load in all of the images in memory
-  for (auto [sprite_path, sprite_name] : sprites) {
-    TextureData data = LoadTexture(sprite_path);
+  
+  // Parallel texture loading using std::async
+  vector<future<TextureData>> texture_futures;
+  texture_futures.reserve(sprites.size());
+  
+  // Launch async texture loads
+  for (const auto& [sprite_path, sprite_name] : sprites) {
+    texture_futures.push_back(async(std::launch::async, [this, &sprite_path]() {
+      return LoadTexture(sprite_path);
+    }));
+  }
+  
+  // Collect results and build sprite data
+  for (size_t i = 0; i < sprites.size(); ++i) {
+    TextureData data = texture_futures[i].get();
     SpriteData sprite;
     sprite.partial_trans_ = data.IsPartialTrans();
     sprite.full_trans_ = data.IsFullTrans();
     sprite.data_ = move(data);
-    sprite.name_ = sprite_name;
+    sprite.name_ = sprites[i].name_;
     sprites_.push_back(move(sprite));
   }
 
@@ -81,6 +98,10 @@ const uint8_t* TextureAtlasSource::GetData() const noexcept {
   return data_.data();
 }
 
+const uint8_t* TextureAtlasSource::GetMipmapLayer(int layer) const noexcept {
+  return nullptr;
+}
+
 vector<TextureAtlasSource::SpritePath> TextureAtlasSource::GetPathList() const {
   vector<char> data = FileUtils::ReadFileToBuffer(context_, atlas_def_);
   vector<SpritePath> sprites;
@@ -108,7 +129,7 @@ vector<TextureAtlasSource::SpritePath> TextureAtlasSource::GetPathList() const {
 
     string type = source["type"].get<string>();
 
-    if (type == "minecraft:directory") {
+    if (type == "minecraft:directory" || type == "directory") {
       if (!source.contains("source") || !source.contains("prefix")) {
         LOG_WARN(
             "Atlas source at '{}' skipped due to missing source or prefix!",
@@ -119,7 +140,7 @@ vector<TextureAtlasSource::SpritePath> TextureAtlasSource::GetPathList() const {
       string prefix = source["prefix"].get<string>();
 
       ParseTypeDirectory(sprites, path, prefix);
-    } else if (type == "minecraft:single") {
+    } else if (type == "minecraft:single" || type == "single") {
       if (!source.contains("resource")) {
         LOG_WARN("Atlas source at '{}' skipped due to missing resource!",
                  atlas_def_);
@@ -164,6 +185,10 @@ void TextureAtlasSource::ParseTypeDirectory(vector<SpritePath>& out,
     path source_path = texture_path / source;
 
     string source_path_str = source_path.string();
+
+    if (!exists(source_path) || !is_directory(source_path)) {
+      continue;
+    }
 
     for (const auto& file : recursive_directory_iterator(source_path)) {
       if (file.is_directory()) {
@@ -242,9 +267,17 @@ void TextureAtlasSource::ParseTypeSingle(vector<SpritePath>& out,
 
 void TextureAtlasSource::Stitch() {
   // Use stitcher to stitch together all of the textures
-  Stitcher stitcher{context_, kDefaultAtlasSize, kDefaultAtlasSize};
+  Stitcher stitcher{context_, kDefaultAtlasSize, kDefaultAtlasSize, 4};
 
   int channels = 1;
+
+  // Sort sprites by area (largest first) - classic bin packing optimization
+  // This significantly improves packing efficiency
+  sort(sprites_.begin(), sprites_.end(), [](const SpriteData& a, const SpriteData& b) {
+    const int area_a = a.data_.GetWidth() * a.data_.GetHeight();
+    const int area_b = b.data_.GetWidth() * b.data_.GetHeight();
+    return area_a > area_b;  // Descending order (largest first)
+  });
 
   for (auto& sprite : sprites_) {
     TextureData& data = sprite.data_;
@@ -273,34 +306,52 @@ void TextureAtlasSource::Stitch() {
 }
 
 void TextureAtlasSource::StitchTexture(const SpriteData& data) {
-  int x_offset = data.x_;
-  int y_offset = data.y_;
-
-  int x_sprite = data.width_;
-  int y_sprite = data.height_;
-
-  int sprite_channel = data.data_.GetChannels();
+  const int x_offset = data.x_;
+  const int y_offset = data.y_;
+  const int sprite_width = data.width_;
+  const int sprite_height = data.height_;
+  const int sprite_channels = data.data_.GetChannels();
   const uint8_t* sprite_data = data.data_.GetData();
 
-  for (int x = 0; x < x_sprite; ++x) {
-    for (int y = 0; y < y_sprite; ++y) {
-      int x_global = x + x_offset;
-      int y_global = y + y_offset;
-
-      glm::u8vec4 rgba = data.data_.GetPixel(x, y);
-      SetPixel(x_global, y_global, rgba);
+  // If channels match, use memcpy per row (much faster)
+  if (sprite_channels == channels_) {
+    const size_t row_bytes = static_cast<size_t>(sprite_width) * channels_;
+    for (int y = 0; y < sprite_height; ++y) {
+      const int y_global = y + y_offset;
+      const size_t dst_offset = (static_cast<size_t>(y_global) * width_ + x_offset) * channels_;
+      const size_t src_offset = static_cast<size_t>(y) * sprite_width * sprite_channels;
+      std::memcpy(data_.data() + dst_offset, sprite_data + src_offset, row_bytes);
     }
-  }
-}
-
-void TextureAtlasSource::SetPixel(int x, int y, glm::u8vec4 rgba) {
-  const int x_stride = channels_;
-  const int y_stride = width_ * channels_;
-
-  const int x_data = x_stride * x;
-  const int y_data = y_stride * y;
-
-  for (int i = 0; i < channels_; ++i) {
-    data_[x_data + y_data + i] = rgba[i];
+  } else {
+    // Inlined channel conversion - no SetPixel() function call overhead
+    const int src_stride_y = sprite_width * sprite_channels;
+    const int dst_stride_y = width_ * channels_;
+    
+    for (int y = 0; y < sprite_height; ++y) {
+      const int y_global = y + y_offset;
+      const int src_row_offset = y * src_stride_y;
+      const int dst_row_offset = (y_global * width_ + x_offset) * channels_;
+      
+      for (int x = 0; x < sprite_width; ++x) {
+        const int src_pixel = src_row_offset + x * sprite_channels;
+        const int dst_pixel = dst_row_offset + x * channels_;
+        
+        // Copy available channels
+        for (int c = 0; c < sprite_channels && c < channels_; ++c) {
+          data_[dst_pixel + c] = sprite_data[src_pixel + c];
+        }
+        
+        // Fill remaining channels (grayscale expansion or alpha)
+        if (sprite_channels == 1 && channels_ >= 3) {
+          // Grayscale to RGB
+          data_[dst_pixel + 1] = sprite_data[src_pixel];
+          data_[dst_pixel + 2] = sprite_data[src_pixel];
+        }
+        if (sprite_channels < 4 && channels_ == 4) {
+          // Set alpha to fully opaque
+          data_[dst_pixel + 3] = 255;
+        }
+      }
+    }
   }
 }

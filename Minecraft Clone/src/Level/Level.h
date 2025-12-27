@@ -6,8 +6,6 @@ class GameContext;
 
 class Level {
  public:
-  std::unique_ptr<Dimension> main_world_;
-
   explicit Level(GameContext&);
   ~Level();
 
@@ -17,4 +15,5 @@ class Level {
   void ResetState();
 
   GameContext& context_;
+  std::unique_ptr<Dimension> main_world_;
 };

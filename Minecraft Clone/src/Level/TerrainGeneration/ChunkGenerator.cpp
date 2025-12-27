@@ -37,7 +37,8 @@ std::vector<std::unique_ptr<Chunk>> ChunkGenerator::GetOutput() {
 /*
  * Static function for the thread pool to use
  */
-std::vector<std::unique_ptr<Chunk>> ChunkGenerator::Worker(ChunkPos task) {
+std::vector<std::unique_ptr<Chunk>> ChunkGenerator::Worker(ChunkPos task,
+                                                           int workerId) {
   // Generate
   ChunkPos pos = task;
   std::vector<std::unique_ptr<Chunk>> output;

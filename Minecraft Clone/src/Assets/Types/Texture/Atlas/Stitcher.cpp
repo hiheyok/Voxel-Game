@@ -10,15 +10,18 @@
 #include "Core/Typenames.h"
 
 using std::pair;
+using std::swap;
+using std::vector;
 
 Stitcher::Stitcher(GameContext& context, int initial_width, int initial_height,
-                   bool can_expand)
+                   int alignment, bool can_expand)
     : context_{context},
       kCanExpand{can_expand},
       place_heuristic_{std::make_unique<BestShortSideFit>()},
       split_heuristic_{std::make_unique<ShorterAxisSplit>()},
       width_{initial_width},
-      height_{initial_height} {
+      height_{initial_height},
+      alignment_{alignment} {
   free_bins_.emplace_back(0, 0, width_, height_);
 }
 
@@ -27,19 +30,19 @@ Stitcher::~Stitcher() = default;
 pair<int, int> Stitcher::PlaceItem(const ResourceLocation& location,
                                    int item_width, int item_height) {
   do {
-    int idx =
-        place_heuristic_->FindBestSpot(item_width, item_height, free_bins_);
+    int idx = place_heuristic_->FindBestSpot(item_width, item_height,
+                                             alignment_, free_bins_);
 
     if (idx != -1) {
       // Copy the rectangle before deleting from free list
       StitchingRectangle rect = free_bins_[idx];
 
       // Swap and pop O(1) deletion
-      std::swap(free_bins_[idx], free_bins_.back());
+      swap(free_bins_[idx], free_bins_.back());
       free_bins_.pop_back();
 
-      std::vector<StitchingRectangle> new_rects =
-          split_heuristic_->Split(item_width, item_height, rect);
+      vector<StitchingRectangle> new_rects =
+          split_heuristic_->Split(item_width, item_height, alignment_, rect);
 
       if (!new_rects.empty()) {
         free_bins_.reserve(free_bins_.size() + new_rects.size());

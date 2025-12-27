@@ -9,7 +9,7 @@
 #include "Level/Entity/Entity.h"
 #include "Utils/LogUtils.h"
 
-World::World(GameContext& context) : WorldInterface{context} {}
+World::World(GameContext& context) : WorldInterface{context, true, true} {}
 
 World::~World() = default;
 

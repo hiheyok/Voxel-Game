@@ -22,6 +22,7 @@ class TextureAtlasSource : public Texture2DBaseSource {
                      const std::string& atlas_def);
 
   void Load() override;
+  const uint8_t* GetMipmapLayer(int layer) const noexcept override;
 
   std::vector<Sprite> GetAllSprites() const;
   std::optional<Sprite> GetSprite(const ResourceLocation& location);
@@ -50,7 +51,6 @@ class TextureAtlasSource : public Texture2DBaseSource {
 
   void Stitch();
   void StitchTexture(const SpriteData& data);
-  void SetPixel(int x, int y, glm::u8vec4 rgba);
 
   static constexpr int kDefaultAtlasSize = 128;
 

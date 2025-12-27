@@ -23,7 +23,6 @@ struct LightEngineStats;
 class Dimension {
  public:
   EventSystem event_manager_;
-  const int tick_rate_ = 20;  // TODO(hiheyok): tmp fix
 
   Dimension(GameContext&, DimensionProperties properties,
             WorldGeneratorID generatorTypeIn);

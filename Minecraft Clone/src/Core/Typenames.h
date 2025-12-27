@@ -18,11 +18,15 @@
 
 typedef uint32_t EventID;
 typedef uint16_t BlockID;
-typedef uint64_t EntityUUID;  // UUID
+typedef int64_t EntityUUID;  // UUID
 typedef uint64_t RegionID;
-typedef uint16_t EntityTypeID;
 typedef uint32_t ItemID;
 typedef uint64_t WorldGeneratorID;
+typedef int32_t EntityModelId;
+
+// ECS
+
+typedef int32_t EntityComponentId;
 
 template <class K, class V, class _Hash = robin_hood::hash<K>>
 using FastHashMap = robin_hood::unordered_flat_map<K, V, _Hash, std::equal_to<>>;

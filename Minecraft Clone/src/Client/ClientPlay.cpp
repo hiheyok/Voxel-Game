@@ -17,14 +17,20 @@
 #include "Core/GameContext/GameContext.h"
 #include "Core/Interfaces/ServerInterface.h"
 #include "Core/Networking/ChunkUpdate.h"
+#include "Core/Networking/ECSUpdate.h"
 #include "Core/Networking/Packet.h"
 #include "Core/Networking/PlayerAction.h"
 #include "Core/Options/Option.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Chunk/Chunk.h"
+#include "Level/ECS/ECSManager.h"
+#include "Level/ECS/EntityRegistry.h"
+#include "Level/ECS/EntitySystems.h"
+#include "Level/ECS/Systems/TransformSystem.h"
 #include "Level/Entity/Entities.h"
 #include "Level/Entity/Mobs/Player.h"
 #include "RenderEngine/ChunkRender/TerrainRenderer.h"
+#include "RenderEngine/EntityRender/ECSEntityRender.h"
 #include "RenderEngine/EntityRender/MultiEntityRender.h"
 #include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
 #include "RenderEngine/Window.h"
@@ -41,6 +47,8 @@ ClientPlay::ClientPlay(GameContext& context, ServerInterface* interface,
       debug_screen_{std::make_unique<DebugScreen>(context)},
       entity_render_{std::make_unique<MultiEntityRender>(
           context, main_player_->GetPlayerPOV())},
+      ecs_entity_render_{std::make_unique<ECSEntityRender>(
+          context, client_level_->cache_.GetECSManager(), main_player_->GetPlayerPOV())},
       terrain_render_{std::make_unique<WorldRender>(
           context, main_player_->GetPlayerPOV())} {
   main_player_->SetPlayerPosition(0., 50, 0.);
@@ -50,6 +58,8 @@ ClientPlay::ClientPlay(GameContext& context, ServerInterface* interface,
   debug_screen_->SetUpdateRate(200);
   entity_render_->Initialize(profiler);
   entity_render_->SetWindow(window->GetWindow());
+  ecs_entity_render_->Initialize();
+  ecs_entity_render_->SetWindow(window->GetWindow());
 
   // Send server update on player position
   PlayerPacket::PlayerMove packet;
@@ -74,6 +84,7 @@ void ClientPlay::Render(Window* window) {
   // entity_render_->Render();
   terrain_render_->Render();
   entity_render_->Render();
+  ecs_entity_render_->Render();
 
   if (!window->GetProperties().draw_solid_) window->RenderSolid();
 
@@ -105,8 +116,11 @@ void ClientPlay::Update(Window* window) {
   entity_render_->SetTimePastTick(interface_->time.GetTimePassed_s());
   entity_render_->Update();
 
+  ecs_entity_render_->SetTimePastTick(interface_->time.GetTimePassed_s());
+
   UpdateChunks();
   UpdateEntities();
+  ProcessECSUpdates();
 
   // Send player pos update
 
@@ -358,4 +372,40 @@ void ClientPlay::UpdateEntities() {
        client_level_->cache_.entities_.GetRemovedEntitiesUUID()) {
     entity_render_->RemoveEntity(entity);
   }
+}
+
+void ClientPlay::ProcessECSUpdates() {
+  std::vector<ECSUpdatePacket::ECSUpdate> updates;
+  interface_->PollECSUpdates(updates);
+  
+  if (updates.empty()) return;
+  
+  auto& ecs = client_level_->cache_.GetECSManager();
+  auto& transform_system = ecs.GetSystems().GetTransformSystem();
+  auto& registry = ecs.GetRegistry();
+  
+  for (const auto& update : updates) {
+    switch (update.type_) {
+      case ECSUpdatePacket::PacketType::kTransformBatch: {
+        const auto& batch = std::get<ECSUpdatePacket::TransformBatch>(update.packet_);
+        
+        for (const auto& data : batch.transforms_) {
+          // Create entity if it doesn't exist
+          if (!registry.IsValidUUID(data.uuid_)) {
+            registry.CreateEntityWithUUID(data.uuid_, data.type_);
+          }
+          
+          // Update transform using embedded component
+          transform_system.ReplaceComponent(data.uuid_, data.component_);
+        }
+        break;
+      }
+      default:
+      GAME_ASSERT(false, "System not handled yet!");
+        break;
+    }
+  }
+  
+  // Commit changes to make them visible to renderer
+  ecs.GetSystems().CommitAll();
 }

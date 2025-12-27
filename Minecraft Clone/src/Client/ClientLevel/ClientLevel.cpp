@@ -2,5 +2,10 @@
 
 #include "Client/ClientLevel/ClientLevel.h"
 
+using std::make_unique;
+
 ClientLevel::ClientLevel(GameContext& context) : cache_{context} {}
+
 ClientLevel::~ClientLevel() = default;
+
+void ClientLevel::Update() {}

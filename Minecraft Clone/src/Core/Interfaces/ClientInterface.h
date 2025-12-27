@@ -18,6 +18,7 @@ class ClientInterface {
   virtual void SendBlockUpdate(const Packet::BlockUpdate& update) = 0;
   virtual void SendEntityUpdate(const Packet::EntityUpdate& update) = 0;
   virtual void SendChunkUpdates(const Packet::ChunkUpdateData& update) = 0;
+  virtual void SendECSUpdate(const ECSUpdatePacket::ECSUpdate& update) = 0;
   virtual void SendServerStats(const ServerStats& stats) = 0;
 
   virtual void SendTimeLastTick() = 0;

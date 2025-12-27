@@ -12,29 +12,18 @@
 #include "Level/World/CollusionDetector.h"
 
 ClientCache::ClientCache(GameContext& context)
-    : context_{context},
+    : WorldInterface{context, false, false},
+      context_{context},
       entities_{context},
-      collusion_manager_{context, &chunk_cache_},
-      chunk_cache_{context} {}
+      collusion_manager_{context, *chunks_} {}
+
 ClientCache::~ClientCache() = default;
 
 void ClientCache::AddChunk(std::unique_ptr<Chunk> chunk) {
-  chunk_cache_.InsertChunk(std::move(chunk));
+  chunks_->InsertChunk(std::move(chunk));
 }
 
-void ClientCache::EraseChunk(ChunkPos pos) { chunk_cache_.EraseChunk(pos); }
-
-Chunk* ClientCache::GetChunk(ChunkPos pos) const {
-  return chunk_cache_.GetChunk(pos);
-}
-
-BlockID ClientCache::GetBlock(BlockPos pos) const {
-  return chunk_cache_.GetBlock(pos);
-}
-
-bool ClientCache::CheckChunk(ChunkPos pos) const {
-  return chunk_cache_.CheckChunk(pos);
-}
+void ClientCache::EraseChunk(ChunkPos pos) { chunks_->EraseChunk(pos); }
 
 void ClientCache::InsertEntity(const EntityProperty& entity) {
   entities_.InsertEntity(entity);

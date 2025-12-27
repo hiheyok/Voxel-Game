@@ -1,13 +1,15 @@
 #include "RenderEngine/UI/Components/ColoredComponent.h"
 
+#include "Utils/Assert.h"
+
 #include "RenderEngine/UI/Data/UserInterfaceData.h"
 
 ColoredComponent::ColoredComponent(float r, float g, float b, float a)
     : Component{}, r_{r}, g_{g}, b_{b}, a_{a} {
-  assert(0 <= r && r <= 1);
-  assert(0 <= g && g <= 1);
-  assert(0 <= b && b <= 1);
-  assert(0 <= a && a <= 1);
+  GAME_ASSERT(0 <= r && r <= 1, "Red value out of range");
+  GAME_ASSERT(0 <= g && g <= 1, "Green value out of range");
+  GAME_ASSERT(0 <= b && b <= 1, "Blue value out of range");
+  GAME_ASSERT(0 <= a && a <= 1, "Alpha value out of range");
 };
 ColoredComponent::~ColoredComponent() = default;
 

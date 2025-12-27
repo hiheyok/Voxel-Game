@@ -13,7 +13,7 @@ ChunkContainer::ChunkContainer(GameContext& context)
       sky_light_{std::make_unique<LightStorage>()},
       block_light_{std::make_unique<LightStorage>()},
       heightmap_{std::make_unique<HeightMap>()},
-      outside_block_to_place_{6},
+      outside_block_to_place_{},
       neighbors_{6},
       block_storage_{} {
   sky_light_->position_ = position_;
@@ -208,7 +208,7 @@ bool ChunkContainer::IsLightUp() const noexcept {
   return is_light_up_.load(std::memory_order_relaxed);
 }
 void ChunkContainer::SetLightUp(bool is_light_up) {
-  is_light_up_.store(is_light_up, std::memory_order_acquire);
+  is_light_up_.store(is_light_up, std::memory_order_release);
 }
 
 const Palette& ChunkContainer::GetPalette() const { return block_storage_; }

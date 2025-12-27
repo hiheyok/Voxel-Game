@@ -1,9 +1,8 @@
 #include "Assets/Types/ShaderSource.h"
 
-#include <cassert>
-
 #include "Core/GameContext/GameContext.h"
 #include "Core/IO/FileUtils.h"
+#include "Utils/Assert.h"
 #include "Utils/LogUtils.h"
 
 ShaderSource::ShaderSource(GameContext& context, const std::string& asset_key,
@@ -46,22 +45,22 @@ void ShaderSource::Load() {
 }
 
 const std::string& ShaderSource::GetVertex() const noexcept {
-  assert(type_ == ShaderType::kShader);
+  GAME_ASSERT(type_ == ShaderType::kShader, "Shader type must be kShader");
   return vert_src_;
 }
 
 const std::string& ShaderSource::GetFragment() const noexcept {
-  assert(type_ == ShaderType::kShader);
+  GAME_ASSERT(type_ == ShaderType::kShader, "Shader type must be kShader");
   return frag_src_;
 }
 
 const std::string& ShaderSource::GetGeometry() const noexcept {
-  assert(type_ == ShaderType::kShader);
+  GAME_ASSERT(type_ == ShaderType::kShader, "Shader type must be kShader");
   return geo_src_;
 }
 
 const std::string& ShaderSource::GetCompute() const noexcept {
-  assert(type_ == ShaderType::kCompute);
+  GAME_ASSERT(type_ == ShaderType::kCompute, "Shader type must be kCompute");
   return comp_src_;
 }
 

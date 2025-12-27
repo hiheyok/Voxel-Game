@@ -5,7 +5,7 @@
 #include "Assets/Types/Texture/Atlas/StitchingRectangle.h"
 
 int BestShortSideFit::FindBestSpot(
-    int item_width, int item_height,
+    int item_width, int item_height, int alignment,
     const std::vector<StitchingRectangle>& free_rects) const {
   int best_bin_idx = -1;
   int best_score = std::numeric_limits<int>::max();
@@ -28,7 +28,8 @@ int BestShortSideFit::FindBestSpot(
 }
 
 std::vector<StitchingRectangle> ShorterAxisSplit::Split(
-    int item_width, int item_height, const StitchingRectangle& rect) const {
+    int item_width, int item_height, int alignment,
+    const StitchingRectangle& rect) const {
   std::vector<StitchingRectangle> new_rects;
   int remaining_width = rect.width_ - item_width;
   int remaining_height = rect.height_ - item_height;

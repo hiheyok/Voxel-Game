@@ -1,10 +1,10 @@
 #include <algorithm>
 #include <array>
-#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
 #include <limits>
+#include "Utils/Assert.h"
 
 template <size_t N, typename T>
 class Product;
@@ -129,14 +129,14 @@ class Product {
   }
 
   explicit Product(std::initializer_list<std::pair<T, T>> bounds) noexcept {
-    assert(bounds.size() == N && "Incorrect number of ranges provided.");
+    GAME_ASSERT(bounds.size() == N, "Incorrect number of ranges provided");
     std::array<Range, N> arr;
     std::copy_n(bounds.begin(), N, arr.data());
     Init(arr);
   }
 
   explicit Product(std::initializer_list<T> bounds) noexcept {
-    assert(bounds.size() == N && "Incorrect number of ranges provided.");
+    GAME_ASSERT(bounds.size() == N, "Incorrect number of ranges provided");
     std::array<Range, N> arr;
     auto it = bounds.begin();
     for (int i = 0; i < N; ++i, ++it) {
@@ -174,13 +174,12 @@ class Product {
 
     max_ = 1;
     for (size_t i = 0; i < N; ++i) {
-      assert(bounds[i].second > bounds[i].first &&
-             "Range end must be greater than begin.");
+      GAME_ASSERT(bounds[i].second > bounds[i].first, "Invalid range bounds");
       bounds_[i] = bounds[i];
       size_t size = bounds[i].second - bounds[i].first;
 
       if (size > 0 && max_ > std::numeric_limits<size_t>::max() / size) {
-        assert(false && "Overflow detected in calculating product size.");
+        GAME_ASSERT(false, "Overflow detected in calculating product size");
         max_ = 0;
         return;
       }

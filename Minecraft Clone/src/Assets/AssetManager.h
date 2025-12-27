@@ -6,6 +6,7 @@
 
 #include "Assets/Asset.h"
 #include "Core/Typenames.h"
+#include "Utils/Assert.h"
 
 class GameContext;
 
@@ -16,6 +17,7 @@ class ShaderSource;
 class Texture2DSource;
 class TextureAtlasSource;
 class BlockModelManager;
+class EntityModel;
 
 class AssetManager {
  public:
@@ -31,6 +33,8 @@ class AssetManager {
   AssetHandle<TextureAtlasSource> GetAtlasSource(std::string key);
   std::vector<AssetHandle<TextureAtlasSource>> GetAllAtlasSource();
 
+  AssetHandle<EntityModel> GetEntityModel(std::string key);
+
   const BlockModelManager& GetBlockModelManager() const;
 
   // This will load in all of the keys
@@ -43,15 +47,16 @@ class AssetManager {
   // Discovery functions
   void DiscoverShaders();
   void DiscoverTextures();
+  void DiscoverEntityModels();
 
   template <IsAsset T, typename... Args>
-  void CreateAsset(std::string key, Args&&... args);
+  T& CreateAsset(const std::string& key, Args&&... args);
 
   template <IsAsset T>
-  void PutAsset(std::string key, std::unique_ptr<T> asset);
+  void PutAsset(const std::string& key, std::unique_ptr<T> asset);
 
   template <IsAsset T>
-  AssetHandle<T> GetAsset(std::string key);
+  AssetHandle<T> GetAsset(const std::string& key);
 
   template <IsAsset T>
   std::vector<AssetHandle<T>> GetAllAsset();
@@ -64,6 +69,7 @@ class AssetManager {
   FastHashMap<std::string, std::unique_ptr<ShaderSource>> shader_cache_;
   FastHashMap<std::string, std::unique_ptr<Texture2DSource>> texture2d_cache_;
   FastHashMap<std::string, std::unique_ptr<TextureAtlasSource>> atlas_cache_;
+  FastHashMap<std::string, std::unique_ptr<EntityModel>> entity_model_cache_;
   std::unique_ptr<BlockModelManager> block_models_;
 };
 
@@ -78,6 +84,8 @@ AssetManager::GetCache() noexcept {
     return texture2d_cache_;
   } else if constexpr (std::is_same_v<TextureAtlasSource, Type>) {
     return atlas_cache_;
+  } else if constexpr (std::is_same_v<EntityModel, Type>) {
+    return entity_model_cache_;
   } else {
     static_assert(std::is_void_v<Type>,
                   "AssetManager::GetCache: Unsupported asset type requested.");
@@ -85,20 +93,22 @@ AssetManager::GetCache() noexcept {
 }
 
 template <IsAsset T, typename... Args>
-void AssetManager::CreateAsset(std::string key, Args&&... args) {
+T& AssetManager::CreateAsset(const std::string& key, Args&&... args) {
   auto& cache = GetCache<T>();
   auto obj = std::make_unique<T>(context_, key, std::forward<Args>(args)...);
-  cache.emplace(key, std::move(obj));
+  auto [it, success] = cache.emplace(key, std::move(obj));
+  GAME_ASSERT(success, "Failed to insert assert");
+  return *it->second;
 }
 
 template <IsAsset T>
-void AssetManager::PutAsset(std::string key, std::unique_ptr<T> asset) {
+void AssetManager::PutAsset(const std::string& key, std::unique_ptr<T> asset) {
   auto& cache = GetCache<T>();
   cache.emplace(key, std::move(asset));
 }
 
 template <IsAsset T>
-AssetHandle<T> AssetManager::GetAsset(std::string key) {
+AssetHandle<T> AssetManager::GetAsset(const std::string& key) {
   auto& cache = GetCache<T>();
   auto it = cache.find(key);
 

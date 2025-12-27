@@ -14,6 +14,7 @@
 #include "Level/Light/LightStorage.h"
 #include "Level/World/World.h"
 #include "Level/World/WorldParameters.h"
+#include "Utils/Assert.h"
 
 WorldUpdater::WorldUpdater(GameContext& context, World* w, WorldParameters p)
     : context_{context},
@@ -156,7 +157,7 @@ void WorldUpdater::loadSurroundedMovedEntityChunk() {
 #include <ranges>
 
 void WorldUpdater::loadSpawnChunks() {
-  assert(world_ != nullptr);
+  GAME_ASSERT(world_ != nullptr, "World is null");
 
   int x0 = -settings_->spawn_chunk_horizontal_radius_;
   int x1 = settings_->spawn_chunk_horizontal_radius_ + 1;

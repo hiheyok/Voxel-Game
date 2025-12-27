@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Core/Typenames.h"
+#include "Level/Phys/Shape/VoxelShape.h"
 
 class Dimension;
 class BlockTextureAtlas;
@@ -25,6 +26,7 @@ struct BlockProperties {
   bool transparency_ = false;
   int light_emission = 0;
   int opacity_ = 15;
+  VoxelShape shape_;
 };
 
 class Block {

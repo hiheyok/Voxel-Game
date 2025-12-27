@@ -15,6 +15,10 @@ TextureSource::~TextureSource() = default;
 
 int TextureSource::GetFormat() const noexcept { return format_; }
 
+int TextureSource::GetMipmapLayerCount() const noexcept {
+  return mipmap_layer_count_;
+}
+
 TextureSource::TextureData TextureSource::LoadTexture(
     const std::string& filepath) {
   return {context_, filepath};
@@ -85,20 +89,23 @@ void TextureSource::TextureData::Load(GameContext& context,
 }
 
 void TextureSource::TextureData::Analyze() {
-  // Analyze the transparency
+  // Analyze the transparency - optimized for cache-friendly access
   if (channels_ == 4) {
-    for (int i = 0; i < img_size_.x * img_size_.y; ++i) {
-      int alpha = data_[i * 4 + 3];
-      if (alpha > 0 && alpha < 255) {
+    const size_t total_pixels = static_cast<size_t>(img_size_.x) * img_size_.y;
+    const uint8_t* ptr = data_;
+    
+    for (size_t i = 0; i < total_pixels; ++i) {
+      const uint8_t alpha = ptr[i * 4 + 3];
+      
+      if (alpha == 0) {
+        full_trans_ = true;
+      } else if (alpha < 255) {
         partial_trans_ = true;
       }
 
-      if (alpha == 0) {
-        full_trans_ = true;
-      }
-
+      // Early exit when both flags are set
       if (full_trans_ && partial_trans_) {
-        break;
+        return;
       }
     }
   }

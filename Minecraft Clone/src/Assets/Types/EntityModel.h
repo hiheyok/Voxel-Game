@@ -2,11 +2,13 @@
 
 #pragma once
 
-#include <iostream>
-#include <vector>
-
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <iostream>
+#include <string>
+#include <vector>
+
+#include "Assets/Asset.h"
 
 namespace Model {
 struct ModelData {
@@ -36,13 +38,19 @@ struct RectangularPrism {
 };
 }  // namespace Model
 
-class EntityModel {
+class EntityModel : public Asset {
  public:
-  Model::RectangularPrism* AddRectangle(glm::vec3 size, glm::vec3 offset);
+  EntityModel(const std::string& key);
 
+  Model::RectangularPrism* AddRectangle(glm::vec3 size, glm::vec3 offset);
   Model::ModelData GetVertices();
 
   void Clear();
+
+  void Load() override {} // tmp
+
+  std::string texture_id_; // tmp fix
+  glm::vec3 hitbox_; // tmp fix
 
  private:
   std::vector<Model::RectangularPrism> shapes_;

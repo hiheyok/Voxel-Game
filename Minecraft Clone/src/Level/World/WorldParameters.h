@@ -9,7 +9,5 @@ struct WorldParameters {
 
   float gravity_ = 10.f;
 
-  WorldParameters() = default;
-  ~WorldParameters() = default;
-  WorldParameters(const WorldParameters&) = default;
+  int world_tps_ = 20;
 };

@@ -1,6 +1,5 @@
 #include "Level/Light/SkyLightEngine.h"
 
-#include <cassert>
 #include <utility>
 
 #include "Core/GameContext/GameContext.h"
@@ -9,6 +8,7 @@
 #include "Level/Light/ChunkLightTask.h"
 #include "Level/Light/LightEngineCache.h"
 #include "Level/World/WorldInterface.h"
+#include "Utils/Assert.h"
 
 SkyLightEngine::SkyLightEngine(GameContext& context, WorldInterface& world)
     : LightEngine{context, world} {
@@ -19,8 +19,8 @@ SkyLightEngine::SkyLightEngine(GameContext& context, WorldInterface& world)
 SkyLightEngine::~SkyLightEngine() = default;
 
 void SkyLightEngine::LightChunk(ChunkPos chunk_pos) {
-  assert(light_cache_ != nullptr);
-  assert(CheckChunk(chunk_pos));
+  GAME_ASSERT(light_cache_ != nullptr, "Light cache is null");
+  GAME_ASSERT(CheckChunk(chunk_pos), "Chunk not found");
 
   Chunk* chunk = GetChunk(chunk_pos);
   BlockPos chunk_offset = chunk_pos.GetBlockPosOffset();
@@ -58,7 +58,7 @@ void SkyLightEngine::LightChunk(ChunkPos chunk_pos) {
   light_cache_ = nullptr;
 }
 void SkyLightEngine::CheckNeighborChunk(ChunkPos center_chunk_pos) {
-  assert(CheckChunk(center_chunk_pos));
+  GAME_ASSERT(CheckChunk(center_chunk_pos), "Center chunk not found");
   Chunk* center_chunk = GetChunk(center_chunk_pos);
 
   InternalTask task;

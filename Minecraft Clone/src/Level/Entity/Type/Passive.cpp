@@ -5,7 +5,7 @@
 #include "Level/Dimension/Dimension.h"
 #include "Level/Entity/Entity.h"
 
-Passive::Passive(GameContext& context) : EntityType{context} {}
+Passive::Passive(GameContext& context) : EntityTypeData{context} {}
 Passive::~Passive() = default;
 
 void Passive::Tick(Entity* entity, Dimension* dimension) {

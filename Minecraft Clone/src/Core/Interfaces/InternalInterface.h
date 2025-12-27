@@ -62,6 +62,13 @@ class InternalInterface : public ServerInterface, public ClientInterface {
     server_stats_ = stats;
   }
 
+  void SendECSUpdate(const ECSUpdatePacket::ECSUpdate& update) override {
+    int attempts = 0;
+    while (!ecs_update_queue_.enqueue(update) &&
+           attempts++ < kQueueAttempts) {
+    }
+  }
+
   void SendTimeLastTick() override { time.Set(); }
 
  private:

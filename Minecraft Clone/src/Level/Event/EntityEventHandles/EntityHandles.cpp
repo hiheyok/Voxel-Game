@@ -13,7 +13,7 @@
 
 void HandleEntityTick(const EntityEvent& e,
                       Dimension* dimension) {  // prob useless
-  Entity* entity = dimension->world_->GetEntity(e.entity_type_);
+  Entity* entity = dimension->world_->GetEntity(e.entity_uuid_);
   entity->Tick(dimension);
 }
 

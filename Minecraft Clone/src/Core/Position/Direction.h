@@ -6,7 +6,6 @@
 
 #include "Core/Position/PositionTypes.h"
 
-// TODO(hiheyok): Refactor the code to use these
 static constexpr int kEastDirection = 0;
 static constexpr int kWestDirection = 1;
 static constexpr int kUpDirection = 2;
@@ -84,7 +83,6 @@ class Directions {
   static constexpr Direction<PositionType> kSouth{0, 0, 1, kSouthDirection};
   static constexpr Direction<PositionType> kNorth{0, 0, -1, kNorthDirection};
 
- private:
   static constexpr Direction<PositionType> kDirections[6]{
       kEast, kWest, kUp, kDown, kSouth, kNorth};
 };

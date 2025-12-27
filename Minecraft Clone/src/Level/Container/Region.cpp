@@ -6,7 +6,7 @@
 
 #include "Core/GameContext/GameContext.h"
 #include "Level/Chunk/Chunk.h"
-#include "Utils/LogUtils.h"
+#include "Utils/Assert.h"
 
 Region::Region(GameContext& context) : context_{context} {
   chunk_count_ = 0;
@@ -18,7 +18,7 @@ Region::~Region() = default;
 
 Chunk* Region::GetChunk(ChunkPos pos) const {
   int idx = pos.GetIndex();
-  assert(CheckChunk(pos));
+  GAME_ASSERT(CheckChunk(pos), "Chunk not in region");
   return region_data_[idx].get();
 }
 
@@ -30,14 +30,14 @@ bool Region::CheckChunk(ChunkPos pos) const noexcept {
 void Region::InsertChunk(std::unique_ptr<Chunk> chunk) {
   ChunkPos pos = chunk->position_;
   int idx = pos.GetIndex();
-  assert(region_data_[idx] == nullptr);
+  GAME_ASSERT(region_data_[idx] == nullptr, "Chunk already exists in region");
   chunk_count_++;
   region_data_[idx] = std::move(chunk);
 }
 
 void Region::EraseChunk(ChunkPos pos) {
   int idx = pos.GetIndex();
-  assert(region_data_[idx] != nullptr);
+  GAME_ASSERT(region_data_[idx] != nullptr, "Chunk does not exist in region");
   chunk_count_--;
   region_data_[idx] = nullptr;
 }

@@ -5,137 +5,64 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
+#include "Assets/AssetManager.h"
+#include "Assets/Types/EntityModel.h"
 #include "Core/GameContext/GameContext.h"
 #include "Level/Entity/Type/Types.h"
+#include "Utils/Assert.h"
 #include "Utils/LogUtils.h"
 
 using json = nlohmann::json;
 
-EntitiesList::EntitiesList(GameContext& context) : context_{context} {}
+EntitiesList::EntitiesList(GameContext& context)
+    : context_{context},
+      entity_type_list_(static_cast<int>(EntityType::kMaxVal), nullptr) {}
 
-EntityTypeID EntitiesList::RegisterEntity(std::string entity_name,
-                                          EntityTypeEnums type_) {
-  EntityTypeID id = static_cast<EntityTypeID>(entity_type_list_.size());
-  EntityType* newEntity = nullptr;
+EntityType EntitiesList::RegisterEntity(std::string entity_name,
+                                        EntityTypeEnums type,
+                                        EntityType entity_type) {
+  EntityTypeData* new_entity = nullptr;
 
-  switch (type_) {
+  switch (type) {
     case ENTITY_PASSIVE:
-      newEntity = static_cast<EntityType*>(new Passive(context_));
+      new_entity = static_cast<EntityTypeData*>(new Passive(context_));
       break;
     case ENTITY_FALLING_BLOCK:
-      newEntity = static_cast<EntityType*>(new FallingBlock(context_));
+      new_entity = static_cast<EntityTypeData*>(new FallingBlock(context_));
       break;
     case ENTITY_HOSTILE:
-      newEntity = static_cast<EntityType*>(new Hostile(context_));
+      new_entity = static_cast<EntityTypeData*>(new Hostile(context_));
       break;
   }
 
-  if (newEntity == nullptr) {
-    throw std::runtime_error(
-        "EntitiesList::RegisterEntity - Failed to register entity");
-  }
+  GAME_ASSERT(new_entity != nullptr, "Failed to register entity");
 
-  newEntity->entity_name_ = entity_name;
+  new_entity->entity_name_ = entity_name;
 
-  LOG_INFO("Registered new entity: {} | EntityID: {}", entity_name, id);
+  LOG_INFO("Registered new entity: {} | EntityID: {}", entity_name,
+           static_cast<int>(entity_type));
 
-  newEntity->id_ = id;
+  new_entity->id_ = entity_type;
 
-  entity_type_list_.emplace_back(newEntity);
-  entity_name_id_[entity_name] = id;
+  entity_type_list_[static_cast<int>(entity_type)] = new_entity;
+  entity_name_id_[entity_name] = entity_type;
 
-  return id;
+  return entity_type;
 }
 
 void EntitiesList::InitializeModels() {
-  std::ifstream file("assets/EntityShape.json");
-
-  json data = json::parse(file);
-
-  for (auto& b : data.items()) {
-    EntityTypeID entityType = entity_name_id_[b.key()];
-
-    json::iterator d = b.value().begin();
-    std::string val = d.value();
-    std::string key = b.key();
-
-    if (d.value().is_string()) {
-      LOG_INFO("Entity: {} | Texture Loading: {}", key, val);
-      RawTextureData TexData{d.value()};
-      entity_type_list_[entityType]->texture_ =
-          std::make_unique<Texture2D>(context_, TexData);
-    }
-
-    d++;
-
-    glm::vec3 hitboxSize(d.value().at(0), d.value().at(1), d.value().at(2));
-
-    entity_type_list_[entityType]->ChangeHitboxSize(hitboxSize);
-
-    d++;
-
-    for (auto& SubData : d.value().items()) {
-      json::iterator it = SubData.value().begin();
-
-      glm::vec3 offset(it.value().at(0), it.value().at(1), it.value().at(2));
-
-      it++;
-
-      glm::vec3 shapeSize(it.value().at(0), it.value().at(1), it.value().at(2));
-
-      it++;
-
-      Model::RectangularPrism* model =
-          entity_type_list_[entityType]->render_model_.AddRectangle(shapeSize,
-                                                                    offset);
-
-      for (auto& ShapeUV : it.value().items()) {
-        json::iterator uv_iterator = ShapeUV.value().begin();
-
-        std::vector<int> uvFaces = {};
-
-        for (auto& uvFace : uv_iterator.value().items()) {
-          int s = 0xFF;
-
-          std::string texSide = uvFace.value();
-
-          // TODO(hiheyok): refactor FRONT BACK LEFT RIGHT TOP BOTTOM to new
-          // directions
-          if (texSide == "FRONT") s = Directions<BlockPos>::kEast;
-          if (texSide == "BACK") s = Directions<BlockPos>::kWest;
-          if (texSide == "LEFT") s = Directions<BlockPos>::kNorth;
-          if (texSide == "RIGHT") s = Directions<BlockPos>::kSouth;
-          if (texSide == "TOP") s = Directions<BlockPos>::kUp;
-          if (texSide == "BOTTOM") s = Directions<BlockPos>::kDown;
-
-          uvFaces.push_back(s);
-        }
-
-        uv_iterator++;
-
-        glm::vec2 pts[2]{};
-
-        int index = 0;
-
-        for (auto& UV_Points :
-             uv_iterator.value().items()) {  // iterate though uv points
-          pts[1 - index] =
-              glm::vec2(static_cast<float>(UV_Points.value().at(0)),
-                        1.f - static_cast<float>(UV_Points.value().at(1)));
-          index++;
-        }
-
-        for (int& face : uvFaces) {
-          model->uv_map_[face].p0_ = pts[0];
-          model->uv_map_[face].p1_ = pts[1];
-        }
-      }
-    }
+  // trash code
+  for (auto entity : entity_type_list_) {
+    if (entity == nullptr) continue;
+    const std::string& name = entity->entity_name_;
+    AssetHandle<EntityModel> model = context_.assets_->GetEntityModel(name);
+    if (!model.HasValue()) continue;
+    entity->ChangeHitboxSize(model->hitbox_);
   }
 }
 
 void EntitiesList::Initialize() { InitializeModels(); }
 
-EntityType* EntitiesList::GetEntity(EntityTypeID id) {
-  return entity_type_list_[id];
+EntityTypeData* EntitiesList::GetEntity(EntityType id) {
+  return entity_type_list_[static_cast<int>(id)];
 }

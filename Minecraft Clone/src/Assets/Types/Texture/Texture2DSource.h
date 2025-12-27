@@ -19,8 +19,11 @@ class Texture2DSource : public Texture2DBaseSource {
   void Load() override;
 
   const uint8_t* GetData() const noexcept override;
+  const uint8_t* GetMipmapLayer(int layer) const noexcept override;
 
  private:
+  void GenMipmap(int layers) {}
+  
   TextureData img_data_;
   std::string filepath;
 };

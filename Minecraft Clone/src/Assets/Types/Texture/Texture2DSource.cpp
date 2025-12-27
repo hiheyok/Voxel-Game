@@ -17,3 +17,7 @@ void Texture2DSource::Load() {
 const uint8_t* Texture2DSource::GetData() const noexcept {
   return img_data_.GetData();
 }
+
+const uint8_t* Texture2DSource::GetMipmapLayer(int layer) const noexcept {
+  return nullptr;
+}

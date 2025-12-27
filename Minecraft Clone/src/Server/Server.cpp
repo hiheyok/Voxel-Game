@@ -11,6 +11,10 @@
 #include "Core/Interfaces/InternalInterface.h"
 #include "Level/Chunk/ChunkData.h"
 #include "Level/Dimension/Dimension.h"
+#include "Level/ECS/ECSManager.h"
+#include "Level/ECS/EntityRegistry.h"
+#include "Level/ECS/EntitySystems.h"
+#include "Level/ECS/Systems/TransformSystem.h"
 #include "Level/Entity/Mobs/Player.h"
 #include "Level/Entity/Properties/EntityProperties.h"
 #include "Level/Level.h"
@@ -152,6 +156,7 @@ void Server::SendPacket() {
   SendEntityUpdatePacket(client_interface_);
   SendChunkUpdatePacket(client_interface_);
   SendBlockUpdatePacket(client_interface_);
+  SendECSUpdatePacket(client_interface_);
   SendServerStats(client_interface_);
   client_interface_->SendTimeLastTick();
 }
@@ -247,3 +252,26 @@ void Server::SendServerStats(ClientInterface* receiver) {
   stats.light_stats_ = level_->main_world_->GetLightEngineStats();
   receiver->SendServerStats(stats);
 }
+
+void Server::SendECSUpdatePacket(ClientInterface* receiver) {
+  // Efficiently batch all transform components into single packet
+  ECSUpdatePacket::TransformBatch batch;
+  
+  auto& ecs = level_->main_world_->world_->GetECSManager();
+  auto& transform_map = ecs.GetSystems().GetTransformSystem().GetComponentMap();
+  auto& registry = ecs.GetRegistry();
+  
+  for (const auto& [uuid, transform] : transform_map) {
+    ECSUpdatePacket::TransformData data;
+    data.uuid_ = uuid;
+    data.type_ = registry.GetEntityType(uuid);
+    data.component_ = transform;  // Copy entire component
+    batch.transforms_.push_back(data);
+  }
+  
+  if (!batch.transforms_.empty()) {
+    // Wrap in variant for future extensibility
+    receiver->SendECSUpdate(ECSUpdatePacket::ECSUpdate{batch});
+  }
+}
+

@@ -1,9 +1,9 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
 #pragma once
-#include "Level/Entity/EntityType.h"
+#include "Level/Entity/EntityTypeData.h"
 
-class FallingBlock : public EntityType {
+class FallingBlock : public EntityTypeData {
  public:
   FallingBlock(GameContext&);
   ~FallingBlock();

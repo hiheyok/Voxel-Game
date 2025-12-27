@@ -1,7 +1,8 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
+#include "Assets/Types/EntityModel.h"
+
 #include "Core/Typenames.h"
-#include "RenderEngine/EntityRender/Models/EntityModel.h"
 
 Model::ModelData Model::RectangularPrism::GetVertices() {
   ModelData model;
@@ -156,6 +157,8 @@ Model::RectangularPrism* EntityModel::AddRectangle(glm::vec3 size,
   return &shapes_.back();
 }
 
+EntityModel::EntityModel(const std::string& key) : Asset{key} {}
+
 Model::ModelData EntityModel::GetVertices() {
   Model::ModelData model;
 
@@ -173,8 +176,7 @@ Model::ModelData EntityModel::GetVertices() {
     }
 
     for (size_t i = 0; i < SubModel.indices_.size(); i++) {
-      model.indices_.push_back(
-          static_cast<uint32_t>(SubModel.indices_[i] + CurrentIndex));
+      model.indices_.push_back(SubModel.indices_[i] + CurrentIndex);
     }
 
     model.vertices_count_ += SubModel.vertices_count_;

@@ -1,10 +1,9 @@
 #include "RenderEngine/RenderResources/Types/Texture/TextureAtlas.h"
 
-#include <cassert>
-
 #include "Assets/Types/Texture/TextureAtlasSource.h"
 #include "Core/GameContext/GameContext.h"
 #include "RenderEngine/RenderResources/Types/Texture/TextureSprite.h"
+#include "Utils/Assert.h"
 #include "Utils/LogUtils.h"
 
 TextureAtlas::TextureAtlas(GameContext& context, const std::string& key,
@@ -15,7 +14,7 @@ TextureAtlas::~TextureAtlas() = default;
 
 TextureSprite TextureAtlas::GetSprite(const std::string& sprite_name) const {
   const auto& it = sprites_.find(sprite_name);
-  assert(it != sprites_.end());
+  GAME_ASSERT(it != sprites_.end(), "Sprite not found in atlas");
   TextureSprite sprite = it->second;
   sprite.handle_ = handle_;
   return sprite;
@@ -29,9 +28,9 @@ void TextureAtlas::LoadTexture() {
                source_->GetData());
 
   glGenerateMipmap(target_);
-  glTexParameteri(target_, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(target_, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+  glTexParameteri(target_, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(target_, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(target_, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(target_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
   LOG_DEBUG("Loaded Texture Atlas: {}", id_);

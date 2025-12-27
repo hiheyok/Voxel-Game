@@ -1,9 +1,10 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
 #pragma once
+#include "Assets/Types/EntityModel.h"
 #include "Core/Typenames.h"
-#include "Level/Entity/Collusion/Hitbox.h"
-#include "RenderEngine/EntityRender/Models/EntityModel.h"
+#include "Level/ECS/EntityType.h"
+#include "Level/Phys/Shape/AABB.h"
 #include "RenderEngine/OpenGL/Texture/Types/Texture2DOld.h"
 
 class Dimension;
@@ -11,11 +12,10 @@ class GameContext;
 
 struct Entity;
 
-// TODO(hiheyok): why did i put texture stuff here
-class EntityType {
+class EntityTypeData {
  public:
-  explicit EntityType(GameContext&);
-  virtual ~EntityType();
+  explicit EntityTypeData(GameContext&);
+  virtual ~EntityTypeData();
 
   void ChangeHitboxSize(glm::vec3 size);
   void ChangeHitboxSize(float x, float y, float z);
@@ -24,9 +24,7 @@ class EntityType {
   virtual void Tick(Entity* entity, Dimension* dimension) = 0;
 
   GameContext& context_;
-  EntityTypeID id_ = 0;
-  EntityModel render_model_;
-  std::unique_ptr<Texture2D> texture_;
+  EntityType id_ = EntityType::kInvalidEntity;
   std::string entity_name_;
 
  private:
