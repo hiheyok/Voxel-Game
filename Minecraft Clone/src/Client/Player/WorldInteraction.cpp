@@ -56,7 +56,7 @@ void WorldInteraction::Interact(Player* player, const InputManager& inputs,
 // This will just get the block from the cache
 
 BlockID WorldInteraction::GetBlock(Ray ray, ClientCache* cache) {
-  if (cache->collusion_manager_.CheckRayIntersection(ray)) {
+  if (cache->collision_manager_.CheckRayIntersection(ray)) {
     BlockPos pos{floor(ray.end_point_.x), floor(ray.end_point_.y),
                  floor(ray.end_point_.z)};
     return cache->GetBlock(pos);
@@ -66,7 +66,7 @@ BlockID WorldInteraction::GetBlock(Ray ray, ClientCache* cache) {
 
 void WorldInteraction::BreakBlock(Ray ray, ServerInterface* interface,
                                   ClientCache* cache) {
-  if (cache->collusion_manager_.CheckRayIntersection(ray)) {
+  if (cache->collision_manager_.CheckRayIntersection(ray)) {
     // Send block break packet
     PlayerPacket::PlayerDestroyBlock packet;
     packet.pos_ = {floor(ray.end_point_.x), floor(ray.end_point_.y),
@@ -79,7 +79,7 @@ void WorldInteraction::BreakBlock(Ray ray, ServerInterface* interface,
 void WorldInteraction::PlaceBlock(Ray ray, BlockID block,
                                   ServerInterface* interface,
                                   ClientCache* cache) {
-  if (cache->collusion_manager_.CheckRayIntersection(ray)) {
+  if (cache->collision_manager_.CheckRayIntersection(ray)) {
     int bounce_surface = ray.bounce_surface_;
 
     glm::ivec3 placePos = floor(ray.end_point_);

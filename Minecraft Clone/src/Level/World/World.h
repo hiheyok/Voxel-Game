@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-#include "Level/World/CollusionDetector.h"
+#include "Level/World/CollisionDetector.h"
 #include "Level/World/WorldInterface.h"
 #include "Level/World/WorldParameters.h"
 

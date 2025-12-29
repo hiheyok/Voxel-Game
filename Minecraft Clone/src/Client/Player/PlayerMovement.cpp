@@ -13,8 +13,8 @@
 
 void PlayerMovement::Update(Player* player, const InputManager& inputs,
                             ClientCache* clientWorld) {
-  if (inputs.CheckAction(InputAction::kToggleCollusion)) {
-    enable_collusion_ = !enable_collusion_;
+  if (inputs.CheckAction(InputAction::kToggleCollision)) {
+    enable_collision_ = !enable_collision_;
   }
 
   RotatePlayer(player, inputs);
@@ -114,8 +114,8 @@ void PlayerMovement::MovePlayer(Player* player, const InputManager& inputs,
   }
 
   if (inputs.CheckAction(InputAction::kJump) &&
-      (clientWorld->collusion_manager_.IsEntityOnGround(player) &&
-       enable_collusion_)) {
+      (clientWorld->collision_manager_.IsEntityOnGround(player) &&
+       enable_collision_)) {
     player->properties_.velocity_.y += velocity * 4000;
   }
 
@@ -123,14 +123,14 @@ void PlayerMovement::MovePlayer(Player* player, const InputManager& inputs,
     player->properties_.velocity_.y += velocity;
   }
 
-  if (enable_collusion_) {
+  if (enable_collision_) {
     float gravity = -80;
     gravity = 0;
 
     player->properties_.velocity_.y += gravity;
 
     glm::vec3 time =
-        clientWorld->collusion_manager_.ComputeCollisionTimes(player);
+        clientWorld->collision_manager_.ComputeCollisionTimes(player);
 
     if ((time.x != -1.) && (time.x <= inputs.delta_)) {
       player->properties_.velocity_.x = 0;

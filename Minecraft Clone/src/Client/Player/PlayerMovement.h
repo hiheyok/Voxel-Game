@@ -19,5 +19,5 @@ class PlayerMovement {
   void MoveRelative(Player* player, float strafe, float up, float forward,
                     float friction);
 
-  bool enable_collusion_ = false;
+  bool enable_collision_ = false;
 };

@@ -36,7 +36,7 @@ Dimension::Dimension(GameContext& context, DimensionProperties properties,
   auto& server_ecs = static_cast<ServerECSManager&>(main_world_->GetECSManager());
   server_ecs.SetWorldUpdater(world_updater_.get());
   
-  collusion_detector_ = std::make_unique<CollusionDetector>(
+  collision_detector_ = std::make_unique<CollisionDetector>(
       context_, *main_world_->GetChunkMap());
 
   if (context_.generators_->GetGenerator(generator_type_)->use_tall_chunks_) {

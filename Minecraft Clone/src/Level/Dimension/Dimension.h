@@ -12,7 +12,7 @@
 #include "Level/World/WorldParameters.h"
 
 class WorldInterface;
-class CollusionDetector;
+class CollisionDetector;
 class WorldUpdater;
 class ChunkGenerator;
 class ThreadedLightEngine;
@@ -42,7 +42,7 @@ class Dimension {
   GameContext& context_;
   WorldInterface* world_;
   std::unique_ptr<WorldUpdater> world_updater_;
-  std::unique_ptr<CollusionDetector> collusion_detector_;
+  std::unique_ptr<CollisionDetector> collision_detector_;
 
  private:
   std::unique_ptr<World> main_world_;

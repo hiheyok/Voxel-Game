@@ -9,7 +9,7 @@
 #include "Level/Chunk/Chunk.h"
 #include "Level/Container/ChunkMap.h"
 #include "Level/Container/Region.h"
-#include "Level/World/CollusionDetector.h"
+#include "Level/World/CollisionDetector.h"
 #include "Level/World/WorldInterface.h"
 
 class GameContext;
@@ -28,5 +28,5 @@ class ClientCache : public WorldInterface {
 
   GameContext& context_;
   ClientEntities entities_;
-  CollusionDetector collusion_manager_;
+  CollisionDetector collision_manager_;
 };

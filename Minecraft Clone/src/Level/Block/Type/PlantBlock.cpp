@@ -5,7 +5,7 @@
 PlantBlock::PlantBlock(GameContext& context) : Block{context} {
   properties_->opacity_ = 0;
   properties_->is_solid_ = true;  // TODO(hiheyok): tmp fix
-  // Add different collusion patterns later
+  // Add different collision patterns later
 }
 
 void PlantBlock::Tick(BlockPos pos, Dimension* current_world) {

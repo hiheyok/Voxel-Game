@@ -66,7 +66,7 @@ bool CollisionSystem::IsGround(EntityUUID uuid) const noexcept {
   return GetComponent(uuid).grounded;
 }
 
-bool CollisionSystem::GetCollusionStatus(EntityUUID uuid,
+bool CollisionSystem::GetCollisionStatus(EntityUUID uuid,
                                          int side) const noexcept {
   // Not implemented for falling sand
   return false;

@@ -21,19 +21,19 @@ void FallingBlock::Tick(Entity* entity, Dimension* dimension) {
   int distanceCheck =
       static_cast<int>(ceil(abs(entity->properties_.velocity_.y * mspt)));
 
-  float collusionDistance =
-      dimension->collusion_detector_->TraceSingleAxisCollision(
+  float collisionDistance =
+      dimension->collision_detector_->TraceSingleAxisCollision(
           entity->properties_.position_, Directions<BlockPos>::kDown,
           distanceCheck + 1);
 
-  float timeTillCollusion =
-      abs(collusionDistance / entity->properties_.velocity_.y);
+  float timeTillCollision =
+      abs(collisionDistance / entity->properties_.velocity_.y);
 
   bool collideWithGround = false;
 
-  if ((timeTillCollusion < mspt) && (collusionDistance != -1.f)) {
+  if ((timeTillCollision < mspt) && (collisionDistance != -1.f)) {
     entity->properties_.position_[1] +=
-        entity->properties_.velocity_[1] * timeTillCollusion;
+        entity->properties_.velocity_[1] * timeTillCollision;
     entity->properties_.velocity_[1] = 0.f;
     entity->properties_.acceleration_[1] = 0.f;
 

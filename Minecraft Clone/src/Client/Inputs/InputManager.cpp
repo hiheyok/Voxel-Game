@@ -89,7 +89,7 @@ bool InputManager::CheckAction(InputAction action) const noexcept {
     case InputAction::kReload: {
       return keyboard_.CheckKeyPress(KEY_R);
     }
-    case InputAction::kToggleCollusion: {
+    case InputAction::kToggleCollision: {
       return keyboard_.CheckKeyPress(KEY_C);
     }
   }

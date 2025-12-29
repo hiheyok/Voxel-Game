@@ -7,10 +7,10 @@ class GameContext;
 struct Entity;
 struct Ray;
 
-class CollusionDetector {
+class CollisionDetector {
  public:
-  CollusionDetector(GameContext&, const ChunkMap& cache);
-  ~CollusionDetector();
+  CollisionDetector(GameContext&, const ChunkMap& cache);
+  ~CollisionDetector();
 
   bool CheckRayIntersection(Ray& ray);
   float TraceSingleAxisCollision(glm::vec3 Origin, int direction,

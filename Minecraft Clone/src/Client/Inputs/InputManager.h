@@ -34,7 +34,7 @@ enum class InputAction {
   kHotbarSlot8,
   kHotbarSlot9,
   kReload,
-  kToggleCollusion,
+  kToggleCollision,
   kExit
 };
 

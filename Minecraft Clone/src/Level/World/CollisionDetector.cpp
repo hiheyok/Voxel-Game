@@ -1,4 +1,4 @@
-#include "Level/World/CollusionDetector.h"
+#include "Level/World/CollisionDetector.h"
 
 #include "Core/GameContext/GameContext.h"
 #include "Level/Block/Block.h"
@@ -9,12 +9,12 @@
 #include "Utils/Math/Ray/Ray.h"
 #include "Utils/Math/vectorOperations.h"
 
-CollusionDetector::CollusionDetector(GameContext& context,
+CollisionDetector::CollisionDetector(GameContext& context,
                                      const ChunkMap& cache)
     : context_{context}, cache_{cache} {}
-CollusionDetector::~CollusionDetector() = default;
+CollisionDetector::~CollisionDetector() = default;
 
-float CollusionDetector::TraceSingleAxisCollision(glm::vec3 origin,
+float CollisionDetector::TraceSingleAxisCollision(glm::vec3 origin,
                                                   int direction,
                                                   int distance_test) {
   const std::vector<BlockProperties>& properties =
@@ -50,7 +50,7 @@ float CollusionDetector::TraceSingleAxisCollision(glm::vec3 origin,
   return -1.f;
 }
 
-glm::dvec3 CollusionDetector::ComputeCollisionTimes(Entity* entity) {
+glm::dvec3 CollisionDetector::ComputeCollisionTimes(Entity* entity) {
   AABB hitbox = context_.entities_list_->GetEntity(entity->properties_.type_)
                     ->GetHitbox();
 
@@ -136,7 +136,7 @@ glm::dvec3 CollusionDetector::ComputeCollisionTimes(Entity* entity) {
   return least_time;
 }
 
-bool CollusionDetector::CheckRayIntersection(Ray& ray) {
+bool CollisionDetector::CheckRayIntersection(Ray& ray) {
   // Direction with magnitude
   glm::vec3 delta = ray.direction_;
   glm::ivec3 direction = Sign(delta);
@@ -212,7 +212,7 @@ bool CollusionDetector::CheckRayIntersection(Ray& ray) {
   return false;
 }
 
-bool CollusionDetector::IsEntityOnGround(Entity* entity) {
+bool CollisionDetector::IsEntityOnGround(Entity* entity) {
   static constexpr int search_buffer = 2;
   AABB hitbox = context_.entities_list_->GetEntity(entity->properties_.type_)
                     ->GetHitbox();
@@ -239,7 +239,7 @@ bool CollusionDetector::IsEntityOnGround(Entity* entity) {
     float distance = 0.0f;
 
     // Set the distance to check to the previose least length from
-    // collusion to optimize searching
+    // collision to optimize searching
     distance = TraceSingleAxisCollision(
         origin, kDownDirection,
         static_cast<int>(floor(least_length)) + search_buffer);
