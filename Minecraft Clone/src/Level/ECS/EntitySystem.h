@@ -6,15 +6,18 @@
 #include "Core/Typenames.h"
 #include "Level/ECS/ComponentMap.h"
 #include "Utils/Assert.h"
+#include "Utils/LogUtils.h"
+#include "Core/GameContext/GameContext.h"
 
 class WorldInterface;
 class GameContext;
-class EntitySystems;
+class ServerEntitySystems;
 
 template <class ComponentType>
 class EntitySystem {
  public:
-  EntitySystem(GameContext& context, WorldInterface& world, EntitySystems& entity_systems);
+  EntitySystem(GameContext& context, WorldInterface& world,
+               ServerEntitySystems& entity_systems);
 
   EntitySystem(const EntitySystem&) = delete;
   EntitySystem(EntitySystem&&) = delete;
@@ -34,7 +37,7 @@ class EntitySystem {
   virtual void OnCommit();
 
   GameContext& context_;
-  EntitySystems& entity_systems_;
+  ServerEntitySystems& entity_systems_;
 
   ComponentMap<ComponentType> components_active_;
   ComponentMap<ComponentType> components_updated_;
@@ -48,9 +51,8 @@ class EntitySystem {
 template <class ComponentType>
 EntitySystem<ComponentType>::EntitySystem(GameContext& context,
                                           WorldInterface& world,
-                                          EntitySystems& entity_systems)
+                                          ServerEntitySystems& entity_systems)
     : context_{context}, world_{world}, entity_systems_{entity_systems} {}
-
 
 template <class ComponentType>
 ComponentType& EntitySystem<ComponentType>::AddComponent(EntityUUID uuid) {
@@ -82,24 +84,26 @@ void EntitySystem<ComponentType>::RemoveComponent(EntityUUID uuid) {
 
 template <class ComponentType>
 void EntitySystem<ComponentType>::Commit() {
-  // Inefficient need to change later
-
   for (auto uuid : delete_queue_) {
     if (components_updated_.HasComponent(uuid)) {
       components_updated_.RemoveComponent(uuid);
     }
   }
+  
+
+  delete_queue_.clear();
 
   components_active_ = components_updated_;
-
+  
   OnCommit();
+
 }
 
 template <class ComponentType>
 void EntitySystem<ComponentType>::OnCommit() {}
 
 template <class ComponentType>
-void EntitySystem<ComponentType>::ReplaceComponent(EntityUUID uuid,
-                                                  const ComponentType& component) {
+void EntitySystem<ComponentType>::ReplaceComponent(
+    EntityUUID uuid, const ComponentType& component) {
   components_updated_.ReplaceComponent(uuid, component);
 }

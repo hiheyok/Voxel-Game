@@ -6,12 +6,17 @@
 #include "Level/Chunk/Chunk.h"
 #include "Level/Container/ChunkMap.h"
 #include "Level/Container/EntityContainer.h"
+#include "Level/ECS/ServerECSManager.h"
 #include "Level/Entity/Entity.h"
 #include "Utils/LogUtils.h"
 
-World::World(GameContext& context) : WorldInterface{context, true, true} {}
+World::World(GameContext& context) : WorldInterface{context, true, true} {
+  // Create server-side ECS manager with full capabilities
+  ecs_manager_ = std::make_unique<ServerECSManager>(context, *this);
+}
 
 World::~World() = default;
+
 
 void World::SetBlock(BlockID block, BlockPos pos) {
   if (!chunks_->SetBlock(block, pos)) {

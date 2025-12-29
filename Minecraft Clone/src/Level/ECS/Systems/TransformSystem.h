@@ -2,6 +2,7 @@
 
 #include "Level/ECS/Components/TransformComponent.h"
 #include "Level/ECS/EntitySystem.h"
+#include "Level/ECS/Systems/ITransformSystem.h"
 
 /**
  * Store position, velocity, acceleration for each entity
@@ -9,11 +10,16 @@
  * Apply physics integration (position += velocity * dt)
  */
 
-class TransformSystem : public EntitySystem<TransformComponent> {
+class TransformSystem : public EntitySystem<TransformComponent>, public ITransformSystem {
  public:
-  TransformSystem(GameContext& context, WorldInterface& world, EntitySystems& entity_systems);
+  TransformSystem(GameContext& context, WorldInterface& world, ServerEntitySystems& entity_systems);
   
   void Tick() override;
+
+  // ITransformSystem interface
+  const ComponentMap<TransformComponent>& GetComponentMap() const override;
+  void ReplaceComponent(EntityUUID uuid, const TransformComponent& component) override;
+
 
   void SetPosition(EntityUUID uuid, glm::vec3 position) noexcept;
   void SetVelocity(EntityUUID uuid, glm::vec3 velocity) noexcept;

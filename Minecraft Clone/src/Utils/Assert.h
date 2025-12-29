@@ -7,6 +7,14 @@
 #include <cstring>
 #include <mutex>
 
+#if defined(_MSC_VER)
+    #define DEBUG_BREAK() __debugbreak()
+#elif defined(__clang__) || defined(__GNUC__)
+    #define DEBUG_BREAK() __builtin_trap()
+#else
+    #define DEBUG_BREAK() std::abort()
+#endif
+
 // Mutex for thread-safe assertion output
 namespace {
 inline std::mutex& GetAssertMutex() {
@@ -36,6 +44,7 @@ inline std::mutex& GetAssertMutex() {
           #condition, message, __FILE__, __LINE__); \
         std::fputs(buffer, stderr); \
         std::fflush(stderr); \
+        DEBUG_BREAK(); \
         std::abort(); \
       } \
     } while(0)

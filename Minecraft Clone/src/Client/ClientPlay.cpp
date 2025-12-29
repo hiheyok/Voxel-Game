@@ -23,11 +23,12 @@
 #include "Core/Options/Option.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Chunk/Chunk.h"
-#include "Level/ECS/ECSManager.h"
-#include "Level/ECS/EntityRegistry.h"
-#include "Level/ECS/EntitySystems.h"
-#include "Level/ECS/Systems/TransformSystem.h"
+#include "Client/ECS/ClientECSManager.h"
+#include "Client/ECS/ClientEntitySystems.h"
+#include "Level/ECS/Systems/ITransformSystem.h"
 #include "Level/Entity/Entities.h"
+#include "Level/Entity/Mobs/Player.h"
+
 #include "Level/Entity/Mobs/Player.h"
 #include "RenderEngine/ChunkRender/TerrainRenderer.h"
 #include "RenderEngine/EntityRender/ECSEntityRender.h"
@@ -380,9 +381,10 @@ void ClientPlay::ProcessECSUpdates() {
   
   if (updates.empty()) return;
   
-  auto& ecs = client_level_->cache_.GetECSManager();
-  auto& transform_system = ecs.GetSystems().GetTransformSystem();
-  auto& registry = ecs.GetRegistry();
+  // Cast to ClientECSManager to access client-specific methods
+  auto& client_ecs = static_cast<ClientECSManager&>(client_level_->cache_.GetECSManager());
+  auto& client_systems = client_ecs.GetConcreteSystems();
+  auto& transform_system = client_systems.GetTransformSystem();
   
   for (const auto& update : updates) {
     switch (update.type_) {
@@ -390,9 +392,9 @@ void ClientPlay::ProcessECSUpdates() {
         const auto& batch = std::get<ECSUpdatePacket::TransformBatch>(update.packet_);
         
         for (const auto& data : batch.transforms_) {
-          // Create entity if it doesn't exist
-          if (!registry.IsValidUUID(data.uuid_)) {
-            registry.CreateEntityWithUUID(data.uuid_, data.type_);
+          // Register entity if not already known
+          if (!client_systems.IsValidUUID(data.uuid_)) {
+            client_systems.RegisterEntity(data.uuid_, data.type_);
           }
           
           // Update transform using embedded component
@@ -400,12 +402,22 @@ void ClientPlay::ProcessECSUpdates() {
         }
         break;
       }
+      case ECSUpdatePacket::PacketType::kEntityRemoval: {
+        const auto& batch = std::get<ECSUpdatePacket::EntityRemovalBatch>(update.packet_);
+        
+        for (EntityUUID uuid : batch.removed_uuids_) {
+          client_systems.UnregisterEntity(uuid);
+        }
+        break;
+      }
       default:
-      GAME_ASSERT(false, "System not handled yet!");
+        GAME_ASSERT(false, "System not handled yet!");
         break;
     }
   }
   
   // Commit changes to make them visible to renderer
-  ecs.GetSystems().CommitAll();
+  client_ecs.CommitAll();
 }
+
+

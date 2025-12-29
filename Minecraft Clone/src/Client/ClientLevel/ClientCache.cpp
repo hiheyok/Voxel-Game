@@ -9,15 +9,20 @@
 #include "Level/Chunk/Chunk.h"
 #include "Level/Container/ChunkMap.h"
 #include "Level/Container/Region.h"
+#include "Client/ECS/ClientECSManager.h"
 #include "Level/World/CollusionDetector.h"
 
 ClientCache::ClientCache(GameContext& context)
     : WorldInterface{context, false, false},
       context_{context},
       entities_{context},
-      collusion_manager_{context, *chunks_} {}
+      collusion_manager_{context, *chunks_} {
+  // Create client-side ECS manager with minimal systems
+  ecs_manager_ = std::make_unique<ClientECSManager>(context, *this);
+}
 
 ClientCache::~ClientCache() = default;
+
 
 void ClientCache::AddChunk(std::unique_ptr<Chunk> chunk) {
   chunks_->InsertChunk(std::move(chunk));

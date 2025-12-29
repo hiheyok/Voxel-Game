@@ -9,7 +9,7 @@ class EntityContainer;
 class ChunkMap;
 class Chunk;
 class GameContext;
-class ECSManager;
+class IECSManager;
 
 struct Entity;
 
@@ -31,7 +31,7 @@ class WorldInterface {
 
   ChunkMap* GetChunkMap() const;
   EntityContainer* GetEntityContainer() const;
-  ECSManager& GetECSManager();
+  IECSManager& GetECSManager();
 
   GameContext& context_;
   WorldParameters parameters;
@@ -39,5 +39,5 @@ class WorldInterface {
  protected:
   std::unique_ptr<ChunkMap> chunks_;
   std::unique_ptr<EntityContainer> entities_;
-  std::unique_ptr<ECSManager> ecs_manager_;
+  std::unique_ptr<IECSManager> ecs_manager_;
 };

@@ -73,7 +73,9 @@ void Mesh::ChunkMeshData::GenerateCache() {
     dst_x += kCacheDim2D;
   }
 
-  for (auto side : Directions<ChunkPos>()) {
+  // Use static reference for optimized iteration
+  static constexpr auto& kDirs = Directions<ChunkPos>::kDirections;
+  for (const auto& side : kDirs) {
     int axis = side.GetAxis();
     int direction = side.GetDirection() & 0b1;
 
@@ -138,10 +140,6 @@ void Mesh::ChunkMeshData::GenerateMesh() {
 void Mesh::ChunkMeshData::GenerateFaceCollection() {
   const BlockModelManager::ModelList& models = model_manager_->GetModels();
 
-  array<uint8_t, 1024> face_visibility;
-  array<uint8_t, 1024> face_visibility_back;
-  array<uint8_t, kChunkSize2D> used_block{};
-
   static constexpr int kChunkStrideU = kChunkDim;
   static constexpr int kChunkStrideV = 1;
 
@@ -166,8 +164,8 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
 
     const BlockID* slice_ptr = base_ptr;
     for (int slice = 0; slice <= kChunkDim; ++slice) {  // Slice
-      used_block.fill(0);
-      uint8_t* __restrict used_ptr = used_block.data();
+      used_block_.fill(0);
+      uint8_t* __restrict used_ptr = used_block_.data();
       const BlockID* u_ptr = slice_ptr;
       for (int u = 0; u < kChunkDim; ++u) {
         const BlockID* v_ptr = u_ptr;
@@ -196,7 +194,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
           if (!blank_curr_model) {
             const auto& curr_elements = curr_model->GetElements();
             for (size_t i = 0; i < curr_elements.size(); ++i) {
-              face_visibility[i] = 0;
+              face_visibility_[i] = 0;
               const baked_model::Element& element = curr_elements[i];
 
               if (!element.faces_[back_side].has_value()) {
@@ -209,14 +207,14 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
                                    cache_ptr))
                   continue;
               }
-              face_visibility[i] = 1;
+              face_visibility_[i] = 1;
             }
           }
           // Check if it is visible from the back and front
           if (!blank_back_model) {
             const auto& back_elements = back_model->GetElements();
             for (size_t i = 0; i < back_elements.size(); ++i) {
-              face_visibility_back[i] = 0;
+              face_visibility_back_[i] = 0;
               const baked_model::Element& element = back_elements[i];
 
               if (!element.faces_[front_side].has_value()) {
@@ -230,7 +228,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
                   continue;
               }
 
-              face_visibility_back[i] = 1;
+              face_visibility_back_[i] = 1;
             }
           }
 
@@ -289,7 +287,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
           if (!blank_curr_model) [[likely]] {
             const auto& curr_elements = curr_model->GetElements();
             for (size_t i = 0; i < curr_elements.size(); i++) {
-              if (!face_visibility[i]) continue;
+              if (!face_visibility_[i]) continue;
               const baked_model::Element& element = curr_elements[i];
               AddFaceToMesh(element, back_side,
                             curr_model->CheckAmbientOcclusion(), q_pos,
@@ -300,7 +298,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
           if (!blank_back_model) [[likely]] {
             const auto& back_elements = back_model->GetElements();
             for (size_t i = 0; i < back_elements.size(); i++) {
-              if (!face_visibility_back[i]) continue;
+              if (!face_visibility_back_[i]) continue;
               const baked_model::Element& element = back_elements[i];
               AddFaceToMesh(element, front_side,
                             back_model->CheckAmbientOcclusion(), q_pos,
@@ -516,7 +514,7 @@ bool Mesh::ChunkMeshData::IsFaceVisible(const baked_model::Element& element,
   const AssetHandle<RenderableModel>& neigh_model = model_list[*cache];
 
   if (!neigh_model.HasValue()) return true;
-  auto neigh_elements = neigh_model->GetElements();
+  const auto& neigh_elements = neigh_model->GetElements();
 
   for (const auto& neigh_element : neigh_elements) {
     if (!neigh_element.faces_[opposite_side].has_value()) {

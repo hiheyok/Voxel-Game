@@ -14,7 +14,7 @@
 
 class CollisionSystem : public EntitySystem<CollisionComponent> {
  public:
-  CollisionSystem(GameContext& context, WorldInterface& world, EntitySystems& entity_systems);
+  CollisionSystem(GameContext& context, WorldInterface& world, ServerEntitySystems& entity_systems);
   void Tick() override;
 
   bool IsGround(EntityUUID uuid) const noexcept;

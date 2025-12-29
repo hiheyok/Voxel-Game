@@ -3,6 +3,8 @@
 #include "Level/ECS/Components/BlockPlaceComponent.h"
 #include "Level/ECS/EntitySystem.h"
 
+class WorldUpdater;
+
 /**
  * Store what block type to place
  * Track how long entity has been falling
@@ -14,7 +16,11 @@
 
 class BlockPlaceSystem : public EntitySystem<BlockPlaceComponent> {
  public:
-  BlockPlaceSystem(GameContext& context, WorldInterface& world, EntitySystems& entity_systems);
+  BlockPlaceSystem(GameContext& context, WorldInterface& world, ServerEntitySystems& entity_systems);
   void Tick() override;
-};
+  
+  void SetWorldUpdater(WorldUpdater* updater);
 
+ private:
+  WorldUpdater* world_updater_ = nullptr;
+};

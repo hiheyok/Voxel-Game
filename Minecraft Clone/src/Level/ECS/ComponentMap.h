@@ -175,7 +175,11 @@ class ComponentMap {
   const ComponentType& GetComponent(EntityUUID uuid) const noexcept;
   void RemoveComponent(EntityUUID uuid) noexcept;
   bool HasComponent(EntityUUID uuid) const noexcept;
-  void ReplaceComponent(EntityUUID uuid, const ComponentType& component) noexcept;
+  void ReplaceComponent(EntityUUID uuid,
+                        const ComponentType& component) noexcept;
+
+  ComponentType& operator[](EntityUUID uuid) noexcept;
+  const ComponentType& operator[](EntityUUID uuid) const noexcept;
 
   // Iterator methods
   Iterator begin();
@@ -185,6 +189,8 @@ class ComponentMap {
   ConstIterator end() const;
   ConstIterator cbegin() const;
   ConstIterator cend() const;
+
+  size_t size() const noexcept;
 
  private:
   static constexpr EntityComponentId kInvalidComponentId = -1;
@@ -203,8 +209,6 @@ class ComponentMap {
 
 template <class ComponentType>
 ComponentMap<ComponentType>::ComponentMap() = default;
-
-
 
 template <class ComponentType>
 ComponentType& ComponentMap<ComponentType>::AddComponent(EntityUUID uuid) {
@@ -239,7 +243,7 @@ template <class ComponentType>
 ComponentType& ComponentMap<ComponentType>::GetComponent(
     EntityUUID uuid) noexcept {
   EntityComponentId component_id = GetComponentId(uuid);
-  GAME_ASSERT(component_id != kInvalidComponentId, "Invalid component id");
+  GAME_ASSERT(component_id != kInvalidComponentId, "Invalid entity uuid");
   return component_data_[component_id];
 }
 
@@ -247,7 +251,7 @@ template <class ComponentType>
 const ComponentType& ComponentMap<ComponentType>::GetComponent(
     EntityUUID uuid) const noexcept {
   EntityComponentId component_id = GetComponentId(uuid);
-  GAME_ASSERT(component_id != kInvalidComponentId, "Invalid component id");
+  GAME_ASSERT(component_id != kInvalidComponentId, "Invalid entity uuid");
   return component_data_[component_id];
 }
 
@@ -255,22 +259,28 @@ template <class ComponentType>
 void ComponentMap<ComponentType>::RemoveComponent(EntityUUID uuid) noexcept {
   // swap and pop
   EntityComponentId component_id = GetComponentId(uuid);
-  EntityComponentId component_id_back = component_data_.size() - 1;
 
   GAME_ASSERT(component_id != kInvalidComponentId,
               "Tried to remove an invalid component");
+  GAME_ASSERT(!component_data_.empty(),
+              "Tried to remove from an empty ComponentMap.");
 
-  EntityUUID uuid_back = GetEntityUUID(component_id_back);
+  EntityComponentId component_id_back = component_data_.size() - 1;
 
-  std::swap(component_data_[component_id], component_data_[component_id_back]);
+  if (component_id_back != component_id) {
+    EntityUUID uuid_back = GetEntityUUID(component_id_back);
 
-  component_id_to_uuid_[component_id] = uuid_back;
+    std::swap(component_data_[component_id],
+              component_data_[component_id_back]);
 
-  uuid_to_component_id_[uuid] = kInvalidComponentId;
-  uuid_to_component_id_[uuid_back] = component_id;
+    component_id_to_uuid_[component_id] = uuid_back;
+    uuid_to_component_id_[uuid_back] = component_id;
+  }
 
   component_data_.pop_back();
   component_id_to_uuid_.pop_back();
+
+  uuid_to_component_id_[uuid] = kInvalidComponentId;
 }
 
 template <class ComponentType>
@@ -300,7 +310,8 @@ bool ComponentMap<ComponentType>::HasComponent(EntityUUID uuid) const noexcept {
 
 template <class ComponentType>
 ComponentMap<ComponentType>::Iterator ComponentMap<ComponentType>::begin() {
-  return Iterator(this, component_data_.empty() ? kInvalidComponentId : 0);
+  // When empty, return same as end() so loop doesn't execute
+  return Iterator(this, component_data_.empty() ? static_cast<EntityComponentId>(component_data_.size()) : 0);
 }
 
 template <class ComponentType>
@@ -311,7 +322,8 @@ ComponentMap<ComponentType>::Iterator ComponentMap<ComponentType>::end() {
 template <class ComponentType>
 ComponentMap<ComponentType>::ConstIterator ComponentMap<ComponentType>::begin()
     const {
-  return ConstIterator(this, component_data_.empty() ? kInvalidComponentId : 0);
+  // When empty, return same as end() so loop doesn't execute
+  return ConstIterator(this, component_data_.empty() ? static_cast<EntityComponentId>(component_data_.size()) : 0);
 }
 
 template <class ComponentType>
@@ -324,7 +336,8 @@ ComponentMap<ComponentType>::ConstIterator ComponentMap<ComponentType>::end()
 template <class ComponentType>
 ComponentMap<ComponentType>::ConstIterator ComponentMap<ComponentType>::cbegin()
     const {
-  return ConstIterator(this, component_data_.empty() ? kInvalidComponentId : 0);
+  // When empty, return same as cend() so loop doesn't execute
+  return ConstIterator(this, component_data_.empty() ? static_cast<EntityComponentId>(component_data_.size()) : 0);
 }
 
 template <class ComponentType>
@@ -335,12 +348,35 @@ ComponentMap<ComponentType>::ConstIterator ComponentMap<ComponentType>::cend()
 }
 
 template <class ComponentType>
-void ComponentMap<ComponentType>::ReplaceComponent(EntityUUID uuid,
-                                                  const ComponentType& component) noexcept {
+void ComponentMap<ComponentType>::ReplaceComponent(
+    EntityUUID uuid, const ComponentType& component) noexcept {
   EntityComponentId component_id = GetComponentId(uuid);
   if (component_id == kInvalidComponentId) {
     AddComponent(uuid);
+    component_id = GetComponentId(uuid);  // Re-fetch after adding!
   }
   component_data_[component_id] = component;
 }
 
+
+template <class ComponentType>
+ComponentType& ComponentMap<ComponentType>::operator[](
+    EntityUUID uuid) noexcept {
+  EntityComponentId component_id = GetComponentId(uuid);
+  GAME_ASSERT(component_id != kInvalidComponentId, "Invalid entity uuid");
+  return component_data_[component_id];
+}
+
+template <class ComponentType>
+const ComponentType& ComponentMap<ComponentType>::operator[](
+    EntityUUID uuid) const noexcept {
+  EntityComponentId component_id = GetComponentId(uuid);
+  GAME_ASSERT(component_id != kInvalidComponentId, "Invalid entity uuid");
+  return component_data_[component_id];
+}
+
+
+template <class ComponentType>
+size_t ComponentMap<ComponentType>::size() const noexcept {
+  return component_data_.size();
+}

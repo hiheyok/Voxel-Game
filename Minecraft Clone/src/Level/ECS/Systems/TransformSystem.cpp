@@ -1,50 +1,65 @@
 #include "Level/ECS/Systems/TransformSystem.h"
 
 #include "Level/ECS/ComponentMap.h"
-#include "Level/ECS/EntitySystems.h"
+#include "Level/ECS/ServerEntitySystems.h"
+#include "Level/ECS/Systems/TickStateSystem.h"
 #include "Level/World/WorldInterface.h"
 
-TransformSystem::TransformSystem(GameContext& context, WorldInterface& world, EntitySystems& entity_systems)
+using glm::vec3;
+
+TransformSystem::TransformSystem(GameContext& context, WorldInterface& world,
+                                 ServerEntitySystems& entity_systems)
     : EntitySystem{context, world, entity_systems} {}
 
-
 void TransformSystem::Tick() {
-  const float mspt = 1.0 / world_.parameters.world_tps_;
+  auto& tick_state_system = entity_systems_.GetConcreteTickStateSystem();
 
   for (const auto& [uuid, component] : components_active_) {
-    OffsetPosition(uuid, component.velocity_ * mspt);
-    OffsetVelocity(uuid, component.acceleration_ * mspt);
+    if (tick_state_system.HasComponent(uuid) &&
+        !tick_state_system.IsActive(uuid)) {
+      continue;
+    }
+    OffsetPosition(uuid, component.velocity_);
+    OffsetVelocity(uuid, component.acceleration_);
   }
 }
 
-void TransformSystem::SetPosition(EntityUUID uuid,
-                                  glm::vec3 position) noexcept {
-  components_updated_.GetComponent(uuid).position_ = position;
-}
-void TransformSystem::SetVelocity(EntityUUID uuid,
-                                  glm::vec3 velocity) noexcept {
-  components_updated_.GetComponent(uuid).velocity_ = velocity;
-}
-void TransformSystem::SetAcceleration(EntityUUID uuid,
-                                      glm::vec3 acceleration) noexcept {
-  components_updated_.GetComponent(uuid).acceleration_ = acceleration;
+// ITransformSystem interface implementations
+const ComponentMap<TransformComponent>& TransformSystem::GetComponentMap() const {
+  return EntitySystem<TransformComponent>::GetComponentMap();
 }
 
-void TransformSystem::OffsetPosition(EntityUUID uuid,
-                                     glm::vec3 position) noexcept {
-  components_updated_.GetComponent(uuid).position_ += position;
+void TransformSystem::ReplaceComponent(EntityUUID uuid, const TransformComponent& component) {
+  EntitySystem<TransformComponent>::ReplaceComponent(uuid, component);
 }
-void TransformSystem::OffsetVelocity(EntityUUID uuid,
-                                     glm::vec3 velocity) noexcept {
-  components_updated_.GetComponent(uuid).velocity_ += velocity;
+
+
+
+
+void TransformSystem::SetPosition(EntityUUID uuid, vec3 position) noexcept {
+  components_updated_[uuid].position_ = position;
+}
+void TransformSystem::SetVelocity(EntityUUID uuid, vec3 velocity) noexcept {
+  components_updated_[uuid].velocity_ = velocity;
+}
+void TransformSystem::SetAcceleration(EntityUUID uuid,
+                                      vec3 acceleration) noexcept {
+  components_updated_[uuid].acceleration_ = acceleration;
+}
+
+void TransformSystem::OffsetPosition(EntityUUID uuid, vec3 position) noexcept {
+  components_updated_[uuid].position_ += position;
+}
+void TransformSystem::OffsetVelocity(EntityUUID uuid, vec3 velocity) noexcept {
+  components_updated_[uuid].velocity_ += velocity;
 }
 void TransformSystem::OffsetAcceleration(EntityUUID uuid,
-                                         glm::vec3 acceleration) noexcept {
-  components_updated_.GetComponent(uuid).acceleration_ += acceleration;
+                                         vec3 acceleration) noexcept {
+  components_updated_[uuid].acceleration_ += acceleration;
 }
 
 void TransformSystem::OnCommit() {
   for (auto& [_, component] : components_updated_) {
-    component.acceleration_ = glm::vec3(0.0f);
+    component.acceleration_ = vec3(0.0f);
   }
 }

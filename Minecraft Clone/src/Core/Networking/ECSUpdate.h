@@ -11,7 +11,7 @@
 
 namespace ECSUpdatePacket {
 
-enum class PacketType { kTransformBatch };
+enum class PacketType { kTransformBatch, kEntityRemoval };
 
 // Base class for type checking
 struct ECSPacketBase {};
@@ -28,10 +28,16 @@ struct TransformBatch : ECSPacketBase {
   static constexpr PacketType kType = PacketType::kTransformBatch;
 };
 
+// Entity removal batch - sent when entities are destroyed
+struct EntityRemovalBatch : ECSPacketBase {
+  std::vector<EntityUUID> removed_uuids_;
+  static constexpr PacketType kType = PacketType::kEntityRemoval;
+};
+
 // Variant wrapper for all ECS packets (future-proof for additional systems)
 struct ECSUpdate {
   PacketType type_;
-  std::variant<TransformBatch, std::monostate> packet_;
+  std::variant<TransformBatch, EntityRemovalBatch, std::monostate> packet_;
 
   template <typename T>
     requires std::is_base_of_v<ECSPacketBase, std::decay_t<T>>

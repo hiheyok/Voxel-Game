@@ -6,12 +6,12 @@
 
 #include "Core/GameContext/GameContext.h"
 #include "Core/Options/Option.h"
+#include "Level/ECS/ServerECSManager.h"
 #include "Level/Light/ChunkLightTask.h"
 #include "Level/Light/LightEngineStats.h"
 #include "Level/Light/ThreadedLightEngine.h"
 #include "Level/TerrainGeneration/ChunkGenerator.h"
 #include "Level/World/WorldUpdater.h"
-#include "Level/ECS/ECSManager.h"
 
 Dimension::Dimension(GameContext& context, DimensionProperties properties,
                      WorldGeneratorID generatorType)
@@ -31,6 +31,11 @@ Dimension::Dimension(GameContext& context, DimensionProperties properties,
 
   world_updater_ = std::make_unique<WorldUpdater>(context_, main_world_.get(),
                                                   world_settings_);
+  
+  // Connect ECS to WorldUpdater for block modifications
+  auto& server_ecs = static_cast<ServerECSManager&>(main_world_->GetECSManager());
+  server_ecs.SetWorldUpdater(world_updater_.get());
+  
   collusion_detector_ = std::make_unique<CollusionDetector>(
       context_, *main_world_->GetChunkMap());
 
@@ -38,6 +43,7 @@ Dimension::Dimension(GameContext& context, DimensionProperties properties,
     world_updater_->tall_generation_ = true;
   }
 }
+
 Dimension::~Dimension() = default;
 
 WorldGeneratorID Dimension::GetGeneratorType() const { return generator_type_; }
@@ -83,8 +89,7 @@ void Dimension::EventTick() {
         break;
       }
       default:
-        throw std::runtime_error(
-            "Dimension::EventTick - Event not handled yet!");
+        GAME_ASSERT(false, "Event not handled yet!");
     }
 
     context_.event_handler_->ExecuteEvent(e, this);
@@ -98,8 +103,9 @@ void Dimension::EventTick() {
   // Tick all entities
 
   world_->GetEntityContainer()->Tick(this);
-  world_->GetECSManager().Tick();
+  static_cast<ServerECSManager&>(world_->GetECSManager()).Tick();
 }
+
 
 void Dimension::Update() {
   const std::vector<ChunkPos>& requested_chunks =

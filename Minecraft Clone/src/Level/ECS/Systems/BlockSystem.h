@@ -9,6 +9,6 @@
 
 class BlockSystem : public EntitySystem<BlockComponent> {
  public:
-  BlockSystem(GameContext& context, WorldInterface& world, EntitySystems& entity_systems);
+  BlockSystem(GameContext& context, WorldInterface& world, ServerEntitySystems& entity_systems);
   void Tick() override;
 };

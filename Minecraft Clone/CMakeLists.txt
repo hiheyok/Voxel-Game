@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.29)
 project(VoxelGame)  # Project name
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -21,16 +21,16 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     # "src/*.cppm"
     "src/*.ixx"
 )
-add_executable(my_program ${SOURCES})
+add_executable(voxel_game ${SOURCES})
 # Specify the directory containing the libraries
-target_compile_options(my_program PRIVATE
+target_compile_options(voxel_game PRIVATE
     $<$<CONFIG:Debug>:
         -g
         -O0
     >
 )
 
-target_compile_options(my_program PRIVATE
+target_compile_options(voxel_game PRIVATE
     $<$<CONFIG:Release>:
         -O3
         -fmodules-ts
@@ -39,8 +39,8 @@ target_compile_options(my_program PRIVATE
     >
 )
 
-target_link_directories(my_program PRIVATE ${CMAKE_SOURCE_DIR}/bin/lib/x64/)
-target_link_libraries(my_program PRIVATE
+target_link_directories(voxel_game PRIVATE ${CMAKE_SOURCE_DIR}/bin/lib/x64/)
+target_link_libraries(voxel_game PRIVATE
     glew32s
     libglfw3
     opengl32

@@ -6,11 +6,13 @@
 #include "Assets/AssetManager.h"
 #include "Client/Player/PlayerPOV.h"
 #include "Core/GameContext/GameContext.h"
-#include "Level/ECS/ECSManager.h"
-#include "Level/ECS/EntityRegistry.h"
-#include "Level/ECS/EntitySystems.h"
-#include "Level/ECS/Systems/TransformSystem.h"
+#include "Client/ECS/ClientECSManager.h"
+#include "Client/ECS/ClientEntitySystems.h"
+#include "Level/ECS/ComponentMap.h"
+#include "Level/ECS/IECSManager.h"
+#include "Level/ECS/Systems/ITransformSystem.h"
 #include "Level/Entity/Entities.h"
+
 #include "Level/Entity/EntityTypeData.h"
 #include "RenderEngine/Camera/Camera.h"
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
@@ -20,11 +22,10 @@
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "RenderEngine/RenderResources/Types/Texture/Texture2D.h"
 
-ECSEntityRender::ECSEntityRender(GameContext& context, ECSManager& manager,
+ECSEntityRender::ECSEntityRender(GameContext& context, IECSManager& manager,
                                  PlayerPOV* player)
     : context_{context},
-      systems_{manager.GetSystems()},
-      registry_{manager.GetRegistry()},
+      ecs_manager_{manager},
       player_{player},
       shader_{context_.render_resource_manager_->GetShader("entity_render")},
       renderer_{
@@ -32,6 +33,7 @@ ECSEntityRender::ECSEntityRender(GameContext& context, ECSManager& manager,
       ssbo_pos_{std::make_unique<Buffer>(context)},
       ssbo_vel_{std::make_unique<Buffer>(context)},
       ssbo_acc_{std::make_unique<Buffer>(context)} {}
+
 
 ECSEntityRender::~ECSEntityRender() = default;
 
@@ -145,13 +147,19 @@ void ECSEntityRender::Render() {
   // 1. Group entities by model ID
   FastHashMap<EntityType, std::vector<std::pair<EntityUUID, TransformComponent>>> grouped_entities;
 
-  auto& transform_system = systems_.GetTransformSystem();
+  auto& transform_system = ecs_manager_.GetSystems().GetTransformSystem();
+  
+  // Cast to ClientECSManager to get entity types for rendering
+  auto& client_ecs = static_cast<ClientECSManager&>(ecs_manager_);
+  auto& client_systems = client_ecs.GetConcreteSystems();
 
   // Iterate over all entities with a TransformComponent
   for (const auto& [uuid, transform] : transform_system.GetComponentMap()) {
-    EntityType type = registry_.GetEntityType(uuid);
+    EntityType type = client_systems.GetEntityType(uuid);
     grouped_entities[type].emplace_back(uuid, transform);
   }
+
+
 
   // 2. Render each group
   for (const auto& [model_id, entities] : grouped_entities) {
@@ -174,12 +182,7 @@ void ECSEntityRender::Render() {
       acceleration_arr_[i * 3 + 0] = transform.acceleration_.x;
       acceleration_arr_[i * 3 + 1] = transform.acceleration_.y;
       acceleration_arr_[i * 3 + 2] = transform.acceleration_.z;
-
-      LOG_DEBUG("Rendering entity {} at pos ({}, {}, {})", i, transform.position_.x, transform.position_.y, transform.position_.z);
     }
-
-    LOG_DEBUG("Rendering {} entities of type {}, model: {}", count, static_cast<int>(model_id), 
-              context_.entities_list_->entity_type_list_[static_cast<int>(model_id)]->entity_name_);
 
     // Upload to SSBOs
     ssbo_pos_->InsertSubData(0, count * 3 * sizeof(float),

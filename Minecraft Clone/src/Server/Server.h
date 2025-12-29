@@ -12,6 +12,8 @@ class Timer;
 class Level;
 class Chunk;
 class GameContext;
+class PacketReceiver;
+class PacketSender;
 
 struct Entity;
 struct Ray;
@@ -24,11 +26,6 @@ struct ServerSettings {
   size_t tick_rate_ = 20;
   size_t horizontal_ticking_distance_ = 10;
   size_t vertical_ticking_distance_ = 8;
-
-  ServerSettings() = default;
-  ServerSettings(const ServerSettings&) = default;
-  ServerSettings(ServerSettings&&) = default;
-  ~ServerSettings() = default;
 };
 
 // This manages the input/output system of the world
@@ -59,16 +56,11 @@ class Server {
  private:
   void Load();
   void ResetState();
-  void ProcessPacket();
-  void ProcessPlayerPackets(ClientInterface* receiver);
-  void SendPacket();
-  void SendEntityUpdatePacket(ClientInterface* receiver);
-  void SendChunkUpdatePacket(ClientInterface* receiver);
-  void SendBlockUpdatePacket(ClientInterface* receiver);
-  void SendECSUpdatePacket(ClientInterface* receiver);
-  void SendServerStats(ClientInterface* receiver);
+
   bool stop_ = true;
   std::thread main_server_loop_;
   std::unique_ptr<Timer> time_;
+  std::unique_ptr<PacketReceiver> packet_receiver_;
+  std::unique_ptr<PacketSender> packet_sender_;
   double mspt_ = 0.0;
 };

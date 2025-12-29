@@ -12,10 +12,8 @@ class Buffer;
 class VertexArray;
 class Shader;
 class GameContext;
-class ECSManager;
-class EntitySystems;
-class EntityRegistry;
-class ECSManager;
+class IECSManager;
+class ITransformSystem;
 class PlayerPOV;
 class Texture2DV2;
 class EntityModel;
@@ -25,7 +23,7 @@ struct GLFWwindow;
 
 class ECSEntityRender {
  public:
-  ECSEntityRender(GameContext& context, ECSManager& manager, PlayerPOV* player);
+  ECSEntityRender(GameContext& context, IECSManager& manager, PlayerPOV* player);
   ~ECSEntityRender();
 
   void Initialize();
@@ -38,10 +36,10 @@ class ECSEntityRender {
   void InitializeBuffers();
 
   GameContext& context_;
-  EntitySystems& systems_;
-  EntityRegistry& registry_;
+  IECSManager& ecs_manager_;
   PlayerPOV* player_;
   GLFWwindow* window_;
+
 
   RenderHandle<Shader> shader_;
 
