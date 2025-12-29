@@ -55,15 +55,18 @@ class Palette {
 
   static constexpr int kMinBitWidth = 1;  // Minimum bits
   static constexpr int kMaxBitWidth = 12;
+  // Only shrink when empty slots exceed 25% of capacity
+  static constexpr float kLazyShrinkThreshold = 0.25f;
 
   int current_bit_width_ = kMinBitWidth;
   int unique_blocks_count_ = 1;  // Initialize with only air blocks
-  int empty_slot_counter_ = 0;   // This counts the amount of empty entries
-                                 // (count == 0) in palette_entries_
 
   NBitVector data_;
 
   // BlockID -> Block, int_16 -> num of that block
   std::vector<BlockID> palette_entries_id_;
   std::vector<int16_t> palette_entries_count_;
+
+  // Free list of reusable palette indices (replaces linear scan)
+  std::vector<PaletteIndex> free_slots_;
 };

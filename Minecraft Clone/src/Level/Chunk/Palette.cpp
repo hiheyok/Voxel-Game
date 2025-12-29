@@ -24,13 +24,11 @@ void Palette::Shrink() {
   NBitVector newData(kChunkSize3D, newBitWidth);
 
   // Repack
-
   std::vector<BlockID> new_block_to_palette_id_(unique_blocks_count_);
   std::vector<int16_t> new_block_to_palette_count_(unique_blocks_count_);
   std::vector<PaletteIndex> new_palette_index(palette_entries_id_.size(), 0);
 
   // 2 pointers
-
   PaletteIndex curr = 0;
   for (size_t i = 0; i < palette_entries_id_.size(); ++i) {
     if (palette_entries_count_[i] == 0) continue;
@@ -40,10 +38,13 @@ void Palette::Shrink() {
     curr++;
   }
 
+  // Batch unpack all indices
+  std::array<PaletteIndex, kChunkSize3D> indices;
+  data_.UnpackAll(indices.data());
+
+  // Batch set with remapped indices
   for (int i = 0; i < kChunkSize3D; ++i) {
-    PaletteIndex currVal = static_cast<PaletteIndex>(data_.Get(i));
-    PaletteIndex newVal = new_palette_index[currVal];
-    newData.Set(i, newVal);
+    newData.SetUnsafe(i, new_palette_index[indices[i]]);
   }
 
   data_ = std::move(newData);
@@ -52,15 +53,21 @@ void Palette::Shrink() {
   // refactor palette block index
   palette_entries_id_ = std::move(new_block_to_palette_id_);
   palette_entries_count_ = std::move(new_block_to_palette_count_);
-  empty_slot_counter_ = 0;
+  free_slots_.clear();
 }
 
 void Palette::Grow() {
   int newBitWidth = GetBitWidth(unique_blocks_count_);
   NBitVector newData(kChunkSize3D, newBitWidth);
   current_bit_width_ = newBitWidth;
+
+  // Batch unpack all indices
+  std::array<PaletteIndex, kChunkSize3D> indices;
+  data_.UnpackAll(indices.data());
+
+  // Batch set into new data
   for (int i = 0; i < kChunkSize3D; ++i) {
-    newData.Set(i, data_.Get(i));
+    newData.SetUnsafe(i, indices[i]);
   }
 
   data_ = std::move(newData);
@@ -74,28 +81,30 @@ void Palette::Resize() {
     return;
 
   if (newBitWidth + 1 < current_bit_width_) {
-    Shrink();
+    // Lazy shrinking: only shrink when empty slots exceed threshold
+    float empty_ratio =
+        static_cast<float>(free_slots_.size()) / palette_entries_id_.size();
+    if (empty_ratio >= kLazyShrinkThreshold) {
+      Shrink();
+    }
   } else {
     Grow();
   }
 }
 
 Palette::PaletteIndex Palette::GetOrAddPaletteIndex(BlockID block) {
-  PaletteIndex firstZero = 0;
-  bool foundZero = false;
+  // First check if block already exists
   for (PaletteIndex i = 0; i < palette_entries_id_.size(); i++) {
     if (palette_entries_id_[i] == block) {
       return i;
     }
-    if (palette_entries_count_[i] == 0) {
-      foundZero = true;
-      firstZero = i;
-    }
   }
 
-  if (foundZero) {
-    palette_entries_id_[firstZero] = block;
-    return firstZero;
+  if (!free_slots_.empty()) {
+    PaletteIndex reused_idx = free_slots_.back();
+    free_slots_.pop_back();
+    palette_entries_id_[reused_idx] = block;
+    return reused_idx;
   }
 
   palette_entries_id_.emplace_back(block);
@@ -146,14 +155,13 @@ void Palette::SetBlockUnsafe(BlockID block, BlockPos pos) {
 
   if (--palette_entries_count_[oldPaletteIdx] == 0) {
     --unique_blocks_count_;
-    ++empty_slot_counter_;
+    free_slots_.push_back(oldPaletteIdx);  // Add to free list
     uniqueCountChanged = !uniqueCountChanged;
   }
 
   PaletteIndex idx = GetOrAddPaletteIndex(block);
   if (palette_entries_count_[idx]++ == 0) {
     unique_blocks_count_++;
-    --empty_slot_counter_;
     uniqueCountChanged = !uniqueCountChanged;
   }
 

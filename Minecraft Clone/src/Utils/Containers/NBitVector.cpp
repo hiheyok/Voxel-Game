@@ -7,11 +7,19 @@
 #include <stdexcept>
 #include <vector>
 
-NBitVector::NBitVector() noexcept : bit_width_{1}, all_one_bit_width_{1} {}
+namespace {
+bool IsPowerOf2AndSmall(size_t bit_width) {
+  return bit_width <= 32 && (bit_width & (bit_width - 1)) == 0;
+}
+}  // namespace
+
+NBitVector::NBitVector() noexcept
+    : bit_width_{1}, all_one_bit_width_{1}, is_power_of_2_{true} {}
 
 NBitVector::NBitVector(size_t numElements, size_t bit_width)
     : bit_width_{bit_width},
       all_one_bit_width_{~(kAllOnes << bit_width)},
+      is_power_of_2_{IsPowerOf2AndSmall(bit_width)},
       num_elements_{numElements} {
   if (bit_width > kDataWidth)
     throw std::domain_error("NBitVector::NBitVector - Bit width is too wide.");
@@ -20,7 +28,9 @@ NBitVector::NBitVector(size_t numElements, size_t bit_width)
 }
 
 NBitVector::NBitVector(size_t bit_width) noexcept
-    : bit_width_{bit_width}, all_one_bit_width_{~(kAllOnes << bit_width)} {}
+    : bit_width_{bit_width},
+      all_one_bit_width_{~(kAllOnes << bit_width)},
+      is_power_of_2_{IsPowerOf2AndSmall(bit_width)} {}
 
 NBitVector::~NBitVector() noexcept = default;
 
@@ -50,11 +60,21 @@ uint64_t NBitVector::GetUnsafe(size_t idx) const noexcept {
   return (chunk >> bit_pos) & all_one_bit_width_;
 #else
   uint64_t result = p[0] >> bit_pos;
-  const uint64_t overflow_mask = overflow_table_[bit_width_][bit_pos];
-  if (overflow_mask != 0) [[unlikely]] {
-    const uint64_t high_bits = data_[data_idx + 1];
-    result |= high_bits << (kDataWidth - bit_pos);
+  // Power-of-2 bit widths <= 32 never cross word boundaries
+  if (!is_power_of_2_) [[unlikely]] {
+    const uint64_t overflow_mask = ComputeOverflowMask(bit_pos);
+    if (overflow_mask != 0) {
+      const uint64_t high_bits = data_[data_idx + 1];
+      result |= high_bits << (kDataWidth - bit_pos);
+    }
   }
   return result & all_one_bit_width_;
 #endif
+}
+
+void NBitVector::Reserve(size_t num_elements) {
+  size_t required_words = (num_elements * bit_width_ + kDataWidth - 1) /
+                              kDataWidth +
+                          1;  // +1 for padding
+  data_.reserve(required_words);
 }

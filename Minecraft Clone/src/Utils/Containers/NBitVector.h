@@ -37,6 +37,9 @@ class NBitVector {
   template <typename T>
   void UnpackAll(T* out) const;
 
+  // Pre-allocate storage for expected number of elements
+  void Reserve(size_t num_elements);
+
  private:
   static constexpr size_t kDataWidth = 64;
   static constexpr uint64_t kAllOnes = ~(static_cast<uint64_t>(0));
@@ -45,25 +48,17 @@ class NBitVector {
 
   size_t bit_width_;
   uint64_t all_one_bit_width_;
+  bool is_power_of_2_;  // True when bit_width_ is power of 2 and <= 32
 
   std::vector<uint64_t> data_;
   size_t num_elements_ = 0;
 
-  static constexpr std::array<std::array<uint64_t, kDataWidth>, kDataWidth>
-      overflow_table_ = []() constexpr {
-        std::array<std::array<uint64_t, kDataWidth>, kDataWidth> table{};
-        for (size_t bit_width = 0; bit_width < kDataWidth; ++bit_width) {
-          const size_t all_one_bit_width = ~(kAllOnes << bit_width);
-          for (size_t i = 0; i < kDataWidth; ++i) {
-            if (kDataWidth - i < bit_width) {
-              table[bit_width][i] = all_one_bit_width >> (kDataWidth - i);
-            } else {
-              table[bit_width][i] = 0;
-            }
-          }
-        }
-        return table;
-      }();
+  // Compute overflow mask directly instead of table lookup
+  [[nodiscard]] uint64_t ComputeOverflowMask(size_t bit_pos) const noexcept {
+    return (bit_pos + bit_width_ > kDataWidth)
+               ? (all_one_bit_width_ >> (kDataWidth - bit_pos))
+               : 0;
+  }
 };
 
 template <typename T>
@@ -86,10 +81,13 @@ void NBitVector::SetUnsafe(size_t idx, T val) noexcept {
   const uint64_t low_mask = all_one_bit_width_ << bit_pos;
   data_[data_idx] = (data_[data_idx] & ~low_mask) | (value << bit_pos);
 
-  const uint64_t overflow_mask = overflow_table_[bit_width_][bit_pos];
-  if (overflow_mask != 0) [[unlikely]] {
-    const uint64_t high_bits = value >> (kDataWidth - bit_pos);
-    data_[data_idx + 1] = (data_[data_idx + 1] & ~overflow_mask) | high_bits;
+  // Power-of-2 bit widths <= 32 never cross word boundaries
+  if (!is_power_of_2_) [[unlikely]] {
+    const uint64_t overflow_mask = ComputeOverflowMask(bit_pos);
+    if (overflow_mask != 0) {
+      const uint64_t high_bits = value >> (kDataWidth - bit_pos);
+      data_[data_idx + 1] = (data_[data_idx + 1] & ~overflow_mask) | high_bits;
+    }
   }
 }
 
@@ -99,7 +97,8 @@ void NBitVector::Append(T val) {
     throw std::domain_error("NBitVector::Append - Invalid number. Wrong size");
 
   num_elements_++;
-  if (num_elements_ * bit_width_ / kDataWidth >=
+  // Use bit shift instead of division
+  if ((num_elements_ * bit_width_) >> kDataWidthLog2 >=
       data_.size() - 1) {  // -1 to keep an extra space of padding
     data_.emplace_back(0ULL);
   }
