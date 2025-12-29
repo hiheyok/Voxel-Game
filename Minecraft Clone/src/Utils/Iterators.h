@@ -1,9 +1,13 @@
+#ifndef SRC_UTILS_ITERATORS_H_
+#define SRC_UTILS_ITERATORS_H_
+
 #include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
 #include <limits>
+
 #include "Utils/Assert.h"
 
 template <size_t N, typename T>
@@ -80,35 +84,30 @@ class ProductIterator {
   }
 
   friend bool operator==(const ProductIterator<N, T>& a,
-                         const ProductIterator<N, T>& b) noexcept {
-    return a.idx_ == b.idx_;
-  };
-  friend bool operator!=(const ProductIterator<N, T>& a,
-                         const ProductIterator<N, T>& b) noexcept {
-    return a.idx_ != b.idx_;
-  };
+                         const ProductIterator<N, T>& b) noexcept = default;
 
  private:
   friend Product<N, T>;
 
-  explicit ProductIterator(size_t idx, const std::pair<T, T>* bounds) noexcept
-      : idx_{idx}, bounds_{bounds} {
-    max_ = 1;
-    for (size_t i = N; i-- > 0;) {
-      size_t size = bounds[i].second - bounds[i].first;
-      val_[i] = idx % size;
-      idx /= size;
-      max_ *= size;
-    }
-
-    for (size_t i = 0; i < N; ++i) {
-      val_[i] += bounds_[i].first;
+  explicit ProductIterator(size_t idx, size_t max,
+                           const std::pair<T, T>* bounds) noexcept
+      : idx_{idx}, max_{max}, bounds_{bounds} {
+    if (idx == 0) {
+      for (size_t i = 0; i < N; ++i) {
+        val_[i] = bounds[i].first;
+      }
+    } else {
+      for (size_t i = N; i-- > 0;) {
+        size_t size = bounds[i].second - bounds[i].first;
+        val_[i] = bounds[i].first + static_cast<T>(idx % size);
+        idx /= size;
+      }
     }
   }
 
-  size_t idx_;
-  size_t max_;
-  const std::pair<T, T>* bounds_;
+  size_t idx_{};
+  size_t max_{};
+  const std::pair<T, T>* bounds_{};
   std::array<T, N> val_{};
 };
 
@@ -139,7 +138,7 @@ class Product {
     GAME_ASSERT(bounds.size() == N, "Incorrect number of ranges provided");
     std::array<Range, N> arr;
     auto it = bounds.begin();
-    for (int i = 0; i < N; ++i, ++it) {
+    for (size_t i = 0; i < N; ++i, ++it) {
       arr[i] = {T{}, *it};
     }
     Init(arr);
@@ -147,7 +146,7 @@ class Product {
 
   explicit Product(T end) noexcept {
     std::array<Range, N> arr;
-    for (int i = 0; i < N; ++i) {
+    for (size_t i = 0; i < N; ++i) {
       arr[i] = {T{}, end};
     }
     Init(arr);
@@ -155,30 +154,28 @@ class Product {
 
   explicit Product(T beg, T end) noexcept {
     std::array<Range, N> arr;
-    for (int i = 0; i < N; ++i) {
+    for (size_t i = 0; i < N; ++i) {
       arr[i] = {beg, end};
     }
     Init(arr);
   }
 
   ProductIterator<N, T> begin() const noexcept {
-    return ProductIterator<N, T>(0, bounds_.data());
+    return ProductIterator<N, T>(0, max_, bounds_.data());
   }
   ProductIterator<N, T> end() const noexcept {
-    return ProductIterator<N, T>(max_, bounds_.data());
+    return ProductIterator<N, T>(max_, max_, bounds_.data());
   }
 
  private:
-  void Init(std::array<Range, N> bounds) noexcept {
+  void Init(const std::array<Range, N>& bounds) noexcept {
     bounds_ = bounds;
-
     max_ = 1;
     for (size_t i = 0; i < N; ++i) {
       GAME_ASSERT(bounds[i].second > bounds[i].first, "Invalid range bounds");
-      bounds_[i] = bounds[i];
       size_t size = bounds[i].second - bounds[i].first;
-
-      if (size > 0 && max_ > std::numeric_limits<size_t>::max() / size) {
+      // size > 0 is guaranteed by the assert above
+      if (max_ > std::numeric_limits<size_t>::max() / size) {
         GAME_ASSERT(false, "Overflow detected in calculating product size");
         max_ = 0;
         return;
@@ -193,3 +190,5 @@ class Product {
 
 // Assertion just to verify
 static_assert(std::bidirectional_iterator<ProductIterator<2, int>>);
+
+#endif  // SRC_UTILS_ITERATORS_H_

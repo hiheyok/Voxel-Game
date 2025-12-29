@@ -93,9 +93,10 @@ void Palette::Resize() {
 }
 
 Palette::PaletteIndex Palette::GetOrAddPaletteIndex(BlockID block) {
-  // First check if block already exists
+  // First check if block already exists (skip entries with count == 0, they're
+  // in the free list and may contain stale block IDs)
   for (PaletteIndex i = 0; i < palette_entries_id_.size(); i++) {
-    if (palette_entries_id_[i] == block) {
+    if (palette_entries_count_[i] > 0 && palette_entries_id_[i] == block) {
       return i;
     }
   }
