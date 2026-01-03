@@ -47,7 +47,7 @@ int LightEngineCache::GetSkyLight(BlockPos pos) {
 BlockID LightEngineCache::GetBlock(BlockPos pos) {
   const Chunk* data = EnsureLoadedGetChunk(pos);
   GAME_ASSERT(data != nullptr, "Chunk data is null");
-  return data->GetBlockUnsafe(pos);
+  return data->GetBlockUnsafe(pos.GetLocalPos());
 }
 
 void LightEngineCache::SetBlockLight(BlockPos pos, int lvl) {

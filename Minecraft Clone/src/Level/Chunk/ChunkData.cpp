@@ -8,13 +8,16 @@
 #include "Level/Chunk/Heightmap/Heightmap.h"
 #include "Level/TerrainGeneration/Structures/Structure.h"
 
+using std::make_unique;
+using std::move;
+
 ChunkContainer::ChunkContainer(GameContext& context)
     : context_{context},
-      sky_light_{std::make_unique<LightStorage>()},
-      block_light_{std::make_unique<LightStorage>()},
-      heightmap_{std::make_unique<HeightMap>()},
+      sky_light_{make_unique<LightStorage>()},
+      block_light_{make_unique<LightStorage>()},
+      heightmap_{make_unique<HeightMap>()},
       outside_block_to_place_{},
-      neighbors_{6},
+      neighbors_{nullptr},
       block_storage_{} {
   sky_light_->position_ = position_;
   block_light_->position_ = position_;
@@ -23,14 +26,18 @@ ChunkContainer::ChunkContainer(GameContext& context)
 ChunkContainer::~ChunkContainer() = default;
 ChunkContainer::ChunkContainer(ChunkContainer&& other)
     : context_{other.context_},
-      sky_light_{std::move(other.sky_light_)},
-      block_light_{std::move(other.block_light_)},
-      heightmap_{std::move(other.heightmap_)},
-      outside_block_to_place_{std::move(other.outside_block_to_place_)},
-      neighbors_{std::move(other.neighbors_)},
-      block_storage_{std::move(other.block_storage_)} {
-  light_dirty_.store(other.light_dirty_.load(std::memory_order_release),
-                     std::memory_order_acquire);
+      position_{other.position_},
+      sky_light_{move(other.sky_light_)},
+      block_light_{move(other.block_light_)},
+      heightmap_{move(other.heightmap_)},
+      outside_block_to_place_{move(other.outside_block_to_place_)},
+      is_empty_{other.is_empty_},
+      neighbors_{move(other.neighbors_)},
+      block_storage_{move(other.block_storage_)} {
+  light_dirty_.store(other.light_dirty_.load(std::memory_order_relaxed),
+                     std::memory_order_relaxed);
+  is_light_up_.store(other.is_light_up_.load(std::memory_order_relaxed),
+                     std::memory_order_relaxed);
 }
 
 ChunkContainer::ChunkContainer(GameContext& context, const ChunkRawData& data)
@@ -46,15 +53,12 @@ BlockID ChunkContainer::GetBlock(BlockPos pos) const {
     int dy = ((pos.y >> 31) & 1) + 2;
     int dz = ((pos.z >> 31) & 1) + 4;
 
-    if (neighbors_[dx].has_value() && (pos.x >> kChunkDimLog2))
-      return neighbors_[dx].value()->GetBlock(
-          pos.IncrementSide(dx, -kChunkDim));
-    if (neighbors_[dy].has_value() && (pos.y >> kChunkDimLog2))
-      return neighbors_[dy].value()->GetBlock(
-          pos.IncrementSide(dy, -kChunkDim));
-    if (neighbors_[dz].has_value() && (pos.z >> kChunkDimLog2))
-      return neighbors_[dz].value()->GetBlock(
-          pos.IncrementSide(dz, -kChunkDim));
+    if (neighbors_[dx] && (pos.x >> kChunkDimLog2))
+      return neighbors_[dx]->GetBlock(pos.IncrementSide(dx, -kChunkDim));
+    if (neighbors_[dy] && (pos.y >> kChunkDimLog2))
+      return neighbors_[dy]->GetBlock(pos.IncrementSide(dy, -kChunkDim));
+    if (neighbors_[dz] && (pos.z >> kChunkDimLog2))
+      return neighbors_[dz]->GetBlock(pos.IncrementSide(dz, -kChunkDim));
 
     return context_.blocks_->AIR;
   } else {
@@ -63,7 +67,7 @@ BlockID ChunkContainer::GetBlock(BlockPos pos) const {
 }
 
 BlockID ChunkContainer::GetBlockUnsafe(BlockPos pos) const noexcept {
-  return block_storage_.GetBlockUnsafe(pos);
+  return block_storage_.GetBlock(pos);
 }
 
 void ChunkContainer::SetLightLvl(BlockPos pos, bool is_sky, int lvl) {
@@ -92,9 +96,9 @@ void ChunkContainer::SetBlock(BlockID block, BlockPos pos) {
   if (static_cast<unsigned>(pos.x) >= kChunkDim ||
       static_cast<unsigned>(pos.y) >= kChunkDim ||
       static_cast<unsigned>(pos.z) >= kChunkDim) {
-    int dx = ((pos.x >> 31) & 1) + 0;
-    int dy = ((pos.y >> 31) & 1) + 2;
-    int dz = ((pos.z >> 31) & 1) + 4;
+    int dx = static_cast<int>(pos.x < 0) + 0;
+    int dy = static_cast<int>(pos.y < 0) + 2;
+    int dz = static_cast<int>(pos.z < 0) + 4;
 
     if (pos.x >> kChunkDimLog2) {
       outside_block_to_place_[dx].emplace_back(
@@ -117,7 +121,7 @@ void ChunkContainer::SetBlock(BlockID block, BlockPos pos) {
 }
 
 void ChunkContainer::SetBlockUnsafe(BlockID block, BlockPos pos) {
-  block_storage_.SetBlockUnsafe(block, pos);
+  block_storage_.SetBlock(block, pos);
   is_empty_ = false;
 }
 
@@ -128,6 +132,9 @@ void ChunkContainer::SetPosition(ChunkPos pos) noexcept {
 }
 std::optional<ChunkContainer*> ChunkContainer::GetNeighbor(
     int side) const noexcept {
+  if (neighbors_[side] == nullptr) {
+    return std::nullopt;
+  }
   return neighbors_[side];
 }
 
@@ -135,11 +142,7 @@ void ChunkContainer::SetNeighbor(ChunkContainer* neighbor, int side) {
   neighbors_[side] = neighbor;
 }
 
-void ChunkContainer::ClearNeighbors() {
-  for (auto side : Directions<ChunkPos>()) {
-    neighbors_[side].reset();
-  }
-}
+void ChunkContainer::ClearNeighbors() { neighbors_.fill(nullptr); }
 
 void ChunkContainer::SetData(const ChunkRawData& data) {
   *sky_light_.get() = data.sky_light_;
@@ -166,13 +169,11 @@ void ChunkContainer::UpdateHeightMap(int x, int z) {
   // Check chunk above first, if the heightmap above is > -1, it means that
   // there are block above -1 indicate theirs nothing in the column
   auto chunk_above = neighbors_[Directions<ChunkPos>::kUp];
-
-  int new_height =
-      -1;  // -1 is the default height if there is no blocks in the column
+  // -1 is the default height if there is no blocks in the column
+  int new_height = -1;
   int old_height = heightmap_->Get(x, z);
 
-  if (chunk_above.has_value() &&
-      chunk_above.value()->heightmap_->Get(x, z) != -1) {
+  if (chunk_above && chunk_above->heightmap_->Get(x, z) != -1) {
     new_height = kChunkDim;
   } else {
     for (int i = kChunkDim - 1; i >= 0; --i) {
@@ -184,20 +185,18 @@ void ChunkContainer::UpdateHeightMap(int x, int z) {
   }
 
   if (new_height != old_height) {
-    light_dirty_ = true;
+    SetLightDirty();
     heightmap_->Edit(x, z, new_height);
 
     auto chunk_bottom = neighbors_[Directions<ChunkPos>::kDown];
-    if (chunk_bottom.has_value() && (old_height == -1 || new_height == -1)) {
-      chunk_bottom.value()->UpdateHeightMap(x, z);
+    if (chunk_bottom && (old_height == -1 || new_height == -1)) {
+      chunk_bottom->UpdateHeightMap(x, z);
     }
   }
 }
 
 bool ChunkContainer::CheckLightDirty() {
-  bool is_dirty = light_dirty_.load(std::memory_order_acquire);
-  light_dirty_.store(false, std::memory_order_release);
-  return is_dirty;
+  return light_dirty_.exchange(false, std::memory_order_acq_rel);
 }
 
 void ChunkContainer::SetLightDirty() {

@@ -4,8 +4,11 @@
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <stdexcept>
 #include <vector>
+
+#include "Utils/Assert.h"
 
 namespace {
 bool IsPowerOf2AndSmall(size_t bit_width) {
@@ -21,9 +24,7 @@ NBitVector::NBitVector(size_t numElements, size_t bit_width)
       all_one_bit_width_{~(kAllOnes << bit_width)},
       is_power_of_2_{IsPowerOf2AndSmall(bit_width)},
       num_elements_{numElements} {
-  if (bit_width > kDataWidth)
-    throw std::domain_error("NBitVector::NBitVector - Bit width is too wide.");
-
+  GAME_ASSERT(bit_width <= kDataWidth, "Bit width is too wide.");
   data_.resize(numElements * bit_width / kDataWidth + 1);
 }
 
@@ -42,13 +43,8 @@ NBitVector& NBitVector::operator=(const NBitVector&) = default;
 
 NBitVector& NBitVector::operator=(NBitVector&&) noexcept = default;
 
-uint64_t NBitVector::Get(size_t idx) const {
-  if (idx >= num_elements_)
-    throw std::out_of_range("NBitVector::Get - Index out of range");
-  return GetUnsafe(idx);
-}
-
-uint64_t NBitVector::GetUnsafe(size_t idx) const noexcept {
+uint64_t NBitVector::Get(size_t idx) const noexcept {
+  GAME_ASSERT(idx < num_elements_, "Index out of range");
   size_t total_bit_offset = bit_width_ * idx;
 
   size_t data_idx = total_bit_offset >> kDataWidthLog2;
@@ -56,7 +52,8 @@ uint64_t NBitVector::GetUnsafe(size_t idx) const noexcept {
   const uint64_t* p = data_.data() + data_idx;
 
 #ifdef __SIZEOF_INT128__
-  unsigned __int128 chunk = *reinterpret_cast<const unsigned __int128*>(p);
+  unsigned __int128 chunk;
+  std::memcpy(&chunk, p, sizeof(chunk));
   return (chunk >> bit_pos) & all_one_bit_width_;
 #else
   uint64_t result = p[0] >> bit_pos;
@@ -73,8 +70,8 @@ uint64_t NBitVector::GetUnsafe(size_t idx) const noexcept {
 }
 
 void NBitVector::Reserve(size_t num_elements) {
-  size_t required_words = (num_elements * bit_width_ + kDataWidth - 1) /
-                              kDataWidth +
-                          1;  // +1 for padding
+  size_t required_words =
+      (num_elements * bit_width_ + kDataWidth - 1) / kDataWidth +
+      1;  // +1 for padding
   data_.reserve(required_words);
 }

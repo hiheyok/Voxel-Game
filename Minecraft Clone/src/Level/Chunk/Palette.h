@@ -22,11 +22,8 @@ class Palette {
   Palette& operator=(const Palette&);
   Palette& operator=(Palette&&) noexcept;
 
-  BlockID GetBlock(BlockPos pos) const;
-  BlockID GetBlockUnsafe(BlockPos pos) const noexcept;
-
+  BlockID GetBlock(BlockPos pos) const noexcept;
   void SetBlock(BlockID block, BlockPos pos);
-  void SetBlockUnsafe(BlockID block, BlockPos pos);
 
   std::array<BlockID, kChunkSize3D> UnpackAll() const;
 
@@ -42,9 +39,9 @@ class Palette {
   using PaletteIndex = uint16_t;
   using StorageBit = uint64_t;
 
-  static constexpr int GetBitWidth(uint32_t n) noexcept {
-    int bitWidth = std::bit_width(n);
-    return std::max(bitWidth, kMinBitWidth);
+  static constexpr size_t GetBitWidth(uint32_t n) noexcept {
+    size_t bit_width = std::bit_width(n);
+    return std::max(bit_width, kMinBitWidth);
   }
 
   void Shrink();
@@ -53,13 +50,13 @@ class Palette {
 
   PaletteIndex GetOrAddPaletteIndex(BlockID block);
 
-  static constexpr int kMinBitWidth = 1;  // Minimum bits
-  static constexpr int kMaxBitWidth = 12;
+  static constexpr size_t kMinBitWidth = 1;  // Minimum bits
+  static constexpr size_t kMaxBitWidth = 12;
   // Only shrink when empty slots exceed 25% of capacity
   static constexpr float kLazyShrinkThreshold = 0.25f;
 
-  int current_bit_width_ = kMinBitWidth;
-  int unique_blocks_count_ = 1;  // Initialize with only air blocks
+  size_t current_bit_width_ = kMinBitWidth;
+  size_t unique_blocks_count_ = 1;  // Initialize with only air blocks
 
   NBitVector data_;
 

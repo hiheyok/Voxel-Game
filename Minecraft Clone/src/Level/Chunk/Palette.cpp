@@ -5,9 +5,14 @@
 #include "Core/GameContext/GameContext.h"
 #include "Level/Block/Blocks.h"
 
+using std::array;
+using std::move;
+using std::swap;
+using std::vector;
+
 Palette::Palette()
     : current_bit_width_{kMinBitWidth},
-      data_{kChunkSize3D, static_cast<size_t>(current_bit_width_)} {
+      data_{kChunkSize3D, current_bit_width_} {
   palette_entries_id_.emplace_back(0);
   palette_entries_count_.emplace_back(static_cast<uint16_t>(kChunkSize3D));
   // TODO(hiheyok): Change this default state from 0 to blocks.AIR later
@@ -24,9 +29,9 @@ void Palette::Shrink() {
   NBitVector newData(kChunkSize3D, newBitWidth);
 
   // Repack
-  std::vector<BlockID> new_block_to_palette_id_(unique_blocks_count_);
-  std::vector<int16_t> new_block_to_palette_count_(unique_blocks_count_);
-  std::vector<PaletteIndex> new_palette_index(palette_entries_id_.size(), 0);
+  vector<BlockID> new_block_to_palette_id_(unique_blocks_count_);
+  vector<int16_t> new_block_to_palette_count_(unique_blocks_count_);
+  vector<PaletteIndex> new_palette_index(palette_entries_id_.size(), 0);
 
   // 2 pointers
   PaletteIndex curr = 0;
@@ -39,20 +44,20 @@ void Palette::Shrink() {
   }
 
   // Batch unpack all indices
-  std::array<PaletteIndex, kChunkSize3D> indices;
+  array<PaletteIndex, kChunkSize3D> indices;
   data_.UnpackAll(indices.data());
 
   // Batch set with remapped indices
   for (int i = 0; i < kChunkSize3D; ++i) {
-    newData.SetUnsafe(i, new_palette_index[indices[i]]);
+    newData.Set(i, new_palette_index[indices[i]]);
   }
 
-  data_ = std::move(newData);
+  data_ = move(newData);
   current_bit_width_ = newBitWidth;
 
   // refactor palette block index
-  palette_entries_id_ = std::move(new_block_to_palette_id_);
-  palette_entries_count_ = std::move(new_block_to_palette_count_);
+  palette_entries_id_ = move(new_block_to_palette_id_);
+  palette_entries_count_ = move(new_block_to_palette_count_);
   free_slots_.clear();
 }
 
@@ -62,15 +67,15 @@ void Palette::Grow() {
   current_bit_width_ = newBitWidth;
 
   // Batch unpack all indices
-  std::array<PaletteIndex, kChunkSize3D> indices;
+  array<PaletteIndex, kChunkSize3D> indices;
   data_.UnpackAll(indices.data());
 
   // Batch set into new data
   for (int i = 0; i < kChunkSize3D; ++i) {
-    newData.SetUnsafe(i, indices[i]);
+    newData.Set(i, indices[i]);
   }
 
-  data_ = std::move(newData);
+  data_ = move(newData);
 }
 
 void Palette::Resize() {
@@ -117,79 +122,63 @@ Palette::PaletteIndex Palette::GetOrAddPaletteIndex(BlockID block) {
   return newIndex;
 }
 
-BlockID Palette::GetBlock(BlockPos pos) const {
-  if ((pos.x | pos.y | pos.z) >> kChunkDimLog2) {
-    throw std::out_of_range("Palette::GetBlock - Invalid palette index");
-  }
-
-  return GetBlockUnsafe(pos);
-}
-
-BlockID Palette::GetBlockUnsafe(BlockPos pos) const noexcept {
-  PaletteIndex idx = static_cast<PaletteIndex>(data_.GetUnsafe(pos.GetIndex()));
+BlockID Palette::GetBlock(BlockPos pos) const noexcept {
+  GAME_ASSERT(!((pos.x | pos.y | pos.z) >> kChunkDimLog2), "Invalid position");
+  PaletteIndex idx = static_cast<PaletteIndex>(data_.Get(pos.GetIndex()));
   return palette_entries_id_[idx];
 }
 
 void Palette::SetBlock(BlockID block, BlockPos pos) {
-  if ((pos.x | pos.y | pos.z) >> kChunkDimLog2) {
-    throw std::out_of_range("Palette::SetBlock - Invalid palette index");
-  }
-
-  SetBlockUnsafe(block, pos);
-}
-
-void Palette::SetBlockUnsafe(BlockID block, BlockPos pos) {
+  GAME_ASSERT(!((pos.x | pos.y | pos.z) >> kChunkDimLog2), "Invalid position");
   // Look at original block
   PaletteIndex oldPaletteIdx =
-      static_cast<PaletteIndex>(data_.GetUnsafe(pos.GetIndex()));
-  if (oldPaletteIdx >= palette_entries_count_.size() ||
-      palette_entries_count_[oldPaletteIdx] <= 0) {
-    throw std::runtime_error(
-        "Palette::SetBlockUnsafe - Corrupt old palette index found in "
-        "data.");
-  }
-  BlockID oldBlockId = palette_entries_id_[oldPaletteIdx];
-  bool uniqueCountChanged = false;
-  if (block == oldBlockId) {
+      static_cast<PaletteIndex>(data_.Get(pos.GetIndex()));
+
+  GAME_ASSERT(oldPaletteIdx < palette_entries_count_.size() &&
+                  palette_entries_count_[oldPaletteIdx] > 0,
+              "Corrupt old palette index found in data.");
+
+  BlockID old_block_id = palette_entries_id_[oldPaletteIdx];
+  bool unique_count_changed = false;
+  if (block == old_block_id) {
     return;
   }
 
   if (--palette_entries_count_[oldPaletteIdx] == 0) {
     --unique_blocks_count_;
     free_slots_.push_back(oldPaletteIdx);  // Add to free list
-    uniqueCountChanged = !uniqueCountChanged;
+    unique_count_changed = !unique_count_changed;
   }
 
   PaletteIndex idx = GetOrAddPaletteIndex(block);
   if (palette_entries_count_[idx]++ == 0) {
     unique_blocks_count_++;
-    uniqueCountChanged = !uniqueCountChanged;
+    unique_count_changed = !unique_count_changed;
   }
 
-  data_.SetUnsafe(pos.GetIndex(), idx);
-  if (uniqueCountChanged) {
+  data_.Set(pos.GetIndex(), idx);
+  if (unique_count_changed) {
     Resize();
   }
 }
 
-std::array<BlockID, kChunkSize3D> Palette::UnpackAll() const {
-  std::array<BlockID, kChunkSize3D> out;
+array<BlockID, kChunkSize3D> Palette::UnpackAll() const {
+  array<BlockID, kChunkSize3D> out;
   data_.UnpackAll(out.data());
-  const BlockID* src = palette_entries_id_.data();
   for (auto& i : out) {
-    i = src[i];
+    i = palette_entries_id_[i];
   }
   return out;
 }
 
-std::array<BlockID, kChunkSize2D> Palette::UnpackSlice(int axis,
-                                                       int slice_idx) const {
+array<BlockID, kChunkSize2D> Palette::UnpackSlice(int axis,
+                                                  int slice_idx) const {
   static constexpr int kStrideX = kChunkSize2D;
   static constexpr int kStrideY = kChunkDim;
   static constexpr int kStrideZ = 1;
   static constexpr int kStrides[3]{kStrideX, kStrideY, kStrideZ};
 
-  std::array<BlockID, kChunkSize2D> out_slice;
+  array<BlockID, kChunkSize2D> out_slice;
 
   BlockPos pos;
   pos[axis] = slice_idx;
@@ -201,7 +190,7 @@ std::array<BlockID, kChunkSize2D> Palette::UnpackSlice(int axis,
 
   // Cache friendly access pattern for y-axis (faster)
   if (axis == kYAxis) {
-    std::swap(axis_u, axis_v);
+    swap(axis_u, axis_v);
   }
 
   int write_idx = 0;
@@ -209,7 +198,7 @@ std::array<BlockID, kChunkSize2D> Palette::UnpackSlice(int axis,
     int v_block_idx = block_idx;
     for (int v = 0; v < kChunkDim; ++v) {
       const PaletteIndex palette_idx =
-          static_cast<PaletteIndex>(data_.GetUnsafe(v_block_idx));
+          static_cast<PaletteIndex>(data_.Get(v_block_idx));
 
       out_slice[write_idx++] = palette_entries_id_[palette_idx];
       v_block_idx += kStrides[axis_v];

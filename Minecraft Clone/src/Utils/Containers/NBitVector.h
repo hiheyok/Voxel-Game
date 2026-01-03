@@ -5,8 +5,11 @@
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <stdexcept>
 #include <vector>
+
+#include "Utils/Assert.h"
 
 class NBitVector {
  public:
@@ -19,17 +22,13 @@ class NBitVector {
   NBitVector& operator=(NBitVector&&) noexcept;
   ~NBitVector() noexcept;
   [[nodiscard]]
-  uint64_t Get(size_t idx) const;
-  [[nodiscard]]
-  uint64_t GetUnsafe(size_t idx) const noexcept;
+  uint64_t Get(size_t idx) const noexcept;
 
   template <typename T>
   void Append(T val);
 
   template <typename T>
-  void Set(size_t idx, T val);
-  template <typename T>
-  void SetUnsafe(size_t idx, T val) noexcept;
+  void Set(size_t idx, T val) noexcept;
 
   template <typename T>
   void UnpackAll(std::vector<T>& out) const;
@@ -62,16 +61,11 @@ class NBitVector {
 };
 
 template <typename T>
-void NBitVector::Set(size_t idx, T val) {
-  if (static_cast<size_t>(val) >= (1ULL << bit_width_))
-    throw std::domain_error("NBitVector::Set - Invalid number. Wrong size");
-  if (idx >= num_elements_)
-    throw std::out_of_range("NBitVector::Set - Index out of range");
-  SetUnsafe(idx, val);
-}
+void NBitVector::Set(size_t idx, T val) noexcept {
+  GAME_ASSERT(idx < num_elements_, "Index out of range");
+  GAME_ASSERT(static_cast<size_t>(val) < (1ULL << bit_width_),
+              "Invalid number. Wrong size");
 
-template <typename T>
-void NBitVector::SetUnsafe(size_t idx, T val) noexcept {
   uint64_t value = static_cast<uint64_t>(val);
 
   size_t total_bit_offset = bit_width_ * idx;
@@ -123,8 +117,8 @@ void NBitVector::UnpackAll(T* out) const {
     const size_t data_idx = bit_offset >> kDataWidthLog2;
     const size_t bit_pos = bit_offset & kDataBitRemainderMask;
 
-    unsigned __int128 chunk =
-        *reinterpret_cast<const unsigned __int128*>(&src[data_idx]);
+    unsigned __int128 chunk;
+    std::memcpy(&chunk, &src[data_idx], sizeof(chunk));
     out[i] = static_cast<T>((chunk >> bit_pos) & mask);
     bit_offset += bit_width_;
   }

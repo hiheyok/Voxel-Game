@@ -70,7 +70,7 @@ class ChunkContainer {
   bool is_empty_ = true;
 
  protected:
-  std::vector<std::optional<ChunkContainer*>> neighbors_;
+  std::array<ChunkContainer*, 6> neighbors_;
 
  private:
   std::atomic<bool> light_dirty_ = false;
