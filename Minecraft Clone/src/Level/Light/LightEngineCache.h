@@ -49,48 +49,23 @@ class LightEngineCache {
   LightEngineCacheStats GetStats() const noexcept;
 
  private:
-  class alignas(16) CacheSlot {
-   public:
-    Chunk* GetChunk() const {
-      // Cast the integer bits back to a pointer
-      return reinterpret_cast<Chunk*>(chunk_);
-    }
-
-    LightStorage* GetBlock() const {
-      return reinterpret_cast<LightStorage*>(block_);
-    }
-
-    LightStorage* GetSky() const {
-      return reinterpret_cast<LightStorage*>(sky_);
-    }
-
-    bool IsDirty() const { return dirty_; }
-
-    void SetChunk(Chunk* chunk) { chunk_ = reinterpret_cast<uintptr_t>(chunk); }
-
-    void SetBlock(LightStorage* block) {
-      block_ = reinterpret_cast<uintptr_t>(block);
-    }
-
-    void SetSky(LightStorage* sky) { sky_ = reinterpret_cast<uintptr_t>(sky); }
-
-    void SetDirty(bool is_dirty) { dirty_ = is_dirty; }
-
-   private:
-    bool dirty_ : 1;
-    uintptr_t chunk_ : 48;
-    uintptr_t block_ : 48;
-    uintptr_t sky_ : 48;
+  struct alignas(16) CacheSlot {
+    Chunk* chunk_ = nullptr;
+    LightStorage* block_ = nullptr;
+    LightStorage* sky_ = nullptr;
   };
 
-  void SetBlockCache(ChunkPos pos, Chunk* data);
-  void SetBlockLightCache(ChunkPos pos, LightStorage* data);
-  void SetSkyLightCache(ChunkPos pos, LightStorage* data);
+  void SetBlockCache(ChunkPos pos, Chunk* data) noexcept;
+  void SetBlockLightCache(ChunkPos pos, LightStorage* data) noexcept;
+  void SetSkyLightCache(ChunkPos pos, LightStorage* data) noexcept;
   void ExpandDown();
   bool TryCacheChunk(ChunkPos pos);
-  size_t CalculateCacheIndex(ChunkPos pos) const noexcept;
   // Calculate the index for the chunk the block_pos is in
+  size_t CalculateCacheIndex(ChunkPos pos) const noexcept;
   size_t CalculateCacheIndex(BlockPos pos) const noexcept;
+  bool TryCalculateCacheIndex(ChunkPos pos, size_t& idx);
+
+
   [[nodiscard]] bool EnsureLoaded(ChunkPos pos);
   [[nodiscard]] LightStorage* EnsureLoadedGetSky(ChunkPos pos);
   [[nodiscard]] LightStorage* EnsureLoadedGetSky(BlockPos pos);
@@ -112,6 +87,7 @@ class LightEngineCache {
   int y_bot;
 
   std::vector<CacheSlot> cache_;
+  std::vector<uint8_t> dirty_;
 
   LightEngineCacheStats stats;
 };

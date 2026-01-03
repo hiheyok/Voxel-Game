@@ -25,6 +25,6 @@ uint8_t LightStorage::GetLighting(BlockPos pos) const noexcept {
   return data_.Get(pos.GetIndex());
 }
 
-void LightStorage::ResetLighting() { data_.Fill(0); }
+void LightStorage::ResetLighting() noexcept { data_.Fill(0); }
 
-void LightStorage::ResetLightingCustom(uint8_t lvl) { data_.Fill(lvl); }
+void LightStorage::ResetLightingCustom(uint8_t lvl) noexcept { data_.Fill(lvl); }

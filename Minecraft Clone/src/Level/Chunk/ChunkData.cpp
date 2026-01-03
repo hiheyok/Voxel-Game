@@ -45,7 +45,7 @@ ChunkContainer::ChunkContainer(GameContext& context, const ChunkRawData& data)
   SetData(data);
 }
 
-BlockID ChunkContainer::GetBlock(BlockPos pos) const {
+BlockID ChunkContainer::GetBlock(BlockPos pos) const noexcept {
   if (static_cast<unsigned>(pos.x) >= kChunkDim ||
       static_cast<unsigned>(pos.y) >= kChunkDim ||
       static_cast<unsigned>(pos.z) >= kChunkDim) {
@@ -70,7 +70,7 @@ BlockID ChunkContainer::GetBlockUnsafe(BlockPos pos) const noexcept {
   return block_storage_.GetBlock(pos);
 }
 
-void ChunkContainer::SetLightLvl(BlockPos pos, bool is_sky, int lvl) {
+void ChunkContainer::SetLightLvl(BlockPos pos, bool is_sky, int lvl) noexcept {
   if (is_sky) {
     if (sky_light_->GetLighting(pos) != lvl) {
       SetLightDirty();
@@ -84,7 +84,7 @@ void ChunkContainer::SetLightLvl(BlockPos pos, bool is_sky, int lvl) {
   }
 }
 
-int ChunkContainer::GetLightLvl(BlockPos pos, bool is_sky) const {
+int ChunkContainer::GetLightLvl(BlockPos pos, bool is_sky) const noexcept {
   if (is_sky) {
     return sky_light_->GetLighting(pos);
   } else {
@@ -138,11 +138,11 @@ std::optional<ChunkContainer*> ChunkContainer::GetNeighbor(
   return neighbors_[side];
 }
 
-void ChunkContainer::SetNeighbor(ChunkContainer* neighbor, int side) {
+void ChunkContainer::SetNeighbor(ChunkContainer* neighbor, int side) noexcept {
   neighbors_[side] = neighbor;
 }
 
-void ChunkContainer::ClearNeighbors() { neighbors_.fill(nullptr); }
+void ChunkContainer::ClearNeighbors() noexcept { neighbors_.fill(nullptr); }
 
 void ChunkContainer::SetData(const ChunkRawData& data) {
   *sky_light_.get() = data.sky_light_;
@@ -195,19 +195,19 @@ void ChunkContainer::UpdateHeightMap(int x, int z) {
   }
 }
 
-bool ChunkContainer::CheckLightDirty() {
+bool ChunkContainer::CheckLightDirty() noexcept {
   return light_dirty_.exchange(false, std::memory_order_acq_rel);
 }
 
-void ChunkContainer::SetLightDirty() {
+void ChunkContainer::SetLightDirty() noexcept {
   light_dirty_.store(true, std::memory_order_release);
 }
 
 bool ChunkContainer::IsLightUp() const noexcept {
   return is_light_up_.load(std::memory_order_relaxed);
 }
-void ChunkContainer::SetLightUp(bool is_light_up) {
+void ChunkContainer::SetLightUp(bool is_light_up) noexcept {
   is_light_up_.store(is_light_up, std::memory_order_release);
 }
 
-const Palette& ChunkContainer::GetPalette() const { return block_storage_; }
+const Palette& ChunkContainer::GetPalette() const noexcept { return block_storage_; }

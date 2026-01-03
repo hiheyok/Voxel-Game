@@ -18,9 +18,9 @@ class Region {
   explicit Region(GameContext&);
   ~Region();
 
-  Chunk* GetChunk(ChunkPos pos) const;
-  void InsertChunk(std::unique_ptr<Chunk> chunk);
-  void EraseChunk(ChunkPos pos);
+  Chunk* GetChunk(ChunkPos pos) const noexcept;
+  void InsertChunk(std::unique_ptr<Chunk> chunk) noexcept;
+  void EraseChunk(ChunkPos pos) noexcept;
   bool CheckChunk(ChunkPos pos) const noexcept;
   int GetChunkCount() const noexcept;
   void IncrementUsage() noexcept;

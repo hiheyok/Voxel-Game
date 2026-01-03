@@ -15,5 +15,4 @@ int HeightMap::Get(int x, int z) const noexcept {
   return data_[x * kChunkDim + z];
 }
 
-void HeightMap::Clear() { data_.fill(kNoBlocks); }
-     
+void HeightMap::Clear() noexcept { data_.fill(kNoBlocks); }

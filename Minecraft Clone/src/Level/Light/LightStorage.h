@@ -22,9 +22,9 @@ class LightStorage {  // Contains all lighting infomation for solid blocks
   void EditLight(BlockPos pos, uint8_t LightingInfo) noexcept;
   uint8_t GetLighting(BlockPos pos) const noexcept;
 
-  void ResetLighting();
+  void ResetLighting() noexcept;
 
-  void ResetLightingCustom(uint8_t lvl);
+  void ResetLightingCustom(uint8_t lvl) noexcept;
 
   static const uint8_t kMaxLightLevel = 15;
   ChunkPos position_;

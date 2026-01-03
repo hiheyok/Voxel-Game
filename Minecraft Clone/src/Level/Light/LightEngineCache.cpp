@@ -11,6 +11,7 @@ LightEngineCache::LightEngineCache(GameContext& context, WorldInterface& world)
 
 void LightEngineCache::BuildCache(BlockPos center) {
   cache_.resize(kCacheSlice * kCacheWidth);
+  dirty_.resize(kCacheSlice * kCacheWidth);
 
   center_chunk_ = center.ToChunkPos();
 
@@ -56,14 +57,14 @@ void LightEngineCache::SetBlockLight(BlockPos pos, int lvl) {
   LightStorage* data = EnsureLoadedGetBlock(pos);
   GAME_ASSERT(data != nullptr, "Block light data is null");
   data->EditLight(pos, lvl);
-  cache_[idx].SetDirty(true);
+  dirty_[idx] = true;
 }
 void LightEngineCache::SetSkyLight(BlockPos pos, int lvl) {
   GAME_ASSERT(lvl >= 0 && lvl <= kMaxLightLevel, "Light level out of range");
   size_t idx = CalculateCacheIndex(pos);
   LightStorage* data = EnsureLoadedGetSky(pos);
   GAME_ASSERT(data != nullptr, "Sky light data is null");
-  cache_[idx].SetDirty(true);
+  dirty_[idx] = true;
   data->EditLight(pos, lvl);
 }
 
@@ -90,20 +91,20 @@ Chunk* LightEngineCache::GetChunk(BlockPos pos) {
 }
 
 void LightEngineCache::UpdateLight() {
-  for (auto& cache : cache_) {
-    if (cache.IsDirty()) {
-      cache.GetChunk()->SetLightDirty();
+  for (size_t i = 0; i < cache_.size(); ++i) {
+    if (dirty_[i] && cache_[i].chunk_) {
+      cache_[i].chunk_->SetLightDirty();
     }
   }
 }
 
 bool LightEngineCache::CheckChunkHasLighting(ChunkPos pos) {
   size_t idx = CalculateCacheIndex(pos);
-  Chunk* chunk = cache_[idx].GetChunk();
+  Chunk* chunk = cache_[idx].chunk_;
   if (chunk == nullptr && !CheckChunk(pos)) {
     return false;
   }
-  chunk = cache_[idx].GetChunk();
+  chunk = cache_[idx].chunk_;
   return chunk->IsLightUp();
 }
 
@@ -113,17 +114,19 @@ LightEngineCache::LightEngineCacheStats LightEngineCache::GetStats()
 }
 
 // Helper function for caching
-void LightEngineCache::SetBlockCache(ChunkPos pos, Chunk* data) {
+void LightEngineCache::SetBlockCache(ChunkPos pos, Chunk* data) noexcept {
   size_t idx = CalculateCacheIndex(pos);
-  cache_[idx].SetChunk(data);
+  cache_[idx].chunk_ = data;
 }
-void LightEngineCache::SetBlockLightCache(ChunkPos pos, LightStorage* data) {
+void LightEngineCache::SetBlockLightCache(ChunkPos pos,
+                                          LightStorage* data) noexcept {
   size_t idx = CalculateCacheIndex(pos);
-  cache_[idx].SetBlock(data);
+  cache_[idx].block_ = data;
 }
-void LightEngineCache::SetSkyLightCache(ChunkPos pos, LightStorage* data) {
+void LightEngineCache::SetSkyLightCache(ChunkPos pos,
+                                        LightStorage* data) noexcept {
   size_t idx = CalculateCacheIndex(pos);
-  cache_[idx].SetSky(data);
+  cache_[idx].sky_ = data;
 }
 
 void LightEngineCache::ExpandDown() {
@@ -131,6 +134,7 @@ void LightEngineCache::ExpandDown() {
   int curr_y = --y_bot;
 
   cache_.resize(curr_size + kCacheSlice);
+  dirty_.resize(curr_size + kCacheSlice);
 
   int x0 = center_chunk_.x - kCacheRadius;
   int x1 = center_chunk_.x + kCacheRadius + 1;
@@ -181,7 +185,7 @@ bool LightEngineCache::EnsureLoaded(ChunkPos pos) {
     ExpandDown();
   }
   const size_t idx = CalculateCacheIndex(pos);
-  return cache_[idx].GetChunk() != nullptr;
+  return cache_[idx].chunk_ != nullptr;
 }
 
 LightStorage* LightEngineCache::EnsureLoadedGetSky(ChunkPos pos) {
@@ -190,15 +194,16 @@ LightStorage* LightEngineCache::EnsureLoadedGetSky(ChunkPos pos) {
     ExpandDown();
   }
   const size_t idx = CalculateCacheIndex(pos);
-  return cache_[idx].GetSky();
+  return cache_[idx].sky_;
 }
 LightStorage* LightEngineCache::EnsureLoadedGetSky(BlockPos pos) {
-  GAME_ASSERT((pos.y >> kChunkDimLog2) >= y_bot, "Position Y below cache bottom");
+  GAME_ASSERT((pos.y >> kChunkDimLog2) >= y_bot,
+              "Position Y below cache bottom");
   if ((pos.y >> kChunkDimLog2) == y_bot) [[unlikely]] {
     ExpandDown();
   }
   const size_t idx = CalculateCacheIndex(pos);
-  return cache_[idx].GetSky();
+  return cache_[idx].sky_;
 }
 LightStorage* LightEngineCache::EnsureLoadedGetBlock(ChunkPos pos) {
   GAME_ASSERT(pos.y >= y_bot, "Position Y below cache bottom");
@@ -206,15 +211,16 @@ LightStorage* LightEngineCache::EnsureLoadedGetBlock(ChunkPos pos) {
     ExpandDown();
   }
   const size_t idx = CalculateCacheIndex(pos);
-  return cache_[idx].GetBlock();
+  return cache_[idx].block_;
 }
 LightStorage* LightEngineCache::EnsureLoadedGetBlock(BlockPos pos) {
-  GAME_ASSERT((pos.y >> kChunkDimLog2) >= y_bot, "Position Y below cache bottom");
+  GAME_ASSERT((pos.y >> kChunkDimLog2) >= y_bot,
+              "Position Y below cache bottom");
   if ((pos.y >> kChunkDimLog2) == y_bot) [[unlikely]] {
     ExpandDown();
   }
   const size_t idx = CalculateCacheIndex(pos);
-  return cache_[idx].GetBlock();
+  return cache_[idx].block_;
 }
 Chunk* LightEngineCache::EnsureLoadedGetChunk(ChunkPos pos) {
   GAME_ASSERT(pos.y >= y_bot, "Position Y below cache bottom");
@@ -222,14 +228,15 @@ Chunk* LightEngineCache::EnsureLoadedGetChunk(ChunkPos pos) {
     ExpandDown();
   }
   const size_t idx = CalculateCacheIndex(pos);
-  return cache_[idx].GetChunk();
+  return cache_[idx].chunk_;
 }
 
 Chunk* LightEngineCache::EnsureLoadedGetChunk(BlockPos pos) {
-  GAME_ASSERT((pos.y >> kChunkDimLog2) >= y_bot, "Position Y below cache bottom");
+  GAME_ASSERT((pos.y >> kChunkDimLog2) >= y_bot,
+              "Position Y below cache bottom");
   if ((pos.y >> kChunkDimLog2) == y_bot) [[unlikely]] {
     ExpandDown();
   }
   const size_t idx = CalculateCacheIndex(pos);
-  return cache_[idx].GetChunk();
+  return cache_[idx].chunk_;
 }

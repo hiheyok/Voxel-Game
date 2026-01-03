@@ -27,15 +27,15 @@ class ChunkContainer {
   ChunkContainer(ChunkContainer&&);
   ChunkContainer(const ChunkContainer&) = delete;
 
-  void SetNeighbor(ChunkContainer* neighbor, int side);
+  void SetNeighbor(ChunkContainer* neighbor, int side) noexcept;
   std::optional<ChunkContainer*> GetNeighbor(int side) const noexcept;
-  void ClearNeighbors();
+  void ClearNeighbors() noexcept;
 
-  BlockID GetBlock(BlockPos pos) const;
+  BlockID GetBlock(BlockPos pos) const noexcept;
   BlockID GetBlockUnsafe(BlockPos pos) const noexcept;
 
-  void SetLightLvl(BlockPos pos, bool is_sky, int lvl);
-  int GetLightLvl(BlockPos pos, bool is_sky) const;
+  void SetLightLvl(BlockPos pos, bool is_sky, int lvl) noexcept;
+  int GetLightLvl(BlockPos pos, bool is_sky) const noexcept;
 
   void SetBlock(BlockID block, BlockPos pos);
   void SetBlockUnsafe(BlockID block, BlockPos pos);
@@ -51,14 +51,14 @@ class ChunkContainer {
   // Check light update request
 
   // For light updates
-  bool CheckLightDirty();
-  void SetLightDirty();
+  bool CheckLightDirty() noexcept;
+  void SetLightDirty() noexcept;
 
   // Signal to relight entire chunk
   bool IsLightUp() const noexcept;
-  void SetLightUp(bool);
+  void SetLightUp(bool) noexcept;
 
-  const Palette& GetPalette() const;
+  const Palette& GetPalette() const noexcept;
 
   GameContext& context_;
   ChunkPos position_;

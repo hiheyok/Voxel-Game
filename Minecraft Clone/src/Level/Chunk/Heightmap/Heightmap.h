@@ -20,7 +20,7 @@ class HeightMap {
 
   int Get(int x, int z) const noexcept;
 
-  void Clear();
+  void Clear() noexcept;
 
   static constexpr int8_t kNoBlocks = -1;
   static constexpr int8_t kColumnFull = kChunkDim;
