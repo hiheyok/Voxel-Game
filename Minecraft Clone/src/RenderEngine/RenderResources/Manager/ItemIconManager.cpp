@@ -65,3 +65,7 @@ void ItemIconManager::RemoveItemIcon(const Item& item) {
   atlas_->RemoveSprite(location);
 }
 
+RenderHandle<TextureV2> ItemIconManager::GetAtlasTexture()
+    const noexcept {
+  return RenderHandle<TextureV2>{atlas_.get()};
+}

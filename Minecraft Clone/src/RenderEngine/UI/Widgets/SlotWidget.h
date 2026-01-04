@@ -1,3 +1,7 @@
+#pragma once
+#include <optional>
+
+#include "Level/Item/Item.h"
 #include "RenderEngine/UI/Widgets/Widget.h"
 
 class Item;
@@ -12,4 +16,6 @@ class SlotWidget : public Widget {
 
  private:
   void Build();
+
+  std::optional<Item> current_item_;
 };

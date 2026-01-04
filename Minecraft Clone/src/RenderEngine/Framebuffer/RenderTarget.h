@@ -33,7 +33,7 @@ class RenderTarget {
 
   void Resize(int width, int height);
 
-  RenderHandle<RenderTargetTexture> GetColorTexture() const;
+  RenderHandle<RenderTargetTexture> GetColorTexture() const noexcept;
 
  private:
   void Create();

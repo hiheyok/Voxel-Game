@@ -49,10 +49,21 @@ void UIRenderer::Clear() {
 }
 
 void UIRenderer::Render() {
+  // Setup GL state for UI rendering
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_CULL_FACE);
+
   UploadToGPU();
   renderer_.GetShader()->BindBufferAsSSBO(handle_ssbo_->GetId(), 0);
   renderer_.Render();
   renderer_.GetShader()->BindBufferAsSSBO(0, 0);
+
+  // Restore GL state
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
+  glDisable(GL_BLEND);
 }
 void UIRenderer::SetVirtualRes(glm::vec2 v_res) { v_res_ = v_res; }
 

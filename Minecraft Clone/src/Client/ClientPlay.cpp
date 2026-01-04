@@ -23,19 +23,21 @@
 #include "RenderEngine/EntityRender/ECSEntityRender.h"
 #include "RenderEngine/EntityRender/MultiEntityRender.h"
 #include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
+#include "RenderEngine/UI/UIManager.h"
 #include "RenderEngine/Window.h"
 
 using std::make_unique;
 using std::to_string;
 
 ClientPlay::ClientPlay(GameContext& context, ServerInterface& interface,
-                       Window* window, PerformanceProfiler* profiler)
+                       Window* window, PerformanceProfiler* profiler,
+                       UIManager& ui_manager)
     : context_{context},
       interface_{interface},
       framebuffer_{make_unique<TexturedFrameBuffer>(context)},
       client_level_{make_unique<ClientLevel>(context)},
       main_player_{
-          make_unique<MainPlayer>(context, window, client_level_->cache_)},
+          make_unique<MainPlayer>(context, client_level_->cache_, ui_manager)},
       debug_screen_{make_unique<DebugScreen>(context)},
       entity_render_{make_unique<MultiEntityRender>(
           context, main_player_->GetPlayerPOV())},
@@ -89,7 +91,6 @@ void ClientPlay::Render(Window* window) {
   framebuffer_->UnbindFBO();
   framebuffer_->Render();
 
-  main_player_->RenderGUIs();
   debug_screen_->Render();
 }
 

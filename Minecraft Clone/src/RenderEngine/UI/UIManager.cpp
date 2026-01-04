@@ -44,3 +44,7 @@ void UIManager::ScreenResChanged(glm::vec2 res) {
     renderer_->SetScreenRes(res);
   }
 }
+
+void UIManager::SetScreenTickCallback(Screen::TickCallback callback) {
+  screen_manager_->SetScreenTickCallback(std::move(callback));
+}

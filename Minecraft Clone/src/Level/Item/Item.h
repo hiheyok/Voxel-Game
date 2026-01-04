@@ -13,12 +13,17 @@ struct ItemProperties {
   BlockID block_ = 0;
   ItemID id_ = 0;
   std::string name_ = "";
+
+  bool operator==(const ItemProperties& other) const noexcept;
 };
 
 class Item {
  public:
   Item();
   ~Item();
+
+  bool operator==(const Item& other) const noexcept;
+
   BlockID GetBlock() const;
   bool CheckIsBlockItem() const;
 

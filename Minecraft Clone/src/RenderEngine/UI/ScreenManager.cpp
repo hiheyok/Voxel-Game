@@ -26,3 +26,9 @@ void ScreenManager::SubmitToRenderer(UIRenderer& ui_renderer) {
 void ScreenManager::ChangeVirtualRes(glm::vec2 v_res) {
   screens_.top()->SetVirtualRes(v_res / ui_scaling_);
 }
+
+void ScreenManager::SetScreenTickCallback(Screen::TickCallback callback) {
+  if (!screens_.empty()) {
+    screens_.top()->SetTickCallback(std::move(callback));
+  }
+}

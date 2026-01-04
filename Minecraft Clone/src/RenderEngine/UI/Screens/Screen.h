@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <functional>
 #include <glm/vec2.hpp>
 #include <memory>
 #include <vector>
@@ -24,8 +25,12 @@ class Screen {
 
   // input event
   void HandleEvent();
+  using TickCallback = std::function<void()>;
+
   // input delta time to update stuff like animation
-  void Update(const std::vector<InputEvent>& events);
+  virtual void Update(const std::vector<InputEvent>& events);
+
+  void SetTickCallback(TickCallback callback);
 
   void SubmitToRenderer(UIRenderer& renderer);
 
@@ -47,4 +52,5 @@ class Screen {
 
   ScreenManager& screen_mgr_;
   std::unique_ptr<Widget> root_widget_;
+  TickCallback tick_callback_;
 };

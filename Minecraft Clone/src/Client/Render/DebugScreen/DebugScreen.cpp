@@ -6,8 +6,8 @@
 
 #include <string>
 
-#include "RenderEngine/GUI/Font.h"
-#include "RenderEngine/GUI/TextRenderer.h"
+#include "RenderEngine/TextRender/Font.h"
+#include "RenderEngine/TextRender/TextRenderer.h"
 #include "Utils/Timer/Timer.h"
 
 DebugScreen::DebugScreen(GameContext& context)

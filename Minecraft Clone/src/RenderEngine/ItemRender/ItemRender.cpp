@@ -1,5 +1,7 @@
 #include "RenderEngine/ItemRender/ItemRender.h"
 
+#include <algorithm>
+
 #include "Assets/AssetManager.h"
 #include "Assets/Types/Models/Data/RenderableModel.h"
 #include "Assets/Types/Models/Managers/BlockModelManager.h"
@@ -12,6 +14,9 @@
 #include "RenderEngine/RenderResources/Types/Texture/TextureAtlas.h"
 
 using std::make_unique;
+
+// Camera position for item rendering (used for sorting)
+static constexpr glm::vec3 kCameraPos{1.1f, 1.1f, 1.1f};
 
 ItemRender::ItemRender(GameContext& context)
     : context_{context},
@@ -51,7 +56,7 @@ void ItemRender::SetUpRenderer() {
   render_->SetDataAttribute(2, 1, GL_FLOAT, 6, 5);
 
   camera_->fov_ = 57;
-  camera_->position_ = {1.1f, 1.1f, 1.1f};
+  camera_->position_ = kCameraPos;
   camera_->pitch_ = -35;
   camera_->yaw_ = -135;
   camera_->UpdateCameraVectors();
@@ -97,7 +102,11 @@ void ItemRender::SetUpData() {
 
 void ItemRender::SetDrawCalls() {
   glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LEQUAL);
   glDepthMask(GL_TRUE);
+  glDisable(GL_CULL_FACE);
 }
 
 void ItemRender::GetVertices(AssetHandle<RenderableModel> model,
@@ -107,10 +116,16 @@ void ItemRender::GetVertices(AssetHandle<RenderableModel> model,
     return;  // Render nothing
   }
 
+  // Collect all faces with their center positions for sorting
+  struct FaceData {
+    VertexFormat v_00, v_01, v_10, v_11;
+    glm::vec3 center;
+    float distance_sq;
+  };
+  std::vector<FaceData> faces;
+
   for (const auto& element : model->GetElements()) {
     for (auto direction : Directions<BlockPos>()) {
-      // TODO(hiheyok): Temp fix
-      if (direction == 1 || direction == 3 || direction == 5) continue;
       if (!element.faces_[direction].has_value()) {
         continue;
       }
@@ -124,22 +139,21 @@ void ItemRender::GetVertices(AssetHandle<RenderableModel> model,
       int u_mask = 1 << axis_u;
       int v_mask = 1 << axis_v;
 
-      VertexFormat v_00, v_01, v_10, v_11;
+      FaceData face_data;
 
-      v_00.pos_ = element.corners_[slice_mask];
-      v_01.pos_ = element.corners_[slice_mask | v_mask];
-      v_10.pos_ = element.corners_[slice_mask | u_mask];
-      v_11.pos_ = element.corners_[slice_mask | v_mask | u_mask];
+      face_data.v_00.pos_ = element.corners_[slice_mask];
+      face_data.v_01.pos_ = element.corners_[slice_mask | v_mask];
+      face_data.v_10.pos_ = element.corners_[slice_mask | u_mask];
+      face_data.v_11.pos_ = element.corners_[slice_mask | v_mask | u_mask];
 
       const baked_model::Face& face = element.faces_[direction].value();
 
-      v_00.uv_ = face.uv_00_;
-      v_01.uv_ = face.uv_01_;
-      v_10.uv_ = face.uv_10_;
-      v_11.uv_ = face.uv_11_;
+      face_data.v_00.uv_ = face.uv_00_;
+      face_data.v_01.uv_ = face.uv_01_;
+      face_data.v_10.uv_ = face.uv_10_;
+      face_data.v_11.uv_ = face.uv_11_;
 
       float light;
-
       if (axis == 0) {
         light = 8.0f;
       } else if (axis == 1) {
@@ -148,17 +162,38 @@ void ItemRender::GetVertices(AssetHandle<RenderableModel> model,
         light = 12.0f;
       }
 
-      v_00.light_ = light;
-      v_01.light_ = light;
-      v_10.light_ = light;
-      v_11.light_ = light;
+      face_data.v_00.light_ = light;
+      face_data.v_01.light_ = light;
+      face_data.v_10.light_ = light;
+      face_data.v_11.light_ = light;
 
-      uint32_t vertex_idx = vertices.size();
+      // Calculate face center for sorting
+      face_data.center = (face_data.v_00.pos_ + face_data.v_01.pos_ +
+                          face_data.v_10.pos_ + face_data.v_11.pos_) *
+                         0.25f;
 
-      vertices.insert(vertices.end(), {v_00, v_01, v_10, v_11});
-      indices.insert(indices.end(),
-                     {vertex_idx + 0, vertex_idx + 1, vertex_idx + 2,
-                      vertex_idx + 2, vertex_idx + 1, vertex_idx + 3});
+      // Distance squared from camera (for sorting back-to-front)
+      glm::vec3 diff = face_data.center - kCameraPos;
+      face_data.distance_sq = glm::dot(diff, diff);
+
+      faces.push_back(face_data);
     }
+  }
+
+  // Sort faces back-to-front (furthest first, closest last)
+  std::sort(faces.begin(), faces.end(),
+            [](const FaceData& a, const FaceData& b) {
+              return a.distance_sq > b.distance_sq;
+            });
+
+  // Build vertex and index buffers in sorted order
+  for (const auto& face_data : faces) {
+    uint32_t vertex_idx = vertices.size();
+
+    vertices.insert(vertices.end(), {face_data.v_00, face_data.v_01,
+                                     face_data.v_10, face_data.v_11});
+    indices.insert(indices.end(),
+                   {vertex_idx + 0, vertex_idx + 1, vertex_idx + 2,
+                    vertex_idx + 2, vertex_idx + 1, vertex_idx + 3});
   }
 }

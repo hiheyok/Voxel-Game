@@ -24,6 +24,7 @@ class ScreenManager {
   void Update(const std::vector<InputEvent>& events);
   void SubmitToRenderer(UIRenderer&);
   void ChangeVirtualRes(glm::vec2 v_res);
+  void SetScreenTickCallback(Screen::TickCallback callback);
 
  private:
   GameContext& context_;

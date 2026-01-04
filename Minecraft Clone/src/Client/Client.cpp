@@ -26,7 +26,7 @@
 #include "Render/WorldRender.h"
 #include "RenderEngine/ChunkRender/TerrainRenderer.h"
 #include "RenderEngine/EntityRender/MultiEntityRender.h"
-#include "RenderEngine/GUI/TextRenderer.h"
+#include "RenderEngine/TextRender/TextRenderer.h"
 #include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
 #include "RenderEngine/UI/UIManager.h"
 #include "Server/Server.h"
@@ -59,16 +59,19 @@ void Client::InitializeServerCom() {
   server_->StartServer(settings);
   player_uuid_ = server_->SetInternalConnection(internal_interface_.get());
   client_play_ = std::make_unique<ClientPlay>(context_, *internal_interface_,
-                                              this, profiler_);
+                                              this, profiler_, *ui_manager_);
 }
 
 void Client::Initialize() {
   context_.InitializeRenderingContext();
   DisableCursor();
-  InitializeServerCom();
+
+  // Create UIManager first so it can be passed to ClientPlay
   ui_manager_ = std::make_unique<UIManager>(context_, inputs_);
   ui_manager_->Initialize();
   ui_manager_->PushScreen("player_hud");
+
+  InitializeServerCom();
 
   /// Initialize game rendering context
 }
@@ -84,7 +87,7 @@ void Client::Cleanup() { server_->Stop(); }
 void Client::Render() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   client_play_->Render(this);
-  // ui_manager_->Render();
+  ui_manager_->Render();
 }
 
 void Client::GameLoop() {
@@ -133,6 +136,7 @@ void Client::Update() {
   }
 
   ui_manager_->ScreenResChanged(inputs_.GetScreenRes());
+  ui_manager_->Update();
 
   client_play_->Update(this);
 

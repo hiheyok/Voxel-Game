@@ -50,7 +50,7 @@ RenderHandle<TextureAtlas> RenderResourceManager::GetAtlas(const string& key) {
 }
 
 ItemIconManager& RenderResourceManager::GetItemIconManager() {
-  return *item_icon_manager_.get();
+  return *item_icon_manager_;
 }
 
 void RenderResourceManager::LoadShaders() {

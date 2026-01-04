@@ -17,7 +17,13 @@ Screen::~Screen() { OnExit(); }
 void Screen::HandleEvent() {
   // Implement later
 }
-void Screen::Update(const std::vector<InputEvent>& events) {}
+void Screen::Update(const std::vector<InputEvent>& events) {
+  if (tick_callback_) tick_callback_();
+}
+
+void Screen::SetTickCallback(TickCallback callback) {
+  tick_callback_ = std::move(callback);
+}
 
 void Screen::SubmitToRenderer(UIRenderer& renderer) {
   GAME_ASSERT(root_widget_, "Root widget is null");

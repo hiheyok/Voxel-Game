@@ -1,13 +1,16 @@
 #include "RenderEngine/UI/Screens/PlayerHud.h"
 
 #include "Core/GameContext/GameContext.h"
+#include "Level/Entity/Mobs/Player.h"
+#include "Level/Item/Item.h"
+#include "Level/Item/ItemStack.h"
 #include "Level/Item/Items.h"
+#include "RenderEngine/FrameBuffer/RenderTargetTexture.h"
+#include "RenderEngine/RenderResources/Manager/ItemIconManager.h"
 #include "RenderEngine/RenderResources/RenderHandle.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
-#include "RenderEngine/RenderResources/Types/Texture/Texture2D.h"
 #include "RenderEngine/RenderResources/Types/Texture/TextureAtlas.h"
 #include "RenderEngine/UI/Components/ColoredComponent.h"
-#include "RenderEngine/UI/Components/Component.h"
 #include "RenderEngine/UI/Components/TextureComponent.h"
 #include "RenderEngine/UI/Widgets/SlotWidget.h"
 #include "RenderEngine/UI/Widgets/Widget.h"
@@ -30,24 +33,88 @@ void PlayerHud::OnEnter() {
   auto hotbar_tex =
       make_unique<TextureComponent>(gui->GetSprite("minecraft:hud/hotbar"));
 
-  auto clr = make_unique<ColoredComponent>(1.0f, 0.0f, 1.0f);
+  auto& manager = context_.render_resource_manager_->GetItemIconManager();
+
+  // auto test_tex = make_unique<TextureComponent>(manager.GetAtlasTexture());
 
   auto hotbar = make_unique<Widget>(context_);
-
-  auto slot = make_unique<SlotWidget>(context_);
-  slot->SetItem(context_.items_->ACACIA_LOG);
-  slot->SetAnchorBoth({0.0f, 0.0f});
-  slot->SetPivot({0.0f, 0.0f});
-  slot->SetOffsetMax({22.0f, 22.0f});
-
   hotbar->SetAnchorBoth({0.5f, 0.0f});
   hotbar->SetOffsetMax({182.0f, 22.0f});
   hotbar->SetPivot({0.5f, 0.0f});
   hotbar->AddComponent(move(hotbar_tex));
 
-  hotbar->AddChildWidget(move(slot));
+  // auto test = make_unique<Widget>(context_);
+  // test->SetAnchorBoth({0.0f, 0.0f});
+  // test->SetPivot({0.0f, 0.0f});
+  // test->SetOffsetMax({100.0f, 100.0f});
+  // test->AddComponent(move(test_tex));
+
+  // Create 9 hotbar slots
+  for (int i = 0; i < kHotbarSlots; i++) {
+    auto slot = make_unique<SlotWidget>(context_);
+    slot->SetAnchorBoth({0.0f, 0.0f});
+    slot->SetPivot({0.0f, 0.0f});
+    slot->SetOffsetMin({3.0f + i * 20.0f, 3.0f});
+    slot->SetOffsetMax({19.0f + i * 20.0f, 19.0f});
+
+    hotbar_slots_[i] = slot.get();
+    hotbar->AddChildWidget(move(slot));
+  }
+
+  // Selection indicator
+  auto selector_tex = make_unique<TextureComponent>(
+      gui->GetSprite("minecraft:hud/hotbar_selection"));
+  auto selector = make_unique<Widget>(context_);
+  selector->SetAnchorBoth({0.0f, 0.0f});
+  selector->SetPivot({0.0f, 0.0f});
+  selector->SetOffsetMin({-1.0f, -1.0f});
+  selector->SetOffsetMax({23.0f, 23.0f});
+  selector->AddComponent(move(selector_tex));
+  selection_indicator_ = selector.get();
+  hotbar->AddChildWidget(move(selector));
+
   root_widget_->AddChildWidget(move(hotbar));
+  // root_widget_->AddChildWidget(move(test));
 }
+
 void PlayerHud::OnPause() {}
 void PlayerHud::OnResume() {}
 void PlayerHud::OnExit() {}
+
+void PlayerHud::Update(const std::vector<InputEvent>& events) {
+  Screen::Update(events);
+
+  if (!context_.main_player_) return;
+
+  auto& inventory = context_.main_player_->entity_inventory_;
+
+  // Update slot contents
+  for (int i = 0; i < kHotbarSlots; i++) {
+    ItemStack item = inventory.GetItem(i);
+    if (item.IsInitialized()) {
+      hotbar_slots_[i]->SetItem(item.item_);
+    }
+  }
+
+  // Update selection indicator position
+  int slot = inventory.right_hand_slot_;
+  if (slot != current_slot_index_) {
+    current_slot_index_ = slot;
+    selection_indicator_->SetOffsetMin({-1.0f + slot * 20.0f, -1.0f});
+    selection_indicator_->SetOffsetMax({23.0f + slot * 20.0f, 23.0f});
+    selection_indicator_->SetDirty();
+  }
+}
+
+void PlayerHud::UpdateSlot(int index, const Item& item) {
+  if (index < 0 || index >= kHotbarSlots) return;
+  hotbar_slots_[index]->SetItem(item);
+}
+
+void PlayerHud::UpdateSelectedSlot(int index) {
+  if (index == current_slot_index_) return;
+  current_slot_index_ = index;
+  selection_indicator_->SetOffsetMin({-1.0f + index * 20.0f, -1.0f});
+  selection_indicator_->SetOffsetMax({23.0f + index * 20.0f, 23.0f});
+  selection_indicator_->SetDirty();
+}

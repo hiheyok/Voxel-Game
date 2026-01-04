@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include "RenderEngine/RenderResources/RenderHandle.h"
+
 class GameContext;
 class Item;
 class DynamicAtlas;
@@ -9,6 +11,7 @@ class TextureSprite;
 class ItemRender;
 class RenderTarget;
 class ResourceLocation;
+class TextureV2;
 
 class ItemIconManager {
  public:
@@ -25,6 +28,8 @@ class ItemIconManager {
 
   // Remove icon if not used
   void RemoveItemIcon(const Item& item);
+
+  RenderHandle<TextureV2> GetAtlasTexture() const noexcept;
 
  private:
   TextureSprite AddItemIcon(const ResourceLocation& location, const Item& item);

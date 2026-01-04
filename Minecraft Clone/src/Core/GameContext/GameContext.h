@@ -12,6 +12,7 @@ class EntitiesList;
 class LogUtils;
 class Options;
 class ItemList;
+class Player;
 class GeneratorType;
 class EventHandler;
 class AssetManager;
@@ -43,4 +44,7 @@ class GameContext {
   // Rendering Context
   std::unique_ptr<ItemTextureAtlas> item_atlas_;
   std::unique_ptr<RenderResourceManager> render_resource_manager_;
+
+  // Set by ClientPlay after MainPlayer is created
+  Player* main_player_ = nullptr;
 };

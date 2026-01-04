@@ -158,9 +158,6 @@ void AssetManager::DiscoverTextures() {
                                "assets/minecraft/textures/font/ascii.png");
   CreateAsset<Texture2DSource>("light_map",
                                "assets/minecraft/textures/colormap/light.png");
-  CreateAsset<Texture2DSource>("widgets",
-                               "assets/minecraft/textures/gui/widgets.png");
-
   CreateAsset<TextureAtlasSource>("blocks",
                                   "assets/minecraft/atlases/blocks.json");
   CreateAsset<TextureAtlasSource>("gui", "assets/minecraft/atlases/gui.json");

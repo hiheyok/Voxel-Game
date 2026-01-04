@@ -32,6 +32,8 @@ class UIManager {
 
   void Update();
 
+  void SetScreenTickCallback(Screen::TickCallback callback);
+
   void ScreenResChanged(glm::vec2 res);
 
  private:

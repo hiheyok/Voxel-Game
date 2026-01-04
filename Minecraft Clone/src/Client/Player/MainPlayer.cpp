@@ -13,88 +13,32 @@
 #include "Core/GameContext/GameContext.h"
 #include "Level/Entity/Mobs/Player.h"
 #include "Level/Entity/Properties/EntityProperties.h"
-#include "Level/Item/ItemTextureAtlas.h"
-#include "RenderEngine/GUI/GUI.h"
-#include "RenderEngine/GUI/GUISet.h"
-#include "RenderEngine/Window.h"
 
-MainPlayer::MainPlayer(GameContext& context, Window* window, ClientCache& cache)
+MainPlayer::MainPlayer(GameContext& context, ClientCache& cache,
+                       UIManager& ui_manager)
     : context_{context},
       player_{std::make_unique<Player>()},
       movement_{std::make_unique<PlayerMovement>()},
       interactions_{std::make_unique<WorldInteraction>(context)},
       player_pov_{std::make_unique<PlayerPOV>()},
-      player_gui_{std::make_unique<GUI>(context, window)},
+      ui_manager_{ui_manager},
       client_cache_{cache} {
-  float ItemViewRelativeSize = 0.85f;
-
-  GUISet hotbar{context};
-  hotbar.SetGUITexture("assets/minecraft/textures/gui/widgets.png");
-  hotbar.AddGUIElement(
-      "Hotbar", "", {9.f * kHotbarSize * 1.0055555555f, kHotbarSize * 1.05f},
-      {0.f, -1.f + kHotbarSize * 0.5f}, {0.5f, 0.5f}, {181.5f, 21.5f});
-
-  hotbar.AddGUIElement("Select", "", {kHotbarSize * 1.1f, kHotbarSize * 1.1f},
-                       {-kHotbarSize * 4.f, -1.f + kHotbarSize * 0.5f},
-                       {0.5f, 22.5f}, {22.5f, 44.5f});
-
-  GUISet itemBar{context};
-  itemBar.SetGUITexture(context_.item_atlas_->Get(),
-                        context_.item_atlas_->GetWidth(),
-                        context_.item_atlas_->GetHeight());
-
-  for (int i = 0; i < kHotbarSlots; i++) {
-    itemBar.AddGUIElementNorm(
-        std::to_string(i), "",
-        {kHotbarSize * ItemViewRelativeSize,
-         kHotbarSize * ItemViewRelativeSize},
-        {kHotbarSize * static_cast<float>(i - 4), -1.0f + kHotbarSize * 0.5f},
-        {0.0f, 0.0f}, {1.0f, 1.0f});
-  }
-
-  gui_index_ = player_gui_->AddGUI("PlayerGUI", std::move(hotbar));
-  item_gui_index_ = player_gui_->AddGUI("Itembar", std::move(itemBar));
+  // Set main player pointer in context for UI access
+  context_.main_player_ = player_.get();
 }
 
-MainPlayer::~MainPlayer() = default;
+MainPlayer::~MainPlayer() {
+  // Clear the context pointer on destruction
+  context_.main_player_ = nullptr;
+}
 
 PlayerPOV* MainPlayer::GetPlayerPOV() { return player_pov_.get(); }
-
-void MainPlayer::RenderGUIs() { player_gui_->Render(); }
-
-void MainPlayer::PrepareGUIs() {
-  size_t currentSlotIndex = player_->entity_inventory_.right_hand_slot_;
-  if (currentSlotIndex != slot_index_) {
-    slot_index_ = currentSlotIndex;
-    player_gui_->EditGUISet(gui_index_)
-        .EditElementPosition("Select",
-                             {kHotbarSize * (static_cast<int>(slot_index_) - 4),
-                              -1.f + kHotbarSize * 0.5f});
-  }
-
-  for (int i = 0; i < kHotbarSlots; i++) {
-    ItemStack item = player_->entity_inventory_.GetItem(i);
-    ItemUVMapping uv =
-        context_.item_atlas_->items_uv_map_[item.item_.properties_.id_];
-
-    if (item.IsInitialized()) {
-      player_gui_->EditGUISet(item_gui_index_)
-          .EditElementUVNorm(std::to_string(i), uv.uv_1_, uv.uv_2_);
-    } else {
-      player_gui_->EditGUISet(item_gui_index_)
-          .EditElementUVNorm(std::to_string(i), {0.0f, 0.0f}, {0.0f, 0.0f});
-    }
-  }
-
-  player_gui_->PrepareRenderer();
-}
 
 void MainPlayer::Update(const InputManager& inputs,
                         ClientActionQueue& action_queue) {
   InventoryUpdate(inputs);
   interactions_->Interact(*player_, inputs, action_queue, client_cache_);
   movement_->Update(*player_, inputs, client_cache_);
-  PrepareGUIs();
 
   player_pov_->SetPosition(player_->properties_.position_);
   player_pov_->SetRotation(player_->properties_.rotation_);

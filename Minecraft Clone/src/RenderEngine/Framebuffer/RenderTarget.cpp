@@ -31,7 +31,16 @@ void RenderTarget::Unbind() {
 }
 
 void RenderTarget::ClearBuffers() {
+  // Save current clear color and set to transparent
+  GLfloat prev_clear_color[4];
+  glGetFloatv(GL_COLOR_CLEAR_VALUE, prev_clear_color);
+  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  // Restore previous clear color
+  glClearColor(prev_clear_color[0], prev_clear_color[1], prev_clear_color[2],
+               prev_clear_color[3]);
 }
 
 void RenderTarget::Resize(int width, int height) {
@@ -48,7 +57,8 @@ void RenderTarget::Resize(int width, int height) {
   clr_texture_ = RenderTargetTexture::CreateColorTexture(*clr_attachment_);
 }
 
-RenderHandle<RenderTargetTexture> RenderTarget::GetColorTexture() const {
+RenderHandle<RenderTargetTexture> RenderTarget::GetColorTexture()
+    const noexcept {
   return RenderHandle<RenderTargetTexture>(clr_texture_.get());
 }
 

@@ -23,6 +23,7 @@ class ECSEntityRender;
 class ClientPacketReceiver;
 class ClientPacketSender;
 class ClientActionQueue;
+class UIManager;
 
 struct WindowProperties;
 struct GLFWwindow;
@@ -30,7 +31,7 @@ struct GLFWwindow;
 class ClientPlay {
  public:
   ClientPlay(GameContext& context, ServerInterface& interface, Window* window,
-             PerformanceProfiler* profiler);
+             PerformanceProfiler* profiler, UIManager& ui_manager);
   ~ClientPlay();
 
   void Update(Window* window);
