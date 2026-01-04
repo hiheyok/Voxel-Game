@@ -38,15 +38,16 @@ class WorldRender : public WorldRenderInfo {
   void LoadChunkToRenderer(ChunkPos chunk);
   void Start(GLFWwindow* window, ClientCache* cache,
              PerformanceProfiler* profiler);
-  void Update(std::vector<ChunkPos> updatedChunks);
+  void Update();
   size_t GetQueuedSize() const noexcept;
+  void LoadChunkMultiToRenderer(const std::vector<ChunkPos>& chunks);
 
   GameContext& context_;
   std::unique_ptr<TerrainRenderer> renderer_;
   PerformanceProfiler* profiler_;
 
+
  private:
-  void LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks);
   std::unique_ptr<Mesh::ChunkVertexData> Worker(ChunkPos pos, int workerId);
 
   using WorkerReturnType = std::invoke_result_t<decltype(&WorldRender::Worker),

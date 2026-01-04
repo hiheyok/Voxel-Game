@@ -50,7 +50,7 @@ void ClientPacketReceiver::ProcessPackets(ServerInterface* server) {
 
   // Apply chunk updates to terrain renderer
   if (!chunks_to_update_.empty()) {
-    terrain_render_.Update(chunks_to_update_);
+    terrain_render_.LoadChunkMultiToRenderer(chunks_to_update_);
   }
 }
 

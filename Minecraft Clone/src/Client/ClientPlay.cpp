@@ -118,6 +118,7 @@ void ClientPlay::Update(Window* window) {
   // Send outgoing packets to server
   packet_sender_->SendPackets(interface_);
 
+  terrain_render_->Update();
   UpdateDebugStats();
 }
 
@@ -125,14 +126,16 @@ void ClientPlay::UpdateDebugStats() {
   ServerStats stats = interface_->GetServerStats();
   glm::vec3 player_pos = main_player_->GetEntityProperties().position_;
   BlockPos block_pos{player_pos.x, player_pos.y, player_pos.z};
+  ChunkPos chunk_pos = block_pos.ToChunkPos();
   BlockPos rel_block_pos = block_pos.GetLocalPos();
   int sky_lvl = -1;
   int block_lvl = -1;
-  if (client_level_->cache_.CheckChunk(block_pos.ToChunkPos())) {
-    sky_lvl = client_level_->cache_.GetChunk(block_pos.ToChunkPos())
-                  .sky_light_->GetLighting(rel_block_pos);
-    block_lvl = client_level_->cache_.GetChunk(block_pos.ToChunkPos())
-                    .block_light_->GetLighting(rel_block_pos);
+  if (client_level_->cache_.CheckChunk(chunk_pos)) {
+    sky_lvl = client_level_->cache_.GetChunk(chunk_pos).sky_light_->GetLighting(
+        rel_block_pos);
+    block_lvl =
+        client_level_->cache_.GetChunk(chunk_pos).block_light_->GetLighting(
+            rel_block_pos);
   }
 
   debug_screen_->EditText(
@@ -150,7 +153,10 @@ void ClientPlay::UpdateDebugStats() {
       "Velocity XYZ: " +
           to_string(main_player_->GetEntityProperties().velocity_.x) + "/" +
           to_string(main_player_->GetEntityProperties().velocity_.y) + "/" +
-          to_string(main_player_->GetEntityProperties().velocity_.z));
+          to_string(main_player_->GetEntityProperties().velocity_.z) +
+          "| Rotation: " +
+          to_string(main_player_->GetEntityProperties().rotation_.x) + "/" +
+          to_string(main_player_->GetEntityProperties().rotation_.y));
   debug_screen_->EditText(
       "Stat4",
       "VRAM Fragmentation Rate: " +
