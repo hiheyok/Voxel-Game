@@ -285,7 +285,10 @@ void ClientPlay::UpdateChunks() {
       }
 
       ChunkPos offset_chunk = chunk_pos + direction;
-      chunk_render_update.insert(offset_chunk);
+      // Only queue for rendering if the neighbor chunk exists
+      if (client_level_->cache_.CheckChunk(offset_chunk)) {
+        chunk_render_update.insert(offset_chunk);
+      }
     }
     chunk_render_update.insert(chunk_pos);
   }

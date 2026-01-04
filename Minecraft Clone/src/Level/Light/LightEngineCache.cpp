@@ -166,6 +166,9 @@ bool LightEngineCache::TryCacheChunk(ChunkPos pos) {
 }
 
 size_t LightEngineCache::CalculateCacheIndex(ChunkPos pos) const noexcept {
+  // Assert that everything is in range
+  GAME_ASSERT(CheckInRange(pos),
+              "ChunkPos is not in range of cache bounderies");
   const int x = center_chunk_.x - pos.x + kCacheRadius;
   const int y = center_chunk_.y - pos.y + kCacheRadius;
   const int z = center_chunk_.z - pos.z + kCacheRadius;
@@ -173,10 +176,20 @@ size_t LightEngineCache::CalculateCacheIndex(ChunkPos pos) const noexcept {
 }
 
 size_t LightEngineCache::CalculateCacheIndex(BlockPos pos) const noexcept {
+  // Assert that everything is in range
+  GAME_ASSERT(CheckInRange(pos.ToChunkPos()),
+              "BlockPos is not in range of cache bounderies");
   const int x = center_chunk_.x - (pos.x >> kChunkDimLog2) + kCacheRadius;
   const int y = center_chunk_.y - (pos.y >> kChunkDimLog2) + kCacheRadius;
   const int z = center_chunk_.z - (pos.z >> kChunkDimLog2) + kCacheRadius;
   return y * kCacheSlice + x * kCacheWidth + z;
+}
+
+bool LightEngineCache::CheckInRange(ChunkPos pos) const noexcept {
+  const int x = center_chunk_.x - pos.x + kCacheRadius;
+  const int z = center_chunk_.z - pos.z + kCacheRadius;
+  return (0 <= x && x < kCacheWidth) && (y_bot <= pos.y && pos.y <= y_top) &&
+         (0 <= z && z < kCacheWidth);
 }
 
 bool LightEngineCache::EnsureLoaded(ChunkPos pos) {

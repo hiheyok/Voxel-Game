@@ -63,7 +63,7 @@ class LightEngineCache {
   // Calculate the index for the chunk the block_pos is in
   size_t CalculateCacheIndex(ChunkPos pos) const noexcept;
   size_t CalculateCacheIndex(BlockPos pos) const noexcept;
-  bool TryCalculateCacheIndex(ChunkPos pos, size_t& idx);
+  bool CheckInRange(ChunkPos pos) const noexcept; 
 
 
   [[nodiscard]] bool EnsureLoaded(ChunkPos pos);

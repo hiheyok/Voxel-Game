@@ -23,9 +23,14 @@ ThreadedLightEngine::ThreadedLightEngine(GameContext& context,
           context.options_->light_engine_threads_, "Lighter",
           std::bind_front(&ThreadedLightEngine::WorkerLighter, this), 250)} {
   for (size_t i = 0; i < context_.options_->light_engine_threads_; ++i) {
-    skylight_engines_.emplace_back(
+    // Separate engines for each pool to avoid racing on SetCache()
+    updater_skylight_engines_.emplace_back(
         std::make_unique<SkyLightEngine>(context_, world_));
-    blocklight_engines_.emplace_back(
+    updater_blocklight_engines_.emplace_back(
+        std::make_unique<BlockLightEngine>(context_, world_));
+    lighter_skylight_engines_.emplace_back(
+        std::make_unique<SkyLightEngine>(context_, world_));
+    lighter_blocklight_engines_.emplace_back(
         std::make_unique<BlockLightEngine>(context_, world_));
   }
 }
@@ -60,8 +65,8 @@ LightEngineStats ThreadedLightEngine::GetStats() const noexcept {
 
 int ThreadedLightEngine::WorkerUpdater(const ChunkLightTask& tasks,
                                        int worker_id) {
-  SkyLightEngine& skylight_engine = *skylight_engines_[worker_id];
-  BlockLightEngine& blocklight_engine = *blocklight_engines_[worker_id];
+  SkyLightEngine& skylight_engine = *updater_skylight_engines_[worker_id];
+  BlockLightEngine& blocklight_engine = *updater_blocklight_engines_[worker_id];
 
   Timer time;
   LightEngineCache cache{context_, world_};
@@ -81,8 +86,8 @@ int ThreadedLightEngine::WorkerUpdater(const ChunkLightTask& tasks,
 }
 
 int ThreadedLightEngine::WorkerLighter(ChunkPos pos, int worker_id) {
-  SkyLightEngine& skylight_engine = *skylight_engines_[worker_id];
-  BlockLightEngine& blocklight_engine = *blocklight_engines_[worker_id];
+  SkyLightEngine& skylight_engine = *lighter_skylight_engines_[worker_id];
+  BlockLightEngine& blocklight_engine = *lighter_blocklight_engines_[worker_id];
 
   Timer time;
   LightEngineCache cache{context_, world_};
