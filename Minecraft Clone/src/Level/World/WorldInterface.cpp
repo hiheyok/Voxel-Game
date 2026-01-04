@@ -20,7 +20,8 @@ BlockID WorldInterface::GetBlock(BlockPos pos) const {
   return chunks_->GetBlock(pos);
 }
 
-Chunk* WorldInterface::GetChunk(ChunkPos pos) const {
+
+Chunk& WorldInterface::GetChunk(ChunkPos pos) const {
   return chunks_->GetChunk(pos);
 }
 

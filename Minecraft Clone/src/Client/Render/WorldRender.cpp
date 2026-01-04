@@ -30,7 +30,7 @@ void WorldRender::Render() {
 }
 
 void WorldRender::LoadChunkToRenderer(ChunkPos chunk) {
-  if (cache_->GetChunk(chunk) != nullptr) {
+  if (cache_->CheckChunk(chunk)) {
     mesh_thread_pool_->SubmitTask(chunk);
   }
 }
@@ -41,13 +41,13 @@ void WorldRender::LoadChunkMultiToRenderer(std::vector<ChunkPos> chunks) {
 
 std::unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(ChunkPos pos,
                                                          int worker_id) {
-  Chunk* chunk = WorldRender::cache_->GetChunk(pos);
+  Chunk& chunk = cache_->GetChunk(pos);
   Mesh::ChunkMeshData& chunk_mesher = *meshers_[worker_id];
   Timer timer;
   chunk_mesher.use_option_ = false;
 
   chunk_mesher.Reset();
-  chunk_mesher.SetChunk(chunk);
+  chunk_mesher.SetChunk(&chunk);
   chunk_mesher.GenerateMesh();
   size_t time = static_cast<size_t>(timer.GetTimePassed_us());
 

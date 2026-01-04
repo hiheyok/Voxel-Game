@@ -14,6 +14,9 @@
 #include "Level/Level.h"
 #include "Level/World/WorldUpdater.h"
 
+using std::vector;
+using std::array;
+
 PacketSender::PacketSender(Level& level, const double& mspt)
     : level_{level}, mspt_{mspt} {}
 
@@ -64,18 +67,17 @@ void PacketSender::SendChunkUpdatePacket(ClientInterface* client) {
       level_.main_world_->world_updater_->GetLightUpdate();
 
   for (const auto& pos : created_chunks) {
-    ChunkContainer* chunk = level_.main_world_->world_->GetChunk(pos);
-    if (chunk == nullptr) continue;  // TODO(hiheyok): Fix this later
-    ChunkRawData data = chunk->GetRawData();
+    ChunkContainer& chunk = level_.main_world_->world_->GetChunk(pos);
+    ChunkRawData data = chunk.GetRawData();
 
     ChunkUpdatePacket::AddChunk packet = {.chunk_ = data};
     client->SendChunkUpdates(packet);
   }
 
   for (const auto& pos : updated_lights) {
-    ChunkContainer* chunk = level_.main_world_->world_->GetChunk(pos);
-    LightStorage sky_light = *chunk->sky_light_.get();
-    LightStorage block_light = *chunk->block_light_.get();
+    ChunkContainer& chunk = level_.main_world_->world_->GetChunk(pos);
+    LightStorage sky_light = *chunk.sky_light_.get();
+    LightStorage block_light = *chunk.block_light_.get();
 
     ChunkUpdatePacket::LightUpdate packet;
     packet.sky_light_ = std::move(sky_light);
@@ -97,7 +99,7 @@ void PacketSender::SendBlockUpdatePacket(ClientInterface* client) {
 
     std::array<BlockID, kChunkSize3D> block_data_ =
         level_.main_world_->world_->GetChunk(chunk_pos)
-            ->GetPalette()
+            .GetPalette()
             .UnpackAll();
 
     for (int i = 0; i < num_updates; ++i) {

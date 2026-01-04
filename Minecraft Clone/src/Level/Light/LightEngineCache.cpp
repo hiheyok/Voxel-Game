@@ -152,12 +152,12 @@ bool LightEngineCache::TryCacheChunk(ChunkPos pos) {
     return false;
   }
 
-  Chunk* chunk = world_.GetChunk(pos);
-  LightStorage* sky_light = chunk->sky_light_.get();
-  LightStorage* block_light = chunk->block_light_.get();
+  Chunk& chunk = world_.GetChunk(pos);
+  LightStorage* sky_light = chunk.sky_light_.get();
+  LightStorage* block_light = chunk.block_light_.get();
 
   SetSkyLightCache(pos, sky_light);
-  SetBlockCache(pos, chunk);
+  SetBlockCache(pos, &chunk);
 
   if (y_top - pos.y < kCacheWidth) {
     SetBlockLightCache(pos, block_light);

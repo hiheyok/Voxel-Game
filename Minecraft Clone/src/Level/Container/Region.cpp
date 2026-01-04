@@ -16,10 +16,10 @@ Region::Region(GameContext& context)
 
 Region::~Region() = default;
 
-Chunk* Region::GetChunk(ChunkPos pos) const noexcept {
+Chunk& Region::GetChunk(ChunkPos pos) const noexcept {
   int idx = pos.GetIndex();
   GAME_ASSERT(CheckChunk(pos), "Chunk not in region");
-  return region_data_[idx].get();
+  return *region_data_[idx];
 }
 
 bool Region::CheckChunk(ChunkPos pos) const noexcept {

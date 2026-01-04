@@ -29,7 +29,7 @@ class ChunkMap {
   bool CheckChunk(ChunkPos pos) const;
   void InsertChunk(std::unique_ptr<Chunk> chunk);
   void EraseChunk(ChunkPos pos);
-  Chunk* GetChunk(ChunkPos pos) const;
+  Chunk& GetChunk(ChunkPos pos) const;
   std::vector<Chunk*> GetAllChunks() const;
 
  private:

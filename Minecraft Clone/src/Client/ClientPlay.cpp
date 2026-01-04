@@ -144,9 +144,9 @@ void ClientPlay::UpdateDebugStats() {
   int block_lvl = -1;
   if (client_level_->cache_.CheckChunk(block_pos.ToChunkPos())) {
     sky_lvl = client_level_->cache_.GetChunk(block_pos.ToChunkPos())
-                  ->sky_light_->GetLighting(rel_block_pos);
+                  .sky_light_->GetLighting(rel_block_pos);
     block_lvl = client_level_->cache_.GetChunk(block_pos.ToChunkPos())
-                    ->block_light_->GetLighting(rel_block_pos);
+                    .block_light_->GetLighting(rel_block_pos);
   }
 
   debug_screen_->EditText(
@@ -254,8 +254,8 @@ void ClientPlay::UpdateChunks() {
     const ChunkRawData& data = chunk.chunk_;
     chunk_render_update.insert(data.pos_);
     if (client_level_->cache_.CheckChunk(data.pos_)) {
-      ChunkContainer* c = client_level_->cache_.GetChunk(data.pos_);
-      c->SetData(data);
+      ChunkContainer& c = client_level_->cache_.GetChunk(data.pos_);
+      c.SetData(data);
     } else {
       std::unique_ptr<Chunk> newChunk = std::make_unique<Chunk>(context_, data);
       client_level_->cache_.AddChunk(std::move(newChunk));
@@ -265,11 +265,11 @@ void ClientPlay::UpdateChunks() {
   for (const auto& block_update : block_updates) {
     // Additional stuff to make sure the chunks get updates
     ChunkPos chunk_pos = block_update.chunk_pos_;
-    ChunkContainer* chunk = client_level_->cache_.GetChunk(chunk_pos);
+    ChunkContainer& chunk = client_level_->cache_.GetChunk(chunk_pos);
     bool neighbor_update[6] = {};
 
     for (auto [block_pos, block] : block_update.updates_) {
-      chunk->SetBlockUnsafe(block, block_pos);
+      chunk.SetBlockUnsafe(block, block_pos);
       // Check if the block update is next to chunk border
       if (block_pos.x == kChunkDim - 1) neighbor_update[0] = true;
       if (block_pos.x == 0) neighbor_update[1] = true;
@@ -302,11 +302,11 @@ void ClientPlay::UpdateChunks() {
       LOG_WARN("Chunk doens't exist!");
     }
 
-    Chunk* chunk = client_level_->cache_.GetChunk(sky_light.position_);
+    Chunk& chunk = client_level_->cache_.GetChunk(sky_light.position_);
 
-    *chunk->sky_light_ = sky_light;
-    *chunk->block_light_ = block_light;
-    chunk_render_update.insert(chunk->position_);
+    *chunk.sky_light_ = sky_light;
+    *chunk.block_light_ = block_light;
+    chunk_render_update.insert(chunk.position_);
   }
 
   std::vector<ChunkPos> to_update(chunk_render_update.begin(),

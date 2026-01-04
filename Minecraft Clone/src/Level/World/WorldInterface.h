@@ -25,7 +25,7 @@ class WorldInterface {
 
   BlockID GetBlock(BlockPos pos) const;
   Entity* GetEntity(EntityUUID) const;
-  Chunk* GetChunk(ChunkPos ID) const;
+  Chunk& GetChunk(ChunkPos ID) const;
   bool CheckChunk(ChunkPos ID) const;
   std::vector<Chunk*> GetAllChunks() const;
 

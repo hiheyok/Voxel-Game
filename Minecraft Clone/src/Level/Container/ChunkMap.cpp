@@ -31,7 +31,7 @@ void ChunkMap::EraseChunk(ChunkPos pos) {
     ChunkPos neighborPos = pos + offset;
 
     if (CheckChunk(neighborPos)) {
-      GetChunk(neighborPos)->SetNeighbor(nullptr, !offset);
+      GetChunk(neighborPos).SetNeighbor(nullptr, !offset);
     }
   }
 
@@ -45,7 +45,7 @@ void ChunkMap::EraseChunk(ChunkPos pos) {
   chunks_.pop_back();
 
   auto bottom_chunk =
-      reg->GetChunk(pos)->GetNeighbor(Directions<ChunkPos>::kDown);
+      reg->GetChunk(pos).GetNeighbor(Directions<ChunkPos>::kDown);
 
   reg->EraseChunk(pos);
 
@@ -66,15 +66,13 @@ bool ChunkMap::SetBlock(BlockID block, BlockPos pos) {
 
   Region* reg = GetRegionUncheck(reg_pos);
   if (reg == nullptr) return false;
-
-  Chunk* chunk = reg->GetChunk(chunk_pos);
-
-  if (chunk != nullptr) {
-    chunk->SetBlockUnsafe(block, local_pos);
-    chunk->is_empty_ = false;
+  if (reg->CheckChunk(chunk_pos)) {
+    Chunk& chunk = reg->GetChunk(chunk_pos);
+    chunk.SetBlockUnsafe(block, local_pos);
+    chunk.is_empty_ = false;
 
     if (heightmap_update_) {
-      chunk->UpdateHeightMap(local_pos.x, local_pos.z);
+      chunk.UpdateHeightMap(local_pos.x, local_pos.z);
     }
 
     return true;
@@ -95,9 +93,7 @@ BlockID ChunkMap::GetBlock(BlockPos pos) const {
     return context_.blocks_->AIR;
   }
 
-  Chunk* chunk = reg->GetChunk(chunk_pos);
-
-  return chunk->GetBlock(local_block_pos);
+  return reg->GetChunk(chunk_pos).GetBlock(local_block_pos);
 }
 
 bool ChunkMap::CheckChunk(ChunkPos pos) const {
@@ -107,11 +103,10 @@ bool ChunkMap::CheckChunk(ChunkPos pos) const {
   return reg->CheckChunk(pos);
 }
 
-Chunk* ChunkMap::GetChunk(ChunkPos pos) const {
+Chunk& ChunkMap::GetChunk(ChunkPos pos) const {
   RegionPos reg_pos = pos.ToRegionPos();
   Region* reg = GetRegionUncheck(reg_pos);
-  if (reg == nullptr) return nullptr;
-
+  GAME_ASSERT(reg != nullptr, "Chunk not in map");
   return reg->GetChunk(pos);
 }
 
@@ -131,12 +126,10 @@ void ChunkMap::InsertChunk(std::unique_ptr<Chunk> chunk) {
     ChunkPos neigh_pos = chunk->position_ + offset;
 
     if (CheckChunk(neigh_pos)) {
-      chunk->SetNeighbor(static_cast<ChunkContainer*>(GetChunk(neigh_pos)),
-                         offset);
-      GetChunk(neigh_pos)->SetNeighbor(
-          static_cast<ChunkContainer*>(chunk.get()), !offset);
+      chunk->SetNeighbor(&GetChunk(neigh_pos), offset);
+      GetChunk(neigh_pos).SetNeighbor(chunk.get(), !offset);
       if (neighbor_update_) {
-        GetChunk(neigh_pos)->UpdateGen();
+        GetChunk(neigh_pos).UpdateGen();
       }
     }
   }
@@ -153,10 +146,10 @@ void ChunkMap::InsertChunk(std::unique_ptr<Chunk> chunk) {
     reg->InsertChunk(std::move(chunk));
   }
 
-  Chunk* chunkPtr = reg->GetChunk(pos);
+  Chunk& chunkRef = reg->GetChunk(pos);
 
   if (heightmap_update_) {
-    chunkPtr->UpdateHeightMap();
+    chunkRef.UpdateHeightMap();
   }
 }
 
