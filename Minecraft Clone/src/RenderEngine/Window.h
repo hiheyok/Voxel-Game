@@ -40,7 +40,7 @@ class Window {
   void DisableCursor();
   void EnableCursor();
 
-  void UpdateWindowName(std::string name);
+  void UpdateWindowName(const std::string& name);
 
   void MousePositionCallback(GLFWwindow* win, double x_pos, double y_pos);
   void MouseButtonCallback(GLFWwindow* win, int button, int action, int mods);

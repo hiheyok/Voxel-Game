@@ -31,7 +31,7 @@ Options::Options(GameContext& context) : context_{context} {
   ProcessTokens(tokens);
 }
 
-bool Options::SetValue(string name, string value) {
+bool Options::SetValue(const string& name, const string& value) {
   size_t val = stoll(value);
 
   if (!option_name_.count(name)) {
@@ -43,7 +43,7 @@ bool Options::SetValue(string name, string value) {
   return true;
 }
 
-void Options::ProcessTokens(vector<string> tokens) {
+void Options::ProcessTokens(const vector<string>& tokens) {
   bool success = true;
 
   for (size_t i = 0; i < tokens.size() / 2; i++) {

@@ -21,7 +21,7 @@ const BlockModelManager::ModelList& BlockModelManager::GetModels()
 }
 
 void BlockModelManager::Load() {
-  vector<Block*> blocks = context_.blocks_->block_type_data_;
+  const vector<Block*>& blocks = context_.blocks_->block_type_data_;
   models_.reserve(blocks.size());
 
   for (int i = 0; i < blocks.size(); ++i) {

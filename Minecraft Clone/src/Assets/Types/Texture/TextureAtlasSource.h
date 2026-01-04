@@ -44,10 +44,10 @@ class TextureAtlasSource : public Texture2DBaseSource {
   };
 
   std::vector<SpritePath> GetPathList() const;
-  void ParseTypeDirectory(std::vector<SpritePath>&, std::string source,
-                          std::string prefix) const;
-  void ParseTypeSingle(std::vector<SpritePath>&, std::string resource,
-                       std::string sprite) const;
+  void ParseTypeDirectory(std::vector<SpritePath>&, const std::string& source,
+                          const std::string& prefix) const;
+  void ParseTypeSingle(std::vector<SpritePath>&, const std::string& resource,
+                       const std::string& sprite) const;
 
   void Stitch();
   void StitchTexture(const SpriteData& data);

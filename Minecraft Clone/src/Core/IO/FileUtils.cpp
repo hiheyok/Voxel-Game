@@ -13,7 +13,7 @@ using std::string;
 using std::vector;
 
 vector<char> FileUtils::ReadFileToBuffer(GameContext& context,
-                                         string filepath) {
+                                         const string& filepath) {
   try {
     // Open the file at the end to easily get its size.
     std::ifstream file(filepath, std::ios::binary | std::ios::ate);

@@ -22,9 +22,9 @@ class Options {
   size_t light_engine_threads_ = 2;
 
  private:
-  bool SetValue(std::string name, std::string value);
+  bool SetValue(const std::string& name, const std::string& value);
 
-  void ProcessTokens(std::vector<std::string> tokens);
+  void ProcessTokens(const std::vector<std::string>& tokens);
 
   void SetOptionNameTable();
 

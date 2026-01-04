@@ -135,7 +135,7 @@ void Window::MousePositionCallback(GLFWwindow* win, double x_pos,
   inputs_.UpdateMouse(static_cast<float>(x_pos), static_cast<float>(y_pos));
 }
 
-void Window::UpdateWindowName(string name) {
+void Window::UpdateWindowName(const string& name) {
   glfwSetWindowTitle(win_, name.c_str());
 }
 

@@ -251,7 +251,7 @@ ShaderInterface& ShaderInterface::BindTexture(GLuint index,
   return *this;
 }
 
-GLint ShaderInterface::GetUniformLocation(string name) {
+GLint ShaderInterface::GetUniformLocation(const string& name) {
   if (cache_.count(name)) {
     return cache_[name];
   } else {
@@ -261,7 +261,7 @@ GLint ShaderInterface::GetUniformLocation(string name) {
   }
 }
 
-GLuint ShaderInterface::CompileShader(string source, string type,
+GLuint ShaderInterface::CompileShader(const string& source, const string& type,
                                       GLuint shaderType) {
   GLuint shader = glCreateShader(shaderType);
   const char* src = source.c_str();
@@ -273,7 +273,7 @@ GLuint ShaderInterface::CompileShader(string source, string type,
   return shader;
 }
 
-void ShaderInterface::CheckCompileErrors(GLuint shader, string type) {
+void ShaderInterface::CheckCompileErrors(GLuint shader, const string& type) {
   GLint success;
   GLchar log[2048];
   if (type != "PROGRAM") {

@@ -95,7 +95,8 @@ class ShaderInterface : public RenderResource {
   FastHashMap<std::string, glm::mat3> cache_mat3_;
   FastHashMap<std::string, glm::mat4> cache_mat4_;
 
-  GLint GetUniformLocation(std::string name);
-  void CheckCompileErrors(GLuint shader, std::string type);
-  GLuint CompileShader(std::string source, std::string type, GLuint shaderType);
+  GLint GetUniformLocation(const std::string& name);
+  void CheckCompileErrors(GLuint shader, const std::string& type);
+  GLuint CompileShader(const std::string& source, const std::string& type,
+                       GLuint shaderType);
 };

@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-std::vector<std::string> Tokenize(std::string str, char divider);
+std::vector<std::string> Tokenize(const std::string& str, char divider);
 
 class File {
  public:
@@ -11,9 +11,9 @@ class File {
   std::string dir_ = "";
 
   File();
-  File(std::string dir);
+  File(const std::string& dir);
 
-  void Open(std::string dir);
+  void Open(const std::string& dir);
 
   void Close();
 
@@ -22,16 +22,18 @@ class File {
 
 class FileManager {
  public:
-  static bool CheckFolder(std::string dir);
+  static bool CheckFolder(const std::string& dir);
 
-  static bool CreateFolder(std::string name);
+  static bool CreateFolder(const std::string& name);
 
   // Return true of file exist and false if it doesn't
-  static bool CheckFile(std::string dir);
+  static bool CheckFile(const std::string& dir);
 
-  static void CreateFile(std::string name, std::string dir = "N/A");
+  static void CreateFile(const std::string& name,
+                         const std::string& dir = "N/A");
 
-  static File GetFile(std::string name, std::string dir = "N/A");
+  static File GetFile(const std::string& name, const std::string& dir = "N/A");
 
-  static void DeleteFile(std::string name, std::string dir = "N/A");
+  static void DeleteFile(const std::string& name,
+                         const std::string& dir = "N/A");
 };

@@ -23,7 +23,7 @@ EntitiesList::EntitiesList(GameContext& context)
     : context_{context},
       entity_type_list_(static_cast<int>(EntityType::kMaxVal), nullptr) {}
 
-EntityType EntitiesList::RegisterEntity(string entity_name,
+EntityType EntitiesList::RegisterEntity(const string& entity_name,
                                         EntityTypeEnums type,
                                         EntityType entity_type) {
   EntityTypeData* new_entity = nullptr;

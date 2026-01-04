@@ -16,7 +16,8 @@ using std::unique_ptr;
 using std::vector;
 
 ShaderSource::ShaderSource(GameContext& context, const string& asset_key,
-                           string vertex, string fragment, string geometry)
+                           const string& vertex, const string& fragment,
+                           const string& geometry)
     : Asset{asset_key},
       context_{context},
       type_{ShaderType::kShader},
@@ -25,7 +26,7 @@ ShaderSource::ShaderSource(GameContext& context, const string& asset_key,
       geo_path_{geometry} {}
 
 ShaderSource::ShaderSource(GameContext& context, const string& asset_key,
-                           string compute)
+                           const string& compute)
     : Asset{asset_key},
       context_{context},
       type_{ShaderType::kCompute},
@@ -33,16 +34,16 @@ ShaderSource::ShaderSource(GameContext& context, const string& asset_key,
 
 unique_ptr<ShaderSource> ShaderSource::CreateShader(GameContext& context,
                                                     const string& asset_key,
-                                                    string vertex,
-                                                    string fragment,
-                                                    string geometry) {
+                                                    const string& vertex,
+                                                    const string& fragment,
+                                                    const string& geometry) {
   LOG_STATIC_DEBUG(context.logger_, "Loaded graphics shader: {}", asset_key);
   return make_unique<ShaderSource>(context, asset_key, vertex, fragment,
                                    geometry);
 }
 
 unique_ptr<ShaderSource> ShaderSource::CreateComputeShader(
-    GameContext& context, const string& asset_key, string compute) {
+    GameContext& context, const string& asset_key, const string& compute) {
   LOG_STATIC_DEBUG(context.logger_, "Loaded compute shader: {}", asset_key);
   return make_unique<ShaderSource>(context, asset_key, compute);
 }

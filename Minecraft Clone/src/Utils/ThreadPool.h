@@ -19,7 +19,7 @@
 template <class TaskIn, class TaskOut>
 class ThreadPool {
  public:
-  ThreadPool(size_t threads, std::string type,
+  ThreadPool(size_t threads, const std::string& type,
              std::function<TaskOut(TaskIn, int)> taskfunc,
              size_t batchSize = SIZE_MAX);
   ~ThreadPool();
@@ -74,7 +74,7 @@ class ThreadPool {
 
 template <class TaskIn, class TaskOut>
 inline ThreadPool<TaskIn, TaskOut>::ThreadPool(
-    size_t threads, std::string type,
+    size_t threads, const std::string& type,
     std::function<TaskOut(TaskIn, int)> taskFunc, size_t batchSize)
     : worker_cv_{threads},
       worker_locks_{threads},

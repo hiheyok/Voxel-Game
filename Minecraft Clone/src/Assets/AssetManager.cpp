@@ -33,7 +33,7 @@ AssetManager::AssetManager(GameContext& context)
       block_models_{make_unique<BlockModelManager>(context)} {}
 AssetManager::~AssetManager() = default;
 
-AssetHandle<ShaderSource> AssetManager::GetShaderSource(string key) {
+AssetHandle<ShaderSource> AssetManager::GetShaderSource(const string& key) {
   return GetAsset<ShaderSource>(key);
 }
 
@@ -41,7 +41,8 @@ vector<AssetHandle<ShaderSource>> AssetManager::GetAllShaderSource() {
   return GetAllAsset<ShaderSource>();
 }
 
-AssetHandle<Texture2DSource> AssetManager::GetTexture2DSource(string key) {
+AssetHandle<Texture2DSource> AssetManager::GetTexture2DSource(
+    const string& key) {
   return GetAsset<Texture2DSource>(key);
 }
 
@@ -49,7 +50,8 @@ vector<AssetHandle<Texture2DSource>> AssetManager::GetAllTexture2DSource() {
   return GetAllAsset<Texture2DSource>();
 }
 
-AssetHandle<TextureAtlasSource> AssetManager::GetAtlasSource(string key) {
+AssetHandle<TextureAtlasSource> AssetManager::GetAtlasSource(
+    const string& key) {
   return GetAsset<TextureAtlasSource>(key);
 }
 
@@ -57,7 +59,7 @@ vector<AssetHandle<TextureAtlasSource>> AssetManager::GetAllAtlasSource() {
   return GetAllAsset<TextureAtlasSource>();
 }
 
-AssetHandle<EntityModel> AssetManager::GetEntityModel(string key) {
+AssetHandle<EntityModel> AssetManager::GetEntityModel(const string& key) {
   return GetAsset<EntityModel>(key);
 }
 

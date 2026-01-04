@@ -14,16 +14,16 @@ class PerformanceProfiler {
 
   void ProfileStart(uint64_t hash);
 
-  void ProfileStart(std::string path);
+  void ProfileStart(const std::string& path);
 
   void ProfileStop(uint64_t hash);
 
-  void ProfileStop(std::string path);
+  void ProfileStop(const std::string& path);
 
   // TOOD: Fix me
-  void RegisterPaths(std::string path);
+  void RegisterPaths(const std::string& path);
 
-  uint64_t Hasher(std::string path);
+  uint64_t Hasher(const std::string& path);
 
   void LoadCache();
 
@@ -44,7 +44,7 @@ class PerformanceProfiler {
 
   struct PerformanceTree {
     PerformanceTree();
-    explicit PerformanceTree(std::string name);
+    explicit PerformanceTree(const std::string& name);
 
     void ChangeTime(std::vector<std::string>& path, int depth, double time);
 

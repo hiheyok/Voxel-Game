@@ -12,7 +12,7 @@
 using std::string;
 using std::vector;
 
-vector<string> Tokenize(string str, char divider) {
+vector<string> Tokenize(const string& str, char divider) {
   vector<string> tokens = {};
   size_t l = 0, r = 0;
   while (r < str.size()) {
@@ -29,9 +29,9 @@ vector<string> Tokenize(string str, char divider) {
 
 File::File() = default;
 
-File::File(string dir) { Open(dir); }
+File::File(const string& dir) { Open(dir); }
 
-void File::Open(string dir) {
+void File::Open(const string& dir) {
   dir_ = dir;
   file_.open(dir_);
 }
@@ -53,7 +53,7 @@ vector<string> File::GetToken(char divider) {
   return tokens;
 }
 
-bool FileManager::CheckFolder(string dir) {
+bool FileManager::CheckFolder(const string& dir) {
   std::filesystem::path p = dir;
 
   std::error_code ec;  // To capture potential errors (optional)
@@ -62,7 +62,7 @@ bool FileManager::CheckFolder(string dir) {
   return result && !ec;
 }
 
-bool FileManager::CreateFolder(string name) {
+bool FileManager::CreateFolder(const string& name) {
   if (CheckFolder(name)) {
     return false;  // Already exist
   }
@@ -71,9 +71,11 @@ bool FileManager::CreateFolder(string name) {
 }
 
 // Return true of file exist and false if it doesn't
-bool FileManager::CheckFile(string dir) { return std::filesystem::exists(dir); }
+bool FileManager::CheckFile(const string& dir) {
+  return std::filesystem::exists(dir);
+}
 
-void FileManager::CreateFile(string name, string dir) {
+void FileManager::CreateFile(const string& name, const string& dir) {
   string d = "";
 
   if (dir == "N/A")
@@ -84,7 +86,7 @@ void FileManager::CreateFile(string name, string dir) {
   file.close();
 }
 
-File FileManager::GetFile(string name, string dir) {
+File FileManager::GetFile(const string& name, const string& dir) {
   string d = "";
 
   if (dir == "N/A")
@@ -95,7 +97,7 @@ File FileManager::GetFile(string name, string dir) {
   return File(d);
 }
 
-void FileManager::DeleteFile(string name, string dir) {
+void FileManager::DeleteFile(const string& name, const string& dir) {
   string d = "";
 
   if (dir == "N/A")

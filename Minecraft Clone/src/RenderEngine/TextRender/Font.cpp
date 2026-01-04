@@ -215,7 +215,7 @@ void RenderableFont::SetBackgroundPadding(float H, float W) {
   background_width_padding_ = W;
 }
 
-void RenderableFont::SetText(string str) { render_text_ = str; }
+void RenderableFont::SetText(const string& str) { render_text_ = str; }
 
 void RenderableFont::AddBackground(glm::vec3 color,
                                    float alpha) {  // add background

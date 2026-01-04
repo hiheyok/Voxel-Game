@@ -24,16 +24,16 @@ class AssetManager {
   explicit AssetManager(GameContext&);
   ~AssetManager();
 
-  AssetHandle<ShaderSource> GetShaderSource(std::string key);
+  AssetHandle<ShaderSource> GetShaderSource(const std::string& key);
   std::vector<AssetHandle<ShaderSource>> GetAllShaderSource();
 
-  AssetHandle<Texture2DSource> GetTexture2DSource(std::string key);
+  AssetHandle<Texture2DSource> GetTexture2DSource(const std::string& key);
   std::vector<AssetHandle<Texture2DSource>> GetAllTexture2DSource();
 
-  AssetHandle<TextureAtlasSource> GetAtlasSource(std::string key);
+  AssetHandle<TextureAtlasSource> GetAtlasSource(const std::string& key);
   std::vector<AssetHandle<TextureAtlasSource>> GetAllAtlasSource();
 
-  AssetHandle<EntityModel> GetEntityModel(std::string key);
+  AssetHandle<EntityModel> GetEntityModel(const std::string& key);
 
   const BlockModelManager& GetBlockModelManager() const;
 

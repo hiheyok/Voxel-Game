@@ -19,8 +19,8 @@ class EntitiesList {
 
   void InitializeModels();
   void Initialize();
-  EntityType RegisterEntity(std::string entityName, EntityTypeEnums type,
-                            EntityType entity_type);
+  EntityType RegisterEntity(const std::string& entity_name,
+                            EntityTypeEnums type, EntityType entity_type);
   EntityTypeData* GetEntity(EntityType id);
 
   GameContext& context_;

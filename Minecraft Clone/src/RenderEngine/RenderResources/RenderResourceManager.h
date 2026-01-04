@@ -45,13 +45,13 @@ class RenderResourceManager {
   void FindTextures();
 
   template <IsResource ResourceType, typename... Args>
-  void CreateResource(std::string key, Args&&... args);
+  void CreateResource(const std::string& key, Args&&... args);
 
   template <IsResource ResourceType>
-  void PutResource(std::string key, std::unique_ptr<ResourceType> asset);
+  void PutResource(const std::string& key, std::unique_ptr<ResourceType> asset);
 
   template <IsResource ResourceType>
-  RenderHandle<ResourceType> GetResource(std::string key);
+  RenderHandle<ResourceType> GetResource(const std::string& key);
 
   template <IsResource ResourceType>
   FastHashMap<std::string, std::unique_ptr<ResourceType>>& GetCache() noexcept;
@@ -87,7 +87,8 @@ RenderResourceManager::GetCache() noexcept {
 }
 
 template <IsResource ResourceType, typename... Args>
-void RenderResourceManager::CreateResource(std::string key, Args&&... args) {
+void RenderResourceManager::CreateResource(const std::string& key,
+                                           Args&&... args) {
   auto& cache = GetCache<ResourceType>();
   auto obj = std::make_unique<ResourceType>(context_, key,
                                             std::forward<Args>(args)...);
@@ -95,14 +96,15 @@ void RenderResourceManager::CreateResource(std::string key, Args&&... args) {
 }
 
 template <IsResource ResourceType>
-void RenderResourceManager::PutResource(std::string key,
+void RenderResourceManager::PutResource(const std::string& key,
                                         std::unique_ptr<ResourceType> asset) {
   auto& cache = GetCache<ResourceType>();
   cache.emplace(key, std::move(asset));
 }
 
 template <IsResource ResourceType>
-RenderHandle<ResourceType> RenderResourceManager::GetResource(std::string key) {
+RenderHandle<ResourceType> RenderResourceManager::GetResource(
+    const std::string& key) {
   auto& cache = GetCache<ResourceType>();
   auto it = cache.find(key);
 

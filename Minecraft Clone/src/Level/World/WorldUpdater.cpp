@@ -280,7 +280,7 @@ void WorldUpdater::SetChunk(unique_ptr<Chunk> chunk) {
   SetChunk(move(arr));
 }
 
-void WorldUpdater::SetChunk(vector<unique_ptr<Chunk>> chunks) {
+void WorldUpdater::SetChunk(vector<unique_ptr<Chunk>>&& chunks) {
   vector<ChunkPos> updated_pos;
   updated_pos.reserve(chunks.size());
 

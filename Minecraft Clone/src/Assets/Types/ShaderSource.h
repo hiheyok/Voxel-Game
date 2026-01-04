@@ -11,18 +11,20 @@ class ShaderSource : public Asset {
   enum class ShaderType { kShader, kCompute };
 
   explicit ShaderSource(GameContext& context, const std::string& asset_key,
-                        std::string vertex, std::string fragment,
-                        std::string geometry = "");
+                        const std::string& vertex, const std::string& fragment,
+                        const std::string& geometry = "");
 
   explicit ShaderSource(GameContext& context, const std::string& asset_key,
-                        std::string compute);
+                        const std::string& compute);
 
   static std::unique_ptr<ShaderSource> CreateShader(
-      GameContext& context, const std::string& asset_key, std::string vertex,
-      std::string fragment, std::string geometry = "");
+      GameContext& context, const std::string& asset_key,
+      const std::string& vertex, const std::string& fragment,
+      const std::string& geometry = "");
 
   static std::unique_ptr<ShaderSource> CreateComputeShader(
-      GameContext& context, const std::string& asset_key, std::string compute);
+      GameContext& context, const std::string& asset_key,
+      const std::string& compute);
 
   ShaderSource();
 

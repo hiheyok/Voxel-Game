@@ -29,7 +29,7 @@ void PerformanceProfiler::ProfileStart(uint64_t hash) {
       (high_resolution_clock::now() - initial_time_).count();
 }
 
-void PerformanceProfiler::ProfileStart(string path) {
+void PerformanceProfiler::ProfileStart(const string& path) {
   uint64_t hash = Hasher(path);
   if (!string_hash_container_.count(hash)) {
     RegisterPaths(path);
@@ -46,7 +46,7 @@ void PerformanceProfiler::ProfileStop(uint64_t hash) {
   timer_stack_.pop();
 }
 
-void PerformanceProfiler::ProfileStop(string path) {
+void PerformanceProfiler::ProfileStop(const string& path) {
   uint64_t hash = Hasher(path);
   uint64_t timePass = (high_resolution_clock::now() - initial_time_).count() -
                       timer_stack_.top().second;
@@ -56,7 +56,7 @@ void PerformanceProfiler::ProfileStop(string path) {
 }
 
 // TOOD: Fix me
-void PerformanceProfiler::RegisterPaths(string path) {
+void PerformanceProfiler::RegisterPaths(const string& path) {
   string_hash_container_[Hasher(path)] = path;
   vector<string> tokens = Tokenize(path, '/');
   vector<string> pathTokens = {};
@@ -68,7 +68,7 @@ void PerformanceProfiler::RegisterPaths(string path) {
   string_tokenized_hash_container_[Hasher(path)] = pathTokens;
 }
 
-uint64_t PerformanceProfiler::Hasher(string path) {
+uint64_t PerformanceProfiler::Hasher(const string& path) {
   return std::hash<string>{}(path);
 }
 
@@ -117,7 +117,7 @@ void PerformanceProfiler::CombineCache(PerformanceProfiler profiler) {
 }
 
 PerformanceProfiler::PerformanceTree::PerformanceTree() = default;
-PerformanceProfiler::PerformanceTree::PerformanceTree(string name)
+PerformanceProfiler::PerformanceTree::PerformanceTree(const string& name)
     : name_(name) {}
 
 void PerformanceProfiler::PerformanceTree::ChangeTime(vector<string>& path,

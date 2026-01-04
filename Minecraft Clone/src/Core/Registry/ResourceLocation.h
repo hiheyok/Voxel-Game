@@ -9,7 +9,7 @@
 class ResourceLocation {
  public:
   ResourceLocation();
-  ResourceLocation(std::string location, std::string prefix = "");
+  ResourceLocation(const std::string& location, const std::string& prefix = "");
   ~ResourceLocation();
   ResourceLocation(ResourceLocation&&) noexcept;
   ResourceLocation(const ResourceLocation&);

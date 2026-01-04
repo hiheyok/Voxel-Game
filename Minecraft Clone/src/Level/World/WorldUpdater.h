@@ -41,7 +41,7 @@ class WorldUpdater {
 
   // Setters
   void SetChunk(std::unique_ptr<Chunk> chunk);
-  void SetChunk(std::vector<std::unique_ptr<Chunk>> chunks);
+  void SetChunk(std::vector<std::unique_ptr<Chunk>>&& chunks);
   EntityUUID SetEntity(std::unique_ptr<Entity> entity);
   void SetEntityChunkLoader(EntityUUID uuid);
   void SetBlock(const BlockID& block, BlockPos pos);

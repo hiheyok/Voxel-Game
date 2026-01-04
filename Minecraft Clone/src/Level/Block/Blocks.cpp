@@ -28,32 +28,33 @@ BlockList::~BlockList() {
   }
 }
 
-BlockID BlockList::RegisterBlock(string blockName, Block* block) {
+BlockID BlockList::RegisterBlock(const string& block_name, Block* block) {
   BlockID id = static_cast<BlockID>(block_type_data_.size());
 
   block->id_ = id;
-  block->block_name_ = blockName;
+  block->block_name_ = block_name;
 
   block_type_data_.emplace_back(block);
   block_properties_.emplace_back(*block->properties_);
 
-  block_id_name_data_[blockName] = id;
+  block_id_name_data_[block_name] = id;
 
-  LOG_INFO("Registered new block (ID) {}: {}", id, blockName);
+  LOG_INFO("Registered new block (ID) {}: {}", id, block_name);
   return id;
 }
 
-void BlockList::AddAssets(string namespaceIn) {
+void BlockList::AddAssets(const string& namespace_in) {
   try {
     vector<string> allOtherBlocks{};
-    string path = "assets/" + namespaceIn + "/models/block";
+    string path = "assets/" + namespace_in + "/models/block";
 
     for (const auto& entry : recursive_directory_iterator(path)) {
       if (entry.is_directory()) continue;
       string path = entry.path().string();
       size_t idx =
           path.find("/models/block") + string("/models/block").length() + 1;
-      string name = namespaceIn + ":" + path.substr(idx, path.size() - idx - 5);
+      string name =
+          namespace_in + ":" + path.substr(idx, path.size() - idx - 5);
       if (entry.path().extension() != ".json") continue;
       if (block_id_name_data_.count(name)) {
         continue;

@@ -8,7 +8,8 @@
 using std::string;
 
 ResourceLocation::ResourceLocation() = default;
-ResourceLocation::ResourceLocation(string location, string prefix) {
+ResourceLocation::ResourceLocation(const string& location,
+                                   const string& prefix) {
   // Search for namespace
   size_t idx = location.find(':');
 

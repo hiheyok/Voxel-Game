@@ -133,7 +133,7 @@ vector<TextureAtlasSource::SpritePath> TextureAtlasSource::GetPathList() const {
       continue;
     }
 
-    string type = source["type"].get<string>();
+    const string& type = source["type"].get<string>();
 
     if (type == "minecraft:directory" || type == "directory") {
       if (!source.contains("source") || !source.contains("prefix")) {
@@ -142,8 +142,8 @@ vector<TextureAtlasSource::SpritePath> TextureAtlasSource::GetPathList() const {
             atlas_def_);
         continue;
       }
-      string path = source["source"].get<string>();
-      string prefix = source["prefix"].get<string>();
+      const string& path = source["source"].get<string>();
+      const string& prefix = source["prefix"].get<string>();
 
       ParseTypeDirectory(sprites, path, prefix);
     } else if (type == "minecraft:single" || type == "single") {
@@ -153,8 +153,8 @@ vector<TextureAtlasSource::SpritePath> TextureAtlasSource::GetPathList() const {
         continue;
       }
 
-      string resource = source["resource"].get<string>();
-      string sprite_name = source.value("sprite", "");
+      const string& resource = source["resource"].get<string>();
+      const string& sprite_name = source.value("sprite", "");
 
       ParseTypeSingle(sprites, resource, sprite_name);
     } else {
@@ -167,14 +167,16 @@ vector<TextureAtlasSource::SpritePath> TextureAtlasSource::GetPathList() const {
 }
 
 void TextureAtlasSource::ParseTypeDirectory(vector<SpritePath>& out,
-                                            string source,
-                                            string prefix) const {
+                                            const string& source,
+                                            const string& prefix) const {
   // Iterate through all of the namespaces
   // Source is relative to the /texture
 
   // Replace all / with forwardslash
+  // Create a mutable copy since we need to modify it
+  string mutable_source = source;
 
-  for (char& c : source) {
+  for (char& c : mutable_source) {
     if (c == '/') {
       c = '\\';
     }
@@ -188,7 +190,7 @@ void TextureAtlasSource::ParseTypeDirectory(vector<SpritePath>& out,
     string namespace_name = space.path().filename().string();
 
     path texture_path = space.path() / "textures";
-    path source_path = texture_path / source;
+    path source_path = texture_path / mutable_source;
 
     string source_path_str = source_path.string();
 
@@ -227,7 +229,7 @@ void TextureAtlasSource::ParseTypeDirectory(vector<SpritePath>& out,
 }
 
 void TextureAtlasSource::ParseTypeSingle(vector<SpritePath>& out,
-                                         string resource, string sprite) const {
+                                         const string& resource, const string& sprite) const {
   // Get the namespace of the atlas source
   path manifest_path = atlas_def_;
   auto it = manifest_path.begin();
@@ -243,19 +245,21 @@ void TextureAtlasSource::ParseTypeSingle(vector<SpritePath>& out,
   ++it;
 
   string namespace_name = it->string();
-  size_t idx = resource.find(':');
+  // Create a mutable copy since we need to modify it
+  string mutable_resource = resource;
+  size_t idx = mutable_resource.find(':');
   if (idx != string::npos) {
-    resource = resource.substr(idx + 1, resource.size() - idx - 1);
+    mutable_resource = mutable_resource.substr(idx + 1, mutable_resource.size() - idx - 1);
   }
 
   // Now build path to resource
   string resource_path =
-      "assets/" + namespace_name + "/textures/" + resource + ".png";
+      "assets/" + namespace_name + "/textures/" + mutable_resource + ".png";
   string sprite_name;
   if (sprite.size()) {
     sprite_name = sprite;
   } else {
-    sprite_name = namespace_name + ":" + resource;
+    sprite_name = namespace_name + ":" + mutable_resource;
   }
 
   for (char& c : sprite_name) {

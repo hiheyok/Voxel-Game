@@ -272,7 +272,7 @@ static constexpr float CharWidth[256]{
 class RenderableFont {
  public:
   void SetBackgroundPadding(float H, float W);
-  void SetText(std::string str);
+  void SetText(const std::string& str);
   void AddBackground(glm::vec3 color, float alpha);
   void FontSize(float size);
   void SetColor(glm::vec3 clr);

@@ -39,7 +39,7 @@ class BlockList {
   BlockID WATER = RegisterBlock("minecraft:water", new Fluid(context_, 5));
   BlockID LAVA = RegisterBlock("minecraft:lava", new Fluid(context_, 5));
   BlockID GRASS_BLOCK = RegisterBlock("minecraft:grass_block",
-                                new GrassBlock(context_, 0.1, 0.1));
+                                      new GrassBlock(context_, 0.1, 0.1));
   BlockID SAND = RegisterBlock("minecraft:sand", new GravityBlock(context_));
   BlockID OAK_LOG =
       RegisterBlock("minecraft:oak_log", new DefaultBlock(context_));
@@ -688,14 +688,14 @@ class BlockList {
       RegisterBlock("minecraft:quartz_pillar", new DefaultBlock(context_));
   BlockID SMOOTH_QUARTZ =
       RegisterBlock("minecraft:smooth_quartz", new DefaultBlock(context_));
-
   BlockID ANVIL = RegisterBlock("minecraft:anvil", new DefaultBlock(context_));
-  BlockID GRASS = RegisterBlock("minecraft:short_grass", new PlantBlock(context_));
+  BlockID GRASS =
+      RegisterBlock("minecraft:short_grass", new PlantBlock(context_));
 
-  void AddAssets(std::string namespaceIn);
+  void AddAssets(const std::string& namespace_in);
 
  private:
-  BlockID RegisterBlock(std::string blockName, Block* block);
+  BlockID RegisterBlock(const std::string& block_name, Block* block);
 
   int block_type_count_ = 0;
 };
