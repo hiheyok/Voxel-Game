@@ -9,11 +9,13 @@
 #include "Level/Chunk/Chunk.h"
 #include "Level/TerrainGeneration/Generators/Generator.h"
 
+using std::unique_ptr;
+
 DebugPositioning::DebugPositioning(GameContext& context)
     : WorldGenerator{context} {}
 DebugPositioning::~DebugPositioning() = default;
 
-void DebugPositioning::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
+void DebugPositioning::Generate(ChunkPos pos, unique_ptr<Chunk>& chunk) {
   (void)pos;
   // Red -> x
   ChunkPos newPos = chunk->position_;

@@ -6,9 +6,10 @@
 #include "Assets/Asset.h"
 
 using baked_model::Element;
+using std::string;
 using std::vector;
 
-RenderableModel::RenderableModel(GameContext& context, const std::string& key)
+RenderableModel::RenderableModel(GameContext& context, const string& key)
     : Asset{key}, context_{context} {}
 RenderableModel::~RenderableModel() = default;
 

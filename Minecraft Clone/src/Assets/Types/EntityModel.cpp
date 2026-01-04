@@ -2,12 +2,66 @@
 
 #include "Assets/Types/EntityModel.h"
 
+#include <array>
 #include <cstddef>
 #include <string>
 
 #include "Assets/Asset.h"
 #include "Core/Position/Direction.h"
 #include "Core/Position/PositionTypes.h"
+
+using std::array;
+using std::string;
+
+static constexpr std::array<int, 36> kIndices = {
+    // Front
+    0,
+    1,
+    2,
+    2,
+    3,
+    0,
+
+    // Back
+    4,
+    6,
+    5,
+    6,
+    4,
+    7,
+
+    // Right
+    8,
+    9,
+    10,
+    10,
+    11,
+    8,
+
+    // Left
+    12,
+    14,
+    13,
+    14,
+    12,
+    15,
+
+    // Top
+    16,
+    17,
+    18,
+    18,
+    19,
+    16,
+
+    // Bottom
+    20,
+    22,
+    21,
+    22,
+    20,
+    23,
+};
 
 Model::ModelData Model::RectangularPrism::GetVertices() {
   ModelData model;
@@ -90,55 +144,8 @@ Model::ModelData Model::RectangularPrism::GetVertices() {
        uv_map_[Directions<BlockPos>::kDown].p1_.x,
        uv_map_[Directions<BlockPos>::kDown].p1_.y});
 
-  model.indices_.insert(model.indices_.begin(), {
-                                                    // Front
-                                                    0,
-                                                    1,
-                                                    2,
-                                                    2,
-                                                    3,
-                                                    0,
-
-                                                    // Back
-                                                    4,
-                                                    6,
-                                                    5,
-                                                    6,
-                                                    4,
-                                                    7,
-
-                                                    // Right
-                                                    8,
-                                                    9,
-                                                    10,
-                                                    10,
-                                                    11,
-                                                    8,
-
-                                                    // Left
-                                                    12,
-                                                    14,
-                                                    13,
-                                                    14,
-                                                    12,
-                                                    15,
-
-                                                    // Top
-                                                    16,
-                                                    17,
-                                                    18,
-                                                    18,
-                                                    19,
-                                                    16,
-
-                                                    // Bottom
-                                                    20,
-                                                    22,
-                                                    21,
-                                                    22,
-                                                    20,
-                                                    23,
-                                                });
+  model.indices_.insert(model.indices_.begin(), kIndices.begin(),
+                        kIndices.end());
 
   model.vertices_count_ = 24;
 
@@ -162,7 +169,7 @@ Model::RectangularPrism* EntityModel::AddRectangle(glm::vec3 size,
   return &shapes_.back();
 }
 
-EntityModel::EntityModel(const std::string& key) : Asset{key} {}
+EntityModel::EntityModel(const string& key) : Asset{key} {}
 
 Model::ModelData EntityModel::GetVertices() {
   Model::ModelData model;

@@ -10,14 +10,16 @@
 #include "Core/GameContext/GameContext.h"
 #include "RenderEngine/OpenGL/Shader/ShaderInterface.h"
 
-Shader::Shader(GameContext& context, const std::string& name,
+using std::string;
+
+Shader::Shader(GameContext& context, const string& name,
                AssetHandle<ShaderSource> shader_src)
     : ShaderInterface{context, name, shader_src} {}
 
 void Shader::Load() {
-  const std::string& vertexCode = shader_src_->GetVertex();
-  const std::string& fragmentCode = shader_src_->GetFragment();
-  const std::string& geometryCode = shader_src_->GetGeometry();
+  const string& vertexCode = shader_src_->GetVertex();
+  const string& fragmentCode = shader_src_->GetFragment();
+  const string& geometryCode = shader_src_->GetGeometry();
 
   uint32_t vertex = CompileShader(vertexCode, "Vertex", GL_VERTEX_SHADER);
   uint32_t fragment =

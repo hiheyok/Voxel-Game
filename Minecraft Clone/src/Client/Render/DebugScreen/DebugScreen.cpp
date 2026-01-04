@@ -13,10 +13,14 @@
 #include "RenderEngine/TextRender/TextRenderer.h"
 #include "Utils/Timer/Timer.h"
 
+using std::make_unique;
+using std::string;
+using std::to_string;
+
 DebugScreen::DebugScreen(GameContext& context)
     : context_{context},
-      renderer_{std::make_unique<TextRenderer>(context)},
-      timer_{std::make_unique<Timer>()} {}
+      renderer_{make_unique<TextRenderer>(context)},
+      timer_{make_unique<Timer>()} {}
 
 DebugScreen::~DebugScreen() = default;
 
@@ -31,11 +35,11 @@ void DebugScreen::Update() {
 
 void DebugScreen::SetUpdateRate(int rate) { update_rate_ = rate; }
 
-void DebugScreen::EditText(const std::string& name, const char* c) {
-  EditText(name, std::string(c));
+void DebugScreen::EditText(const string& name, const char* c) {
+  EditText(name, string(c));
 }
 
-void DebugScreen::EditText(const std::string& name, const std::string& text) {
+void DebugScreen::EditText(const string& name, const string& text) {
   renderer_->EditFontText(name, text);
 }
 
@@ -47,18 +51,18 @@ void DebugScreen::Initialize(GLFWwindow* w) {
 
   RenderableFont versionFont;
   versionFont.FontSize(0.05f);
-  versionFont.SetText(std::string("Version 1.3.0A"));
+  versionFont.SetText(string("Version 1.3.0A"));
   versionFont.SetPosition({-1.f, 0.95f});
   versionFont.AddBackground(clr, a);
 
   for (int i = 1; i <= 10; i++) {
     RenderableFont stat;
     stat.FontSize(0.04f);
-    stat.SetText(std::string("N/A"));
+    stat.SetText(string("N/A"));
     stat.SetPosition({-1.0f, 0.95f - 0.05f * i});
     stat.AddBackground(clr, a);
     stat.SetBackgroundPadding(0.005f, 0.0f);
-    renderer_->InsertFontObject("Stat" + std::to_string(i), stat);
+    renderer_->InsertFontObject("Stat" + to_string(i), stat);
   }
 
   renderer_->InsertFontObject("Title", versionFont);

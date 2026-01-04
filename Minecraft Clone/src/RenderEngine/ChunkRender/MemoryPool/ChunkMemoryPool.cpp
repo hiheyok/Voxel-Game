@@ -20,6 +20,12 @@
 
 using namespace MemoryManagement;
 
+using std::make_unique;
+using std::map;
+using std::move;
+using std::multimap;
+using std::vector;
+
 ChunkMemoryPoolOffset::ChunkMemoryPoolOffset() = default;
 ChunkMemoryPoolOffset::ChunkMemoryPoolOffset(size_t offset, size_t size)
     : mem_offset_(offset), mem_size_(size) {}
@@ -28,7 +34,7 @@ ChunkMemoryPoolOffset::ChunkMemoryPoolOffset(size_t offset, size_t size,
     : mem_offset_(offset), mem_size_(size), position_(position) {}
 
 void BlockManagement::Add(MemoryBlock block) {
-  std::map<size_t, MemoryBlock>::iterator it =
+  map<size_t, MemoryBlock>::iterator it =
       mem_blocks_.emplace(block.offset_, block).first;
   mem_blocks_iterators_.emplace(block.offset_, it);
 }
@@ -37,19 +43,18 @@ void BlockManagement::Delete(size_t offset) {
   if (!mem_blocks_iterators_.count(offset)) {
     return;
   }
-  std::map<size_t, MemoryBlock>::const_iterator it =
-      mem_blocks_iterators_[offset];
+  map<size_t, MemoryBlock>::const_iterator it = mem_blocks_iterators_[offset];
   Delete(it);
 }
 
-void BlockManagement::Delete(std::map<size_t, MemoryBlock>::const_iterator it) {
+void BlockManagement::Delete(map<size_t, MemoryBlock>::const_iterator it) {
   size_t offset = it->first;
 
   mem_blocks_.erase(it);
   mem_blocks_iterators_.erase(offset);
 }
 
-std::map<size_t, MemoryBlock>::const_iterator BlockManagement::GetIterator(
+map<size_t, MemoryBlock>::const_iterator BlockManagement::GetIterator(
     size_t offset) const {
   if (mem_blocks_iterators_.count(offset)) {
     const auto& it = mem_blocks_iterators_.find(offset);
@@ -59,25 +64,24 @@ std::map<size_t, MemoryBlock>::const_iterator BlockManagement::GetIterator(
   }
 }
 
-std::map<size_t, MemoryBlock>::const_iterator BlockManagement::begin() const {
+map<size_t, MemoryBlock>::const_iterator BlockManagement::begin() const {
   return mem_blocks_.begin();
 }
 
-std::map<size_t, MemoryBlock>::const_iterator BlockManagement::end() const {
+map<size_t, MemoryBlock>::const_iterator BlockManagement::end() const {
   return mem_blocks_.end();
 }
 
-std::map<size_t, MemoryBlock>::const_reverse_iterator BlockManagement::rbegin()
+map<size_t, MemoryBlock>::const_reverse_iterator BlockManagement::rbegin()
     const {
   return mem_blocks_.rbegin();
 }
 
-std::map<size_t, MemoryBlock>::const_reverse_iterator BlockManagement::rend()
-    const {
+map<size_t, MemoryBlock>::const_reverse_iterator BlockManagement::rend() const {
   return mem_blocks_.rend();
 }
 
-std::map<size_t, MemoryBlock>::const_iterator BlockManagement::lower_bound(
+map<size_t, MemoryBlock>::const_iterator BlockManagement::lower_bound(
     size_t k) const {  // Get latest element less than k
   auto it = mem_blocks_.lower_bound(k);
   if (it != mem_blocks_.begin()) {
@@ -86,7 +90,7 @@ std::map<size_t, MemoryBlock>::const_iterator BlockManagement::lower_bound(
   return it;
 }
 
-std::map<size_t, MemoryBlock>::const_iterator BlockManagement::upper_bound(
+map<size_t, MemoryBlock>::const_iterator BlockManagement::upper_bound(
     size_t k) const {  // Get latest element greater than k
   return mem_blocks_.upper_bound(k);
 }
@@ -102,7 +106,7 @@ MemoryPoolManager::~MemoryPoolManager() = default;
 void MemoryPoolManager::Initialize(size_t spaceAvailable) {
   pool_size_ = spaceAvailable;
   free_memory_blocks_.Add(MemoryBlock{0, pool_size_});
-  std::multimap<size_t, size_t>::iterator it =
+  multimap<size_t, size_t>::iterator it =
       sorted_mem_sizes_.emplace(pool_size_, 0);  // use for deletions
   sorted_mem_sizes_iterators[0] = it;
 }
@@ -112,7 +116,7 @@ void MemoryPoolManager::AllocateSpace(
 
   reserved_memory_blocks_.Add(MemoryBlock{memOffset, memSize});
 
-  std::map<size_t, MemoryBlock>::const_iterator left =
+  map<size_t, MemoryBlock>::const_iterator left =
       free_memory_blocks_.GetIterator(memOffset);
 
   MemoryBlock current = left->second;
@@ -128,7 +132,7 @@ void MemoryPoolManager::AllocateSpace(
 
   MemoryBlock newFreeBlock(newFreeSpaceOffset, newFreeSpaceSize);
 
-  std::multimap<size_t, size_t>::iterator it = sorted_mem_sizes_.emplace(
+  multimap<size_t, size_t>::iterator it = sorted_mem_sizes_.emplace(
       newFreeSpaceSize, newFreeSpaceOffset);  // use for deletions
   sorted_mem_sizes_iterators[newFreeSpaceOffset] = it;
 
@@ -136,9 +140,9 @@ void MemoryPoolManager::AllocateSpace(
 }
 
 void MemoryPoolManager::DeallocateSpace(size_t MemOffset, size_t MemSize) {
-  std::map<size_t, MemoryBlock>::const_iterator rightBlockFree =
+  map<size_t, MemoryBlock>::const_iterator rightBlockFree =
       free_memory_blocks_.upper_bound(MemOffset);
-  std::map<size_t, MemoryBlock>::const_iterator leftBlockFree =
+  map<size_t, MemoryBlock>::const_iterator leftBlockFree =
       free_memory_blocks_.lower_bound(MemOffset);
 
   bool isFreeBlockRight = true;
@@ -195,7 +199,7 @@ void MemoryPoolManager::DeallocateSpace(size_t MemOffset, size_t MemSize) {
   // Add Free Space
   free_memory_blocks_.Add(MemoryBlock(freeMemoryOffset, freeMemorySize));
 
-  std::multimap<size_t, size_t>::iterator it = sorted_mem_sizes_.emplace(
+  multimap<size_t, size_t>::iterator it = sorted_mem_sizes_.emplace(
       freeMemorySize, freeMemoryOffset);  // use for deletions
   sorted_mem_sizes_iterators[freeMemoryOffset] = it;
 
@@ -221,25 +225,25 @@ size_t MemoryPoolManager::GetReserveSpaceFragmentCount() const {
 // Other class
 ChunkGPUMemoryPool::ChunkGPUMemoryPool(ChunkGPUMemoryPool&& other) noexcept
     : context_{other.context_},
-      stagging_buffer_{std::move(other.stagging_buffer_)},
-      buffer_{std::move(other.buffer_)},
+      stagging_buffer_{move(other.stagging_buffer_)},
+      buffer_{move(other.buffer_)},
       memory_pool_size_{other.memory_pool_size_},
-      chunk_memory_offsets_{std::move(other.chunk_memory_offsets_)},
-      memory_chunk_offsets_{std::move(other.memory_chunk_offsets_)},
-      statistics_{std::move(other.statistics_)} {
-  memory_pool_ = std::move(other.memory_pool_);
+      chunk_memory_offsets_{move(other.chunk_memory_offsets_)},
+      memory_chunk_offsets_{move(other.memory_chunk_offsets_)},
+      statistics_{move(other.statistics_)} {
+  memory_pool_ = move(other.memory_pool_);
 }
 
 ChunkGPUMemoryPool& ChunkGPUMemoryPool::operator=(
     ChunkGPUMemoryPool&& other) noexcept {
   if (this != &other) {
-    stagging_buffer_ = std::move(other.stagging_buffer_);
-    buffer_ = std::move(other.buffer_);
-    memory_pool_ = std::move(other.memory_pool_);
+    stagging_buffer_ = move(other.stagging_buffer_);
+    buffer_ = move(other.buffer_);
+    memory_pool_ = move(other.memory_pool_);
     memory_pool_size_ = other.memory_pool_size_;
-    chunk_memory_offsets_ = std::move(other.chunk_memory_offsets_);
-    memory_chunk_offsets_ = std::move(other.memory_chunk_offsets_);
-    statistics_ = std::move(other.statistics_);
+    chunk_memory_offsets_ = move(other.chunk_memory_offsets_);
+    memory_chunk_offsets_ = move(other.memory_chunk_offsets_);
+    statistics_ = move(other.statistics_);
   }
   return *this;
 }
@@ -247,10 +251,10 @@ ChunkGPUMemoryPool& ChunkGPUMemoryPool::operator=(
 ChunkGPUMemoryPool::ChunkGPUMemoryPool(GameContext& context,
                                        size_t memory_pool_size)
     : context_{context},
-      stagging_buffer_{std::make_unique<BufferStorage>(
+      stagging_buffer_{make_unique<BufferStorage>(
           context, GL_COPY_WRITE_BUFFER, kStaggingBufferSize, true, nullptr)},
-      buffer_{std::make_unique<BufferStorage>(
-          context, GL_ARRAY_BUFFER, memory_pool_size, true, nullptr)} {
+      buffer_{make_unique<BufferStorage>(context, GL_ARRAY_BUFFER,
+                                         memory_pool_size, true, nullptr)} {
   memory_pool_size_ = memory_pool_size;
   if (memory_pool_size_ == 0) {
     throw std::logic_error(
@@ -289,7 +293,7 @@ void ChunkGPUMemoryPool::DeleteChunk(ChunkPos pos) {
 }
 
 ChunkMemoryPoolOffset ChunkGPUMemoryPool::AddChunk(
-    const std::vector<BlockVertexFormat>& vertices,
+    const vector<BlockVertexFormat>& vertices,
     ChunkPos pos) {  // assumes vertices.size() != 0
   size_t blockSize = vertices.size() * sizeof(vertices[0]);
   size_t blockOffset = memory_pool_.FindFreeSpace(blockSize);

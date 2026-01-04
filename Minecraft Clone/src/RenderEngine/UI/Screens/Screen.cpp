@@ -11,11 +11,15 @@
 #include "RenderEngine/UI/Widgets/Widget.h"
 #include "Utils/Assert.h"
 
+using std::make_unique;
+using std::move;
+using std::vector;
+
 Screen::Screen(GameContext& context, ScreenManager& screen_mgr, glm::vec2 v_res)
     : context_{context},
       screen_mgr_{screen_mgr},
       v_res_{v_res},
-      root_widget_{std::make_unique<Widget>(context)} {
+      root_widget_{make_unique<Widget>(context)} {
   root_widget_->manager_ = &screen_mgr;
 }
 Screen::~Screen() { OnExit(); }
@@ -23,12 +27,12 @@ Screen::~Screen() { OnExit(); }
 void Screen::HandleEvent() {
   // Implement later
 }
-void Screen::Update(const std::vector<InputEvent>& events) {
+void Screen::Update(const vector<InputEvent>& events) {
   if (tick_callback_) tick_callback_();
 }
 
 void Screen::SetTickCallback(TickCallback callback) {
-  tick_callback_ = std::move(callback);
+  tick_callback_ = move(callback);
 }
 
 void Screen::SubmitToRenderer(UIRenderer& renderer) {

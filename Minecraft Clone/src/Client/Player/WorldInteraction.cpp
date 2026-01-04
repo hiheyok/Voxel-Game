@@ -16,6 +16,9 @@
 #include "Level/Item/Items.h"
 #include "Utils/Math/Ray/Ray.h"
 
+using glm::dvec3;
+using glm::ivec3;
+
 WorldInteraction::WorldInteraction(GameContext& context) : context_{context} {}
 WorldInteraction::~WorldInteraction() = default;
 
@@ -24,12 +27,11 @@ void WorldInteraction::Interact(Player& player, const InputManager& inputs,
                                 ClientCache& cache) {
   Ray ray;
   ray.origin_ = player.properties_.position_;
-  ray.direction_ =
-      glm::dvec3(cos(player.properties_.rotation_.x * kDegToRad) *
-                     cos(player.properties_.rotation_.y * kDegToRad),
-                 sin(player.properties_.rotation_.y * kDegToRad),
-                 sin(player.properties_.rotation_.x * kDegToRad) *
-                     cos(player.properties_.rotation_.y * kDegToRad));
+  ray.direction_ = dvec3(cos(player.properties_.rotation_.x * kDegToRad) *
+                             cos(player.properties_.rotation_.y * kDegToRad),
+                         sin(player.properties_.rotation_.y * kDegToRad),
+                         sin(player.properties_.rotation_.x * kDegToRad) *
+                             cos(player.properties_.rotation_.y * kDegToRad));
 
   BlockID block = player.entity_inventory_
                       .GetItem(player.entity_inventory_.right_hand_slot_)
@@ -79,7 +81,7 @@ void WorldInteraction::PlaceBlock(Ray ray, BlockID block,
   if (cache.collision_manager_.CheckRayIntersection(ray)) {
     int bounce_surface = ray.bounce_surface_;
 
-    glm::ivec3 placePos = floor(ray.end_point_);
+    ivec3 placePos = floor(ray.end_point_);
 
     placePos[bounce_surface >> 1] +=
         (bounce_surface & 0b1) -

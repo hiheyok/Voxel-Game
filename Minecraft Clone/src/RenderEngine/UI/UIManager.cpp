@@ -13,13 +13,16 @@
 #include "RenderEngine/UI/UIRenderer.h"
 #include "Utils/Assert.h"
 
+using std::make_unique;
+using std::move;
+
 UIManager::UIManager(GameContext& context, InputManager& input_mgr)
     : context_{context},
       input_mgr_{input_mgr},
-      renderer_{std::make_unique<UIRenderer>(context_)},
-      screen_registry_{std::make_unique<ScreenRegistry>(context_)},
-      screen_manager_{
-          std::make_unique<ScreenManager>(context_, *screen_registry_)} {}
+      renderer_{make_unique<UIRenderer>(context_)},
+      screen_registry_{make_unique<ScreenRegistry>(context_)},
+      screen_manager_{make_unique<ScreenManager>(context_, *screen_registry_)} {
+}
 
 UIManager::~UIManager() = default;
 
@@ -51,5 +54,5 @@ void UIManager::ScreenResChanged(glm::vec2 res) {
 }
 
 void UIManager::SetScreenTickCallback(Screen::TickCallback callback) {
-  screen_manager_->SetScreenTickCallback(std::move(callback));
+  screen_manager_->SetScreenTickCallback(move(callback));
 }

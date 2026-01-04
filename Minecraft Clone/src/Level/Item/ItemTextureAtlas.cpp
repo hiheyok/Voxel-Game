@@ -15,6 +15,9 @@
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 
+using std::make_unique;
+using std::vector;
+
 void ItemTextureAtlas::RenderBlockItem(Item item) {
   framebuffer_single_block_render_.BindFBO();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -38,14 +41,14 @@ void ItemTextureAtlas::StitchTexture(size_t index, ItemID ItemID) {
   yCoord = -(yCoord * 2.f - 1.f);
 
   // Insert Data
-  std::vector<float> vertices = {
+  vector<float> vertices = {
       xCoord - 0.0f, yCoord - 0.0f, 0.0f, 1.0f,
       xCoord - Size, yCoord - 0.0f, 1.0f, 1.0f,
       xCoord - Size, yCoord - Size, 1.0f, 0.0f,
       xCoord - 0.0f, yCoord - Size, 0.0f, 0.0f,
   };
 
-  std::vector<uint32_t> indices = {0, 1, 2, 2, 3, 0};
+  vector<uint32_t> indices = {0, 1, 2, 2, 3, 0};
 
   render_->SetData(vertices, indices);
   render_->SetIndicesCount(indices.size());
@@ -77,7 +80,7 @@ ItemTextureAtlas::~ItemTextureAtlas() = default;
 
 // TODO(hiheyok): Need to move atlas stitching to CPU
 void ItemTextureAtlas::Initialize(int atlasItemSize, int individualItemSize) {
-  item_render_ = std::make_unique<ItemRender>(context_);
+  item_render_ = make_unique<ItemRender>(context_);
 
   individual_size_ = individualItemSize;
   atlas_size_ = atlasItemSize;
@@ -86,7 +89,7 @@ void ItemTextureAtlas::Initialize(int atlasItemSize, int individualItemSize) {
   framebuffer_single_block_render_.GenBuffer(individual_size_, individual_size_,
                                              2, GL_RGBA);
 
-  render_ = std::make_unique<RenderDrawElements>(context_);
+  render_ = make_unique<RenderDrawElements>(context_);
   render_->SetDataAttribute(0, 2, GL_FLOAT, 4, 0);
   render_->SetDataAttribute(1, 2, GL_FLOAT, 4, 2);
   render_->SetShader("atlas_stitch_shader");

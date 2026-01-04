@@ -10,12 +10,13 @@
 #include "Level/TerrainGeneration/Generators/Generator.h"
 #include "Utils/Iterators.h"
 
+using std::unique_ptr;
+
 DebugMeshStressFace::DebugMeshStressFace(GameContext& context)
     : WorldGenerator{context} {}
 DebugMeshStressFace::~DebugMeshStressFace() = default;
 
-void DebugMeshStressFace::Generate(ChunkPos pos,
-                                   std::unique_ptr<Chunk>& chunk) {
+void DebugMeshStressFace::Generate(ChunkPos pos, unique_ptr<Chunk>& chunk) {
   (void)pos;
   for (auto [x, y, z] : Product<3>(0, kChunkDim)) {
     if ((y & 1)) {

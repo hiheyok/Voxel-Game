@@ -12,6 +12,9 @@
 #include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 
+using std::string;
+using std::stringstream;
+
 void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, uint32_t id,
                                     GLenum severity, GLsizei length,
                                     const char* message,
@@ -19,7 +22,7 @@ void APIENTRY Window::glDebugOutput(GLenum source, GLenum type, uint32_t id,
   Window* window = static_cast<Window*>(const_cast<void*>(userParam));
   LogUtils* logger = window->context_.logger_.get();
 
-  std::stringstream str;
+  stringstream str;
 
   if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
 
@@ -132,7 +135,7 @@ void Window::MousePositionCallback(GLFWwindow* win, double x_pos,
   inputs_.UpdateMouse(static_cast<float>(x_pos), static_cast<float>(y_pos));
 }
 
-void Window::UpdateWindowName(std::string name) {
+void Window::UpdateWindowName(string name) {
   glfwSetWindowTitle(win_, name.c_str());
 }
 
@@ -236,7 +239,7 @@ void Window::InitializeGLEW() {
   }
   glewExperimental = GL_TRUE;
 
-  std::stringstream str;
+  stringstream str;
   str << "OpenGL Version: " << glGetString(GL_VERSION);
   LOG_INFO("{}", str.str());
 

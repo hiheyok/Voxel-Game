@@ -21,6 +21,7 @@ using namespace model;
 using glm::vec2;
 using glm::vec3;
 using std::array;
+using std::move;
 using std::nullopt;
 using std::optional;
 using std::reverse;
@@ -53,7 +54,7 @@ optional<ModelData> ModelLoader::GetModel(const ResourceLocation& location) {
     return it->second;
   }
 
-  std::string filepath = location.GetPath() + ".json";
+  string filepath = location.GetPath() + ".json";
 
   // Loads up the json def
   vector<char> data = FileUtils::ReadFileToBuffer(context_, filepath);
@@ -100,7 +101,7 @@ optional<ModelData> ModelLoader::GetModel(const ResourceLocation& location) {
   }
 
   if (manifest.contains("gui_light")) {
-    const std::string& type = manifest["gui_light"].get<string>();
+    const string& type = manifest["gui_light"].get<string>();
     if (type == "front") {
       model.gui_light_ = GuiLight::kFront;
     } else if (type == "side") {
@@ -231,7 +232,7 @@ void ModelLoader::ProcessElement(ModelData& model, const json& data) {
       ProcessFace(model_element, element["faces"]);
     }
 
-    model.elements_.push_back(std::move(model_element));
+    model.elements_.push_back(move(model_element));
   }
 }
 

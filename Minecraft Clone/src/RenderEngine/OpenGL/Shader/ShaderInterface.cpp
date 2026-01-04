@@ -17,7 +17,9 @@
 #include "RenderEngine/RenderResources/Types/Texture/Texture.h"
 #include "Utils/LogUtils.h"
 
-ShaderInterface::ShaderInterface(GameContext& context, const std::string& name,
+using std::string;
+
+ShaderInterface::ShaderInterface(GameContext& context, const string& name,
                                  AssetHandle<ShaderSource> shader_src)
     : RenderResource{name}, context_{context}, shader_src_{shader_src} {}
 
@@ -29,7 +31,7 @@ ShaderInterface::~ShaderInterface() {
 
 void ShaderInterface::Use() { glUseProgram(shader_id_); }
 
-ShaderInterface& ShaderInterface::SetBool(const std::string& name, bool value) {
+ShaderInterface& ShaderInterface::SetBool(const string& name, bool value) {
   auto it = cache_bool_.find(name);
   if (it != cache_bool_.end()) {
     if (it->second == value) return *this;
@@ -42,7 +44,7 @@ ShaderInterface& ShaderInterface::SetBool(const std::string& name, bool value) {
   return *this;
 }
 
-ShaderInterface& ShaderInterface::SetInt(const std::string& name, int value) {
+ShaderInterface& ShaderInterface::SetInt(const string& name, int value) {
   auto it = cache_int_.find(name);
   if (it != cache_int_.end()) {
     if (it->second == value) return *this;
@@ -55,8 +57,7 @@ ShaderInterface& ShaderInterface::SetInt(const std::string& name, int value) {
   return *this;
 }
 
-ShaderInterface& ShaderInterface::SetFloat(const std::string& name,
-                                           float value) {
+ShaderInterface& ShaderInterface::SetFloat(const string& name, float value) {
   auto it = cache_float_.find(name);
   if (it != cache_float_.end()) {
     if (it->second == value) return *this;
@@ -69,7 +70,7 @@ ShaderInterface& ShaderInterface::SetFloat(const std::string& name,
   return *this;
 }
 
-ShaderInterface& ShaderInterface::SetVec2(const std::string& name,
+ShaderInterface& ShaderInterface::SetVec2(const string& name,
                                           const glm::vec2& value) {
   auto it = cache_vec2_.find(name);
   if (it != cache_vec2_.end()) {
@@ -83,7 +84,7 @@ ShaderInterface& ShaderInterface::SetVec2(const std::string& name,
   return *this;
 }
 
-ShaderInterface& ShaderInterface::SetVec2(const std::string& name, float x,
+ShaderInterface& ShaderInterface::SetVec2(const string& name, float x,
                                           float y) {
   auto it = cache_vec2_.find(name);
   if (it != cache_vec2_.end()) {
@@ -97,7 +98,7 @@ ShaderInterface& ShaderInterface::SetVec2(const std::string& name, float x,
   return *this;
 }
 
-ShaderInterface& ShaderInterface::SetVec3(const std::string& name,
+ShaderInterface& ShaderInterface::SetVec3(const string& name,
                                           const glm::vec3& value) {
   auto it = cache_vec3_.find(name);
   if (it != cache_vec3_.end()) {
@@ -111,8 +112,8 @@ ShaderInterface& ShaderInterface::SetVec3(const std::string& name,
   return *this;
 }
 
-ShaderInterface& ShaderInterface::SetVec3(const std::string& name, float x,
-                                          float y, float z) {
+ShaderInterface& ShaderInterface::SetVec3(const string& name, float x, float y,
+                                          float z) {
   auto it = cache_vec3_.find(name);
   if (it != cache_vec3_.end()) {
     if (it->second == glm::vec3(x, y, z)) return *this;
@@ -125,7 +126,7 @@ ShaderInterface& ShaderInterface::SetVec3(const std::string& name, float x,
   return *this;
 }
 
-ShaderInterface& ShaderInterface::SetIVec3(const std::string& name,
+ShaderInterface& ShaderInterface::SetIVec3(const string& name,
                                            const glm::ivec3& value) {
   auto it = cache_ivec3_.find(name);
   if (it != cache_ivec3_.end()) {
@@ -139,8 +140,8 @@ ShaderInterface& ShaderInterface::SetIVec3(const std::string& name,
   return *this;
 }
 
-ShaderInterface& ShaderInterface::SetIVec3(const std::string& name, int x,
-                                           int y, int z) {
+ShaderInterface& ShaderInterface::SetIVec3(const string& name, int x, int y,
+                                           int z) {
   auto it = cache_ivec3_.find(name);
   if (it != cache_ivec3_.end()) {
     if (it->second == glm::ivec3(x, y, z)) return *this;
@@ -153,7 +154,7 @@ ShaderInterface& ShaderInterface::SetIVec3(const std::string& name, int x,
   return *this;
 }
 
-ShaderInterface& ShaderInterface::SetVec4(const std::string& name,
+ShaderInterface& ShaderInterface::SetVec4(const string& name,
                                           const glm::vec4& value) {
   auto it = cache_vec4_.find(name);
   if (it != cache_vec4_.end()) {
@@ -167,8 +168,8 @@ ShaderInterface& ShaderInterface::SetVec4(const std::string& name,
   return *this;
 }
 
-ShaderInterface& ShaderInterface::SetVec4(const std::string& name, float x,
-                                          float y, float z, float w) {
+ShaderInterface& ShaderInterface::SetVec4(const string& name, float x, float y,
+                                          float z, float w) {
   auto it = cache_vec4_.find(name);
   if (it != cache_vec4_.end()) {
     if (it->second == glm::vec4(x, y, z, w)) return *this;
@@ -181,7 +182,7 @@ ShaderInterface& ShaderInterface::SetVec4(const std::string& name, float x,
   return *this;
 }
 
-ShaderInterface& ShaderInterface::SetMat2(const std::string& name,
+ShaderInterface& ShaderInterface::SetMat2(const string& name,
                                           const glm::mat2& mat) {
   auto it = cache_mat2_.find(name);
   if (it != cache_mat2_.end()) {
@@ -195,7 +196,7 @@ ShaderInterface& ShaderInterface::SetMat2(const std::string& name,
   return *this;
 }
 
-ShaderInterface& ShaderInterface::SetMat3(const std::string& name,
+ShaderInterface& ShaderInterface::SetMat3(const string& name,
                                           const glm::mat3& mat) {
   auto it = cache_mat3_.find(name);
   if (it != cache_mat3_.end()) {
@@ -209,7 +210,7 @@ ShaderInterface& ShaderInterface::SetMat3(const std::string& name,
   return *this;
 }
 
-ShaderInterface& ShaderInterface::SetMat4(const std::string& name,
+ShaderInterface& ShaderInterface::SetMat4(const string& name,
                                           const glm::mat4& mat) {
   auto it = cache_mat4_.find(name);
   if (it != cache_mat4_.end()) {
@@ -224,7 +225,7 @@ ShaderInterface& ShaderInterface::SetMat4(const std::string& name,
 }
 
 ShaderInterface& ShaderInterface::BindTexture2D(GLuint index, GLuint img,
-                                                const std::string& name) {
+                                                const string& name) {
   SetInt(name, index);
   Use();
   glActiveTexture(GL_TEXTURE0 + index);
@@ -233,7 +234,7 @@ ShaderInterface& ShaderInterface::BindTexture2D(GLuint index, GLuint img,
 }
 
 ShaderInterface& ShaderInterface::BindTextureArray2D(GLuint index, GLuint img,
-                                                     const std::string& name) {
+                                                     const string& name) {
   SetInt(name, index);
   Use();
   glActiveTexture(GL_TEXTURE0 + index);
@@ -250,7 +251,7 @@ ShaderInterface& ShaderInterface::BindTexture(GLuint index,
   return *this;
 }
 
-GLint ShaderInterface::GetUniformLocation(std::string name) {
+GLint ShaderInterface::GetUniformLocation(string name) {
   if (cache_.count(name)) {
     return cache_[name];
   } else {
@@ -260,7 +261,7 @@ GLint ShaderInterface::GetUniformLocation(std::string name) {
   }
 }
 
-GLuint ShaderInterface::CompileShader(std::string source, std::string type,
+GLuint ShaderInterface::CompileShader(string source, string type,
                                       GLuint shaderType) {
   GLuint shader = glCreateShader(shaderType);
   const char* src = source.c_str();
@@ -272,21 +273,20 @@ GLuint ShaderInterface::CompileShader(std::string source, std::string type,
   return shader;
 }
 
-void ShaderInterface::CheckCompileErrors(GLuint shader, std::string type) {
+void ShaderInterface::CheckCompileErrors(GLuint shader, string type) {
   GLint success;
   GLchar log[2048];
   if (type != "PROGRAM") {
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success) {
       glGetShaderInfoLog(shader, 2048, 0, log);
-      LOG_ERROR("Failed to compile {} Shader: \n {} \n", type,
-                std::string(log));
+      LOG_ERROR("Failed to compile {} Shader: \n {} \n", type, string(log));
     }
   } else {
     glGetProgramiv(shader, GL_LINK_STATUS, &success);
     if (!success) {
       glGetProgramInfoLog(shader, 1024, 0, log);
-      LOG_ERROR("Failed to link Shader Program: \n {} \n", std::string(log));
+      LOG_ERROR("Failed to link Shader Program: \n {} \n", string(log));
     }
   }
 }

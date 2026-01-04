@@ -6,8 +6,11 @@
 
 #include "Core/Position/PositionTypes.h"
 
+using std::move;
+using std::vector;
+
 ChunkLightTask::ChunkLightTask(ChunkPos chunk_pos,
-                               const std::vector<BlockPos>& blocks)
+                               const vector<BlockPos>& blocks)
     : chunk_pos_{chunk_pos}, changed_block_{blocks} {}
 
 ChunkLightTask::ChunkLightTask(ChunkPos chunk_pos)
@@ -16,7 +19,7 @@ ChunkLightTask::~ChunkLightTask() = default;
 
 ChunkLightTask::ChunkLightTask(const ChunkLightTask&) = default;
 ChunkLightTask::ChunkLightTask(ChunkLightTask&& other) noexcept
-    : changed_block_{std::move(other.changed_block_)},
+    : changed_block_{move(other.changed_block_)},
       chunk_pos_{other.chunk_pos_} {}
 
 ChunkLightTask& ChunkLightTask::operator=(const ChunkLightTask& other) {
@@ -24,7 +27,7 @@ ChunkLightTask& ChunkLightTask::operator=(const ChunkLightTask& other) {
   return *this;
 }
 ChunkLightTask& ChunkLightTask::operator=(ChunkLightTask&& other) noexcept {
-  changed_block_ = std::move(other.changed_block_);
+  changed_block_ = move(other.changed_block_);
   return *this;
 }
 
@@ -38,7 +41,7 @@ void ChunkLightTask::SetInQueue(bool in_queue) noexcept {
 
 bool ChunkLightTask::CheckInQueue() const noexcept { return in_queue_; }
 
-const std::vector<BlockPos>& ChunkLightTask::GetLightTask() const {
+const vector<BlockPos>& ChunkLightTask::GetLightTask() const {
   return changed_block_;
 }
 

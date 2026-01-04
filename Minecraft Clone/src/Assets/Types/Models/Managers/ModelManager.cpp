@@ -159,7 +159,7 @@ void ModelManager::BakeElement(RenderableModel& model,
 
 void ModelManager::BakeFace(
     baked_model::Element& baked_element, const model::Element& element,
-    const FastHashMap<std::string, ResourceLocation>& mapping) {
+    const FastHashMap<string, ResourceLocation>& mapping) {
   for (int i = 0; i < 6; ++i) {
     const optional<model::Face>& face = element.faces_[i];
     if (!face.has_value()) {

@@ -8,10 +8,12 @@
 #include "Level/Block/Block.h"
 #include "Level/Chunk/Chunk.h"
 
+using std::make_unique;
+
 TallChunk::TallChunk(GameContext& context) : context_{context} {
   chunk_sub_column_.resize(16);
   for (int i = 0; i < 16; i++)
-    chunk_sub_column_[i] = std::make_unique<Chunk>(context);
+    chunk_sub_column_[i] = make_unique<Chunk>(context);
 }
 
 TallChunk::~TallChunk() = default;

@@ -21,6 +21,10 @@
 #include "Utils/LogUtils.h"
 #include "Utils/Timer/Timer.h"
 
+using std::make_unique;
+using std::move;
+using std::unique_ptr;
+
 Server::Server(GameContext& context) : context_{context} {}
 Server::~Server() {
   if (!stop_) {
@@ -29,13 +33,13 @@ Server::~Server() {
 }
 
 void Server::StartServer(ServerSettings serverSettings) {
-  level_ = std::make_unique<Level>(context_);
+  level_ = make_unique<Level>(context_);
   level_->Start();
-  time_ = std::make_unique<Timer>();
+  time_ = make_unique<Timer>();
   stop_ = false;
-  settings_ = std::make_unique<ServerSettings>(serverSettings);
-  packet_receiver_ = std::make_unique<ServerPacketReceiver>(*level_, context_);
-  packet_sender_ = std::make_unique<ServerPacketSender>(*level_, mspt_);
+  settings_ = make_unique<ServerSettings>(serverSettings);
+  packet_receiver_ = make_unique<ServerPacketReceiver>(*level_, context_);
+  packet_sender_ = make_unique<ServerPacketSender>(*level_, mspt_);
   main_server_loop_ = std::thread(&Server::Loop, this);
 }
 
@@ -80,9 +84,9 @@ void Server::SendEvent(const Event& eventIn) {
 
 EntityUUID Server::SetInternalConnection(InternalInterface* interface) {
   client_interface_ = static_cast<ClientInterface*>(interface);
-  std::unique_ptr<Player> player = std::make_unique<Player>();
+  unique_ptr<Player> player = make_unique<Player>();
   EntityUUID uuid =
-      level_->main_world_->world_updater_->SetEntity(std::move(player));
+      level_->main_world_->world_updater_->SetEntity(move(player));
   interface->SetPlayerUUID(uuid);
   return uuid;
 }

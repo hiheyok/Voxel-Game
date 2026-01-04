@@ -19,8 +19,11 @@
 #include "Core/Position/PositionTypes.h"
 #include "Utils/LogUtils.h"
 
+using glm::vec2;
+using glm::vec3;
 using std::ifstream;
 using std::make_unique;
+using std::move;
 using std::string;
 using std::unique_ptr;
 using std::vector;
@@ -153,7 +156,7 @@ void AssetManager::DiscoverShaders() {
         continue;
       }
 
-      PutAsset(name, std::move(source));
+      PutAsset(name, move(source));
 
     } catch (const json::type_error& e) {
       LOG_WARN("Type error in shader definition for '{}': {}", name, e.what());
@@ -202,7 +205,7 @@ void AssetManager::DiscoverEntityModels() {
 
     d++;
 
-    glm::vec3 hitboxSize(d.value().at(0), d.value().at(1), d.value().at(2));
+    vec3 hitboxSize(d.value().at(0), d.value().at(1), d.value().at(2));
     model->hitbox_ = hitboxSize;
 
     d++;
@@ -210,11 +213,11 @@ void AssetManager::DiscoverEntityModels() {
     for (auto& SubData : d.value().items()) {
       json::iterator it = SubData.value().begin();
 
-      glm::vec3 offset(it.value().at(0), it.value().at(1), it.value().at(2));
+      vec3 offset(it.value().at(0), it.value().at(1), it.value().at(2));
 
       it++;
 
-      glm::vec3 shapeSize(it.value().at(0), it.value().at(1), it.value().at(2));
+      vec3 shapeSize(it.value().at(0), it.value().at(1), it.value().at(2));
 
       it++;
 
@@ -245,15 +248,15 @@ void AssetManager::DiscoverEntityModels() {
 
         uv_iterator++;
 
-        glm::vec2 pts[2]{};
+        vec2 pts[2]{};
 
         int index = 0;
 
         for (auto& UV_Points :
              uv_iterator.value().items()) {  // iterate though uv points
           pts[1 - index] =
-              glm::vec2(static_cast<float>(UV_Points.value().at(0)),
-                        1.f - static_cast<float>(UV_Points.value().at(1)));
+              vec2(static_cast<float>(UV_Points.value().at(0)),
+                   1.f - static_cast<float>(UV_Points.value().at(1)));
           index++;
         }
 
@@ -264,6 +267,6 @@ void AssetManager::DiscoverEntityModels() {
       }
     }
 
-    PutAsset(model_name, std::move(model));
+    PutAsset(model_name, move(model));
   }
 }

@@ -16,9 +16,10 @@
 using std::make_unique;
 using std::nullopt;
 using std::optional;
+using std::string;
 
-DynamicAtlas::DynamicAtlas(GameContext& context, const std::string& key,
-                           int width, int height)
+DynamicAtlas::DynamicAtlas(GameContext& context, const string& key, int width,
+                           int height)
     : Texture2DBase{context, key, width, height},
       stitcher_{make_unique<Stitcher>(context, width, height, 16, false)} {}
 

@@ -15,15 +15,18 @@
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "Utils/LogUtils.h"
 
+using std::make_unique;
+using std::string;
+
 GameContext::GameContext()
-    : logger_{std::make_unique<LogUtils>()},
-      options_{std::make_unique<Options>(*this)},
-      blocks_{std::make_unique<BlockList>(*this)},
-      entities_list_{std::make_unique<EntitiesList>(*this)},
-      items_{std::make_unique<ItemList>(*this)},
-      generators_{std::make_unique<GeneratorType>(*this)},
-      event_handler_{std::make_unique<EventHandler>(*this)},
-      assets_{std::make_unique<AssetManager>(*this)} {}
+    : logger_{make_unique<LogUtils>()},
+      options_{make_unique<Options>(*this)},
+      blocks_{make_unique<BlockList>(*this)},
+      entities_list_{make_unique<EntitiesList>(*this)},
+      items_{make_unique<ItemList>(*this)},
+      generators_{make_unique<GeneratorType>(*this)},
+      event_handler_{make_unique<EventHandler>(*this)},
+      assets_{make_unique<AssetManager>(*this)} {}
 GameContext::~GameContext() = default;
 
 void GameContext::InitializeGameContext() {
@@ -34,7 +37,7 @@ void GameContext::InitializeGameContext() {
   // try {
   //   for (const auto& entry : std::filesystem::directory_iterator("assets")) {
   //     if (!entry.is_directory()) continue;
-  //     std::string name = entry.path().filename().string();
+  //     string name = entry.path().filename().string();
   //     if (!strcmp(name.c_str(), "shaders")) continue;
   //     blocks_->AddAssets(name);
   //   }
@@ -46,11 +49,11 @@ void GameContext::InitializeGameContext() {
 
 void GameContext::InitializeRenderingContext() {
   // Initialize objects
-  render_resource_manager_ = std::make_unique<RenderResourceManager>(*this);
+  render_resource_manager_ = make_unique<RenderResourceManager>(*this);
   render_resource_manager_->Initialize();
   render_resource_manager_->Load();
 
-  item_atlas_ = std::make_unique<ItemTextureAtlas>(*this);
+  item_atlas_ = make_unique<ItemTextureAtlas>(*this);
   item_atlas_->Initialize(512 * 16 * 2, 16 * 2 * 8);
   for (auto& item : items_->item_container_) {
     item_atlas_->AddItem(item.second);

@@ -9,11 +9,14 @@
 #include "Level/Container/EntityContainer.h"
 #include "Level/ECS/IECSManager.h"
 
+using std::make_unique;
+using std::vector;
+
 WorldInterface::WorldInterface(GameContext& context, bool neighbor_update,
                                bool heightmap_update)
     : context_{context},
-      chunks_{std::make_unique<ChunkMap>(context, true, true)},
-      entities_{std::make_unique<EntityContainer>()} {
+      chunks_{make_unique<ChunkMap>(context, true, true)},
+      entities_{make_unique<EntityContainer>()} {
   // ECS manager is created by derived classes (World or ClientCache)
 }
 
@@ -27,7 +30,7 @@ Chunk& WorldInterface::GetChunk(ChunkPos pos) const {
   return chunks_->GetChunk(pos);
 }
 
-std::vector<Chunk*> WorldInterface::GetAllChunks() const {
+vector<Chunk*> WorldInterface::GetAllChunks() const {
   return chunks_->GetAllChunks();
 }
 

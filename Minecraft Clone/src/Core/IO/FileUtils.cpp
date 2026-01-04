@@ -9,8 +9,11 @@
 #include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 
-std::vector<char> FileUtils::ReadFileToBuffer(GameContext& context,
-                                              std::string filepath) {
+using std::string;
+using std::vector;
+
+vector<char> FileUtils::ReadFileToBuffer(GameContext& context,
+                                         string filepath) {
   try {
     // Open the file at the end to easily get its size.
     std::ifstream file(filepath, std::ios::binary | std::ios::ate);
@@ -29,7 +32,7 @@ std::vector<char> FileUtils::ReadFileToBuffer(GameContext& context,
 
     file.seekg(0, std::ios::beg);  // Go back to the beginning
 
-    std::vector<char> buffer(size);
+    vector<char> buffer(size);
     if (!file.read(buffer.data(), size)) {
       LOG_STATIC_ERROR(context.logger_, "Failed to read file: {}", filepath);
       return {};  // Return empty vector on failure

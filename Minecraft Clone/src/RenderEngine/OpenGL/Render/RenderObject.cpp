@@ -11,26 +11,29 @@
 #include "RenderEngine/RenderResources/RenderHandle.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 
+using std::move;
+using std::string;
+
 RenderObject::RenderObject(GameContext& context) noexcept
     : context_{context}, shader_{nullptr}, vao_{context} {}
 RenderObject::RenderObject(RenderObject&&) noexcept = default;
 RenderObject& RenderObject::operator=(RenderObject&& other) noexcept {
   if (this != &other) {
-    shader_ = std::move(other.shader_);
-    vao_ = std::move(other.vao_);
-    texture_2d_cache_ = std::move(other.texture_2d_cache_);
+    shader_ = move(other.shader_);
+    vao_ = move(other.vao_);
+    texture_2d_cache_ = move(other.texture_2d_cache_);
   }
   return *this;
 }
 RenderObject::~RenderObject() noexcept = default;
 
-void RenderObject::SetShader(const std::string& asset_key) {
+void RenderObject::SetShader(const string& asset_key) {
   shader_ = context_.render_resource_manager_->GetShader(asset_key);
 }
 
 RenderHandle<Shader> RenderObject::GetShader() { return shader_; }
 
-void RenderObject::SetTexture2D(int index, int id, const std::string& name) {
+void RenderObject::SetTexture2D(int index, int id, const string& name) {
   shader_->BindTexture2D(index, id, name);
 
   // Tries to search for the the index first

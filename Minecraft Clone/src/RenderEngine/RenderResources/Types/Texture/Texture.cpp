@@ -7,7 +7,9 @@
 #include "RenderEngine/RenderResources/RenderResource.h"
 #include "Utils/LogUtils.h"
 
-Texture::Texture(GameContext& context, const std::string& key, GLenum target)
+using std::string;
+
+Texture::Texture(GameContext& context, const string& key, GLenum target)
     : RenderResource{key}, TextureBase{}, context_{context}, target_{target} {
   glGenTextures(1, &id_);
   handle_ = 0;

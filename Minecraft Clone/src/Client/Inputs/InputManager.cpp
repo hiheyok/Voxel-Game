@@ -9,6 +9,8 @@
 #include "Client/Inputs/InputCodes.h"
 #include "Client/Inputs/InputEvent.h"
 
+using std::vector;
+
 void InputManager::UpdateAllKey() noexcept {
   keyboard_.Refresh();
   mouse_.Refresh();
@@ -109,8 +111,8 @@ MouseInputs::ScrollState InputManager::GetScrollState() const noexcept {
   return mouse_.GetScrollState();
 }
 
-std::vector<InputEvent> InputManager::GetEvents() const {
-  std::vector<InputEvent> events;
+vector<InputEvent> InputManager::GetEvents() const {
+  vector<InputEvent> events;
 
   if (cursor_enable_) {
     // 1. Check for Mouse Movement

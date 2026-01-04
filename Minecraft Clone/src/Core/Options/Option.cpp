@@ -11,6 +11,10 @@
 #include "FileManager/Files.h"
 #include "Utils/LogUtils.h"
 
+using std::string;
+using std::to_string;
+using std::vector;
+
 Options::Options(GameContext& context) : context_{context} {
   SetOptionNameTable();
 
@@ -22,12 +26,12 @@ Options::Options(GameContext& context) : context_{context} {
 
   File file = FileManager::GetFile("options.txt");
 
-  std::vector<std::string> tokens = file.GetToken(':');
+  vector<string> tokens = file.GetToken(':');
 
   ProcessTokens(tokens);
 }
 
-bool Options::SetValue(std::string name, std::string value) {
+bool Options::SetValue(string name, string value) {
   size_t val = stoll(value);
 
   if (!option_name_.count(name)) {
@@ -39,12 +43,12 @@ bool Options::SetValue(std::string name, std::string value) {
   return true;
 }
 
-void Options::ProcessTokens(std::vector<std::string> tokens) {
+void Options::ProcessTokens(vector<string> tokens) {
   bool success = true;
 
   for (size_t i = 0; i < tokens.size() / 2; i++) {
-    std::string name = tokens[2 * i];
-    std::string val = tokens[2 * i + 1];
+    string name = tokens[2 * i];
+    string val = tokens[2 * i + 1];
     LOG_DEBUG("{}:{}", name, val);
     if (!SetValue(name, val)) {
       success = false;
@@ -74,7 +78,7 @@ void Options::GenerateOptionFile() {  // Generate file if deleted
   std::ofstream file("options.txt");
 
   for (const auto& option : option_name_) {
-    std::string str = option.first + ":" + std::to_string((*option.second));
+    string str = option.first + ":" + to_string((*option.second));
     file << str << "\n";
   }
 

@@ -8,6 +8,9 @@
 #include <string>
 #include <vector>
 
+using std::string;
+using std::vector;
+
 glm::vec4 RenderableFont::GetCharUV(char c) const noexcept {
   int index = static_cast<int>(c);
 
@@ -31,9 +34,9 @@ float RenderableFont::GetCharWidth(char c) const noexcept {
   return CharWidth[static_cast<int>(c)];
 }
 
-std::vector<float> RenderableFont::GetCharactorVertex(
-    char c, float xOffset, float yOffset, float xOrigin,
-    float yOrigin) const noexcept {
+vector<float> RenderableFont::GetCharactorVertex(char c, float xOffset,
+                                                 float yOffset, float xOrigin,
+                                                 float yOrigin) const noexcept {
   glm::vec4 uv_ = GetCharUV(c);
 
   float x0 = uv_.x;
@@ -43,78 +46,78 @@ std::vector<float> RenderableFont::GetCharactorVertex(
 
   float Width = GetCharWidth(c);
 
-  std::vector<float> out = {0,
-                            0,
-                            xOffset,
-                            yOffset,
-                            xOrigin,
-                            yOrigin,
-                            x0,
-                            y1,
-                            color_.x,
-                            color_.y,
-                            color_.z,
-                            0 + font_size_ * Width,
-                            0,
-                            xOffset,
-                            yOffset,
-                            xOrigin,
-                            yOrigin,
-                            x1,
-                            y1,
-                            color_.x,
-                            color_.y,
-                            color_.z,
-                            0 + font_size_ * Width,
-                            0 + font_size_,
-                            xOffset,
-                            yOffset,
-                            xOrigin,
-                            yOrigin,
-                            x1,
-                            y0,
-                            color_.x,
-                            color_.y,
-                            color_.z,
-                            0 + font_size_ * Width,
-                            0 + font_size_,
-                            xOffset,
-                            yOffset,
-                            xOrigin,
-                            yOrigin,
-                            x1,
-                            y0,
-                            color_.x,
-                            color_.y,
-                            color_.z,
-                            0,
-                            0 + font_size_,
-                            xOffset,
-                            yOffset,
-                            xOrigin,
-                            yOrigin,
-                            x0,
-                            y0,
-                            color_.x,
-                            color_.y,
-                            color_.z,
-                            0,
-                            0,
-                            xOffset,
-                            yOffset,
-                            xOrigin,
-                            yOrigin,
-                            x0,
-                            y1,
-                            color_.x,
-                            color_.y,
-                            color_.z};
+  vector<float> out = {0,
+                       0,
+                       xOffset,
+                       yOffset,
+                       xOrigin,
+                       yOrigin,
+                       x0,
+                       y1,
+                       color_.x,
+                       color_.y,
+                       color_.z,
+                       0 + font_size_ * Width,
+                       0,
+                       xOffset,
+                       yOffset,
+                       xOrigin,
+                       yOrigin,
+                       x1,
+                       y1,
+                       color_.x,
+                       color_.y,
+                       color_.z,
+                       0 + font_size_ * Width,
+                       0 + font_size_,
+                       xOffset,
+                       yOffset,
+                       xOrigin,
+                       yOrigin,
+                       x1,
+                       y0,
+                       color_.x,
+                       color_.y,
+                       color_.z,
+                       0 + font_size_ * Width,
+                       0 + font_size_,
+                       xOffset,
+                       yOffset,
+                       xOrigin,
+                       yOrigin,
+                       x1,
+                       y0,
+                       color_.x,
+                       color_.y,
+                       color_.z,
+                       0,
+                       0 + font_size_,
+                       xOffset,
+                       yOffset,
+                       xOrigin,
+                       yOrigin,
+                       x0,
+                       y0,
+                       color_.x,
+                       color_.y,
+                       color_.z,
+                       0,
+                       0,
+                       xOffset,
+                       yOffset,
+                       xOrigin,
+                       yOrigin,
+                       x0,
+                       y1,
+                       color_.x,
+                       color_.y,
+                       color_.z};
 
   return out;
 }
 
-std::vector<float> RenderableFont::GetVertices() const {
-  std::vector<float> out;
+vector<float> RenderableFont::GetVertices() const {
+  vector<float> out;
 
   float shift = font_size_;
 
@@ -127,8 +130,8 @@ std::vector<float> RenderableFont::GetVertices() const {
     float Width = GetCharWidth(c);
     float ShiftMag = shift * Width + spacing_ * shift;
 
-    std::vector<float> charVert = GetCharactorVertex(
-        render_text_[i], offsetValue, 0.f, coords.x, coords.y);
+    vector<float> charVert = GetCharactorVertex(render_text_[i], offsetValue,
+                                                0.f, coords.x, coords.y);
 
     offsetValue = offsetValue + ShiftMag;
 
@@ -141,7 +144,7 @@ std::vector<float> RenderableFont::GetVertices() const {
   return out;
 }
 
-std::vector<float> RenderableFont::GetBackgroundVertices() const {
+vector<float> RenderableFont::GetBackgroundVertices() const {
   float r = background_color_.x;
   float g = background_color_.y;
   float b = background_color_.z;
@@ -153,7 +156,7 @@ std::vector<float> RenderableFont::GetBackgroundVertices() const {
   float W = background_width_padding_;
   float H = background_height_padding_;
 
-  std::vector<float> out = {
+  vector<float> out = {
       0 - W,
       0 - H,
       xOrigin,
@@ -212,7 +215,7 @@ void RenderableFont::SetBackgroundPadding(float H, float W) {
   background_width_padding_ = W;
 }
 
-void RenderableFont::SetText(std::string str) { render_text_ = str; }
+void RenderableFont::SetText(string str) { render_text_ = str; }
 
 void RenderableFont::AddBackground(glm::vec3 color,
                                    float alpha) {  // add background

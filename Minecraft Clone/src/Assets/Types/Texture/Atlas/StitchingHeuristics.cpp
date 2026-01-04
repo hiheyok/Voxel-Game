@@ -33,10 +33,10 @@ int BestShortSideFit::FindBestSpot(
   return best_bin_idx;
 }
 
-std::vector<StitchingRectangle> ShorterAxisSplit::Split(
+vector<StitchingRectangle> ShorterAxisSplit::Split(
     int item_width, int item_height, int alignment,
     const StitchingRectangle& rect) const {
-  std::vector<StitchingRectangle> new_rects;
+  vector<StitchingRectangle> new_rects;
   int remaining_width = rect.width_ - item_width;
   int remaining_height = rect.height_ - item_height;
 

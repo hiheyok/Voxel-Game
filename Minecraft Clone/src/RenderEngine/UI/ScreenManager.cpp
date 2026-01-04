@@ -10,6 +10,9 @@
 #include "RenderEngine/UI/UIRenderer.h"
 #include "Utils/Assert.h"
 
+using std::move;
+using std::vector;
+
 ScreenManager::ScreenManager(GameContext& context,
                              ScreenRegistry& screen_registry)
     : context_{context}, screen_registry_{screen_registry}, ui_scaling_{3.0f} {}
@@ -20,7 +23,7 @@ void ScreenManager::PopScreen() {
   screens_.pop();
 }
 
-void ScreenManager::Update(const std::vector<InputEvent>& events) {
+void ScreenManager::Update(const vector<InputEvent>& events) {
   screens_.top()->Update(events);
 }
 
@@ -35,6 +38,6 @@ void ScreenManager::ChangeVirtualRes(glm::vec2 v_res) {
 
 void ScreenManager::SetScreenTickCallback(Screen::TickCallback callback) {
   if (!screens_.empty()) {
-    screens_.top()->SetTickCallback(std::move(callback));
+    screens_.top()->SetTickCallback(move(callback));
   }
 }

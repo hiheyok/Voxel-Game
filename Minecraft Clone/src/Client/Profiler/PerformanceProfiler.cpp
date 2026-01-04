@@ -13,50 +13,53 @@
 
 #include "FileManager/Files.h"
 
+using std::make_unique;
+using std::string;
+using std::to_string;
+using std::vector;
+using std::chrono::high_resolution_clock;
+
 PerformanceProfiler::PerformanceProfiler() {
-  initial_time_ = std::chrono::high_resolution_clock::now();
+  initial_time_ = high_resolution_clock::now();
 }
 
 void PerformanceProfiler::ProfileStart(uint64_t hash) {
   timer_stack_.emplace(hash, 0);
   timer_stack_.top().second =
-      (std::chrono::high_resolution_clock::now() - initial_time_).count();
+      (high_resolution_clock::now() - initial_time_).count();
 }
 
-void PerformanceProfiler::ProfileStart(std::string path) {
+void PerformanceProfiler::ProfileStart(string path) {
   uint64_t hash = Hasher(path);
   if (!string_hash_container_.count(hash)) {
     RegisterPaths(path);
   }
 
-  timer_stack_.emplace(
-      hash,
-      (std::chrono::high_resolution_clock::now() - initial_time_).count());
+  timer_stack_.emplace(hash,
+                       (high_resolution_clock::now() - initial_time_).count());
 }
 
 void PerformanceProfiler::ProfileStop(uint64_t hash) {
-  uint64_t timePass =
-      (std::chrono::high_resolution_clock::now() - initial_time_).count() -
-      timer_stack_.top().second;
+  uint64_t timePass = (high_resolution_clock::now() - initial_time_).count() -
+                      timer_stack_.top().second;
   time_pass_cache_.emplace_back(hash, timePass);
   timer_stack_.pop();
 }
 
-void PerformanceProfiler::ProfileStop(std::string path) {
+void PerformanceProfiler::ProfileStop(string path) {
   uint64_t hash = Hasher(path);
-  uint64_t timePass =
-      (std::chrono::high_resolution_clock::now() - initial_time_).count() -
-      timer_stack_.top().second;
+  uint64_t timePass = (high_resolution_clock::now() - initial_time_).count() -
+                      timer_stack_.top().second;
 
   time_pass_cache_.emplace_back(hash, timePass);
   timer_stack_.pop();
 }
 
 // TOOD: Fix me
-void PerformanceProfiler::RegisterPaths(std::string path) {
+void PerformanceProfiler::RegisterPaths(string path) {
   string_hash_container_[Hasher(path)] = path;
-  std::vector<std::string> tokens = Tokenize(path, '/');
-  std::vector<std::string> pathTokens = {};
+  vector<string> tokens = Tokenize(path, '/');
+  vector<string> pathTokens = {};
 
   if (tokens.size() != 1) {
     pathTokens.insert(pathTokens.end(), tokens.begin(), tokens.end());
@@ -65,15 +68,15 @@ void PerformanceProfiler::RegisterPaths(std::string path) {
   string_tokenized_hash_container_[Hasher(path)] = pathTokens;
 }
 
-uint64_t PerformanceProfiler::Hasher(std::string path) {
-  return std::hash<std::string>{}(path);
+uint64_t PerformanceProfiler::Hasher(string path) {
+  return std::hash<string>{}(path);
 }
 
 void PerformanceProfiler::LoadCache() {
   CondenseCache();
 
   for (const auto& [hash, time] : time_pass_cache_) {
-    std::vector<std::string> tokens = string_tokenized_hash_container_[hash];
+    vector<string> tokens = string_tokenized_hash_container_[hash];
     root_.ChangeTime(tokens, 0, static_cast<double>(time));
   }
 
@@ -114,11 +117,11 @@ void PerformanceProfiler::CombineCache(PerformanceProfiler profiler) {
 }
 
 PerformanceProfiler::PerformanceTree::PerformanceTree() = default;
-PerformanceProfiler::PerformanceTree::PerformanceTree(std::string name)
+PerformanceProfiler::PerformanceTree::PerformanceTree(string name)
     : name_(name) {}
 
-void PerformanceProfiler::PerformanceTree::ChangeTime(
-    std::vector<std::string>& path, int depth, double time) {
+void PerformanceProfiler::PerformanceTree::ChangeTime(vector<string>& path,
+                                                      int depth, double time) {
   time_passed_ += time;
 
   if (static_cast<int>(path.size()) == depth) {
@@ -132,12 +135,12 @@ void PerformanceProfiler::PerformanceTree::ChangeTime(
     }
   }
 
-  nodes_.push_back(std::make_unique<PerformanceTree>(path[depth]));
+  nodes_.push_back(make_unique<PerformanceTree>(path[depth]));
   nodes_.back()->ChangeTime(path, depth + 1, time);
 }
 
 void PerformanceProfiler::PerformanceTree::print(int depth) const {
-  std::string out = "";
+  string out = "";
 
   for (int i = 0; i < depth; i++) {
     out += ' ';
@@ -148,7 +151,7 @@ void PerformanceProfiler::PerformanceTree::print(int depth) const {
   }
 
   out += name_ + ':';
-  out += std::to_string(time_passed_ / 1000000.0) + " ms\n";
+  out += to_string(time_passed_ / 1000000.0) + " ms\n";
   std::cout << out;
 
   for (const auto& node : nodes_) {

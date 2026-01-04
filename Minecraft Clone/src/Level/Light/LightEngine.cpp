@@ -16,6 +16,8 @@
 #include "Level/World/WorldInterface.h"
 #include "Utils/Assert.h"
 
+using std::vector;
+
 template <EngineType kEngineType>
 void LightEngine<kEngineType>::InternalTask::SetBlockPos(
     BlockPos pos) noexcept {
@@ -90,7 +92,7 @@ void LightEngine<kEngineType>::PropagateIncrease() {
   InternalTask task;
   InternalTask next_task;
   // to prevent pointer chasing
-  const std::vector<BlockProperties>& block_properties =
+  const vector<BlockProperties>& block_properties =
       context_.blocks_->GetBlockPropertyList();
 
   BlockPos block_pos;

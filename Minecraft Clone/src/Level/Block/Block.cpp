@@ -6,8 +6,10 @@
 
 #include "Core/GameContext/GameContext.h"
 
+using std::make_unique;
+
 Block::Block(GameContext& context) : context_{context} {
-  properties_ = std::make_unique<BlockProperties>();
+  properties_ = make_unique<BlockProperties>();
 }
 Block::~Block() = default;
 

@@ -11,13 +11,15 @@
 #include "Utils/Assert.h"
 #include "Utils/LogUtils.h"
 
-TextureAtlas::TextureAtlas(GameContext& context, const std::string& key,
+using std::string;
+
+TextureAtlas::TextureAtlas(GameContext& context, const string& key,
                            AssetHandle<TextureAtlasSource> source)
     : Texture2DBase{context, key}, source_{source} {}
 
 TextureAtlas::~TextureAtlas() = default;
 
-TextureSprite TextureAtlas::GetSprite(const std::string& sprite_name) const {
+TextureSprite TextureAtlas::GetSprite(const string& sprite_name) const {
   const auto& it = sprites_.find(sprite_name);
   GAME_ASSERT(it != sprites_.end(), "Sprite not found in atlas");
   TextureSprite sprite = it->second;

@@ -8,6 +8,8 @@
 
 using namespace item_model;
 
+using std::move;
+
 CompositeEvaluator::CompositeEvaluator(GameContext& context, const json& data)
     : Evaluator{context} {
   Parse(data);
@@ -34,7 +36,7 @@ void CompositeEvaluator::Parse(const json& data) {
     if (evaluator == nullptr) {
       LOG_WARN("Skipping child composite model.");
     } else {
-      evaluators_.push_back(std::move(evaluator));
+      evaluators_.push_back(move(evaluator));
     }
   }
 }

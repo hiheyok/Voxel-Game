@@ -7,6 +7,7 @@
 #include "Level/Phys/Shape/AABB.h"
 
 using glm::vec3;
+using std::vector;
 
 void VoxelShape::AddBox(const AABB& box) {
   if (boxes_.empty()) {
@@ -25,6 +26,6 @@ void VoxelShape::Clear() {
   root_bounds_.max_ = {0.0f, 0.0f, 0.0f};
 }
 
-const std::vector<AABB>& VoxelShape::GetBoxes() const { return boxes_; }
+const vector<AABB>& VoxelShape::GetBoxes() const { return boxes_; }
 
 const AABB& VoxelShape::GetRootBounds() const { return root_bounds_; }

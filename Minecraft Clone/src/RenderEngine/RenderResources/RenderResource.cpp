@@ -4,9 +4,11 @@
 
 #include "RenderEngine/RenderResources/RenderResourceState.h"
 
-RenderResource::RenderResource(const std::string& key)
+using std::string;
+
+RenderResource::RenderResource(const string& key)
     : key_{key}, state{RenderResourceState::kUnloaded} {}
 
 RenderResource::~RenderResource() = default;
 
-const std::string& RenderResource::GetKey() const noexcept { return key_; }
+const string& RenderResource::GetKey() const noexcept { return key_; }

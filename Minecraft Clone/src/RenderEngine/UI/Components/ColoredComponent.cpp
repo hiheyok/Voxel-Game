@@ -6,6 +6,8 @@
 #include "RenderEngine/UI/Data/UserInterfaceData.h"
 #include "Utils/Assert.h"
 
+using std::vector;
+
 ColoredComponent::ColoredComponent(float r, float g, float b, float a)
     : Component{}, r_{r}, g_{g}, b_{b}, a_{a} {
   GAME_ASSERT(0 <= r && r <= 1, "Red value out of range");
@@ -15,7 +17,7 @@ ColoredComponent::ColoredComponent(float r, float g, float b, float a)
 };
 ColoredComponent::~ColoredComponent() = default;
 
-void ColoredComponent::GetRectangles(std::vector<UIRectangle>& primitives) {
+void ColoredComponent::GetRectangles(vector<UIRectangle>& primitives) {
   UIRectangle rect;
   rect.pos_.x = 0.0f;
   rect.pos_.y = 0.0f;

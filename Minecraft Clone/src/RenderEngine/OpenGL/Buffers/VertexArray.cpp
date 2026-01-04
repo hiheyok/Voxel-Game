@@ -9,6 +9,8 @@
 #include "RenderEngine/OpenGL/Buffers/BufferStorage.h"
 #include "Utils/LogUtils.h"
 
+using std::move;
+
 VertexArray::VertexArray(GameContext& context) : context_{context} {
   glGenVertexArrays(1, &array_id_);
   LOG_DEBUG("Created array. ID: {}", array_id_);
@@ -22,7 +24,7 @@ VertexArray::~VertexArray() {
 
 VertexArray::VertexArray(VertexArray&& buffer) noexcept
     : context_{buffer.context_} {
-  (*this) = std::move(buffer);
+  (*this) = move(buffer);
 }
 
 VertexArray& VertexArray::operator=(VertexArray&& buffer) noexcept {

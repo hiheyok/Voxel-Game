@@ -21,6 +21,10 @@
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "Utils/Timer/Timer.h"
 
+using std::string;
+using std::to_string;
+using std::vector;
+
 ChunkDrawBatch::ChunkDrawBatch(GameContext& context, size_t maxSize)
     : context_{context},
       memory_pool_{context, maxSize},
@@ -129,8 +133,8 @@ void ChunkDrawBatch::UpdateCommandBufferSize() {
   chunk_shader_pos_.resize(render_list_.size() * 3);
 }
 
-bool ChunkDrawBatch::AddChunkVertices(
-    const std::vector<BlockVertexFormat>& data, ChunkPos pos) {
+bool ChunkDrawBatch::AddChunkVertices(const vector<BlockVertexFormat>& data,
+                                      ChunkPos pos) {
   ChunkMemoryPoolOffset memoryPoolBlockData = memory_pool_.AddChunk(data, pos);
 
   if (memoryPoolBlockData.mem_offset_ == ULLONG_MAX) {
@@ -155,8 +159,8 @@ void ChunkDrawBatch::DeleteChunkVertices(ChunkPos pos) {
         memory_pool_.GetChunkMemoryPoolOffset(pos);
     if (ChunkMemOffset.mem_offset_ == std::numeric_limits<size_t>::max()) {
       throw std::logic_error("ChunkDrawBatch::DeleteChunkVertices - " +
-                             std::string("Failed to delete chunk: ") +
-                             std::to_string(pos));
+                             string("Failed to delete chunk: ") +
+                             to_string(pos));
     }
 
     size_t idx = render_list_[ChunkMemOffset.mem_offset_];

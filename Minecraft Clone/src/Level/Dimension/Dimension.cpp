@@ -21,32 +21,37 @@
 #include "Level/World/WorldUpdater.h"
 #include "Utils/Assert.h"
 
+using std::make_unique;
+using std::move;
+using std::unique_ptr;
+using std::vector;
+
 Dimension::Dimension(GameContext& context, DimensionProperties properties,
                      WorldGeneratorID generatorType)
     : context_{context},
       properties_{properties},
       generator_type_{generatorType},
-      main_world_{std::make_unique<World>(context)},
-      chunk_generator_{std::make_unique<ChunkGenerator>(context, kWorldSeed,
-                                                        generatorType)} {
+      main_world_{make_unique<World>(context)},
+      chunk_generator_{
+          make_unique<ChunkGenerator>(context, kWorldSeed, generatorType)} {
   world_settings_.horizontal_ticking_distance_ =
       context.options_->horizontal_render_distance_;
   world_settings_.vertical_ticking_distance_ =
       context.options_->vertical_render_distance_;
 
   world_ = static_cast<WorldInterface*>(main_world_.get());
-  light_engine_ = std::make_unique<ThreadedLightEngine>(context, *world_);
+  light_engine_ = make_unique<ThreadedLightEngine>(context, *world_);
 
-  world_updater_ = std::make_unique<WorldUpdater>(context_, main_world_.get(),
-                                                  world_settings_);
+  world_updater_ =
+      make_unique<WorldUpdater>(context_, main_world_.get(), world_settings_);
 
   // Connect ECS to WorldUpdater for block modifications
   auto& server_ecs =
       static_cast<ServerECSManager&>(main_world_->GetECSManager());
   server_ecs.SetWorldUpdater(world_updater_.get());
 
-  collision_detector_ = std::make_unique<CollisionDetector>(
-      context_, *main_world_->GetChunkMap());
+  collision_detector_ =
+      make_unique<CollisionDetector>(context_, *main_world_->GetChunkMap());
 
   if (context_.generators_->GetGenerator(generator_type_)->use_tall_chunks_) {
     world_updater_->tall_generation_ = true;
@@ -69,7 +74,7 @@ void Dimension::TickUsed(EventID id, BlockPos pos) {  // temp solution
 }
 
 void Dimension::EventTick() {
-  std::vector<Event>& event_queue = event_manager_.GetQueue();
+  vector<Event>& event_queue = event_manager_.GetQueue();
 
   for (size_t i = 0; i < event_queue.size(); i++) {
     const Event& e = event_queue[i];
@@ -116,21 +121,20 @@ void Dimension::EventTick() {
 }
 
 void Dimension::Update() {
-  const std::vector<ChunkPos>& requested_chunks =
+  const vector<ChunkPos>& requested_chunks =
       world_updater_->GetRequestedChunks();
   chunk_generator_->Generate(requested_chunks);
 
-  const FastHashMap<ChunkPos, std::vector<BlockPos>>& changed_blocks =
+  const FastHashMap<ChunkPos, vector<BlockPos>>& changed_blocks =
       world_updater_->GetChangedBlocks();
   for (const auto& [chunk_pos, changed_blocks] : changed_blocks) {
     light_engine_->UpdateChunk(ChunkLightTask{chunk_pos, changed_blocks});
   }
 
-  std::vector<std::unique_ptr<Chunk>> chunks = chunk_generator_->GetOutput();
-  world_updater_->SetChunk(std::move(chunks));
+  vector<unique_ptr<Chunk>> chunks = chunk_generator_->GetOutput();
+  world_updater_->SetChunk(move(chunks));
 
-  const std::vector<ChunkPos>& created_chunks =
-      world_updater_->GetCreatedChunkPos();
+  const vector<ChunkPos>& created_chunks = world_updater_->GetCreatedChunkPos();
   for (auto chunk_pos : created_chunks) {
     light_engine_->LightUpChunk(chunk_pos);
   }

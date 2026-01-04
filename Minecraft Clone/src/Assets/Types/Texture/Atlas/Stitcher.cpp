@@ -13,6 +13,7 @@
 #include "Core/Typenames.h"
 
 using glm::ivec2;
+using std::make_unique;
 using std::pair;
 using std::swap;
 using std::vector;
@@ -21,8 +22,8 @@ Stitcher::Stitcher(GameContext& context, int initial_width, int initial_height,
                    int alignment, bool can_expand)
     : context_{context},
       kCanExpand{can_expand},
-      place_heuristic_{std::make_unique<BestShortSideFit>()},
-      split_heuristic_{std::make_unique<ShorterAxisSplit>()},
+      place_heuristic_{make_unique<BestShortSideFit>()},
+      split_heuristic_{make_unique<ShorterAxisSplit>()},
       width_{initial_width},
       height_{initial_height},
       alignment_{alignment} {

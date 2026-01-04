@@ -36,6 +36,10 @@
 #include "RenderEngine/RenderResources/Types/Texture/Texture2D.h"
 #include "Utils/LogUtils.h"
 
+using std::string;
+using std::vector;
+using std::make_unique;
+
 ECSEntityRender::ECSEntityRender(GameContext& context, IECSManager& manager,
                                  PlayerPOV* player)
     : context_{context},
@@ -43,22 +47,22 @@ ECSEntityRender::ECSEntityRender(GameContext& context, IECSManager& manager,
       player_{player},
       shader_{context_.render_resource_manager_->GetShader("entity_render")},
       renderer_{
-          std::make_unique<RenderDrawElementsInstanced>(context, GL_TRIANGLES)},
-      ssbo_pos_{std::make_unique<Buffer>(context)},
-      ssbo_vel_{std::make_unique<Buffer>(context)},
-      ssbo_acc_{std::make_unique<Buffer>(context)} {}
+          make_unique<RenderDrawElementsInstanced>(context, GL_TRIANGLES)},
+      ssbo_pos_{make_unique<Buffer>(context)},
+      ssbo_vel_{make_unique<Buffer>(context)},
+      ssbo_acc_{make_unique<Buffer>(context)} {}
 
 ECSEntityRender::~ECSEntityRender() = default;
 
 void ECSEntityRender::Initialize() {
   static constexpr int kMaxEntityCount = 10000;
 
-  const std::vector<EntityTypeData*>& entity_type_list =
+  const vector<EntityTypeData*>& entity_type_list =
       context_.entities_list_->entity_type_list_;
 
   for (int i = 0; i < entity_type_list.size(); i++) {
     if (entity_type_list[i] == nullptr) continue;
-    const std::string& name = entity_type_list[i]->entity_name_;
+    const string& name = entity_type_list[i]->entity_name_;
     AssetHandle<EntityModel> model = context_.assets_->GetEntityModel(name);
     entity_cached_models_[entity_type_list[i]->id_] = model;
   }
@@ -161,8 +165,7 @@ void ECSEntityRender::Render() {
   renderer_->SetShader("entity_render");
 
   // 1. Group entities by model ID
-  FastHashMap<EntityType,
-              std::vector<std::pair<EntityUUID, TransformComponent>>>
+  FastHashMap<EntityType, vector<std::pair<EntityUUID, TransformComponent>>>
       grouped_entities;
 
   auto& transform_system = ecs_manager_.GetSystems().GetTransformSystem();
@@ -209,7 +212,7 @@ void ECSEntityRender::Render() {
                              acceleration_arr_.data());
 
     // Bind and Draw
-    const std::string& model_name =
+    const string& model_name =
         context_.entities_list_->entity_type_list_[static_cast<int>(model_id)]
             ->entity_name_;
 

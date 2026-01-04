@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+using glm::vec2;
+
 MouseInputs::MouseInputs() { button_states_.fill(ButtonState::kNone); }
 MouseInputs::~MouseInputs() = default;
 void MouseInputs::Refresh() noexcept {
@@ -68,11 +70,9 @@ bool MouseInputs::CheckButtonRelease(ButtonType type) const noexcept {
   return button_states_[idx] == ButtonState::kRelease;
 }
 
-glm::vec2 MouseInputs::GetDisplacement() const noexcept {
-  return displacement_;
-}
+vec2 MouseInputs::GetDisplacement() const noexcept { return displacement_; }
 
-glm::vec2 MouseInputs::GetPos() const noexcept { return position_; }
+vec2 MouseInputs::GetPos() const noexcept { return position_; }
 
 MouseInputs::ScrollState MouseInputs::GetScrollState() const noexcept {
   return scroll_direction_;

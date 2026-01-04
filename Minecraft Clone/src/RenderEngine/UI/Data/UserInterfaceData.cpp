@@ -4,13 +4,15 @@
 #include <iostream>
 #include <vector>
 
+using std::vector;
+
 std::ostream& operator<<(std::ostream& s, const UIVertexFormat& obj) {
   s << "(" << obj.x_ << ',' << obj.y_ << ')';
   return s;
 }
 
-void UIRectangle::GetVertices(std::vector<UIVertexFormat>& vertices,
-                              std::vector<uint32_t>& indices) const {
+void UIRectangle::GetVertices(vector<UIVertexFormat>& vertices,
+                              vector<uint32_t>& indices) const {
   uint32_t index_offset = vertices.size();
 
   UIVertexFormat v_base;

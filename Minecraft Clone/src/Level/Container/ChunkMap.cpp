@@ -19,6 +19,11 @@
 #include "Level/Container/Region.h"
 #include "Utils/Assert.h"
 
+using std::make_unique;
+using std::move;
+using std::unique_ptr;
+using std::vector;
+
 ChunkMap::ChunkMap(GameContext& context, bool neighborUpdate,
                    bool heightmapUpdate)
     : context_{context},
@@ -115,9 +120,9 @@ Chunk& ChunkMap::GetChunk(ChunkPos pos) const {
   return reg->GetChunk(pos);
 }
 
-std::vector<Chunk*> ChunkMap::GetAllChunks() const { return chunks_; }
+vector<Chunk*> ChunkMap::GetAllChunks() const { return chunks_; }
 
-void ChunkMap::InsertChunk(std::unique_ptr<Chunk> chunk) {
+void ChunkMap::InsertChunk(unique_ptr<Chunk> chunk) {
   const ChunkPos pos = chunk->position_;
 
   RegionPos reg_pos = pos.ToRegionPos();
@@ -144,11 +149,11 @@ void ChunkMap::InsertChunk(std::unique_ptr<Chunk> chunk) {
   if (reg->CheckChunk(pos)) {
     int idx = chunks_idx_[pos];
     chunks_[idx] = chunk.get();
-    reg->InsertChunk(std::move(chunk));
+    reg->InsertChunk(move(chunk));
   } else {
     chunks_.push_back(chunk.get());
     chunks_idx_.emplace(chunk->position_, chunks_.size() - 1);
-    reg->InsertChunk(std::move(chunk));
+    reg->InsertChunk(move(chunk));
   }
 
   Chunk& chunkRef = reg->GetChunk(pos);
@@ -177,9 +182,9 @@ bool ChunkMap::CheckRegion(RegionPos pos) const noexcept {
 Region* ChunkMap::CreateRegion(RegionPos pos) {
   GAME_ASSERT(!CheckRegion(pos),
               "Tried to create region when one already exists");
-  std::unique_ptr<Region> newRegion = std::make_unique<Region>(context_);
+  unique_ptr<Region> newRegion = make_unique<Region>(context_);
   Region* region = newRegion.get();
-  regions_.emplace(pos, std::move(newRegion));
+  regions_.emplace(pos, move(newRegion));
   ++epoch_;  // Invalidate all thread-local caches
   return region;
 }

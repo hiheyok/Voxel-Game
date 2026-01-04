@@ -13,10 +13,13 @@
 #include "RenderEngine/RenderResources/RenderHandle.h"
 #include "RenderEngine/UI/Data/UserInterfaceData.h"
 
+using std::make_unique;
+using std::vector;
+
 UIRenderer::UIRenderer(GameContext& context)
     : context_{context},
       renderer_{context},
-      handle_ssbo_{std::make_unique<Buffer>(context_)} {
+      handle_ssbo_{make_unique<Buffer>(context_)} {
   renderer_.SetDataAttribute(0, 2, GL_FLOAT, 9, 0);
   renderer_.SetDataAttribute(1, 2, GL_FLOAT, 9, 2);
   renderer_.SetDataAttribute(2, 4, GL_FLOAT, 9, 4);
@@ -28,8 +31,8 @@ UIRenderer::UIRenderer(GameContext& context)
 }
 UIRenderer::~UIRenderer() = default;
 
-void UIRenderer::Submit(const std::vector<UIVertexFormat>& vertices,
-                        const std::vector<uint32_t>& indices) {
+void UIRenderer::Submit(const vector<UIVertexFormat>& vertices,
+                        const vector<uint32_t>& indices) {
   size_t index_offset = vertices_.size();
   size_t start = indices_.size();
   size_t end = start + indices.size();

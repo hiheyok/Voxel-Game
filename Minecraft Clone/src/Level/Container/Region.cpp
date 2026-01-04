@@ -12,6 +12,9 @@
 #include "Level/Chunk/Chunk.h"
 #include "Utils/Assert.h"
 
+using std::move;
+using std::unique_ptr;
+
 Region::Region(GameContext& context)
     : context_{context}, region_data_(kRegionSize3D) {
   chunk_count_ = 0;
@@ -31,12 +34,12 @@ bool Region::CheckChunk(ChunkPos pos) const noexcept {
   return region_data_[idx] != nullptr;
 }
 
-void Region::InsertChunk(std::unique_ptr<Chunk> chunk) noexcept {
+void Region::InsertChunk(unique_ptr<Chunk> chunk) noexcept {
   ChunkPos pos = chunk->position_;
   int idx = pos.GetIndex();
   GAME_ASSERT(region_data_[idx] == nullptr, "Chunk already exists in region");
   chunk_count_++;
-  region_data_[idx] = std::move(chunk);
+  region_data_[idx] = move(chunk);
 }
 
 void Region::EraseChunk(ChunkPos pos) noexcept {

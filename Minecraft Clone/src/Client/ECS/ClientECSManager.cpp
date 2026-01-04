@@ -4,8 +4,10 @@
 
 #include "Client/ECS/ClientEntitySystems.h"
 
+using std::make_unique;
+
 ClientECSManager::ClientECSManager(GameContext& context, WorldInterface& world)
-    : systems_{std::make_unique<ClientEntitySystems>()} {}
+    : systems_{make_unique<ClientEntitySystems>()} {}
 
 ClientECSManager::~ClientECSManager() = default;
 

@@ -8,7 +8,9 @@
 
 #include "RenderEngine/Camera/camera.h"
 
-PlayerPOV::PlayerPOV() : camera_{std::make_unique<Camera>()} {}
+using std::make_unique;
+
+PlayerPOV::PlayerPOV() : camera_{make_unique<Camera>()} {}
 
 PlayerPOV::~PlayerPOV() = default;
 

@@ -8,12 +8,14 @@
 #include "Level/ECS/ServerECSManager.h"
 #include "Level/ECS/ServerEntitySystems.h"
 
+using std::make_unique;
+
 Level::Level(GameContext& context) : context_{context} {}
 Level::~Level() = default;
 
 void Level::Start() {
   DimensionProperties properties;
-  main_world_ = std::make_unique<OverworldDimension>(context_, properties);
+  main_world_ = make_unique<OverworldDimension>(context_, properties);
 
   // Create test ECS entity (server-side only)
   auto& server_ecs =

@@ -17,26 +17,28 @@
 #include "Utils/ThreadPool.h"
 #include "Utils/Timer/Timer.h"
 
+using std::make_unique;
+
 ThreadedLightEngine::ThreadedLightEngine(GameContext& context,
                                          WorldInterface& world)
     : context_{context},
       world_{world},
-      updater_{std::make_unique<ThreadPool<ChunkLightTask, int>>(
+      updater_{make_unique<ThreadPool<ChunkLightTask, int>>(
           context.options_->light_engine_threads_, "Light Updater",
           std::bind_front(&ThreadedLightEngine::WorkerUpdater, this), 250)},
-      lighter_{std::make_unique<ThreadPool<ChunkPos, int>>(
+      lighter_{make_unique<ThreadPool<ChunkPos, int>>(
           context.options_->light_engine_threads_, "Lighter",
           std::bind_front(&ThreadedLightEngine::WorkerLighter, this), 250)} {
   for (size_t i = 0; i < context_.options_->light_engine_threads_; ++i) {
     // Separate engines for each pool to avoid racing on SetCache()
     updater_skylight_engines_.emplace_back(
-        std::make_unique<SkyLightEngine>(context_, world_));
+        make_unique<SkyLightEngine>(context_, world_));
     updater_blocklight_engines_.emplace_back(
-        std::make_unique<BlockLightEngine>(context_, world_));
+        make_unique<BlockLightEngine>(context_, world_));
     lighter_skylight_engines_.emplace_back(
-        std::make_unique<SkyLightEngine>(context_, world_));
+        make_unique<SkyLightEngine>(context_, world_));
     lighter_blocklight_engines_.emplace_back(
-        std::make_unique<BlockLightEngine>(context_, world_));
+        make_unique<BlockLightEngine>(context_, world_));
   }
 }
 

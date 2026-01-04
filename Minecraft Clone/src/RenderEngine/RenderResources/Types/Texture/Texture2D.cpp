@@ -9,7 +9,9 @@
 #include "RenderEngine/RenderResources/Types/Texture/Texture2DBase.h"
 #include "Utils/LogUtils.h"
 
-Texture2D::Texture2D(GameContext& context, const std::string& key,
+using std::string;
+
+Texture2D::Texture2D(GameContext& context, const string& key,
                      AssetHandle<Texture2DSource> source)
     : Texture2DBase{context, key}, source_{source} {}
 

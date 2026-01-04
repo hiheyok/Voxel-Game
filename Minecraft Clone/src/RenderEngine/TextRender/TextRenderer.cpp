@@ -22,10 +22,14 @@
 #include "RenderEngine/TextRender/Font.h"
 #include "Utils/LogUtils.h"
 
+using std::make_unique;
+using std::string;
+using std::vector;
+
 TextRenderer::TextRenderer(GameContext& context)
     : context_{context},
-      background_render_{std::make_unique<RenderDrawArrays>(context_)},
-      font_render_{std::make_unique<RenderDrawArrays>(context_)} {}
+      background_render_{make_unique<RenderDrawArrays>(context_)},
+      font_render_{make_unique<RenderDrawArrays>(context_)} {}
 
 TextRenderer::~TextRenderer() = default;
 
@@ -54,29 +58,26 @@ void TextRenderer::InitializeTextRenderer(GLFWwindow* w) {
   LOG_DEBUG("Initialized font renderer");
 }
 
-void TextRenderer::InsertFontObject(const std::string& name,
-                                    RenderableFont font) {
+void TextRenderer::InsertFontObject(const string& name, RenderableFont font) {
   if (font_map_.count(name)) {
-    throw std::logic_error(
-        FUNC_SIGNATURE +
-        std::string("Font with the name " + name + " already exist!"));
+    throw std::logic_error(FUNC_SIGNATURE + string("Font with the name " +
+                                                   name + " already exist!"));
   }
 
   font_map_[name] = font;
 }
 
-void TextRenderer::RemoveFontObject(const std::string& name) {
+void TextRenderer::RemoveFontObject(const string& name) {
   if (!font_map_.count(name)) {
     throw std::logic_error("TextRenderer::RemoveFontObject - " +
-                           std::string("Font with the name " + name +
-                                       " doesn't exist! Cannot remove."));
+                           string("Font with the name " + name +
+                                  " doesn't exist! Cannot remove."));
   }
 
   font_map_.erase(name);
 }
 
-void TextRenderer::EditFontText(const std::string& name,
-                                const std::string& text) {
+void TextRenderer::EditFontText(const string& name, const string& text) {
   font_map_[name].SetText(text);
 }
 
@@ -85,7 +86,7 @@ void TextRenderer::ConstructBuffer() {
   vertices_.clear();
 
   for (const auto& font : font_map_) {
-    std::vector<float> fontVertices = font.second.GetVertices();
+    vector<float> fontVertices = font.second.GetVertices();
 
     vertices_.insert(vertices_.end(), fontVertices.begin(), fontVertices.end());
   }
@@ -99,7 +100,7 @@ void TextRenderer::ConstructBuffer() {
   for (const auto& font : font_map_) {
     if (!font.second.background_) continue;
 
-    std::vector<float> backgroundVertices = font.second.GetBackgroundVertices();
+    vector<float> backgroundVertices = font.second.GetBackgroundVertices();
 
     vertices_background_.insert(vertices_background_.end(),
                                 backgroundVertices.begin(),

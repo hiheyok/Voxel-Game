@@ -3,13 +3,15 @@
 #include "Client/ClientLevel/Entity/ClientEntities.h"
 
 #include <cstddef>
-#include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include "Core/GameContext/GameContext.h"
 #include "Core/Typenames.h"
 #include "Level/Entity/Properties/EntityProperties.h"
+#include "Utils/Assert.h"
+
+using std::vector;
 
 ClientEntities::ClientEntities(GameContext& context) : context_{context} {}
 ClientEntities::~ClientEntities() = default;
@@ -17,11 +19,8 @@ ClientEntities::~ClientEntities() = default;
 void ClientEntities::InsertEntity(const EntityProperty& entityProperty) {
   const EntityUUID& uuid = entityProperty.entity_uuid_;
 
-  if (entity_idx_.count(uuid)) {
-    throw std::logic_error(
-        "ClientEntities::InsertEntity - Tried to insert already existing "
-        "entity.");
-  }
+  GAME_ASSERT(!entity_idx_.count(uuid),
+              "Attempted to insert already existing entity");
 
   changed_entities_.emplace(uuid, changed_entities_list_.size());
   changed_entities_list_.push_back(entityProperty);
@@ -43,11 +42,8 @@ void ClientEntities::InsertEntity(const EntityProperty& entityProperty) {
 void ClientEntities::UpdateEntity(const EntityProperty& entityProperty) {
   const EntityUUID& uuid = entityProperty.entity_uuid_;
   auto it = entity_idx_.find(uuid);
-  if (it == entity_idx_.end()) {
-    throw std::logic_error(
-        "ClientEntities::ChangeEntity - Tried to change entity that doesn't "
-        "exist.");
-  }
+  GAME_ASSERT(it != entity_idx_.end(),
+              "Attempted to change nonexistent entity");
   all_entities_[it->second] = entityProperty;
   auto changedIt = changed_entities_.find(uuid);
   if (changedIt != changed_entities_.end()) {
@@ -61,20 +57,14 @@ void ClientEntities::UpdateEntity(const EntityProperty& entityProperty) {
 
 EntityProperty ClientEntities::GetEntity(const EntityUUID& uuid) const {
   const auto& it = entity_idx_.find(uuid);
-  if (it == entity_idx_.end()) {
-    throw std::logic_error(
-        "ClientEntities::GetEntity - Tried to get entity that doesn't exist.");
-  }
+  GAME_ASSERT(it != entity_idx_.end(), "Attempted to get nonexistent entity");
   return all_entities_[it->second];
 }
 
 void ClientEntities::RemoveEntity(const EntityUUID& uuid) {
   auto it = entity_idx_.find(uuid);
-  if (it == entity_idx_.end()) {
-    throw std::logic_error(
-        "ClientEntities::RemoveEntity - Tried to remove entity that doesn't "
-        "exist.");
-  }
+  GAME_ASSERT(it != entity_idx_.end(),
+              "Attempted to remove nonexistent entity");
 
   size_t idx = it->second;
   entity_idx_[all_entities_.back().entity_uuid_] = idx;
@@ -91,19 +81,19 @@ void ClientEntities::RemoveEntity(const EntityUUID& uuid) {
   removed_entities_list_.push_back(uuid);
 }
 
-std::vector<EntityProperty> ClientEntities::GetAllEntities() const {
+vector<EntityProperty> ClientEntities::GetAllEntities() const {
   return all_entities_;
 }
 
-std::vector<EntityProperty> ClientEntities::GetChangedEntities() {
-  std::vector<EntityProperty> out = std::move(changed_entities_list_);
+vector<EntityProperty> ClientEntities::GetChangedEntities() {
+  vector<EntityProperty> out = move(changed_entities_list_);
   changed_entities_.clear();
   changed_entities_list_.clear();
   return out;
 }
 
-std::vector<EntityUUID> ClientEntities::GetRemovedEntitiesUUID() {
-  std::vector<EntityUUID> out = std::move(removed_entities_list_);
+vector<EntityUUID> ClientEntities::GetRemovedEntitiesUUID() {
+  vector<EntityUUID> out = move(removed_entities_list_);
   removed_entities_.clear();
   removed_entities_list_.clear();
   return out;

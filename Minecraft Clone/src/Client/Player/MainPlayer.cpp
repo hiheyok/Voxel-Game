@@ -14,13 +14,15 @@
 #include "Level/Entity/Mobs/Player.h"
 #include "Level/Entity/Properties/EntityProperties.h"
 
+using std::make_unique;
+
 MainPlayer::MainPlayer(GameContext& context, ClientCache& cache,
                        UIManager& ui_manager)
     : context_{context},
-      player_{std::make_unique<Player>()},
-      movement_{std::make_unique<PlayerMovement>()},
-      interactions_{std::make_unique<WorldInteraction>(context)},
-      player_pov_{std::make_unique<PlayerPOV>()},
+      player_{make_unique<Player>()},
+      movement_{make_unique<PlayerMovement>()},
+      interactions_{make_unique<WorldInteraction>(context)},
+      player_pov_{make_unique<PlayerPOV>()},
       ui_manager_{ui_manager},
       client_cache_{cache} {
   // Set main player pointer in context for UI access

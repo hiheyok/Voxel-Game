@@ -8,13 +8,16 @@
 #include "Core/Typenames.h"
 #include "Utils/LogUtils.h"
 
+using std::move;
+using std::unique_ptr;
+
 GeneratorType::GeneratorType(GameContext& context) : context_{context} {}
 
 GeneratorType::~GeneratorType() = default;
 
 WorldGeneratorID GeneratorType::RegisterWorldGenerator(
-    std::unique_ptr<WorldGenerator> generator) {
-  generator_list_.push_back(std::move(generator));
+    unique_ptr<WorldGenerator> generator) {
+  generator_list_.push_back(move(generator));
   size_t id = generator_list_.size() - 1;
   LOG_INFO("Registered Generator: {}", id);
   return id;

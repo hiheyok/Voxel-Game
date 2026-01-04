@@ -22,6 +22,8 @@
 #include "Level/ECS/Systems/TransformSystem.h"
 #include "Utils/Assert.h"
 
+using std::vector;
+
 EntityRegistry::EntityRegistry(GameContext& context,
                                ServerEntitySystems& entity_systems)
     : context_{context}, entity_systems_{entity_systems} {}
@@ -130,8 +132,7 @@ void EntityRegistry::Commit() {
 
 void EntityRegistry::ResetState() { delete_queue_.clear(); }
 
-const std::vector<EntityUUID>& EntityRegistry::GetRemovedEntities()
-    const noexcept {
+const vector<EntityUUID>& EntityRegistry::GetRemovedEntities() const noexcept {
   return delete_queue_;
 }
 

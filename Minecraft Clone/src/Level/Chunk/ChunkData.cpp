@@ -19,6 +19,7 @@
 
 using std::make_unique;
 using std::move;
+using std::vector;
 
 ChunkContainer::ChunkContainer(GameContext& context)
     : context_{context},
@@ -172,7 +173,7 @@ void ChunkContainer::UpdateHeightMap() {
 }
 
 void ChunkContainer::UpdateHeightMap(int x, int z) {
-  const std::vector<BlockProperties>& properties =
+  const vector<BlockProperties>& properties =
       context_.blocks_->GetBlockPropertyList();
 
   // Check chunk above first, if the heightmap above is > -1, it means that

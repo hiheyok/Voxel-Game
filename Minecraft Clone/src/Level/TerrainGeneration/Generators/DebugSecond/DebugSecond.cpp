@@ -10,11 +10,13 @@
 #include "Level/Chunk/Chunk.h"
 #include "Level/TerrainGeneration/Generators/Generator.h"
 
+using std::unique_ptr;
+
 DebugWorldSecond::DebugWorldSecond(GameContext& context)
     : WorldGenerator{context} {}
 DebugWorldSecond::~DebugWorldSecond() = default;
 
-void DebugWorldSecond::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
+void DebugWorldSecond::Generate(ChunkPos pos, unique_ptr<Chunk>& chunk) {
   chunk->SetBlock(context_.blocks_->COBBLESTONE, {8, 8, 8});
 
   BlockPos chunk_offset = pos.GetBlockPosOffset();

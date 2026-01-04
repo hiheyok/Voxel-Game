@@ -2,7 +2,7 @@
 
 #include <glfw/glfw3.h>
 
-#include <stdexcept>
+#include "Utils/Assert.h"
 
 KeysInputs::KeysInputs() { states_.fill(KeyState::kNone); }
 
@@ -48,8 +48,7 @@ void KeysInputs::UpdateKeys(int key, int scancode, int action,
       break;
     }
     default: {
-      throw std::runtime_error(
-          "InputManager::SetKeyboardState - Invalid action");
+      GAME_ASSERT(false, "Invalid action");
     }
   }
 }

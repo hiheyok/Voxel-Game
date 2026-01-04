@@ -13,9 +13,13 @@
 #include "Level/Entity/Entity.h"
 #include "Utils/LogUtils.h"
 
+using std::make_unique;
+using std::move;
+using std::unique_ptr;
+
 World::World(GameContext& context) : WorldInterface{context, true, true} {
   // Create server-side ECS manager with full capabilities
-  ecs_manager_ = std::make_unique<ServerECSManager>(context, *this);
+  ecs_manager_ = make_unique<ServerECSManager>(context, *this);
 }
 
 World::~World() = default;
@@ -26,12 +30,12 @@ void World::SetBlock(BlockID block, BlockPos pos) {
   }
 }
 
-void World::SetChunk(std::unique_ptr<Chunk> chunk) {
-  chunks_->InsertChunk(std::move(chunk));
+void World::SetChunk(unique_ptr<Chunk> chunk) {
+  chunks_->InsertChunk(move(chunk));
 }
 
-EntityUUID World::SetEntity(std::unique_ptr<Entity> entity) {
-  return entities_->AddEntity(std::move(entity));
+EntityUUID World::SetEntity(unique_ptr<Entity> entity) {
+  return entities_->AddEntity(move(entity));
 }
 
 void World::RemoveEntity(const EntityUUID& uuid) {

@@ -13,14 +13,20 @@
 #include "Level/Entity/Entity.h"
 #include "Level/Entity/Properties/EntityProperties.h"
 
+using std::lock_guard;
+using std::move;
+using std::mutex;
+using std::unique_ptr;
+using std::vector;
+
 EntityContainer::EntityContainer() = default;
 EntityContainer::~EntityContainer() = default;
 
-EntityUUID EntityContainer::AddEntity(std::unique_ptr<Entity> e) {
+EntityUUID EntityContainer::AddEntity(unique_ptr<Entity> e) {
   e->properties_.entity_uuid_ = unique_id_;
   spawned_entity_.insert(unique_id_);
   entities_idx_.emplace(unique_id_, entities_.size());
-  entities_.push_back(std::move(e));
+  entities_.push_back(move(e));
   unique_id_++;
   entity_count_++;
   return unique_id_ - 1;
@@ -28,9 +34,9 @@ EntityUUID EntityContainer::AddEntity(std::unique_ptr<Entity> e) {
 
 int EntityContainer::GetEntityCount() const { return entity_count_; }
 
-std::vector<EntityProperty> EntityContainer::GetSpawnedEntities() {
-  std::lock_guard<std::mutex> lock{entity_lock_};
-  std::vector<EntityProperty> out;
+vector<EntityProperty> EntityContainer::GetSpawnedEntities() {
+  lock_guard<mutex> lock{entity_lock_};
+  vector<EntityProperty> out;
 
   for (const auto& entity : spawned_entity_) {
     out.emplace_back(GetEntity(entity)->properties_);
@@ -38,11 +44,11 @@ std::vector<EntityProperty> EntityContainer::GetSpawnedEntities() {
   return out;
 }
 
-std::vector<EntityProperty>
+vector<EntityProperty>
 EntityContainer::GetUpdatedEntities() {  // change this to past on a vector
                                          // later
-  std::lock_guard<std::mutex> lock{entity_lock_};
-  std::vector<EntityProperty> out;
+  lock_guard<mutex> lock{entity_lock_};
+  vector<EntityProperty> out;
   out.reserve(entities_idx_.size());
 
   for (auto& entity : entities_) {
@@ -54,9 +60,8 @@ EntityContainer::GetUpdatedEntities() {  // change this to past on a vector
   return out;
 }
 
-std::vector<EntityUUID> EntityContainer::GetRemovedEntities() {
-  return std::vector<EntityUUID>(removed_entity_.begin(),
-                                 removed_entity_.end());
+vector<EntityUUID> EntityContainer::GetRemovedEntities() {
+  return vector<EntityUUID>(removed_entity_.begin(), removed_entity_.end());
 }
 
 void EntityContainer::RemoveEntity(EntityUUID entityId) {
@@ -71,7 +76,7 @@ void EntityContainer::RemoveEntity(EntityUUID entityId) {
   std::swap(entities_.back(), entities_[removeIdx]);
   entities_idx_.erase(it);
   entities_.pop_back();
-  std::lock_guard<std::mutex> lock{entity_lock_};
+  lock_guard<mutex> lock{entity_lock_};
   removed_entity_.emplace(entityId);
   entity_count_--;
 }

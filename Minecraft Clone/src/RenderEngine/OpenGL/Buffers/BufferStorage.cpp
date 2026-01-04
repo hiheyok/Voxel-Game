@@ -14,6 +14,10 @@
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "Utils/LogUtils.h"
 
+using std::move;
+using std::string;
+using std::to_string;
+
 namespace {
 const char* glErrorToString(GLenum err) {
   switch (err) {
@@ -80,26 +84,27 @@ BufferStorage::BufferStorage(GameContext& context, GLuint bufferTarget,
 
 BufferStorage::~BufferStorage() {
   if (buffer_storage_id_ != 0) {
+    uint32_t id = buffer_storage_id_;
     glDeleteBuffers(1, &buffer_storage_id_);
     buffer_storage_id_ = 0;  // Use 0 to indicate deleted/uninitialized
     max_size_ = 0;
     target_ = 0;
-    LOG_DEBUG("Deleted buffer storage. ID was: {}",
-              buffer_storage_id_);  // Log before setting to 0
+    // Log before setting to 0
+    LOG_DEBUG("Deleted buffer storage. ID was: {}", id);
   }
 }
 
 BufferStorage::BufferStorage(BufferStorage&& buffer) noexcept
     : context_{buffer.context_} {
-  (*this) = std::move(buffer);
+  (*this) = move(buffer);
 }
 
 BufferStorage& BufferStorage::operator=(BufferStorage&& buffer) noexcept {
   buffer_storage_id_ = buffer.buffer_storage_id_;
   max_size_ = buffer.max_size_;
   target_ = buffer.target_;
-  copy_shader_ = std::move(buffer.copy_shader_);
-  move_shader_ = std::move(buffer.move_shader_);
+  copy_shader_ = move(buffer.copy_shader_);
+  move_shader_ = move(buffer.move_shader_);
 
   buffer.buffer_storage_id_ = 0;
   buffer.max_size_ = 0;
@@ -128,9 +133,9 @@ void BufferStorage::InsertData(uint64_t offset, uint64_t size,
   if (offset + size > max_size_) {
     throw std::logic_error(
         "BufferStorage::InsertData - " +
-        std::string("InsertData exceeds buffer bounds. Offset: ") +
-        std::to_string(offset) + ", Size: " + std::to_string(size) +
-        ", MaxSize: " + std::to_string(max_size_));
+        string("InsertData exceeds buffer bounds. Offset: ") +
+        to_string(offset) + ", Size: " + to_string(size) +
+        ", MaxSize: " + to_string(max_size_));
   }
 
   Bind();

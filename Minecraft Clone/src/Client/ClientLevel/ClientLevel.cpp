@@ -4,8 +4,6 @@
 
 #include "Client/ClientLevel/ClientCache.h"
 
-using std::make_unique;
-
 ClientLevel::ClientLevel(GameContext& context) : cache_{context} {}
 
 ClientLevel::~ClientLevel() = default;

@@ -4,9 +4,10 @@
 
 #include "Assets/AssetState.h"
 
-Asset::Asset(const std::string& key)
-    : key_{key}, state{AssetState::kUnloaded} {}
+using std::string;
+
+Asset::Asset(const string& key) : key_{key}, state{AssetState::kUnloaded} {}
 
 Asset::~Asset() = default;
 
-const std::string& Asset::GetKey() const noexcept { return key_; }
+const string& Asset::GetKey() const noexcept { return key_; }

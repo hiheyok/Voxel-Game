@@ -4,8 +4,10 @@
 
 #include "Assets/Types/Texture/TextureSource.h"
 
+using std::string;
+
 Texture2DBaseSource::Texture2DBaseSource(GameContext& context,
-                                         const std::string& asset_key)
+                                         const string& asset_key)
     : TextureSource{context, asset_key} {}
 
 Texture2DBaseSource::~Texture2DBaseSource() = default;

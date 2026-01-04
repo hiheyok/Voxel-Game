@@ -7,6 +7,8 @@
 #include "RenderEngine/RenderResources/Types/Texture/TextureAtlas.h"
 #include "RenderEngine/UI/Data/UserInterfaceData.h"
 
+using std::vector;
+
 TextureComponent::TextureComponent(TextureSprite sprite)
     : type_{TextureType::kSprite},
       sprite_{sprite},
@@ -33,7 +35,7 @@ TextureComponent::TextureComponent(RenderHandle<RenderTargetTexture> handle)
 
 TextureComponent::~TextureComponent() = default;
 
-void TextureComponent::GetRectangles(std::vector<UIRectangle>& primitives) {
+void TextureComponent::GetRectangles(vector<UIRectangle>& primitives) {
   UIRectangle rect;
   rect.rgba_ = {r_, g_, b_, a_};
   rect.pos_.x = 0.0f;

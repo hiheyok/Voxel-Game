@@ -10,6 +10,8 @@
 #include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 
+using std::move;
+
 Buffer::Buffer(GameContext& context) : context_{context} {
   glGenBuffers(1, &buffer_id_);
   if (buffer_id_ == 0) {
@@ -25,7 +27,7 @@ Buffer::~Buffer() {
 }
 
 Buffer::Buffer(Buffer&& buffer) noexcept : context_(buffer.context_) {
-  (*this) = std::move(buffer);
+  (*this) = move(buffer);
 }
 
 Buffer& Buffer::operator=(Buffer&& other) noexcept {

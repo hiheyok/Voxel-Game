@@ -15,6 +15,10 @@
 #include "Utils/LogUtils.h"
 
 using json = nlohmann::json;
+using std::string;
+using std::vector;
+using std::filesystem::filesystem_error;
+using std::filesystem::recursive_directory_iterator;
 
 BlockList::BlockList(GameContext& context) : context_{context} {}
 
@@ -24,7 +28,7 @@ BlockList::~BlockList() {
   }
 }
 
-BlockID BlockList::RegisterBlock(std::string blockName, Block* block) {
+BlockID BlockList::RegisterBlock(string blockName, Block* block) {
   BlockID id = static_cast<BlockID>(block_type_data_.size());
 
   block->id_ = id;
@@ -39,19 +43,17 @@ BlockID BlockList::RegisterBlock(std::string blockName, Block* block) {
   return id;
 }
 
-void BlockList::AddAssets(std::string namespaceIn) {
+void BlockList::AddAssets(string namespaceIn) {
   try {
-    std::vector<std::string> allOtherBlocks{};
-    std::string path = "assets/" + namespaceIn + "/models/block";
+    vector<string> allOtherBlocks{};
+    string path = "assets/" + namespaceIn + "/models/block";
 
-    for (const auto& entry :
-         std::filesystem::recursive_directory_iterator(path)) {
+    for (const auto& entry : recursive_directory_iterator(path)) {
       if (entry.is_directory()) continue;
-      std::string path = entry.path().string();
-      size_t idx = path.find("/models/block") +
-                   std::string("/models/block").length() + 1;
-      std::string name =
-          namespaceIn + ":" + path.substr(idx, path.size() - idx - 5);
+      string path = entry.path().string();
+      size_t idx =
+          path.find("/models/block") + string("/models/block").length() + 1;
+      string name = namespaceIn + ":" + path.substr(idx, path.size() - idx - 5);
       if (entry.path().extension() != ".json") continue;
       if (block_id_name_data_.count(name)) {
         continue;
@@ -60,18 +62,18 @@ void BlockList::AddAssets(std::string namespaceIn) {
       allOtherBlocks.push_back(name);
     }
 
-    for (std::string& name : allOtherBlocks) {
+    for (string& name : allOtherBlocks) {
       RegisterBlock(name, new DefaultBlock(context_));
     }
 
-  } catch (std::filesystem::filesystem_error& e) {
+  } catch (filesystem_error& e) {
     LOG_WARN("{}", e.what());
   }
 }
 
 Block* BlockList::GetBlockType(BlockID id) { return block_type_data_[id]; }
 
-const std::vector<Block*>& BlockList::GetBlockTypeList() const noexcept {
+const vector<Block*>& BlockList::GetBlockTypeList() const noexcept {
   return block_type_data_;
 }
 
@@ -79,6 +81,6 @@ const BlockProperties& BlockList::GetBlockProperties(BlockID id) const {
   return block_properties_[id];
 }
 
-const std::vector<BlockProperties>& BlockList::GetBlockPropertyList() const {
+const vector<BlockProperties>& BlockList::GetBlockPropertyList() const {
   return block_properties_;
 }

@@ -9,12 +9,14 @@
 #include "Assets/Types/ShaderSource.h"
 #include "RenderEngine/OpenGL/Shader/ShaderInterface.h"
 
-ComputeShader::ComputeShader(GameContext& context, const std::string& name,
+using std::string;
+
+ComputeShader::ComputeShader(GameContext& context, const string& name,
                              AssetHandle<ShaderSource> shader_src)
     : ShaderInterface{context, name, shader_src} {}
 
 void ComputeShader::Load() {
-  const std::string& src = shader_src_->GetCompute();
+  const string& src = shader_src_->GetCompute();
 
   shader_id_ = glCreateProgram();
   GLuint shader = CompileShader(src, "Compute", GL_COMPUTE_SHADER);

@@ -26,6 +26,7 @@
 #include "Level/World/WorldUpdater.h"
 
 using std::array;
+using std::move;
 using std::vector;
 
 ServerPacketSender::ServerPacketSender(Level& level, const double& mspt)
@@ -42,11 +43,11 @@ void ServerPacketSender::SendPackets(ClientInterface* client) {
 }
 
 void ServerPacketSender::SendEntityUpdatePacket(ClientInterface* client) {
-  std::vector<EntityProperty> spawned_entities =
+  vector<EntityProperty> spawned_entities =
       level_.main_world_->world_updater_->GetSpawnedEntities();
-  std::vector<EntityProperty> entity_updated =
+  vector<EntityProperty> entity_updated =
       level_.main_world_->world_updater_->GetUpdatedEntities();
-  std::vector<EntityUUID> entity_despawned =
+  vector<EntityUUID> entity_despawned =
       level_.main_world_->world_updater_->GetRemovedEntities();
 
   // Work on spawn entities
@@ -72,9 +73,9 @@ void ServerPacketSender::SendEntityUpdatePacket(ClientInterface* client) {
 }
 
 void ServerPacketSender::SendChunkUpdatePacket(ClientInterface* client) {
-  const std::vector<ChunkPos>& created_chunks =
+  const vector<ChunkPos>& created_chunks =
       level_.main_world_->world_updater_->GetCreatedChunkPos();
-  std::vector<ChunkPos> updated_lights =
+  vector<ChunkPos> updated_lights =
       level_.main_world_->world_updater_->GetLightUpdate();
 
   for (const auto& pos : created_chunks) {
@@ -91,14 +92,14 @@ void ServerPacketSender::SendChunkUpdatePacket(ClientInterface* client) {
     LightStorage block_light = *chunk.block_light_.get();
 
     ChunkUpdatePacket::LightUpdate packet;
-    packet.sky_light_ = std::move(sky_light);
-    packet.block_light_ = std::move(block_light);
+    packet.sky_light_ = move(sky_light);
+    packet.block_light_ = move(block_light);
     client->SendChunkUpdates(packet);
   }
 }
 
 void ServerPacketSender::SendBlockUpdatePacket(ClientInterface* client) {
-  const FastHashMap<ChunkPos, std::vector<BlockPos>>& changed_blocks_ =
+  const FastHashMap<ChunkPos, vector<BlockPos>>& changed_blocks_ =
       level_.main_world_->world_updater_->GetChangedBlocks();
 
   for (const auto& [chunk_pos, updates] : changed_blocks_) {
@@ -108,7 +109,7 @@ void ServerPacketSender::SendBlockUpdatePacket(ClientInterface* client) {
     packet.chunk_pos_ = chunk_pos;
     packet.updates_.resize(num_updates);
 
-    std::array<BlockID, kChunkSize3D> block_data_ =
+    array<BlockID, kChunkSize3D> block_data_ =
         level_.main_world_->world_->GetChunk(chunk_pos)
             .GetPalette()
             .UnpackAll();
@@ -118,7 +119,7 @@ void ServerPacketSender::SendBlockUpdatePacket(ClientInterface* client) {
       packet.updates_[i].second = block_data_[updates[i].GetIndex()];
     }
 
-    client->SendBlockUpdate(std::move(packet));
+    client->SendBlockUpdate(move(packet));
   }
 }
 

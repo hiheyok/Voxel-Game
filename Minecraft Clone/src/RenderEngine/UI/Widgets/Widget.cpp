@@ -14,6 +14,10 @@
 #include "RenderEngine/UI/Data/UserInterfaceData.h"
 #include "RenderEngine/UI/UIRenderer.h"
 
+using std::move;
+using std::unique_ptr;
+using std::vector;
+
 Widget::Widget(GameContext& context)
     : context_{context},
       parent_{nullptr},
@@ -35,22 +39,22 @@ void Widget::SetOffsetMax(glm::vec2 pos) noexcept { offset_max_ = pos; }
 
 void Widget::SetOffsetMin(glm::vec2 pos) noexcept { offset_min_ = pos; }
 
-void Widget::AddChildWidget(std::unique_ptr<Widget> widget) {
+void Widget::AddChildWidget(unique_ptr<Widget> widget) {
   if (!widget) {  // guard against nullptr
     return;
   }
 
   widget->SetScreenManager(manager_);
   widget->parent_ = this;
-  children_.push_back(std::move(widget));
+  children_.push_back(move(widget));
   SetDirty();
 }
 
-void Widget::AddComponent(std::unique_ptr<Component> component) {
+void Widget::AddComponent(unique_ptr<Component> component) {
   if (!component) {
     return;
   }
-  components_.push_back(std::move(component));
+  components_.push_back(move(component));
 }
 
 void Widget::TryUpdateLayout(const UIRectangle& parent) {
@@ -99,10 +103,10 @@ void Widget::SetBranchDirty() noexcept {
 }
 
 void Widget::SubmitToRenderer(UIRenderer& renderer) {
-  std::vector<UIVertexFormat> vertices;
-  std::vector<uint32_t> indices;
+  vector<UIVertexFormat> vertices;
+  vector<uint32_t> indices;
 
-  std::vector<UIRectangle> primitives;
+  vector<UIRectangle> primitives;
   GetPrimitives(primitives);
 
   // Populate handle idx
@@ -162,7 +166,7 @@ void Widget::SetScreenManager(ScreenManager* manager) noexcept {
   }
 }
 
-void Widget::GetPrimitives(std::vector<UIRectangle>& primitives) {
+void Widget::GetPrimitives(vector<UIRectangle>& primitives) {
   size_t beg = primitives.size();
 
   for (const auto& component : components_) {

@@ -15,19 +15,23 @@
 #include "Level/Entity/Properties/EntityProperties.h"
 #include "Level/World/CollisionDetector.h"
 
+using std::make_unique;
+using std::move;
+using std::unique_ptr;
+
 ClientCache::ClientCache(GameContext& context)
     : WorldInterface{context, false, false},
       context_{context},
       entities_{context},
       collision_manager_{context, *chunks_} {
   // Create client-side ECS manager with minimal systems
-  ecs_manager_ = std::make_unique<ClientECSManager>(context, *this);
+  ecs_manager_ = make_unique<ClientECSManager>(context, *this);
 }
 
 ClientCache::~ClientCache() = default;
 
-void ClientCache::AddChunk(std::unique_ptr<Chunk> chunk) {
-  chunks_->InsertChunk(std::move(chunk));
+void ClientCache::AddChunk(unique_ptr<Chunk> chunk) {
+  chunks_->InsertChunk(move(chunk));
 }
 
 void ClientCache::EraseChunk(ChunkPos pos) { chunks_->EraseChunk(pos); }

@@ -15,6 +15,9 @@
 #include "Level/Event/Event.h"
 #include "Level/Level.h"
 
+using std::get;
+using std::vector;
+
 ServerPacketReceiver::ServerPacketReceiver(Level& level, GameContext& context)
     : level_{level}, context_{context} {}
 
@@ -24,7 +27,7 @@ void ServerPacketReceiver::ProcessPackets(ClientInterface* client) {
 }
 
 void ServerPacketReceiver::ProcessPlayerPackets(ClientInterface* client) {
-  std::vector<Packet::PlayerAction> player_packets;
+  vector<Packet::PlayerAction> player_packets;
   client->PollClientPlayerAction(player_packets);
 
   for (const auto& packet : player_packets) {
@@ -33,7 +36,7 @@ void ServerPacketReceiver::ProcessPlayerPackets(ClientInterface* client) {
         // Send packet to player
         {
           const PlayerPacket::PlayerGetItem& get_item =
-              std::get<PlayerPacket::PlayerGetItem>(packet.packet_);
+              get<PlayerPacket::PlayerGetItem>(packet.packet_);
           Entity* e =
               level_.main_world_->world_->GetEntity(client->GetPlayerUUID());
           Player* player = static_cast<Player*>(e);
@@ -48,7 +51,7 @@ void ServerPacketReceiver::ProcessPlayerPackets(ClientInterface* client) {
         break;
       case PlayerPacket::PacketType::DESTROY_BLOCK: {
         const PlayerPacket::PlayerDestroyBlock& destroyBlock =
-            std::get<PlayerPacket::PlayerDestroyBlock>(packet.packet_);
+            get<PlayerPacket::PlayerDestroyBlock>(packet.packet_);
         BlockEvent block_event;
         block_event.block_ = context_.blocks_->AIR;
         block_event.id_ = context_.event_handler_->BlockPlace;
@@ -57,7 +60,7 @@ void ServerPacketReceiver::ProcessPlayerPackets(ClientInterface* client) {
       } break;
       case PlayerPacket::PacketType::PLACE_BLOCK: {
         const PlayerPacket::PlayerPlaceBlock& placeBlock =
-            std::get<PlayerPacket::PlayerPlaceBlock>(packet.packet_);
+            get<PlayerPacket::PlayerPlaceBlock>(packet.packet_);
         BlockEvent block_event;
         block_event.block_ = placeBlock.block_;
         block_event.id_ = context_.event_handler_->BlockPlace;
@@ -66,7 +69,7 @@ void ServerPacketReceiver::ProcessPlayerPackets(ClientInterface* client) {
       } break;
       case PlayerPacket::PacketType::MOVE: {
         const PlayerPacket::PlayerMove& movePlayer =
-            std::get<PlayerPacket::PlayerMove>(packet.packet_);
+            get<PlayerPacket::PlayerMove>(packet.packet_);
         Entity* e =
             level_.main_world_->world_->GetEntity(client->GetPlayerUUID());
         e->properties_.acceleration_ = movePlayer.acc_;

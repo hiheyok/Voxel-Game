@@ -10,10 +10,12 @@
 #include "Level/TerrainGeneration/Generators/Generator.h"
 #include "Utils/Iterators.h"
 
+using std::unique_ptr;
+
 DebugWorld::DebugWorld(GameContext& context) : WorldGenerator{context} {}
 DebugWorld::~DebugWorld() = default;
 
-void DebugWorld::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
+void DebugWorld::Generate(ChunkPos pos, unique_ptr<Chunk>& chunk) {
   int gx = pos.x * kChunkDim;
   int gz = pos.z * kChunkDim;
   int gy = pos.y * kChunkDim;

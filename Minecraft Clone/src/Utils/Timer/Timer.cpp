@@ -3,6 +3,9 @@
 #include <chrono>
 #include <string>
 
+using std::string;
+using std::to_string;
+
 Timer::Timer() noexcept : first_{std::chrono::high_resolution_clock::now()} {}
 
 void Timer::Set() { first_ = std::chrono::high_resolution_clock::now(); }
@@ -31,18 +34,18 @@ double Timer::GetTimePassed_ns() const noexcept {
       .count();
 }
 
-std::string Timer::StrGetTimePassed_s() const {
-  return std::to_string(GetTimePassed_s());
+string Timer::StrGetTimePassed_s() const {
+  return to_string(GetTimePassed_s());
 }
 
-std::string Timer::StrGetTimePassed_ms() const {
-  return std::to_string(GetTimePassed_ms());
+string Timer::StrGetTimePassed_ms() const {
+  return to_string(GetTimePassed_ms());
 }
 
-std::string Timer::StrGetTimePassed_us() const {
-  return std::to_string(GetTimePassed_us());
+string Timer::StrGetTimePassed_us() const {
+  return to_string(GetTimePassed_us());
 }
 
-std::string Timer::StrGetTimePassed_ns() const {
-  return std::to_string(GetTimePassed_ns());
+string Timer::StrGetTimePassed_ns() const {
+  return to_string(GetTimePassed_ns());
 }

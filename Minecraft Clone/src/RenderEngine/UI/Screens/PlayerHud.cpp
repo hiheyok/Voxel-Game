@@ -20,6 +20,7 @@
 
 using std::make_unique;
 using std::move;
+using std::vector;
 
 PlayerHud::PlayerHud(GameContext& context, ScreenManager& screen_mgr)
     : Screen{context, screen_mgr, {1920.0f, 1080.0f}} {
@@ -84,7 +85,7 @@ void PlayerHud::OnPause() {}
 void PlayerHud::OnResume() {}
 void PlayerHud::OnExit() {}
 
-void PlayerHud::Update(const std::vector<InputEvent>& events) {
+void PlayerHud::Update(const vector<InputEvent>& events) {
   Screen::Update(events);
 
   if (!context_.main_player_) return;

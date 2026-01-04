@@ -12,10 +12,12 @@
 #include "Level/TerrainGeneration/Generators/Math/MathWorld.h"
 #include "Utils/Iterators.h"
 
+using std::unique_ptr;
+
 MathWorld::MathWorld(GameContext& context) : WorldGenerator{context} {}
 MathWorld::~MathWorld() = default;
 
-void MathWorld::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
+void MathWorld::Generate(ChunkPos pos, unique_ptr<Chunk>& chunk) {
   int cx = pos.x * kChunkDim;
   int cy = pos.y * kChunkDim;
   int cz = pos.z * kChunkDim;

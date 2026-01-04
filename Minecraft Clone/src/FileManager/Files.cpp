@@ -9,8 +9,11 @@
 #include <system_error>
 #include <vector>
 
-std::vector<std::string> Tokenize(std::string str, char divider) {
-  std::vector<std::string> tokens = {};
+using std::string;
+using std::vector;
+
+vector<string> Tokenize(string str, char divider) {
+  vector<string> tokens = {};
   size_t l = 0, r = 0;
   while (r < str.size()) {
     // Shift right ptr to the first non-divider character
@@ -26,31 +29,31 @@ std::vector<std::string> Tokenize(std::string str, char divider) {
 
 File::File() = default;
 
-File::File(std::string dir) { Open(dir); }
+File::File(string dir) { Open(dir); }
 
-void File::Open(std::string dir) {
+void File::Open(string dir) {
   dir_ = dir;
   file_.open(dir_);
 }
 
 void File::Close() { file_.close(); }
 
-std::vector<std::string> File::GetToken(char divider) {
+vector<string> File::GetToken(char divider) {
   std::ifstream f(dir_);
 
-  std::vector<std::string> tokens = {};
+  vector<string> tokens = {};
 
-  std::string line;
+  string line;
 
   while (std::getline(f, line)) {
-    std::vector<std::string> lineTokens = Tokenize(line, divider);
+    vector<string> lineTokens = Tokenize(line, divider);
     tokens.insert(tokens.end(), lineTokens.begin(), lineTokens.end());
   }
 
   return tokens;
 }
 
-bool FileManager::CheckFolder(std::string dir) {
+bool FileManager::CheckFolder(string dir) {
   std::filesystem::path p = dir;
 
   std::error_code ec;  // To capture potential errors (optional)
@@ -59,7 +62,7 @@ bool FileManager::CheckFolder(std::string dir) {
   return result && !ec;
 }
 
-bool FileManager::CreateFolder(std::string name) {
+bool FileManager::CreateFolder(string name) {
   if (CheckFolder(name)) {
     return false;  // Already exist
   }
@@ -68,12 +71,10 @@ bool FileManager::CreateFolder(std::string name) {
 }
 
 // Return true of file exist and false if it doesn't
-bool FileManager::CheckFile(std::string dir) {
-  return std::filesystem::exists(dir);
-}
+bool FileManager::CheckFile(string dir) { return std::filesystem::exists(dir); }
 
-void FileManager::CreateFile(std::string name, std::string dir) {
-  std::string d = "";
+void FileManager::CreateFile(string name, string dir) {
+  string d = "";
 
   if (dir == "N/A")
     d = name;
@@ -83,8 +84,8 @@ void FileManager::CreateFile(std::string name, std::string dir) {
   file.close();
 }
 
-File FileManager::GetFile(std::string name, std::string dir) {
-  std::string d = "";
+File FileManager::GetFile(string name, string dir) {
+  string d = "";
 
   if (dir == "N/A")
     d = name;
@@ -94,8 +95,8 @@ File FileManager::GetFile(std::string name, std::string dir) {
   return File(d);
 }
 
-void FileManager::DeleteFile(std::string name, std::string dir) {
-  std::string d = "";
+void FileManager::DeleteFile(string name, string dir) {
+  string d = "";
 
   if (dir == "N/A")
     d = name;

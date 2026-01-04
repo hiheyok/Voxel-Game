@@ -31,11 +31,13 @@
 #include "Utils/Clock.h"
 #include "Utils/Timer/Timer.h"
 
+using std::make_unique;
+
 Client::Client(GameContext& context)
     : Window{context},
       context_{context},
-      text_render_{std::make_unique<TextRenderer>(context)},
-      internal_interface_{std::make_unique<InternalInterface>()},
+      text_render_{make_unique<TextRenderer>(context)},
+      internal_interface_{make_unique<InternalInterface>()},
       profiler_{new PerformanceProfiler()} {}
 
 Client::~Client() = default;
@@ -52,11 +54,11 @@ void Client::InitializeServerCom() {
       context_.options_->vertical_render_distance_;
 
   // Joins the server it should start receiving stuff now
-  server_ = std::make_unique<Server>(context_);
+  server_ = make_unique<Server>(context_);
   server_->StartServer(settings);
   player_uuid_ = server_->SetInternalConnection(internal_interface_.get());
-  client_play_ = std::make_unique<ClientPlay>(context_, *internal_interface_,
-                                              this, profiler_, *ui_manager_);
+  client_play_ = make_unique<ClientPlay>(context_, *internal_interface_, this,
+                                         profiler_, *ui_manager_);
 }
 
 void Client::Initialize() {
@@ -64,7 +66,7 @@ void Client::Initialize() {
   DisableCursor();
 
   // Create UIManager first so it can be passed to ClientPlay
-  ui_manager_ = std::make_unique<UIManager>(context_, inputs_);
+  ui_manager_ = make_unique<UIManager>(context_, inputs_);
   ui_manager_->Initialize();
   ui_manager_->PushScreen("player_hud");
 

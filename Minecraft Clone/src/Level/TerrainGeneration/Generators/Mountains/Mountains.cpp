@@ -18,15 +18,18 @@
 #include "Utils/FastNoiseLite.h"
 #include "Utils/Iterators.h"
 
+using std::make_unique;
+using std::unique_ptr;
+
 MountainGenerator::MountainGenerator(GameContext& context)
-    : WorldGenerator{context}, noise_{std::make_unique<FastNoiseLite>()} {
+    : WorldGenerator{context}, noise_{make_unique<FastNoiseLite>()} {
   noise_->SetNoiseType(noise_->NoiseType_OpenSimplex2);
   noise_->SetFrequency(0.005f);
 }
 
 MountainGenerator::~MountainGenerator() = default;
 
-void MountainGenerator::Generate(ChunkPos pos, std::unique_ptr<Chunk>& chunk) {
+void MountainGenerator::Generate(ChunkPos pos, unique_ptr<Chunk>& chunk) {
   ChunkPos scaledPos = pos * kChunkDim;
 
   float heightBias = 50;

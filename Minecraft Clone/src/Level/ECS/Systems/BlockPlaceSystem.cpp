@@ -22,6 +22,7 @@
 #include "Level/World/WorldUpdater.h"
 
 using std::floor;
+using std::vector;
 
 BlockPlaceSystem::BlockPlaceSystem(GameContext& context, WorldInterface& world,
                                    ServerEntitySystems& entity_systems)
@@ -44,7 +45,7 @@ void BlockPlaceSystem::Tick() {
   auto& server_ecs = static_cast<ServerECSManager&>(world_.GetECSManager());
   auto& registry = server_ecs.GetRegistry();
 
-  std::vector<EntityUUID> entities_to_remove;
+  vector<EntityUUID> entities_to_remove;
 
   for (const auto& [uuid, place_comp] : components_active_) {
     continue;

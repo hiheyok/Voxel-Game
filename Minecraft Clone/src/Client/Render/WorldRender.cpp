@@ -21,6 +21,7 @@
 
 using std::make_move_iterator;
 using std::make_unique;
+using std::move;
 using std::unique_ptr;
 using std::vector;
 
@@ -97,7 +98,7 @@ void WorldRender::Update() {
     if (kChunkUpdateLimit == updateAmount) {
       break;
     }
-    renderer_->AddChunk(std::move(mesh_add_queue_.back()));
+    renderer_->AddChunk(move(mesh_add_queue_.back()));
     mesh_add_queue_.pop_back();
     renderer_->Defrag(2);
   }

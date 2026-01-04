@@ -17,12 +17,13 @@
 #include "Utils/LogUtils.h"
 
 using json = nlohmann::json;
+using std::string;
 
 EntitiesList::EntitiesList(GameContext& context)
     : context_{context},
       entity_type_list_(static_cast<int>(EntityType::kMaxVal), nullptr) {}
 
-EntityType EntitiesList::RegisterEntity(std::string entity_name,
+EntityType EntitiesList::RegisterEntity(string entity_name,
                                         EntityTypeEnums type,
                                         EntityType entity_type) {
   EntityTypeData* new_entity = nullptr;
@@ -58,7 +59,7 @@ void EntitiesList::InitializeModels() {
   // trash code
   for (auto entity : entity_type_list_) {
     if (entity == nullptr) continue;
-    const std::string& name = entity->entity_name_;
+    const string& name = entity->entity_name_;
     AssetHandle<EntityModel> model = context_.assets_->GetEntityModel(name);
     if (!model.HasValue()) continue;
     entity->ChangeHitboxSize(model->hitbox_);

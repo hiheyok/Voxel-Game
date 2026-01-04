@@ -32,6 +32,10 @@
 #include "Utils/LogUtils.h"
 #include "Utils/Timer/Timer.h"
 
+using std::make_unique;
+using std::unique_ptr;
+using std::vector;
+
 TerrainRenderer::TerrainRenderer(GameContext& context)
     : context_{context},
       chunk_solid_batches_{},
@@ -39,7 +43,7 @@ TerrainRenderer::TerrainRenderer(GameContext& context)
       chunk_transparent_batches_{},
       chunk_batch_transparent_lookup_{},
       camera_{nullptr},
-      time_{std::make_unique<Timer>()},
+      time_{make_unique<Timer>()},
       cubic_shader_{
           context_.render_resource_manager_->GetShader("world_render")} {}
 
@@ -170,8 +174,8 @@ void TerrainRenderer::LoadAssets() {
 }
 
 void TerrainRenderer::AddChunk(ChunkPos pos,
-                               const std::vector<BlockVertexFormat>& data,
-                               std::vector<ChunkDrawBatch>& batchType,
+                               const vector<BlockVertexFormat>& data,
+                               vector<ChunkDrawBatch>& batchType,
                                FastHashMap<ChunkPos, int>& lookUpMap) {
   if (lookUpMap.count(pos)) {
     size_t BatchIndex = lookUpMap[pos];
@@ -205,8 +209,7 @@ void TerrainRenderer::AddChunk(ChunkPos pos,
   }
 }
 
-void TerrainRenderer::AddChunk(
-    std::unique_ptr<Mesh::ChunkVertexData> MeshData) {
+void TerrainRenderer::AddChunk(unique_ptr<Mesh::ChunkVertexData> MeshData) {
   AddChunk(MeshData->position_, MeshData->solid_vertices_, chunk_solid_batches_,
            chunk_batch_solid_lookup_);
   AddChunk(MeshData->position_, MeshData->transparent_vertices_,

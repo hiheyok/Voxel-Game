@@ -24,6 +24,7 @@
 #include "RenderEngine/RenderResources/Types/Texture/TextureAtlas.h"
 
 using std::make_unique;
+using std::vector;
 
 // Camera position for item rendering (used for sorting)
 static constexpr glm::vec3 kCameraPos{1.1f, 1.1f, 1.1f};
@@ -92,8 +93,8 @@ void ItemRender::SetUpData() {
   const BlockModelManager::ModelList& models =
       context_.assets_->GetBlockModelManager().GetModels();
 
-  std::vector<VertexFormat> vertices;
-  std::vector<uint32_t> indices;
+  vector<VertexFormat> vertices;
+  vector<uint32_t> indices;
   item_model_info_.resize(models.size());
 
   for (int id = 0; id < models.size(); ++id) {
@@ -120,8 +121,8 @@ void ItemRender::SetDrawCalls() {
 }
 
 void ItemRender::GetVertices(AssetHandle<RenderableModel> model,
-                             std::vector<VertexFormat>& vertices,
-                             std::vector<uint32_t>& indices) {
+                             vector<VertexFormat>& vertices,
+                             vector<uint32_t>& indices) {
   if (!model.HasValue()) {
     return;  // Render nothing
   }
@@ -132,7 +133,7 @@ void ItemRender::GetVertices(AssetHandle<RenderableModel> model,
     glm::vec3 center;
     float distance_sq;
   };
-  std::vector<FaceData> faces;
+  vector<FaceData> faces;
 
   for (const auto& element : model->GetElements()) {
     for (auto direction : Directions<BlockPos>()) {

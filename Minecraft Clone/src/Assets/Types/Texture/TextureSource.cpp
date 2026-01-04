@@ -14,7 +14,9 @@
 #include "Utils/LogUtils.h"
 #include "Utils/stb_image.h"
 
+using std::move;
 using std::string;
+using std::vector;
 
 TextureSource::TextureSource(GameContext& context, const string& asset_key)
     : Asset{asset_key}, context_{context} {}
@@ -54,7 +56,7 @@ TextureSource::TextureData::TextureData(GameContext& context,
 
 void TextureSource::TextureData::Load(GameContext& context,
                                       const string& filepath) {
-  std::vector<char> data = FileUtils::ReadFileToBuffer(context, filepath);
+  vector<char> data = FileUtils::ReadFileToBuffer(context, filepath);
 
   if (data.size() == 0) {
     LOG_STATIC_ERROR(context.logger_, "Failed to load in texture data: {}",
@@ -145,12 +147,12 @@ TextureSource::TextureData::TextureData(TextureData&& other) noexcept
 TextureSource::TextureData& TextureSource::TextureData::operator=(
     TextureData&& other) noexcept {
   if (this != &other) {
-    data_ = std::move(other.data_);
-    img_size_ = std::move(other.img_size_);
-    format_ = std::move(other.format_);
-    channels_ = std::move(other.channels_);
-    success_ = std::move(other.success_);
-    partial_trans_ = std::move(other.partial_trans_);
+    data_ = move(other.data_);
+    img_size_ = move(other.img_size_);
+    format_ = move(other.format_);
+    channels_ = move(other.channels_);
+    success_ = move(other.success_);
+    partial_trans_ = move(other.partial_trans_);
 
     other.data_ = nullptr;
     other.img_size_ = {0, 0};
