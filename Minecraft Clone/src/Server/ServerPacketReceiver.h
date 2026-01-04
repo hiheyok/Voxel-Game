@@ -11,10 +11,10 @@ class Level;
 class GameContext;
 
 // Handles incoming packets from clients
-class PacketReceiver {
+class ServerPacketReceiver {
  public:
-  explicit PacketReceiver(Level& level, GameContext& context);
-  ~PacketReceiver() = default;
+  explicit ServerPacketReceiver(Level& level, GameContext& context);
+  ~ServerPacketReceiver() = default;
 
   // Process all incoming packets from the client
   void ProcessPackets(ClientInterface* client);

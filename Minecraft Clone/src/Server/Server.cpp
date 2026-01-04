@@ -15,8 +15,8 @@
 #include "Level/Entity/Mobs/Player.h"
 #include "Level/Level.h"
 #include "Level/World/WorldUpdater.h"
-#include "Server/PacketReceiver.h"
-#include "Server/PacketSender.h"
+#include "Server/ServerPacketReceiver.h"
+#include "Server/ServerPacketSender.h"
 #include "Utils/Clock.h"
 #include "Utils/Timer/Timer.h"
 
@@ -33,8 +33,8 @@ void Server::StartServer(ServerSettings serverSettings) {
   time_ = std::make_unique<Timer>();
   stop_ = false;
   settings_ = std::make_unique<ServerSettings>(serverSettings);
-  packet_receiver_ = std::make_unique<PacketReceiver>(*level_, context_);
-  packet_sender_ = std::make_unique<PacketSender>(*level_, mspt_);
+  packet_receiver_ = std::make_unique<ServerPacketReceiver>(*level_, context_);
+  packet_sender_ = std::make_unique<ServerPacketSender>(*level_, mspt_);
   main_server_loop_ = std::thread(&Server::Loop, this);
 }
 
@@ -96,4 +96,3 @@ void Server::ResetState() {
       level_->main_world_->world_->GetECSManager());
   server_ecs.GetRegistry().ResetState();
 }
-

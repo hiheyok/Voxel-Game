@@ -10,10 +10,10 @@ class Level;
 struct ServerStats;
 
 // Handles outgoing packets to clients
-class PacketSender {
+class ServerPacketSender {
  public:
-  explicit PacketSender(Level& level, const double& mspt);
-  ~PacketSender() = default;
+  explicit ServerPacketSender(Level& level, const double& mspt);
+  ~ServerPacketSender() = default;
 
   // Send all outgoing packets to the client
   void SendPackets(ClientInterface* client);

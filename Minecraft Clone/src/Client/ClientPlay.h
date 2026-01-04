@@ -20,6 +20,8 @@ class DebugScreen;
 class Window;
 class MultiEntityRender;
 class ECSEntityRender;
+class ClientPacketReceiver;
+class ClientPacketSender;
 
 struct WindowProperties;
 struct GLFWwindow;
@@ -42,12 +44,11 @@ class ClientPlay {
   std::unique_ptr<MultiEntityRender> entity_render_;
   std::unique_ptr<ECSEntityRender> ecs_entity_render_;
   std::unique_ptr<WorldRender> terrain_render_;
+  std::unique_ptr<ClientPacketReceiver> packet_receiver_;
+  std::unique_ptr<ClientPacketSender> packet_sender_;
 
   double frametime_ = 1;
 
  private:
   void UpdateDebugStats();
-  void UpdateChunks();
-  void UpdateEntities();
-  void ProcessECSUpdates();
 };

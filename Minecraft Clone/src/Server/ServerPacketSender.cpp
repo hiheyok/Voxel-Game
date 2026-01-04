@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
-#include "Server/PacketSender.h"
+#include "Server/ServerPacketSender.h"
 
 #include <vector>
 
@@ -14,13 +14,13 @@
 #include "Level/Level.h"
 #include "Level/World/WorldUpdater.h"
 
-using std::vector;
 using std::array;
+using std::vector;
 
-PacketSender::PacketSender(Level& level, const double& mspt)
+ServerPacketSender::ServerPacketSender(Level& level, const double& mspt)
     : level_{level}, mspt_{mspt} {}
 
-void PacketSender::SendPackets(ClientInterface* client) {
+void ServerPacketSender::SendPackets(ClientInterface* client) {
   if (client == nullptr) return;
   SendEntityUpdatePacket(client);
   SendChunkUpdatePacket(client);
@@ -30,7 +30,7 @@ void PacketSender::SendPackets(ClientInterface* client) {
   client->SendTimeLastTick();
 }
 
-void PacketSender::SendEntityUpdatePacket(ClientInterface* client) {
+void ServerPacketSender::SendEntityUpdatePacket(ClientInterface* client) {
   std::vector<EntityProperty> spawned_entities =
       level_.main_world_->world_updater_->GetSpawnedEntities();
   std::vector<EntityProperty> entity_updated =
@@ -60,7 +60,7 @@ void PacketSender::SendEntityUpdatePacket(ClientInterface* client) {
   }
 }
 
-void PacketSender::SendChunkUpdatePacket(ClientInterface* client) {
+void ServerPacketSender::SendChunkUpdatePacket(ClientInterface* client) {
   const std::vector<ChunkPos>& created_chunks =
       level_.main_world_->world_updater_->GetCreatedChunkPos();
   std::vector<ChunkPos> updated_lights =
@@ -86,7 +86,7 @@ void PacketSender::SendChunkUpdatePacket(ClientInterface* client) {
   }
 }
 
-void PacketSender::SendBlockUpdatePacket(ClientInterface* client) {
+void ServerPacketSender::SendBlockUpdatePacket(ClientInterface* client) {
   const FastHashMap<ChunkPos, std::vector<BlockPos>>& changed_blocks_ =
       level_.main_world_->world_updater_->GetChangedBlocks();
 
@@ -111,7 +111,7 @@ void PacketSender::SendBlockUpdatePacket(ClientInterface* client) {
   }
 }
 
-void PacketSender::SendServerStats(ClientInterface* client) {
+void ServerPacketSender::SendServerStats(ClientInterface* client) {
   ServerStats stats;
   stats.chunk_count_ = 0;  // level_->level_loader_->GetChunkCount();
                            // TODO(hiheyok): Add chunk counter
@@ -121,7 +121,7 @@ void PacketSender::SendServerStats(ClientInterface* client) {
   client->SendServerStats(stats);
 }
 
-void PacketSender::SendECSUpdatePacket(ClientInterface* client) {
+void ServerPacketSender::SendECSUpdatePacket(ClientInterface* client) {
   // Cast to ServerECSManager to access server-specific methods
   auto& server_ecs = static_cast<ServerECSManager&>(
       level_.main_world_->world_->GetECSManager());

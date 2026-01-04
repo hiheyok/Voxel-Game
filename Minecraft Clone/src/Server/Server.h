@@ -12,8 +12,8 @@ class Timer;
 class Level;
 class Chunk;
 class GameContext;
-class PacketReceiver;
-class PacketSender;
+class ServerPacketReceiver;
+class ServerPacketSender;
 
 struct Entity;
 struct Ray;
@@ -60,7 +60,7 @@ class Server {
   bool stop_ = true;
   std::thread main_server_loop_;
   std::unique_ptr<Timer> time_;
-  std::unique_ptr<PacketReceiver> packet_receiver_;
-  std::unique_ptr<PacketSender> packet_sender_;
+  std::unique_ptr<ServerPacketReceiver> packet_receiver_;
+  std::unique_ptr<ServerPacketSender> packet_sender_;
   double mspt_ = 0.0;
 };

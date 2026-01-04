@@ -1,6 +1,6 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
-#include "Server/PacketReceiver.h"
+#include "Server/ServerPacketReceiver.h"
 
 #include <vector>
 
@@ -10,15 +10,15 @@
 #include "Level/Entity/Mobs/Player.h"
 #include "Level/Level.h"
 
-PacketReceiver::PacketReceiver(Level& level, GameContext& context)
+ServerPacketReceiver::ServerPacketReceiver(Level& level, GameContext& context)
     : level_{level}, context_{context} {}
 
-void PacketReceiver::ProcessPackets(ClientInterface* client) {
+void ServerPacketReceiver::ProcessPackets(ClientInterface* client) {
   if (client == nullptr) return;
   ProcessPlayerPackets(client);
 }
 
-void PacketReceiver::ProcessPlayerPackets(ClientInterface* client) {
+void ServerPacketReceiver::ProcessPlayerPackets(ClientInterface* client) {
   std::vector<Packet::PlayerAction> player_packets;
   client->PollClientPlayerAction(player_packets);
 
