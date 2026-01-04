@@ -2,6 +2,8 @@
 
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 
+#include <cstddef>
+#include <cstdint>
 #include <stdexcept>
 #include <utility>
 

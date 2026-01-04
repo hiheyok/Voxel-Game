@@ -4,6 +4,7 @@
 
 #include "Level/Dimension/Dimension.h"
 #include "Level/Entity/Entity.h"
+#include "Level/Entity/EntityTypeData.h"
 
 Passive::Passive(GameContext& context) : EntityTypeData{context} {}
 Passive::~Passive() = default;

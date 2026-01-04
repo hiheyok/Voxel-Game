@@ -2,8 +2,15 @@
 
 #include "Level/Item/ItemTextureAtlas.h"
 
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <vector>
+
 #include "Core/GameContext/GameContext.h"
+#include "Core/Typenames.h"
 #include "RenderEngine/ItemRender/ItemRender.h"
+#include "RenderEngine/OpenGL/Buffers/Buffer.h"
 #include "RenderEngine/OpenGL/Render/RenderDrawElements.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"

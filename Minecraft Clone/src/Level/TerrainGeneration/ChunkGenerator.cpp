@@ -2,13 +2,21 @@
 
 #include "Level/TerrainGeneration/ChunkGenerator.h"
 
+#include <cstdint>
 #include <functional>
+#include <iterator>
+#include <memory>
+#include <utility>
+#include <vector>
 
 #include "Core/GameContext/GameContext.h"
 #include "Core/Options/Option.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Chunk/Chunk.h"
+#include "Level/Chunk/TallChunk.h"
 #include "Level/TerrainGeneration/Generators/GeneratorType.h"
-#include "Level/TerrainGeneration/Generators/Generators.h"
+#include "Utils/ThreadPool.h"
 
 ChunkGenerator::ChunkGenerator(GameContext& context, int64_t world_seed,
                                WorldGeneratorID gen_type)

@@ -2,11 +2,11 @@
 
 #include "Level/Event/BlockEventHandles/BlockHandles.h"
 
-#include <iostream>
-
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/Direction.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Block/Block.h"
-#include "Level/Block/Type/Dirt.h"
 #include "Level/Dimension/Dimension.h"
 #include "Level/Event/EventHandler.h"
 #include "Level/World/WorldInterface.h"

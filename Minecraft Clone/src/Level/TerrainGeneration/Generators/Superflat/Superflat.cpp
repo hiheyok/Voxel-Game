@@ -1,7 +1,14 @@
 #include "Level/TerrainGeneration/Generators/Superflat/Superflat.h"
 
+#include <memory>
+
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Block/Blocks.h"
+#include "Level/Chunk/Chunk.h"
+#include "Level/TerrainGeneration/Generators/Generator.h"
+#include "Utils/Iterators.h"
 
 SuperflatWorld::SuperflatWorld(GameContext& context)
     : WorldGenerator{context} {}

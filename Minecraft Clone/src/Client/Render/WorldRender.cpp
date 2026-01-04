@@ -2,6 +2,7 @@
 
 #include "Client/Render/WorldRender.h"
 
+#include <cstddef>
 #include <functional>
 #include <memory>
 #include <utility>
@@ -11,10 +12,11 @@
 #include "Client/Player/PlayerPOV.h"
 #include "Core/GameContext/GameContext.h"
 #include "Core/Options/Option.h"
+#include "Core/Position/PositionTypes.h"
 #include "RenderEngine/ChunkRender/Mesh/BlockVertexFormat.h"
 #include "RenderEngine/ChunkRender/Mesh/ChunkMesh.h"
 #include "RenderEngine/ChunkRender/TerrainRenderer.h"
-#include "Utils/Clock.h"
+#include "Utils/ThreadPool.h"
 #include "Utils/Timer/Timer.h"
 
 using std::make_move_iterator;

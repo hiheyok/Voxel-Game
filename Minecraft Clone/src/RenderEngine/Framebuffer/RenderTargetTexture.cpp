@@ -1,5 +1,8 @@
 #include "RenderEngine/Framebuffer/RenderTargetTexture.h"
 
+#include <memory>
+
+#include "RenderEngine/API/TextureBase.h"
 #include "RenderEngine/Framebuffer/Attachments/ColorAttachment.h"
 
 using framebuffer::ColorAttachment;

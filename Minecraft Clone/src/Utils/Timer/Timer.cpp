@@ -1,5 +1,8 @@
 ﻿#include "Utils/Timer/Timer.h"
 
+#include <chrono>
+#include <string>
+
 Timer::Timer() noexcept : first_{std::chrono::high_resolution_clock::now()} {}
 
 void Timer::Set() { first_ = std::chrono::high_resolution_clock::now(); }

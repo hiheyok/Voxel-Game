@@ -1,7 +1,12 @@
 #include "RenderEngine/RenderResources/Types/Texture/TextureAtlas.h"
 
+#include <string>
+
+#include "Assets/AssetHandle.h"
 #include "Assets/Types/Texture/TextureAtlasSource.h"
 #include "Core/GameContext/GameContext.h"
+#include "RenderEngine/RenderResources/Types/Texture/Texture.h"
+#include "RenderEngine/RenderResources/Types/Texture/Texture2DBase.h"
 #include "RenderEngine/RenderResources/Types/Texture/TextureSprite.h"
 #include "Utils/Assert.h"
 #include "Utils/LogUtils.h"

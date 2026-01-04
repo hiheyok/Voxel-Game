@@ -1,10 +1,15 @@
 #include "Level/ECS/Systems/TickStateSystem.h"
 
+#include <cmath>
+#include <glm/vec3.hpp>
+
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
+#include "Level/ECS/EntitySystem.h"
 #include "Level/ECS/ServerEntitySystems.h"
 #include "Level/ECS/Systems/TransformSystem.h"
 #include "Level/World/WorldInterface.h"
-#include "Utils/LogUtils.h"
 
 using std::floor;
 
@@ -48,5 +53,3 @@ bool TickStateSystem::HasComponent(EntityUUID uuid) const {
 bool TickStateSystem::IsActive(EntityUUID uuid) const noexcept {
   return GetComponent(uuid).state_ == TickStateComponent::State::kActive;
 }
-
-

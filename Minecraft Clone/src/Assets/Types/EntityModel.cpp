@@ -2,7 +2,12 @@
 
 #include "Assets/Types/EntityModel.h"
 
-#include "Core/Typenames.h"
+#include <cstddef>
+#include <string>
+
+#include "Assets/Asset.h"
+#include "Core/Position/Direction.h"
+#include "Core/Position/PositionTypes.h"
 
 Model::ModelData Model::RectangularPrism::GetVertices() {
   ModelData model;

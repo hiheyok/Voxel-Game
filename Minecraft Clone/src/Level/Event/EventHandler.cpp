@@ -3,6 +3,9 @@
 #include "Level/Event/EventHandler.h"
 
 #include "Core/GameContext/GameContext.h"
+#include "Core/Typenames.h"
+#include "Level/Block/Block.h"
+#include "Level/Event/Event.h"
 #include "Utils/LogUtils.h"
 
 EventHandler::EventHandler(GameContext& context) : context_{context} {}

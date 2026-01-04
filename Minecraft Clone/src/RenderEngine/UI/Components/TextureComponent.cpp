@@ -1,6 +1,9 @@
 #include "RenderEngine/UI/Components/TextureComponent.h"
 
+#include <vector>
+
 #include "RenderEngine/Framebuffer/RenderTargetTexture.h"
+#include "RenderEngine/RenderResources/RenderHandle.h"
 #include "RenderEngine/RenderResources/Types/Texture/TextureAtlas.h"
 #include "RenderEngine/UI/Data/UserInterfaceData.h"
 
@@ -12,7 +15,7 @@ TextureComponent::TextureComponent(TextureSprite sprite)
       b_{1.0f},
       a_{1.0f} {}
 
-TextureComponent::TextureComponent(RenderHandle<TextureV2> handle)
+TextureComponent::TextureComponent(RenderHandle<Texture> handle)
     : type_{TextureType::kFull},
       handle_{handle},
       r_{1.0f},

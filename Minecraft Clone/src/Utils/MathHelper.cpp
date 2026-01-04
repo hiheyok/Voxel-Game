@@ -1,8 +1,10 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
 #include <cmath>
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_int2.hpp>
+#include <glm/ext/vector_int3.hpp>
 
 float FindDistanceNoSqrt(float x, float y, float z, float x1, float y1,
                          float z1) {

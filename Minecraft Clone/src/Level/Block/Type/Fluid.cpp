@@ -3,9 +3,13 @@
 #include "Level/Block/Type/Fluid.h"
 
 #include "Core/GameContext/GameContext.h"
-#include "FileManager/Files.h"
+#include "Core/Position/Direction.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
+#include "Level/Block/Block.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Dimension/Dimension.h"
+#include "Level/Event/Event.h"
 #include "Level/Event/EventHandler.h"
 
 Fluid::Fluid(GameContext& context, int spread_rate) : Block{context} {

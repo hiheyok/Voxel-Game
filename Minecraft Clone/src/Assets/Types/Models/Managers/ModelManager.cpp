@@ -4,15 +4,22 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <memory>
 #include <optional>
+#include <string>
 #include <vector>
 
 #include "Assets/AssetHandle.h"
 #include "Assets/AssetManager.h"
+#include "Assets/Types/Models/Data/ModelData.h"
 #include "Assets/Types/Models/Data/RenderableModel.h"
 #include "Assets/Types/Models/Managers/ModelLoader.h"
 #include "Assets/Types/Texture/TextureAtlasSource.h"
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/Direction.h"
+#include "Core/Typenames.h"
+#include "Utils/LogUtils.h"
 
 using glm::mat4;
 using glm::radians;

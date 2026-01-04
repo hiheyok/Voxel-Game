@@ -1,6 +1,7 @@
 #include "Level/Phys/Shape/AABB.h"
 
 #include <glm/common.hpp>
+#include <glm/vec3.hpp>
 
 using glm::vec3;
 

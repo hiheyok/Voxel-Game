@@ -2,21 +2,19 @@
 
 #include "Client/Client.h"
 
-#include <GLFW/glfw3.h>
 #include <gl/glew.h>
+#include <glfw/glfw3.h>
 
-#include <chrono>
 #include <memory>
 
 #include "Client/ClientPlay.h"
+#include "Client/Inputs/InputManager.h"
 #include "Core/GameContext/GameContext.h"
 #include "Core/Interfaces/InternalInterface.h"
-#include "Core/Networking/Packet.h"
 #include "Core/Options/Option.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Chunk/Chunk.h"
 #include "Level/Entity/Entities.h"
-#include "Level/Entity/Mobs/Player.h"
 #include "Level/Item/ItemTextureAtlas.h"
 #include "Level/Item/Items.h"
 #include "Level/Level.h"
@@ -26,12 +24,11 @@
 #include "Render/WorldRender.h"
 #include "RenderEngine/ChunkRender/TerrainRenderer.h"
 #include "RenderEngine/EntityRender/MultiEntityRender.h"
-#include "RenderEngine/TextRender/TextRenderer.h"
 #include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
+#include "RenderEngine/TextRender/TextRenderer.h"
 #include "RenderEngine/UI/UIManager.h"
 #include "Server/Server.h"
 #include "Utils/Clock.h"
-#include "Utils/LogUtils.h"
 #include "Utils/Timer/Timer.h"
 
 Client::Client(GameContext& context)

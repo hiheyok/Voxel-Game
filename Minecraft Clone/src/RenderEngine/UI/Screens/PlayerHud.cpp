@@ -1,5 +1,8 @@
 #include "RenderEngine/UI/Screens/PlayerHud.h"
 
+#include <vector>
+
+#include "Client/Inputs/InputEvent.h"
 #include "Core/GameContext/GameContext.h"
 #include "Level/Entity/Mobs/Player.h"
 #include "Level/Item/Item.h"
@@ -10,8 +13,8 @@
 #include "RenderEngine/RenderResources/RenderHandle.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "RenderEngine/RenderResources/Types/Texture/TextureAtlas.h"
-#include "RenderEngine/UI/Components/ColoredComponent.h"
 #include "RenderEngine/UI/Components/TextureComponent.h"
+#include "RenderEngine/UI/Screens/Screen.h"
 #include "RenderEngine/UI/Widgets/SlotWidget.h"
 #include "RenderEngine/UI/Widgets/Widget.h"
 

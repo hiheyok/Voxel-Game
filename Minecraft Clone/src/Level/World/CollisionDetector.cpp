@@ -1,11 +1,26 @@
 #include "Level/World/CollisionDetector.h"
 
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <cstdlib>
+#include <glm/ext/vector_bool3.hpp>
+#include <glm/ext/vector_double3.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_int3.hpp>
+#include <vector>
+
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/Direction.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Block/Block.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Container/ChunkMap.h"
 #include "Level/Entity/Entities.h"
 #include "Level/Entity/Entity.h"
+#include "Level/Phys/Shape/AABB.h"
+#include "Utils/Iterators.h"
 #include "Utils/Math/Ray/Ray.h"
 #include "Utils/Math/vectorOperations.h"
 
@@ -146,7 +161,8 @@ bool CollisionDetector::CheckRayIntersection(Ray& ray) {
 
   // To keep track of point location
   vec3 end_point = ray.origin_;
-  vec3 delta_dist(abs(1.0 / delta[0]), abs(1.0 / delta[1]), abs(1.0 / delta[2]));
+  vec3 delta_dist(abs(1.0 / delta[0]), abs(1.0 / delta[1]),
+                  abs(1.0 / delta[2]));
 
   // Stepping Variable
   vec3 side_dist((static_cast<float>(direction[0]) *

@@ -1,7 +1,9 @@
 #include "Assets/Types/Models/Evaluators/Item/ConditionEvaluator.h"
 
+#include <string>
 #include <utility>
 
+#include "Assets/Types/Models/Evaluators/Item/Evaluator.h"
 #include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 

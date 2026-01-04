@@ -3,10 +3,14 @@
 #include "Level/Block/Type/Grass.h"
 
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/PositionTypes.h"
+#include "Level/Block/Block.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Dimension/Dimension.h"
+#include "Level/Event/Event.h"
 #include "Level/Event/EventHandler.h"
 #include "Level/World/WorldUpdater.h"
+#include "Utils/Iterators.h"
 #include "Utils/Math/Probability/Probability.h"
 
 GrassBlock::GrassBlock(GameContext& context, double spread_chance,

@@ -2,11 +2,20 @@
 
 #include "Level/Chunk/ChunkData.h"
 
+#include <array>
+#include <atomic>
+#include <optional>
+#include <vector>
+
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/Direction.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Chunk/ChunkRawData.h"
 #include "Level/Chunk/Heightmap/Heightmap.h"
 #include "Level/TerrainGeneration/Structures/Structure.h"
+#include "Utils/Iterators.h"
 
 using std::make_unique;
 using std::move;
@@ -210,4 +219,6 @@ void ChunkContainer::SetLightUp(bool is_light_up) noexcept {
   is_light_up_.store(is_light_up, std::memory_order_release);
 }
 
-const Palette& ChunkContainer::GetPalette() const noexcept { return block_storage_; }
+const Palette& ChunkContainer::GetPalette() const noexcept {
+  return block_storage_;
+}

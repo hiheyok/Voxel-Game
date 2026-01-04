@@ -2,6 +2,8 @@
 
 #include "Level/Chunk/Heightmap/Heightmap.h"
 
+#include <cstdint>
+
 #include "Core//Typenames.h"
 
 HeightMap::HeightMap() { data_.fill(kNoBlocks); }

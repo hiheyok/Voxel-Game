@@ -2,13 +2,17 @@
 
 #include "Level/Entity/Entities.h"
 
-#include <fstream>
 #include <nlohmann/json.hpp>
 
+#include "Assets/AssetHandle.h"
 #include "Assets/AssetManager.h"
 #include "Assets/Types/EntityModel.h"
 #include "Core/GameContext/GameContext.h"
-#include "Level/Entity/Type/Types.h"
+#include "Level/ECS/EntityType.h"
+#include "Level/Entity/EntityTypeData.h"
+#include "Level/Entity/Type/FallingBlock.h"
+#include "Level/Entity/Type/Hostile.h"
+#include "Level/Entity/Type/Passive.h"
 #include "Utils/Assert.h"
 #include "Utils/LogUtils.h"
 

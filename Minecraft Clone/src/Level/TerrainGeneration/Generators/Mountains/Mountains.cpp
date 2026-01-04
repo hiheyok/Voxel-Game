@@ -2,9 +2,21 @@
 
 #include "Level/TerrainGeneration/Generators/Mountains/Mountains.h"
 
+#include <cmath>
+#include <cstddef>
+#include <cstdlib>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <memory>
+
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Block/Blocks.h"
+#include "Level/Chunk/Chunk.h"
+#include "Level/TerrainGeneration/Generators/Generator.h"
 #include "Utils/FastNoiseLite.h"
+#include "Utils/Iterators.h"
 
 MountainGenerator::MountainGenerator(GameContext& context)
     : WorldGenerator{context}, noise_{std::make_unique<FastNoiseLite>()} {

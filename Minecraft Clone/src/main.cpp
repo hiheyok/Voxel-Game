@@ -1,11 +1,14 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
+#include <cstdint>
+#include <cstdlib>
+#include <exception>
+
 #include "Client/Client.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <time.h>
 
 #include <iostream>
-#include <stdexcept>
 
 #include "Core/GameContext/GameContext.h"
 #include "Core/Options/Option.h"

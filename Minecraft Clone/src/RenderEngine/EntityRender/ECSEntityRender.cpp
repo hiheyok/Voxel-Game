@@ -1,26 +1,40 @@
 #include "RenderEngine/EntityRender/ECSEntityRender.h"
 
 #include <gl/glew.h>
-#include <GLFW/glfw3.h>
+#include <glfw/glfw3.h>
 
+#include <cstddef>
+#include <cstdint>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/trigonometric.hpp>
+#include <memory>
+#include <utility>
+#include <vector>
+
+#include "Assets/AssetHandle.h"
 #include "Assets/AssetManager.h"
-#include "Client/Player/PlayerPOV.h"
-#include "Core/GameContext/GameContext.h"
+#include "Assets/Types/EntityModel.h"
 #include "Client/ECS/ClientECSManager.h"
 #include "Client/ECS/ClientEntitySystems.h"
-#include "Level/ECS/ComponentMap.h"
+#include "Client/Player/PlayerPOV.h"
+#include "Core/GameContext/GameContext.h"
+#include "Core/Typenames.h"
+#include "Level/ECS/Components/TransformComponent.h"
+#include "Level/ECS/EntityType.h"
 #include "Level/ECS/IECSManager.h"
 #include "Level/ECS/Systems/ITransformSystem.h"
 #include "Level/Entity/Entities.h"
-
 #include "Level/Entity/EntityTypeData.h"
 #include "RenderEngine/Camera/Camera.h"
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "RenderEngine/OpenGL/Render/RenderDrawElementsInstanced.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "RenderEngine/RenderResources/RenderHandle.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "RenderEngine/RenderResources/Types/Texture/Texture2D.h"
+#include "Utils/LogUtils.h"
 
 ECSEntityRender::ECSEntityRender(GameContext& context, IECSManager& manager,
                                  PlayerPOV* player)
@@ -33,7 +47,6 @@ ECSEntityRender::ECSEntityRender(GameContext& context, IECSManager& manager,
       ssbo_pos_{std::make_unique<Buffer>(context)},
       ssbo_vel_{std::make_unique<Buffer>(context)},
       ssbo_acc_{std::make_unique<Buffer>(context)} {}
-
 
 ECSEntityRender::~ECSEntityRender() = default;
 
@@ -66,8 +79,11 @@ void ECSEntityRender::InitializeBuffers() {
     entity_element_index_[entity_model.first] = entity_indices_.size();
     entity_element_size_[entity_model.first] = model.indices_.size();
 
-    LOG_DEBUG("Setting up entity model {}: vertices size={}, indices size={}, model_index={}", 
-              static_cast<int>(entity_model.first), model.vertices_.size(), model.indices_.size(), model_index);
+    LOG_DEBUG(
+        "Setting up entity model {}: vertices size={}, indices size={}, "
+        "model_index={}",
+        static_cast<int>(entity_model.first), model.vertices_.size(),
+        model.indices_.size(), model_index);
 
     entity_indices_.reserve(entity_indices_.size() + model.indices_.size());
     for (int i : model.indices_) {
@@ -145,10 +161,12 @@ void ECSEntityRender::Render() {
   renderer_->SetShader("entity_render");
 
   // 1. Group entities by model ID
-  FastHashMap<EntityType, std::vector<std::pair<EntityUUID, TransformComponent>>> grouped_entities;
+  FastHashMap<EntityType,
+              std::vector<std::pair<EntityUUID, TransformComponent>>>
+      grouped_entities;
 
   auto& transform_system = ecs_manager_.GetSystems().GetTransformSystem();
-  
+
   // Cast to ClientECSManager to get entity types for rendering
   auto& client_ecs = static_cast<ClientECSManager&>(ecs_manager_);
   auto& client_systems = client_ecs.GetConcreteSystems();
@@ -158,8 +176,6 @@ void ECSEntityRender::Render() {
     EntityType type = client_systems.GetEntityType(uuid);
     grouped_entities[type].emplace_back(uuid, transform);
   }
-
-
 
   // 2. Render each group
   for (const auto& [model_id, entities] : grouped_entities) {
@@ -197,7 +213,7 @@ void ECSEntityRender::Render() {
         context_.entities_list_->entity_type_list_[static_cast<int>(model_id)]
             ->entity_name_;
 
-    RenderHandle<Texture2DV2> texture =
+    RenderHandle<Texture2D> texture =
         context_.render_resource_manager_->GetTexture2D(model_name);
 
     // Reuse the renderer's texture setting capability

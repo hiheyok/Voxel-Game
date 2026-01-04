@@ -1,4 +1,7 @@
 #include <algorithm>
+#include <memory>
+#include <utility>
+#include <vector>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 #include <glm/vec2.hpp>
@@ -9,6 +12,7 @@
 #include "Assets/Types/Texture/Atlas/StitchingRectangle.h"
 #include "Core/Typenames.h"
 
+using glm::ivec2;
 using std::pair;
 using std::swap;
 using std::vector;
@@ -87,11 +91,11 @@ void Stitcher::Expand(int item_width, int item_height) {
 }
 
 void Stitcher::MergeBins() {
-  FastHashMap<glm::ivec2, StitchingRectangle> rects_map;
-  FastHashSet<glm::ivec2> consumed_set;
+  FastHashMap<ivec2, StitchingRectangle> rects_map;
+  FastHashSet<ivec2> consumed_set;
 
   for (const auto& bin : free_bins_) {
-    rects_map.emplace(glm::ivec2{bin.x_, bin.y_}, bin);
+    rects_map.emplace(ivec2{bin.x_, bin.y_}, bin);
   }
 
   // Merges horizontally first
@@ -101,7 +105,7 @@ void Stitcher::MergeBins() {
     }
 
     while (true) {
-      const auto& it = rects_map.find(pos + glm::ivec2{rect.width_, 0});
+      const auto& it = rects_map.find(pos + ivec2{rect.width_, 0});
 
       if (it == rects_map.end() || it->second.height_ != rect.height_) {
         break;  // No neighbor or mismatched height
@@ -119,7 +123,7 @@ void Stitcher::MergeBins() {
     }
 
     while (true) {
-      const auto& it = rects_map.find(pos + glm::ivec2{0, rect.height_});
+      const auto& it = rects_map.find(pos + ivec2{0, rect.height_});
 
       if (it == rects_map.end() || it->second.width_ != rect.width_) {
         break;  // No neighbor or mismatched width

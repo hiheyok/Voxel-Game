@@ -2,8 +2,9 @@
 
 #include "RenderEngine/OpenGL/Buffers/BufferStorage.h"
 
-#include <GLFW/glfw3.h>
-
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -34,7 +35,7 @@ const char* glErrorToString(GLenum err) {
       return "Unknown OpenGL Error";
   }
 }
-}
+}  // namespace
 
 BufferStorage::BufferStorage(GameContext& context, GLuint bufferTarget,
                              uint64_t size, bool dynamic, const void* data)

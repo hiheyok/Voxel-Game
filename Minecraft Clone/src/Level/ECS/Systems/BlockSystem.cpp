@@ -1,8 +1,8 @@
 #include "Level/ECS/Systems/BlockSystem.h"
 
 #include "Core/GameContext/GameContext.h"
+#include "Level/ECS/EntitySystem.h"
 #include "Level/ECS/ServerEntitySystems.h"
-#include "Level/ECS/Systems/TickStateSystem.h"
 #include "Level/World/WorldInterface.h"
 
 BlockSystem::BlockSystem(GameContext& context, WorldInterface& world,

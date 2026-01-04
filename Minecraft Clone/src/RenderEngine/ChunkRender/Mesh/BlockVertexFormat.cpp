@@ -2,8 +2,6 @@
 
 #include "RenderEngine/ChunkRender/Mesh/BlockVertexFormat.h"
 
-#include <cstdint>
-
 void BlockVertexFormat::Set(float x, float y, float z, int r, int g, int b,
                             int a, float u, float v, int sky_light,
                             int block_light) noexcept {

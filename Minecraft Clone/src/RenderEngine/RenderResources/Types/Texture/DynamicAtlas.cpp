@@ -1,9 +1,15 @@
 #include "RenderEngine/RenderResources/Types/Texture/DynamicAtlas.h"
 
+#include <optional>
+#include <string>
+
 #include "Assets/Types/Texture/Atlas/Sticher.h"
 #include "Core/GameContext/GameContext.h"
 #include "RenderEngine/Framebuffer/RenderTarget.h"
 #include "RenderEngine/Framebuffer/RenderTargetTexture.h"
+#include "RenderEngine/RenderResources/RenderHandle.h"
+#include "RenderEngine/RenderResources/Types/Texture/Texture.h"
+#include "RenderEngine/RenderResources/Types/Texture/Texture2DBase.h"
 #include "RenderEngine/RenderResources/Types/Texture/TextureSprite.h"
 #include "Utils/LogUtils.h"
 

@@ -1,8 +1,13 @@
 #include "Assets/AssetManager.h"
 
+#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <nlohmann/json.hpp>
+#include <string>
+#include <utility>
+#include <vector>
 
+#include "Assets/AssetHandle.h"
 #include "Assets/Types/EntityModel.h"
 #include "Assets/Types/Models/Managers/BlockModelManager.h"
 #include "Assets/Types/ShaderSource.h"
@@ -10,6 +15,9 @@
 #include "Assets/Types/Texture/TextureAtlasSource.h"
 #include "Core/GameContext/GameContext.h"
 #include "Core/IO/FileUtils.h"
+#include "Core/Position/Direction.h"
+#include "Core/Position/PositionTypes.h"
+#include "Utils/LogUtils.h"
 
 using std::ifstream;
 using std::make_unique;

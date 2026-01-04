@@ -3,12 +3,19 @@
 #include "RenderEngine/ChunkRender/Batch/ChunkBatch.h"
 
 #include <algorithm>
+#include <climits>
 #include <cmath>
-#include <iterator>
+#include <cstddef>
+#include <cstdint>
+#include <glm/ext/vector_int3.hpp>
 #include <limits>
+#include <stdexcept>
+#include <string>
 #include <utility>
 #include <vector>
 
+#include "Core/Typenames.h"
+#include "RenderEngine/ChunkRender/MemoryPool/ChunkMemoryPool.h"
 #include "RenderEngine/ChunkRender/Mesh/BlockVertexFormat.h"
 #include "RenderEngine/OpenGL/Buffers/BufferStorage.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"

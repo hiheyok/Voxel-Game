@@ -2,12 +2,15 @@
 
 #include "Client/ClientPacketSender.h"
 
+#include <type_traits>
 #include <variant>
 
 #include "Client/ClientActionQueue.h"
 #include "Client/Player/MainPlayer.h"
 #include "Core/Interfaces/ServerInterface.h"
 #include "Core/Networking/PlayerAction.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Entity/Mobs/Player.h"
 
 ClientPacketSender::ClientPacketSender(ServerInterface& server,

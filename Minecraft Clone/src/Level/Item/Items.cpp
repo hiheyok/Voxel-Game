@@ -5,6 +5,7 @@
 #include "Core/GameContext/GameContext.h"
 #include "Core/Typenames.h"
 #include "Level/Block/Block.h"
+#include "Level/Item/Item.h"
 #include "Level/Item/Type/BlockItem.h"
 #include "Utils/LogUtils.h"
 

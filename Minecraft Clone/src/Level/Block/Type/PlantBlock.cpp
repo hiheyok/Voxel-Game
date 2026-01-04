@@ -2,6 +2,9 @@
 
 #include "Level/Block/Type/PlantBlock.h"
 
+#include "Core/Position/PositionTypes.h"
+#include "Level/Block/Block.h"
+
 PlantBlock::PlantBlock(GameContext& context) : Block{context} {
   properties_->opacity_ = 0;
   properties_->is_solid_ = true;  // TODO(hiheyok): tmp fix

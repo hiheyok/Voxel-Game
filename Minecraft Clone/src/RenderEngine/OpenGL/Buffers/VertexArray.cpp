@@ -2,9 +2,6 @@
 
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 
-#include <GLFW/glfw3.h>
-
-#include <stdexcept>
 #include <utility>
 
 #include "Core/GameContext/GameContext.h"

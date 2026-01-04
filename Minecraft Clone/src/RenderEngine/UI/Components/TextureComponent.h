@@ -7,7 +7,7 @@
 #include "RenderEngine/RenderResources/Types/Texture/TextureSprite.h"
 #include "RenderEngine/UI/Components/Component.h"
 
-class TextureV2;
+class Texture;
 class RenderTargetTexture;
 
 struct UIRectangle;
@@ -16,7 +16,7 @@ struct UIRectangle;
 class TextureComponent : public Component {
  public:
   explicit TextureComponent(TextureSprite sprite);
-  explicit TextureComponent(RenderHandle<TextureV2> handle);
+  explicit TextureComponent(RenderHandle<Texture> handle);
   explicit TextureComponent(RenderHandle<RenderTargetTexture> handle);
   ~TextureComponent() override;
 
@@ -26,7 +26,7 @@ class TextureComponent : public Component {
   enum class TextureType { kSprite, kFull, kRenderTarget };
   TextureType type_;
   TextureSprite sprite_;
-  RenderHandle<TextureV2> handle_;
+  RenderHandle<Texture> handle_;
   RenderHandle<RenderTargetTexture> handle_render_target_;
   float r_, g_, b_, a_;
 };

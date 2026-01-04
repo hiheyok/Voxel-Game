@@ -2,11 +2,8 @@
 
 #include "Core/Registry/ResourceLocation.h"
 
+#include <cstddef>
 #include <string>
-#include <utility>
-
-#include "FileManager/Files.h"
-#include "Utils/LogUtils.h"
 
 using std::string;
 

@@ -4,6 +4,7 @@
 
 #include "Level/Dimension/Dimension.h"
 #include "Level/Entity/Entity.h"
+#include "Level/Entity/EntityTypeData.h"
 
 Hostile::Hostile(GameContext& context) : EntityTypeData{context} {}
 Hostile::~Hostile() = default;

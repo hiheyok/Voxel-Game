@@ -1,6 +1,10 @@
 #include "Core/IO/FileUtils.h"
 
+#include <exception>
 #include <fstream>
+#include <ios>
+#include <string>
+#include <vector>
 
 #include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
@@ -33,10 +37,11 @@ std::vector<char> FileUtils::ReadFileToBuffer(GameContext& context,
 
     return buffer;
   } catch (std::ios_base::failure& e) {
-    LOG_STATIC_ERROR(context.logger_, "Failed to read file: {} | {}", filepath, e.what());
+    LOG_STATIC_ERROR(context.logger_, "Failed to read file: {} | {}", filepath,
+                     e.what());
   } catch (std::exception& e) {
-    LOG_STATIC_ERROR(context.logger_, "Failed to read file: {} | {}", filepath, e.what());
-
+    LOG_STATIC_ERROR(context.logger_, "Failed to read file: {} | {}", filepath,
+                     e.what());
   }
 
   return {};

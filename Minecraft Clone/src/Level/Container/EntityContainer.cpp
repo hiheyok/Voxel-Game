@@ -2,6 +2,14 @@
 
 #include "Level/Container/EntityContainer.h"
 
+#include <cstddef>
+#include <memory>
+#include <mutex>
+#include <stdexcept>
+#include <utility>
+#include <vector>
+
+#include "Core/Typenames.h"
 #include "Level/Entity/Entity.h"
 #include "Level/Entity/Properties/EntityProperties.h"
 

@@ -5,7 +5,6 @@
 #include "Core/Typenames.h"
 #include "Level/ECS/EntityType.h"
 #include "Level/Phys/Shape/AABB.h"
-#include "RenderEngine/OpenGL/Texture/Types/Texture2DOld.h"
 
 class Dimension;
 class GameContext;

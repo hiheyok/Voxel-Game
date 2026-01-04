@@ -2,15 +2,23 @@
 
 #include "FallingBlock.h"
 
+#include <cmath>
+#include <cstdlib>
+
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/Direction.h"
+#include "Core/Position/PositionTypes.h"
 #include "Level/Dimension/Dimension.h"
 #include "Level/Entity/Entity.h"
+#include "Level/Entity/EntityTypeData.h"
+#include "Level/Event/Event.h"
 
 FallingBlock::FallingBlock(GameContext& context) : EntityTypeData{context} {}
 FallingBlock::~FallingBlock() = default;
 
 void FallingBlock::Tick(Entity* entity, Dimension* dimension) {
-  float mspt = 1.0f / static_cast<float>(dimension->world_->parameters.world_tps_);
+  float mspt =
+      1.0f / static_cast<float>(dimension->world_->parameters.world_tps_);
 
   // Physics
 

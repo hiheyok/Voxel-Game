@@ -1,12 +1,18 @@
 #include "Level/ECS/Systems/CollisionSystem.h"
 
+#include <cmath>
+#include <glm/vec3.hpp>
+
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Block/Blocks.h"
-#include "Level/ECS/ComponentMap.h"
+#include "Level/ECS/EntitySystem.h"
 #include "Level/ECS/ServerEntitySystems.h"
 #include "Level/ECS/Systems/TickStateSystem.h"
 #include "Level/ECS/Systems/TransformSystem.h"
 #include "Level/World/WorldInterface.h"
+#include "Utils/Assert.h"
 
 CollisionSystem::CollisionSystem(GameContext& context, WorldInterface& world,
                                  ServerEntitySystems& entity_systems)

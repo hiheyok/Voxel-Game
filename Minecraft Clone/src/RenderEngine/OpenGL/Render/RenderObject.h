@@ -15,7 +15,7 @@
 
 class GameContext;
 class Shader;
-class TextureV2;
+class Texture;
 class Buffer;
 
 /*
@@ -41,7 +41,7 @@ class RenderObject {
   RenderHandle<Shader> GetShader();
   void SetTexture2D(int index, int id, const std::string& name);
 
-  void SetTexture(int idx, RenderHandle<TextureV2> handle);
+  void SetTexture(int idx, RenderHandle<Texture> handle);
   void BindSSBO(int locatiom, Buffer);
 
   void EnableDepthTest();
@@ -114,5 +114,5 @@ class RenderObject {
   std::vector<std::tuple<int, int, std::string>>
       texture_2d_cache_;  // <index, id, name>
 
-  std::vector<std::pair<int, RenderHandle<TextureV2>>> texture_cache_;
+  std::vector<std::pair<int, RenderHandle<Texture>>> texture_cache_;
 };

@@ -2,12 +2,13 @@
 
 #include "Level/Item/Item.h"
 
-#include "RenderEngine/OpenGL/Texture/TextureOld.h"
+#include "Core/Typenames.h"
 
 Item::Item() = default;
 Item::~Item() = default;
 
-bool ItemProperties::operator==(const ItemProperties& other) const noexcept = default;
+bool ItemProperties::operator==(const ItemProperties& other) const noexcept =
+    default;
 bool Item::operator==(const Item& other) const noexcept = default;
 
 BlockID Item::GetBlock() const { return properties_.block_; }

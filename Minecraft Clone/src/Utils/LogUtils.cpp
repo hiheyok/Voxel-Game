@@ -1,15 +1,20 @@
 #include "Utils/LogUtils.h"
 
+#include <array>
 #include <chrono>
+#include <cstdio>
 #include <cstring>
+#include <ctime>
 #include <format>
 #include <functional>
 #include <iomanip>
-#include <iostream>
+#include <mutex>
 #include <sstream>
+#include <stop_token>
+#include <string_view>
+#include <utility>
 
 #include "FileManager/Files.h"
-#include "Utils/Clock.h"
 
 static constexpr std::array<std::string_view, 4> kSeverityStrings = {
     "DEBUG", "INFO", "ERROR", "WARNING"};
@@ -34,27 +39,27 @@ LogUtils::LogUtils() : buffer_{'\0'} {
 
 LogUtils::~LogUtils() { logging_thread_.request_stop(); }
 
-
-
 void LogUtils::MainLogger(std::stop_token stoken) {
   std::string print_output;
   print_output.reserve(kPrintLimit + 512);
-  
+
   char timestamp_buffer[32];
-  
+
   while (!stoken.stop_requested()) {
     if (!logs_cache_.empty()) {
       LogData& log = logs_cache_.front();
 
       auto time_t = std::chrono::system_clock::to_time_t(log.time_);
       std::tm tm = *std::localtime(&time_t);
-      std::strftime(timestamp_buffer, sizeof(timestamp_buffer), "%Y-%m-%d %H:%M:%S", &tm);
+      std::strftime(timestamp_buffer, sizeof(timestamp_buffer),
+                    "%Y-%m-%d %H:%M:%S", &tm);
 
-      std::string_view severity = kSeverityStrings[static_cast<size_t>(log.type_)];
+      std::string_view severity =
+          kSeverityStrings[static_cast<size_t>(log.type_)];
 
-      print_output += std::format("[ {} ] [ {} ] [ {} / {}]: {}\n",
-                                   log.r_time_, timestamp_buffer, severity, 
-                                   log.func_, log.message_);
+      print_output +=
+          std::format("[ {} ] [ {} ] [ {} / {}]: {}\n", log.r_time_,
+                      timestamp_buffer, severity, log.func_, log.message_);
 
       logs_cache_.pop_front();
 

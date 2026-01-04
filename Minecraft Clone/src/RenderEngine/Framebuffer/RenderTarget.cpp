@@ -1,12 +1,14 @@
 #include "RenderEngine/Framebuffer/RenderTarget.h"
 
 #include <gl/glew.h>
+#include <glfw/glfw3.h>
 
 #include <memory>
 
 #include "RenderEngine/Framebuffer/Attachments/ColorAttachment.h"
 #include "RenderEngine/Framebuffer/Attachments/DepthStencilAttachment.h"
 #include "RenderEngine/Framebuffer/RenderTargetTexture.h"
+#include "RenderEngine/RenderResources/RenderHandle.h"
 
 using framebuffer::ColorAttachment;
 using framebuffer::DepthStencilAttachment;

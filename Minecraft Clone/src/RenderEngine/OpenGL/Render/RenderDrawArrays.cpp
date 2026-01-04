@@ -2,7 +2,11 @@
 
 #include "RenderEngine/OpenGL/Render/RenderDrawArrays.h"
 
+#include <cstddef>
+#include <cstdint>
+
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
+#include "RenderEngine/OpenGL/Render/RenderObject.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 
 RenderDrawArrays::RenderDrawArrays(GameContext& context, uint32_t draw_type)

@@ -1,8 +1,11 @@
 #include "Level/World/World.h"
 
+#include <memory>
 #include <utility>
 
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Chunk/Chunk.h"
 #include "Level/Container/ChunkMap.h"
 #include "Level/Container/EntityContainer.h"
@@ -16,7 +19,6 @@ World::World(GameContext& context) : WorldInterface{context, true, true} {
 }
 
 World::~World() = default;
-
 
 void World::SetBlock(BlockID block, BlockPos pos) {
   if (!chunks_->SetBlock(block, pos)) {

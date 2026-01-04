@@ -3,9 +3,12 @@
 #include "Level/Block/Type/GravityBlock.h"
 
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/PositionTypes.h"
+#include "Level/Block/Block.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Dimension/Dimension.h"
 #include "Level/Entity/Entities.h"
+#include "Level/Event/Event.h"
 #include "Level/Event/EventHandler.h"
 
 GravityBlock::GravityBlock(GameContext& context) : Block{context} {

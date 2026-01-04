@@ -1,15 +1,25 @@
 #include "RenderEngine/ItemRender/ItemRender.h"
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <glm/geometric.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/vec3.hpp>
+#include <vector>
 
+#include "Assets/AssetHandle.h"
 #include "Assets/AssetManager.h"
 #include "Assets/Types/Models/Data/RenderableModel.h"
 #include "Assets/Types/Models/Managers/BlockModelManager.h"
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/Direction.h"
+#include "Core/Position/PositionTypes.h"
 #include "Level/Item/Item.h"
 #include "RenderEngine/Camera/Camera.h"
 #include "RenderEngine/OpenGL/Render/RenderDrawElements.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "RenderEngine/RenderResources/RenderHandle.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "RenderEngine/RenderResources/Types/Texture/TextureAtlas.h"
 

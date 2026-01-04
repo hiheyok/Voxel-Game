@@ -1,7 +1,12 @@
 #include "Level/Light/ThreadedLightEngine.h"
 
+#include <cstddef>
+#include <functional>
+#include <memory>
+
 #include "Core/GameContext/GameContext.h"
 #include "Core/Options/Option.h"
+#include "Core/Position/PositionTypes.h"
 #include "Level/Chunk/Chunk.h"
 #include "Level/Light/BlockLightEngine.h"
 #include "Level/Light/ChunkLightTask.h"

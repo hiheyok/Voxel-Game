@@ -2,6 +2,8 @@
 
 #include "Level/Block/Type/DefaultBlock.h"
 
+#include "Core/Position/PositionTypes.h"
+#include "Level/Block/Block.h"
 #include "Level/Dimension/Dimension.h"
 
 DefaultBlock::DefaultBlock(GameContext& context) : Block{context} {

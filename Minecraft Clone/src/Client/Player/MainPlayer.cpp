@@ -2,11 +2,11 @@
 
 #include "Client/Player/MainPlayer.h"
 
-#include <glm/vec2.hpp>
-#include <utility>
+#include <memory>
 
 #include "Client/ClientActionQueue.h"
 #include "Client/Inputs/InputManager.h"
+#include "Client/Inputs/MouseInputs.h"
 #include "Client/Player/PlayerMovement.h"
 #include "Client/Player/PlayerPOV.h"
 #include "Client/Player/WorldInteraction.h"

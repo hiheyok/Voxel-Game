@@ -2,6 +2,11 @@
 
 #include "Level/Light/LightStorage.h"
 
+#include <cstddef>
+#include <cstdint>
+
+#include "Core/Position/PositionTypes.h"
+
 LightStorage::LightStorage() { ResetLighting(); }
 
 LightStorage::LightStorage(LightStorage&&) noexcept = default;
@@ -27,4 +32,6 @@ uint8_t LightStorage::GetLighting(BlockPos pos) const noexcept {
 
 void LightStorage::ResetLighting() noexcept { data_.Fill(0); }
 
-void LightStorage::ResetLightingCustom(uint8_t lvl) noexcept { data_.Fill(lvl); }
+void LightStorage::ResetLightingCustom(uint8_t lvl) noexcept {
+  data_.Fill(lvl);
+}

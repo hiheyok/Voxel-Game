@@ -1,3 +1,5 @@
+#include <gl/glew.h>
+
 #include <memory>
 
 #include "RenderEngine/API/TextureBase.h"

@@ -4,10 +4,12 @@
 
 #include <cmath>
 #include <glm/geometric.hpp>
+#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
 #include "Client/ClientLevel/ClientCache.h"
 #include "Client/Inputs/InputManager.h"
+#include "Core/Typenames.h"
 #include "Level/Entity/Mobs/Player.h"
 #include "Utils/Math/vectorOperations.h"
 

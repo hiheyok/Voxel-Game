@@ -2,9 +2,11 @@
 
 #include "RenderEngine/Window.h"
 
+#include <glfw/glfw3.h>
+
+#include <cstdint>
 #include <iostream>
 #include <sstream>
-#include <stdexcept>
 #include <string>
 
 #include "Core/GameContext/GameContext.h"
@@ -236,7 +238,7 @@ void Window::InitializeGLEW() {
 
   std::stringstream str;
   str << "OpenGL Version: " << glGetString(GL_VERSION);
-  LOG_INFO("{}",str.str());
+  LOG_INFO("{}", str.str());
 
   if (!GL_ARB_bindless_texture) {
     return;

@@ -2,13 +2,14 @@
 
 #include "Client/ClientLevel/Entity/ClientEntities.h"
 
+#include <cstddef>
 #include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include "Core/GameContext/GameContext.h"
 #include "Core/Typenames.h"
-#include "Level/Entity/Entity.h"
+#include "Level/Entity/Properties/EntityProperties.h"
 
 ClientEntities::ClientEntities(GameContext& context) : context_{context} {}
 ClientEntities::~ClientEntities() = default;

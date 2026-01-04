@@ -3,9 +3,8 @@
 #include "RenderEngine/TextRender/TextRenderer.h"
 
 #include <gl/glew.h>
-#include <GLFW/glfw3.h>
+#include <glfw/glfw3.h>
 
-#include <exception>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -13,7 +12,6 @@
 
 #include "Assets/AssetManager.h"
 #include "Core/GameContext/GameContext.h"
-#include "RenderEngine/TextRender/Font.h"
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "RenderEngine/OpenGL/Render/RenderDrawArrays.h"
@@ -21,6 +19,7 @@
 #include "RenderEngine/RenderResources/RenderHandle.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "RenderEngine/RenderResources/Types/Texture/Texture2D.h"
+#include "RenderEngine/TextRender/Font.h"
 #include "Utils/LogUtils.h"
 
 TextRenderer::TextRenderer(GameContext& context)
@@ -48,7 +47,7 @@ void TextRenderer::InitializeTextRenderer(GLFWwindow* w) {
   background_render_->SetShader("font_background_render");
 
   // Load textures
-  RenderHandle<Texture2DV2> tex_handle =
+  RenderHandle<Texture2D> tex_handle =
       context_.render_resource_manager_->GetTexture2D("ascii_font");
   font_render_->SetTexture(0, tex_handle);
   window_ = w;

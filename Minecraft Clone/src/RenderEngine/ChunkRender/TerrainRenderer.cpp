@@ -5,11 +5,19 @@
 #include <gl/glew.h>
 #include <glfw/glfw3.h>
 
+#include <climits>
+#include <cstddef>
+#include <cstdint>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/trigonometric.hpp>
 #include <memory>
 #include <vector>
 
 #include "Core/GameContext/GameContext.h"
 #include "Core/Options/Option.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "RenderEngine/Camera/camera.h"
 #include "RenderEngine/ChunkRender/Batch/ChunkBatch.h"
 #include "RenderEngine/ChunkRender/Mesh/BlockVertexFormat.h"
@@ -17,11 +25,11 @@
 #include "RenderEngine/Frustum/frustum.h"
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
-#include "RenderEngine/OpenGL/Texture/TextureOld.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
+#include "RenderEngine/RenderResources/Types/Texture/Texture.h"
 #include "RenderEngine/RenderResources/Types/Texture/Texture2D.h"
 #include "RenderEngine/RenderResources/Types/Texture/TextureAtlas.h"
-#include "Utils/MathHelper.h"
+#include "Utils/LogUtils.h"
 #include "Utils/Timer/Timer.h"
 
 TerrainRenderer::TerrainRenderer(GameContext& context)

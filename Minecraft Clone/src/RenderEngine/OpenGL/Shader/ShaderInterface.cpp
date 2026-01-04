@@ -2,11 +2,18 @@
 
 #include "RenderEngine/OpenGL/Shader/ShaderInterface.h"
 
-#include <fstream>
-#include <iostream>
+#include <glm/mat2x2.hpp>
+#include <glm/mat3x3.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 #include <string>
 
+#include "Assets/AssetHandle.h"
 #include "Core/GameContext/GameContext.h"
+#include "RenderEngine/RenderResources/RenderHandle.h"
+#include "RenderEngine/RenderResources/RenderResource.h"
 #include "RenderEngine/RenderResources/Types/Texture/Texture.h"
 #include "Utils/LogUtils.h"
 
@@ -235,7 +242,7 @@ ShaderInterface& ShaderInterface::BindTextureArray2D(GLuint index, GLuint img,
 }
 
 ShaderInterface& ShaderInterface::BindTexture(GLuint index,
-                                              RenderHandle<TextureV2> texture) {
+                                              RenderHandle<Texture> texture) {
   SetInt(texture->GetKey(), index);
   Use();
   glActiveTexture(GL_TEXTURE0 + index);

@@ -1,13 +1,15 @@
 #include "RenderEngine/UI/Screens/MainScreen.h"
 
+#include <memory>
+#include <utility>
+
 #include "Core/GameContext/GameContext.h"
-#include "RenderEngine/RenderResources/RenderHandle.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "RenderEngine/RenderResources/Types/Texture/Texture2D.h"
 #include "RenderEngine/RenderResources/Types/Texture/TextureAtlas.h"
 #include "RenderEngine/UI/Components/ColoredComponent.h"
-#include "RenderEngine/UI/Components/Component.h"
 #include "RenderEngine/UI/Components/TextureComponent.h"
+#include "RenderEngine/UI/Screens/Screen.h"
 #include "RenderEngine/UI/Widgets/Widget.h"
 
 MainScreen::MainScreen(GameContext& context, ScreenManager& screen_mgr)

@@ -5,8 +5,6 @@
 
 #include "Core/Typenames.h"
 
-class RawTextureData;
-
 struct ItemProperties {
   int max_stack_ = 64;
   bool is_block_item_ = false;

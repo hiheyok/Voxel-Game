@@ -4,13 +4,16 @@
 #include "Level/ECS/Systems/BlockSystem.h"
 #include "Level/ECS/Systems/CollisionSystem.h"
 #include "Level/ECS/Systems/GravitySystem.h"
+#include "Level/ECS/Systems/ITickStateSystem.h"
+#include "Level/ECS/Systems/ITransformSystem.h"
 #include "Level/ECS/Systems/TickStateSystem.h"
 #include "Level/ECS/Systems/TransformSystem.h"
 #include "Level/World/WorldUpdater.h"
 
 using std::make_unique;
 
-ServerEntitySystems::ServerEntitySystems(GameContext& context, WorldInterface& world)
+ServerEntitySystems::ServerEntitySystems(GameContext& context,
+                                         WorldInterface& world)
     : context_{context},
       world_{world},
       transform_system_{make_unique<TransformSystem>(context, world, *this)},
@@ -54,7 +57,9 @@ TickStateSystem& ServerEntitySystems::GetConcreteTickStateSystem() {
   return *tick_state_system_;
 }
 
-GravitySystem& ServerEntitySystems::GetGravitySystem() { return *gravity_system_; }
+GravitySystem& ServerEntitySystems::GetGravitySystem() {
+  return *gravity_system_;
+}
 
 CollisionSystem& ServerEntitySystems::GetCollisionSystem() {
   return *collision_system_;

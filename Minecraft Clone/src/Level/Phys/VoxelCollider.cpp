@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <glm/glm.hpp>
+#include <glm/vec3.hpp>
 
 #include "Level/Phys/Shape/VoxelShape.h"
 

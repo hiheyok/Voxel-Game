@@ -1,5 +1,8 @@
 #include "Assets/Types/Models/Evaluators/Item/Evaluator.h"
 
+#include <memory>
+#include <string>
+
 #include "Assets/Types/Models/Evaluators/Item/BundleSelectedItemEvaluator.h"
 #include "Assets/Types/Models/Evaluators/Item/CompositeEvaluator.h"
 #include "Assets/Types/Models/Evaluators/Item/ConditionEvaluator.h"

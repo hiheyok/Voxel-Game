@@ -1,6 +1,9 @@
 #include "RenderEngine/UI/UIManager.h"
 
 #include <cassert>
+#include <glm/ext/vector_float2.hpp>
+#include <memory>
+#include <utility>
 
 #include "Client/Inputs/InputManager.h"
 #include "RenderEngine/UI/ScreenManager.h"
@@ -21,7 +24,8 @@ UIManager::UIManager(GameContext& context, InputManager& input_mgr)
 UIManager::~UIManager() = default;
 
 void UIManager::Initialize() {
-  GAME_ASSERT(screen_registry_ != nullptr, "Screen Registry hasn't been created yet");
+  GAME_ASSERT(screen_registry_ != nullptr,
+              "Screen Registry hasn't been created yet");
   screen_registry_->RegisterScreen<MainScreen, ScreenManager&>("debug_screen");
   screen_registry_->RegisterScreen<PlayerHud, ScreenManager&>("player_hud");
 }
@@ -29,7 +33,8 @@ void UIManager::Initialize() {
 void UIManager::PopScreen() { screen_manager_->PopScreen(); }
 
 void UIManager::Render() {
-  GAME_ASSERT(renderer_ && screen_manager_, "Renderer or screen manager is null");
+  GAME_ASSERT(renderer_ && screen_manager_,
+              "Renderer or screen manager is null");
   renderer_->Clear();
   screen_manager_->SubmitToRenderer(*renderer_);
   renderer_->Render();

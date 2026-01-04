@@ -1,5 +1,12 @@
 #include "RenderEngine/Camera/Camera.h"
 
+#include <cmath>
+#include <glm/ext/matrix_float4x4.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/geometric.hpp>
+#include <glm/trigonometric.hpp>
+
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
     : front_(0.0f, 0.0f, -1.0f),
       movement_speed_(SPEED),

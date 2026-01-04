@@ -3,6 +3,7 @@
 #include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
 
 #include <memory>
+#include <stdexcept>
 
 #include "Core/GameContext/GameContext.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"

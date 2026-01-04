@@ -2,6 +2,10 @@
 
 #include "Level/Chunk/ChunkRawData.h"
 
+#include "Core/Position/PositionTypes.h"
+#include "Level/Chunk/Palette.h"
+#include "Level/Light/LightStorage.h"
+
 ChunkRawData::ChunkRawData(const Palette& chunkData,
                            const LightStorage& sky_light,
                            const LightStorage& block_light, ChunkPos pos)

@@ -1,10 +1,16 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
+#include <glm/ext/vector_float3.hpp>
 #include <memory>
 
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Block/Blocks.h"
+#include "Level/Chunk/Chunk.h"
+#include "Level/TerrainGeneration/Generators/Generator.h"
 #include "Level/TerrainGeneration/Generators/Math/MathWorld.h"
+#include "Utils/Iterators.h"
 
 MathWorld::MathWorld(GameContext& context) : WorldGenerator{context} {}
 MathWorld::~MathWorld() = default;

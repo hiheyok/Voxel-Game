@@ -1,5 +1,9 @@
 #include "Assets/Asset.h"
 
+#include <string>
+
+#include "Assets/AssetState.h"
+
 Asset::Asset(const std::string& key)
     : key_{key}, state{AssetState::kUnloaded} {}
 

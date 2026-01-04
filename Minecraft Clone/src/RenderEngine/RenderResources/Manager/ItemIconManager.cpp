@@ -1,11 +1,16 @@
 
 #include "RenderEngine/RenderResources/Manager/ItemIconManager.h"
 
+#include <optional>
+#include <vector>
+
 #include "Core/GameContext/GameContext.h"
+#include "Level/Block/Block.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Item/Item.h"
 #include "RenderEngine/Framebuffer/RenderTarget.h"
 #include "RenderEngine/ItemRender/ItemRender.h"
+#include "RenderEngine/RenderResources/RenderHandle.h"
 #include "RenderEngine/RenderResources/Types/Texture/DynamicAtlas.h"
 #include "RenderEngine/RenderResources/Types/Texture/TextureSprite.h"
 
@@ -65,7 +70,6 @@ void ItemIconManager::RemoveItemIcon(const Item& item) {
   atlas_->RemoveSprite(location);
 }
 
-RenderHandle<TextureV2> ItemIconManager::GetAtlasTexture()
-    const noexcept {
-  return RenderHandle<TextureV2>{atlas_.get()};
+RenderHandle<Texture> ItemIconManager::GetAtlasTexture() const noexcept {
+  return RenderHandle<Texture>{atlas_.get()};
 }

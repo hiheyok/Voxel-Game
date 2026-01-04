@@ -2,9 +2,14 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include <cstddef>
+#include <cstdint>
+#include <vector>
 
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/Direction.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Light/ChunkLightTask.h"
 #include "Level/Light/LightEngineCache.h"
@@ -60,8 +65,7 @@ LightEngine<kEngineType>::LightEngine(GameContext& context,
     : context_{context},
       world_{world},
       properties_{context.blocks_->GetBlockPropertyList()},
-      light_cache_{nullptr} {
-}
+      light_cache_{nullptr} {}
 
 template <EngineType kEngineType>
 LightEngine<kEngineType>::~LightEngine() = default;
@@ -222,28 +226,32 @@ void LightEngine<kEngineType>::EnqueueDecrease(InternalTask task) {
 template <EngineType kEngineType>
 void LightEngine<kEngineType>::EnlargeIncreaseQueue() {
   // Exponential growth (2x) for fewer reallocations
-  size_t new_size = increase_queue_.empty() ? kQueueSizeIncrement : increase_queue_.size() * 2;
+  size_t new_size = increase_queue_.empty() ? kQueueSizeIncrement
+                                            : increase_queue_.size() * 2;
   increase_queue_.resize(new_size);
 }
 
 template <EngineType kEngineType>
 void LightEngine<kEngineType>::EnlargeDecreaseQueue() {
   // Exponential growth (2x) for fewer reallocations
-  size_t new_size = decrease_queue_.empty() ? kQueueSizeIncrement : decrease_queue_.size() * 2;
+  size_t new_size = decrease_queue_.empty() ? kQueueSizeIncrement
+                                            : decrease_queue_.size() * 2;
   decrease_queue_.resize(new_size);
 }
 
 template <EngineType kEngineType>
 LightEngine<kEngineType>::InternalTask
 LightEngine<kEngineType>::DequeueIncrease() noexcept {
-  GAME_ASSERT(dequeue_increase_pos_ < enqueue_increase_pos_, "Invalid queue state");
+  GAME_ASSERT(dequeue_increase_pos_ < enqueue_increase_pos_,
+              "Invalid queue state");
   return increase_queue_[dequeue_increase_pos_++];
 }
 
 template <EngineType kEngineType>
 LightEngine<kEngineType>::InternalTask
 LightEngine<kEngineType>::DequeueDecrease() noexcept {
-  GAME_ASSERT(dequeue_decrease_pos_ < enqueue_decrease_pos_, "Invalid queue state");
+  GAME_ASSERT(dequeue_decrease_pos_ < enqueue_decrease_pos_,
+              "Invalid queue state");
   return decrease_queue_[dequeue_decrease_pos_++];
 }
 

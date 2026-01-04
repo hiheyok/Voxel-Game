@@ -12,7 +12,7 @@ class GameContext;
 
 class Shader;
 class ComputeShader;
-class Texture2DV2;
+class Texture2D;
 class TextureAtlas;
 class ItemIconManager;
 
@@ -32,7 +32,7 @@ class RenderResourceManager {
 
   RenderHandle<Shader> GetShader(const std::string& key);
   RenderHandle<ComputeShader> GetComputeShader(const std::string& key);
-  RenderHandle<Texture2DV2> GetTexture2D(const std::string& key);
+  RenderHandle<Texture2D> GetTexture2D(const std::string& key);
   RenderHandle<TextureAtlas> GetAtlas(const std::string& key);
 
   ItemIconManager& GetItemIconManager();
@@ -55,16 +55,15 @@ class RenderResourceManager {
 
   template <IsResource ResourceType>
   FastHashMap<std::string, std::unique_ptr<ResourceType>>& GetCache() noexcept;
-  
+
   GameContext& context_;
 
   FastHashMap<std::string, std::unique_ptr<Shader>> shaders_cache_;
   FastHashMap<std::string, std::unique_ptr<ComputeShader>> compute_cache_;
-  FastHashMap<std::string, std::unique_ptr<Texture2DV2>> texture2d_;
+  FastHashMap<std::string, std::unique_ptr<Texture2D>> texture2d_;
   FastHashMap<std::string, std::unique_ptr<TextureAtlas>> atlas_;
 
   std::unique_ptr<ItemIconManager> item_icon_manager_;
-
 };
 
 template <IsResource ResourceType>
@@ -76,7 +75,7 @@ RenderResourceManager::GetCache() noexcept {
     return shaders_cache_;
   } else if constexpr (std::is_same_v<ComputeShader, Type>) {
     return compute_cache_;
-  } else if constexpr (std::is_same_v<Texture2DV2, Type>) {
+  } else if constexpr (std::is_same_v<Texture2D, Type>) {
     return texture2d_;
   } else if constexpr (std::is_same_v<TextureAtlas, Type>) {
     return atlas_;

@@ -1,7 +1,15 @@
 #include "Assets/Types/Models/Managers/ModelLoader.h"
 
 #include <array>
+#include <cstddef>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
 
+#include "Assets/Types/Models/Data/ModelData.h"
 #include "Core/GameContext/GameContext.h"
 #include "Core/IO/FileUtils.h"
 #include "Core/Position/Direction.h"

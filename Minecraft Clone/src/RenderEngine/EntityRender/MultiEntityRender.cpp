@@ -3,14 +3,23 @@
 #include "RenderEngine/EntityRender/MultiEntityRender.h"
 
 #include <gl/glew.h>
-#include <GLFW/glfw3.h>
+#include <glfw/glfw3.h>
 
+#include <cstddef>
+#include <cstdint>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/trigonometric.hpp>
 #include <memory>
+#include <vector>
 
+#include "Assets/AssetHandle.h"
 #include "Assets/AssetManager.h"
+#include "Assets/Types/EntityModel.h"
 #include "Client/Player/PlayerPOV.h"
 #include "Client/Profiler/PerformanceProfiler.h"
 #include "Core/GameContext/GameContext.h"
+#include "Core/Typenames.h"
 #include "Level/Entity/Entities.h"
 #include "Level/Entity/EntityTypeData.h"
 #include "Level/Entity/Properties/EntityProperties.h"
@@ -19,6 +28,7 @@
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
+#include "RenderEngine/RenderResources/RenderHandle.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "RenderEngine/RenderResources/Types/Texture/Texture2D.h"
 
@@ -80,8 +90,7 @@ void MultiEntityRender::Initialize(PerformanceProfiler* pProfilerIn) {
 
     entity_element_index_[entity_type] =
         entity_indices_.size();  // temp solution
-    entity_element_size_[entity_type] =
-        model.indices_.size();
+    entity_element_size_[entity_type] = model.indices_.size();
 
     for (int i = 0; i < model.indices_.size(); i++) {
       entity_indices_.emplace_back(model_index + model.indices_[i]);
@@ -173,10 +182,11 @@ void MultiEntityRender::Render() {
     shader_->Use();
 
     const std::string& model_name =
-        context_.entities_list_->entity_type_list_[static_cast<size_t>(entityarr.first)]
+        context_.entities_list_
+            ->entity_type_list_[static_cast<size_t>(entityarr.first)]
             ->entity_name_;
 
-    RenderHandle<Texture2DV2> texture =
+    RenderHandle<Texture2D> texture =
         context_.render_resource_manager_->GetTexture2D(model_name);
 
     shader_->BindTexture2D(0, texture->GetId(), "EntityTexture");

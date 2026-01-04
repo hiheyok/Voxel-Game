@@ -1,6 +1,11 @@
 #include "Level/ECS/Systems/TransformSystem.h"
 
+#include <glm/vec3.hpp>
+
+#include "Core/Typenames.h"
 #include "Level/ECS/ComponentMap.h"
+#include "Level/ECS/Components/TransformComponent.h"
+#include "Level/ECS/EntitySystem.h"
 #include "Level/ECS/ServerEntitySystems.h"
 #include "Level/ECS/Systems/TickStateSystem.h"
 #include "Level/World/WorldInterface.h"
@@ -25,16 +30,15 @@ void TransformSystem::Tick() {
 }
 
 // ITransformSystem interface implementations
-const ComponentMap<TransformComponent>& TransformSystem::GetComponentMap() const {
+const ComponentMap<TransformComponent>& TransformSystem::GetComponentMap()
+    const {
   return EntitySystem<TransformComponent>::GetComponentMap();
 }
 
-void TransformSystem::ReplaceComponent(EntityUUID uuid, const TransformComponent& component) {
+void TransformSystem::ReplaceComponent(EntityUUID uuid,
+                                       const TransformComponent& component) {
   EntitySystem<TransformComponent>::ReplaceComponent(uuid, component);
 }
-
-
-
 
 void TransformSystem::SetPosition(EntityUUID uuid, vec3 position) noexcept {
   components_updated_[uuid].position_ = position;

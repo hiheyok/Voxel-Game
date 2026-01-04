@@ -1,5 +1,9 @@
 #include "Assets/Types/Texture/Texture2DBaseSource.h"
 
+#include <string>
+
+#include "Assets/Types/Texture/TextureSource.h"
+
 Texture2DBaseSource::Texture2DBaseSource(GameContext& context,
                                          const std::string& asset_key)
     : TextureSource{context, asset_key} {}

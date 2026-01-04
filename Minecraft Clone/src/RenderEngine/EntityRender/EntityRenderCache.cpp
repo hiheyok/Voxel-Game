@@ -2,9 +2,13 @@
 
 #include "RenderEngine/EntityRender/EntityRenderCache.h"
 
+#include <cstddef>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
+#include "Core/Typenames.h"
+#include "Level/ECS/EntityType.h"
 #include "Level/Entity/Entity.h"
 
 void EntityRenderCache::AddEntity(const EntityProperty& entity) {

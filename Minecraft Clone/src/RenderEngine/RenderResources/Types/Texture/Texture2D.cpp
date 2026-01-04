@@ -1,16 +1,21 @@
 #include "RenderEngine/RenderResources/Types/Texture/Texture2D.h"
 
+#include <string>
+
+#include "Assets/AssetHandle.h"
 #include "Assets/Types/Texture/Texture2DSource.h"
 #include "Core/GameContext/GameContext.h"
+#include "RenderEngine/RenderResources/Types/Texture/Texture.h"
+#include "RenderEngine/RenderResources/Types/Texture/Texture2DBase.h"
 #include "Utils/LogUtils.h"
 
-Texture2DV2::Texture2DV2(GameContext& context, const std::string& key,
-                         AssetHandle<Texture2DSource> source)
+Texture2D::Texture2D(GameContext& context, const std::string& key,
+                     AssetHandle<Texture2DSource> source)
     : Texture2DBase{context, key}, source_{source} {}
 
-Texture2DV2::~Texture2DV2() = default;
+Texture2D::~Texture2D() = default;
 
-void Texture2DV2::LoadTexture() {
+void Texture2D::LoadTexture() {
   glBindTexture(target_, id_);
   glTexImage2D(target_, 0, source_->GetFormat(), source_->GetWidth(),
                source_->GetHeight(), 0, source_->GetFormat(), GL_UNSIGNED_BYTE,

@@ -5,7 +5,9 @@
 #include <stdexcept>
 #include <string>
 
+#include "Assets/AssetHandle.h"
 #include "Assets/Types/ShaderSource.h"
+#include "RenderEngine/OpenGL/Shader/ShaderInterface.h"
 
 ComputeShader::ComputeShader(GameContext& context, const std::string& name,
                              AssetHandle<ShaderSource> shader_src)

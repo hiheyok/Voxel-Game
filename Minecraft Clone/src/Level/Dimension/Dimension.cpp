@@ -2,16 +2,24 @@
 
 #include "Level/Dimension/Dimension.h"
 
-#include <stdexcept>
+#include <cstddef>
+#include <memory>
+#include <utility>
+#include <vector>
 
 #include "Core/GameContext/GameContext.h"
 #include "Core/Options/Option.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
+#include "Level/Dimension/DimensionProperties.h"
 #include "Level/ECS/ServerECSManager.h"
+#include "Level/Event/Event.h"
 #include "Level/Light/ChunkLightTask.h"
 #include "Level/Light/LightEngineStats.h"
 #include "Level/Light/ThreadedLightEngine.h"
 #include "Level/TerrainGeneration/ChunkGenerator.h"
 #include "Level/World/WorldUpdater.h"
+#include "Utils/Assert.h"
 
 Dimension::Dimension(GameContext& context, DimensionProperties properties,
                      WorldGeneratorID generatorType)
@@ -31,11 +39,12 @@ Dimension::Dimension(GameContext& context, DimensionProperties properties,
 
   world_updater_ = std::make_unique<WorldUpdater>(context_, main_world_.get(),
                                                   world_settings_);
-  
+
   // Connect ECS to WorldUpdater for block modifications
-  auto& server_ecs = static_cast<ServerECSManager&>(main_world_->GetECSManager());
+  auto& server_ecs =
+      static_cast<ServerECSManager&>(main_world_->GetECSManager());
   server_ecs.SetWorldUpdater(world_updater_.get());
-  
+
   collision_detector_ = std::make_unique<CollisionDetector>(
       context_, *main_world_->GetChunkMap());
 
@@ -105,7 +114,6 @@ void Dimension::EventTick() {
   world_->GetEntityContainer()->Tick(this);
   static_cast<ServerECSManager&>(world_->GetECSManager()).Tick();
 }
-
 
 void Dimension::Update() {
   const std::vector<ChunkPos>& requested_chunks =

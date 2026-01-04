@@ -15,7 +15,7 @@ class GameContext;
 class IECSManager;
 class ITransformSystem;
 class PlayerPOV;
-class Texture2DV2;
+class Texture2D;
 class EntityModel;
 class RenderDrawElementsInstanced;
 

@@ -2,6 +2,9 @@
 
 #include "Core/Position/PositionTypes.h"
 
+#include <cstddef>
+#include <cstdint>
+
 #include "Core/Typenames.h"
 
 static constexpr int kBlockToRegionLog2 = kChunkDimLog2 + kRegionDimLog2;

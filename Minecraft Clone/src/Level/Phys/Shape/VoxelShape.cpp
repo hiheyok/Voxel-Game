@@ -1,6 +1,10 @@
 #include "Level/Phys/Shape/VoxelShape.h"
 
 #include <glm/common.hpp>
+#include <glm/vec3.hpp>
+#include <vector>
+
+#include "Level/Phys/Shape/AABB.h"
 
 using glm::vec3;
 

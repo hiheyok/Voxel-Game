@@ -1,5 +1,10 @@
 #include "Assets/Types/Models/Data/RenderableModel.h"
 
+#include <string>
+#include <vector>
+
+#include "Assets/Asset.h"
+
 using baked_model::Element;
 using std::vector;
 

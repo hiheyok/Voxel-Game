@@ -1,5 +1,9 @@
 #include "Assets/Types/Models/Evaluators/Item/Property/PropertyValueProvider.h"
 
+#include <memory>
+#include <string>
+
+#include "Assets/Types/Models/Evaluators/Item/Evaluator.h"
 #include "Assets/Types/Models/Evaluators/Item/Property/BlockStateProvider.h"
 #include "Assets/Types/Models/Evaluators/Item/Property/ChargeTypeProvider.h"
 #include "Assets/Types/Models/Evaluators/Item/Property/ComponentProvider.h"

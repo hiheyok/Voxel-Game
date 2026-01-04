@@ -2,7 +2,6 @@
 
 #include "Core/GameContext/GameContext.h"
 
-#include <filesystem>
 #include <memory>
 
 #include "Assets/AssetManager.h"

@@ -1,11 +1,18 @@
 #include "Level/ECS/EntityRegistry.h"
 
+#include <glm/vec3.hpp>
+#include <vector>
+
 #include "Core/GameContext/GameContext.h"
+#include "Core/Typenames.h"
 #include "Level/Block/Blocks.h"
 #include "Level/ECS/Components/BlockComponent.h"
 #include "Level/ECS/Components/BlockPlaceComponent.h"
 #include "Level/ECS/Components/CollisionComponent.h"
 #include "Level/ECS/Components/GravityComponent.h"
+#include "Level/ECS/Components/TickStateComponent.h"
+#include "Level/ECS/Components/TransformComponent.h"
+#include "Level/ECS/EntityType.h"
 #include "Level/ECS/ServerEntitySystems.h"
 #include "Level/ECS/Systems/BlockPlaceSystem.h"
 #include "Level/ECS/Systems/BlockSystem.h"
@@ -33,7 +40,8 @@ EntityUUID EntityRegistry::CreateSand(glm::vec3 position) {
   EntityUUID entity = GetNewUUID(EntityType::kFallingBlock);
 
   // Add Transform component (position, velocity, acceleration)
-  TransformSystem& transform_system = entity_systems_.GetConcreteTransformSystem();
+  TransformSystem& transform_system =
+      entity_systems_.GetConcreteTransformSystem();
   TransformComponent& transform_comp = transform_system.AddComponent(entity);
   transform_comp.position_ = position;
   transform_comp.velocity_ = glm::vec3(0.0f);
@@ -89,10 +97,11 @@ EntityUUID EntityRegistry::GetNewUUID(EntityType entity_type) {
 
 void EntityRegistry::RemoveEntity(EntityUUID uuid) {
   // Remove components from all systems (deferred until Commit)
-  // Note: We call RemoveComponent unconditionally because HasComponent only 
-  // checks components_active_, but the entity might only be in components_updated_
-  // (if created and removed in the same tick). RemoveComponent will handle
-  // entities that don't exist in the delete_queue gracefully.
+  // Note: We call RemoveComponent unconditionally because HasComponent only
+  // checks components_active_, but the entity might only be in
+  // components_updated_ (if created and removed in the same tick).
+  // RemoveComponent will handle entities that don't exist in the delete_queue
+  // gracefully.
   auto& transform_system = entity_systems_.GetConcreteTransformSystem();
   auto& gravity_system = entity_systems_.GetGravitySystem();
   auto& collision_system = entity_systems_.GetCollisionSystem();
@@ -119,11 +128,10 @@ void EntityRegistry::Commit() {
   // after network sync has sent the removal notifications
 }
 
-void EntityRegistry::ResetState() {
-  delete_queue_.clear();
-}
+void EntityRegistry::ResetState() { delete_queue_.clear(); }
 
-const std::vector<EntityUUID>& EntityRegistry::GetRemovedEntities() const noexcept {
+const std::vector<EntityUUID>& EntityRegistry::GetRemovedEntities()
+    const noexcept {
   return delete_queue_;
 }
 
@@ -144,6 +152,7 @@ void EntityRegistry::CreateEntityWithUUID(EntityUUID uuid, EntityType type) {
   uuid_id_mapping_[uuid] = type;
 
   // Add transform component for this entity
-  TransformSystem& transform_system = entity_systems_.GetConcreteTransformSystem();
+  TransformSystem& transform_system =
+      entity_systems_.GetConcreteTransformSystem();
   transform_system.AddComponent(uuid);
 }

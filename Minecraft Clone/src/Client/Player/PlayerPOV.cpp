@@ -2,6 +2,10 @@
 
 #include "Client/Player/PlayerPOV.h"
 
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <memory>
+
 #include "RenderEngine/Camera/camera.h"
 
 PlayerPOV::PlayerPOV() : camera_{std::make_unique<Camera>()} {}

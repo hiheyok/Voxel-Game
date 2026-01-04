@@ -1,10 +1,15 @@
 #include "Level/Light/LightEngineCache.h"
 
+#include <cstddef>
+
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Chunk/Chunk.h"
 #include "Level/Light/LightStorage.h"
 #include "Level/World/WorldInterface.h"
 #include "Utils/Assert.h"
+#include "Utils/Iterators.h"
 
 LightEngineCache::LightEngineCache(GameContext& context, WorldInterface& world)
     : context_{context}, world_{world} {}

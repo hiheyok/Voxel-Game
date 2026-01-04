@@ -2,6 +2,8 @@
 
 #include "Client/ClientLevel/ClientLevel.h"
 
+#include "Client/ClientLevel/ClientCache.h"
+
 using std::make_unique;
 
 ClientLevel::ClientLevel(GameContext& context) : cache_{context} {}

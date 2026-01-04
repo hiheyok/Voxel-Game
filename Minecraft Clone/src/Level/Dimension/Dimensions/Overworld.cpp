@@ -3,7 +3,8 @@
 #include "Level/Dimension/Dimensions/Overworld.h"
 
 #include "Core/GameContext/GameContext.h"
-#include "Level/TerrainGeneration/Generators/Generators.h"
+#include "Level/Dimension/Dimension.h"
+#include "Level/Dimension/DimensionProperties.h"
 
 OverworldDimension::OverworldDimension(GameContext& context,
                                        DimensionProperties properties)

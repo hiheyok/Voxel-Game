@@ -1,8 +1,9 @@
 #include "Client/Inputs/MouseInputs.h"
 
+#include <cstdint>
+
 MouseInputs::MouseInputs() { button_states_.fill(ButtonState::kNone); }
 MouseInputs::~MouseInputs() = default;
-#include <iostream>
 void MouseInputs::Refresh() noexcept {
   scroll_direction_ = ScrollState::kNone;
 

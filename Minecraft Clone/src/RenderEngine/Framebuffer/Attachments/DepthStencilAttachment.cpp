@@ -1,5 +1,8 @@
 #include "RenderEngine/Framebuffer/Attachments/DepthStencilAttachment.h"
 
+#include "RenderEngine/API/TextureBase.h"
+#include "RenderEngine/Framebuffer/Attachments/Attachment.h"
+
 using namespace framebuffer;
 
 DepthStencilAttachment::DepthStencilAttachment(GameContext& context, int width,

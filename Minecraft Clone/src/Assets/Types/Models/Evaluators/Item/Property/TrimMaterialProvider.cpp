@@ -1,5 +1,10 @@
 #include "Assets/Types/Models/Evaluators/Item/Property/TrimMaterialProvider.h"
 
+#include <memory>
+#include <string>
+
+#include "Assets/Types/Models/Evaluators/Item/Evaluator.h"
+#include "Assets/Types/Models/Evaluators/Item/Property/PropertyValueProvider.h"
 #include "Core/GameContext/GameContext.h"
 #include "Utils/LogUtils.h"
 

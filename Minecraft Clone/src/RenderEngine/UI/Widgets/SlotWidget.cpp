@@ -5,6 +5,7 @@
 #include "RenderEngine/RenderResources/Manager/ItemIconManager.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "RenderEngine/UI/Components/TextureComponent.h"
+#include "RenderEngine/UI/Widgets/Widget.h"
 
 using std::make_unique;
 using std::move;

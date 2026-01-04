@@ -1,5 +1,7 @@
 #include "RenderEngine/Framebuffer/Attachments/Attachment.h"
 
+#include "RenderEngine/API/TextureBase.h"
+
 using namespace framebuffer;
 
 Attachment::Attachment(GameContext& context, int width, int height)

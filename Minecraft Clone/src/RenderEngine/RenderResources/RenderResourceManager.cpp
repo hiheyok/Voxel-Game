@@ -1,5 +1,9 @@
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 
+#include <string>
+#include <vector>
+
+#include "Assets/AssetHandle.h"
 #include "Assets/AssetManager.h"
 #include "Assets/Types/ShaderSource.h"
 #include "Assets/Types/Texture/Texture2DSource.h"
@@ -8,6 +12,7 @@
 #include "RenderEngine/OpenGL/Shader/ComputeShader.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "RenderEngine/RenderResources/Manager/ItemIconManager.h"
+#include "RenderEngine/RenderResources/RenderHandle.h"
 #include "RenderEngine/RenderResources/Types/Texture/Texture2D.h"
 #include "RenderEngine/RenderResources/Types/Texture/TextureAtlas.h"
 
@@ -40,9 +45,8 @@ RenderHandle<ComputeShader> RenderResourceManager::GetComputeShader(
   return GetResource<ComputeShader>(key);
 }
 
-RenderHandle<Texture2DV2> RenderResourceManager::GetTexture2D(
-    const string& key) {
-  return GetResource<Texture2DV2>(key);
+RenderHandle<Texture2D> RenderResourceManager::GetTexture2D(const string& key) {
+  return GetResource<Texture2D>(key);
 }
 
 RenderHandle<TextureAtlas> RenderResourceManager::GetAtlas(const string& key) {
@@ -67,7 +71,7 @@ void RenderResourceManager::LoadShaders() {
 }
 
 void RenderResourceManager::LoadTextures() {
-  for (auto& [key, resource] : GetCache<Texture2DV2>()) {
+  for (auto& [key, resource] : GetCache<Texture2D>()) {
     resource->Load();
   }
 
@@ -96,7 +100,7 @@ void RenderResourceManager::FindTextures() {
   vector<AssetHandle<TextureAtlasSource>> atlas = assets.GetAllAtlasSource();
 
   for (auto& source : tex_2d) {
-    CreateResource<Texture2DV2>(source->GetKey(), source);
+    CreateResource<Texture2D>(source->GetKey(), source);
   }
 
   for (auto& source : atlas) {

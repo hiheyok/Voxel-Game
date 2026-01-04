@@ -2,6 +2,9 @@
 
 #include "Level/Block/Type/AirBlock.h"
 
+#include "Core/Position/PositionTypes.h"
+#include "Level/Block/Block.h"
+
 AirBlock::AirBlock(GameContext& context) : Block{context} {
   properties_->is_solid_ = false;
   properties_->transparency_ = true;

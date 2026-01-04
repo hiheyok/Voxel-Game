@@ -1,21 +1,27 @@
 #include "Assets/Types/Texture/Atlas/StitchingHeuristics.h"
 
+#include <algorithm>
 #include <limits>
+#include <vector>
 
 #include "Assets/Types/Texture/Atlas/StitchingRectangle.h"
 
+using std::min;
+using std::numeric_limits;
+using std::vector;
+
 int BestShortSideFit::FindBestSpot(
     int item_width, int item_height, int alignment,
-    const std::vector<StitchingRectangle>& free_rects) const {
+    const vector<StitchingRectangle>& free_rects) const {
   int best_bin_idx = -1;
-  int best_score = std::numeric_limits<int>::max();
+  int best_score = numeric_limits<int>::max();
 
   for (int i = 0; i < free_rects.size(); ++i) {
     const StitchingRectangle& rect = free_rects[i];
     if (rect.width_ >= item_width && rect.height_ >= item_height) {
       int leftoverWidth = rect.width_ - item_width;
       int leftoverHeight = rect.height_ - item_height;
-      int score = std::min(leftoverWidth, leftoverHeight);
+      int score = min(leftoverWidth, leftoverHeight);
 
       if (score < best_score) {
         best_score = score;

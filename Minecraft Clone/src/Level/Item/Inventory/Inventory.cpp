@@ -2,6 +2,8 @@
 
 #include "Level/Item/Inventory/Inventory.h"
 
+#include "Level/Item/ItemStack.h"
+
 ItemStack Inventory::GetItem(int slot) { return storage_[slot]; }
 
 void Inventory::SetSlot(int slot, ItemStack item) { storage_[slot] = item; }

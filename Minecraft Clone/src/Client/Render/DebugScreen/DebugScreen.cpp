@@ -3,7 +3,10 @@
 #include "Client/Render/DebugScreen/DebugScreen.h"
 
 #include <gl/glew.h>
+#include <glfw/glfw3.h>
 
+#include <glm/vec3.hpp>
+#include <memory>
 #include <string>
 
 #include "RenderEngine/TextRender/Font.h"

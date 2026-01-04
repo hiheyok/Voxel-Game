@@ -2,6 +2,7 @@
 
 #include "RenderEngine/OpenGL/Render/RenderObject.h"
 
+#include <string>
 #include <utility>
 
 #include "Core/GameContext/GameContext.h"
@@ -44,7 +45,7 @@ void RenderObject::SetTexture2D(int index, int id, const std::string& name) {
   texture_2d_cache_.emplace_back(index, id, name);
 }
 
-void RenderObject::SetTexture(int idx, RenderHandle<TextureV2> handle) {
+void RenderObject::SetTexture(int idx, RenderHandle<Texture> handle) {
   shader_->BindTexture(idx, handle);
 
   // Tries to search for the the index first
@@ -70,7 +71,9 @@ void RenderObject::SetupTexture() {
 
 void RenderObject::EnableDepthTest() { glEnable(GL_DEPTH_TEST); }
 void RenderObject::DisableDepthTest() { glDisable(GL_DEPTH_TEST); }
-void RenderObject::SetDepthMask(bool mask) { glDepthMask(mask ? GL_TRUE : GL_FALSE); }
+void RenderObject::SetDepthMask(bool mask) {
+  glDepthMask(mask ? GL_TRUE : GL_FALSE);
+}
 void RenderObject::EnableBlend() { glEnable(GL_BLEND); }
 void RenderObject::DisableBlend() { glDisable(GL_BLEND); }
 void RenderObject::EnableCullFace() { glEnable(GL_CULL_FACE); }

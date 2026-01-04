@@ -1,20 +1,27 @@
 #include "Level/World/WorldUpdater.h"
 
+#include <cstddef>
+#include <cstdlib>
 #include <deque>
-#include <glm/vec3.hpp>
+#include <glm/ext/vector_float3.hpp>
+#include <glm/ext/vector_int3.hpp>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/Direction.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Chunk/Chunk.h"
 #include "Level/Container/EntityContainer.h"
 #include "Level/Entity/Entity.h"
-#include "Level/Light/LightStorage.h"
 #include "Level/World/World.h"
 #include "Level/World/WorldParameters.h"
 #include "Utils/Assert.h"
+#include "Utils/Iterators.h"
 
 WorldUpdater::WorldUpdater(GameContext& context, World* w, WorldParameters p)
     : context_{context},

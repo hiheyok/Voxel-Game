@@ -11,7 +11,7 @@ class TextureSprite;
 class ItemRender;
 class RenderTarget;
 class ResourceLocation;
-class TextureV2;
+class Texture;
 
 class ItemIconManager {
  public:
@@ -29,7 +29,7 @@ class ItemIconManager {
   // Remove icon if not used
   void RemoveItemIcon(const Item& item);
 
-  RenderHandle<TextureV2> GetAtlasTexture() const noexcept;
+  RenderHandle<Texture> GetAtlasTexture() const noexcept;
 
  private:
   TextureSprite AddItemIcon(const ResourceLocation& location, const Item& item);

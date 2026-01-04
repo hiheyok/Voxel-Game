@@ -2,15 +2,26 @@
 
 #include "Server/ServerPacketSender.h"
 
+#include <array>
+#include <cstddef>
+#include <utility>
 #include <vector>
 
 #include "Core/Interfaces/ClientInterface.h"
+#include "Core/Networking/BlockUpdate.h"
+#include "Core/Networking/ChunkUpdate.h"
+#include "Core/Networking/ECSUpdate.h"
+#include "Core/Networking/EntityUpdate.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Chunk/ChunkData.h"
 #include "Level/Dimension/Dimension.h"
+#include "Level/ECS/ComponentMap.h"
+#include "Level/ECS/Components/TransformComponent.h"
 #include "Level/ECS/EntityRegistry.h"
 #include "Level/ECS/ServerECSManager.h"
 #include "Level/ECS/ServerEntitySystems.h"
-#include "Level/ECS/Systems/TransformSystem.h"
+#include "Level/ECS/Systems/ITransformSystem.h"
 #include "Level/Level.h"
 #include "Level/World/WorldUpdater.h"
 

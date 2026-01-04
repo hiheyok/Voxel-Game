@@ -1,8 +1,10 @@
 #include "RenderEngine/UI/Components/ColoredComponent.h"
 
-#include "Utils/Assert.h"
+#include <vector>
 
+#include "RenderEngine/UI/Components/Component.h"
 #include "RenderEngine/UI/Data/UserInterfaceData.h"
+#include "Utils/Assert.h"
 
 ColoredComponent::ColoredComponent(float r, float g, float b, float a)
     : Component{}, r_{r}, g_{g}, b_{b}, a_{a} {

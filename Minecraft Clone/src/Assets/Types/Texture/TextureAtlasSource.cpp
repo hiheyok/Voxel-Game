@@ -1,25 +1,31 @@
 #include "Assets/Types/Texture/TextureAtlasSource.h"
 
+#include <algorithm>
+#include <cstdint>
 #include <cstring>
 #include <filesystem>
 #include <future>
 #include <nlohmann/json.hpp>
+#include <optional>
+#include <string>
+#include <vector>
 
 #include "Assets/Types/Texture/Atlas/Sticher.h"
+#include "Assets/Types/Texture/Texture2DBaseSource.h"
 #include "Core/GameContext/GameContext.h"
 #include "Core/IO/FileUtils.h"
 #include "Utils/LogUtils.h"
 
 using json = nlohmann::json;
 using namespace std::filesystem;
+using std::async;
+using std::future;
 using std::move;
 using std::nullopt;
 using std::optional;
+using std::sort;
 using std::string;
 using std::vector;
-using std::future;
-using std::async;
-using std::sort;
 
 TextureAtlasSource::TextureAtlasSource(GameContext& context, const string& key,
                                        const string& atlas_def)
@@ -29,18 +35,18 @@ void TextureAtlasSource::Load() {
   LOG_INFO("Loading texture atlas: {}", atlas_def_);
   vector<SpritePath> sprites = GetPathList();
   sprites_.reserve(sprites.size());
-  
+
   // Parallel texture loading using std::async
   vector<future<TextureData>> texture_futures;
   texture_futures.reserve(sprites.size());
-  
+
   // Launch async texture loads
   for (const auto& [sprite_path, sprite_name] : sprites) {
     texture_futures.push_back(async(std::launch::async, [this, &sprite_path]() {
       return LoadTexture(sprite_path);
     }));
   }
-  
+
   // Collect results and build sprite data
   for (size_t i = 0; i < sprites.size(); ++i) {
     TextureData data = texture_futures[i].get();
@@ -273,11 +279,12 @@ void TextureAtlasSource::Stitch() {
 
   // Sort sprites by area (largest first) - classic bin packing optimization
   // This significantly improves packing efficiency
-  sort(sprites_.begin(), sprites_.end(), [](const SpriteData& a, const SpriteData& b) {
-    const int area_a = a.data_.GetWidth() * a.data_.GetHeight();
-    const int area_b = b.data_.GetWidth() * b.data_.GetHeight();
-    return area_a > area_b;  // Descending order (largest first)
-  });
+  sort(sprites_.begin(), sprites_.end(),
+       [](const SpriteData& a, const SpriteData& b) {
+         const int area_a = a.data_.GetWidth() * a.data_.GetHeight();
+         const int area_b = b.data_.GetWidth() * b.data_.GetHeight();
+         return area_a > area_b;  // Descending order (largest first)
+       });
 
   for (auto& sprite : sprites_) {
     TextureData& data = sprite.data_;
@@ -318,29 +325,32 @@ void TextureAtlasSource::StitchTexture(const SpriteData& data) {
     const size_t row_bytes = static_cast<size_t>(sprite_width) * channels_;
     for (int y = 0; y < sprite_height; ++y) {
       const int y_global = y + y_offset;
-      const size_t dst_offset = (static_cast<size_t>(y_global) * width_ + x_offset) * channels_;
-      const size_t src_offset = static_cast<size_t>(y) * sprite_width * sprite_channels;
-      std::memcpy(data_.data() + dst_offset, sprite_data + src_offset, row_bytes);
+      const size_t dst_offset =
+          (static_cast<size_t>(y_global) * width_ + x_offset) * channels_;
+      const size_t src_offset =
+          static_cast<size_t>(y) * sprite_width * sprite_channels;
+      std::memcpy(data_.data() + dst_offset, sprite_data + src_offset,
+                  row_bytes);
     }
   } else {
     // Inlined channel conversion - no SetPixel() function call overhead
     const int src_stride_y = sprite_width * sprite_channels;
     const int dst_stride_y = width_ * channels_;
-    
+
     for (int y = 0; y < sprite_height; ++y) {
       const int y_global = y + y_offset;
       const int src_row_offset = y * src_stride_y;
       const int dst_row_offset = (y_global * width_ + x_offset) * channels_;
-      
+
       for (int x = 0; x < sprite_width; ++x) {
         const int src_pixel = src_row_offset + x * sprite_channels;
         const int dst_pixel = dst_row_offset + x * channels_;
-        
+
         // Copy available channels
         for (int c = 0; c < sprite_channels && c < channels_; ++c) {
           data_[dst_pixel + c] = sprite_data[src_pixel + c];
         }
-        
+
         // Fill remaining channels (grayscale expansion or alpha)
         if (sprite_channels == 1 && channels_ >= 3) {
           // Grayscale to RGB

@@ -1,5 +1,11 @@
 #include "Level/Light/ChunkLightTask.h"
 
+#include <cstddef>
+#include <utility>
+#include <vector>
+
+#include "Core/Position/PositionTypes.h"
+
 ChunkLightTask::ChunkLightTask(ChunkPos chunk_pos,
                                const std::vector<BlockPos>& blocks)
     : chunk_pos_{chunk_pos}, changed_block_{blocks} {}
@@ -38,4 +44,6 @@ const std::vector<BlockPos>& ChunkLightTask::GetLightTask() const {
 
 ChunkPos ChunkLightTask::GetChunkPos() const noexcept { return chunk_pos_; }
 
-size_t ChunkLightTask::GetTaskCount() const noexcept { return changed_block_.size(); }
+size_t ChunkLightTask::GetTaskCount() const noexcept {
+  return changed_block_.size();
+}

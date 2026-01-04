@@ -1,7 +1,10 @@
 #include "Level/World/WorldInterface.h"
 
+#include <memory>
 #include <vector>
 
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Container/ChunkMap.h"
 #include "Level/Container/EntityContainer.h"
 #include "Level/ECS/IECSManager.h"
@@ -19,7 +22,6 @@ WorldInterface::~WorldInterface() = default;
 BlockID WorldInterface::GetBlock(BlockPos pos) const {
   return chunks_->GetBlock(pos);
 }
-
 
 Chunk& WorldInterface::GetChunk(ChunkPos pos) const {
   return chunks_->GetChunk(pos);
@@ -44,4 +46,3 @@ EntityContainer* WorldInterface::GetEntityContainer() const {
 }
 
 IECSManager& WorldInterface::GetECSManager() { return *ecs_manager_; }
-

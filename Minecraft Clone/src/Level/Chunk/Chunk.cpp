@@ -2,15 +2,13 @@
 
 #include "Level/Chunk/Chunk.h"
 
-#include <algorithm>
 #include <array>
-#include <iostream>
-#include <utility>
 
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/Direction.h"
+#include "Core/Position/PositionTypes.h"
 #include "Level/Block/Blocks.h"
-#include "Level/Chunk/Heightmap/Heightmap.h"
-#include "Level/Light/LightStorage.h"
+#include "Level/Chunk/ChunkData.h"
 #include "Level/TerrainGeneration/Structures/Structure.h"
 
 Chunk::Chunk(GameContext& context) : ChunkContainer{context} {}

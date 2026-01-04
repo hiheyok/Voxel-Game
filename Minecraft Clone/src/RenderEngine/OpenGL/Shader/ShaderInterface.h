@@ -17,7 +17,7 @@
 
 class GameContext;
 class ShaderSource;
-class TextureV2;
+class Texture;
 
 class ShaderInterface : public RenderResource {
  public:
@@ -68,7 +68,7 @@ class ShaderInterface : public RenderResource {
   ShaderInterface& BindTextureArray2D(GLuint index, GLuint img,
                                       const std::string& name);
 
-  ShaderInterface& BindTexture(GLuint index, RenderHandle<TextureV2> texture);
+  ShaderInterface& BindTexture(GLuint index, RenderHandle<Texture> texture);
 
   ShaderInterface& BindBufferAsSSBO(GLuint buffer, int idx);
   ShaderInterface& UnbindBufferSSBO(int idx);

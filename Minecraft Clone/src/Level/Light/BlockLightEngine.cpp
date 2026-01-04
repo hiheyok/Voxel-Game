@@ -1,14 +1,19 @@
 #include "Level/Light/BlockLightEngine.h"
 
+#include <algorithm>
 #include <utility>
 
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/Direction.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Chunk/Chunk.h"
-#include "Level/Chunk/Heightmap/Heightmap.h"
 #include "Level/Light/ChunkLightTask.h"
+#include "Level/Light/LightEngine.h"
 #include "Level/Light/LightEngineCache.h"
 #include "Level/World/WorldInterface.h"
 #include "Utils/Assert.h"
+#include "Utils/Iterators.h"
 
 BlockLightEngine::BlockLightEngine(GameContext& context, WorldInterface& world)
     : LightEngine{context, world} {

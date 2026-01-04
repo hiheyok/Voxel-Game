@@ -9,11 +9,12 @@
 #include "Client/ClientLevel/ClientCache.h"
 #include "Client/Inputs/InputManager.h"
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Entity/Mobs/Player.h"
 #include "Level/Item/Items.h"
 #include "Utils/Math/Ray/Ray.h"
-#include "Utils/Math/vectorOperations.h"
 
 WorldInteraction::WorldInteraction(GameContext& context) : context_{context} {}
 WorldInteraction::~WorldInteraction() = default;

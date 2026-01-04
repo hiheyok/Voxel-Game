@@ -2,9 +2,14 @@
 
 #include "RenderEngine/UI/Widgets/Widget.h"
 
-#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <glm/ext/vector_float2.hpp>
+#include <memory>
+#include <utility>
 #include <vector>
 
+#include "Client/Inputs/MouseInputs.h"
 #include "RenderEngine/UI/Components/Component.h"
 #include "RenderEngine/UI/Data/UserInterfaceData.h"
 #include "RenderEngine/UI/UIRenderer.h"

@@ -2,6 +2,12 @@
 
 #include "Level/Chunk/TallChunk.h"
 
+#include <memory>
+
+#include "Core/Typenames.h"
+#include "Level/Block/Block.h"
+#include "Level/Chunk/Chunk.h"
+
 TallChunk::TallChunk(GameContext& context) : context_{context} {
   chunk_sub_column_.resize(16);
   for (int i = 0; i < 16; i++)

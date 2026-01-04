@@ -2,6 +2,8 @@
 
 #include "Level/Entity/EntityTypeData.h"
 
+#include <glm/ext/vector_float3.hpp>
+
 EntityTypeData::EntityTypeData(GameContext& context) : context_{context} {}
 EntityTypeData::~EntityTypeData() = default;
 void EntityTypeData::ChangeHitboxSize(glm::vec3 size) { hitbox_.max_ = size; }

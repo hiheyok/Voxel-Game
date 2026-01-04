@@ -2,8 +2,15 @@
 
 #include "Level/Chunk/Palette.h"
 
-#include "Core/GameContext/GameContext.h"
-#include "Level/Block/Blocks.h"
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <vector>
+
+#include "Core/Position/Direction.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
+#include "Utils/Assert.h"
 
 using std::array;
 using std::move;

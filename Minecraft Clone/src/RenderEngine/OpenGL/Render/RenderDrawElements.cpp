@@ -2,10 +2,13 @@
 
 #include "RenderEngine/OpenGL/Render/RenderDrawElements.h"
 
+#include <cstddef>
+#include <cstdint>
+
 #include "Core/GameContext/GameContext.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
+#include "RenderEngine/OpenGL/Render/RenderObject.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
-#include "Utils/LogUtils.h"
 
 RenderDrawElements::RenderDrawElements(GameContext& context, uint32_t draw_type)
     : RenderObject{context}, vbo_{context}, ebo_{context} {

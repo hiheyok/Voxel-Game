@@ -12,9 +12,9 @@ class TextureSource;
 
 // This is designed as an interface to manage all of the different types
 // textures (e.g. TextureArray, Texture2D, TextureAtlas)
-class TextureV2 : public RenderResource, public TextureBase {
+class Texture : public RenderResource, public TextureBase {
  public:
-  virtual ~TextureV2();
+  virtual ~Texture();
 
   GLuint GetId() const noexcept override;
   GLenum GetTarget() const noexcept override;
@@ -24,7 +24,7 @@ class TextureV2 : public RenderResource, public TextureBase {
   void Load() override;
 
  protected:
-  TextureV2(GameContext& context, const std::string& key, GLenum target);
+  Texture(GameContext& context, const std::string& key, GLenum target);
 
   virtual void LoadTexture() = 0;
 

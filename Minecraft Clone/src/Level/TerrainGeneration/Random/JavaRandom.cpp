@@ -1,8 +1,8 @@
 #include "Level/TerrainGeneration/Random/JavaRandom.h"
 
+#include <cstdint>
+#include <ctime>
 #include <stdexcept>
-
-#include "Utils/LogUtils.h"
 
 JavaRandom::JavaRandom() noexcept : JavaRandom{static_cast<int64_t>(time(0))} {}
 
@@ -19,7 +19,8 @@ int JavaRandom::Next(int bits) noexcept {
 }
 
 int JavaRandom::NextInt(int n) {
-  if (n <= 0) throw std::domain_error("JavaRandom::NextInt - n must be positive");
+  if (n <= 0)
+    throw std::domain_error("JavaRandom::NextInt - n must be positive");
   if ((n & (-n)) == n)  // n is power of 2
     return static_cast<int>((n * static_cast<int64_t>(Next(31))) >> 31);
   int bits, val;

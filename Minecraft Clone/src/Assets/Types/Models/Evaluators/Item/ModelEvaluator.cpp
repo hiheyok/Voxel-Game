@@ -1,6 +1,10 @@
 #include "Assets/Types/Models/Evaluators/Item/ModelEvaluator.h"
 
+#include <string>
+
+#include "Assets/Types/Models/Evaluators/Item/Evaluator.h"
 #include "Core/GameContext/GameContext.h"
+#include "Core/Registry/ResourceLocation.h"
 #include "Utils/LogUtils.h"
 
 using namespace item_model;

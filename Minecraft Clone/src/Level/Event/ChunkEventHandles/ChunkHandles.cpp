@@ -2,7 +2,7 @@
 
 #include "Level/Event/ChunkEventHandles/ChunkHandles.h"
 
-#include "Level/Event/EventHandler.h"
+#include "Level/Event/Event.h"
 
 void UpdateLighting(const ChunkEvent& chunkEvent) { (void)chunkEvent; }
 

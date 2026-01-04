@@ -2,10 +2,13 @@
 
 #include "RenderEngine/OpenGL/Render/RenderDrawElementsInstanced.h"
 
+#include <cstddef>
+#include <cstdint>
+
 #include "Core/GameContext/GameContext.h"
 #include "RenderEngine/OpenGL/Buffers/VertexArray.h"
+#include "RenderEngine/OpenGL/Render/RenderObject.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
-#include "Utils/LogUtils.h"
 
 RenderDrawElementsInstanced::RenderDrawElementsInstanced(GameContext& context,
                                                          uint32_t draw_type)

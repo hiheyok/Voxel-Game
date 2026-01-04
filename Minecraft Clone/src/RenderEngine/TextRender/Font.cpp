@@ -2,6 +2,9 @@
 
 #include "RenderEngine/TextRender/Font.h"
 
+#include <cstddef>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float4.hpp>
 #include <string>
 #include <vector>
 

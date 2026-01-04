@@ -1,8 +1,14 @@
 #include "Assets/Types/Texture/Texture2DSource.h"
 
-Texture2DSource::Texture2DSource(GameContext& context,
-                                 const std::string& asset_key,
-                                 const std::string& path)
+#include <cstdint>
+#include <string>
+
+#include "Assets/Types/Texture/Texture2DBaseSource.h"
+
+using std::string;
+
+Texture2DSource::Texture2DSource(GameContext& context, const string& asset_key,
+                                 const string& path)
     : Texture2DBaseSource{context, asset_key}, filepath{path} {}
 
 Texture2DSource::~Texture2DSource() = default;

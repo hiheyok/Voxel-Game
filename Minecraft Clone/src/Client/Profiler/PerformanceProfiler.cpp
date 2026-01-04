@@ -2,12 +2,16 @@
 
 #include "Client/Profiler/PerformanceProfiler.h"
 
+#include <chrono>
+#include <cstdint>
+#include <cstring>
+#include <functional>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "FileManager/Files.h"
-#include "Utils/Timer/Timer.h"
 
 PerformanceProfiler::PerformanceProfiler() {
   initial_time_ = std::chrono::high_resolution_clock::now();

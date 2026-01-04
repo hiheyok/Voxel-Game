@@ -2,6 +2,13 @@
 
 #include "Level/Event/EventSystem.h"
 
+#include <cstdint>
+#include <memory>
+#include <utility>
+#include <vector>
+
+#include "Level/Event/Event.h"
+
 EventSystem::EventSystem() {
   NullEvent.type_ = NULL_EVENT;
 
@@ -17,9 +24,7 @@ EventSystem::~EventSystem() {
   queue_unactive_->clear();
 }
 
-std::vector<Event>& EventSystem::GetQueue() {
-  return *queue_active_.get();
-}
+std::vector<Event>& EventSystem::GetQueue() { return *queue_active_.get(); }
 
 void EventSystem::Swap() {
   std::unique_ptr<std::vector<Event>> tmp = std::move(queue_active_);

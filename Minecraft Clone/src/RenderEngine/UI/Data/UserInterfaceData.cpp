@@ -1,12 +1,13 @@
 #include "RenderEngine/UI/Data/UserInterfaceData.h"
 
+#include <cstdint>
 #include <iostream>
+#include <vector>
 
 std::ostream& operator<<(std::ostream& s, const UIVertexFormat& obj) {
   s << "(" << obj.x_ << ',' << obj.y_ << ')';
   return s;
 }
-
 
 void UIRectangle::GetVertices(std::vector<UIVertexFormat>& vertices,
                               std::vector<uint32_t>& indices) const {
@@ -44,4 +45,3 @@ void UIRectangle::GetVertices(std::vector<UIVertexFormat>& vertices,
                  {index_offset + 0, index_offset + 1, index_offset + 2,
                   index_offset + 2, index_offset + 1, index_offset + 3});
 }
-

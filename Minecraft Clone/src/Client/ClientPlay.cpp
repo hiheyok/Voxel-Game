@@ -2,13 +2,15 @@
 
 #include "Client/ClientPlay.h"
 
+#include <glm/vec3.hpp>
 #include <memory>
-#include <vector>
+#include <string>
 
 #include "Client/ClientActionQueue.h"
 #include "Client/ClientPacketReceiver.h"
 #include "Client/ClientPacketSender.h"
 #include "Client/Inputs/InputManager.h"
+#include "Client/Inputs/MouseInputs.h"
 #include "Client/Player/MainPlayer.h"
 #include "Client/Profiler/PerformanceProfiler.h"
 #include "Client/Render/DebugScreen/DebugScreen.h"
@@ -18,7 +20,8 @@
 #include "Core/GameContext/GameContext.h"
 #include "Core/Interfaces/ServerInterface.h"
 #include "Core/Options/Option.h"
-#include "Level/Entity/Mobs/Player.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Stats/ServerStats.h"
 #include "RenderEngine/ChunkRender/TerrainRenderer.h"
 #include "RenderEngine/EntityRender/ECSEntityRender.h"
 #include "RenderEngine/EntityRender/MultiEntityRender.h"

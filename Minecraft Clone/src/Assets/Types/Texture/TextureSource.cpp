@@ -1,14 +1,22 @@
 #include "Assets/Types/Texture/TextureSource.h"
 
+#include <cassert>
+#include <cstddef>
 #include <cstdint>
+#include <glm/vec4.hpp>
+#include <string>
+#include <utility>
 #include <vector>
 
+#include "Assets/Asset.h"
 #include "Core/GameContext/GameContext.h"
 #include "Core/IO/FileUtils.h"
 #include "Utils/LogUtils.h"
 #include "Utils/stb_image.h"
 
-TextureSource::TextureSource(GameContext& context, const std::string& asset_key)
+using std::string;
+
+TextureSource::TextureSource(GameContext& context, const string& asset_key)
     : Asset{asset_key}, context_{context} {}
 
 TextureSource::~TextureSource() = default;
@@ -19,8 +27,7 @@ int TextureSource::GetMipmapLayerCount() const noexcept {
   return mipmap_layer_count_;
 }
 
-TextureSource::TextureData TextureSource::LoadTexture(
-    const std::string& filepath) {
+TextureSource::TextureData TextureSource::LoadTexture(const string& filepath) {
   return {context_, filepath};
 }
 
@@ -38,7 +45,7 @@ int TextureSource::GetFormat(int channel) noexcept {
 }
 
 TextureSource::TextureData::TextureData(GameContext& context,
-                                        const std::string& filepath) {
+                                        const string& filepath) {
   Load(context, filepath);
   if (success_) {
     Analyze();
@@ -46,7 +53,7 @@ TextureSource::TextureData::TextureData(GameContext& context,
 }
 
 void TextureSource::TextureData::Load(GameContext& context,
-                                      const std::string& filepath) {
+                                      const string& filepath) {
   std::vector<char> data = FileUtils::ReadFileToBuffer(context, filepath);
 
   if (data.size() == 0) {
@@ -93,10 +100,10 @@ void TextureSource::TextureData::Analyze() {
   if (channels_ == 4) {
     const size_t total_pixels = static_cast<size_t>(img_size_.x) * img_size_.y;
     const uint8_t* ptr = data_;
-    
+
     for (size_t i = 0; i < total_pixels; ++i) {
       const uint8_t alpha = ptr[i * 4 + 3];
-      
+
       if (alpha == 0) {
         full_trans_ = true;
       } else if (alpha < 255) {

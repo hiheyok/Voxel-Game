@@ -1,5 +1,10 @@
 #include "Assets/Types/ShaderSource.h"
 
+#include <memory>
+#include <string>
+#include <vector>
+
+#include "Assets/Asset.h"
 #include "Core/GameContext/GameContext.h"
 #include "Core/IO/FileUtils.h"
 #include "Utils/Assert.h"

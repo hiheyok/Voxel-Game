@@ -1,5 +1,10 @@
 #include "Client/ECS/ClientEntitySystems.h"
 
+#include "Core/Typenames.h"
+#include "Level/ECS/EntityType.h"
+#include "Level/ECS/Systems/ITickStateSystem.h"
+#include "Level/ECS/Systems/ITransformSystem.h"
+
 // IEntitySystems interface
 ITransformSystem& ClientEntitySystems::GetTransformSystem() {
   return transform_system_;
@@ -18,7 +23,8 @@ const ITickStateSystem& ClientEntitySystems::GetTickStateSystem() const {
 }
 
 void ClientEntitySystems::CommitAll() {
-  // No-op for client: client systems receive updates directly without double-buffering
+  // No-op for client: client systems receive updates directly without
+  // double-buffering
 }
 
 // Client-specific methods
@@ -43,6 +49,6 @@ void ClientEntitySystems::UnregisterEntity(EntityUUID uuid) {
 }
 
 bool ClientEntitySystems::IsValidUUID(EntityUUID uuid) const {
-  return uuid < uuid_to_type_.size() && 
+  return uuid < uuid_to_type_.size() &&
          uuid_to_type_[uuid] != EntityType::kInvalidEntity;
 }

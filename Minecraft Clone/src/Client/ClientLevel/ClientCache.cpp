@@ -6,10 +6,13 @@
 #include <utility>
 
 #include "Client/ClientLevel/Entity/ClientEntities.h"
+#include "Client/ECS/ClientECSManager.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Chunk/Chunk.h"
 #include "Level/Container/ChunkMap.h"
 #include "Level/Container/Region.h"
-#include "Client/ECS/ClientECSManager.h"
+#include "Level/Entity/Properties/EntityProperties.h"
 #include "Level/World/CollisionDetector.h"
 
 ClientCache::ClientCache(GameContext& context)
@@ -22,7 +25,6 @@ ClientCache::ClientCache(GameContext& context)
 }
 
 ClientCache::~ClientCache() = default;
-
 
 void ClientCache::AddChunk(std::unique_ptr<Chunk> chunk) {
   chunks_->InsertChunk(std::move(chunk));

@@ -1,6 +1,8 @@
 // Copyright (c) 2025 Voxel-Game Author. All rights reserved.
 
 #include "Level/Block/Type/SolidBlock.h"
+#include "Level/Block/Block.h"
+#include "Core/Position/PositionTypes.h"
 
 SolidBlock::SolidBlock(GameContext& context) : Block{context} {}
 

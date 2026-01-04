@@ -1,8 +1,14 @@
 #include "RenderEngine/UI/ScreenManager.h"
 
+#include <glm/ext/vector_float2.hpp>
+#include <utility>
+#include <vector>
+
+#include "Client/Inputs/InputEvent.h"
+#include "RenderEngine/UI/ScreenRegistry.h"
 #include "RenderEngine/UI/Screens/Screen.h"
-#include "Utils/Assert.h"
 #include "RenderEngine/UI/UIRenderer.h"
+#include "Utils/Assert.h"
 
 ScreenManager::ScreenManager(GameContext& context,
                              ScreenRegistry& screen_registry)

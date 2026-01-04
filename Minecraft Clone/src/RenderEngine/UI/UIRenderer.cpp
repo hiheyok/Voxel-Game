@@ -1,14 +1,17 @@
 #include "RenderEngine/UI/UIRenderer.h"
 
+#include <cstddef>
 #include <cstdint>
+#include <glm/ext/vector_float2.hpp>
+#include <memory>
 #include <vector>
 
 #include "Core/GameContext/GameContext.h"
 #include "RenderEngine/OpenGL/Buffers/Buffer.h"
+#include "RenderEngine/OpenGL/Render/RenderObject.h"
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 #include "RenderEngine/RenderResources/RenderHandle.h"
 #include "RenderEngine/UI/Data/UserInterfaceData.h"
-#include "Utils/LogUtils.h"
 
 UIRenderer::UIRenderer(GameContext& context)
     : context_{context},

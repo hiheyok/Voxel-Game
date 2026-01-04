@@ -6,8 +6,13 @@
 
 #include "Core/GameContext/GameContext.h"
 #include "Core/Interfaces/ClientInterface.h"
+#include "Core/Networking/EntityUpdate.h"
+#include "Core/Networking/Packet.h"
+#include "Core/Networking/PlayerAction.h"
 #include "Level/Dimension/Dimension.h"
+#include "Level/Entity/Entity.h"
 #include "Level/Entity/Mobs/Player.h"
+#include "Level/Event/Event.h"
 #include "Level/Level.h"
 
 ServerPacketReceiver::ServerPacketReceiver(Level& level, GameContext& context)

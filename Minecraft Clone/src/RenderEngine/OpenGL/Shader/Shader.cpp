@@ -2,12 +2,13 @@
 
 #include "RenderEngine/OpenGL/Shader/Shader.h"
 
-#include <sstream>
+#include <cstdint>
 #include <string>
 
+#include "Assets/AssetHandle.h"
 #include "Assets/Types/ShaderSource.h"
 #include "Core/GameContext/GameContext.h"
-#include "Utils/LogUtils.h"
+#include "RenderEngine/OpenGL/Shader/ShaderInterface.h"
 
 Shader::Shader(GameContext& context, const std::string& name,
                AssetHandle<ShaderSource> shader_src)

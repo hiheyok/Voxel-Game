@@ -1,6 +1,12 @@
 #include "Level/TerrainGeneration/Generators/Generator.h"
 
+#include <cstdint>
+#include <memory>
 #include <stdexcept>
+
+#include "Core/Position/PositionTypes.h"
+#include "Level/Chunk/Chunk.h"
+#include "Level/Chunk/TallChunk.h"
 
 WorldGenerator::WorldGenerator(GameContext& context) : context_{context} {}
 

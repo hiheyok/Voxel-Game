@@ -2,6 +2,8 @@
 
 #include "Level/Block/Type/Dirt.h"
 
+#include "Core/Position/PositionTypes.h"
+#include "Level/Block/Block.h"
 #include "Level/Dimension/Dimension.h"
 
 DirtBlock::DirtBlock(GameContext& context) : Block{context} {

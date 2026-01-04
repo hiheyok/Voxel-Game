@@ -1,5 +1,7 @@
 #include "Level/ECS/Components/MovementComponent.h"
 
+#include <glm/vec3.hpp>
+
 using glm::vec3;
 
 MovementComponent::MovementComponent()

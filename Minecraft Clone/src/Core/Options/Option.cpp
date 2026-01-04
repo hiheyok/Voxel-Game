@@ -2,6 +2,8 @@
 
 #include "Core/Options/Option.h"
 
+#include <cstddef>
+#include <fstream>
 #include <string>
 #include <vector>
 

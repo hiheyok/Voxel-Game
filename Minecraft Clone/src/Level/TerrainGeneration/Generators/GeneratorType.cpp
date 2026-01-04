@@ -1,10 +1,11 @@
 #include "Level/TerrainGeneration/Generators/GeneratorType.h"
 
+#include <cstddef>
 #include <memory>
 #include <utility>
 
 #include "Core/GameContext/GameContext.h"
-#include "Level/TerrainGeneration/Generators/Generators.h"
+#include "Core/Typenames.h"
 #include "Utils/LogUtils.h"
 
 GeneratorType::GeneratorType(GameContext& context) : context_{context} {}

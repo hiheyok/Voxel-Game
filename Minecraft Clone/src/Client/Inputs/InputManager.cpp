@@ -2,9 +2,12 @@
 
 #include "Client/Inputs/InputManager.h"
 
-#include <glfw/glfw3.h>
+#include <cstdint>
+#include <glm/vec2.hpp>
+#include <vector>
 
 #include "Client/Inputs/InputCodes.h"
+#include "Client/Inputs/InputEvent.h"
 
 void InputManager::UpdateAllKey() noexcept {
   keyboard_.Refresh();

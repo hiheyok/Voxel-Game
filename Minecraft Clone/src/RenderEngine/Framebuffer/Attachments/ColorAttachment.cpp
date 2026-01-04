@@ -1,5 +1,8 @@
 #include "RenderEngine/Framebuffer/Attachments/ColorAttachment.h"
 
+#include "RenderEngine/API/TextureBase.h"
+#include "RenderEngine/Framebuffer/Attachments/Attachment.h"
+
 using namespace framebuffer;
 
 ColorAttachment::ColorAttachment(GameContext& context, int width, int height)

@@ -1,13 +1,18 @@
 #include "Level/ECS/Systems/BlockPlaceSystem.h"
 
+#include <cmath>
+#include <glm/vec3.hpp>
+#include <vector>
+
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/PositionTypes.h"
+#include "Core/Typenames.h"
 #include "Level/Block/Blocks.h"
 #include "Level/Container/ChunkMap.h"
 #include "Level/Dimension/Dimension.h"
-#include "Level/ECS/ComponentMap.h"
-#include "Level/ECS/ServerECSManager.h"
-
 #include "Level/ECS/EntityRegistry.h"
+#include "Level/ECS/EntitySystem.h"
+#include "Level/ECS/ServerECSManager.h"
 #include "Level/ECS/ServerEntitySystems.h"
 #include "Level/ECS/Systems/BlockSystem.h"
 #include "Level/ECS/Systems/CollisionSystem.h"
@@ -34,11 +39,10 @@ void BlockPlaceSystem::Tick() {
   auto& collision_system = entity_systems_.GetCollisionSystem();
   auto& block_system = entity_systems_.GetBlockSystem();
   auto& tick_state_system = entity_systems_.GetConcreteTickStateSystem();
-  
+
   // Cast to ServerECSManager to access GetRegistry()
   auto& server_ecs = static_cast<ServerECSManager&>(world_.GetECSManager());
   auto& registry = server_ecs.GetRegistry();
-
 
   std::vector<EntityUUID> entities_to_remove;
 

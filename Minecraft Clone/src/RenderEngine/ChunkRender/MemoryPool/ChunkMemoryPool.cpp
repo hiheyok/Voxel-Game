@@ -2,11 +2,18 @@
 
 #include "RenderEngine/ChunkRender/MemoryPool/ChunkMemoryPool.h"
 
+#include <climits>
+#include <cstddef>
+#include <cstdint>
 #include <limits>
 #include <map>
+#include <memory>
+#include <stdexcept>
+#include <utility>
 #include <vector>
 
 #include "Core/GameContext/GameContext.h"
+#include "Core/Position/PositionTypes.h"
 #include "RenderEngine/ChunkRender/Mesh/BlockVertexFormat.h"
 #include "RenderEngine/OpenGL/Buffers/BufferStorage.h"
 #include "Utils/LogUtils.h"
