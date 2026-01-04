@@ -5,12 +5,12 @@
 #include <glm/vec2.hpp>
 #include <utility>
 
+#include "Client/ClientActionQueue.h"
 #include "Client/Inputs/InputManager.h"
 #include "Client/Player/PlayerMovement.h"
 #include "Client/Player/PlayerPOV.h"
 #include "Client/Player/WorldInteraction.h"
 #include "Core/GameContext/GameContext.h"
-#include "Core/Interfaces/ServerInterface.h"
 #include "Level/Entity/Mobs/Player.h"
 #include "Level/Entity/Properties/EntityProperties.h"
 #include "Level/Item/ItemTextureAtlas.h"
@@ -18,15 +18,13 @@
 #include "RenderEngine/GUI/GUISet.h"
 #include "RenderEngine/Window.h"
 
-MainPlayer::MainPlayer(GameContext& context, Window* window,
-                       ServerInterface* interface, ClientCache* cache)
+MainPlayer::MainPlayer(GameContext& context, Window* window, ClientCache& cache)
     : context_{context},
       player_{std::make_unique<Player>()},
       movement_{std::make_unique<PlayerMovement>()},
       interactions_{std::make_unique<WorldInteraction>(context)},
       player_pov_{std::make_unique<PlayerPOV>()},
       player_gui_{std::make_unique<GUI>(context, window)},
-      internal_interface_{interface},
       client_cache_{cache} {
   float ItemViewRelativeSize = 0.85f;
 
@@ -37,8 +35,7 @@ MainPlayer::MainPlayer(GameContext& context, Window* window,
       {0.f, -1.f + kHotbarSize * 0.5f}, {0.5f, 0.5f}, {181.5f, 21.5f});
 
   hotbar.AddGUIElement("Select", "", {kHotbarSize * 1.1f, kHotbarSize * 1.1f},
-                       {-kHotbarSize * 4.f, -1.f + kHotbarSize * 0.5f},  
-                       
+                       {-kHotbarSize * 4.f, -1.f + kHotbarSize * 0.5f},
                        {0.5f, 22.5f}, {22.5f, 44.5f});
 
   GUISet itemBar{context};
@@ -92,11 +89,11 @@ void MainPlayer::PrepareGUIs() {
   player_gui_->PrepareRenderer();
 }
 
-void MainPlayer::Update(const InputManager& inputs) {
+void MainPlayer::Update(const InputManager& inputs,
+                        ClientActionQueue& action_queue) {
   InventoryUpdate(inputs);
-  interactions_->Interact(player_.get(), inputs, internal_interface_,
-                          client_cache_);
-  movement_->Update(player_.get(), inputs, client_cache_);
+  interactions_->Interact(*player_, inputs, action_queue, client_cache_);
+  movement_->Update(*player_, inputs, client_cache_);
   PrepareGUIs();
 
   player_pov_->SetPosition(player_->properties_.position_);

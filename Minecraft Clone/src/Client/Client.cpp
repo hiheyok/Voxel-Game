@@ -58,8 +58,8 @@ void Client::InitializeServerCom() {
   server_ = std::make_unique<Server>(context_);
   server_->StartServer(settings);
   player_uuid_ = server_->SetInternalConnection(internal_interface_.get());
-  client_play_ = std::make_unique<ClientPlay>(
-      context_, internal_interface_.get(), this, profiler_);
+  client_play_ = std::make_unique<ClientPlay>(context_, *internal_interface_,
+                                              this, profiler_);
 }
 
 void Client::Initialize() {
@@ -84,7 +84,7 @@ void Client::Cleanup() { server_->Stop(); }
 void Client::Render() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   client_play_->Render(this);
-  //ui_manager_->Render();
+  // ui_manager_->Render();
 }
 
 void Client::GameLoop() {

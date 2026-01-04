@@ -5,10 +5,10 @@
 #include <memory>
 
 class ClientCache;
-class ServerInterface;
+class ClientActionQueue;
 class WorldInteraction;
 class InputManager;
-class PlayerMovement; 
+class PlayerMovement;
 
 class PlayerPOV;
 class Player;
@@ -20,12 +20,11 @@ struct EntityProperty;
 
 class MainPlayer {
  public:
-  MainPlayer(GameContext&, Window* window, ServerInterface* server,
-             ClientCache* cache);
+  MainPlayer(GameContext&, Window* window, ClientCache& cache);
   MainPlayer(const MainPlayer&) = delete;
   ~MainPlayer();
 
-  void Update(const InputManager& inputs);
+  void Update(const InputManager& inputs, ClientActionQueue& action_queue);
 
   EntityProperty GetEntityProperties();
 
@@ -49,8 +48,7 @@ class MainPlayer {
   std::unique_ptr<PlayerPOV> player_pov_;
   std::unique_ptr<GUI> player_gui_;
 
-  ServerInterface* internal_interface_ = nullptr;
-  ClientCache* client_cache_ = nullptr;
+  ClientCache& client_cache_;
 
   size_t gui_index_ = 0;
   size_t item_gui_index_ = 0;

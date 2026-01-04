@@ -5,7 +5,7 @@
 
 class Player;
 class InputManager;
-class ServerInterface;
+class ClientActionQueue;
 class ClientCache;
 class GameContext;
 
@@ -16,13 +16,13 @@ class WorldInteraction {
   explicit WorldInteraction(GameContext&);
   ~WorldInteraction();
 
-  void Interact(Player* player, const InputManager& Inputs,
-                ServerInterface* interface, ClientCache* cache);
+  void Interact(Player& player, const InputManager& Inputs,
+                ClientActionQueue& action_queue, ClientCache& cache);
 
  private:
-  BlockID GetBlock(Ray ray, ClientCache* cache);
-  void BreakBlock(Ray ray, ServerInterface* interface, ClientCache* cache);
-  void PlaceBlock(Ray ray, BlockID block, ServerInterface* interface,
-                  ClientCache* cache);
+  BlockID GetBlock(Ray ray, ClientCache& cache);
+  void BreakBlock(Ray ray, ClientActionQueue& action_queue, ClientCache& cache);
+  void PlaceBlock(Ray ray, BlockID block, ClientActionQueue& action_queue,
+                  ClientCache& cache);
   GameContext& context_;
 };

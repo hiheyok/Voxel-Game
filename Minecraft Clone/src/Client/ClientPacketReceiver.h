@@ -22,7 +22,7 @@ class ClientPacketReceiver {
 
   // Process all incoming packets from the server
   // Returns the set of chunk positions that need rendering updates
-  void ProcessPackets(ServerInterface* server);
+  void ProcessPackets(ServerInterface& server);
 
   // Get chunk positions that need rendering updates after processing
   const std::vector<ChunkPos>& GetChunksToUpdate() const {
@@ -32,10 +32,10 @@ class ClientPacketReceiver {
   void ClearChunksToUpdate() { chunks_to_update_.clear(); }
 
  private:
-  void ProcessChunkUpdates(ServerInterface* server);
-  void ProcessBlockUpdates(ServerInterface* server);
-  void ProcessEntityUpdates(ServerInterface* server);
-  void ProcessECSUpdates(ServerInterface* server);
+  void ProcessChunkUpdates(ServerInterface& server);
+  void ProcessBlockUpdates(ServerInterface& server);
+  void ProcessEntityUpdates(ServerInterface& server);
+  void ProcessECSUpdates(ServerInterface& server);
 
   GameContext& context_;
   ClientLevel& client_level_;

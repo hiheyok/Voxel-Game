@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 
+#include "Client/ClientActionQueue.h"
 #include "Client/ClientPacketReceiver.h"
 #include "Client/ClientPacketSender.h"
 #include "Client/Inputs/InputManager.h"
@@ -27,14 +28,14 @@
 using std::make_unique;
 using std::to_string;
 
-ClientPlay::ClientPlay(GameContext& context, ServerInterface* interface,
+ClientPlay::ClientPlay(GameContext& context, ServerInterface& interface,
                        Window* window, PerformanceProfiler* profiler)
     : context_{context},
       interface_{interface},
       framebuffer_{make_unique<TexturedFrameBuffer>(context)},
       client_level_{make_unique<ClientLevel>(context)},
-      main_player_{make_unique<MainPlayer>(context, window, interface,
-                                           &client_level_->cache_)},
+      main_player_{
+          make_unique<MainPlayer>(context, window, client_level_->cache_)},
       debug_screen_{make_unique<DebugScreen>(context)},
       entity_render_{make_unique<MultiEntityRender>(
           context, main_player_->GetPlayerPOV())},
@@ -42,11 +43,12 @@ ClientPlay::ClientPlay(GameContext& context, ServerInterface* interface,
           context, client_level_->cache_.GetECSManager(),
           main_player_->GetPlayerPOV())},
       terrain_render_{
-          make_unique<WorldRender>(context, main_player_->GetPlayerPOV())} {
+          make_unique<WorldRender>(context, main_player_->GetPlayerPOV())},
+      action_queue_{make_unique<ClientActionQueue>()} {
   // Initialize packet handlers
   packet_receiver_ = make_unique<ClientPacketReceiver>(
       context, *client_level_, *terrain_render_, *entity_render_);
-  packet_sender_ = make_unique<ClientPacketSender>(*main_player_);
+  packet_sender_ = make_unique<ClientPacketSender>(interface, *main_player_);
 
   main_player_->SetPlayerPosition(0.0f, 50.0f, 0.0f);
   main_player_->SetPlayerRotation(-135.0f, -30.0f);
@@ -59,7 +61,7 @@ ClientPlay::ClientPlay(GameContext& context, ServerInterface* interface,
   ecs_entity_render_->SetWindow(window->GetWindow());
 
   // Send initial player position to server
-  packet_sender_->SendPackets(interface);
+  packet_sender_->SendPackets();
 
   terrain_render_->Start(window->GetWindow(), &client_level_->cache_, profiler);
   framebuffer_->GenBuffer(
@@ -105,25 +107,30 @@ void ClientPlay::Update(Window* window) {
     entity_render_->Reload();
   }
 
-  main_player_->Update(window->GetUserInputs());
+  // Update main player with action queue
+  main_player_->Update(window->GetUserInputs(), *action_queue_);
 
-  entity_render_->SetTimePastTick(interface_->time.GetTimePassed_s());
+  entity_render_->SetTimePastTick(interface_.time.GetTimePassed_s());
   entity_render_->Update();
 
-  ecs_entity_render_->SetTimePastTick(interface_->time.GetTimePassed_s());
+  ecs_entity_render_->SetTimePastTick(interface_.time.GetTimePassed_s());
 
   // Process incoming packets from server
   packet_receiver_->ProcessPackets(interface_);
 
-  // Send outgoing packets to server
-  packet_sender_->SendPackets(interface_);
+  // Process action queue and send outgoing packets to server
+  packet_sender_->ProcessQueue(*action_queue_);
+  action_queue_->Clear();
+
+  // Send player movement (legacy, still needed for position sync)
+  packet_sender_->SendPackets();
 
   terrain_render_->Update();
   UpdateDebugStats();
 }
 
 void ClientPlay::UpdateDebugStats() {
-  ServerStats stats = interface_->GetServerStats();
+  ServerStats stats = interface_.GetServerStats();
   glm::vec3 player_pos = main_player_->GetEntityProperties().position_;
   BlockPos block_pos{player_pos.x, player_pos.y, player_pos.z};
   ChunkPos chunk_pos = block_pos.ToChunkPos();

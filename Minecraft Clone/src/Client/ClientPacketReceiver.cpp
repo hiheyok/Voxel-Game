@@ -38,9 +38,7 @@ ClientPacketReceiver::ClientPacketReceiver(GameContext& context,
       terrain_render_{terrain_render},
       entity_render_{entity_render} {}
 
-void ClientPacketReceiver::ProcessPackets(ServerInterface* server) {
-  if (server == nullptr) return;
-
+void ClientPacketReceiver::ProcessPackets(ServerInterface& server) {
   chunks_to_update_.clear();
 
   ProcessChunkUpdates(server);
@@ -54,9 +52,9 @@ void ClientPacketReceiver::ProcessPackets(ServerInterface* server) {
   }
 }
 
-void ClientPacketReceiver::ProcessChunkUpdates(ServerInterface* server) {
+void ClientPacketReceiver::ProcessChunkUpdates(ServerInterface& server) {
   vector<Packet::ChunkUpdateData> chunk_packets;
-  server->PollChunkUpdates(chunk_packets);
+  server.PollChunkUpdates(chunk_packets);
 
   vector<ChunkUpdatePacket::AddChunk> new_chunks;
   vector<ChunkUpdatePacket::LightUpdate> light_updates;
@@ -107,9 +105,9 @@ void ClientPacketReceiver::ProcessChunkUpdates(ServerInterface* server) {
   }
 }
 
-void ClientPacketReceiver::ProcessBlockUpdates(ServerInterface* server) {
+void ClientPacketReceiver::ProcessBlockUpdates(ServerInterface& server) {
   vector<Packet::BlockUpdate> block_packets;
-  server->PollBlockUpdates(block_packets);
+  server.PollBlockUpdates(block_packets);
 
   vector<BlockUpdatePacket::BlockMultiUpdate> block_updates;
 
@@ -158,14 +156,14 @@ void ClientPacketReceiver::ProcessBlockUpdates(ServerInterface* server) {
   }
 }
 
-void ClientPacketReceiver::ProcessEntityUpdates(ServerInterface* server) {
+void ClientPacketReceiver::ProcessEntityUpdates(ServerInterface& server) {
   vector<EntityProperty> spawnedEntities;
   vector<EntityProperty> updatedEntities;
   vector<EntityUUID> despawnedEntities;
 
   vector<Packet::EntityUpdate> packets;
 
-  server->PollEntityUpdates(packets);
+  server.PollEntityUpdates(packets);
 
   for (const auto& packet : packets) {
     switch (packet.type_) {
@@ -220,9 +218,9 @@ void ClientPacketReceiver::ProcessEntityUpdates(ServerInterface* server) {
   }
 }
 
-void ClientPacketReceiver::ProcessECSUpdates(ServerInterface* server) {
+void ClientPacketReceiver::ProcessECSUpdates(ServerInterface& server) {
   vector<ECSUpdatePacket::ECSUpdate> updates;
-  server->PollECSUpdates(updates);
+  server.PollECSUpdates(updates);
 
   if (updates.empty()) return;
 

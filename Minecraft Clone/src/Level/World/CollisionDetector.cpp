@@ -9,15 +9,19 @@
 #include "Utils/Math/Ray/Ray.h"
 #include "Utils/Math/vectorOperations.h"
 
+using glm::dvec3;
+using glm::ivec3;
+using glm::vec3;
+using std::vector;
+
 CollisionDetector::CollisionDetector(GameContext& context,
                                      const ChunkMap& cache)
     : context_{context}, cache_{cache} {}
 CollisionDetector::~CollisionDetector() = default;
 
-float CollisionDetector::TraceSingleAxisCollision(glm::vec3 origin,
-                                                  int direction,
+float CollisionDetector::TraceSingleAxisCollision(vec3 origin, int direction,
                                                   int distance_test) {
-  const std::vector<BlockProperties>& properties =
+  const vector<BlockProperties>& properties =
       context_.blocks_->GetBlockPropertyList();
 
   float displacement = 0;
@@ -47,23 +51,23 @@ float CollisionDetector::TraceSingleAxisCollision(glm::vec3 origin,
     }
   }
 
-  return -1.f;
+  return -1.0f;
 }
 
-glm::dvec3 CollisionDetector::ComputeCollisionTimes(Entity* entity) {
-  AABB hitbox = context_.entities_list_->GetEntity(entity->properties_.type_)
-                    ->GetHitbox();
+dvec3 CollisionDetector::ComputeCollisionTimes(Entity& entity) {
+  AABB hitbox =
+      context_.entities_list_->GetEntity(entity.properties_.type_)->GetHitbox();
 
-  glm::vec3 hitbox_start = entity->properties_.position_ - (hitbox.max_ / 2.f);
-  glm::vec3 hitbox_end = entity->properties_.position_ + (hitbox.max_ / 2.f);
+  vec3 hitbox_start = entity.properties_.position_ - (hitbox.max_ / 2.0f);
+  vec3 hitbox_end = entity.properties_.position_ + (hitbox.max_ / 2.0f);
 
   int ix = static_cast<int>(floor(hitbox.max_.x)) + 1;
   int iy = static_cast<int>(floor(hitbox.max_.y)) + 1;
   int iz = static_cast<int>(floor(hitbox.max_.z)) + 1;
 
-  glm::ivec3 i_bound{ix, iy, iz};
+  ivec3 i_bound{ix, iy, iz};
 
-  glm::vec3 least_time{-1.0f, -1.0f, -1.0f};
+  vec3 least_time{-1.0f, -1.0f, -1.0f};
 
   float least_distance = static_cast<float>(kSearchDistance);
 
@@ -74,13 +78,13 @@ glm::dvec3 CollisionDetector::ComputeCollisionTimes(Entity* entity) {
     int v_axis = (axis + 2) % 3;
 
     for (auto [u, v] : Product<2>({i_bound[u_axis] + 1, i_bound[v_axis] + 1})) {
-      glm::ivec3 offset;
+      ivec3 offset;
 
-      offset[axis] = i_bound[axis] * (entity->properties_.velocity_[axis] >= 0);
+      offset[axis] = i_bound[axis] * (entity.properties_.velocity_[axis] >= 0);
       offset[u_axis] = u;
       offset[v_axis] = v;
 
-      glm::vec3 origin = hitbox_start + (glm::vec3)offset;
+      vec3 origin = hitbox_start + (vec3)offset;
 
       if (origin.x > hitbox_end.x) origin.x = hitbox_end.x;
       if (origin.y > hitbox_end.y) origin.y = hitbox_end.y;
@@ -96,40 +100,37 @@ glm::dvec3 CollisionDetector::ComputeCollisionTimes(Entity* entity) {
                                         // stuff
         continue;
 
-      if (entity->properties_.velocity_[axis] ==
-          0.f)  // First checks if the velocity isn't 0 because if it
-                // is 0, it's not moving in that axis so it's not
-                // going to collide in that direction
-        continue;
+      // First checks if the velocity isn't 0 because if it
+      // is 0, it's not moving in that axis so it's not
+      // going to collide in that direction
+      if (entity.properties_.velocity_[axis] == 0.0f) continue;
 
-      int direction =
-          axis * 2 + (entity->properties_.velocity_[axis] <
-                      0);  // The "+1" indicates that the direction is negative
+      // The "+1" indicates that the direction is negative
+      int direction = axis * 2 + (entity.properties_.velocity_[axis] < 0);
 
       float distance = TraceSingleAxisCollision(
           origin, direction, static_cast<int>(floor(least_distance)) + 2);
 
-      if ((distance < least_distance) && (distance != -1.f))
+      if ((distance < least_distance) && (distance != -1.0f))
         least_distance = distance;
 
-      if (distance == -1.f)  // -1.f means that it cannot find any blocks that
-                             // could collide in that range (5)
-        continue;
+      // -1.f means that it cannot find any blocks that
+      // could collide in that range (5)
+      if (distance == -1.0f) continue;
 
-      float time =
-          abs(distance /
-              entity->properties_.velocity_[axis]);  // This gets the time it
-                                                     // takes for the entity to
-                                                     // travel that distance
+      // This gets the time it
+      // takes for the entity to
+      // travel that distance
+      float time = abs(distance / entity.properties_.velocity_[axis]);
 
       if (time < least_time[axis]) {
         least_time[axis] = time;
         continue;
       }
 
-      if (least_time[axis] == -1.f)  // leasttime[axis] == -1.f means that a
-                                     // "time" value haven't been inputted yet
-        least_time[axis] = time;
+      // leasttime[axis] == -1.f means that a
+      // "time" value haven't been inputted yet
+      if (least_time[axis] == -1.0f) least_time[axis] = time;
     }
   }
 
@@ -138,28 +139,28 @@ glm::dvec3 CollisionDetector::ComputeCollisionTimes(Entity* entity) {
 
 bool CollisionDetector::CheckRayIntersection(Ray& ray) {
   // Direction with magnitude
-  glm::vec3 delta = ray.direction_;
-  glm::ivec3 direction = Sign(delta);
-  glm::ivec3 block_pos = glm::ivec3(floor(ray.origin_.x), floor(ray.origin_.y),
-                                    floor(ray.origin_.z));
+  vec3 delta = ray.direction_;
+  ivec3 direction = Sign(delta);
+  ivec3 block_pos =
+      ivec3(floor(ray.origin_.x), floor(ray.origin_.y), floor(ray.origin_.z));
 
   // To keep track of point location
-  glm::vec3 end_point = ray.origin_;
-  glm::vec3 delta_dist(abs(1 / delta[0]), abs(1 / delta[1]), abs(1 / delta[2]));
+  vec3 end_point = ray.origin_;
+  vec3 delta_dist(abs(1.0 / delta[0]), abs(1.0 / delta[1]), abs(1.0 / delta[2]));
 
   // Stepping Variable
-  glm::vec3 side_dist((static_cast<float>(direction[0]) *
-                           (static_cast<float>(block_pos[0]) - end_point[0]) +
-                       (static_cast<float>(direction[0]) * 0.5f) + 0.5f) *
-                          delta_dist[0],
-                      (static_cast<float>(direction[1]) *
-                           (static_cast<float>(block_pos[1]) - end_point[1]) +
-                       (static_cast<float>(direction[1]) * 0.5f) + 0.5f) *
-                          delta_dist[1],
-                      (static_cast<float>(direction[2]) *
-                           (static_cast<float>(block_pos[2]) - end_point[2]) +
-                       (static_cast<float>(direction[2]) * 0.5f) + 0.5f) *
-                          delta_dist[2]);
+  vec3 side_dist((static_cast<float>(direction[0]) *
+                      (static_cast<float>(block_pos[0]) - end_point[0]) +
+                  (static_cast<float>(direction[0]) * 0.5f) + 0.5f) *
+                     delta_dist[0],
+                 (static_cast<float>(direction[1]) *
+                      (static_cast<float>(block_pos[1]) - end_point[1]) +
+                  (static_cast<float>(direction[1]) * 0.5f) + 0.5f) *
+                     delta_dist[1],
+                 (static_cast<float>(direction[2]) *
+                      (static_cast<float>(block_pos[2]) - end_point[2]) +
+                  (static_cast<float>(direction[2]) * 0.5f) + 0.5f) *
+                     delta_dist[2]);
 
   static constexpr uint32_t kMaxIterations = 50;
   uint32_t iterations = 0;
@@ -172,7 +173,7 @@ bool CollisionDetector::CheckRayIntersection(Ray& ray) {
     BlockID b = cache_.GetBlock({block_pos.x, block_pos.y, block_pos.z});
 
     if (context_.blocks_->GetBlockType(b)->properties_->is_solid_) {
-      ray.end_point_ = (glm::vec3)block_pos;
+      ray.end_point_ = (vec3)block_pos;
 
       ray.length_ = sqrtf(powf(ray.end_point_.x - ray.origin_.x, 2) +
                           powf(ray.end_point_.y - ray.origin_.y, 2) +
@@ -212,26 +213,26 @@ bool CollisionDetector::CheckRayIntersection(Ray& ray) {
   return false;
 }
 
-bool CollisionDetector::IsEntityOnGround(Entity* entity) {
+bool CollisionDetector::IsEntityOnGround(Entity& entity) {
   static constexpr int search_buffer = 2;
-  AABB hitbox = context_.entities_list_->GetEntity(entity->properties_.type_)
-                    ->GetHitbox();
+  AABB hitbox =
+      context_.entities_list_->GetEntity(entity.properties_.type_)->GetHitbox();
 
-  glm::vec3 hitbox_start = entity->properties_.position_ - (hitbox.max_ / 2.f);
-  glm::vec3 hitbox_end = entity->properties_.position_ + (hitbox.max_ / 2.f);
+  vec3 hitbox_start = entity.properties_.position_ - (hitbox.max_ / 2.f);
+  vec3 hitbox_end = entity.properties_.position_ + (hitbox.max_ / 2.f);
 
   int ix = static_cast<int>(floor(hitbox.max_.x)) + 1;
   int iz = static_cast<int>(floor(hitbox.max_.z)) + 1;
 
   float least_length = static_cast<float>(kSearchDistance);
 
-  if (entity->properties_.velocity_.y > 0.f) {
+  if (entity.properties_.velocity_.y > 0.f) {
     return false;
   }
 
   for (auto [x, z] : Product<2>({ix + 1, iz + 1})) {
-    glm::vec3 offset(x, 0.0f, z);
-    glm::vec3 origin = hitbox_start + offset;
+    vec3 offset(x, 0.0f, z);
+    vec3 origin = hitbox_start + offset;
 
     if (origin.x > hitbox_end.x) origin.x = hitbox_end.x;
     if (origin.z > hitbox_end.z) origin.z = hitbox_end.z;

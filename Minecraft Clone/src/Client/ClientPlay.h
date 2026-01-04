@@ -22,13 +22,14 @@ class MultiEntityRender;
 class ECSEntityRender;
 class ClientPacketReceiver;
 class ClientPacketSender;
+class ClientActionQueue;
 
 struct WindowProperties;
 struct GLFWwindow;
 
 class ClientPlay {
  public:
-  ClientPlay(GameContext& context, ServerInterface* interface, Window* window,
+  ClientPlay(GameContext& context, ServerInterface& interface, Window* window,
              PerformanceProfiler* profiler);
   ~ClientPlay();
 
@@ -36,7 +37,8 @@ class ClientPlay {
   void Render(Window* window);
 
   GameContext& context_;
-  ServerInterface* interface_;
+  ServerInterface& interface_;
+
   std::unique_ptr<TexturedFrameBuffer> framebuffer_;
   std::unique_ptr<ClientLevel> client_level_;
   std::unique_ptr<MainPlayer> main_player_;
@@ -46,6 +48,7 @@ class ClientPlay {
   std::unique_ptr<WorldRender> terrain_render_;
   std::unique_ptr<ClientPacketReceiver> packet_receiver_;
   std::unique_ptr<ClientPacketSender> packet_sender_;
+  std::unique_ptr<ClientActionQueue> action_queue_;
 
   double frametime_ = 1;
 
