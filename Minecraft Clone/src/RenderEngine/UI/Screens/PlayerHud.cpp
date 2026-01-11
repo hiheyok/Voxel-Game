@@ -13,10 +13,12 @@
 #include "RenderEngine/RenderResources/RenderHandle.h"
 #include "RenderEngine/RenderResources/RenderResourceManager.h"
 #include "RenderEngine/RenderResources/Types/Texture/TextureAtlas.h"
+#include "RenderEngine/UI/Components/ColoredComponent.h"
 #include "RenderEngine/UI/Components/TextureComponent.h"
 #include "RenderEngine/UI/Screens/Screen.h"
 #include "RenderEngine/UI/Widgets/SlotWidget.h"
 #include "RenderEngine/UI/Widgets/Widget.h"
+#include "Utils/Assert.h"
 
 using std::make_unique;
 using std::move;
@@ -46,12 +48,6 @@ void PlayerHud::OnEnter() {
   hotbar->SetOffsetMax({182.0f, 22.0f});
   hotbar->SetPivot({0.5f, 0.0f});
   hotbar->AddComponent(move(hotbar_tex));
-
-  // auto test = make_unique<Widget>(context_);
-  // test->SetAnchorBoth({0.0f, 0.0f});
-  // test->SetPivot({0.0f, 0.0f});
-  // test->SetOffsetMax({100.0f, 100.0f});
-  // test->AddComponent(move(test_tex));
 
   // Create 9 hotbar slots
   for (int i = 0; i < kHotbarSlots; i++) {
@@ -102,16 +98,11 @@ void PlayerHud::Update(const vector<InputEvent>& events) {
 
   // Update selection indicator position
   int slot = inventory.right_hand_slot_;
-  if (slot != current_slot_index_) {
-    current_slot_index_ = slot;
-    selection_indicator_->SetOffsetMin({-1.0f + slot * 20.0f, -1.0f});
-    selection_indicator_->SetOffsetMax({23.0f + slot * 20.0f, 23.0f});
-    selection_indicator_->SetDirty();
-  }
+  UpdateSelectedSlot(slot);
 }
 
 void PlayerHud::UpdateSlot(int index, const Item& item) {
-  if (index < 0 || index >= kHotbarSlots) return;
+  GAME_ASSERT(index >= 0 && index < kHotbarSlots, "Invalid hotbar bounds.");
   hotbar_slots_[index]->SetItem(item);
 }
 

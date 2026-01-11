@@ -39,7 +39,7 @@ class Widget {
   void TryUpdateLayout(const UIRectangle& parent);
   void SetBranchDirty() noexcept;
 
-  void SubmitToRenderer(UIRenderer& renderer);
+  void SubmitToRenderer(UIRenderer& renderer) const;
   bool OnEvent(const InputManager&);
   void AddCallback();
 
@@ -56,16 +56,19 @@ class Widget {
   glm::vec2 offset_min_ = {0.0f, 0.0f};  // Often called "position"
   glm::vec2 offset_max_ = {0.0f, 0.0f};  // Often called "size"
 
+  UIRectangle screen_;
+
   std::vector<std::unique_ptr<Component>> components_;
+
+  // Virtual so derived widgets can add their own primitives
+  virtual void GetPrimitives(std::vector<UIRectangle>& primitives) const;
 
  private:
   friend class Screen;
 
   void SetChildDirty();
   void SetScreenManager(ScreenManager* manager) noexcept;
-  void GetPrimitives(std::vector<UIRectangle>& primitives);
 
-  UIRectangle screen_;
 
   ScreenManager* manager_;
   Widget* parent_;

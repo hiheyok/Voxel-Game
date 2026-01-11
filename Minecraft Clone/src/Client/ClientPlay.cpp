@@ -13,7 +13,6 @@
 #include "Client/Inputs/MouseInputs.h"
 #include "Client/Player/MainPlayer.h"
 #include "Client/Profiler/PerformanceProfiler.h"
-#include "Client/Render/DebugScreen/DebugScreen.h"
 #include "Client/Render/WorldRender.h"
 #include "ClientLevel/ClientCache.h"
 #include "ClientLevel/ClientLevel.h"
@@ -26,9 +25,11 @@
 #include "RenderEngine/EntityRender/ECSEntityRender.h"
 #include "RenderEngine/EntityRender/MultiEntityRender.h"
 #include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
+#include "RenderEngine/UI/Screens/DebugOverlay.h"
 #include "RenderEngine/UI/UIManager.h"
 #include "RenderEngine/Window.h"
 
+using glm::vec3;
 using std::make_unique;
 using std::to_string;
 
@@ -41,7 +42,6 @@ ClientPlay::ClientPlay(GameContext& context, ServerInterface& interface,
       client_level_{make_unique<ClientLevel>(context)},
       main_player_{
           make_unique<MainPlayer>(context, client_level_->cache_, ui_manager)},
-      debug_screen_{make_unique<DebugScreen>(context)},
       entity_render_{make_unique<MultiEntityRender>(
           context, main_player_->GetPlayerPOV())},
       ecs_entity_render_{make_unique<ECSEntityRender>(
@@ -58,8 +58,6 @@ ClientPlay::ClientPlay(GameContext& context, ServerInterface& interface,
   main_player_->SetPlayerPosition(0.0f, 50.0f, 0.0f);
   main_player_->SetPlayerRotation(-135.0f, -30.0f);
 
-  debug_screen_->Initialize(window->GetWindow());
-  debug_screen_->SetUpdateRate(200);
   entity_render_->Initialize(profiler);
   entity_render_->SetWindow(window->GetWindow());
   ecs_entity_render_->Initialize();
@@ -94,7 +92,7 @@ void ClientPlay::Render(Window* window) {
   framebuffer_->UnbindFBO();
   framebuffer_->Render();
 
-  debug_screen_->Render();
+  //   debug_screen_->Render();
 }
 
 void ClientPlay::Update(Window* window) {
@@ -130,77 +128,65 @@ void ClientPlay::Update(Window* window) {
   packet_sender_->SendPackets();
 
   terrain_render_->Update();
-  UpdateDebugStats();
 }
 
-void ClientPlay::UpdateDebugStats() {
-  ServerStats stats = interface_.GetServerStats();
-  glm::vec3 player_pos = main_player_->GetEntityProperties().position_;
-  BlockPos block_pos{player_pos.x, player_pos.y, player_pos.z};
-  ChunkPos chunk_pos = block_pos.ToChunkPos();
-  BlockPos rel_block_pos = block_pos.GetLocalPos();
-  int sky_lvl = -1;
-  int block_lvl = -1;
-  if (client_level_->cache_.CheckChunk(chunk_pos)) {
-    sky_lvl = client_level_->cache_.GetChunk(chunk_pos).sky_light_->GetLighting(
-        rel_block_pos);
-    block_lvl =
-        client_level_->cache_.GetChunk(chunk_pos).block_light_->GetLighting(
-            rel_block_pos);
-  }
+Screen::TickCallback ClientPlay::GetDebugStatsCallback() {
+  return [this](Screen* screen) {
+    DebugOverlay* debug_screen = static_cast<DebugOverlay*>(screen);
+    ServerStats stats = interface_.GetServerStats();
+    glm::vec3 player_pos = main_player_->GetEntityProperties().position_;
+    BlockPos block_pos{player_pos.x, player_pos.y, player_pos.z};
+    ChunkPos chunk_pos = block_pos.ToChunkPos();
+    BlockPos rel_block_pos = block_pos.GetLocalPos();
 
-  debug_screen_->EditText(
-      "Stat1",
-      "VRAM Usage: " +
-          to_string(static_cast<double>(
-                        terrain_render_->renderer_->GetVRAMUsageFull()) /
-                    1000000.0) +
-          " MB");
-  debug_screen_->EditText("Stat2", "XYZ: " + to_string(player_pos.x) + "/" +
-                                       to_string(player_pos.y) + "/" +
-                                       to_string(player_pos.z));
-  debug_screen_->EditText(
-      "Stat3",
-      "Velocity XYZ: " +
-          to_string(main_player_->GetEntityProperties().velocity_.x) + "/" +
-          to_string(main_player_->GetEntityProperties().velocity_.y) + "/" +
-          to_string(main_player_->GetEntityProperties().velocity_.z) +
-          "| Rotation: " +
-          to_string(main_player_->GetEntityProperties().rotation_.x) + "/" +
-          to_string(main_player_->GetEntityProperties().rotation_.y));
-  debug_screen_->EditText(
-      "Stat4",
-      "VRAM Fragmentation Rate: " +
-          to_string(terrain_render_->renderer_->GetFragmentationRate() * 100) +
-          "%");
-  debug_screen_->EditText("Stat5", "FPS: " + to_string(1.0 / frametime_));
+    int sky_lvl = -1;
+    int block_lvl = -1;
+    if (client_level_->cache_.CheckChunk(chunk_pos)) {
+      sky_lvl =
+          client_level_->cache_.GetChunk(chunk_pos).sky_light_->GetLighting(
+              rel_block_pos);
+      block_lvl =
+          client_level_->cache_.GetChunk(chunk_pos).block_light_->GetLighting(
+              rel_block_pos);
+    }
 
-  debug_screen_->EditText(
-      "Stat6", "Mesh Stats (ms) Total/S0/S1/S2: " +
-                   to_string(terrain_render_->build_time_ / 1000.f) + "/" +
-                   to_string(100.0 * terrain_render_->build_stage_0_ /
-                             terrain_render_->build_time_) +
-                   "/" +
-                   to_string(100.0 * terrain_render_->build_stage_1_ /
-                             terrain_render_->build_time_) +
-                   "/" +
-                   to_string(terrain_render_->build_time_ /
-                             terrain_render_->amount_of_mesh_generated_) +
-                   "/" +
-                   to_string((double)terrain_render_->set_face_calls_clocks_ /
-                             terrain_render_->set_face_calls_));
+    float vram_usage =
+        static_cast<float>(terrain_render_->renderer_->GetVRAMUsageFull()) /
+        1000000;
 
-  debug_screen_->EditText(
-      "Stat7",
-      "Mesh Engine Queued: " + to_string(terrain_render_->GetQueuedSize()));
-  debug_screen_->EditText("Stat8", "Light Level: " + to_string(sky_lvl) +
-                                       " : " + to_string(block_lvl));
-  debug_screen_->EditText("Stat9",
-                          "Server Tick (MSPT): " + to_string(stats.mspt_));
-  debug_screen_->EditText(
-      "Stat10",
-      "Light Engine Queue: " + to_string(stats.light_stats_.queue_size_) +
-          " | Update time: " +
-          to_string(stats.light_stats_.average_light_update_time_));
-  debug_screen_->Update();
+    vec3 velocity = main_player_->GetEntityProperties().velocity_;
+
+    debug_screen->Edit(0, "VRAM Usage {} MB", vram_usage);
+    debug_screen->Edit(1, "Position: x={}, y={}, z={}", player_pos.x,
+                       player_pos.y, player_pos.z);
+    debug_screen->Edit(2, "Velocity: x={}, y={}, z={}", velocity.x, velocity.y,
+                       velocity.z);
+
+    float vram_frag_rate =
+        terrain_render_->renderer_->GetFragmentationRate() * 100;
+    debug_screen->Edit(3, "VRAM Fragmentation Rate: {}%", vram_frag_rate);
+
+    float fps = 1.0 / frametime_;
+    debug_screen->Edit(4, "FPS: {}", fps);
+
+    float mesh_ms = terrain_render_->build_time_ / 1000;
+    float s0 =
+        100.0 * terrain_render_->build_stage_0_ / terrain_render_->build_time_;
+    float s1 =
+        100.0 * terrain_render_->build_stage_1_ / terrain_render_->build_time_;
+    float avg = terrain_render_->build_time_ /
+                terrain_render_->amount_of_mesh_generated_;
+
+    debug_screen->Edit(5, "Mesh Stats (ms) Total={} S0={} S1={} Avg={} us",
+                       mesh_ms, s0, s1, avg);
+
+    debug_screen->Edit(6, "Mesh Engine Queued: {}",
+                       terrain_render_->GetQueuedSize());
+
+    debug_screen->Edit(7, "Light Level: Sky={}, Block={}", sky_lvl, block_lvl);
+    debug_screen->Edit(8, "Server Tick (MSPT): {}", stats.mspt_);
+    debug_screen->Edit(9, "Light Engine Queue: {} | Update time: {}",
+                       stats.light_stats_.queue_size_,
+                       stats.light_stats_.average_light_update_time_);
+  };
 }

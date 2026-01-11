@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "Core/Typenames.h"
+#include "RenderEngine/UI/Screens/Screen.h"
 // This will handle all of the world rendering and interaction with the server
 // and play controls stuff
 
@@ -16,7 +17,6 @@ class WorldRender;
 class InputManager;
 class ClientLevel;
 class PerformanceProfiler;
-class DebugScreen;
 class Window;
 class MultiEntityRender;
 class ECSEntityRender;
@@ -36,6 +36,8 @@ class ClientPlay {
 
   void Update(Window* window);
   void Render(Window* window);
+  
+  Screen::TickCallback GetDebugStatsCallback();
 
   GameContext& context_;
   ServerInterface& interface_;
@@ -43,7 +45,6 @@ class ClientPlay {
   std::unique_ptr<TexturedFrameBuffer> framebuffer_;
   std::unique_ptr<ClientLevel> client_level_;
   std::unique_ptr<MainPlayer> main_player_;
-  std::unique_ptr<DebugScreen> debug_screen_;
   std::unique_ptr<MultiEntityRender> entity_render_;
   std::unique_ptr<ECSEntityRender> ecs_entity_render_;
   std::unique_ptr<WorldRender> terrain_render_;
@@ -52,7 +53,4 @@ class ClientPlay {
   std::unique_ptr<ClientActionQueue> action_queue_;
 
   double frametime_ = 1;
-
- private:
-  void UpdateDebugStats();
 };

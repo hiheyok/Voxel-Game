@@ -25,14 +25,15 @@ class Screen {
 
   // input event
   void HandleEvent();
-  using TickCallback = std::function<void()>;
+  using TickCallback = std::function<void(Screen*)>;
 
+  void UpdateResolution();
   // input delta time to update stuff like animation
   virtual void Update(const std::vector<InputEvent>& events);
 
   void SetTickCallback(TickCallback callback);
-
-  void SubmitToRenderer(UIRenderer& renderer);
+  void CallCallback();
+  void SubmitToRenderer(UIRenderer& renderer) const;
 
   glm::vec2 GetVirtualRes() const noexcept;
   void SetVirtualRes(glm::vec2 v_res);
@@ -44,6 +45,9 @@ class Screen {
   // Clean up before exiting, saving state, etc
   virtual void OnExit();
 
+  bool IsInputBlocking() const noexcept;
+  void TryUpdateLayout();
+
  protected:
   explicit Screen(GameContext&, ScreenManager&, glm::vec2 virtual_res);
 
@@ -53,4 +57,6 @@ class Screen {
   ScreenManager& screen_mgr_;
   std::unique_ptr<Widget> root_widget_;
   TickCallback tick_callback_;
+  // Stops inputs from propagating
+  bool input_blocking_;
 };

@@ -2,12 +2,16 @@
 
 #include <cassert>
 #include <glm/ext/vector_float2.hpp>
+#include <iostream>
 #include <memory>
 #include <utility>
+#include <vector>
 
+#include "Client/Inputs/InputEvent.h"
 #include "Client/Inputs/InputManager.h"
 #include "RenderEngine/UI/ScreenManager.h"
 #include "RenderEngine/UI/ScreenRegistry.h"
+#include "RenderEngine/UI/Screens/DebugOverlay.h"
 #include "RenderEngine/UI/Screens/MainScreen.h"
 #include "RenderEngine/UI/Screens/PlayerHud.h"
 #include "RenderEngine/UI/UIRenderer.h"
@@ -15,6 +19,7 @@
 
 using std::make_unique;
 using std::move;
+using std::vector;
 
 UIManager::UIManager(GameContext& context, InputManager& input_mgr)
     : context_{context},
@@ -29,8 +34,9 @@ UIManager::~UIManager() = default;
 void UIManager::Initialize() {
   GAME_ASSERT(screen_registry_ != nullptr,
               "Screen Registry hasn't been created yet");
-  screen_registry_->RegisterScreen<MainScreen, ScreenManager&>("debug_screen");
-  screen_registry_->RegisterScreen<PlayerHud, ScreenManager&>("player_hud");
+  screen_registry_->RegisterScreen<MainScreen>("debug_screen");
+  screen_registry_->RegisterScreen<PlayerHud>("player_hud");
+  screen_registry_->RegisterScreen<DebugOverlay>("debug_overlay");
 }
 
 void UIManager::PopScreen() { screen_manager_->PopScreen(); }
@@ -53,6 +59,6 @@ void UIManager::ScreenResChanged(glm::vec2 res) {
   }
 }
 
-void UIManager::SetScreenTickCallback(Screen::TickCallback callback) {
-  screen_manager_->SetScreenTickCallback(move(callback));
+void UIManager::SetScreenTickCallback(int idx, Screen::TickCallback callback) {
+  screen_manager_->SetScreenTickCallback(idx, move(callback));
 }

@@ -102,7 +102,7 @@ void Widget::SetBranchDirty() noexcept {
   }
 }
 
-void Widget::SubmitToRenderer(UIRenderer& renderer) {
+void Widget::SubmitToRenderer(UIRenderer& renderer) const {
   vector<UIVertexFormat> vertices;
   vector<uint32_t> indices;
 
@@ -166,7 +166,7 @@ void Widget::SetScreenManager(ScreenManager* manager) noexcept {
   }
 }
 
-void Widget::GetPrimitives(vector<UIRectangle>& primitives) {
+void Widget::GetPrimitives(vector<UIRectangle>& primitives) const {
   size_t beg = primitives.size();
 
   for (const auto& component : components_) {

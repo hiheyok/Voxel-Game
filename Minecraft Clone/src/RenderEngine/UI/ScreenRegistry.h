@@ -10,6 +10,7 @@
 
 class Screen;
 class GameContext;
+class ScreenManager;
 
 template <typename T>
 concept ScreenType = std::is_base_of_v<Screen, std::decay_t<T>>;
@@ -32,15 +33,13 @@ class ScreenRegistry {
 
 template <ScreenType TScreen, typename... ContextArgs>
 void ScreenRegistry::RegisterScreen(const std::string& screen_name) {
-  if (screens_.count(screen_name)) {
-    throw std::runtime_error(
-        "ScreenRegistry::RegisterScreen - Attempted to register screen that "
-        "already exist");
-  }
+  GAME_ASSERT(!screens_.count(screen_name),
+              "Attempted to register screen that already exist.");
 
-  std::function<std::unique_ptr<Screen>(ContextArgs...)> factory =
-      [&](ContextArgs... args) -> std::unique_ptr<Screen> {
-    return std::make_unique<TScreen>(context_,
+  std::function<std::unique_ptr<Screen>(ScreenManager&, ContextArgs...)>
+      factory = [&](ScreenManager& screen_manager,
+                    ContextArgs... args) -> std::unique_ptr<Screen> {
+    return std::make_unique<TScreen>(context_, screen_manager,
                                      std::forward<ContextArgs>(args)...);
   };
 
@@ -51,12 +50,7 @@ template <typename... Args>
 std::unique_ptr<Screen> ScreenRegistry::CreateScreen(const std::string& name,
                                                      Args&&... args) const {
   auto it = screens_.find(name);
-
-  if (it == screens_.end()) {
-    throw std::runtime_error(
-        "ScreenRegistry::CreateScreen - Couldn't find screen name.");
-  }
-
+  GAME_ASSERT(it != screens_.end(), "Invalid screen");
   using FactoryType = std::function<std::unique_ptr<Screen>(Args...)>;
 
   try {

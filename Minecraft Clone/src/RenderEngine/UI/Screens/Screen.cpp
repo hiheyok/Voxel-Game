@@ -19,31 +19,43 @@ Screen::Screen(GameContext& context, ScreenManager& screen_mgr, glm::vec2 v_res)
     : context_{context},
       screen_mgr_{screen_mgr},
       v_res_{v_res},
-      root_widget_{make_unique<Widget>(context)} {
+      root_widget_{make_unique<Widget>(context)},
+      input_blocking_{false} {
   root_widget_->manager_ = &screen_mgr;
 }
+
 Screen::~Screen() { OnExit(); }
 
 void Screen::HandleEvent() {
   // Implement later
 }
-void Screen::Update(const vector<InputEvent>& events) {
-  if (tick_callback_) tick_callback_();
-}
+void Screen::Update(const vector<InputEvent>& events) {}
 
 void Screen::SetTickCallback(TickCallback callback) {
   tick_callback_ = move(callback);
 }
 
-void Screen::SubmitToRenderer(UIRenderer& renderer) {
+void Screen::CallCallback() {
+  if (tick_callback_ == nullptr) {
+    return;
+  }
+
+  tick_callback_(this);
+}
+
+void Screen::UpdateResolution() {
   GAME_ASSERT(root_widget_, "Root widget is null");
   UIRectangle bounds;
   bounds.pos_.x = 0.0f;
   bounds.pos_.y = 0.0f;
-  bounds.size_.x = 1.0f;
-  bounds.size_.y = 1.0f;
+  // Use virtual resolution for bounds, not normalized coordinates
+  bounds.size_ = v_res_;
 
   root_widget_->TryUpdateLayout(bounds);
+}
+
+void Screen::SubmitToRenderer(UIRenderer& renderer) const {
+  GAME_ASSERT(root_widget_, "Root widget is null");
   root_widget_->SubmitToRenderer(renderer);
 }
 
@@ -60,3 +72,13 @@ void Screen::OnEnter() {}
 void Screen::OnPause() {}
 void Screen::OnResume() {}
 void Screen::OnExit() {}
+
+bool Screen::IsInputBlocking() const noexcept { return input_blocking_; }
+
+void Screen::TryUpdateLayout() {
+  UIRectangle bounds;
+  bounds.pos_.x = 0.0f;
+  bounds.pos_.y = 0.0f;
+  bounds.size_ = v_res_;
+  root_widget_->TryUpdateLayout(bounds);
+}

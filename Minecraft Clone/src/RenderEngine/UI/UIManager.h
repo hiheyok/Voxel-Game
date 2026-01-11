@@ -21,7 +21,7 @@ class UIManager {
 
   // External api functions
   template <typename... Args>
-  void PushScreen(const std::string& name, Args&&... args);
+  int PushScreen(const std::string& name, Args&&... args);
 
   template <typename... Args>
   void SwitchScreen(const std::string& name, Args&&... args);
@@ -32,7 +32,7 @@ class UIManager {
 
   void Update();
 
-  void SetScreenTickCallback(Screen::TickCallback callback);
+  void SetScreenTickCallback(int idx, Screen::TickCallback callback);
 
   void ScreenResChanged(glm::vec2 res);
 
@@ -49,8 +49,8 @@ class UIManager {
 
 // External api functions
 template <typename... Args>
-void UIManager::PushScreen(const std::string& name, Args&&... args) {
-  screen_manager_->PushScreen(name, std::forward<Args>(args)...);
+int UIManager::PushScreen(const std::string& name, Args&&... args) {
+  return screen_manager_->PushScreen(name, std::forward<Args>(args)...);
 }
 
 template <typename... Args>

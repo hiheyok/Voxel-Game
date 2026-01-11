@@ -9,7 +9,6 @@
 class ClientPlay;
 class MainPlayer;
 class WorldRender;
-class TextRenderer;
 class PerformanceProfiler;
 class InternalInterface;
 class ClientLevel;
@@ -38,7 +37,6 @@ class Client : public Window {
   EntityUUID player_uuid_;
   std::unique_ptr<ClientPlay> client_play_;
   std::unique_ptr<Server> server_;
-  std::unique_ptr<TextRenderer> text_render_;
   std::unique_ptr<InternalInterface> internal_interface_;
   std::unique_ptr<UIManager> ui_manager_;
   PerformanceProfiler* profiler_;

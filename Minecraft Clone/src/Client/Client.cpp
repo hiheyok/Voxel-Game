@@ -20,12 +20,11 @@
 #include "Level/Level.h"
 #include "Player/MainPlayer.h"
 #include "Profiler/PerformanceProfiler.h"
-#include "Render/DebugScreen/DebugScreen.h"
 #include "Render/WorldRender.h"
 #include "RenderEngine/ChunkRender/TerrainRenderer.h"
 #include "RenderEngine/EntityRender/MultiEntityRender.h"
 #include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
-#include "RenderEngine/TextRender/TextRenderer.h"
+#include "RenderEngine/UI/Screens/DebugOverlay.h"
 #include "RenderEngine/UI/UIManager.h"
 #include "Server/Server.h"
 #include "Utils/Clock.h"
@@ -36,7 +35,6 @@ using std::make_unique;
 Client::Client(GameContext& context)
     : Window{context},
       context_{context},
-      text_render_{make_unique<TextRenderer>(context)},
       internal_interface_{make_unique<InternalInterface>()},
       profiler_{new PerformanceProfiler()} {}
 
@@ -69,8 +67,11 @@ void Client::Initialize() {
   ui_manager_ = make_unique<UIManager>(context_, inputs_);
   ui_manager_->Initialize();
   ui_manager_->PushScreen("player_hud");
+  int debug_idx = ui_manager_->PushScreen("debug_overlay");
+
 
   InitializeServerCom();
+  ui_manager_->SetScreenTickCallback(debug_idx, client_play_->GetDebugStatsCallback());
 
   /// Initialize game rendering context
 }

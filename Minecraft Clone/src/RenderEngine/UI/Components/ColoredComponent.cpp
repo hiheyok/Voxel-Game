@@ -1,11 +1,13 @@
 #include "RenderEngine/UI/Components/ColoredComponent.h"
 
+#include <glm/vec4.hpp>
 #include <vector>
 
 #include "RenderEngine/UI/Components/Component.h"
 #include "RenderEngine/UI/Data/UserInterfaceData.h"
 #include "Utils/Assert.h"
 
+using glm::vec4;
 using std::vector;
 
 ColoredComponent::ColoredComponent(float r, float g, float b, float a)
@@ -15,6 +17,15 @@ ColoredComponent::ColoredComponent(float r, float g, float b, float a)
   GAME_ASSERT(0 <= b && b <= 1, "Blue value out of range");
   GAME_ASSERT(0 <= a && a <= 1, "Alpha value out of range");
 };
+
+ColoredComponent::ColoredComponent(glm::vec4 rgba)
+    : Component{}, r_{rgba.r}, g_{rgba.g}, b_{rgba.b}, a_{rgba.a} {
+  GAME_ASSERT(0 <= rgba.r && rgba.r <= 1, "Red value out of range");
+  GAME_ASSERT(0 <= rgba.g && rgba.g <= 1, "Green value out of range");
+  GAME_ASSERT(0 <= rgba.b && rgba.b <= 1, "Blue value out of range");
+  GAME_ASSERT(0 <= rgba.a && rgba.a <= 1, "Alpha value out of range");
+};
+
 ColoredComponent::~ColoredComponent() = default;
 
 void ColoredComponent::GetRectangles(vector<UIRectangle>& primitives) {
@@ -30,4 +41,26 @@ void ColoredComponent::GetRectangles(vector<UIRectangle>& primitives) {
   rect.rgba_.a = a_;
 
   primitives.emplace_back(rect);
+}
+
+void ColoredComponent::SetColor(float r, float g, float b, float a) noexcept {
+  GAME_ASSERT(0 <= r && r <= 1, "Red value out of range");
+  GAME_ASSERT(0 <= g && g <= 1, "Green value out of range");
+  GAME_ASSERT(0 <= b && b <= 1, "Blue value out of range");
+  GAME_ASSERT(0 <= a && a <= 1, "Alpha value out of range");
+  r_ = r;
+  g_ = g;
+  b_ = b;
+  a_ = a;
+}
+
+void ColoredComponent::SetColor(glm::vec4 rgba) noexcept {
+  GAME_ASSERT(0 <= rgba.r && rgba.r <= 1, "Red value out of range");
+  GAME_ASSERT(0 <= rgba.g && rgba.g <= 1, "Green value out of range");
+  GAME_ASSERT(0 <= rgba.b && rgba.b <= 1, "Blue value out of range");
+  GAME_ASSERT(0 <= rgba.a && rgba.a <= 1, "Alpha value out of range");
+  r_ = rgba.r;
+  g_ = rgba.g;
+  b_ = rgba.b;
+  a_ = rgba.a;
 }
