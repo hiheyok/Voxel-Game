@@ -350,20 +350,35 @@ void TextureAtlasSource::StitchTexture(const SpriteData& data) {
         const int src_pixel = src_row_offset + x * sprite_channels;
         const int dst_pixel = dst_row_offset + x * channels_;
 
-        // Copy available channels
-        for (int c = 0; c < sprite_channels && c < channels_; ++c) {
-          data_[dst_pixel + c] = sprite_data[src_pixel + c];
-        }
+        // Handle different source channel formats
+        switch (sprite_channels) {
+          case 1:  // Grayscale -> expand to RGB(A)
+            data_[dst_pixel] = sprite_data[src_pixel];
+            if (channels_ >= 2) data_[dst_pixel + 1] = sprite_data[src_pixel];
+            if (channels_ >= 3) data_[dst_pixel + 2] = sprite_data[src_pixel];
+            if (channels_ == 4) data_[dst_pixel + 3] = 255;
+            break;
 
-        // Fill remaining channels (grayscale expansion or alpha)
-        if (sprite_channels == 1 && channels_ >= 3) {
-          // Grayscale to RGB
-          data_[dst_pixel + 1] = sprite_data[src_pixel];
-          data_[dst_pixel + 2] = sprite_data[src_pixel];
-        }
-        if (sprite_channels < 4 && channels_ == 4) {
-          // Set alpha to fully opaque
-          data_[dst_pixel + 3] = 255;
+          case 2:  // Grayscale + Alpha -> expand to RGBA
+            data_[dst_pixel] = sprite_data[src_pixel];  // R = Gray
+            if (channels_ >= 2) data_[dst_pixel + 1] = sprite_data[src_pixel];  // G = Gray
+            if (channels_ >= 3) data_[dst_pixel + 2] = sprite_data[src_pixel];  // B = Gray
+            if (channels_ == 4) data_[dst_pixel + 3] = sprite_data[src_pixel + 1];  // A
+            break;
+
+          case 3:  // RGB -> copy RGB, set A=255
+            data_[dst_pixel] = sprite_data[src_pixel];
+            data_[dst_pixel + 1] = sprite_data[src_pixel + 1];
+            data_[dst_pixel + 2] = sprite_data[src_pixel + 2];
+            if (channels_ == 4) data_[dst_pixel + 3] = 255;
+            break;
+
+          case 4:  // RGBA -> copy all (shouldn't happen since we memcpy above)
+            data_[dst_pixel] = sprite_data[src_pixel];
+            data_[dst_pixel + 1] = sprite_data[src_pixel + 1];
+            data_[dst_pixel + 2] = sprite_data[src_pixel + 2];
+            data_[dst_pixel + 3] = sprite_data[src_pixel + 3];
+            break;
         }
       }
     }

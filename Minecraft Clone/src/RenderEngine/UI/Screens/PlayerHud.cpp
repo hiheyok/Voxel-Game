@@ -72,9 +72,18 @@ void PlayerHud::OnEnter() {
   selector->AddComponent(move(selector_tex));
   selection_indicator_ = selector.get();
   hotbar->AddChildWidget(move(selector));
-
   root_widget_->AddChildWidget(move(hotbar));
-  // root_widget_->AddChildWidget(move(test));
+
+  // Crosshair
+  auto crosshair_tex =
+      make_unique<TextureComponent>(gui->GetSprite("minecraft:hud/crosshair"));
+  auto crosshair = make_unique<Widget>(context_);
+  crosshair->SetAnchorBoth({0.5f, 0.5f});
+  crosshair->SetPivot({0.5f, 0.5f});
+  crosshair->SetOffsetMin({0.0f, 0.0f});
+  crosshair->SetOffsetMax({15.0f, 15.0f});
+  crosshair->AddComponent(move(crosshair_tex));
+  root_widget_->AddChildWidget(move(crosshair));
 }
 
 void PlayerHud::OnPause() {}

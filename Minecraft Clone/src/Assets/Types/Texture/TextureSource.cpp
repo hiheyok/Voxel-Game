@@ -36,12 +36,14 @@ TextureSource::TextureData TextureSource::LoadTexture(const string& filepath) {
 int TextureSource::GetFormat(int channel) noexcept {
   switch (channel) {
     case 1:
-      return GL_R;
+      return GL_RED;
     case 2:
       return GL_RG;
     case 3:
       return GL_RGB;
     case 4:
+      return GL_RGBA;
+    default:
       return GL_RGBA;
   }
 }
@@ -99,23 +101,29 @@ void TextureSource::TextureData::Load(GameContext& context,
 
 void TextureSource::TextureData::Analyze() {
   // Analyze the transparency - optimized for cache-friendly access
-  if (channels_ == 4) {
-    const size_t total_pixels = static_cast<size_t>(img_size_.x) * img_size_.y;
-    const uint8_t* ptr = data_;
+  // Only images with alpha channel need analysis (2 = grayscale+alpha, 4 = RGBA)
+  if (channels_ != 2 && channels_ != 4) {
+    return;
+  }
 
-    for (size_t i = 0; i < total_pixels; ++i) {
-      const uint8_t alpha = ptr[i * 4 + 3];
+  const size_t total_pixels = static_cast<size_t>(img_size_.x) * img_size_.y;
+  const uint8_t* ptr = data_;
 
-      if (alpha == 0) {
-        full_trans_ = true;
-      } else if (alpha < 255) {
-        partial_trans_ = true;
-      }
+  // Alpha is at index 1 for 2-channel (grayscale+alpha) and index 3 for RGBA
+  const int alpha_offset = channels_ - 1;
 
-      // Early exit when both flags are set
-      if (full_trans_ && partial_trans_) {
-        return;
-      }
+  for (size_t i = 0; i < total_pixels; ++i) {
+    const uint8_t alpha = ptr[i * channels_ + alpha_offset];
+
+    if (alpha == 0) {
+      full_trans_ = true;
+    } else if (alpha < 255) {
+      partial_trans_ = true;
+    }
+
+    // Early exit when both flags are set
+    if (full_trans_ && partial_trans_) {
+      return;
     }
   }
 }
@@ -205,21 +213,33 @@ bool TextureSource::TextureData::IsFullTrans() const noexcept {
 }
 
 glm::u8vec4 TextureSource::TextureData::GetPixel(int x, int y) const noexcept {
-  int stride_x = x * channels_;
-  int stride_y = y * img_size_.x * channels_;
+  const int stride = (y * img_size_.x + x) * channels_;
 
-  glm::u8vec4 rgba;
-  for (int i = 0; i < channels_; ++i) {
-    rgba[i] = data_[stride_x + stride_y + i];
-  }
+  glm::u8vec4 rgba{0, 0, 0, 255};
 
-  if (channels_ != 4) {
-    rgba.a = 255;
-  }
-
-  if (channels_ == 1) {
-    rgba.g = rgba.r;
-    rgba.b = rgba.r;
+  switch (channels_) {
+    case 1:  // Grayscale - copy to RGB, alpha = 255
+      rgba.r = data_[stride];
+      rgba.g = rgba.r;
+      rgba.b = rgba.r;
+      break;
+    case 2:  // Grayscale + Alpha
+      rgba.r = data_[stride];
+      rgba.g = rgba.r;
+      rgba.b = rgba.r;
+      rgba.a = data_[stride + 1];
+      break;
+    case 3:  // RGB - alpha = 255
+      rgba.r = data_[stride];
+      rgba.g = data_[stride + 1];
+      rgba.b = data_[stride + 2];
+      break;
+    case 4:  // RGBA
+      rgba.r = data_[stride];
+      rgba.g = data_[stride + 1];
+      rgba.b = data_[stride + 2];
+      rgba.a = data_[stride + 3];
+      break;
   }
 
   return rgba;
