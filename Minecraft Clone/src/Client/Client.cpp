@@ -9,24 +9,11 @@
 
 #include "Client/ClientPlay.h"
 #include "Client/Inputs/InputManager.h"
+#include "Client/Network/ClientServerBridge.h"
+#include "Client/Profiler/PerformanceProfiler.h"
 #include "Core/GameContext/GameContext.h"
-#include "Core/Interfaces/InternalInterface.h"
-#include "Core/Options/Option.h"
-#include "Level/Block/Blocks.h"
-#include "Level/Chunk/Chunk.h"
-#include "Level/Entity/Entities.h"
-#include "Level/Item/ItemTextureAtlas.h"
-#include "Level/Item/Items.h"
-#include "Level/Level.h"
-#include "Player/MainPlayer.h"
-#include "Profiler/PerformanceProfiler.h"
-#include "Render/WorldRender.h"
-#include "RenderEngine/ChunkRender/TerrainRenderer.h"
-#include "RenderEngine/EntityRender/MultiEntityRender.h"
-#include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
 #include "RenderEngine/UI/Screens/DebugOverlay.h"
 #include "RenderEngine/UI/UIManager.h"
-#include "Server/Server.h"
 #include "Utils/Clock.h"
 #include "Utils/Timer/Timer.h"
 
@@ -35,29 +22,9 @@ using std::make_unique;
 Client::Client(GameContext& context)
     : Window{context},
       context_{context},
-      internal_interface_{make_unique<InternalInterface>()},
       profiler_{new PerformanceProfiler()} {}
 
 Client::~Client() = default;
-
-void Client::InitializeServerCom() {
-  // Start Server First
-  ServerSettings settings;
-  settings.gen_thread_count_ = context_.options_->world_gen_threads_;
-  settings.light_engine_thread_count_ =
-      context_.options_->light_engine_threads_;
-  settings.horizontal_ticking_distance_ =
-      context_.options_->horizontal_render_distance_;
-  settings.vertical_ticking_distance_ =
-      context_.options_->vertical_render_distance_;
-
-  // Joins the server it should start receiving stuff now
-  server_ = make_unique<Server>(context_);
-  server_->StartServer(settings);
-  player_uuid_ = server_->SetInternalConnection(internal_interface_.get());
-  client_play_ = make_unique<ClientPlay>(context_, *internal_interface_, this,
-                                         profiler_, *ui_manager_);
-}
 
 void Client::Initialize() {
   context_.InitializeRenderingContext();
@@ -69,12 +36,19 @@ void Client::Initialize() {
   int hud_idx = ui_manager_->PushScreen("player_hud");
   int debug_idx = ui_manager_->PushScreen("debug_overlay");
 
+  // Create server bridge and connect
+  server_bridge_ = make_unique<ClientServerBridge>(context_);
+  server_bridge_->Connect();
 
-  InitializeServerCom();
-  ui_manager_->SetScreenTickCallback(debug_idx, client_play_->GetDebugStatsCallback());
-  ui_manager_->SetScreenTickCallback(hud_idx, client_play_->GetHotbarUpdateCallback());
+  // Create ClientPlay with server interface
+  client_play_ = make_unique<ClientPlay>(
+      context_, server_bridge_->GetInterface(), this, profiler_, *ui_manager_);
 
-  /// Initialize game rendering context
+  // Set up UI callbacks
+  ui_manager_->SetScreenTickCallback(debug_idx,
+                                     client_play_->GetDebugStatsCallback());
+  ui_manager_->SetScreenTickCallback(hud_idx,
+                                     client_play_->GetHotbarUpdateCallback());
 }
 
 void Client::run() {
@@ -83,7 +57,7 @@ void Client::run() {
   Cleanup();
 }
 
-void Client::Cleanup() { server_->Stop(); }
+void Client::Cleanup() { server_bridge_->Stop(); }
 
 void Client::Render() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

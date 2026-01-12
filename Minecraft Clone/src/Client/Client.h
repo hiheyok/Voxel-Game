@@ -7,18 +7,14 @@
 #include "RenderEngine/Window.h"
 
 class ClientPlay;
-class MainPlayer;
-class WorldRender;
+class ClientServerBridge;
 class PerformanceProfiler;
-class InternalInterface;
-class ClientLevel;
-class Server;
 class GameContext;
 class UIManager;
 
 class Client : public Window {
  public:
-  Client(GameContext&);
+  explicit Client(GameContext&);
   ~Client();
 
   void run();
@@ -29,15 +25,12 @@ class Client : public Window {
   void Update();
   void Cleanup();
   void Render();
-  void InitializeServerCom();
 
   double frametime_ = 0.5;
 
   GameContext& context_;
-  EntityUUID player_uuid_;
+  std::unique_ptr<ClientServerBridge> server_bridge_;
   std::unique_ptr<ClientPlay> client_play_;
-  std::unique_ptr<Server> server_;
-  std::unique_ptr<InternalInterface> internal_interface_;
   std::unique_ptr<UIManager> ui_manager_;
   PerformanceProfiler* profiler_;
 };

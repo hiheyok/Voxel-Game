@@ -11,19 +11,18 @@
 
 class GameContext;
 class ServerInterface;
-class TexturedFrameBuffer;
 class MainPlayer;
-class WorldRender;
 class InputManager;
 class ClientLevel;
 class PerformanceProfiler;
 class Window;
-class MultiEntityRender;
-class ECSEntityRender;
 class ClientPacketReceiver;
 class ClientPacketSender;
 class ClientActionQueue;
 class UIManager;
+class ClientRenderer;
+class DebugStatsCollector;
+class ClientUICallbacks;
 
 struct WindowProperties;
 struct GLFWwindow;
@@ -36,22 +35,21 @@ class ClientPlay {
 
   void Update(Window* window);
   void Render(Window* window);
-  
+
   Screen::TickCallback GetDebugStatsCallback();
   Screen::TickCallback GetHotbarUpdateCallback();
 
   GameContext& context_;
   ServerInterface& interface_;
 
-  std::unique_ptr<TexturedFrameBuffer> framebuffer_;
   std::unique_ptr<ClientLevel> client_level_;
   std::unique_ptr<MainPlayer> main_player_;
-  std::unique_ptr<MultiEntityRender> entity_render_;
-  std::unique_ptr<ECSEntityRender> ecs_entity_render_;
-  std::unique_ptr<WorldRender> terrain_render_;
+  std::unique_ptr<ClientRenderer> renderer_;
   std::unique_ptr<ClientPacketReceiver> packet_receiver_;
   std::unique_ptr<ClientPacketSender> packet_sender_;
   std::unique_ptr<ClientActionQueue> action_queue_;
+  std::unique_ptr<DebugStatsCollector> stats_collector_;
+  std::unique_ptr<ClientUICallbacks> ui_callbacks_;
 
   double frametime_ = 1;
 };
