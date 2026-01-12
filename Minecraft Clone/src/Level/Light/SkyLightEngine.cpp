@@ -50,9 +50,9 @@ void SkyLightEngine::LightChunk(ChunkPos chunk_pos) {
     }
 
     for (int y = height + 1; y < kChunkDim; ++y) {
-      task.SetBlockPos(BlockPos{x, y, z} + chunk_offset);
-      task.SetDirection(kAllDirections);
-      task.SetLightLevel(kMaxLightLevel);
+      task.block_pos_ = BlockPos{x, y, z} + chunk_offset;
+      task.direction_ = kAllDirections;
+      task.light_lvl_ = kMaxLightLevel;
       EnqueueIncrease(task);
     }
   }
@@ -114,24 +114,23 @@ void SkyLightEngine::CheckNeighborChunk(ChunkPos center_chunk_pos) {
         continue;
       }
 
-      task.SetBlockPos(next_pos);
-      task.SetLightLevel(spread_lvl);
-      task.SetDirection(direction);
+      task.block_pos_ = next_pos;
+      task.light_lvl_ = static_cast<uint8_t>(spread_lvl);
+      task.direction_ = direction;
       EnqueueIncrease(task);
     }
   }
 }
 
 void SkyLightEngine::CheckBlock(BlockPos block_pos) {
-  BlockID block = GetBlock(block_pos);
   int curr_light_lvl = GetLightLvl(block_pos);
 
   if (curr_light_lvl == kMaxLightLevel) {
     // Propagate the light back
     InternalTask task;
-    task.SetBlockPos(block_pos);
-    task.SetDirection(kAllDirections);
-    task.SetLightLevel(curr_light_lvl);
+    task.block_pos_ = block_pos;
+    task.direction_ = kAllDirections;
+    task.light_lvl_ = static_cast<uint8_t>(curr_light_lvl);
     EnqueueIncrease(task);
     SetLightLvl(block_pos, curr_light_lvl);
   } else {
@@ -139,9 +138,9 @@ void SkyLightEngine::CheckBlock(BlockPos block_pos) {
   }
 
   InternalTask task;
-  task.SetBlockPos(block_pos);
-  task.SetDirection(kAllDirections);
-  task.SetLightLevel(curr_light_lvl);
+  task.block_pos_ = block_pos;
+  task.direction_ = kAllDirections;
+  task.light_lvl_ = static_cast<uint8_t>(curr_light_lvl);
   EnqueueDecrease(task);
 }
 
@@ -197,14 +196,14 @@ void SkyLightEngine::PropagateChanges(const ChunkLightTask& tasks) {
 void SkyLightEngine::DelayDecrease() {
   for (size_t i = 0; i < enqueue_decrease_pos_; ++i) {
     InternalTask& task = decrease_queue_[i];
-    SetLightLvl(task.GetBlockPos(), 0);
+    SetLightLvl(task.block_pos_, 0);
   }
 }
 
 void SkyLightEngine::DelayIncrease() {
   for (size_t i = 0; i < enqueue_increase_pos_; ++i) {
     InternalTask& task = increase_queue_[i];
-    SetLightLvl(task.GetBlockPos(), task.GetLightLevel());
+    SetLightLvl(task.block_pos_, task.light_lvl_);
   }
 }
 
@@ -230,15 +229,15 @@ int SkyLightEngine::TryPropagateSkylight(BlockPos block_pos) {
 
   // Terminates if it hits an opaque block or bottom of world
   InternalTask task;
-  task.SetDirection(kAllDirections);
-  task.SetLightLevel(kMaxLightLevel);
+  task.direction_ = kAllDirections;
+  task.light_lvl_ = kMaxLightLevel;
 
   while (true) {
     // Use heightmap to optimize finding opaque block
     int height = curr_chunk->heightmap_->Get(local_x, local_z);
     int bot_y = block_pos.ToChunkPos().y * kChunkDim;
     for (; block_pos.y > bot_y + height; --block_pos.y) {
-      task.SetBlockPos(block_pos);
+      task.block_pos_ = block_pos;
       EnqueueIncrease(task);
     }
 
@@ -276,9 +275,9 @@ void SkyLightEngine::TryPropagateShadow(BlockPos block_pos) {
     curr_light_lvl = GetLightLvl(block_pos);
     if (curr_light_lvl == 0) break;
     InternalTask task;
-    task.SetBlockPos(block_pos);
-    task.SetDirection(kAllDirections);
-    task.SetLightLevel(curr_light_lvl);
+    task.block_pos_ = block_pos;
+    task.direction_ = kAllDirections;
+    task.light_lvl_ = static_cast<uint8_t>(curr_light_lvl);
     EnqueueDecrease(task);
 
     --block_pos.y;

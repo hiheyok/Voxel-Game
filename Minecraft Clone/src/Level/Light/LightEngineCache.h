@@ -48,12 +48,20 @@ class LightEngineCache {
   bool CheckChunkHasLighting(ChunkPos pos);
   LightEngineCacheStats GetStats() const noexcept;
 
- private:
+  // Cache slot for direct access in hot paths
   struct alignas(16) CacheSlot {
     Chunk* chunk_ = nullptr;
     LightStorage* block_ = nullptr;
     LightStorage* sky_ = nullptr;
   };
+
+  // Direct slot access for hot path optimization
+  size_t CalculateCacheIndex(BlockPos pos) const noexcept;
+  CacheSlot& GetSlot(size_t idx) noexcept;
+  const CacheSlot& GetSlot(size_t idx) const noexcept;
+  void MarkDirty(size_t idx) noexcept;
+
+ private:
 
   void SetBlockCache(ChunkPos pos, Chunk* data) noexcept;
   void SetBlockLightCache(ChunkPos pos, LightStorage* data) noexcept;
@@ -62,7 +70,6 @@ class LightEngineCache {
   bool TryCacheChunk(ChunkPos pos);
   // Calculate the index for the chunk the block_pos is in
   size_t CalculateCacheIndex(ChunkPos pos) const noexcept;
-  size_t CalculateCacheIndex(BlockPos pos) const noexcept;
   bool CheckInRange(ChunkPos pos) const noexcept; 
 
 

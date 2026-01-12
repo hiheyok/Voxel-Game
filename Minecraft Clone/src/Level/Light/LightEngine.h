@@ -17,19 +17,7 @@ enum class EngineType : uint8_t { kBlockLight = 0, kSkyLight = 1 };
 template <EngineType kEngineType>
 class LightEngine {
  protected:
-  class InternalTask {
-   public:
-    void SetBlockPos(BlockPos block_pos) noexcept;
-    void SetDirection(int direction) noexcept;
-    void SetLightLevel(int lvl) noexcept;
-    void SetRecheckLight(bool) noexcept;
-
-    BlockPos GetBlockPos() const noexcept;
-    int GetDirection() const noexcept;
-    int GetLightLevel() const noexcept;
-    bool GetRecheckLight() const noexcept;
-
-   private:
+  struct InternalTask {
     BlockPos block_pos_;
     bool recheck_light_ : 1 = false;
     uint8_t direction_ : 4 = 0;

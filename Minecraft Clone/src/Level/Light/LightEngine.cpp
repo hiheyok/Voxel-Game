@@ -11,55 +11,14 @@
 #include "Core/Position/PositionTypes.h"
 #include "Core/Typenames.h"
 #include "Level/Block/Blocks.h"
+#include "Level/Chunk/Chunk.h"
 #include "Level/Light/ChunkLightTask.h"
 #include "Level/Light/LightEngineCache.h"
+#include "Level/Light/LightStorage.h"
 #include "Level/World/WorldInterface.h"
 #include "Utils/Assert.h"
 
 using std::vector;
-
-template <EngineType kEngineType>
-void LightEngine<kEngineType>::InternalTask::SetBlockPos(
-    BlockPos pos) noexcept {
-  block_pos_ = pos;
-}
-
-template <EngineType kEngineType>
-void LightEngine<kEngineType>::InternalTask::SetDirection(
-    int direction) noexcept {
-  direction_ = direction;
-}
-
-template <EngineType kEngineType>
-void LightEngine<kEngineType>::InternalTask::SetLightLevel(int lvl) noexcept {
-  GAME_ASSERT(lvl >= 0 && lvl < 16, "Light level out of range");
-  light_lvl_ = static_cast<uint8_t>(lvl);
-}
-
-template <EngineType kEngineType>
-void LightEngine<kEngineType>::InternalTask::SetRecheckLight(bool b) noexcept {
-  recheck_light_ = b;
-}
-
-template <EngineType kEngineType>
-BlockPos LightEngine<kEngineType>::InternalTask::GetBlockPos() const noexcept {
-  return block_pos_;
-}
-
-template <EngineType kEngineType>
-int LightEngine<kEngineType>::InternalTask::GetDirection() const noexcept {
-  return direction_;
-}
-
-template <EngineType kEngineType>
-int LightEngine<kEngineType>::InternalTask::GetLightLevel() const noexcept {
-  return light_lvl_;
-}
-
-template <EngineType kEngineType>
-bool LightEngine<kEngineType>::InternalTask::GetRecheckLight() const noexcept {
-  return recheck_light_;
-}
 
 template <EngineType kEngineType>
 LightEngine<kEngineType>::LightEngine(GameContext& context,
@@ -95,19 +54,22 @@ void LightEngine<kEngineType>::PropagateIncrease() {
   const vector<BlockProperties>& block_properties =
       context_.blocks_->GetBlockPropertyList();
 
-  BlockPos block_pos;
-  int direction;
-  int propagation_lvl;
-
   while (TryDequeueIncrease(task)) {
-    block_pos = task.GetBlockPos();
-    direction = task.GetDirection();
-    propagation_lvl = task.GetLightLevel();
+    const BlockPos block_pos = task.block_pos_;
+    const int direction = task.direction_;
+    const int propagation_lvl = task.light_lvl_;
 
     // Light level already changed from somewhere else
-    if (task.GetRecheckLight() && propagation_lvl != GetLightLvl(block_pos)) {
+    if (task.recheck_light_ && propagation_lvl != GetLightLvl(block_pos)) {
       continue;
     }
+
+    // Cache source chunk info - reuse for same-chunk neighbors
+    const ChunkPos src_chunk_pos = block_pos.ToChunkPos();
+    size_t src_cache_idx = light_cache_->CalculateCacheIndex(block_pos);
+    auto* src_slot = &light_cache_->GetSlot(src_cache_idx);
+    auto* curr_slot = src_slot;
+    size_t curr_cache_idx = src_cache_idx;
 
     // Static reference to avoid any template instantiation overhead
     static constexpr auto& kDirs = Directions<BlockPos>::kDirections;
@@ -125,19 +87,35 @@ void LightEngine<kEngineType>::PropagateIncrease() {
 
       BlockPos offset_pos = block_pos + propagation;
 
-      // Light level is already at the expected level or chunk doesn't exist
-
-      if (!light_cache_->CheckChunk(offset_pos)) [[unlikely]] {
-        continue;
+      // Check if neighbor is in a different chunk
+      ChunkPos offset_chunk_pos = offset_pos.ToChunkPos();
+      if (offset_chunk_pos != src_chunk_pos) {
+        // Different chunk - need to check and get new slot
+        if (!light_cache_->CheckChunk(offset_pos)) [[unlikely]] {
+          continue;
+        }
+        curr_cache_idx = light_cache_->CalculateCacheIndex(offset_pos);
+        curr_slot = &light_cache_->GetSlot(curr_cache_idx);
+      } else {
+        // Same chunk as source - reset to cached source slot
+        curr_cache_idx = src_cache_idx;
+        curr_slot = src_slot;
       }
 
-      int curr_lvl = GetLightLvl(offset_pos);
+      // Get light level directly from slot
+      int curr_lvl;
+      if constexpr (kEngineType == EngineType::kBlockLight) {
+        curr_lvl = curr_slot->block_->GetLighting(offset_pos);
+      } else {
+        curr_lvl = curr_slot->sky_->GetLighting(offset_pos);
+      }
 
       if (curr_lvl >= propagation_lvl - 1) {
         continue;
       }
 
-      BlockID offset_block = GetBlock(offset_pos);
+      // Get block directly from slot
+      BlockID offset_block = curr_slot->chunk_->GetBlockUnsafe(offset_pos.GetLocalPos());
       int block_opacity = block_properties[offset_block].opacity_;
       int target_lvl = propagation_lvl - std::max(1, block_opacity);
       target_lvl = std::max(0, target_lvl);
@@ -146,14 +124,20 @@ void LightEngine<kEngineType>::PropagateIncrease() {
         continue;
       }
 
-      SetLightLvl(offset_pos, target_lvl);
+      // Set light level directly using slot
+      if constexpr (kEngineType == EngineType::kBlockLight) {
+        curr_slot->block_->EditLight(offset_pos, target_lvl);
+      } else {
+        curr_slot->sky_->EditLight(offset_pos, target_lvl);
+      }
+      light_cache_->MarkDirty(curr_cache_idx);
 
       // If target lvl is <= 1, then its not going to be able to spread and
       // value is already set
       if (target_lvl > 1) [[likely]] {
-        next_task.SetBlockPos(offset_pos);
-        next_task.SetLightLevel(target_lvl);
-        next_task.SetDirection(propagation);
+        next_task.block_pos_ = offset_pos;
+        next_task.light_lvl_ = static_cast<uint8_t>(target_lvl);
+        next_task.direction_ = propagation;
         EnqueueIncrease(next_task);
       }
     }
@@ -164,11 +148,11 @@ template <EngineType kEngineType>
 void LightEngine<kEngineType>::PropagateDecrease() {
   InternalTask task;
   InternalTask next_task;
-  next_task.SetRecheckLight(true);
+  next_task.recheck_light_ = true;
 
   while (TryDequeueDecrease(task)) {
-    BlockPos block_pos = task.GetBlockPos();
-    int propagation_lvl = task.GetLightLevel();
+    const BlockPos block_pos = task.block_pos_;
+    const int propagation_lvl = task.light_lvl_;
 
     static constexpr auto& kDirs = Directions<BlockPos>::kDirections;
     for (const auto& propagation : kDirs) {
@@ -191,16 +175,16 @@ void LightEngine<kEngineType>::PropagateDecrease() {
 
       if (curr_lvl < propagation_lvl) {
         SetLightLvl(offset_pos, 0);
-        next_task.SetBlockPos(offset_pos);
-        next_task.SetLightLevel(curr_lvl);
-        next_task.SetDirection(propagation);
+        next_task.block_pos_ = offset_pos;
+        next_task.light_lvl_ = static_cast<uint8_t>(curr_lvl);
+        next_task.direction_ = propagation;
         EnqueueDecrease(next_task);
       } else {
         // If neighbor is brighter or equal, it is an independent light source.
         // Add it to the increase queue to re-light the new darkness.
-        next_task.SetBlockPos(offset_pos);
-        next_task.SetLightLevel(curr_lvl);
-        next_task.SetDirection(propagation.GetOppositeDirection());
+        next_task.block_pos_ = offset_pos;
+        next_task.light_lvl_ = static_cast<uint8_t>(curr_lvl);
+        next_task.direction_ = propagation.GetOppositeDirection();
         EnqueueIncrease(next_task);
       }
     }

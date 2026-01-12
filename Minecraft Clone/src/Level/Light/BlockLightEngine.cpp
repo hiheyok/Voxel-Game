@@ -27,7 +27,7 @@ void BlockLightEngine::LightChunk(ChunkPos chunk_pos) {
 
   Chunk* chunk = GetChunk(chunk_pos);
   InternalTask task;
-  task.SetDirection(kAllDirections);
+  task.direction_ = kAllDirections;
   BlockPos chunk_offset = chunk_pos.GetBlockPosOffset();
 
   int x0 = chunk_offset.x;
@@ -44,8 +44,8 @@ void BlockLightEngine::LightChunk(ChunkPos chunk_pos) {
 
     int block_emission = properties_[block].light_emission;
     if (block_emission > 0) {
-      task.SetBlockPos(block_pos);
-      task.SetLightLevel(block_emission);
+      task.block_pos_ = block_pos;
+      task.light_lvl_ = static_cast<uint8_t>(block_emission);
       EnqueueIncrease(task);
       SetLightLvl(block_pos, block_emission);
     }
@@ -103,9 +103,9 @@ void BlockLightEngine::CheckNeighborChunk(ChunkPos center_chunk_pos) {
         continue;
       }
 
-      task.SetBlockPos(next_pos);
-      task.SetLightLevel(spread_lvl);
-      task.SetDirection(direction);
+      task.block_pos_ = next_pos;
+      task.light_lvl_ = static_cast<uint8_t>(spread_lvl);
+      task.direction_ = direction;
       EnqueueIncrease(task);
     }
   }
@@ -121,16 +121,16 @@ void BlockLightEngine::CheckBlock(BlockPos block_pos) {
   SetLightLvl(block_pos, emission_lvl);
   if (emission_lvl != 0) {
     InternalTask task;
-    task.SetBlockPos(block_pos);
-    task.SetDirection(kAllDirections);
-    task.SetLightLevel(emission_lvl);
+    task.block_pos_ = block_pos;
+    task.direction_ = kAllDirections;
+    task.light_lvl_ = static_cast<uint8_t>(emission_lvl);
     EnqueueIncrease(task);
   }
 
   InternalTask task;
-  task.SetBlockPos(block_pos);
-  task.SetLightLevel(curr_lvl);
-  task.SetDirection(kAllDirections);
+  task.block_pos_ = block_pos;
+  task.light_lvl_ = static_cast<uint8_t>(curr_lvl);
+  task.direction_ = kAllDirections;
   EnqueueDecrease(task);
 }
 

@@ -190,6 +190,22 @@ size_t LightEngineCache::CalculateCacheIndex(BlockPos pos) const noexcept {
   return y * kCacheSlice + x * kCacheWidth + z;
 }
 
+LightEngineCache::CacheSlot& LightEngineCache::GetSlot(size_t idx) noexcept {
+  GAME_ASSERT(idx < cache_.size(), "Cache index out of bounds");
+  return cache_[idx];
+}
+
+const LightEngineCache::CacheSlot& LightEngineCache::GetSlot(
+    size_t idx) const noexcept {
+  GAME_ASSERT(idx < cache_.size(), "Cache index out of bounds");
+  return cache_[idx];
+}
+
+void LightEngineCache::MarkDirty(size_t idx) noexcept {
+  GAME_ASSERT(idx < dirty_.size(), "Dirty index out of bounds");
+  dirty_[idx] = true;
+}
+
 bool LightEngineCache::CheckInRange(ChunkPos pos) const noexcept {
   const int x = center_chunk_.x - pos.x + kCacheRadius;
   const int z = center_chunk_.z - pos.z + kCacheRadius;
