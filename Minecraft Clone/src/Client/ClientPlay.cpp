@@ -12,6 +12,7 @@
 #include "Client/Inputs/InputManager.h"
 #include "Client/Inputs/MouseInputs.h"
 #include "Client/Player/MainPlayer.h"
+#include "Level/Entity/Mobs/Player.h"
 #include "Client/Profiler/PerformanceProfiler.h"
 #include "Client/Render/WorldRender.h"
 #include "ClientLevel/ClientCache.h"
@@ -26,8 +27,10 @@
 #include "RenderEngine/EntityRender/MultiEntityRender.h"
 #include "RenderEngine/OpenGL/Framebuffer/Framebuffer.h"
 #include "RenderEngine/UI/Screens/DebugOverlay.h"
+#include "RenderEngine/UI/Screens/PlayerHud.h"
 #include "RenderEngine/UI/UIManager.h"
 #include "RenderEngine/Window.h"
+#include "Level/Item/ItemStack.h"
 
 using glm::vec3;
 using std::make_unique;
@@ -196,5 +199,23 @@ Screen::TickCallback ClientPlay::GetDebugStatsCallback() {
     debug_screen->Edit(9, "Light Engine Queue: {} | Update time: {}",
                        stats.light_stats_.queue_size_,
                        stats.light_stats_.average_light_update_time_);
+  };
+}
+
+Screen::TickCallback ClientPlay::GetHotbarUpdateCallback() {
+  return [this](Screen* screen) {
+    PlayerHud* player_hud = static_cast<PlayerHud*>(screen);
+    auto& inventory = main_player_->player_->entity_inventory_;
+
+    // Update slot contents
+    for (int i = 0; i < 9; i++) {
+      ItemStack item = inventory.GetItem(i);
+      if (item.IsInitialized()) {
+        player_hud->UpdateSlot(i, item.item_);
+      }
+    }
+
+    // Update selection indicator position
+    player_hud->UpdateSelectedSlot(inventory.right_hand_slot_);
   };
 }

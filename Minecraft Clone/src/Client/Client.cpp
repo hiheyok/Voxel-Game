@@ -66,12 +66,13 @@ void Client::Initialize() {
   // Create UIManager first so it can be passed to ClientPlay
   ui_manager_ = make_unique<UIManager>(context_, inputs_);
   ui_manager_->Initialize();
-  ui_manager_->PushScreen("player_hud");
+  int hud_idx = ui_manager_->PushScreen("player_hud");
   int debug_idx = ui_manager_->PushScreen("debug_overlay");
 
 
   InitializeServerCom();
   ui_manager_->SetScreenTickCallback(debug_idx, client_play_->GetDebugStatsCallback());
+  ui_manager_->SetScreenTickCallback(hud_idx, client_play_->GetHotbarUpdateCallback());
 
   /// Initialize game rendering context
 }

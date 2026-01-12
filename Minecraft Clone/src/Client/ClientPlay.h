@@ -38,6 +38,7 @@ class ClientPlay {
   void Render(Window* window);
   
   Screen::TickCallback GetDebugStatsCallback();
+  Screen::TickCallback GetHotbarUpdateCallback();
 
   GameContext& context_;
   ServerInterface& interface_;

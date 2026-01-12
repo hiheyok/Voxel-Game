@@ -24,15 +24,9 @@ MainPlayer::MainPlayer(GameContext& context, ClientCache& cache,
       interactions_{make_unique<WorldInteraction>(context)},
       player_pov_{make_unique<PlayerPOV>()},
       ui_manager_{ui_manager},
-      client_cache_{cache} {
-  // Set main player pointer in context for UI access
-  context_.main_player_ = player_.get();
-}
+      client_cache_{cache} {}
 
-MainPlayer::~MainPlayer() {
-  // Clear the context pointer on destruction
-  context_.main_player_ = nullptr;
-}
+MainPlayer::~MainPlayer() = default;
 
 PlayerPOV* MainPlayer::GetPlayerPOV() { return player_pov_.get(); }
 

@@ -20,8 +20,6 @@ class PlayerHud : public Screen {
   // Clean up before exiting, saving state, etc
   void OnExit() override;
 
-  void Update(const std::vector<InputEvent>& events) override;
-
   // Called by tick callback to update slot contents
   void UpdateSlot(int index, const Item& item);
   void UpdateSelectedSlot(int index);

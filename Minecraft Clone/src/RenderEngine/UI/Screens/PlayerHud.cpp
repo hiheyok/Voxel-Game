@@ -1,13 +1,9 @@
 #include "RenderEngine/UI/Screens/PlayerHud.h"
 
-#include <vector>
+#include <memory>
 
-#include "Client/Inputs/InputEvent.h"
 #include "Core/GameContext/GameContext.h"
-#include "Level/Entity/Mobs/Player.h"
 #include "Level/Item/Item.h"
-#include "Level/Item/ItemStack.h"
-#include "Level/Item/Items.h"
 #include "RenderEngine/FrameBuffer/RenderTargetTexture.h"
 #include "RenderEngine/RenderResources/Manager/ItemIconManager.h"
 #include "RenderEngine/RenderResources/RenderHandle.h"
@@ -89,26 +85,6 @@ void PlayerHud::OnEnter() {
 void PlayerHud::OnPause() {}
 void PlayerHud::OnResume() {}
 void PlayerHud::OnExit() {}
-
-void PlayerHud::Update(const vector<InputEvent>& events) {
-  Screen::Update(events);
-
-  if (!context_.main_player_) return;
-
-  auto& inventory = context_.main_player_->entity_inventory_;
-
-  // Update slot contents
-  for (int i = 0; i < kHotbarSlots; i++) {
-    ItemStack item = inventory.GetItem(i);
-    if (item.IsInitialized()) {
-      hotbar_slots_[i]->SetItem(item.item_);
-    }
-  }
-
-  // Update selection indicator position
-  int slot = inventory.right_hand_slot_;
-  UpdateSelectedSlot(slot);
-}
 
 void PlayerHud::UpdateSlot(int index, const Item& item) {
   GAME_ASSERT(index >= 0 && index < kHotbarSlots, "Invalid hotbar bounds.");
