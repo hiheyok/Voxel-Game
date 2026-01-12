@@ -140,10 +140,10 @@ void ChunkLoader::LoadMovingEntitySurrounding() {
     GAME_ASSERT(entity != nullptr, "Entity is null");
 
     // Calculate current chunk position
-    vec3 pos = entity->properties_.position_;
-    int x = static_cast<int>(floor(pos.x / kChunkDim));
-    int y = static_cast<int>(floor(pos.y / kChunkDim));
-    int z = static_cast<int>(floor(pos.z / kChunkDim));
+    vec3 entity_pos = entity->properties_.position_;
+    int x = static_cast<int>(floor(entity_pos.x / kChunkDim));
+    int y = static_cast<int>(floor(entity_pos.y / kChunkDim));
+    int z = static_cast<int>(floor(entity_pos.z / kChunkDim));
     ChunkPos current_chunk{x, y, z};
 
     // Check if entity changed chunks
