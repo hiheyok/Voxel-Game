@@ -34,6 +34,11 @@ class Widget {
   void SetOffsetMax(glm::vec2 pos) noexcept;
   void SetOffsetMin(glm::vec2 pos) noexcept;
 
+  glm::vec2 GetOffsetMax() const noexcept;
+  glm::vec2 GetOffsetMin() const noexcept;
+  glm::vec2 GetAnchorMax() const noexcept;
+  glm::vec2 GetAnchorMin() const noexcept;
+
   void AddChildWidget(std::unique_ptr<Widget> widget);
   void AddComponent(std::unique_ptr<Component> component);
   void TryUpdateLayout(const UIRectangle& parent);

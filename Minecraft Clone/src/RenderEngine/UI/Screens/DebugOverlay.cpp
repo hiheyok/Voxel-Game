@@ -28,7 +28,7 @@ DebugOverlay::~DebugOverlay() = default;
 void DebugOverlay::OnEnter() {
   glm::vec4 bg_color = {0.2f, 0.2f, 0.2f, 0.5f};
 
-  float widget_height = 4.5f;
+  float widget_height = 4.33333333333f;
   float widget_width = 150.0f;
 
   // Title widget
@@ -67,7 +67,12 @@ void DebugOverlay::EditText(int idx, const string& text) {
 
   // Handle "Stat1" through "Stat10"
   if (idx >= 0 && idx < kNumStats && stat_widgets_[idx]) {
-    stat_widgets_[idx]->SetText(text);
-    stat_widgets_[idx]->SetDirty();
+    TextWidget& widget = *stat_widgets_[idx];
+    
+    widget.SetText(text);
+    float len = widget.GetTextLength();
+    float curr_offset = widget.GetOffsetMax().y;
+    widget.SetOffsetMax({len, curr_offset});
+    widget.SetDirty();
   }
 }

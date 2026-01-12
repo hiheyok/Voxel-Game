@@ -133,6 +133,14 @@ void ClientPlay::Update(Window* window) {
 Screen::TickCallback ClientPlay::GetDebugStatsCallback() {
   return [this](Screen* screen) {
     DebugOverlay* debug_screen = static_cast<DebugOverlay*>(screen);
+    int duration = debug_screen->timer.GetTimePassed_ms();
+
+    if (duration <= debug_screen->update_rate_) {
+      return;
+    }
+
+    debug_screen->timer.Set();
+
     ServerStats stats = interface_.GetServerStats();
     glm::vec3 player_pos = main_player_->GetEntityProperties().position_;
     BlockPos block_pos{player_pos.x, player_pos.y, player_pos.z};
@@ -171,9 +179,9 @@ Screen::TickCallback ClientPlay::GetDebugStatsCallback() {
 
     float mesh_ms = terrain_render_->build_time_ / 1000;
     float s0 =
-        100.0 * terrain_render_->build_stage_0_ / terrain_render_->build_time_;
+        terrain_render_->build_stage_0_ / terrain_render_->build_time_ * 100;
     float s1 =
-        100.0 * terrain_render_->build_stage_1_ / terrain_render_->build_time_;
+        terrain_render_->build_stage_1_ / terrain_render_->build_time_ * 100;
     float avg = terrain_render_->build_time_ /
                 terrain_render_->amount_of_mesh_generated_;
 

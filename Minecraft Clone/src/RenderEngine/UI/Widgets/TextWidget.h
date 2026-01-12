@@ -27,6 +27,7 @@ class TextWidget : public Widget {
 
   // Background settings
   void SetBackgroundColor(glm::vec4 rgba);
+  float GetTextLength() const;
 
  protected:
   // Override to add text rectangles after component rectangles

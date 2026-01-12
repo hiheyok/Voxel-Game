@@ -39,6 +39,14 @@ void Widget::SetOffsetMax(glm::vec2 pos) noexcept { offset_max_ = pos; }
 
 void Widget::SetOffsetMin(glm::vec2 pos) noexcept { offset_min_ = pos; }
 
+glm::vec2 Widget::GetOffsetMax() const noexcept { return offset_max_; }
+
+glm::vec2 Widget::GetOffsetMin() const noexcept { return offset_min_; }
+
+glm::vec2 Widget::GetAnchorMax() const noexcept { return anchor_max_; }
+
+glm::vec2 Widget::GetAnchorMin() const noexcept { return anchor_min_; }
+
 void Widget::AddChildWidget(unique_ptr<Widget> widget) {
   if (!widget) {  // guard against nullptr
     return;
