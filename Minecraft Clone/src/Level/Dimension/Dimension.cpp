@@ -54,7 +54,7 @@ Dimension::Dimension(GameContext& context, DimensionProperties properties,
       make_unique<CollisionDetector>(context_, *main_world_->GetChunkMap());
 
   if (context_.generators_->GetGenerator(generator_type_)->use_tall_chunks_) {
-    world_updater_->tall_generation_ = true;
+    world_updater_->SetTallGeneration(true);
   }
 }
 

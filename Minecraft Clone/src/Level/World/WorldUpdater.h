@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Core/Typenames.h"
+#include "Level/World/ChunkLoader.h"
 
 class World;
 class Chunk;
@@ -22,9 +23,10 @@ updates
 */
 class WorldUpdater {
  public:
-  bool tall_generation_ = false;
-
   WorldUpdater(GameContext&, World* w, WorldParameters p);
+
+  void SetTallGeneration(bool val);
+  bool IsTallGeneration() const;
 
   void DeleteEntityChunkLoader(EntityUUID uuid);
   bool CheckEntityExistChunkLoader(EntityUUID uuid) const;
@@ -50,27 +52,12 @@ class WorldUpdater {
   void ResetState();
 
  private:
-  bool RequestLoad(ChunkPos pos);
-  void loadSpawnChunks();
-  void loadSummonEntitySurrounding(EntityUUID uuid);
-  void loadSurroundedMovedEntityChunk();
-
   GameContext& context_;
-  std::unique_ptr<WorldParameters> settings_;
   World* world_ = nullptr;
-  FastHashSet<ChunkPos> generating_chunk_;
-  bool is_spawn_chunks_loaded_ = false;
-
-  FastHashSet<EntityUUID>
-      entity_chunk_loaders_;  // List of entities that force loads chunks
-
-  // Track last known chunk for each entity to detect chunk changes
-  FastHashMap<EntityUUID, ChunkPos> entity_last_chunk_;
-
-  std::vector<EntityUUID> chunk_loader_queue_;
+  
+  std::unique_ptr<ChunkLoader> chunk_loader_;
 
   // States
-  std::vector<ChunkPos> chunk_request_;
   FastHashSet<ChunkPos> created_chunk_;
   std::vector<ChunkPos> created_chunk_arr_;
   FastHashMap<ChunkPos, std::vector<BlockPos>> changed_block_;
