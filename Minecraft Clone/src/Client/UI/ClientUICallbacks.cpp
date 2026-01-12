@@ -44,8 +44,9 @@ Screen::TickCallback ClientUICallbacks::GetDebugStatsCallback() {
     debug_screen->Edit(7, "Light Level: Sky={}, Block={}", stats.sky_light,
                        stats.block_light);
     debug_screen->Edit(8, "Server Tick (MSPT): {}", stats.mspt);
-    debug_screen->Edit(9, "Light Engine Queue: {} | Update time: {}",
-                       stats.light_queue_size, stats.light_update_time);
+    debug_screen->Edit(9, "Light Engine Queue: {} | Update: {} | Dupes: {}",
+                       stats.light_queue_size, stats.light_update_time,
+                       stats.light_duplicates_skipped);
   };
 }
 

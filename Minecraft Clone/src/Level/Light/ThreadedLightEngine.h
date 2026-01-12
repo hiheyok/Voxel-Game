@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <memory>
+#include <mutex>
 #include <vector>
 
 #include "Core/Typenames.h"
@@ -52,4 +53,11 @@ class ThreadedLightEngine {
   std::unique_ptr<ThreadPool<ChunkPos, int>>
       lighter_;  // Returns int, placeholder until i can make it so it can
                  // handle void
+
+  // Deduplication: track chunks already queued to prevent duplicate submissions
+  mutable std::mutex pending_lighter_mutex_;
+  mutable std::mutex pending_updater_mutex_;
+  FastHashSet<ChunkPos> pending_lighter_chunks_;
+  FastHashSet<ChunkPos> pending_updater_chunks_;
+  std::atomic<size_t> duplicates_skipped_{0};
 };

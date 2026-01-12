@@ -66,6 +66,7 @@ DebugStats DebugStatsCollector::Collect(double frametime) {
   stats.light_queue_size = server_stats.light_stats_.queue_size_;
   stats.light_update_time =
       server_stats.light_stats_.average_light_update_time_;
+  stats.light_duplicates_skipped = server_stats.light_stats_.duplicates_skipped_;
 
   return stats;
 }

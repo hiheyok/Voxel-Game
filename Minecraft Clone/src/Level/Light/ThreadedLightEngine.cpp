@@ -45,9 +45,23 @@ ThreadedLightEngine::ThreadedLightEngine(GameContext& context,
 ThreadedLightEngine::~ThreadedLightEngine() = default;
 
 void ThreadedLightEngine::LightUpChunk(ChunkPos pos) {
+  {
+    std::lock_guard<std::mutex> lock(pending_lighter_mutex_);
+    if (!pending_lighter_chunks_.insert(pos).second) {
+      ++duplicates_skipped_;  // Track duplicate
+      return;  // Already queued, skip duplicate
+    }
+  }
   lighter_->SubmitTask(pos);
 }
 void ThreadedLightEngine::UpdateChunk(const ChunkLightTask& task) {
+  {
+    std::lock_guard<std::mutex> lock(pending_updater_mutex_);
+    if (!pending_updater_chunks_.insert(task.GetChunkPos()).second) {
+      ++duplicates_skipped_;  // Track duplicate
+      return;  // Already queued, skip duplicate
+    }
+  }
   updater_->SubmitTask(task);
 }
 
@@ -67,6 +81,7 @@ LightEngineStats ThreadedLightEngine::GetStats() const noexcept {
   LightEngineStats stats;
   stats.average_light_update_time_ = GetAverageLightUpTime();
   stats.queue_size_ = GetQueueSize();
+  stats.duplicates_skipped_ = duplicates_skipped_.load();
   return stats;
 }
 
@@ -89,6 +104,12 @@ int ThreadedLightEngine::WorkerUpdater(const ChunkLightTask& tasks,
   double cpu_time = time.GetTimePassed_us();
   total_cpu_time_ += cpu_time;
   ++light_update_done_;
+
+  // Remove from pending set after processing
+  {
+    std::lock_guard<std::mutex> lock(pending_updater_mutex_);
+    pending_updater_chunks_.erase(tasks.GetChunkPos());
+  }
   return 987654321;
 }
 
@@ -110,5 +131,11 @@ int ThreadedLightEngine::WorkerLighter(ChunkPos pos, int worker_id) {
   double cpu_time = time.GetTimePassed_us();
   total_cpu_time_ += cpu_time;
   ++light_update_done_;
+
+  // Remove from pending set after processing
+  {
+    std::lock_guard<std::mutex> lock(pending_lighter_mutex_);
+    pending_lighter_chunks_.erase(pos);
+  }
   return 987654321;
 }

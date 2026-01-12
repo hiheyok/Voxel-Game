@@ -37,6 +37,7 @@ struct DebugStats {
   float mspt = 0.0f;
   size_t light_queue_size = 0;
   float light_update_time = 0.0f;
+  size_t light_duplicates_skipped = 0;
 };
 
 // Gathers all debug statistics into a single struct.
