@@ -1,11 +1,13 @@
 #include "Level/World/WorldUpdater.h"
 
+#include <cmath>
 #include <cstddef>
 #include <cstdlib>
 #include <deque>
 #include <glm/ext/vector_float3.hpp>
 #include <glm/ext/vector_int3.hpp>
 #include <memory>
+#include <ranges>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -25,6 +27,7 @@
 
 using std::make_unique;
 using std::move;
+using std::floor;
 using std::string;
 using std::to_string;
 using std::unique_ptr;
@@ -37,22 +40,26 @@ WorldUpdater::WorldUpdater(GameContext& context, World* w, WorldParameters p)
 
 void WorldUpdater::loadSummonEntitySurrounding(EntityUUID uuid) {
   Entity* e = world_->GetEntity(uuid);
+  GAME_ASSERT(e != nullptr, "Entity with UUID " + to_string(uuid) + " not found");
 
-  if (e == nullptr) {
-    throw std::logic_error(
-        "WorldLoader::loadSummonEntitySurrounding - " +
-        string("Entity with UUID " + to_string(uuid) + " not found"));
-    return;
-  }
-  glm::vec3 pos = e->properties_.position_ / 16.f;
-  // vec3 velocity = e->Properties.Velocity;
+  // Calculate entity chunk position
+  int chunk_x = static_cast<int>(std::floor(e->properties_.position_.x / kChunkDim));
+  int chunk_y = static_cast<int>(std::floor(e->properties_.position_.y / kChunkDim));
+  int chunk_z = static_cast<int>(std::floor(e->properties_.position_.z / kChunkDim));
+  ChunkPos entity_chunk{chunk_x, chunk_y, chunk_z};
 
-  glm::ivec3 initial_pos{pos.x, pos.y, pos.z};
+  // Store entity's initial chunk position for future tracking
+  entity_last_chunk_[uuid] = entity_chunk;
 
-  // TODO(hiheyok): Use light engine FIFO
+  glm::ivec3 initial_pos{chunk_x, chunk_y, chunk_z};
+
+  // BFS with visited set to prevent exponential redundant processing
   std::deque<glm::ivec3> fifo;
+  FastHashSet<ChunkPos> visited;
 
   fifo.push_back(initial_pos);
+  visited.insert(entity_chunk);
+
   while (!fifo.empty()) {
     glm::ivec3 current_chunk_pos = fifo.front();
     fifo.pop_front();
@@ -72,13 +79,18 @@ void WorldUpdater::loadSummonEntitySurrounding(EntityUUID uuid) {
 
     for (int side = 0; side < 6; side++) {
       glm::ivec3 neighbor_chunk_pos = current_chunk_pos;
-
       neighbor_chunk_pos[side >> 1] += (side & 0b1) * 2 - 1;
 
-      fifo.push_back(neighbor_chunk_pos);
+      ChunkPos neighbor{neighbor_chunk_pos.x, neighbor_chunk_pos.y,
+                        neighbor_chunk_pos.z};
+      // Only add if not visited
+      if (visited.insert(neighbor).second) {
+        fifo.push_back(neighbor_chunk_pos);
+      }
     }
   }
 }
+
 
 bool WorldUpdater::RequestLoad(ChunkPos pos) {
   ChunkPos p = pos;
@@ -94,53 +106,52 @@ bool WorldUpdater::RequestLoad(ChunkPos pos) {
   }
 }
 
-// Only work on loading chunks for not. Unloading for later
+// Only work on loading chunks for now. Unloading for later
 void WorldUpdater::loadSurroundedMovedEntityChunk() {
-  vector<glm::ivec3> center_position_list;
-  vector<glm::vec3> center_velocity_list;
-
-  // Get entity chunk position
-
-  for (const auto& e : entity_chunk_loaders_) {
-    Entity* entity = world_->GetEntity(e);
-
-    GAME_ASSERT(entity != nullptr,
-                string("Entity with UUID " + to_string(e) + " not found"));
-
-    int x = static_cast<int>(entity->properties_.position_.x / kChunkDim);
-    int y = static_cast<int>(entity->properties_.position_.y / kChunkDim);
-    int z = static_cast<int>(entity->properties_.position_.z / kChunkDim);
-
-    if ((entity->properties_.velocity_.x == 0.f) &&
-        (entity->properties_.velocity_.y == 0.f) &&
-        (entity->properties_.velocity_.z == 0.f)) {
-      continue;
-    }
-
-    center_position_list.emplace_back(x, y, z);
-    center_velocity_list.emplace_back(entity->properties_.velocity_);
-  }
-
-  if (center_position_list.empty()) return;
-
   glm::ivec3 axis_tick_dist{settings_->horizontal_ticking_distance_,
                             settings_->vertical_ticking_distance_,
                             settings_->horizontal_ticking_distance_};
 
-  int chunk_padding = 4;
+  for (const auto& uuid : entity_chunk_loaders_) {
+    Entity* entity = world_->GetEntity(uuid);
 
-  for (size_t i = 0; i < center_position_list.size(); i++) {
-    glm::ivec3 pos = center_position_list[i];
-    glm::vec3 vel = center_velocity_list[i];
+    GAME_ASSERT(entity != nullptr,
+                string("Entity with UUID " + to_string(uuid) + " not found"));
+
+    // Calculate current chunk position
+    int x = static_cast<int>(floor(entity->properties_.position_.x / kChunkDim));
+    int y = static_cast<int>(floor(entity->properties_.position_.y / kChunkDim));
+    int z = static_cast<int>(floor(entity->properties_.position_.z / kChunkDim));
+    ChunkPos current_chunk{x, y, z};
+
+    // Check if entity changed chunks
+    auto it = entity_last_chunk_.find(uuid);
+    if (it != entity_last_chunk_.end() && it->second != current_chunk) {
+      // Entity moved to a new chunk - load all surrounding chunks
+      for (auto [dx, dy, dz] :
+           Product<3>({{-axis_tick_dist.x, axis_tick_dist.x + 1},
+                       {-axis_tick_dist.y, axis_tick_dist.y + 1},
+                       {-axis_tick_dist.z, axis_tick_dist.z + 1}})) {
+        RequestLoad({x + dx, y + dy, z + dz});
+      }
+      // Update last known chunk
+      it->second = current_chunk;
+    }
+
+    // Velocity-based directional loading for moving entities
+    glm::vec3 vel = entity->properties_.velocity_;
+    if (vel.x == 0.f && vel.y == 0.f && vel.z == 0.f) {
+      continue;
+    }
+
+    constexpr int chunk_padding = 4;
+    glm::ivec3 pos{x, y, z};
 
     for (int j = 0; j < 3; j++) {
       int side = 0;
-
       if (vel[j] > 0) {
         side = 1;
-      }
-
-      if (vel[j] < 0) {
+      } else if (vel[j] < 0) {
         side = -1;
       }
 
@@ -157,16 +168,12 @@ void WorldUpdater::loadSurroundedMovedEntityChunk() {
         test_position[(j + 2) % 3] += v;
         test_position[j] += sideDistanceOffset * side;
 
-        // Test if it exist of generating
-        bool isSuccess =
-            RequestLoad({test_position.x, test_position.y, test_position.z});
-        if (!isSuccess) continue;
+        RequestLoad({test_position.x, test_position.y, test_position.z});
       }
     }
   }
 }
 
-#include <ranges>
 
 void WorldUpdater::loadSpawnChunks() {
   GAME_ASSERT(world_ != nullptr, "World is null");
@@ -196,6 +203,7 @@ void WorldUpdater::DeleteEntityChunkLoader(EntityUUID uuid) {
         "WorldLoader::DeleteEntityChunkLoader - " +
         string("Could not find entity with UUID " + to_string(uuid)));
   entity_chunk_loaders_.erase(uuid);
+  entity_last_chunk_.erase(uuid);  // Clean up tracking
 }
 
 bool WorldUpdater::CheckEntityExistChunkLoader(EntityUUID uuid) const {

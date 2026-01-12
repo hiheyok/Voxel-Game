@@ -64,6 +64,9 @@ class WorldUpdater {
   FastHashSet<EntityUUID>
       entity_chunk_loaders_;  // List of entities that force loads chunks
 
+  // Track last known chunk for each entity to detect chunk changes
+  FastHashMap<EntityUUID, ChunkPos> entity_last_chunk_;
+
   std::vector<EntityUUID> chunk_loader_queue_;
 
   // States
