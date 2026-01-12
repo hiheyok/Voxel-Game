@@ -28,13 +28,12 @@ ClientRenderer::ClientRenderer(GameContext& context, PlayerPOV* player,
 ClientRenderer::~ClientRenderer() = default;
 
 void ClientRenderer::Initialize(Window* window, ClientCache* cache,
-                                PerformanceProfiler* profiler,
                                 float graphics_scale) {
-  entity_render_->Initialize(profiler);
+  entity_render_->Initialize();
   entity_render_->SetWindow(window->GetWindow());
   ecs_entity_render_->Initialize();
   ecs_entity_render_->SetWindow(window->GetWindow());
-  terrain_render_->Start(window->GetWindow(), cache, profiler);
+  terrain_render_->Start(window->GetWindow(), cache);
 
   // Use window properties for framebuffer size
   framebuffer_->GenBuffer(window->GetProperties().res_x_,

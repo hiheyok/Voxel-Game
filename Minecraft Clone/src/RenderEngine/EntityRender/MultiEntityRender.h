@@ -15,7 +15,6 @@ class Buffer;
 class VertexArray;
 class EntityModel;
 class Shader;
-class PerformanceProfiler;
 class Camera;
 class PlayerPOV;
 class GameContext;
@@ -40,7 +39,7 @@ class MultiEntityRender {
 
   void RemoveEntity(EntityUUID EntityUUID);
 
-  void Initialize(PerformanceProfiler* pProfilerIn);
+  void Initialize();
 
   void SetTimePastTick(double t);
 
@@ -78,8 +77,6 @@ class MultiEntityRender {
   std::vector<float> position_arr_;
   std::vector<float> velocity_arr_;
   std::vector<float> acceleration_arr_;
-
-  PerformanceProfiler* profiler_;
 
   size_t num_entity_rendered_ = 0;
 

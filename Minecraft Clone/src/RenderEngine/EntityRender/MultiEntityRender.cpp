@@ -17,7 +17,6 @@
 #include "Assets/AssetManager.h"
 #include "Assets/Types/EntityModel.h"
 #include "Client/Player/PlayerPOV.h"
-#include "Client/Profiler/PerformanceProfiler.h"
 #include "Core/GameContext/GameContext.h"
 #include "Core/Typenames.h"
 #include "Level/Entity/Entities.h"
@@ -71,7 +70,7 @@ void MultiEntityRender::Clean() {
   vao_ = make_unique<VertexArray>(context_);
 }
 
-void MultiEntityRender::Initialize(PerformanceProfiler* pProfilerIn) {
+void MultiEntityRender::Initialize() {
   static constexpr int kMaxEntityCount = 10000000;
 
   const vector<EntityTypeData*> entity_type_list =
@@ -82,7 +81,6 @@ void MultiEntityRender::Initialize(PerformanceProfiler* pProfilerIn) {
     const string& name = entity_type_list[i]->entity_name_;
     AssetHandle<EntityModel> model = context_.assets_->GetEntityModel(name);
     entity_cached_models_[entity_type_list[i]->id_] = model;
-    profiler_ = pProfilerIn;
   }
 
   // Initialize Buffers
@@ -149,7 +147,6 @@ void MultiEntityRender::SetupCall() {
 }
 
 void MultiEntityRender::Render() {
-  profiler_->ProfileStart("root/render/entity");
   SetupCall();
 
   size_t n = 0;
@@ -217,13 +214,11 @@ void MultiEntityRender::Render() {
     vao_->Unbind();
   }
   num_entity_rendered_ = n;
-  profiler_->ProfileStop("root/render/entity");
 }
 
 void MultiEntityRender::SetWindow(GLFWwindow* win) { window_ = win; }
 
 void MultiEntityRender::Update() {
-  profiler_->ProfileStart("root/update/entity");
   int width, height;
 
   glfwGetWindowSize(window_, &width, &height);
@@ -247,8 +242,6 @@ void MultiEntityRender::Update() {
                 static_cast<float>(vertical_render_distance_ * kChunkDim))
       .SetVec3("camPos", player_->GetPosition())
       .SetFloat("TimeDelta", static_cast<float>(time_past_tick_));
-
-  profiler_->ProfileStop("root/update/entity");
 }
 
 void MultiEntityRender::Reload() {

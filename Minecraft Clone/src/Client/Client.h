@@ -8,7 +8,6 @@
 
 class ClientPlay;
 class ClientServerBridge;
-class PerformanceProfiler;
 class GameContext;
 class UIManager;
 
@@ -32,5 +31,4 @@ class Client : public Window {
   std::unique_ptr<ClientServerBridge> server_bridge_;
   std::unique_ptr<ClientPlay> client_play_;
   std::unique_ptr<UIManager> ui_manager_;
-  PerformanceProfiler* profiler_;
 };

@@ -108,8 +108,7 @@ void WorldRender::Update() {
   renderer_->PrepareRenderer();
 }
 
-void WorldRender::Start(GLFWwindow* window, ClientCache* cache,
-                        PerformanceProfiler* profiler) {
+void WorldRender::Start(GLFWwindow* window, ClientCache* cache) {
   horizontal_render_distance_ = context_.options_->horizontal_render_distance_;
   vertical_render_distance_ = context_.options_->vertical_render_distance_;
 
@@ -129,8 +128,6 @@ void WorldRender::Start(GLFWwindow* window, ClientCache* cache,
   renderer_->LoadAssets();
   renderer_->SetSettings(horizontal_render_distance_, vertical_render_distance_,
                          90);
-
-  profiler_ = profiler;
 }
 
 size_t WorldRender::GetQueuedSize() const noexcept {

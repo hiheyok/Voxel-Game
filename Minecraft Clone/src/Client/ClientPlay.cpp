@@ -7,17 +7,16 @@
 #include <string>
 
 #include "Client/ClientActionQueue.h"
+#include "Client/ClientLevel/ClientCache.h"
+#include "Client/ClientLevel/ClientLevel.h"
 #include "Client/ClientPacketReceiver.h"
 #include "Client/ClientPacketSender.h"
 #include "Client/Inputs/InputManager.h"
 #include "Client/Player/MainPlayer.h"
-#include "Client/Profiler/PerformanceProfiler.h"
 #include "Client/Render/ClientRenderer.h"
 #include "Client/Render/WorldRender.h"
 #include "Client/Stats/DebugStatsCollector.h"
 #include "Client/UI/ClientUICallbacks.h"
-#include "Client/ClientLevel/ClientCache.h"
-#include "Client/ClientLevel/ClientLevel.h"
 #include "Core/GameContext/GameContext.h"
 #include "Core/Interfaces/ServerInterface.h"
 #include "Core/Options/Option.h"
@@ -28,15 +27,15 @@
 using std::make_unique;
 
 ClientPlay::ClientPlay(GameContext& context, ServerInterface& interface,
-                       Window* window, PerformanceProfiler* profiler,
-                       UIManager& ui_manager)
+                       Window* window, UIManager& ui_manager)
     : context_{context},
       interface_{interface},
       client_level_{make_unique<ClientLevel>(context)},
       main_player_{
           make_unique<MainPlayer>(context, client_level_->cache_, ui_manager)},
-      renderer_{make_unique<ClientRenderer>(context, main_player_->GetPlayerPOV(),
-                                            client_level_->cache_.GetECSManager())},
+      renderer_{
+          make_unique<ClientRenderer>(context, main_player_->GetPlayerPOV(),
+                                      client_level_->cache_.GetECSManager())},
       action_queue_{make_unique<ClientActionQueue>()} {
   // Initialize packet handlers
   packet_receiver_ = make_unique<ClientPacketReceiver>(
@@ -48,7 +47,7 @@ ClientPlay::ClientPlay(GameContext& context, ServerInterface& interface,
   main_player_->SetPlayerRotation(-135.0f, -30.0f);
 
   // Initialize renderer
-  renderer_->Initialize(window, &client_level_->cache_, profiler,
+  renderer_->Initialize(window, &client_level_->cache_,
                         static_cast<float>(context_.options_->graphics_scale_));
 
   // Send initial player position to server
@@ -57,8 +56,8 @@ ClientPlay::ClientPlay(GameContext& context, ServerInterface& interface,
   // Create stats collector and UI callbacks
   stats_collector_ = make_unique<DebugStatsCollector>(
       interface_, *main_player_, *renderer_, *client_level_);
-  ui_callbacks_ =
-      make_unique<ClientUICallbacks>(*stats_collector_, *main_player_, frametime_);
+  ui_callbacks_ = make_unique<ClientUICallbacks>(*stats_collector_,
+                                                 *main_player_, frametime_);
 }
 
 ClientPlay::~ClientPlay() = default;

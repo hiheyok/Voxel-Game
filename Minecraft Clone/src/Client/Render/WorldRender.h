@@ -13,7 +13,6 @@
 
 class TerrainRenderer;
 class ClientCache;
-class PerformanceProfiler;
 class PlayerPOV;
 class GameContext;
 
@@ -36,15 +35,13 @@ class WorldRender : public WorldRenderInfo {
 
   void Render();
   void LoadChunkToRenderer(ChunkPos chunk);
-  void Start(GLFWwindow* window, ClientCache* cache,
-             PerformanceProfiler* profiler);
+  void Start(GLFWwindow* window, ClientCache* cache);
   void Update();
   size_t GetQueuedSize() const noexcept;
   void LoadChunkMultiToRenderer(const std::vector<ChunkPos>& chunks);
 
   GameContext& context_;
   std::unique_ptr<TerrainRenderer> renderer_;
-  PerformanceProfiler* profiler_;
 
 
  private:

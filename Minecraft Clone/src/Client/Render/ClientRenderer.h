@@ -12,7 +12,6 @@ class WorldRender;
 class MultiEntityRender;
 class ECSEntityRender;
 class ClientCache;
-class PerformanceProfiler;
 class Window;
 
 struct GLFWwindow;
@@ -27,8 +26,7 @@ class ClientRenderer {
   ClientRenderer(const ClientRenderer&) = delete;
   ClientRenderer& operator=(const ClientRenderer&) = delete;
 
-  void Initialize(Window* window, ClientCache* cache,
-                  PerformanceProfiler* profiler, float graphics_scale);
+  void Initialize(Window* window, ClientCache* cache, float graphics_scale);
   void Render(Window* window);
   void Update(Window* window, float graphics_scale);
   void HandleReload();

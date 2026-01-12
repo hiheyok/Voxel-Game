@@ -14,7 +14,6 @@ class ServerInterface;
 class MainPlayer;
 class InputManager;
 class ClientLevel;
-class PerformanceProfiler;
 class Window;
 class ClientPacketReceiver;
 class ClientPacketSender;
@@ -30,7 +29,7 @@ struct GLFWwindow;
 class ClientPlay {
  public:
   ClientPlay(GameContext& context, ServerInterface& interface, Window* window,
-             PerformanceProfiler* profiler, UIManager& ui_manager);
+             UIManager& ui_manager);
   ~ClientPlay();
 
   void Update(Window* window);

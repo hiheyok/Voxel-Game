@@ -10,7 +10,6 @@
 #include "Client/ClientPlay.h"
 #include "Client/Inputs/InputManager.h"
 #include "Client/Network/ClientServerBridge.h"
-#include "Client/Profiler/PerformanceProfiler.h"
 #include "Core/GameContext/GameContext.h"
 #include "RenderEngine/UI/Screens/DebugOverlay.h"
 #include "RenderEngine/UI/UIManager.h"
@@ -19,10 +18,7 @@
 
 using std::make_unique;
 
-Client::Client(GameContext& context)
-    : Window{context},
-      context_{context},
-      profiler_{new PerformanceProfiler()} {}
+Client::Client(GameContext& context) : Window{context}, context_{context} {}
 
 Client::~Client() = default;
 
@@ -42,7 +38,7 @@ void Client::Initialize() {
 
   // Create ClientPlay with server interface
   client_play_ = make_unique<ClientPlay>(
-      context_, server_bridge_->GetInterface(), this, profiler_, *ui_manager_);
+      context_, server_bridge_->GetInterface(), this, *ui_manager_);
 
   // Set up UI callbacks
   ui_manager_->SetScreenTickCallback(debug_idx,
@@ -75,9 +71,7 @@ void Client::GameLoop() {
 
     Render();
 
-    profiler_->ProfileStart("root/refresh");
     Refresh();
-    profiler_->ProfileStop("root/refresh");
 
     double curr = frametime_tracker.GetTimePassed_s();
 
@@ -99,11 +93,6 @@ void Client::Update() {
   }
   if (inputs_.CheckAction(InputAction::kDrawSolids)) {
     properties_.draw_solid_ = true;
-  }
-
-  if (inputs_.CheckAction(InputAction::kPrintProfiler)) {
-    profiler_->LoadCache();
-    profiler_->Print();
   }
 
   if (inputs_.CheckAction(InputAction::kExit)) {
