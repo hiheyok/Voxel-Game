@@ -139,37 +139,37 @@ class BlockList {
   BlockID COBBLESTONE =
       RegisterBlock("minecraft:cobblestone", new DefaultBlock(context_));
   BlockID BLUE_STAINED_GLASS =
-      RegisterBlock("minecraft:blue_stained_glass", new DefaultBlock(context_));
+      RegisterBlock("minecraft:blue_stained_glass", new GlassBlock(context_));
   BlockID GREEN_STAINED_GLASS = RegisterBlock("minecraft:green_stained_glass",
-                                              new DefaultBlock(context_));
+                                              new GlassBlock(context_));
   BlockID BLACK_STAINED_GLASS = RegisterBlock("minecraft:black_stained_glass",
-                                              new DefaultBlock(context_));
+                                              new GlassBlock(context_));
   BlockID BROWN_STAINED_GLASS = RegisterBlock("minecraft:brown_stained_glass",
-                                              new DefaultBlock(context_));
+                                              new GlassBlock(context_));
   BlockID CYAN_STAINED_GLASS =
-      RegisterBlock("minecraft:cyan_stained_glass", new DefaultBlock(context_));
+      RegisterBlock("minecraft:cyan_stained_glass", new GlassBlock(context_));
   BlockID GRAY_STAINED_GLASS =
-      RegisterBlock("minecraft:gray_stained_glass", new DefaultBlock(context_));
+      RegisterBlock("minecraft:gray_stained_glass", new GlassBlock(context_));
   BlockID LIGHT_BLUE_STAINED_GLASS = RegisterBlock(
-      "minecraft:light_blue_stained_glass", new DefaultBlock(context_));
+      "minecraft:light_blue_stained_glass", new GlassBlock(context_));
   BlockID LIGHT_GRAY_STAINED_GLASS = RegisterBlock(
-      "minecraft:light_gray_stained_glass", new DefaultBlock(context_));
+      "minecraft:light_gray_stained_glass", new GlassBlock(context_));
   BlockID LIME_STAINED_GLASS =
-      RegisterBlock("minecraft:lime_stained_glass", new DefaultBlock(context_));
+      RegisterBlock("minecraft:lime_stained_glass", new GlassBlock(context_));
   BlockID MAGENTA_STAINED_GLASS = RegisterBlock(
-      "minecraft:magenta_stained_glass", new DefaultBlock(context_));
+      "minecraft:magenta_stained_glass", new GlassBlock(context_));
   BlockID ORANGE_STAINED_GLASS = RegisterBlock("minecraft:orange_stained_glass",
-                                               new DefaultBlock(context_));
+                                               new GlassBlock(context_));
   BlockID PINK_STAINED_GLASS =
-      RegisterBlock("minecraft:pink_stained_glass", new DefaultBlock(context_));
+      RegisterBlock("minecraft:pink_stained_glass", new GlassBlock(context_));
   BlockID PURPLE_STAINED_GLASS = RegisterBlock("minecraft:purple_stained_glass",
-                                               new DefaultBlock(context_));
+                                               new GlassBlock(context_));
   BlockID RED_STAINED_GLASS =
-      RegisterBlock("minecraft:red_stained_glass", new DefaultBlock(context_));
+      RegisterBlock("minecraft:red_stained_glass", new GlassBlock(context_));
   BlockID WHITE_STAINED_GLASS = RegisterBlock("minecraft:white_stained_glass",
-                                              new DefaultBlock(context_));
+                                              new GlassBlock(context_));
   BlockID YELLOW_STAINED_GLASS = RegisterBlock("minecraft:yellow_stained_glass",
-                                               new DefaultBlock(context_));
+                                               new GlassBlock(context_));
   BlockID WHITE_WOOL =
       RegisterBlock("minecraft:white_wool", new DefaultBlock(context_));
   BlockID BLACK_WOOL =

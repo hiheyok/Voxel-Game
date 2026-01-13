@@ -82,6 +82,7 @@ void Mesh::ChunkMeshData::GenerateCache() {
   }
 
   // Use static reference for optimized iteration
+  // Fetch blocks from orthogonal sides
   static constexpr auto& kDirs = Directions<ChunkPos>::kDirections;
   for (const auto& side : kDirs) {
     int axis = side.GetAxis();
@@ -124,6 +125,135 @@ void Mesh::ChunkMeshData::GenerateCache() {
       }
       dst_u += stride_u;
     }
+  }
+
+  static constexpr size_t kCacheXOffset = kCacheStrideX * (kCacheDim1D - 1);
+  static constexpr size_t kCacheYOffset = kCacheStrideY * (kCacheDim1D - 1);
+  static constexpr size_t kCacheZOffset = kCacheStrideZ * (kCacheDim1D - 1);
+  static constexpr size_t kCacheOffsets[3] = {kCacheXOffset, kCacheYOffset,
+                                              kCacheZOffset};
+
+  // Neighbor direction indices: [axis][negative=0/positive=1]
+  // X: West=1, East=0  Y: Down=3, Up=2  Z: North=5, South=4
+  static constexpr int kNeighborDirs[3][2] = {{1, 0}, {3, 2}, {5, 4}};
+
+  // Cache the 6 orthogonal neighbors (already fetched partially above)
+  ChunkContainer* ortho_neighbors[6];
+  for (int i = 0; i < 6; ++i) {
+    ortho_neighbors[i] = chunk_->GetNeighborRaw(i);
+  }
+
+  // Compute diagonal neighbors for edges using cached ortho neighbors
+  // Only 12 valid diagonals (where u_axis != v_axis)
+  // Indexed as: diag[u_axis * 6 + v_axis * 2 + u_neg_flag * 2 + v_neg_flag]
+  // Simpler: flat array of 12 entries
+  struct EdgeInfo {
+    const ChunkContainer* chunk;
+    int axis;      // The varying axis
+    int u_axis;    // First fixed axis
+    int v_axis;    // Second fixed axis
+    int u_local;   // Local coord in u_axis (0 or 15)
+    int v_local;   // Local coord in v_axis (0 or 15)
+    size_t cache_base;
+  };
+
+  EdgeInfo edges[12];
+  int edge_count = 0;
+
+  for (int axis = 0; axis < 3; ++axis) {
+    const int u_axis = (axis + 1) % 3;
+    const int v_axis = (axis + 2) % 3;
+
+    for (int u_m = 0; u_m < 2; ++u_m) {
+      for (int v_m = 0; v_m < 2; ++v_m) {
+        int u_dir = kNeighborDirs[u_axis][u_m];
+        int v_dir = kNeighborDirs[v_axis][v_m];
+
+        ChunkContainer* u_neigh = ortho_neighbors[u_dir];
+        if (!u_neigh) continue;
+
+        ChunkContainer* diag = u_neigh->GetNeighborRaw(v_dir);
+        if (!diag) continue;
+
+        edges[edge_count++] = {
+            diag,
+            axis,
+            u_axis,
+            v_axis,
+            (u_m == 0) ? 15 : 0,
+            (v_m == 0) ? 15 : 0,
+            kCacheOffsets[u_axis] * u_m + kCacheOffsets[v_axis] * v_m +
+                kCacheStride[axis]};
+      }
+    }
+  }
+
+  // Prefetch edge chunk palettes before reading
+  for (int e = 0; e < edge_count; ++e) {
+#if defined(_MSC_VER)
+    _mm_prefetch(reinterpret_cast<const char*>(&edges[e].chunk->GetPalette()),
+                 _MM_HINT_T0);
+#elif defined(__GNUC__) || defined(__clang__)
+    __builtin_prefetch(&edges[e].chunk->GetPalette(), 0, 3);
+#endif
+  }
+
+  // Fetch edge blocks
+  for (int e = 0; e < edge_count; ++e) {
+    const EdgeInfo& edge = edges[e];
+    BlockPos local_pos;
+    local_pos[edge.u_axis] = edge.u_local;
+    local_pos[edge.v_axis] = edge.v_local;
+
+    for (int t = 0; t < kChunkDim; ++t) {
+      local_pos[edge.axis] = t;
+      chunk_cache_[edge.cache_base + kCacheStride[edge.axis] * t] =
+          edge.chunk->GetBlockUnsafe(local_pos);
+    }
+  }
+
+  // Fetch the 8 corner blocks
+  // Corner chunk is reached via 3 hops from ortho neighbors
+  for (int i = 0; i < 8; ++i) {
+    int x_m = (i >> 0) & 1;
+    int y_m = (i >> 1) & 1;
+    int z_m = (i >> 2) & 1;
+
+    // Hop: X neighbor -> Y neighbor -> Z neighbor
+    ChunkContainer* x_neigh = ortho_neighbors[kNeighborDirs[0][x_m]];
+    if (!x_neigh) continue;
+
+    ChunkContainer* xy_neigh = x_neigh->GetNeighborRaw(kNeighborDirs[1][y_m]);
+    if (!xy_neigh) continue;
+
+    ChunkContainer* xyz_neigh = xy_neigh->GetNeighborRaw(kNeighborDirs[2][z_m]);
+    if (!xyz_neigh) continue;
+
+    // Prefetch next corner's palette while processing this one
+    if (i + 1 < 8) {
+      int nx_m = ((i + 1) >> 0) & 1;
+      int ny_m = ((i + 1) >> 1) & 1;
+      int nz_m = ((i + 1) >> 2) & 1;
+      ChunkContainer* nx = ortho_neighbors[kNeighborDirs[0][nx_m]];
+      if (nx) {
+        ChunkContainer* nxy = nx->GetNeighborRaw(kNeighborDirs[1][ny_m]);
+        if (nxy) {
+          ChunkContainer* nxyz = nxy->GetNeighborRaw(kNeighborDirs[2][nz_m]);
+          if (nxyz) {
+#if defined(_MSC_VER)
+            _mm_prefetch(reinterpret_cast<const char*>(&nxyz->GetPalette()),
+                         _MM_HINT_T0);
+#elif defined(__GNUC__) || defined(__clang__)
+            __builtin_prefetch(&nxyz->GetPalette(), 0, 3);
+#endif
+          }
+        }
+      }
+    }
+
+    BlockPos local_pos{x_m == 0 ? 15 : 0, y_m == 0 ? 15 : 0, z_m == 0 ? 15 : 0};
+    chunk_cache_[kCacheXOffset * x_m + kCacheYOffset * y_m +
+                 kCacheZOffset * z_m] = xyz_neigh->GetBlockUnsafe(local_pos);
   }
 }
 

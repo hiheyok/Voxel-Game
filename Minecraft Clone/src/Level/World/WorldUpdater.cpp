@@ -61,7 +61,7 @@ void WorldUpdater::Load() {
 // Getters
 
 vector<ChunkPos> WorldUpdater::GetLightUpdate() {
-  auto chunks = world_->GetAllChunks();
+  auto& chunks = world_->GetAllChunks();
   vector<ChunkPos> out;
 
   for (auto& chunk : chunks) {

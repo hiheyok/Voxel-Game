@@ -59,9 +59,9 @@ BlockID ChunkContainer::GetBlock(BlockPos pos) const noexcept {
   if (static_cast<unsigned>(pos.x) >= kChunkDim ||
       static_cast<unsigned>(pos.y) >= kChunkDim ||
       static_cast<unsigned>(pos.z) >= kChunkDim) {
-    int dx = ((pos.x >> 31) & 1) + 0;
-    int dy = ((pos.y >> 31) & 1) + 2;
-    int dz = ((pos.z >> 31) & 1) + 4;
+    int dx = static_cast<int>(pos.x < 0) + 0;
+    int dy = static_cast<int>(pos.y < 0) + 2;
+    int dz = static_cast<int>(pos.z < 0) + 4;
 
     if (neighbors_[dx] && (pos.x >> kChunkDimLog2))
       return neighbors_[dx]->GetBlock(pos.IncrementSide(dx, -kChunkDim));
@@ -78,6 +78,31 @@ BlockID ChunkContainer::GetBlock(BlockPos pos) const noexcept {
 
 BlockID ChunkContainer::GetBlockUnsafe(BlockPos pos) const noexcept {
   return block_storage_.GetBlock(pos);
+}
+
+const ChunkContainer* ChunkContainer::GetChunkAtBlockPos(
+    BlockPos pos) const noexcept {
+  if (static_cast<unsigned>(pos.x) >= kChunkDim ||
+      static_cast<unsigned>(pos.y) >= kChunkDim ||
+      static_cast<unsigned>(pos.z) >= kChunkDim) {
+    int dx = static_cast<int>(pos.x < 0) + 0;
+    int dy = static_cast<int>(pos.y < 0) + 2;
+    int dz = static_cast<int>(pos.z < 0) + 4;
+
+    if (neighbors_[dx] && (pos.x >> kChunkDimLog2))
+      return neighbors_[dx]->GetChunkAtBlockPos(
+          pos.IncrementSide(dx, -kChunkDim));
+    if (neighbors_[dy] && (pos.y >> kChunkDimLog2))
+      return neighbors_[dy]->GetChunkAtBlockPos(
+          pos.IncrementSide(dy, -kChunkDim));
+    if (neighbors_[dz] && (pos.z >> kChunkDimLog2))
+      return neighbors_[dz]->GetChunkAtBlockPos(
+          pos.IncrementSide(dz, -kChunkDim));
+
+    return nullptr;
+  } else {
+    return this;
+  }
 }
 
 void ChunkContainer::SetLightLvl(BlockPos pos, bool is_sky, int lvl) noexcept {

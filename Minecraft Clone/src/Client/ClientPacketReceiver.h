@@ -25,9 +25,7 @@ class ClientPacketReceiver {
   void ProcessPackets(ServerInterface& server);
 
   // Get chunk positions that need rendering updates after processing
-  const std::vector<ChunkPos>& GetChunksToUpdate() const {
-    return chunks_to_update_;
-  }
+  std::vector<ChunkPos> GetChunksToUpdate() const;
 
   void ClearChunksToUpdate() { chunks_to_update_.clear(); }
 
@@ -42,5 +40,5 @@ class ClientPacketReceiver {
   WorldRender& terrain_render_;
   MultiEntityRender& entity_render_;
 
-  std::vector<ChunkPos> chunks_to_update_;
+  FastHashSet<ChunkPos> chunks_to_update_;
 };

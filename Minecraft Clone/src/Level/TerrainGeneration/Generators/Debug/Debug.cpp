@@ -20,7 +20,17 @@ void DebugWorld::Generate(ChunkPos pos, unique_ptr<Chunk>& chunk) {
   int gz = pos.z * kChunkDim;
   int gy = pos.y * kChunkDim;
 
-  if (pos.y < 0) {
+  if (pos.y < -1) {
+    return;
+  }
+
+  if (pos.y == -1) {
+    int parity = (pos.z ^ pos.x) & 1;
+    BlockID block = parity ? context_.blocks_->LIGHT_GRAY_CONCRETE
+                           : context_.blocks_->WHITE_CONCRETE;
+    for (auto [x, z] : Product<2>(kChunkDim)) {
+      chunk->SetBlockUnsafe(block, {x, 15, z});
+    }
     return;
   }
 
@@ -29,16 +39,10 @@ void DebugWorld::Generate(ChunkPos pos, unique_ptr<Chunk>& chunk) {
   int RowLen = 50;
   int ColLen = 50;
 
-  if (gy == 0) {
-    for (auto [x, z] : Product<2>(kChunkDim)) {
-      chunk->SetBlockUnsafe(context_.blocks_->WHITE_CONCRETE, {x, 0, z});
-    }
-  }
-
   for (auto [x, y, z] : Product<3>(kChunkDim)) {
     int px = x + gx;
     int pz = z + gz;
-    int py = y + gy - 1;
+    int py = y + gy;
 
     if (((px & 0b1) == 1) || ((pz & 0b1) == 1) || ((py & 0b1) == 1)) {
       continue;

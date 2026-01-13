@@ -30,7 +30,7 @@ Chunk& WorldInterface::GetChunk(ChunkPos pos) const {
   return chunks_->GetChunk(pos);
 }
 
-vector<Chunk*> WorldInterface::GetAllChunks() const {
+const vector<Chunk*>& WorldInterface::GetAllChunks() const {
   return chunks_->GetAllChunks();
 }
 

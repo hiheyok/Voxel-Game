@@ -27,7 +27,7 @@ class WorldInterface {
   Entity* GetEntity(EntityUUID) const;
   Chunk& GetChunk(ChunkPos ID) const;
   bool CheckChunk(ChunkPos ID) const;
-  std::vector<Chunk*> GetAllChunks() const;
+  const std::vector<Chunk*>& GetAllChunks() const;
 
   ChunkMap* GetChunkMap() const;
   EntityContainer* GetEntityContainer() const;

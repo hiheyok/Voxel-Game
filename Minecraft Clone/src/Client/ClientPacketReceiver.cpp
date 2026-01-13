@@ -54,8 +54,12 @@ void ClientPacketReceiver::ProcessPackets(ServerInterface& server) {
 
   // Apply chunk updates to terrain renderer
   if (!chunks_to_update_.empty()) {
-    terrain_render_.LoadChunkMultiToRenderer(chunks_to_update_);
+    terrain_render_.LoadChunkMultiToRenderer(GetChunksToUpdate());
   }
+}
+
+vector<ChunkPos> ClientPacketReceiver::GetChunksToUpdate() const {
+  return vector<ChunkPos>(chunks_to_update_.begin(), chunks_to_update_.end());
 }
 
 void ClientPacketReceiver::ProcessChunkUpdates(ServerInterface& server) {
@@ -85,7 +89,7 @@ void ClientPacketReceiver::ProcessChunkUpdates(ServerInterface& server) {
 
   for (const auto& chunk : new_chunks) {
     const ChunkRawData& data = chunk.chunk_;
-    chunks_to_update_.push_back(data.pos_);
+    chunks_to_update_.insert(data.pos_);
     if (client_level_.cache_.CheckChunk(data.pos_)) {
       ChunkContainer& c = client_level_.cache_.GetChunk(data.pos_);
       c.SetData(data);
@@ -107,7 +111,15 @@ void ClientPacketReceiver::ProcessChunkUpdates(ServerInterface& server) {
 
     *chunk.sky_light_ = sky_light;
     *chunk.block_light_ = block_light;
-    chunks_to_update_.push_back(chunk.position_);
+
+    chunks_to_update_.insert(chunk.position_);
+
+    for (const auto& direction : Directions<ChunkPos>()) {
+      ChunkPos neighbor = chunk.position_ + direction;
+      if (client_level_.cache_.CheckChunk(neighbor)) {
+        chunks_to_update_.insert(neighbor);
+      }
+    }
   }
 }
 
@@ -155,10 +167,10 @@ void ClientPacketReceiver::ProcessBlockUpdates(ServerInterface& server) {
       ChunkPos offset_chunk = chunk_pos + direction;
       // Only queue for rendering if the neighbor chunk exists
       if (client_level_.cache_.CheckChunk(offset_chunk)) {
-        chunks_to_update_.push_back(offset_chunk);
+        chunks_to_update_.insert(offset_chunk);
       }
     }
-    chunks_to_update_.push_back(chunk_pos);
+    chunks_to_update_.insert(chunk_pos);
   }
 }
 

@@ -2,7 +2,6 @@
 
 #pragma once
 #include <array>
-
 #include <atomic>
 #include <glm/vec3.hpp>
 #include <optional>
@@ -29,10 +28,17 @@ class ChunkContainer {
 
   void SetNeighbor(ChunkContainer* neighbor, int side) noexcept;
   std::optional<ChunkContainer*> GetNeighbor(int side) const noexcept;
+  // Fast accessor without std::optional overhead for hot paths
+  ChunkContainer* GetNeighborRaw(int side) const noexcept {
+    return neighbors_[side];
+  }
   void ClearNeighbors() noexcept;
 
   BlockID GetBlock(BlockPos pos) const noexcept;
   BlockID GetBlockUnsafe(BlockPos pos) const noexcept;
+
+  // Get chunk at relative block pos
+  const ChunkContainer* GetChunkAtBlockPos(BlockPos pos) const noexcept;
 
   void SetLightLvl(BlockPos pos, bool is_sky, int lvl) noexcept;
   int GetLightLvl(BlockPos pos, bool is_sky) const noexcept;

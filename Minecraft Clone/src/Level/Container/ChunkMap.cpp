@@ -120,7 +120,7 @@ Chunk& ChunkMap::GetChunk(ChunkPos pos) const {
   return reg->GetChunk(pos);
 }
 
-vector<Chunk*> ChunkMap::GetAllChunks() const { return chunks_; }
+const vector<Chunk*>& ChunkMap::GetAllChunks() const { return chunks_; }
 
 void ChunkMap::InsertChunk(unique_ptr<Chunk> chunk) {
   const ChunkPos pos = chunk->position_;
