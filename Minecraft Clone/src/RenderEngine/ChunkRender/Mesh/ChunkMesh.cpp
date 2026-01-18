@@ -30,15 +30,64 @@
 #include "RenderEngine/ChunkRender/Mesh/BlockVertexFormat.h"
 #include "Utils/Timer/Timer.h"
 
+using glm::vec2;
+using glm::vec3;
 using std::array;
 using std::optional;
 using std::pair;
 using std::swap;
 using std::vector;
 
+namespace {
+
+static constexpr uint8_t kTriIdx[4][6] = {
+    /* case 0: !use_flipped, !flip_winding */ {0, 2, 1, 1, 2, 3},
+    /* case 1: !use_flipped,  flip_winding */ {0, 1, 2, 1, 3, 2},
+    /* case 2:  use_flipped, !flip_winding */ {0, 2, 3, 0, 3, 1},
+    /* case 3:  use_flipped,  flip_winding */ {0, 3, 2, 0, 1, 3},
+};
+
+constexpr array<array<uint8_t, 256>, 4> MakeMulAO() {
+  array<array<uint8_t, 256>, 4> t{};
+  for (uint32_t c = 0; c < 256; ++c) {
+    t[0][c] = c * 2 / 5;                // ao=2
+    t[1][c] = c * 3 / 5;                // ao=3
+    t[2][c] = c * 4 / 5;                // ao=4
+    t[3][c] = static_cast<uint8_t>(c);  // ao=5
+  }
+  return t;
+};
+
+static constexpr int kAxisU[3] = {1, 2, 0};
+static constexpr int kAxisV[3] = {2, 0, 1};
+
+alignas(64) inline constexpr auto kMulAO = MakeMulAO();
+
+static inline uint8_t MulColorByte(uint8_t clr, uint8_t ao) noexcept {
+  return kMulAO[ao][clr];  // ao in {2,3,4,5}
+}
+
+static inline void StoreRGB(BlockVertexFormat& out, uint8_t r, uint8_t g,
+                            uint8_t b) {
+  out.rgba_ =
+      uint32_t(r) | (uint32_t(g) << 8) | (uint32_t(b) << 16) | 0xFF000000u;
+}
+
+static inline uint32_t PackRGBMulAO(const uint8_t clr[3], uint8_t ao) noexcept {
+  const uint8_t r = MulColorByte(clr[0], ao);
+  const uint8_t g = MulColorByte(clr[1], ao);
+  const uint8_t b = MulColorByte(clr[2], ao);
+  return uint32_t(r) | (uint32_t(g) << 8) | (uint32_t(b) << 16) | 0xFF000000u;
+}
+
+}  // namespace
+
 Mesh::ChunkMeshData::ChunkMeshData(GameContext& context) : context_{context} {
   chunk_cache_.fill(context_.blocks_->AIR);
 }
+
+// Static sentinel LightStorage - always returns 0 light values
+const LightStorage Mesh::ChunkMeshData::kNullLight_;
 
 Mesh::ChunkMeshData::~ChunkMeshData() = default;
 
@@ -55,12 +104,26 @@ void Mesh::ChunkMeshData::Reset() {
   solid_face_count_ = 0;
 
   chunk_cache_.fill(context_.blocks_->AIR);
+  cached_sky_light_.fill(&kNullLight_);
+  cached_block_light_.fill(&kNullLight_);
 }
 
 void Mesh::ChunkMeshData::GenerateCache() {
-  array<BlockID, kChunkSize3D> chunk_data = chunk_->GetPalette().UnpackAll();
+  // Cache LightStorage pointers for branchless light lookups
+  // Index 0 = self, indices 1-6 = neighbors (side+1)
+  // Use kNullLight_ sentinel for missing neighbors (always returns 0)
+  cached_sky_light_[0] = chunk_->sky_light_.get();
+  cached_block_light_[0] = chunk_->block_light_.get();
+  for (int i = 0; i < 6; ++i) {
+    ChunkContainer* neighbor = chunk_->GetNeighborRaw(i);
+    if (!neighbor) continue;
+    cached_sky_light_[i + 1] = neighbor->sky_light_.get();
+    cached_block_light_[i + 1] = neighbor->block_light_.get();
+  }
 
-  const BlockID* restrict src = &chunk_data[0];
+  unpack_scratch_ = chunk_->GetPalette().UnpackAll();
+
+  const BlockID* restrict src = &unpack_scratch_[0];
   BlockID* restrict dst =
       &chunk_cache_[kCacheStrideX + kCacheStrideY + kCacheStrideZ];
 
@@ -99,8 +162,8 @@ void Mesh::ChunkMeshData::GenerateCache() {
     array<BlockID, kChunkSize2D> slice_data =
         neighbor.value()->GetPalette().UnpackSlice(axis, side_idx);
 
-    int axis_u = (axis + 1) % 3;
-    int axis_v = (axis + 2) % 3;
+    int axis_u = kAxisU[axis];
+    int axis_v = kAxisV[axis];
 
     // Cache friendly access pattern for y-axis (faster)
     if (side.GetAxis() == kYAxis) {
@@ -149,11 +212,11 @@ void Mesh::ChunkMeshData::GenerateCache() {
   // Simpler: flat array of 12 entries
   struct EdgeInfo {
     const ChunkContainer* chunk;
-    int axis;      // The varying axis
-    int u_axis;    // First fixed axis
-    int v_axis;    // Second fixed axis
-    int u_local;   // Local coord in u_axis (0 or 15)
-    int v_local;   // Local coord in v_axis (0 or 15)
+    int axis;     // The varying axis
+    int u_axis;   // First fixed axis
+    int v_axis;   // Second fixed axis
+    int u_local;  // Local coord in u_axis (0 or 15)
+    int v_local;  // Local coord in v_axis (0 or 15)
     size_t cache_base;
   };
 
@@ -161,8 +224,8 @@ void Mesh::ChunkMeshData::GenerateCache() {
   int edge_count = 0;
 
   for (int axis = 0; axis < 3; ++axis) {
-    const int u_axis = (axis + 1) % 3;
-    const int v_axis = (axis + 2) % 3;
+    const int u_axis = kAxisU[axis];
+    const int v_axis = kAxisV[axis];
 
     for (int u_m = 0; u_m < 2; ++u_m) {
       for (int v_m = 0; v_m < 2; ++v_m) {
@@ -175,15 +238,15 @@ void Mesh::ChunkMeshData::GenerateCache() {
         ChunkContainer* diag = u_neigh->GetNeighborRaw(v_dir);
         if (!diag) continue;
 
-        edges[edge_count++] = {
-            diag,
-            axis,
-            u_axis,
-            v_axis,
-            (u_m == 0) ? 15 : 0,
-            (v_m == 0) ? 15 : 0,
-            kCacheOffsets[u_axis] * u_m + kCacheOffsets[v_axis] * v_m +
-                kCacheStride[axis]};
+        edges[edge_count++] = {diag,
+                               axis,
+                               u_axis,
+                               v_axis,
+                               (u_m == 0) ? 15 : 0,
+                               (v_m == 0) ? 15 : 0,
+                               kCacheOffsets[u_axis] * u_m +
+                                   kCacheOffsets[v_axis] * v_m +
+                                   kCacheStride[axis]};
       }
     }
   }
@@ -278,17 +341,18 @@ void Mesh::ChunkMeshData::GenerateMesh() {
 void Mesh::ChunkMeshData::GenerateFaceCollection() {
   const BlockModelManager::ModelList& models = model_manager_->GetModels();
 
+  // Cache air block ID for GetAO (avoids dereference in hot path)
+  cached_air_id_ = context_.blocks_->AIR;
+
   static constexpr int kChunkStrideU = kChunkDim;
   static constexpr int kChunkStrideV = 1;
 
   for (int axis = 0; axis < 3; axis++) {
-    int axis_u = (axis + 1) % 3;
-    int axis_v = (axis + 2) % 3;
+    int axis_u = kAxisU[axis];
+    int axis_v = kAxisV[axis];
 
-    if (axis == kYAxis) {  // More cache friendly access
-                           // pattern for y-axis
-      swap(axis_u, axis_v);
-    }
+    // Cache friendly access pattern
+    if (axis == kYAxis) swap(axis_u, axis_v);
 
     const int stride_slice = kCacheStride[axis];
     const int stride_u = kCacheStride[axis_u];
@@ -300,9 +364,18 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
     const BlockID* base_ptr =
         &chunk_cache_[kCacheStrideX + kCacheStrideY + kCacheStrideZ];
 
+    // Cache the element ptr array
+    const baked_model::Element* curr_elems_ptr = nullptr;
+    size_t curr_elems_n = 0;
+    bool curr_allow_ao = false;
+
+    const baked_model::Element* back_elems_ptr = nullptr;
+    size_t back_elems_n = 0;
+    bool back_allow_ao = false;
+
     const BlockID* slice_ptr = base_ptr;
     for (int slice = 0; slice <= kChunkDim; ++slice) {  // Slice
-      used_block_.fill(0);
+      memset(used_block_.data(), 0, kChunkSize2D);
       uint8_t* __restrict used_ptr = used_block_.data();
       const BlockID* u_ptr = slice_ptr;
       for (int u = 0; u < kChunkDim; ++u) {
@@ -314,8 +387,6 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
             used_ptr += *used_ptr;
             continue;
           }
-
-          *used_ptr = 0xFF;
 
           const BlockID* cache_ptr = v_ptr;
 
@@ -331,8 +402,11 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
           // Check if it is visible from the back and front
           if (!blank_curr_model) {
             const auto& curr_elements = curr_model->GetElements();
-            for (size_t i = 0; i < curr_elements.size(); ++i) {
-              face_visibility_[i] = 0;
+            curr_elems_ptr = curr_elements.data();
+            curr_elems_n = curr_elements.size();
+            curr_allow_ao = curr_model->CheckAmbientOcclusion();
+
+            for (size_t i = 0; i < curr_elems_n; ++i) {
               const baked_model::Element& element = curr_elements[i];
 
               if (!element.faces_[back_side].has_value()) {
@@ -345,14 +419,17 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
                                    cache_ptr))
                   continue;
               }
-              face_visibility_[i] = 1;
+              visible_idx_curr_[visible_idx_curr_n_++] = i;
             }
           }
           // Check if it is visible from the back and front
           if (!blank_back_model) {
             const auto& back_elements = back_model->GetElements();
-            for (size_t i = 0; i < back_elements.size(); ++i) {
-              face_visibility_back_[i] = 0;
+            back_elems_ptr = back_elements.data();
+            back_elems_n = back_elements.size();
+            back_allow_ao = back_model->CheckAmbientOcclusion();
+
+            for (size_t i = 0; i < back_elems_n; ++i) {
               const baked_model::Element& element = back_elements[i];
 
               if (!element.faces_[front_side].has_value()) {
@@ -366,7 +443,7 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
                   continue;
               }
 
-              face_visibility_back_[i] = 1;
+              visible_idx_back_[visible_idx_back_n_++] = i;
             }
           }
 
@@ -382,12 +459,9 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
             q_cache_ptr += stride_v;
             q_used_ptr += kChunkStrideV;
             // Check if they are the same
-            BlockID curr_block_2 = *q_cache_ptr;
-            if (curr_block_2 != curr_block) break;
-            BlockID back_block_2 = *(q_cache_ptr - stride_slice);
-            if (back_block_2 != back_block) break;
+            if (*q_cache_ptr != curr_block) break;
+            if (*(q_cache_ptr - stride_slice) != back_block) break;
 
-            *q_used_ptr = 0xFFU;
             v_length++;
           }
 
@@ -418,30 +492,18 @@ void Mesh::ChunkMeshData::GenerateFaceCollection() {
           q_pos[axis_v] = v;
 
           // Memorize & Add Faces
-          /*
-           * Center wont have AO check as it is no sides
-           * Do lighting checks when combining faces
-           */
-          if (!blank_curr_model) [[likely]] {
-            const auto& curr_elements = curr_model->GetElements();
-            for (size_t i = 0; i < curr_elements.size(); i++) {
-              if (!face_visibility_[i]) continue;
-              const baked_model::Element& element = curr_elements[i];
-              AddFaceToMesh(element, back_side,
-                            curr_model->CheckAmbientOcclusion(), q_pos,
-                            u_length, v_length, cache_ptr);
-            }
+          while (visible_idx_curr_n_ > 0) {
+            const baked_model::Element& element =
+                curr_elems_ptr[visible_idx_curr_[--visible_idx_curr_n_]];
+            AddFaceToMesh(element, back_side, curr_allow_ao, q_pos, u_length,
+                          v_length, cache_ptr);
           }
           --q_pos[axis];
-          if (!blank_back_model) [[likely]] {
-            const auto& back_elements = back_model->GetElements();
-            for (size_t i = 0; i < back_elements.size(); i++) {
-              if (!face_visibility_back_[i]) continue;
-              const baked_model::Element& element = back_elements[i];
-              AddFaceToMesh(element, front_side,
-                            back_model->CheckAmbientOcclusion(), q_pos,
-                            u_length, v_length, cache_ptr - stride_slice);
-            }
+          while (visible_idx_back_n_ > 0) {
+            const baked_model::Element& element =
+                back_elems_ptr[visible_idx_back_[--visible_idx_back_n_]];
+            AddFaceToMesh(element, front_side, back_allow_ao, q_pos, u_length,
+                          v_length, cache_ptr - stride_slice);
           }
 
           v += v_length;
@@ -465,15 +527,21 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const baked_model::Element& element,
   //  First get some of the general data
   const int direction = side & 1;
   const int axis = side >> 1;
-  const int axis_u = (axis + 1) % 3;
-  const int axis_v = (axis + 2) % 3;
+  const int axis_u = kAxisU[axis];
+  const int axis_v = kAxisV[axis];
   const int new_face_count = u_size * v_size;
-  bool is_trans = element.faces_[side]->partial_trans_;
-  int tint_index = element.faces_[side]->tint_index_;
-  glm::vec2 uv_00 = element.faces_[side]->uv_00_;
-  glm::vec2 uv_01 = element.faces_[side]->uv_01_;
-  glm::vec2 uv_10 = element.faces_[side]->uv_10_;
-  glm::vec2 uv_11 = element.faces_[side]->uv_11_;
+
+  if (axis == kYAxis) {
+    swap(u_size, v_size);
+  }
+  const auto& face = *element.faces_[side];
+
+  // Get the face data
+  bool is_trans = face.partial_trans_;
+  int tint_index = face.tint_index_;
+  vec2 uv[4] = {face.uv_00_, face.uv_01_, face.uv_10_, face.uv_11_};
+
+  // Manage buffer
   vector<BlockVertexFormat>& buffer = is_trans ? trans_buffer_ : solid_buffer_;
   size_t& face_count = is_trans ? trans_face_count_ : solid_face_count_;
   size_t vertex_index = face_count * 6;
@@ -485,152 +553,137 @@ void Mesh::ChunkMeshData::AddFaceToMesh(const baked_model::Element& element,
 
   BlockVertexFormat* vertex_dst = buffer.data() + vertex_index;
 
+  BlockPos light_pos = pos;
+  light_pos.IncrementSide(side, 1);
+  const bool out_of_bounds =
+      (light_pos[axis] < 0) | (light_pos[axis] >= kChunkDim);
+  const int light_idx = out_of_bounds ? (side + 1) : 0;
+  const LightStorage& sky_ls = *cached_sky_light_[light_idx];
+  const LightStorage& blk_ls = *cached_block_light_[light_idx];
+  light_pos = light_pos.GetLocalPos();
+
   const int stride_u = kCacheStride[axis_u];
   const int stride_v = kCacheStride[axis_v];
 
-  if (axis == kYAxis) {
-    swap(u_size, v_size);
-  }
-
-  auto CreateVertex = [&](BlockVertexFormat& v, const glm::vec3& tint_color,
-                          const glm::vec2& uv, float ao_multiplier,
-                          int sky_light, int block_light) {
-    glm::vec4 color(tint_color * ao_multiplier, 1.0f);
-    // Assuming BlockVertexFormat::Set now takes a vec4 for color
-    v.SetColor(static_cast<int>(color.r * 255), static_cast<int>(color.g * 255),
-               static_cast<int>(color.b * 255), 255);
-    v.SetUV(uv.x, uv.y);
-    v.SetLight(sky_light, block_light);
-  };
+  // Pre-compute light index base and strides for inline access
+  // BlockPos::GetIndex() = kChunkSize2D * (x & mask) | kChunkDim * (y & mask) |
+  // (z & mask) This is linear in each axis, so we can compute incrementally
+  static constexpr int kLightStride[3] = {kChunkSize2D, kChunkDim, 1};
+  const int light_stride_u = kLightStride[axis_u];
+  const int light_stride_v = kLightStride[axis_v];
+  const int base_light_idx =
+      light_pos[0] * kChunkSize2D + light_pos[1] * kChunkDim + light_pos[2];
 
   // Now calculate the AO, lighting, colors, vertices
   int slice_mask = (1 << axis) * (~side & 1);
   int u_mask = 1 << axis_u;
   int v_mask = 1 << axis_v;
 
-  BlockVertexFormat v_00, v_10, v_11, v_01;
-  v_00.pos_ = element.corners_[slice_mask];
-  v_01.pos_ = element.corners_[slice_mask | v_mask];
-  v_10.pos_ = element.corners_[slice_mask | u_mask];
-  v_11.pos_ = element.corners_[slice_mask | u_mask | v_mask];
-
-  float ao_multi[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-  glm::vec3 color{1.0f};
+  uint8_t clr[3] = {255, 255, 255};
   if (tint_index != -1) {
-    color = {93.0f / 255, 200.0f / 255, 62.0f / 255};
+    clr[0] = 93;
+    clr[1] = 200;
+    clr[2] = 62;
   }
+
+  const uint32_t rgba_by_ao[4] = {
+      PackRGBMulAO(clr, 0),
+      PackRGBMulAO(clr, 1),
+      PackRGBMulAO(clr, 2),
+      PackRGBMulAO(clr, 3),
+  };
 
   BlockPos offset_pos = pos;
 
-  v_00.pos_ += glm::vec3{pos.x, pos.y, pos.z};
-  v_01.pos_ += glm::vec3{pos.x, pos.y, pos.z};
-  v_10.pos_ += glm::vec3{pos.x, pos.y, pos.z};
-  v_11.pos_ += glm::vec3{pos.x, pos.y, pos.z};
+  const uint8_t corner_idx[4] = {slice_mask, slice_mask | v_mask,
+                                 slice_mask | u_mask,
+                                 slice_mask | u_mask | v_mask};
 
+  // AO indices (0..3). Full-bright default.
+  uint8_t ao_m[4] = {3, 3, 3, 3};
+
+  const int u0 = pos[axis_u];
+  const int v0 = pos[axis_v];
   const int u1 = pos[axis_u] + u_size;
   const int v1 = pos[axis_v] + v_size;
-  const BlockID* u_ptr = cache_ptr;
 
-  for (int u = pos[axis_u]; u < u1; ++u, u_ptr += stride_u) {
+  const BlockID* u_ptr = cache_ptr;
+  vec3 base_pos = {float(pos.x), float(pos.y), float(pos.z)};
+  for (int u = u0; u < u1; ++u, u_ptr += stride_u) {
     const BlockID* v_ptr = u_ptr;
-    for (int v = pos[axis_v]; v < v1; ++v, v_ptr += stride_v) {
-      offset_pos[axis_u] = u;
-      offset_pos[axis_v] = v;
+
+    int light_idx =
+        base_light_idx + (u - u0) * light_stride_u + (v0 - v0) * light_stride_v;
+
+    base_pos[axis_u] = float(u);
+
+    for (int v = v0; v < v1;
+         ++v, v_ptr += stride_v, light_idx += light_stride_v) {
+      base_pos[axis_v] = float(v);
 
       if (allow_ao) {
-        GetAO(side, v_ptr, ao_multi);
+        GetAO(side, v_ptr, ao_m);
       }
 
-      auto [sky_light, block_light] = GetLightDirectional(offset_pos, side);
+      // Inline light access: compute index directly instead of GetLighting()
+      const int sky_light = sky_ls.GetLightingByIndex(light_idx);
+      const int blk_light = blk_ls.GetLightingByIndex(light_idx);
+      const int packed_light = sky_light | (blk_light << 4);
 
-      CreateVertex(v_00, color, uv_00, ao_multi[0b00], sky_light, block_light);
-      CreateVertex(v_01, color, uv_01, ao_multi[0b01], sky_light, block_light);
-      CreateVertex(v_10, color, uv_10, ao_multi[0b10], sky_light, block_light);
-      CreateVertex(v_11, color, uv_11, ao_multi[0b11], sky_light, block_light);
+      // Choose quad diagonal and winding using lookup table
+      const bool use_flipped = (ao_m[0] + ao_m[3] > ao_m[1] + ao_m[2]);
+      const int table_idx = (use_flipped << 1) | (direction == 0);
+      const uint8_t* idx = kTriIdx[table_idx];
 
-      // Now work on positions
-      // Set vertices
+      for (int i = 0; i < 6; ++i) {
+        const int c = idx[i];
+        const vec3& corner = element.corners_[corner_idx[c]];
 
-      if (ao_multi[0] + ao_multi[3] > ao_multi[1] + ao_multi[2]) {
-        // Flipped quad
-        vertex_dst[0] = v_00;
-        vertex_dst[1] = v_10;
-        vertex_dst[2] = v_11;
-
-        vertex_dst[3] = v_00;
-        vertex_dst[4] = v_11;
-        vertex_dst[5] = v_01;
-      } else {
-        // Normal quad
-        vertex_dst[0] = v_00;
-        vertex_dst[1] = v_10;
-        vertex_dst[2] = v_01;
-
-        vertex_dst[3] = v_01;
-        vertex_dst[4] = v_10;
-        vertex_dst[5] = v_11;
+        vertex_dst[i].pos_.x = corner.x + base_pos.x;
+        vertex_dst[i].pos_.y = corner.y + base_pos.y;
+        vertex_dst[i].pos_.z = corner.z + base_pos.z;
+        vertex_dst[i].rgba_ = rgba_by_ao[ao_m[c]];
+        vertex_dst[i].u_ = uv[c].x;
+        vertex_dst[i].v_ = uv[c].y;
+        vertex_dst[i].light_ = packed_light;
       }
-
-      // Flip vertices for face culling
-      if (direction == 0) {
-        swap(vertex_dst[1], vertex_dst[2]);
-        swap(vertex_dst[4], vertex_dst[5]);
-      }
-
-      v_00.pos_[axis_v]++;
-      v_01.pos_[axis_v]++;
-      v_10.pos_[axis_v]++;
-      v_11.pos_[axis_v]++;
 
       vertex_dst += 6;
     }
-
-    v_00.pos_[axis_v] -= v_size;
-    v_01.pos_[axis_v] -= v_size;
-    v_10.pos_[axis_v] -= v_size;
-    v_11.pos_[axis_v] -= v_size;
-
-    v_00.pos_[axis_u]++;
-    v_01.pos_[axis_u]++;
-    v_10.pos_[axis_u]++;
-    v_11.pos_[axis_u]++;
   }
 }
 
-void Mesh::ChunkMeshData::GetAO(int side, const BlockID* restrict cache_ptr,
-                                float* ao_m) {
-  constexpr float kTable[4] = {0.40f, 0.60f, 0.80f, 1.00f};
-  const int axis = side >> 1;
-  const int stride_u = kCacheStride[(axis + 1) % 3];
-  const int stride_v = kCacheStride[(axis + 2) % 3];
+FORCEINLINE void Mesh::ChunkMeshData::GetAO(int side,
+                                            const BlockID* restrict cache_ptr,
+                                            uint8_t* ao_m) {
+  static constexpr int8_t kSideSign[6] = {1, -1, 1, -1, 1, -1};
 
-  const BlockID* restrict p = cache_ptr;
-  if ((side & 1) == 0) {
-    p += kCacheStride[axis];
-  } else {
-    p -= kCacheStride[axis];
-  }
-  BlockID air = context_.blocks_->AIR;
+  const int axis = side >> 1;
+  const int stride_u = kCacheStride[kAxisU[axis]];
+  const int stride_v = kCacheStride[kAxisV[axis]];
+
+  // Branchless stride offset: +stride for even side, -stride for odd
+  const int stride_axis = kCacheStride[axis];
+  const BlockID* restrict p = cache_ptr + stride_axis * kSideSign[side];
+
+  const BlockID air = cached_air_id_;
   const int s_u = (p[stride_u] != air);
   const int s_d = (p[-stride_u] != air);
   const int s_r = (p[stride_v] != air);
   const int s_l = (p[-stride_v] != air);
 
-  int ao_00 = 3 - s_d - s_l;
-  int ao_01 = 3 - s_d - s_r;
-  int ao_10 = 3 - s_u - s_l;
-  int ao_11 = 3 - s_u - s_r;
+  const int c_dl = (p[-stride_u - stride_v] != air);
+  const int c_dr = (p[-stride_u + stride_v] != air);
+  const int c_ul = (p[+stride_u - stride_v] != air);
+  const int c_ur = (p[+stride_u + stride_v] != air);
 
-  const BlockID* q = p - stride_u;
-  ao_00 -= ((ao_00 == 1u) | (*(q - stride_v) != air));
-  ao_01 -= ((ao_01 == 1u) | (*(q + stride_v) != air));
-  q += 2 * stride_u;
-  ao_10 -= ((ao_10 == 1u) | (*(q - stride_v) != air));
-  ao_11 -= ((ao_11 == 1u) | (*(q + stride_v) != air));
-  ao_m[0b00] = kTable[ao_00];
-  ao_m[0b01] = kTable[ao_01];
-  ao_m[0b10] = kTable[ao_10];
-  ao_m[0b11] = kTable[ao_11];
+  // (0.2 * ao + 0.4) * 5 = ao + 2
+  // + 2 is deleted as thats handled in the lut
+
+  ao_m[0b00] = uint8_t(3 - s_d - s_l - ((s_d & s_l) | c_dl));
+  ao_m[0b01] = uint8_t(3 - s_d - s_r - ((s_d & s_r) | c_dr));
+  ao_m[0b10] = uint8_t(3 - s_u - s_l - ((s_u & s_l) | c_ul));
+  ao_m[0b11] = uint8_t(3 - s_u - s_r - ((s_u & s_r) | c_ur));
 }
 
 // Checks if a block side is visible to the player
@@ -638,14 +691,14 @@ bool Mesh::ChunkMeshData::IsFaceVisible(const baked_model::Element& element,
                                         int side,
                                         const BlockID* restrict cache) {
   const int axis = (side >> 1);  // Get side
-  const int axis_u = (axis + 1) % 3;
-  const int axis_v = (axis + 2) % 3;
+  const int axis_u = kAxisU[axis];
+  const int axis_v = kAxisV[axis];
   const int opposite_side = side ^ 1;  // Flip the leading bit
 
-  if ((side & 1) == 0) {
-    cache += kCacheStride[axis];
-  } else {
+  if (side & 1) {
     cache -= kCacheStride[axis];
+  } else {
+    cache += kCacheStride[axis];
   }
 
   const BlockModelManager::ModelList& model_list = model_manager_->GetModels();
@@ -682,20 +735,4 @@ bool Mesh::ChunkMeshData::IsFaceVisible(const baked_model::Element& element,
     }
   }
   return true;
-}
-
-pair<int, int> Mesh::ChunkMeshData::GetLightDirectional(BlockPos pos,
-                                                        int side) {
-  const int axis = side >> 1;
-
-  pos.IncrementSide(side, 1);
-  ChunkContainer* chunk = chunk_;
-  if (0 > pos[axis] || kChunkDim <= pos[axis]) {
-    auto neigh = chunk->GetNeighbor(side);
-    if (!neigh.has_value()) return {0, 0};
-    chunk = neigh.value();
-  }
-
-  return {chunk->sky_light_->GetLighting(pos),
-          chunk->block_light_->GetLighting(pos)};
 }

@@ -15,7 +15,7 @@ using std::vector;
 WorldInterface::WorldInterface(GameContext& context, bool neighbor_update,
                                bool heightmap_update)
     : context_{context},
-      chunks_{make_unique<ChunkMap>(context, true, true)},
+      chunks_{make_unique<ChunkMap>(context, neighbor_update, heightmap_update)},
       entities_{make_unique<EntityContainer>()} {
   // ECS manager is created by derived classes (World or ClientCache)
 }

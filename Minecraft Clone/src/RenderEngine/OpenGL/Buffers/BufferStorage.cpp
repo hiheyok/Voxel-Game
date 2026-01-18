@@ -138,8 +138,7 @@ void BufferStorage::InsertData(uint64_t offset, uint64_t size,
         ", MaxSize: " + to_string(max_size_));
   }
 
-  Bind();
-  glBufferSubData(target_, offset, size, data);
+  glNamedBufferSubData(buffer_storage_id_, offset, size, data);
 }
 
 void BufferStorage::CopyFrom(BufferStorage& sourceBuffer, size_t readOffset,

@@ -28,14 +28,18 @@ class ClientInterface {
 
   size_t PollClientPlayerAction(
       std::vector<Packet::PlayerAction>& out_updates) {
-    const int queue_size = player_action_queue_.size_approx();
-    if (queue_size == 0) return 0;
-    std::vector<Packet::PlayerAction> temp(queue_size);
+    size_t count = player_action_queue_.size_approx();
+    if (count == 0) return 0;
 
-    size_t dequeue_count =
-        player_action_queue_.wait_dequeue_bulk(temp.data(), queue_size);
-    out_updates.insert(out_updates.end(), std::make_move_iterator(temp.begin()),
-                       std::make_move_iterator(temp.begin() + dequeue_count));
+    size_t start_idx = out_updates.size();
+    out_updates.resize(start_idx + count);
+
+    size_t dequeue_count = player_action_queue_.wait_dequeue_bulk(
+        out_updates.data() + start_idx, count);
+
+    if (dequeue_count < count) {
+      out_updates.resize(start_idx + dequeue_count);
+    }
     return dequeue_count;
   }
 
@@ -48,5 +52,4 @@ class ClientInterface {
   moodycamel::BlockingConcurrentQueue<Packet::PlayerAction>
       player_action_queue_;
   EntityUUID player_uuid_;
-
 };

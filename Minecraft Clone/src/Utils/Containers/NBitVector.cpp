@@ -43,11 +43,12 @@ NBitVector& NBitVector::operator=(NBitVector&&) noexcept = default;
 
 uint64_t NBitVector::Get(size_t idx) const noexcept {
   GAME_ASSERT(idx < num_elements_, "Index out of range");
-  size_t total_bit_offset = bit_width_ * idx;
+  const size_t bit_width = bit_width_;  // Cache member as local
+  const size_t total_bit_offset = bit_width * idx;
 
-  size_t data_idx = total_bit_offset >> kDataWidthLog2;
-  size_t bit_pos = total_bit_offset & kDataBitRemainderMask;
-  const uint64_t* p = data_.data() + data_idx;
+  const size_t data_idx = total_bit_offset >> kDataWidthLog2;
+  const size_t bit_pos = total_bit_offset & kDataBitRemainderMask;
+  const uint64_t* GAME_RESTRICT p = data_.data() + data_idx;
 
 #ifdef __SIZEOF_INT128__
   unsigned __int128 chunk;
@@ -59,7 +60,7 @@ uint64_t NBitVector::Get(size_t idx) const noexcept {
   if (!is_power_of_2_) [[unlikely]] {
     const uint64_t overflow_mask = ComputeOverflowMask(bit_pos);
     if (overflow_mask != 0) {
-      const uint64_t high_bits = data_[data_idx + 1];
+      const uint64_t high_bits = p[1];
       result |= high_bits << (kDataWidth - bit_pos);
     }
   }

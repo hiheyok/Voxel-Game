@@ -76,8 +76,7 @@ void ChunkLoader::LoadSpawnChunks() {
 
 void ChunkLoader::LoadSpawnEntitySurrounding(EntityUUID uuid) {
   Entity* e = world_->GetEntity(uuid);
-  GAME_ASSERT(e != nullptr,
-              "Entity with UUID " + to_string(uuid) + " not found");
+  GAME_ASSERT(e != nullptr, "Entity with UUID not found");
 
   // Calculate entity chunk position
   int chunk_x = static_cast<int>(floor(e->properties_.position_.x / kChunkDim));

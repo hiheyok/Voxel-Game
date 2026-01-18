@@ -4,7 +4,7 @@
 
 #include <glm/vec2.hpp>
 
-struct TextureSprite {
+struct alignas(32) TextureSprite {
   glm::vec2 uv_beg_;
   glm::vec2 uv_end_;
   GLuint texture_id_;

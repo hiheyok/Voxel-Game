@@ -13,8 +13,26 @@
 #include "Core/Position/PositionTypes.h"
 #include "Core/Registry/ResourceLocation.h"
 #include "Utils/Containers/robin_hood.h"
-#include "Utils/LogUtils.h"
 #include "Utils/Iterators.h"
+#include "Utils/LogUtils.h"
+
+#if defined(_MSC_VER)
+#include <immintrin.h>
+#define restrict
+#elif defined(__GNUC__) || defined(__clang__)
+#include <x86intrin.h>
+#define restrict __restrict__
+#else
+#define restrict
+#endif
+
+#if defined(_MSC_VER)
+#define FORCEINLINE __forceinline
+#elif defined(__GNUC__) || defined(__clang__)
+#define FORCEINLINE __attribute__((always_inline)) inline
+#else
+#define FORCEINLINE inline
+#endif
 
 typedef uint32_t EventID;
 typedef uint16_t BlockID;
@@ -29,7 +47,8 @@ typedef int32_t EntityModelId;
 typedef int32_t EntityComponentId;
 
 template <class K, class V, class _Hash = robin_hood::hash<K>>
-using FastHashMap = robin_hood::unordered_flat_map<K, V, _Hash, std::equal_to<>>;
+using FastHashMap =
+    robin_hood::unordered_flat_map<K, V, _Hash, std::equal_to<>>;
 
 template <class V, class _Hash = robin_hood::hash<V>>
 using FastHashSet = robin_hood::unordered_flat_set<V, _Hash, std::equal_to<>>;

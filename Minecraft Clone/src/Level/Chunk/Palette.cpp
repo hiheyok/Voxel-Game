@@ -171,10 +171,8 @@ void Palette::SetBlock(BlockID block, BlockPos pos) {
 
 array<BlockID, kChunkSize3D> Palette::UnpackAll() const {
   array<BlockID, kChunkSize3D> out;
-  data_.UnpackAll(out.data());
-  for (auto& i : out) {
-    i = palette_entries_id_[i];
-  }
+  // Fused unpack + map: eliminates second loop
+  data_.UnpackAllMapped(out.data(), palette_entries_id_.data());
   return out;
 }
 

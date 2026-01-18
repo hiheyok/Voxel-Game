@@ -27,56 +27,67 @@ class ServerInterface {
   virtual void Update() = 0;
 
   size_t PollBlockUpdates(std::vector<Packet::BlockUpdate>& out_updates) {
-    const int queue_size = block_update_queue_.size_approx();
-    if (queue_size == 0) return 0;
-    std::vector<Packet::BlockUpdate> temp(queue_size);
+    size_t count = block_update_queue_.size_approx();
+    if (count == 0) return 0;
 
-    size_t dequeue_count =
-        block_update_queue_.wait_dequeue_bulk(temp.data(), queue_size);
+    size_t start_idx = out_updates.size();
+    out_updates.resize(start_idx + count);
 
-    out_updates.insert(out_updates.end(), std::make_move_iterator(temp.begin()),
-                       std::make_move_iterator(temp.begin() + dequeue_count));
+    size_t dequeue_count = block_update_queue_.wait_dequeue_bulk(
+        out_updates.data() + start_idx, count);
+
+    // Resize down if we dequeued fewer than expected
+    if (dequeue_count < count) {
+      out_updates.resize(start_idx + dequeue_count);
+    }
     return dequeue_count;
   }
 
   size_t PollEntityUpdates(std::vector<Packet::EntityUpdate>& out_updates) {
-    const int queue_size = entity_update_queue_.size_approx();
-    if (queue_size == 0) return 0;
-    std::vector<Packet::EntityUpdate> temp(queue_size);
+    size_t count = entity_update_queue_.size_approx();
+    if (count == 0) return 0;
 
-    size_t dequeue_count =
-        entity_update_queue_.wait_dequeue_bulk(temp.data(), queue_size);
+    size_t start_idx = out_updates.size();
+    out_updates.resize(start_idx + count);
 
-    out_updates.insert(out_updates.end(), std::make_move_iterator(temp.begin()),
-                       std::make_move_iterator(temp.begin() + dequeue_count));
+    size_t dequeue_count = entity_update_queue_.wait_dequeue_bulk(
+        out_updates.data() + start_idx, count);
+
+    if (dequeue_count < count) {
+      out_updates.resize(start_idx + dequeue_count);
+    }
     return dequeue_count;
   }
 
   size_t PollChunkUpdates(std::vector<Packet::ChunkUpdateData>& out_updates) {
-    const int queue_size = chunk_update_queue_.size_approx();
-    if (queue_size == 0) return 0;
-    
-    std::vector<Packet::ChunkUpdateData> temp(queue_size);
+    size_t count = chunk_update_queue_.size_approx();
+    if (count == 0) return 0;
 
-    size_t dequeue_count =
-        chunk_update_queue_.wait_dequeue_bulk(temp.data(), queue_size);
+    size_t start_idx = out_updates.size();
+    out_updates.resize(start_idx + count);
 
-    out_updates.insert(out_updates.end(), std::make_move_iterator(temp.begin()),
-                       std::make_move_iterator(temp.begin() + dequeue_count));
+    size_t dequeue_count = chunk_update_queue_.wait_dequeue_bulk(
+        out_updates.data() + start_idx, count);
+
+    if (dequeue_count < count) {
+      out_updates.resize(start_idx + dequeue_count);
+    }
     return dequeue_count;
   }
 
   size_t PollECSUpdates(std::vector<ECSUpdatePacket::ECSUpdate>& out_updates) {
-    const int queue_size = ecs_update_queue_.size_approx();
-    if (queue_size == 0) return 0;
-    
-    std::vector<ECSUpdatePacket::ECSUpdate> temp(queue_size);
+    size_t count = ecs_update_queue_.size_approx();
+    if (count == 0) return 0;
 
-    size_t dequeue_count =
-        ecs_update_queue_.wait_dequeue_bulk(temp.data(), queue_size);
+    size_t start_idx = out_updates.size();
+    out_updates.resize(start_idx + count);
 
-    out_updates.insert(out_updates.end(), std::make_move_iterator(temp.begin()),
-                       std::make_move_iterator(temp.begin() + dequeue_count));
+    size_t dequeue_count = ecs_update_queue_.wait_dequeue_bulk(
+        out_updates.data() + start_idx, count);
+
+    if (dequeue_count < count) {
+      out_updates.resize(start_idx + dequeue_count);
+    }
     return dequeue_count;
   }
 

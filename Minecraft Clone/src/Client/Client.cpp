@@ -62,7 +62,7 @@ void Client::Render() {
 }
 
 void Client::GameLoop() {
-  int fps = 12000;
+  int fps = 360;
 
   while (!WindowCloseCheck()) {
     Timer frametime_tracker;

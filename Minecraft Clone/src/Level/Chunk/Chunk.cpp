@@ -3,6 +3,7 @@
 #include "Level/Chunk/Chunk.h"
 
 #include <array>
+#include <utility>
 
 #include "Core/GameContext/GameContext.h"
 #include "Core/Position/Direction.h"
@@ -11,11 +12,14 @@
 #include "Level/Chunk/ChunkData.h"
 #include "Level/TerrainGeneration/Structures/Structure.h"
 
+using std::move;
+
 Chunk::Chunk(GameContext& context) : ChunkContainer{context} {}
 Chunk::~Chunk() = default;
-Chunk::Chunk(GameContext& context, const ChunkRawData& data)
-    : ChunkContainer{context, data} {}
-
+Chunk::Chunk(GameContext& context, ChunkRawData&& data)
+    : ChunkContainer(context, move(data)) {
+  UpdateGen();
+}
 void Chunk::UpdateGen() {
   for (auto offset : Directions<ChunkPos>()) {
     if (!neighbors_[offset]) {

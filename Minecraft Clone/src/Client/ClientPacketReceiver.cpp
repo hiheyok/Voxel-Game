@@ -64,38 +64,40 @@ vector<ChunkPos> ClientPacketReceiver::GetChunksToUpdate() const {
 
 void ClientPacketReceiver::ProcessChunkUpdates(ServerInterface& server) {
   vector<Packet::ChunkUpdateData> chunk_packets;
-  server.PollChunkUpdates(chunk_packets);
+  size_t dequeue_count = server.PollChunkUpdates(chunk_packets);
+  if (dequeue_count == 0) return;
 
   vector<ChunkUpdatePacket::AddChunk> new_chunks;
+  new_chunks.reserve(dequeue_count);
   vector<ChunkUpdatePacket::LightUpdate> light_updates;
+  light_updates.reserve(dequeue_count);
 
-  for (const auto& packet : chunk_packets) {
+  for (auto& packet : chunk_packets) {
     switch (packet.type_) {
       case ChunkUpdatePacket::PacketType::ADD_CHUNK: {
-        const ChunkUpdatePacket::AddChunk& p =
-            get<ChunkUpdatePacket::AddChunk>(packet.packet_);
-        new_chunks.push_back(p);
+        auto& p = get<ChunkUpdatePacket::AddChunk>(packet.packet_);
+        new_chunks.push_back(move(p));
       } break;
       case ChunkUpdatePacket::PacketType::DELETE_CHUNK:
         GAME_ASSERT(false, "Attempted to process unimplemented type");
         break;
       case ChunkUpdatePacket::PacketType::LIGHT_UPDATE: {
-        const ChunkUpdatePacket::LightUpdate& p =
-            get<ChunkUpdatePacket::LightUpdate>(packet.packet_);
-        light_updates.push_back(p);
+        auto& p = get<ChunkUpdatePacket::LightUpdate>(packet.packet_);
+        light_updates.push_back(move(p));
       } break;
     }
   }
 
-  for (const auto& chunk : new_chunks) {
-    const ChunkRawData& data = chunk.chunk_;
+  for (auto& chunk : new_chunks) {
+    ChunkRawData& data = chunk.chunk_;
     chunks_to_update_.insert(data.pos_);
     if (client_level_.cache_.CheckChunk(data.pos_)) {
       ChunkContainer& c = client_level_.cache_.GetChunk(data.pos_);
-      c.SetData(data);
+      c.SetData(move(data));
     } else {
-      unique_ptr<Chunk> newChunk = make_unique<Chunk>(context_, data);
-      client_level_.cache_.AddChunk(move(newChunk));
+      unique_ptr<Chunk> new_chunk =
+          make_unique<Chunk>(context_, move(data));
+      client_level_.cache_.AddChunk(move(new_chunk));
     }
   }
 

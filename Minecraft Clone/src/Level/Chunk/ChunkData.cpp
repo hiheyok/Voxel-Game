@@ -50,9 +50,9 @@ ChunkContainer::ChunkContainer(ChunkContainer&& other)
                      std::memory_order_relaxed);
 }
 
-ChunkContainer::ChunkContainer(GameContext& context, const ChunkRawData& data)
+ChunkContainer::ChunkContainer(GameContext& context, ChunkRawData&& data)
     : ChunkContainer(context) {
-  SetData(data);
+  SetData(move(data));
 }
 
 BlockID ChunkContainer::GetBlock(BlockPos pos) const noexcept {
@@ -179,10 +179,10 @@ void ChunkContainer::SetNeighbor(ChunkContainer* neighbor, int side) noexcept {
 
 void ChunkContainer::ClearNeighbors() noexcept { neighbors_.fill(nullptr); }
 
-void ChunkContainer::SetData(const ChunkRawData& data) {
-  *sky_light_.get() = data.sky_light_;
-  *block_light_.get() = data.block_light_;
-  block_storage_ = data.chunk_data_;
+void ChunkContainer::SetData(ChunkRawData&& data) {
+  *sky_light_.get() = move(data.sky_light_);
+  *block_light_.get() = move(data.block_light_);
+  block_storage_ = move(data.chunk_data_);
   position_ = data.pos_;
 }
 

@@ -11,6 +11,15 @@
 
 #include "Utils/Assert.h"
 
+// Portable restrict qualifier for pointer aliasing hints
+#if defined(_MSC_VER)
+#define GAME_RESTRICT __restrict
+#elif defined(__GNUC__) || defined(__clang__)
+#define GAME_RESTRICT __restrict__
+#else
+#define GAME_RESTRICT
+#endif
+
 class NBitVector {
  public:
   NBitVector(size_t numElements, size_t bit_width);
@@ -34,7 +43,12 @@ class NBitVector {
   void UnpackAll(std::vector<T>& out) const;
 
   template <typename T>
-  void UnpackAll(T* out) const;
+  void UnpackAll(T* GAME_RESTRICT out) const;
+
+  // Fused unpack + map: unpacks indices and maps them through lookup table
+  // Eliminates second loop in Palette::UnpackAll
+  template <typename T, typename MapT>
+  void UnpackAllMapped(T* GAME_RESTRICT out, const MapT* GAME_RESTRICT map) const;
 
   // Pre-allocate storage for expected number of elements
   void Reserve(size_t num_elements);
@@ -66,21 +80,23 @@ void NBitVector::Set(size_t idx, T val) noexcept {
   GAME_ASSERT(static_cast<size_t>(val) < (1ULL << bit_width_),
               "Invalid number. Wrong size");
 
-  uint64_t value = static_cast<uint64_t>(val);
+  const uint64_t value = static_cast<uint64_t>(val);
+  const size_t bit_width = bit_width_;  // Cache member as local
+  uint64_t* GAME_RESTRICT data = data_.data();
 
-  size_t total_bit_offset = bit_width_ * idx;
-  size_t data_idx = total_bit_offset >> kDataWidthLog2;
-  size_t bit_pos = total_bit_offset & kDataBitRemainderMask;
+  const size_t total_bit_offset = bit_width * idx;
+  const size_t data_idx = total_bit_offset >> kDataWidthLog2;
+  const size_t bit_pos = total_bit_offset & kDataBitRemainderMask;
 
   const uint64_t low_mask = all_one_bit_width_ << bit_pos;
-  data_[data_idx] = (data_[data_idx] & ~low_mask) | (value << bit_pos);
+  data[data_idx] = (data[data_idx] & ~low_mask) | (value << bit_pos);
 
   // Power-of-2 bit widths <= 32 never cross word boundaries
   if (!is_power_of_2_) [[unlikely]] {
     const uint64_t overflow_mask = ComputeOverflowMask(bit_pos);
     if (overflow_mask != 0) {
       const uint64_t high_bits = value >> (kDataWidth - bit_pos);
-      data_[data_idx + 1] = (data_[data_idx + 1] & ~overflow_mask) | high_bits;
+      data[data_idx + 1] = (data[data_idx + 1] & ~overflow_mask) | high_bits;
     }
   }
 }
@@ -107,9 +123,10 @@ void NBitVector::UnpackAll(std::vector<T>& out) const {
 }
 
 template <typename T>
-void NBitVector::UnpackAll(T* out) const {
-  const uint64_t* src = data_.data();
+void NBitVector::UnpackAll(T* GAME_RESTRICT out) const {
+  const uint64_t* GAME_RESTRICT src = data_.data();
   const uint64_t mask = all_one_bit_width_;
+  const size_t bit_width = bit_width_;  // Cache member as local
 
 #ifdef __SIZEOF_INT128__
   size_t bit_offset = 0;
@@ -120,7 +137,7 @@ void NBitVector::UnpackAll(T* out) const {
     unsigned __int128 chunk;
     std::memcpy(&chunk, &src[data_idx], sizeof(chunk));
     out[i] = static_cast<T>((chunk >> bit_pos) & mask);
-    bit_offset += bit_width_;
+    bit_offset += bit_width;
   }
 #else
   // 64-bit fallback
@@ -128,14 +145,55 @@ void NBitVector::UnpackAll(T* out) const {
   size_t bit_pos = 0;
 
   for (size_t i = 0; i < num_elements_; ++i) {
-    if (bit_pos + bit_width_ <= kDataWidth) [[likely]] {
+    if (bit_pos + bit_width <= kDataWidth) [[likely]] {
       out[i] = static_cast<T>((src[data_idx] >> bit_pos) & mask);
     } else {
       const uint64_t lo = src[data_idx] >> bit_pos;
       const uint64_t hi = src[++data_idx] << (kDataWidth - bit_pos);
       out[i] = static_cast<T>((lo | hi) & mask);
     }
-    bit_pos = (bit_pos + bit_width_) & kDataBitRemainderMask;
+    bit_pos = (bit_pos + bit_width) & kDataBitRemainderMask;
+    data_idx += (bit_pos == 0);
+  }
+#endif
+}
+
+// Fused unpack + map: unpacks indices and maps them through lookup table
+template <typename T, typename MapT>
+void NBitVector::UnpackAllMapped(T* GAME_RESTRICT out,
+                                  const MapT* GAME_RESTRICT map) const {
+  const uint64_t* GAME_RESTRICT src = data_.data();
+  const uint64_t mask = all_one_bit_width_;
+  const size_t bit_width = bit_width_;  // Cache member as local
+
+#ifdef __SIZEOF_INT128__
+  size_t bit_offset = 0;
+  for (size_t i = 0; i < num_elements_; ++i) {
+    const size_t data_idx = bit_offset >> kDataWidthLog2;
+    const size_t bit_pos = bit_offset & kDataBitRemainderMask;
+
+    unsigned __int128 chunk;
+    std::memcpy(&chunk, &src[data_idx], sizeof(chunk));
+    const size_t idx = static_cast<size_t>((chunk >> bit_pos) & mask);
+    out[i] = static_cast<T>(map[idx]);
+    bit_offset += bit_width;
+  }
+#else
+  // 64-bit fallback
+  size_t data_idx = 0;
+  size_t bit_pos = 0;
+
+  for (size_t i = 0; i < num_elements_; ++i) {
+    size_t idx;
+    if (bit_pos + bit_width <= kDataWidth) [[likely]] {
+      idx = static_cast<size_t>((src[data_idx] >> bit_pos) & mask);
+    } else {
+      const uint64_t lo = src[data_idx] >> bit_pos;
+      const uint64_t hi = src[++data_idx] << (kDataWidth - bit_pos);
+      idx = static_cast<size_t>((lo | hi) & mask);
+    }
+    out[i] = static_cast<T>(map[idx]);
+    bit_pos = (bit_pos + bit_width) & kDataBitRemainderMask;
     data_idx += (bit_pos == 0);
   }
 #endif

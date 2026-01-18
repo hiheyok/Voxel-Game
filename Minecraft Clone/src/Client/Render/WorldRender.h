@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 
+#include "Core/DataStructure/blockingconcurrentqueue.h"
 #include "Core/Typenames.h"
 #include "Utils/ThreadPool.h"
 #include "WorldRenderInfo.h"
@@ -43,7 +44,6 @@ class WorldRender : public WorldRenderInfo {
   GameContext& context_;
   std::unique_ptr<TerrainRenderer> renderer_;
 
-
  private:
   std::unique_ptr<Mesh::ChunkVertexData> Worker(ChunkPos pos, int workerId);
 
@@ -53,6 +53,9 @@ class WorldRender : public WorldRenderInfo {
   std::vector<std::unique_ptr<Mesh::ChunkMeshData>> meshers_;
   std::unique_ptr<ThreadPool<ChunkPos, WorkerReturnType>> mesh_thread_pool_;
   std::vector<std::unique_ptr<Mesh::ChunkVertexData>> mesh_add_queue_;
+  // Reuse vertex object for transfering data
+  moodycamel::BlockingConcurrentQueue<std::unique_ptr<Mesh::ChunkVertexData>>
+      vertex_data_pool_;
 
   PlayerPOV* player_;
   GLFWwindow* window_;

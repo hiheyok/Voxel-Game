@@ -22,7 +22,7 @@ class ChunkContainer {
  public:
   explicit ChunkContainer(GameContext&);
   virtual ~ChunkContainer();
-  ChunkContainer(GameContext&, const ChunkRawData&);
+  ChunkContainer(GameContext&, ChunkRawData&&);
   ChunkContainer(ChunkContainer&&);
   ChunkContainer(const ChunkContainer&) = delete;
 
@@ -46,7 +46,7 @@ class ChunkContainer {
   void SetBlock(BlockID block, BlockPos pos);
   void SetBlockUnsafe(BlockID block, BlockPos pos);
 
-  void SetData(const ChunkRawData& data);
+  void SetData(ChunkRawData&& data);
   ChunkRawData GetRawData();
 
   void SetPosition(ChunkPos pos) noexcept;

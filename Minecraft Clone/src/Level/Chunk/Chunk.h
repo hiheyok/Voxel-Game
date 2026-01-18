@@ -22,7 +22,7 @@ enum TerrainType {
 class Chunk : public ChunkContainer {
  public:
   explicit Chunk(GameContext&);
-  Chunk(GameContext&, const ChunkRawData&);
+  Chunk(GameContext&, ChunkRawData&&);
   ~Chunk();
   void UpdateGen();
 };

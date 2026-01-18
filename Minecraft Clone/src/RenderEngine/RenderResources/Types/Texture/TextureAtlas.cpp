@@ -20,9 +20,9 @@ TextureAtlas::TextureAtlas(GameContext& context, const string& key,
 TextureAtlas::~TextureAtlas() = default;
 
 TextureSprite TextureAtlas::GetSprite(const string& sprite_name) const {
-  const auto& it = sprites_.find(sprite_name);
-  GAME_ASSERT(it != sprites_.end(), "Sprite not found in atlas");
-  TextureSprite sprite = it->second;
+  const auto& it = sprite_indices_.find(sprite_name);
+  GAME_ASSERT(it != sprite_indices_.end(), "Sprite not found in atlas");
+  TextureSprite sprite = sprites_[it->second];
   sprite.handle_ = handle_;
   return sprite;
 }
@@ -46,11 +46,13 @@ void TextureAtlas::LoadTexture() {
 
   // Then process and hold all of the sprite data
   auto sprites = source_->GetAllSprites();
+  sprites_.reserve(sprites.size());
   for (const auto& sprite : sprites) {
     TextureSprite s;
     s.texture_id_ = id_;
     s.uv_beg_ = sprite.uv_beg_;
     s.uv_end_ = sprite.uv_end_;
-    sprites_[sprite.name_] = s;
+    sprite_indices_[sprite.name_] = sprites_.size();
+    sprites_.push_back(s);
   }
 }

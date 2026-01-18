@@ -10,19 +10,12 @@
 
 #include "Core/Typenames.h"
 
-#if defined(_MSC_VER)
-#include <immintrin.h>
-#define restrict
-#elif defined(__GNUC__) || defined(__clang__)
-#include <x86intrin.h>
-#define restrict __restrict__
-#else
-#define restrict
-#endif
 
 class Chunk;
+class ChunkContainer;
 class GameContext;
 class BlockModelManager;
+class LightStorage;
 
 struct Cuboid;
 struct BlockFace;
@@ -77,25 +70,6 @@ class ChunkMeshData {
   bool use_option_ = false;  // for performance debugging purposes
 
  private:
-  struct GreedyFace {
-    GreedyFace(int axis, BlockPos pos, int u_len, int v_len,
-               const BlockID* cache_ptr, BlockID curr, BlockID back)
-        : cache_ptr_{cache_ptr},
-          starting_pos_{pos},
-          axis_{axis},
-          u_len_{u_len},
-          v_len_{v_len},
-          curr_{curr},
-          back_{back} {}
-
-    const BlockID* cache_ptr_;
-    BlockPos starting_pos_;
-    int axis_;
-    int u_len_;
-    int v_len_;
-    BlockID curr_;
-    BlockID back_;
-  };
 
   // Used to generate the cache
   void GenerateCache();
@@ -115,9 +89,8 @@ class ChunkMeshData {
                      bool allow_ao, BlockPos pos, int u_size, int v_size,
                      const BlockID* restrict cache_ptr);
 
-  void GetAO(int side, const BlockID* restrict cache_ptr, float* ao_m);
-
-  std::pair<int, int> GetLightDirectional(BlockPos pos, int direction);
+  FORCEINLINE void GetAO(int side, const BlockID* restrict cache_ptr,
+                         uint8_t* ao_m);
 
   static constexpr uint64_t kBufferStepSize = 4096;
   static constexpr int kCacheDim1D = kChunkDim + 2;
@@ -137,12 +110,27 @@ class ChunkMeshData {
                                        kChunkStrideZ};
 
   // Visibility arrays as class members to avoid repeated stack allocation
-  std::array<uint8_t, 1024> face_visibility_;
-  std::array<uint8_t, 1024> face_visibility_back_;
+  std::array<uint16_t, 1024> visible_idx_curr_;
+  int visible_idx_curr_n_ = 0;
+  std::array<uint16_t, 1024> visible_idx_back_;
+  int visible_idx_back_n_ = 0;
+
   std::array<uint8_t, kChunkSize2D> used_block_;
 
   alignas(64) std::array<BlockID, kCacheDim3D> chunk_cache_;
+  alignas(64) std::array<BlockID, kChunkSize3D> unpack_scratch_;
   Chunk* chunk_;
   const BlockModelManager* model_manager_;
+
+  // Cached LightStorage pointers for branchless light lookups
+  // Index 0 = self, indices 1-6 = neighbors (side+1)
+  std::array<const LightStorage*, 7> cached_sky_light_;
+  std::array<const LightStorage*, 7> cached_block_light_;
+
+  // Sentinel LightStorage that always returns 0 (for missing neighbors)
+  static const LightStorage kNullLight_;
+
+  // Cached air block ID for fast comparisons in GetAO
+  BlockID cached_air_id_;
 };
 }  // namespace Mesh

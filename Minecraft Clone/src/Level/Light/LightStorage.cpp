@@ -26,10 +26,6 @@ void LightStorage::EditLight(BlockPos pos, uint8_t lighting_info) noexcept {
   data_.Set(idx, lighting_info);
 }
 
-uint8_t LightStorage::GetLighting(BlockPos pos) const noexcept {
-  return data_.Get(pos.GetIndex());
-}
-
 void LightStorage::ResetLighting() noexcept { data_.Fill(0); }
 
 void LightStorage::ResetLightingCustom(uint8_t lvl) noexcept {

@@ -51,25 +51,56 @@ void LightEngine<kEngineType>::PropagateIncrease() {
   InternalTask task;
   InternalTask next_task;
   // to prevent pointer chasing
-  const vector<BlockProperties>& block_properties =
-      context_.blocks_->GetBlockPropertyList();
+  const auto& block_properties = context_.blocks_->GetBlockPropertyList();
+
+  ChunkPos src_chunk_pos = light_cache_->center_chunk_;
+  size_t src_cache_idx = light_cache_->CalculateCacheIndex(src_chunk_pos);
+  auto* src_sky_light = light_cache_->GetSlot(src_cache_idx).sky_;
+  auto* src_block_light = light_cache_->GetSlot(src_cache_idx).block_;
+  auto* src_chunk = light_cache_->GetSlot(src_cache_idx).chunk_;
+
+  size_t curr_cache_idx = src_cache_idx;
+  auto* curr_sky_light = src_sky_light;
+  auto* curr_block_light = src_block_light;
+  auto* curr_chunk = src_chunk;
 
   while (TryDequeueIncrease(task)) {
     const BlockPos block_pos = task.block_pos_;
     const int direction = task.direction_;
     const int propagation_lvl = task.light_lvl_;
 
-    // Light level already changed from somewhere else
-    if (task.recheck_light_ && propagation_lvl != GetLightLvl(block_pos)) {
-      continue;
-    }
+
+
+    ChunkPos curr_chunk_pos = block_pos.ToChunkPos();
 
     // Cache source chunk info - reuse for same-chunk neighbors
-    const ChunkPos src_chunk_pos = block_pos.ToChunkPos();
-    size_t src_cache_idx = light_cache_->CalculateCacheIndex(block_pos);
-    auto* src_slot = &light_cache_->GetSlot(src_cache_idx);
-    auto* curr_slot = src_slot;
-    size_t curr_cache_idx = src_cache_idx;
+    if (curr_chunk_pos != src_chunk_pos) [[unlikely]] {
+      src_cache_idx = light_cache_->CalculateCacheIndex(curr_chunk_pos);
+      LightEngineCache::CacheSlot& slot = light_cache_->GetSlot(src_cache_idx);
+      src_sky_light = slot.sky_;
+      src_block_light = slot.block_;
+      src_chunk = slot.chunk_;
+
+      curr_cache_idx = src_cache_idx;
+      curr_sky_light = src_sky_light;
+      curr_block_light = src_block_light;
+      curr_chunk = src_chunk;
+
+      src_chunk_pos = curr_chunk_pos;
+    }
+
+    // Light level already changed from somewhere else
+    if (task.recheck_light_) {
+      int current_lvl;
+      if constexpr (kEngineType == EngineType::kBlockLight) {
+        current_lvl = curr_block_light->GetLighting(block_pos);
+      } else {
+        current_lvl = curr_sky_light->GetLighting(block_pos);
+      }
+      if (propagation_lvl != current_lvl) {
+        continue;
+      }
+    }
 
     // Static reference to avoid any template instantiation overhead
     static constexpr auto& kDirs = Directions<BlockPos>::kDirections;
@@ -89,25 +120,31 @@ void LightEngine<kEngineType>::PropagateIncrease() {
 
       // Check if neighbor is in a different chunk
       ChunkPos offset_chunk_pos = offset_pos.ToChunkPos();
-      if (offset_chunk_pos != src_chunk_pos) {
+      if (offset_chunk_pos != src_chunk_pos) [[unlikely]] {
         // Different chunk - need to check and get new slot
         if (!light_cache_->CheckChunk(offset_pos)) [[unlikely]] {
           continue;
         }
         curr_cache_idx = light_cache_->CalculateCacheIndex(offset_pos);
-        curr_slot = &light_cache_->GetSlot(curr_cache_idx);
+        LightEngineCache::CacheSlot& slot =
+            light_cache_->GetSlot(curr_cache_idx);
+        curr_sky_light = slot.sky_;
+        curr_block_light = slot.block_;
+        curr_chunk = slot.chunk_;
       } else {
         // Same chunk as source - reset to cached source slot
         curr_cache_idx = src_cache_idx;
-        curr_slot = src_slot;
+        curr_sky_light = src_sky_light;
+        curr_block_light = src_block_light;
+        curr_chunk = src_chunk;
       }
 
       // Get light level directly from slot
       int curr_lvl;
       if constexpr (kEngineType == EngineType::kBlockLight) {
-        curr_lvl = curr_slot->block_->GetLighting(offset_pos);
+        curr_lvl = curr_block_light->GetLighting(offset_pos);
       } else {
-        curr_lvl = curr_slot->sky_->GetLighting(offset_pos);
+        curr_lvl = curr_sky_light->GetLighting(offset_pos);
       }
 
       if (curr_lvl >= propagation_lvl - 1) {
@@ -115,7 +152,8 @@ void LightEngine<kEngineType>::PropagateIncrease() {
       }
 
       // Get block directly from slot
-      BlockID offset_block = curr_slot->chunk_->GetBlockUnsafe(offset_pos.GetLocalPos());
+      BlockID offset_block =
+          curr_chunk->GetBlockUnsafe(offset_pos.GetLocalPos());
       int block_opacity = block_properties[offset_block].opacity_;
       int target_lvl = propagation_lvl - std::max(1, block_opacity);
       target_lvl = std::max(0, target_lvl);
@@ -126,9 +164,9 @@ void LightEngine<kEngineType>::PropagateIncrease() {
 
       // Set light level directly using slot
       if constexpr (kEngineType == EngineType::kBlockLight) {
-        curr_slot->block_->EditLight(offset_pos, target_lvl);
+        curr_block_light->EditLight(offset_pos, target_lvl);
       } else {
-        curr_slot->sky_->EditLight(offset_pos, target_lvl);
+        curr_sky_light->EditLight(offset_pos, target_lvl);
       }
       light_cache_->MarkDirty(curr_cache_idx);
 

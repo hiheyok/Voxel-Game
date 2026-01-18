@@ -56,22 +56,22 @@ class LightEngineCache {
   };
 
   // Direct slot access for hot path optimization
+  // Calculate the index for the chunk the block_pos is in
   size_t CalculateCacheIndex(BlockPos pos) const noexcept;
+  size_t CalculateCacheIndex(ChunkPos pos) const noexcept;
   CacheSlot& GetSlot(size_t idx) noexcept;
   const CacheSlot& GetSlot(size_t idx) const noexcept;
   void MarkDirty(size_t idx) noexcept;
 
- private:
+  ChunkPos center_chunk_;
 
+ private:
   void SetBlockCache(ChunkPos pos, Chunk* data) noexcept;
   void SetBlockLightCache(ChunkPos pos, LightStorage* data) noexcept;
   void SetSkyLightCache(ChunkPos pos, LightStorage* data) noexcept;
   void ExpandDown();
   bool TryCacheChunk(ChunkPos pos);
-  // Calculate the index for the chunk the block_pos is in
-  size_t CalculateCacheIndex(ChunkPos pos) const noexcept;
-  bool CheckInRange(ChunkPos pos) const noexcept; 
-
+  bool CheckInRange(ChunkPos pos) const noexcept;
 
   [[nodiscard]] bool EnsureLoaded(ChunkPos pos);
   [[nodiscard]] LightStorage* EnsureLoadedGetSky(ChunkPos pos);
@@ -88,7 +88,6 @@ class LightEngineCache {
   GameContext& context_;
   WorldInterface& world_;
 
-  ChunkPos center_chunk_;
   BlockPos center_block_offset_;
   int y_top;
   int y_bot;

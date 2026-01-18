@@ -60,14 +60,23 @@ unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(ChunkPos pos,
   size_t time = static_cast<size_t>(timer.GetTimePassed_us());
 
   // Transfer Infomation
-  unique_ptr<Mesh::ChunkVertexData> data = make_unique<Mesh::ChunkVertexData>();
+  // Checks if there are any available vertex objects
+  unique_ptr<Mesh::ChunkVertexData> data;
+  bool success = vertex_data_pool_.try_dequeue(data);
+  if (!success) {
+    data = make_unique<Mesh::ChunkVertexData>();
+  }
 
-  data->solid_vertices_.insert(
-      data->solid_vertices_.end(), chunk_mesher.solid_buffer_.begin(),
-      chunk_mesher.solid_buffer_.begin() + chunk_mesher.solid_face_count_ * 6);
-  data->transparent_vertices_.insert(
-      data->transparent_vertices_.end(), chunk_mesher.trans_buffer_.begin(),
-      chunk_mesher.trans_buffer_.begin() + chunk_mesher.trans_face_count_ * 6);
+  int solid_vert_count = chunk_mesher.solid_face_count_ * 6;
+  int trans_vert_count = chunk_mesher.trans_face_count_ * 6;
+
+  data->solid_vertices_.resize(solid_vert_count);
+  data->transparent_vertices_.resize(trans_vert_count);
+
+  memcpy(data->solid_vertices_.data(), chunk_mesher.solid_buffer_.data(),
+         sizeof(BlockVertexFormat) * solid_vert_count);
+  memcpy(data->transparent_vertices_.data(), chunk_mesher.trans_buffer_.data(),
+         sizeof(BlockVertexFormat) * trans_vert_count);
 
   data->position_ = pos;
 
@@ -84,8 +93,9 @@ unique_ptr<Mesh::ChunkVertexData> WorldRender::Worker(ChunkPos pos,
 }
 
 void WorldRender::Update() {
-  static constexpr int kChunkUpdateLimit = 4000;
+  static constexpr int kChunkUpdateLimit = 4096;
   int updateAmount = 0;
+  static size_t frame_count_ = 0;
 
   vector<unique_ptr<Mesh::ChunkVertexData>> output =
       mesh_thread_pool_->GetOutput();
@@ -98,12 +108,17 @@ void WorldRender::Update() {
     if (kChunkUpdateLimit == updateAmount) {
       break;
     }
-    renderer_->AddChunk(move(mesh_add_queue_.back()));
+    renderer_->AddChunk(*mesh_add_queue_.back());
+    vertex_data_pool_.enqueue(move(mesh_add_queue_.back()));
+
     mesh_add_queue_.pop_back();
-    renderer_->Defrag(2);
+    updateAmount++;
   }
 
-  renderer_->Defrag(1);
+  if (frame_count_++ % 25 == 0) {
+    renderer_->Defrag(4);
+  }
+
   renderer_->Update();
   renderer_->PrepareRenderer();
 }

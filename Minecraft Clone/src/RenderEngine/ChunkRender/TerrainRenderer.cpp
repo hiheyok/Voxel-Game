@@ -209,10 +209,10 @@ void TerrainRenderer::AddChunk(ChunkPos pos,
   }
 }
 
-void TerrainRenderer::AddChunk(unique_ptr<Mesh::ChunkVertexData> MeshData) {
-  AddChunk(MeshData->position_, MeshData->solid_vertices_, chunk_solid_batches_,
+void TerrainRenderer::AddChunk(const Mesh::ChunkVertexData& MeshData) {
+  AddChunk(MeshData.position_, MeshData.solid_vertices_, chunk_solid_batches_,
            chunk_batch_solid_lookup_);
-  AddChunk(MeshData->position_, MeshData->transparent_vertices_,
+  AddChunk(MeshData.position_, MeshData.transparent_vertices_,
            chunk_transparent_batches_, chunk_batch_transparent_lookup_);
 }
 

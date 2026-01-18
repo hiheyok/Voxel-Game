@@ -36,7 +36,7 @@ class TerrainRenderer {
   void SetSettings(uint32_t RenderDistance, uint32_t verticalRenderDistance,
                    float fov_);
   void LoadAssets();
-  void AddChunk(std::unique_ptr<Mesh::ChunkVertexData> MeshData);
+  void AddChunk(const Mesh::ChunkVertexData& MeshData);
   double GetDebugTime();
   double GetFragmentationRate();
   size_t GetVRAMUsageFull();
