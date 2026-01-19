@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "Core/DataStructure/BucketQueue.h"
 #include "Core/Typenames.h"
 
 class ChunkLightTask;
@@ -24,6 +25,13 @@ class LightEngine {
     uint8_t light_lvl_ : 4 = 0;
   };
 
+  // Functor to extract priority (light level) from InternalTask
+  struct GetTaskPriority {
+    size_t operator()(const InternalTask& task) const noexcept {
+      return task.light_lvl_;
+    }
+  };
+
  public:
   LightEngine(GameContext&, WorldInterface&);
   virtual ~LightEngine();
@@ -33,18 +41,6 @@ class LightEngine {
   void Propagate(const ChunkLightTask& chunk_task);
   void PropagateIncrease();
   void PropagateDecrease();
-  void EnqueueIncrease(InternalTask);
-  void EnqueueDecrease(InternalTask);
-  void EnlargeIncreaseQueue();
-  void EnlargeDecreaseQueue();
-  InternalTask DequeueIncrease() noexcept;
-  InternalTask DequeueDecrease() noexcept;
-  bool IsIncreaseEmpty() const noexcept;
-  bool IsDecreaseEmpty() const noexcept;
-  bool TryDequeueIncrease(InternalTask&) noexcept;
-  bool TryDequeueDecrease(InternalTask&) noexcept;
-  void ResetIncreaseQueue();
-  void ResetDecreaseQueue();
 
   void SetLightLvl(BlockPos block_pos, int light_lvl);
   int GetLightLvl(BlockPos block_pos);
@@ -58,7 +54,8 @@ class LightEngine {
   virtual void PropagateChanges(const ChunkLightTask& tasks) = 0;
 
  protected:
-  static constexpr size_t kQueueSizeIncrement = 16392;
+  static constexpr int kMaxLightLevel = 15;
+  static constexpr int kNumLightLevels = kMaxLightLevel + 1;
 
   GameContext& context_;
   WorldInterface& world_;
@@ -66,14 +63,9 @@ class LightEngine {
 
   LightEngineCache* light_cache_;
 
-  std::vector<InternalTask> decrease_queue_;
-  std::vector<InternalTask> increase_queue_;
-
-  size_t enqueue_decrease_pos_ = 0;
-  size_t enqueue_increase_pos_ = 0;
-
-  size_t dequeue_decrease_pos_ = 0;
-  size_t dequeue_increase_pos_ = 0;
+  // Bucket queues for O(1) priority-based light propagation
+  BucketQueue<InternalTask, kNumLightLevels, GetTaskPriority> increase_queue_;
+  BucketQueue<InternalTask, kNumLightLevels, GetTaskPriority> decrease_queue_;
 
   EngineType type_;
 };

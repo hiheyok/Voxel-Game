@@ -46,14 +46,14 @@ void BlockLightEngine::LightChunk(ChunkPos chunk_pos) {
     if (block_emission > 0) {
       task.block_pos_ = block_pos;
       task.light_lvl_ = static_cast<uint8_t>(block_emission);
-      EnqueueIncrease(task);
+      increase_queue_.Push(task);
       SetLightLvl(block_pos, block_emission);
     }
   }
 
   CheckNeighborChunk(chunk_pos);
   PropagateIncrease();
-  ResetIncreaseQueue();
+  increase_queue_.Clear();
   light_cache_ = nullptr;
 }
 void BlockLightEngine::CheckNeighborChunk(ChunkPos center_chunk_pos) {
@@ -106,7 +106,7 @@ void BlockLightEngine::CheckNeighborChunk(ChunkPos center_chunk_pos) {
       task.block_pos_ = next_pos;
       task.light_lvl_ = static_cast<uint8_t>(spread_lvl);
       task.direction_ = direction;
-      EnqueueIncrease(task);
+      increase_queue_.Push(task);
     }
   }
 }
@@ -124,14 +124,14 @@ void BlockLightEngine::CheckBlock(BlockPos block_pos) {
     task.block_pos_ = block_pos;
     task.direction_ = kAllDirections;
     task.light_lvl_ = static_cast<uint8_t>(emission_lvl);
-    EnqueueIncrease(task);
+    increase_queue_.Push(task);
   }
 
   InternalTask task;
   task.block_pos_ = block_pos;
   task.light_lvl_ = static_cast<uint8_t>(curr_lvl);
   task.direction_ = kAllDirections;
-  EnqueueDecrease(task);
+  decrease_queue_.Push(task);
 }
 
 void BlockLightEngine::PropagateChanges(const ChunkLightTask& tasks) {
