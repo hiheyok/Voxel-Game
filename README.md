@@ -48,7 +48,7 @@ The project currently targets **Windows x64**. Prebuilt GLEW and GLFW libraries 
 
 - A GPU and driver that support OpenGL 4.5 or newer
 - A CPU with AVX2 support (Release builds use `-mavx2`)
-- Either Visual Studio 2022 (C++20), or CMake 3.29+ with a MinGW-w64 GCC toolchain
+- One of: Visual Studio 2022 (C++20), VS Code with the CMake Tools extension, or CMake 3.29+ on its own. The last two need a MinGW-w64 GCC toolchain.
 
 ### Option 1: Visual Studio
 
@@ -65,6 +65,25 @@ cd "Voxel-Game/Minecraft Clone"
 cmake -S . -B out -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
 cmake --build out -j
 ```
+
+### Option 3: VS Code + CMake Tools (GCC)
+
+1. Install [VS Code](https://code.visualstudio.com/) and a MinGW-w64 GCC toolchain (for example from [MSYS2](https://www.msys2.org/)). Make sure `gcc`, `g++` and `cmake` are on your `PATH`.
+2. Install the **C/C++** and **CMake Tools** extensions.
+3. Open the `Minecraft Clone` folder (the one containing `CMakeLists.txt`) in VS Code.
+4. When asked to pick a kit, choose your **GCC (MinGW-w64)** kit. To change it later, run **CMake: Select a Kit** from the Command Palette.
+5. Run **CMake: Select Variant** and choose `Release`, then build with **CMake: Build** (`F7`).
+6. To run or debug, set the working directory to `Minecraft Clone/build` so the game can find its assets. One way is to add this to `.vscode/settings.json`:
+
+   ```json
+   {
+     "cmake.debugConfig": {
+       "cwd": "${workspaceFolder}/build"
+     }
+   }
+   ```
+
+   Then use **CMake: Run Without Debugging** (`Shift+F5`) or **CMake: Debug** (`Ctrl+F5`).
 
 ### Running
 
